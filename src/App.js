@@ -352,7 +352,7 @@ componentDidMount() {
 renderEvents() {
   if (typeof this.state.eventList === 'undefined') {
     return (
-      <div/>
+      <img class= "LoadingImage" src="./loading.gif"/>
       ) 
   }
 
@@ -390,8 +390,8 @@ render() {
   if(this.isWeb3) {      
       return (  
       <div>
-      {this.renderCoinbase()}
-      {this.renderEvents()}
+        {this.renderCoinbase()}
+        {this.renderEvents()}        
       </div>  
       ) 
   } else{  
