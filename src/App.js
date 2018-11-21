@@ -218,8 +218,6 @@ retrieveData = () => {
                 liquidtyProviderFee : "-"
               }
 
-              if (e.blockNumber >= 6738238) return;//TODO remove
-
               let eth, tokens;
 
               if (eventType === "AddLiquidity") {
