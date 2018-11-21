@@ -2,19 +2,19 @@
 
 table {
   border-collapse: collapse;
-    background: #37474f;
+    background: #1b1c1f;
 
 }
 
 th {
-  color:#78909c;
-  background:#263238;
+  color:#727272;
+  background:#1b1c1f;
   text-align: left;
 }
 
 td {
-  color:#dbdbdb;
-  border: 1px solid #455b64;
+  color:#a0a0a0;
+  
 
 }
 
@@ -22,6 +22,7 @@ th, td {
   vertical-align: middle;
 
   padding: 15px;
+  border: 1px solid #252526;
   
 }
 
@@ -33,7 +34,7 @@ table{
 }
 
 a {
-  color: pink;
+  color: #6699cb;
 }
 
 .truncate {
@@ -44,7 +45,7 @@ a {
 }
 
 .myTransaction {
-  background:#50474f;  
+  background:#363f49;  
 }
 
 .InstallMetaMask {

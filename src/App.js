@@ -1,4 +1,4 @@
-//https://gifer.com/en/1FNa unicorn dance gif
+
 
 import React, { Component } from 'react';
 import Uniswap from './Uniswap.js';  
@@ -87,7 +87,8 @@ class App extends React.Component {
     this.eventList = [];
 
     this.myAddress = "";
-    this.myCollectedFees = "";
+    this.myCollectedEthFees = "";
+    this.myCollectedTokenFees = "";
 
     this.state = {
       myAddress : "Locked",
@@ -95,7 +96,10 @@ class App extends React.Component {
       curEthPoolTotal : "-",
       curTokenPoolTotal : "-",
       curPoolShare : "-",
-      myCollectedFees : "-",
+      
+      myCollectedEthFees : "",
+      myCollectedTokenFees : "",
+
       tokenType : "MKR",
       providerFeePercent : 0.003,
     }
@@ -186,9 +190,13 @@ retrieveData = () => {
             let curTokenTotal = 0;
 
             let curPoolShare = 0.0;
+            let curPoolShareDisplay = 0.0;
 
             let numMyShareTokens = 0.0;
             let numMintedShareTokens = 0.0;
+
+            let numMyDepositedEth = 0.0;
+            let numMyDepositedTokens = 0.0;
 
             let lastEventObj;
 
@@ -210,7 +218,7 @@ retrieveData = () => {
                 liquidtyProviderFee : "-"
               }
 
-              // if (e.blockNumber >= 6738238) return;//TODO remove
+              if (e.blockNumber >= 6738238) return;//TODO remove
 
               let eth, tokens;
 
@@ -219,29 +227,37 @@ retrieveData = () => {
                 tokens = e.returnValues.token_amount / 1e18;
 
                 eventObj.type = "Add Liquidty";
+
+                if (eventObj.provider.toUpperCase() == this.state.myAddress.toUpperCase()) {
+                  numMyDepositedEth += eth;
+                  numMyDepositedTokens += tokens;
+                }
               } else if (eventType === "RemoveLiquidity") {
                 eth = -e.returnValues.eth_amount / 1e18;
                 tokens = -e.returnValues.token_amount / 1e18;
 
                 eventObj.type = "Remove Liquidty";
+
+                if (eventObj.provider.toUpperCase() == this.state.myAddress.toUpperCase()) {
+                  numMyDepositedEth += eth;
+                  numMyDepositedTokens += tokens;
+                }
               } else if (eventType === "TokenPurchase") {
                 eth = e.returnValues.eth_sold / 1e18;
                 tokens = -e.returnValues.tokens_bought / 1e18;
                 
                 eventObj.provider = e.returnValues.buyer; 
 
-                eventObj.liquidtyProviderFee = -tokens * this.state.providerFeePercent + " MKR"; //"TODO"; // TODO
-
-                eventObj.type = "Swap";
+                // calculate the eth fee that liquidity providers will receive
+                eventObj.liquidtyProviderFee = (eth * this.state.providerFeePercent).toFixed(5) + " ETH";
               } else if (eventType === "EthPurchase") {
                 eth = -e.returnValues.eth_bought / 1e18;
                 tokens = e.returnValues.tokens_sold / 1e18;
 
                 eventObj.provider = e.returnValues.buyer; 
 
-                eventObj.liquidtyProviderFee = -eth * this.state.providerFeePercent + " ETH"; //"TODO"; // TODO
-
-                eventObj.type = "Swap";
+                // calculate the token fee that liquidity providers will receive
+                eventObj.liquidtyProviderFee = (tokens * this.state.providerFeePercent).toFixed(5) + " " + this.state.tokenType;
               } else if (eventType == "Transfer") {
                 // Track share tokens
                 let sender = e.returnValues[0];
@@ -268,22 +284,19 @@ retrieveData = () => {
 
                 // update current pool share. take users's share tokens and divide by total minted share tokens
                 curPoolShare = numMyShareTokens / numMintedShareTokens;
-                // round to 4 decimals
-                curPoolShare = Math.round( curPoolShare * 1e4 ) / 1e4;  
-                // get a percentage
-                curPoolShare = (curPoolShare * 100);      
-                // now only keep 2 decimals for clarity
-                curPoolShare = curPoolShare.toFixed(2);
+          
+                // get a percentage from the pool share
+                curPoolShareDisplay = (curPoolShare * 100).toFixed(2);
 
                 // if the user's pool share is 0, don't show a number
-                if (curPoolShare == 0.0) {
-                  curPoolShare = "-";
+                if (curPoolShareDisplay == 0.0) {
+                  curPoolShareDisplay = "-";
                 } else {
-                  curPoolShare = curPoolShare  + "%";
+                  curPoolShareDisplay = curPoolShareDisplay  + "%"; // add a percentage symbol
                 }
 
                 // set it on the last event object before this transfer
-                lastEventObj.curPoolShare = curPoolShare;
+                lastEventObj.curPoolShare = curPoolShareDisplay;
 
                 return;
               }
@@ -298,11 +311,11 @@ retrieveData = () => {
               curTokenTotal += tokens;
 
               // set the number of eth and tokens for this event
-              eventObj.numEth = eth.toFixed(2);
-              eventObj.numTokens = tokens.toFixed(2);
+              eventObj.numEth = eth.toFixed(3);
+              eventObj.numTokens = tokens.toFixed(3);
 
               // set the user's current pool share %
-              eventObj.curPoolShare = curPoolShare;
+              eventObj.curPoolShare = curPoolShareDisplay;
 
               // push this event object onto the array
               eventListTemp.push(eventObj);
@@ -312,6 +325,26 @@ retrieveData = () => {
             // reverse the list so the most recent events are first
             eventListTemp.reverse();
 
+            // calculate how much fees we've accrued by determining how much eth/tokens we own minus what we've deposited/withdrawn
+            let myEstimatedAccruedEthFees = curPoolShare * curEthTotal - numMyDepositedEth;
+
+            if (myEstimatedAccruedEthFees == 0) {
+              myEstimatedAccruedEthFees = "";
+            } else {
+              myEstimatedAccruedEthFees = myEstimatedAccruedEthFees.toFixed(5) + " ETH";
+            }
+
+            let myEstimatedAccruedTokenFees = curPoolShare * curTokenTotal - numMyDepositedTokens;
+            if (myEstimatedAccruedTokenFees == 0) {
+              myEstimatedAccruedTokenFees = "";
+            } else {
+              if (myEstimatedAccruedEthFees.length == 0) {
+                myEstimatedAccruedTokenFees = myEstimatedAccruedTokenFees.toFixed(5) + " " + this.state.tokenType;
+              } else {
+                myEstimatedAccruedTokenFees = ", " + myEstimatedAccruedTokenFees.toFixed(5) + " " + this.state.tokenType;
+              }              
+            }
+
             // update our state
             that.setState({  
               eventList : eventListTemp,
@@ -319,10 +352,10 @@ retrieveData = () => {
               curEthPoolTotal : curEthTotal.toFixed(2),
               curTokenPoolTotal : curTokenTotal.toFixed(2),
 
-              curPoolShare : curPoolShare,
-
-              // myCollectedFees : "-0.02 ETH, 0.23 MKR",
-              myCollectedFees : "-",
+              curPoolShare : curPoolShareDisplay,
+              
+              myCollectedEthFees : myEstimatedAccruedEthFees,
+              myCollectedTokenFees : myEstimatedAccruedTokenFees
             });
           });
       });
@@ -332,27 +365,10 @@ retrieveData = () => {
   }
 }
 
-setNetwork = () => {  
-  if (typeof this.web3 ==! 'undefined') {
-    let networkName, that = this;  
-
-    this.web3.eth.net.getId((err,networkId) => {            
-      that.setState({  
-        network: networkId  
-      });
-    });
-  }
-}
-
-componentDidMount() {  
-  this.setNetwork();
-
-}
-
 renderEvents() {
   if (typeof this.state.eventList === 'undefined') {
     return (
-      <img class= "LoadingImage" src="./loading.gif"/>
+      <img className= "LoadingImage" src="./loading.gif"/>
       ) 
   }
 
@@ -370,7 +386,7 @@ renderCoinbase() {
       <th>Pool Size (ETH)</th>
       <th>Pool Size ({this.state.tokenType})</th>
       <th>Pool Share</th>
-      <th>Accrued Fees</th>
+      <th>Accrued Fees (Estimated)</th>
       </tr> 
     </thead>
     <tbody>
@@ -379,7 +395,7 @@ renderCoinbase() {
         <td>{this.state.curEthPoolTotal}</td>
         <td>{this.state.curTokenPoolTotal}</td>
         <td>{this.state.curPoolShare}</td>
-        <td>{this.state.myCollectedFees}</td>
+        <td>{this.state.myCollectedEthFees}{this.state.myCollectedTokenFees}</td>
       </tr>
     </tbody>
     </table>
