@@ -11,14 +11,14 @@ function GetTime(block) {
   )
 }
 
-function EventRow(e) {
+function EventRow(e, myAddress) {
   
   let txLink = "https://etherscan.io/tx/" + e.tx;
   let blockLink = "https://etherscan.io/block/" + e.block;
   let providerLink = "https://etherscan.io/address/" + e.provider;
   let rowClassName = "";
 
-  if (e.provider.toUpperCase() === "0xa7f3dfed2bcf7b35a8824e11ae8f723650edfb58".toUpperCase()) {
+  if (e.provider.toUpperCase() === myAddress.toUpperCase()) {
     rowClassName = "myTransaction";
   }
 
@@ -42,13 +42,12 @@ function EventTableBody(props) {
 
   return eventList.map(e => {
     return (
-      EventRow(e)
+      EventRow(e, props.myAddress)
     )
   });
 }
 
 function EventTable(props) {
-  console.log(props.tokenType + " <<");
   return (  
   <table>
     <thead>
@@ -90,7 +89,7 @@ class App extends React.Component {
     this.myAddress = "";
     this.myCollectedFees = "";
 
-    this.state = {            
+    this.state = {
       myAddress : "Locked",
 
       curEthPoolTotal : "-",
@@ -99,23 +98,46 @@ class App extends React.Component {
       myCollectedFees : "-",
       tokenType : "MKR",
       providerFeePercent : 0.003,
-    } 
+    }
 
-    let web3 = window.web3; 
+    // check for new modern dapp browsers
+    if (window.ethereum) {
+      // request access to account
+      let enableRequest = async () => {
+        try {
+            await window.ethereum.enable();          
+            
+            this.retrieveData();
+        } catch (error) {            
+            console.log(error);
 
-    console.log(web3.version);
+            this.retrieveData();
+        }
+      }
 
-    if (typeof web3 !== 'undefined') {
-      this.web3Provider = web3.currentProvider;
+      enableRequest();      
 
-      web3 = new Web3(web3.currentProvider);
+      this.retrieveData();
+    } else if (window.web3) {
+      // legacy dapp browsers
+      this.retrieveData();      
+    } else {
+      this.isWeb3 = false;
+    }
+}
 
-      web3.eth.getBlockNumber().then((blockNumber) => {
+retrieveData = () => {
+  if (typeof web3 !== 'undefined') {
+      this.web3Provider = window.web3.currentProvider;
+
+      window.web3 = new Web3(window.web3.currentProvider);
+
+      window.web3.eth.getBlockNumber().then((blockNumber) => {
 
         let address = Uniswap.address;
         let abi = Uniswap.abi;
 
-        let contract = new web3.eth.Contract(abi, address);
+        let contract = new window.web3.eth.Contract(abi, address);
         // let contractInstance = contractRef.at(address);
 
         // console.log(Uniswap.address);
@@ -124,7 +146,7 @@ class App extends React.Component {
         console.log(blockNumber);
 
         // get the user address
-        web3.eth.getCoinbase().then((coinbase) => {
+        window.web3.eth.getCoinbase().then((coinbase) => {
             if (coinbase === null) {
               coinbase = "Locked";
             }
@@ -335,7 +357,7 @@ renderEvents() {
   }
 
   return (
-   <EventTable eventList={this.state.eventList} tokenType={this.state.tokenType}/>
+   <EventTable eventList={this.state.eventList} tokenType={this.state.tokenType} myAddress={this.state.myAddress}/>
   );
 }
 
@@ -374,7 +396,15 @@ render() {
       ) 
   } else{  
     return(  
-    <div>Install Metamask</div>
+      <div className="InstallMetaMask">
+
+        <div>
+        <img src="./metamask-locked.png"/>
+        <br/>
+        <br/>
+          <a href="https://metamask.io/">Get MetaMask</a>
+          </div>
+      </div>
     ) 
   } 
 }

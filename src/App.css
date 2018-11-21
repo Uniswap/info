@@ -46,3 +46,14 @@ a {
 .myTransaction {
   background:#50474f;  
 }
+
+.InstallMetaMask {
+  position: relative;
+  height: 200px;
+  margin-top:200px;
+  
+  
+  text-align: center;
+ }
+
+ 
