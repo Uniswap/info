@@ -1,32 +1,48 @@
-.App {
-  text-align: center;
+
+
+table {
+  border-collapse: collapse;
+    background: #37474f;
+
 }
 
-.App-logo {
-  animation: App-logo-spin infinite 20s linear;
-  height: 40vmin;
+th {
+  color:#78909c;
+  background:#263238;
+  text-align: left;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+td {
+  color:#dbdbdb;
+  border: 1px solid #455b64;
+
 }
 
-.App-link {
-  color: #61dafb;
+th, td {
+  vertical-align: middle;
+
+  padding: 15px;
+  
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+table{
+  width:calc(100% - 200px);
+  margin-left: 100px;
+  margin-top:40px;
+  margin-bottom:40px;
+}
+
+a {
+  color: pink;
+}
+
+.truncate {
+  width: 100px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;  
+}
+
+.myTransaction {
+  background:#50474f;  
 }
