@@ -103,6 +103,14 @@ class App extends React.Component {
     this.myCollectedEthFees = "";
     this.myCollectedTokenFees = "";
 
+    // extract factory token if possible (if not, just use the first token in the list)
+    var factory = Tokens.tokens[0]
+    var urlParams = new URLSearchParams(window.location.search);
+    
+    if (urlParams.has("factory")) {
+      factory = urlParams.get("factory");
+    }
+
     this.state = {
       myAddress : "Locked",
 
@@ -113,7 +121,7 @@ class App extends React.Component {
       myCollectedEthFees : "",
       myCollectedTokenFees : "",
 
-      curFactory : "MKR",
+      curFactory : factory,
       providerFeePercent : 0.003,
     }
 
