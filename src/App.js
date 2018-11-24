@@ -5,15 +5,52 @@ import Tokens from './Tokens.js';
 import Web3 from 'web3'  
 import './App.css';
 
-function TokenSelectorRow(props) {
-  return (
-      Tokens.tokens.map((token, index) => {
-        // console.log(index);
-        var link = "?factory=" + token;
+function TokenSelectorSingleRow(props) {
+  var tokensInRow = props.tokensInRow;
 
+  var link = ""
+
+  return (
+    tokensInRow.map((token) => {
+      var link = "?factory=" + token;
+
+      return (
+        <td key={token}><a href= {link}><b>{token}</b></a></td>
+      )
+    })
+  )
+}
+
+
+// var link = "?factory=" + token;
+
+        // return (
+          // <td key={token}><a href= {link}><b>{token}</b></a></td>
+        // )
+
+
+function TokenSelectorRows(props) {
+  var tokenRows = [];
+
+  tokenRows.push([]);
+
+  var tokensPerRow = 6;
+
+  for (var i = 0; i < Tokens.tokens.length; i++) {
+    if (tokenRows[tokenRows.length - 1].length == tokensPerRow) {
+      tokenRows.push([]);
+    }
+
+    tokenRows[tokenRows.length - 1].push(Tokens.tokens[i]);
+  }
+
+  return (
+      tokenRows.map((row, index) => {
         return (
-          <td key={token}><a href= {link}><b>{token}</b></a></td>
-        )
+          <tr>
+          <TokenSelectorSingleRow tokensInRow={row}/>
+          </tr>
+        )        
       })
   );
 }
@@ -432,10 +469,16 @@ renderDropdown() {
   return (  
     <table className="token-selector">
     <tbody> 
-    <tr><TokenSelectorRow/></tr>
+    <TokenSelectorRows/>
     </tbody>
     </table>    
   );
+}
+
+renderAttribution() {
+  return (
+    <p className="attribution">Loading indicator from: <a href="https://www.behance.net/gallery/31234507/Open-source-Loading-GIF-Icons-Vol-1" target="_blank">@hassan_gde</a></p>
+  )
 }
 
 render() {  
@@ -445,7 +488,8 @@ render() {
         {this.renderDropdown()}
         {this.renderCoinbase()}
         {this.renderEvents()}        
-      </div>  
+        {this.renderAttribution()}        
+      </div>        
       ) 
   } else{  
     return(  
@@ -459,7 +503,7 @@ render() {
           </div>
       </div>
     ) 
-  } 
+  }
 }
 } 
 

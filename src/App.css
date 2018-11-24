@@ -1,6 +1,11 @@
 .token-selector {
   text-align: center;
+}
 
+.attribution {
+  color:#FFFFFF;
+  font-size: 12px;
+  text-align: center;
 }
 
 .truncate {
