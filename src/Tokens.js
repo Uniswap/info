@@ -18,7 +18,8 @@ export default {
       "SPANK",
       "ZRX"
     ],
-    contract: {
-      "ANT" : ""
+    addresses: {
+      "ANT" : "",
+      "MKR" : "0x2C4Bd064b998838076fa341A83d007FC2FA50957"
     }
 }

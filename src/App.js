@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import Uniswap from './Uniswap.js';  
-import UniswapFactory from './UniswapFactory.js';
 import Tokens from './Tokens.js'; 
+import TokenABI from './TokenABI.js';
 import Web3 from 'web3'  
 import './App.css';
 
@@ -20,13 +20,6 @@ function TokenSelectorSingleRow(props) {
     })
   )
 }
-
-
-// var link = "?factory=" + token;
-
-        // return (
-          // <td key={token}><a href= {link}><b>{token}</b></a></td>
-        // )
 
 
 function TokenSelectorRows(props) {
@@ -57,7 +50,7 @@ function TokenSelectorRows(props) {
 
 function GetTime(block) {
   return (
-    "2 min ago" // TODO
+    "-" // TODO
   )
 }
 
@@ -198,10 +191,9 @@ retrieveData = () => {
         return;
       }
 
-      let address = Uniswap.address;
-      let abi = Uniswap.abi;
+      let address = Tokens.addresses[this.state.curFactory];
 
-      var contract = new window.web3.eth.Contract(abi, address);
+      var contract = new window.web3.eth.Contract(TokenABI.abi, address);
       // let contractInstance = contractRef.at(address);
 
       // console.log(Uniswap.address);
