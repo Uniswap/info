@@ -1,5 +1,5 @@
 export default {    
-    abi :  [
+  abi :  [
   {
     "anonymous": false,
     "inputs": [

@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import Uniswap from './Uniswap.js';  
-import Tokens from './Tokens.js'; 
+import Factory from './Factory.js'; 
 import TokenABI from './TokenABI.js';
 import Web3 from 'web3'  
 import './App.css';
@@ -29,18 +28,22 @@ function TokenSelectorRows(props) {
 
   var tokensPerRow = 6;
 
-  for (var i = 0; i < Tokens.tokens.length; i++) {
+  var tokenKeys = Object.keys(Factory.tokens);
+
+  for (var i = 0; i < tokenKeys.length; i++) {
     if (tokenRows[tokenRows.length - 1].length == tokensPerRow) {
       tokenRows.push([]);
     }
 
-    tokenRows[tokenRows.length - 1].push(Tokens.tokens[i]);
+    var key = tokenKeys[i];
+
+    tokenRows[tokenRows.length - 1].push(key);
   }
 
   return (
       tokenRows.map((row, index) => {
         return (
-          <tr>
+          <tr key={index}>
           <TokenSelectorSingleRow tokensInRow={row}/>
           </tr>
         )        
@@ -132,9 +135,10 @@ class App extends React.Component {
     this.myAddress = "";
     this.myCollectedEthFees = "";
     this.myCollectedTokenFees = "";
+    
+    var factory = Factory.initial;
 
-    // extract factory token if possible (if not, just use the first token in the list)
-    var factory = Tokens.tokens[0]
+    // extract factory token from URL if found
     var urlParams = new URLSearchParams(window.location.search);
     
     if (urlParams.has("factory")) {
@@ -191,7 +195,7 @@ retrieveData = () => {
         return;
       }
 
-      let address = Tokens.addresses[this.state.curFactory];
+      let address = Factory.tokens[this.state.curFactory];
 
       var contract = new window.web3.eth.Contract(TokenABI.abi, address);
       // let contractInstance = contractRef.at(address);
@@ -214,7 +218,8 @@ retrieveData = () => {
         let options = {
           address: address,
           // fromBlock: (blockNumber - 150000),
-          fromBlock:6629098,
+          fromBlock : 6627944,
+          // fromBlock : 0,
           // fromBlock: (blockNumber - 9000),
           toBlock: 'latest',
           // topics: [["0xcd60aa75dea3072fbc07ae6d7d856b5dc5f4eee88854f5b4abf7b680ef8bc50f",
@@ -333,6 +338,10 @@ retrieveData = () => {
 
               // update current pool share. take users's share tokens and divide by total minted share tokens
               curPoolShare = numMyShareTokens / numMintedShareTokens;
+              
+              if (numMintedShareTokens == 0) {
+                curPoolShare = 0;
+              }
         
               // get a percentage from the pool share
               curPoolShareDisplay = (curPoolShare * 100).toFixed(2);
