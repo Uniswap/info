@@ -11,7 +11,52 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-    monospace;
+table {
+  border-collapse: collapse;
+    background: #1b1c1f;
+}
+
+th {
+  color:#727272;
+  background:#1b1c1f;
+  text-align: left;
+}
+
+td {
+  color:#a0a0a0;
+}
+
+th, td {
+  vertical-align: middle;  
+
+  padding: 15px;
+  border: 1px solid #252526;
+  
+}
+
+table{
+  width:calc(100% - 200px);
+  margin-left: 100px;
+  margin-top:40px;
+  margin-bottom:40px;
+}
+
+a {
+  color: #6699cb;
+}
+
+a:link {
+    text-decoration: none;
+}
+
+a:visited {
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+a:active {
+    text-decoration: none;
 }
