@@ -1,5 +1,10 @@
-.token-selector {
+.factory-selector {
   text-align: center;
+}
+
+.factory-selector-active {
+	background:#252526;
+	
 }
 
 .attribution {

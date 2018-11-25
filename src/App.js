@@ -5,6 +5,7 @@ import Web3 from 'web3'
 import './App.css';
 
 function TokenSelectorSingleRow(props) {
+  var activeFactory = props.activeFactory;
   var tokensInRow = props.tokensInRow;
 
   var link = ""
@@ -12,10 +13,17 @@ function TokenSelectorSingleRow(props) {
   return (
     tokensInRow.map((token) => {
       var link = "?factory=" + token;
+      var isActiveFactory = (token === activeFactory);
 
-      return (
-        <td key={token}><a href= {link}><b>{token}</b></a></td>
-      )
+      if (isActiveFactory) {
+        return (
+          <td key={token} className="factory-selector-active"><div className="factory-selector-active"><b>{token}</b></div></td>
+        )
+      } else {
+        return (
+          <td key={token}><a href= {link}><b>{token}</b></a></td>
+        )
+      }
     })
   )
 }
@@ -25,6 +33,8 @@ function TokenSelectorRows(props) {
   var tokenRows = [];
 
   tokenRows.push([]);
+
+  var activeFactory = props.activeFactory;
 
   var tokensPerRow = 6;
 
@@ -44,7 +54,7 @@ function TokenSelectorRows(props) {
       tokenRows.map((row, index) => {
         return (
           <tr key={index}>
-          <TokenSelectorSingleRow tokensInRow={row}/>
+          <TokenSelectorSingleRow tokensInRow={row} activeFactory={activeFactory}/>
           </tr>
         )        
       })
@@ -468,9 +478,9 @@ renderCoinbase() {
 
 renderDropdown() {
   return (  
-    <table className="token-selector">
+    <table className="factory-selector">
     <tbody> 
-    <TokenSelectorRows/>
+    <TokenSelectorRows activeFactory={this.state.curFactory}/>
     </tbody>
     </table>    
   );
