@@ -36,7 +36,7 @@ function TokenSelectorRows(props) {
 
   var activeFactory = props.activeFactory;
 
-  var tokensPerRow = 6;
+  var tokensPerRow = 7;
 
   var tokenKeys = Object.keys(Factory.tokens);
 
@@ -205,7 +205,9 @@ retrieveData = () => {
         return;
       }
 
-      let address = Factory.tokens[this.state.curFactory];
+      let address = Factory.tokens[this.state.curFactory].address;
+
+      var tokenDecimals = Math.pow(10, Factory.tokens[this.state.curFactory].decimals);
 
       var contract = new window.web3.eth.Contract(TokenABI.abi, address);
       // let contractInstance = contractRef.at(address);
@@ -286,9 +288,11 @@ retrieveData = () => {
 
             let eth, tokens;
 
+
+
             if (eventType === "AddLiquidity") {
               eth = e.returnValues[1] / 1e18;
-              tokens = e.returnValues.token_amount / 1e18;
+              tokens = e.returnValues.token_amount / tokenDecimals;
 
               eventObj.type = "Add Liquidty";
 
@@ -298,7 +302,7 @@ retrieveData = () => {
               }
             } else if (eventType === "RemoveLiquidity") {
               eth = -e.returnValues.eth_amount / 1e18;
-              tokens = -e.returnValues.token_amount / 1e18;
+              tokens = -e.returnValues.token_amount / tokenDecimals;
 
               eventObj.type = "Remove Liquidty";
 
@@ -308,7 +312,7 @@ retrieveData = () => {
               }
             } else if (eventType === "TokenPurchase") {
               eth = e.returnValues.eth_sold / 1e18;
-              tokens = -e.returnValues.tokens_bought / 1e18;
+              tokens = -e.returnValues.tokens_bought / tokenDecimals;
               
               eventObj.provider = e.returnValues.buyer; 
 
@@ -316,7 +320,7 @@ retrieveData = () => {
               eventObj.liquidtyProviderFee = (eth * this.state.providerFeePercent).toFixed(5) + " ETH";
             } else if (eventType === "EthPurchase") {
               eth = -e.returnValues.eth_bought / 1e18;
-              tokens = e.returnValues.tokens_sold / 1e18;
+              tokens = e.returnValues.tokens_sold / tokenDecimals;
 
               eventObj.provider = e.returnValues.buyer; 
 
