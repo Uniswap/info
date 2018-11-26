@@ -3,9 +3,9 @@ body {
   margin: 0;
   padding: 0;  
   font-family:PxGrotesk,sans-serif;
-  font-weight:500;
-  line-height:1;
   
+  line-height:1;
+  font-size: 14px;
 
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -13,7 +13,8 @@ body {
 
 table {
   border-collapse: collapse;
-    background: #1b1c1f;
+  background: #1b1c1f;
+  
 }
 
 th {
@@ -32,13 +33,6 @@ th, td {
   padding: 15px;
   border: 1px solid #252526;
   
-}
-
-table{
-  width:calc(100% - 200px);
-  margin-left: 100px;
-  margin-top:40px;
-  margin-bottom:40px;
 }
 
 a {

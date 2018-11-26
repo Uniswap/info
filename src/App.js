@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
+import TokenPoolDetails from './TokenPoolDetails/TokenPoolDetails.js';
 import Factory from './Factory.js'; 
-import TokenABI from './TokenABI.js';
+import ExchangeABI from './ExchangeABI.js';
 import Web3 from 'web3'  
 import './App.css';
 
@@ -12,16 +13,16 @@ function TokenSelectorSingleRow(props) {
 
   return (
     tokensInRow.map((token) => {
-      var link = "?factory=" + token;
+      var link = "?token=" + token;
       var isActiveFactory = (token === activeFactory);
 
       if (isActiveFactory) {
         return (
-          <td key={token} className="factory-selector-active"><div className="factory-selector-active"><b>{token}</b></div></td>
+          <td key={token} className="token-selector-active"><div className="token-selector-active">{token}</div></td>
         )
       } else {
         return (
-          <td key={token}><a href= {link}><b>{token}</b></a></td>
+          <td key={token}><a href= {link}>{token}</a></td>
         )
       }
     })
@@ -36,7 +37,7 @@ function TokenSelectorRows(props) {
 
   var activeFactory = props.activeFactory;
 
-  var tokensPerRow = 7;
+  var tokensPerRow = 1;
 
   var tokenKeys = Object.keys(Factory.tokens);
 
@@ -142,7 +143,6 @@ class App extends React.Component {
 
     this.eventList = [];
 
-    this.myAddress = "";
     this.myCollectedEthFees = "";
     this.myCollectedTokenFees = "";
     
@@ -153,13 +153,14 @@ class App extends React.Component {
       // extract factory token from URL if found
       var urlParams = new URLSearchParams(window.location.search);
       
-      if (urlParams.has("factory")) {
-        factory = urlParams.get("factory");
+      if (urlParams.has("token")) {
+        factory = urlParams.get("token");
       }
     }
 
     this.state = {
       myAddress : "Locked",
+      tokenAddress : "",
 
       curEthPoolTotal : "-",
       curTokenPoolTotal : "-",
@@ -208,16 +209,22 @@ retrieveData = () => {
         return;
       }
 
-      let address = Factory.tokens[this.state.curFactory].address;
+      let exchangeAddress = Factory.tokens[this.state.curFactory].address;
+
+      // get the token address
+      
 
       var tokenDecimals = Math.pow(10, Factory.tokens[this.state.curFactory].decimals);
 
-      var contract = new window.web3.eth.Contract(TokenABI.abi, address);
-      // let contractInstance = contractRef.at(address);
+      var contract = new window.web3.eth.Contract(ExchangeABI.abi, exchangeAddress);
 
-      // console.log(Uniswap.address);
-      // console.log(events);
-      // console.log(Web3.version);
+      let that = this;
+
+      contract.methods.tokenAddress().call().then(function(tokenAddress) {
+        that.setState({ 
+          tokenAddress : tokenAddress
+        });
+      });
 
       // get the user address
       window.web3.eth.getCoinbase().then((coinbase) => {
@@ -231,11 +238,8 @@ retrieveData = () => {
           });      
 
         let options = {
-          address: address,
-          // fromBlock: (blockNumber - 150000),
+          address: exchangeAddress,
           fromBlock : 6627944,
-          // fromBlock : 0,
-          // fromBlock: (blockNumber - 9000),
           toBlock: 'latest',
           // topics: [["0xcd60aa75dea3072fbc07ae6d7d856b5dc5f4eee88854f5b4abf7b680ef8bc50f",
           // "0x06239653922ac7bea6aa2b19dc486b9361821d37712eb796adfd38d81de278ca",
@@ -249,8 +253,6 @@ retrieveData = () => {
         // 0x06239653922ac7bea6aa2b19dc486b9361821d37712eb796adfd38d81de278ca = AddLiquidity
         // 0x7f4091b46c33e918a0f3aa42307641d17bb67029427a5369e54b353984238705 = EthPurchase
         // 0x0fbf06c058b90cb038a618f8c2acbf6145f8b3570fd1fa56abb8f0f3f05b36e8 = RemoveLiquidity 
-
-        let that = this;
 
         var events = contract.getPastEvents("allEvents", options).then((events) => {
           console.log(events);
@@ -290,8 +292,6 @@ retrieveData = () => {
             }
 
             let eth, tokens;
-
-
 
             if (eventType === "AddLiquidity") {
               eth = e.returnValues[1] / 1e18;
@@ -458,34 +458,26 @@ renderEvents() {
   );
 }
 
-renderCoinbase() {
+renderTokenPoolDetails() {
+  var exchange = Factory.tokens[this.state.curFactory].address;
+
   return (
-    <table>
-    <thead>
-    <tr>
-      <th>Address</th>
-      <th>Pool Size (ETH)</th>
-      <th>Pool Size ({this.state.curFactory})</th>
-      <th>Pool Share</th>
-      <th>Accrued Fees (Estimated)</th>
-      </tr> 
-    </thead>
-    <tbody>
-      <tr>
-        <td><div className="truncate">{this.state.myAddress}</div></td>
-        <td>{this.state.curEthPoolTotal}</td>
-        <td>{this.state.curTokenPoolTotal}</td>
-        <td>{this.state.curPoolShare}</td>
-        <td>{this.state.myCollectedEthFees}{this.state.myCollectedTokenFees}</td>
-      </tr>
-    </tbody>
-    </table>
+    <TokenPoolDetails 
+      curFactory = {this.state.curFactory} 
+      tokenAddress = {this.state.tokenAddress}
+      curEthPoolTotal = {this.state.curEthPoolTotal}
+      curTokenPoolTotal = {this.state.curTokenPoolTotal}
+      curPoolShare = {this.state.curPoolShare}
+      myCollectedEthFees = {this.state.myCollectedEthFees}
+      myCollectedTokenFees = {this.state.myCollectedTokenFees}
+      exchangeAddress = {exchange}
+    />    
   );
 }
 
-renderDropdown() {
+renderTokenSelector() {
   return (  
-    <table className="factory-selector">
+    <table className="token-selector">
     <tbody> 
     <TokenSelectorRows activeFactory={this.state.curFactory}/>
     </tbody>
@@ -503,10 +495,14 @@ render() {
   if(this.isWeb3) {      
       return (        
       <div>
-        {this.renderDropdown()}
-        {this.renderCoinbase()}
-        {this.renderEvents()}        
-        {this.renderAttribution()}        
+        <div className="sidenav">
+          {this.renderTokenSelector()}
+        </div>
+        <div className="main-content">
+          {this.renderTokenPoolDetails()}
+          {this.renderEvents()}        
+          {this.renderAttribution()}        
+        </div>
       </div>        
       ) 
   } else{  
