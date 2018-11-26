@@ -6,5 +6,5 @@ Check it out live: https://conlan.github.io/uniswap-history
 
 # TODO
 
-Add navigation for other exchanges
-Improve mobile viewing
+- Improve mobile experience. (ie Trust browser)
+- Implement time column.
