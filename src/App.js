@@ -148,11 +148,14 @@ class App extends React.Component {
     
     var factory = Factory.initial;
 
-    // extract factory token from URL if found
-    var urlParams = new URLSearchParams(window.location.search);
-    
-    if (urlParams.has("factory")) {
-      factory = urlParams.get("factory");
+    // check for URL Search Params support    
+    if ('URLSearchParams' in window) {
+      // extract factory token from URL if found
+      var urlParams = new URLSearchParams(window.location.search);
+      
+      if (urlParams.has("factory")) {
+        factory = urlParams.get("factory");
+      }
     }
 
     this.state = {
@@ -514,7 +517,11 @@ render() {
         <img src="./metamask-locked.png"/>
         <br/>
         <br/>
-          <a href="https://metamask.io/">Get MetaMask</a>
+          <a href="https://metamask.io/" target="_blank">Get MetaMask</a>
+          
+          <p className="InstallMetaMaskText">or</p>
+          
+          <a href="https://brave.com" target="_blank">Switch to Brave</a>
           </div>
       </div>
     ) 

@@ -29,8 +29,11 @@
   height: 200px;
   margin-top:200px;
   
-  
   text-align: center;
+ }
+
+ .InstallMetaMaskText {
+  color:#a0a0a0;
  }
  
  .LoadingImage {
