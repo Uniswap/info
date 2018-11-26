@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import TokenPoolDetails from './TokenPoolDetails/TokenPoolDetails.js';
+import TokenPoolHistory from './TokenPoolHistory/TokenPoolHistory.js';
 import Factory from './Factory.js'; 
 import ExchangeABI from './ExchangeABI.js';
 import Web3 from 'web3'  
@@ -60,71 +61,6 @@ function TokenSelectorRows(props) {
         )        
       })
   );
-}
-
-function GetTime(block) {
-  return (
-    "-" // TODO
-  )
-}
-
-function EventRow(e, myAddress) {
-  
-  let txLink = "https://etherscan.io/tx/" + e.tx;
-  let blockLink = "https://etherscan.io/block/" + e.block;
-  let providerLink = "https://etherscan.io/address/" + e.provider;
-  let rowClassName = "";
-
-  if (e.provider.toUpperCase() === myAddress.toUpperCase()) {
-    rowClassName = "myTransaction";
-  }
-
-  return (
-    <tr key={e.tx} className={rowClassName}>
-      <td><a href={txLink} target="_blank"><div className="truncate">{e.tx}</div></a></td>
-      <td><a href={blockLink} target="_blank">{e.block}</a></td>
-      <td>{GetTime(e.block)}</td>
-      <td><a href={providerLink} target="_blank"><div className="truncate">{e.provider}</div></a></td>
-      <td>{e.type}</td>
-      <td>{e.numEth}</td>
-      <td>{e.numTokens}</td>
-      <td>{e.curPoolShare}</td>
-      <td>{e.liquidtyProviderFee}</td>
-    </tr>
-  );
-}
-
-function EventTableBody(props) {
-  let eventList = props.eventList;
-
-  return eventList.map(e => {
-    return (
-      EventRow(e, props.myAddress)
-    )
-  });
-}
-
-function EventTable(props) {
-  return (  
-  <table>
-    <thead>
-    <tr>
-    <th>Transaction</th>
-    <th>Block</th>
-    <th>Time</th>
-    <th>Address</th>
-    <th>Event</th>
-    <th>Pool Adjustment (ETH)</th>
-    <th>Pool Adjustment ({props.curFactory})</th>
-    <th>Pool Share</th>
-    <th>Provider Fee</th>
-    </tr>
-    </thead>
-   <tbody>
-    {EventTableBody(props)}
-  </tbody>
-  </table>
-  )
 }
 
 class App extends React.Component {  
@@ -446,7 +382,7 @@ retrieveData = () => {
   }
 }
 
-renderEvents() {
+renderTokenPoolHistory() {
   if (typeof this.state.eventList === 'undefined') {
     return (
       <img className= "LoadingImage" src="./loading.gif"/>
@@ -454,7 +390,7 @@ renderEvents() {
   }
 
   return (
-   <EventTable eventList={this.state.eventList} curFactory={this.state.curFactory} myAddress={this.state.myAddress}/>
+   <TokenPoolHistory eventList={this.state.eventList} curFactory={this.state.curFactory} myAddress={this.state.myAddress}/>
   );
 }
 
@@ -500,7 +436,7 @@ render() {
         </div>
         <div className="main-content">
           {this.renderTokenPoolDetails()}
-          {this.renderEvents()}        
+          {this.renderTokenPoolHistory()}        
           {this.renderAttribution()}        
         </div>
       </div>        
