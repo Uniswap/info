@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import {BigNumber} from 'bignumber.js';
 import TokenPoolDetails from './TokenPoolDetails/TokenPoolDetails.js';
 import TokenPoolHistory from './TokenPoolHistory/TokenPoolHistory.js';
 import Factory from './Factory.js'; 
@@ -201,8 +202,8 @@ retrieveData = () => {
           let curPoolShare = 0.0;
           let curPoolShareDisplay = 0.0;
 
-          let numMyShareTokens = 0.0;
-          let numMintedShareTokens = 0.0;
+          let numMyShareTokens = new BigNumber(0);
+          let numMintedShareTokens = new BigNumber(0);
 
           let numMyDepositedEth = 0.0;
           let numMyDepositedTokens = 0.0;
@@ -254,46 +255,50 @@ retrieveData = () => {
               tokens = -e.returnValues.tokens_bought / tokenDecimals;
               
               eventObj.provider = e.returnValues.buyer; 
+              eventObj.type = "Token Purchase";
 
               // calculate the eth fee that liquidity providers will receive
-              eventObj.liquidtyProviderFee = (eth * this.state.providerFeePercent).toFixed(5) + " ETH";
+              eventObj.liquidtyProviderFee = (eth * this.state.providerFeePercent).toFixed(4) + " ETH";
             } else if (eventType === "EthPurchase") {
               eth = -e.returnValues.eth_bought / 1e18;
               tokens = e.returnValues.tokens_sold / tokenDecimals;
 
               eventObj.provider = e.returnValues.buyer; 
+              eventObj.type = "Eth Purchase";
 
               // calculate the token fee that liquidity providers will receive
-              eventObj.liquidtyProviderFee = (tokens * this.state.providerFeePercent).toFixed(5) + " " + this.state.curFactory;
+              eventObj.liquidtyProviderFee = (tokens * this.state.providerFeePercent).toFixed(4) + " " + this.state.curFactory;
             } else if (eventType == "Transfer") {
               // Track share tokens
               let sender = e.returnValues[0];
-              let receiver = e.returnValues[1];
-              let numShareTokens = e.returnValues[2] / 1e18;
-                      
+              let receiver = e.returnValues[1];              
+              let numShareTokens = new BigNumber(e.returnValues[2]);// / 1e18;
+              
               // check if this was mint or burn share tokens        
               if (receiver === "0x0000000000000000000000000000000000000000") {
                 // burn share tokens
-                numMintedShareTokens -= numShareTokens;
+                numMintedShareTokens = numMintedShareTokens.minus(numShareTokens);
 
                 // check if the sender was user
                 if (sender.toUpperCase() === this.myAddress.toUpperCase()) {
-                    numMyShareTokens -= numShareTokens;
+                    numMyShareTokens = numMyShareTokens.minus(numShareTokens);
                 }
               } else {
                 // mint share tokens
-                numMintedShareTokens += numShareTokens;
+                numMintedShareTokens = numMintedShareTokens.plus(numShareTokens);
 
                 if (receiver.toUpperCase() === this.myAddress.toUpperCase()) {
-                    numMyShareTokens += numShareTokens;
+                	numMyShareTokens = numMyShareTokens.plus(numShareTokens);
                 }
               }
 
               // update current pool share. take users's share tokens and divide by total minted share tokens
-              curPoolShare = numMyShareTokens / numMintedShareTokens;
+              curPoolShare = numMyShareTokens.dividedBy(numMintedShareTokens);
               
-              if (numMintedShareTokens == 0) {
+              if (curPoolShare.toFixed(4) == 0) {
                 curPoolShare = 0;
+                numMyDepositedEth = 0;
+                numMyDepositedTokens = 0;
               }
         
               // get a percentage from the pool share
@@ -322,8 +327,8 @@ retrieveData = () => {
             curTokenTotal += tokens;
 
             // set the number of eth and tokens for this event
-            eventObj.numEth = eth.toFixed(3);
-            eventObj.numTokens = tokens.toFixed(3);
+            eventObj.numEth = eth.toFixed(4);
+            eventObj.numTokens = tokens.toFixed(4);
 
             // set the user's current pool share %
             eventObj.curPoolShare = curPoolShareDisplay;
@@ -337,29 +342,22 @@ retrieveData = () => {
           eventListTemp.reverse();
 
           // calculate how much fees we've accrued by determining how much eth/tokens we own minus what we've deposited/withdrawn
-          let myEstimatedAccruedEthFees = curPoolShare * curEthTotal - numMyDepositedEth;
-          let myEstimatedAccruedTokenFees = curPoolShare * curTokenTotal - numMyDepositedTokens;
-
-          // if user doesn't have any pool share, then don't share how many fees they might've accumulated before the most recent LiquidityRemoval
-          if (curPoolShare.toFixed(2) <= 0.0) {
-            myEstimatedAccruedEthFees = 0;
-            myEstimatedAccruedTokenFees = 0;
-          }
-
+          let myEstimatedAccruedEthFees = (curPoolShare * curEthTotal - numMyDepositedEth).toFixed(2);
+          let myEstimatedAccruedTokenFees = (curPoolShare * curTokenTotal - numMyDepositedTokens).toFixed(2);
 
           if (myEstimatedAccruedEthFees == 0) {
             myEstimatedAccruedEthFees = "";
           } else {
-            myEstimatedAccruedEthFees = myEstimatedAccruedEthFees.toFixed(5) + " ETH";
+            myEstimatedAccruedEthFees = myEstimatedAccruedEthFees + " ETH";
           }
           
           if (myEstimatedAccruedTokenFees == 0) {
             myEstimatedAccruedTokenFees = "";
           } else {
             if (myEstimatedAccruedEthFees.length == 0) {
-              myEstimatedAccruedTokenFees = myEstimatedAccruedTokenFees.toFixed(5) + " " + this.state.curFactory;
+              myEstimatedAccruedTokenFees = myEstimatedAccruedTokenFees + " " + this.state.curFactory;
             } else {
-              myEstimatedAccruedTokenFees = ", " + myEstimatedAccruedTokenFees.toFixed(5) + " " + this.state.curFactory;
+              myEstimatedAccruedTokenFees = ", " + myEstimatedAccruedTokenFees + " " + this.state.curFactory;
             }              
           }
 
@@ -367,8 +365,8 @@ retrieveData = () => {
           that.setState({  
             eventList : eventListTemp,
 
-            curEthPoolTotal : curEthTotal.toFixed(2),
-            curTokenPoolTotal : curTokenTotal.toFixed(2),
+            curEthPoolTotal : curEthTotal.toFixed(4),
+            curTokenPoolTotal : curTokenTotal.toFixed(4),
 
             curPoolShare : curPoolShareDisplay,
             
