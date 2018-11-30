@@ -1,3 +1,6 @@
+.volumeChart {
+}
+
 .sidenav {
   height: 100%; /* Full-height: remove this if you want "auto" height */
   width: 100px; /* Set the width of the sidebar */
@@ -12,8 +15,8 @@
 
 .main-content {
     position: absolute;
-    left: 100px;
-    width:calc(100% - 100px);
+    left: 110px;
+    width:calc(100% - 120px);
 }
 
 /* Default token selector cell */

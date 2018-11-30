@@ -28,7 +28,7 @@ function EventRow(e, myAddress) {
   }
 
   return (
-    <tr key={e.tx} className={rowClassName}>
+    <tr key={e.id} className={rowClassName}>
       <td>{e.type}</td>
       <td><a href={txLink} target="_blank"><div className="truncate">{e.tx}</div></a></td>
       <td><a href={blockLink} target="_blank">{e.block}</a></td>
