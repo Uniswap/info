@@ -93,7 +93,7 @@ function TokenSelectorRows(props) {
       }
   }
 
-  this.curFactory = factory.toUpperCase();
+  this.curFactory = factory;
 
   this.state = {
   	myAddress : "Locked",
@@ -109,7 +109,7 @@ function TokenSelectorRows(props) {
   	didRequestData : false,
   	didReceiveData : false,
 
-  	curFactory : factory.toUpperCase(),
+  	curFactory : factory,
   	providerFeePercent : 0.003,
 
   	eventList : [],
