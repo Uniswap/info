@@ -1,6 +1,6 @@
 # Uniswap History
 
-An event viewer for exchanges created on https://uniswap.exchange.
+Transaction and liquidity pool stats for Uniswap.exchange
 
 Check it out live: http://uniswap.info
 
