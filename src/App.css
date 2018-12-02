@@ -55,7 +55,7 @@
 }
 
 /* Image to install metamask when web3 not detected */
-.installMetaMask {
+.InstallMetaMask {
   position: relative;
   height: 200px;
   margin-top:200px;
@@ -64,7 +64,7 @@
  }
 
 /* Text to install metamask when web3 not detected */
- .installMetaMaskText {
+ .InstallMetaMaskText {
   color:#a0a0a0;
  }
  

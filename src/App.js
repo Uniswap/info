@@ -593,11 +593,17 @@ render() {
    <img src="./metamask-locked.png"/>
    <br/>
    <br/>
-   <a href="https://metamask.io/" target="_blank">Get MetaMask</a>
+   <b><p className="InstallMetaMaskText">Desktop</p></b>
 
-   <p className="InstallMetaMaskText">or</p>
+   <a href="https://metamask.io/" target="_blank">MetaMask</a>
 
-   <a href="https://brave.com" target="_blank">Switch to Brave</a>
+   <p/>
+  
+   <a href="https://brave.com" target="_blank">Brave</a>
+<br/>
+   <b><p className="InstallMetaMaskText">Mobile</p></b>
+
+   <a href="https://trustwallet.com" target="_blank">Trust</a>
    </div>
    </div>
    ) 
