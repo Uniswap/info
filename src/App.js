@@ -591,7 +591,7 @@ render() {
 
    <div>
    <img src="./metamask-locked.png"/>
-   <br/>
+   <p className="InstallMetaMaskText">Web3 Required</p>   
    <br/>
    <b><p className="InstallMetaMaskText">Desktop</p></b>
 
