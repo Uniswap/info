@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { defaults } from 'react-chartjs-2';
 
 import {Bar} from 'react-chartjs-2';
 
@@ -74,6 +75,8 @@ function TokenSelectorRows(props) {
 		class App extends React.Component {  
 			constructor() {
 				super(); 
+
+        defaults.global.animation = false;
 
 				this.appName = 'Uniswap Events'; 
 				this.isWeb3 = true;
@@ -312,9 +315,9 @@ function TokenSelectorRows(props) {
               }
 
               // update current pool share. take users's share tokens and divide by total minted share tokens
-              curPoolShare = numMyShareTokens.dividedBy(numMintedShareTokens);
+              curPoolShare = new BigNumber(numMyShareTokens.dividedBy(numMintedShareTokens));
               
-              if (curPoolShare.toFixed(4) == 0) {
+              if (isNaN(curPoolShare) || (curPoolShare.toFixed(4) == 0)) {
               	curPoolShare = 0;
               	numMyDepositedEth = 0;
               	numMyDepositedTokens = 0;
@@ -422,7 +425,7 @@ function TokenSelectorRows(props) {
 
 		  				var dateKey = blockDay.getMonth() + "-" + blockDay.getDate() + "-" + blockDay.getFullYear();
 
-		  				console.log(e.block + "  " + oldestBlockNum  + "  " + dateKey + "  " + e.volume);//+ "  "  + mostRecentBlockNum + "   " + blockRatio + "  " + dateKey);
+		  				// console.log(e.block + "  " + oldestBlockNum  + "  " + dateKey + "  " + e.volume);//+ "  "  + mostRecentBlockNum + "   " + blockRatio + "  " + dateKey);
 
 		  				if (e.volume > 0) {
 		  					if (!(dateKey in dateKeyToVolumeMap)) {
@@ -502,7 +505,7 @@ renderVolumeChart() {
   ];
 
 	  	// calculate dataset
-	  	var daysToShow = 90;
+	  	var daysToShow = 30;
 
 	  	var oneDayOffset = (24 * 60 * 60 * 1000);
 

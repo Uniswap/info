@@ -1,5 +1,7 @@
 .volumeChart {
   background:#0f0f0f;
+  margin-left: 10px;
+  width:calc(100% - 20px);
 }
 
 .sidenav {
