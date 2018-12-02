@@ -1,5 +1,6 @@
 body {
-  background:#17181a;
+  /*background:#17181a;*/
+  background:#000000;
   margin: 0;
   padding: 0;  
   font-family:PxGrotesk,sans-serif;
@@ -13,13 +14,15 @@ body {
 
 table {
   border-collapse: collapse;
-  background: #1b1c1f;
+  /*background: #1b1c1f;*/
+  background:#000000;
   
 }
 
 th {
   color:#727272;
-  background:#252527;
+  /*background:#252527;*/
+  background:#0f0f0f;
   text-align: left;
 }
 

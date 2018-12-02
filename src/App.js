@@ -91,30 +91,30 @@ function TokenSelectorRows(props) {
       if (urlParams.has("token")) {
       	factory = urlParams.get("token");
       }
-  }
+    }
 
-  this.curFactory = factory;
+    this.curFactory = factory;
 
-  this.state = {
-  	myAddress : "Locked",
-  	tokenAddress : "",
+    this.state = {
+     myAddress : "Locked",
+     tokenAddress : "",
 
-  	curEthPoolTotal : "-",
-  	curTokenPoolTotal : "-",
-  	curPoolShare : "-",
+     curEthPoolTotal : "-",
+     curTokenPoolTotal : "-",
+     curPoolShare : "-",
 
-  	myCollectedEthFees : "",
-  	myCollectedTokenFees : "",
+     myCollectedEthFees : "",
+     myCollectedTokenFees : "",
 
-  	didRequestData : false,
-  	didReceiveData : false,
+     didRequestData : false,
+     didReceiveData : false,
 
-  	curFactory : factory,
-  	providerFeePercent : 0.003,
+     curFactory : factory,
+     providerFeePercent : 0.003,
 
-  	eventList : [],
-  	volumeDataMap : {}
-  };
+     eventList : [],
+     volumeDataMap : {}
+   };
 
     // check for new modern dapp browsers
     if (window.ethereum) {
@@ -134,30 +134,30 @@ function TokenSelectorRows(props) {
       enableRequest();      
 
       
-  } else if (window.web3) {
+    } else if (window.web3) {
       // legacy dapp browsers
       this.retrieveData();      
-  } else {
-  	this.isWeb3 = false;
+    } else {
+     this.isWeb3 = false;
+   }
+ }
+
+ retrieveData = () => {
+   if (this.didRequestData) {
+    return;
   }
-}
 
-retrieveData = () => {
-	if (this.didRequestData) {
-		return;
-	}
+  if (typeof web3 !== 'undefined') {
+    this.web3Provider = window.web3.currentProvider;
 
-	if (typeof web3 !== 'undefined') {
-		this.web3Provider = window.web3.currentProvider;
+    window.web3 = new Web3(window.web3.currentProvider);
 
-		window.web3 = new Web3(window.web3.currentProvider);
+    console.log(this.state.curFactory);
+    if (typeof this.state.curFactory === 'undefined') {
+     return;
+   }
 
-		console.log(this.state.curFactory);
-		if (typeof this.state.curFactory === 'undefined') {
-			return;
-		}
-
-		let exchangeAddress = Factory.tokens[this.state.curFactory].address;
+   let exchangeAddress = Factory.tokens[this.state.curFactory].address;
 
       // get the token address
       var tokenDecimals = Math.pow(10, Factory.tokens[this.state.curFactory].decimals);
@@ -194,7 +194,7 @@ retrieveData = () => {
           // "0x7f4091b46c33e918a0f3aa42307641d17bb67029427a5369e54b353984238705"]]
           // "0x0fbf06c058b90cb038a618f8c2acbf6145f8b3570fd1fa56abb8f0f3f05b36e8"]]
 
-      };
+        };
 
         // topics
         // 0xcd60aa75dea3072fbc07ae6d7d856b5dc5f4eee88854f5b4abf7b680ef8bc50f = TokenPurchase      
@@ -241,20 +241,20 @@ retrieveData = () => {
         			liquidtyProviderFee : "-",
 
               volume : 0 // how much swapping volume was in this event (set by purchase events only)
-          }
+            }
 
-          let eth, tokens;
+            let eth, tokens;
 
-          if (eventType === "AddLiquidity") {
-          	eth = e.returnValues[1] / 1e18;
-          	tokens = e.returnValues.token_amount / tokenDecimals;
+            if (eventType === "AddLiquidity") {
+             eth = e.returnValues[1] / 1e18;
+             tokens = e.returnValues.token_amount / tokenDecimals;
 
-          	eventObj.type = "Add Liquidty";
+             eventObj.type = "Add Liquidty";
 
-          	if (eventObj.provider.toUpperCase() === this.state.myAddress.toUpperCase()) {
-          		numMyDepositedEth += eth;
-          		numMyDepositedTokens += tokens;
-          	}
+             if (eventObj.provider.toUpperCase() === this.state.myAddress.toUpperCase()) {
+              numMyDepositedEth += eth;
+              numMyDepositedTokens += tokens;
+            }
           } else if (eventType === "RemoveLiquidity") {
           	eth = -e.returnValues.eth_amount / 1e18;
           	tokens = -e.returnValues.token_amount / tokenDecimals;
@@ -276,18 +276,18 @@ retrieveData = () => {
 
               // calculate the eth fee that liquidity providers will receive
               eventObj.liquidtyProviderFee = (eth * this.state.providerFeePercent).toFixed(4) + " ETH";
-          } else if (eventType === "EthPurchase") {
-          	eth = -e.returnValues.eth_bought / 1e18;
-          	tokens = e.returnValues.tokens_sold / tokenDecimals;
+            } else if (eventType === "EthPurchase") {
+             eth = -e.returnValues.eth_bought / 1e18;
+             tokens = e.returnValues.tokens_sold / tokenDecimals;
 
-          	eventObj.provider = e.returnValues.buyer; 
-          	eventObj.type = "Eth Purchase";
+             eventObj.provider = e.returnValues.buyer; 
+             eventObj.type = "Eth Purchase";
 
-          	eventObj.volume = -eth;
+             eventObj.volume = -eth;
 
               // calculate the token fee that liquidity providers will receive
               eventObj.liquidtyProviderFee = (tokens * this.state.providerFeePercent).toFixed(4) + " " + this.state.curFactory;
-          } else if (eventType === "Transfer") {
+            } else if (eventType === "Transfer") {
               // Track share tokens
               let sender = e.returnValues[0];
               let receiver = e.returnValues[1];              
@@ -302,14 +302,14 @@ retrieveData = () => {
                 if (sender.toUpperCase() === this.myAddress.toUpperCase()) {
                 	numMyShareTokens = numMyShareTokens.minus(numShareTokens);
                 }
-            } else {
+              } else {
                 // mint share tokens
                 numMintedShareTokens = numMintedShareTokens.plus(numShareTokens);
 
                 if (receiver.toUpperCase() === this.myAddress.toUpperCase()) {
                 	numMyShareTokens = numMyShareTokens.plus(numShareTokens);
                 }
-            }
+              }
 
               // update current pool share. take users's share tokens and divide by total minted share tokens
               curPoolShare = numMyShareTokens.dividedBy(numMintedShareTokens);
@@ -328,13 +328,13 @@ retrieveData = () => {
               	curPoolShareDisplay = "-";
               } else {
                 curPoolShareDisplay = curPoolShareDisplay  + "%"; // add a percentage symbol
-            }
+              }
 
               // set it on the last event object before this transfer
               lastEventObj.curPoolShare = curPoolShareDisplay;
 
               return;
-          }
+            }
 
             // save a reference to the last event object (transfer events follow add/remove liquidity)
             lastEventObj = eventObj;
@@ -355,7 +355,7 @@ retrieveData = () => {
             // push this event object onto the array
             eventListTemp.push(eventObj);
 
-        });
+          });
 
           // reverse the list so the most recent events are first
           eventListTemp.reverse();
@@ -439,12 +439,12 @@ retrieveData = () => {
 		  			});
 		  		});
 			});
-	      } else {
-	      	that.setState({
-	      		didReceiveData : true
-	      	});
-	      }
-	  });
+         } else {
+          that.setState({
+           didReceiveData : true
+         });
+        }
+      });
 });
 } else {
 	this.isWeb3 = false;
@@ -454,7 +454,7 @@ retrieveData = () => {
 renderTokenPoolHistory() {	
 	if (this.didReceiveData == false) {
 		return (
-			<img className= "LoadingImage" src="./loading.gif"/>
+			<img className= "LoadingImage" src="./loading3.gif"/>
 			) 
 	}
 
@@ -497,9 +497,9 @@ renderVolumeChart() {
 	var labels = [];
 	var volumeData = [];
 
-		var monthNames = [
-		"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-		];
+  var monthNames = [
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+  ];
 
 	  	// calculate dataset
 	  	var daysToShow = 90;
@@ -521,85 +521,85 @@ renderVolumeChart() {
 	  		}
 	  	}
 
-	  var data = {
-	  	labels: labels,
-	  	datasets: [
-	  	{
-	  		label: 'Swap Volume (ETH)',
-	  		backgroundColor: 'rgba(160,160,160,0.2)',
+     var data = {
+      labels: labels,
+      datasets: [
+      {
+       label: 'Swap Volume (ETH)',
+       backgroundColor: 'rgba(160,160,160,0.4)',
+       borderWidth: 0,
+       hoverBackgroundColor: 'rgba(102,153,203,1)',
+       hoverBorderWidth: 0,
+       data: volumeData
+     }
+     ]
+   };
 
-	  		borderWidth: 0,
-	  		hoverBackgroundColor: 'rgba(102,153,203,1)',
-	  		hoverBorderWidth: 0,
-	  		data: volumeData
-	  	}
-	  	]
-	  };
+   return (
+    <div className="volumeChart">
+    <Bar 
+    data={data} 
+    height={250}
 
-	  return (
-	  	<div className="volumeChart">
-	  	<Bar 
-	  	data={data} 
-	  	height={250}
-	  	options={
-	  		{
-	  			maintainAspectRatio: false
-	  		}
-	  	}
-	  	/>
-	  	</div>
-	  	)
-	  }
+    options={
+     {
+      maintainAspectRatio: false
+    }
+  }
+  />
+  </div>
+  )
+}
 
-	  renderTokenSelector() {
-	  	return (
-	  	<table className="token-selector">
-	  	<tbody> 
-	  	<TokenSelectorRows activeFactory={this.state.curFactory}/>
-	  	</tbody>
-	  	</table>    
-	  	);
-	  }
+renderTokenSelector() {
+  return (
+  <table className="token-selector">
+  <tbody> 
+  <TokenSelectorRows activeFactory={this.state.curFactory}/>
+  </tbody>
+  </table>    
+  );
+}
 
-	  renderAttribution() {
-	  	return (
-	  	<p className="attribution">Loading indicator from: <a href="https://www.behance.net/gallery/31234507/Open-source-Loading-GIF-Icons-Vol-1" target="_blank">@hassan_gde</a></p>
-	  	)
-	  }
+renderAttribution() {
+  return (
+  <p className="attribution"><a href="https://github.com/conlan/uniswap-info" target="_blank">Github</a> - <a href="https://uniswap.io" target="_blank">Uniswap</a> - <a href="https://gifer.com/en/1Atv" target="_blank">GIF</a></p>
+  )
+}
 
-	  render() {  
-	  	if(this.isWeb3) {      
-	  		return (        
-	  		<div>
-	  		<div className="sidenav">
-	  		{this.renderTokenSelector()}
-	  		</div>
-	  		<div className="main-content">
-	  		{this.renderTokenPoolDetails()}
-	  		{this.renderVolumeChart()}
-	  		{this.renderTokenPoolHistory()}        
-	  		{this.renderAttribution()}        
-	  		</div>
-	  		</div>        
-	  		) 
-	  	} else{  
-	  		return(  
-	  		<div className="InstallMetaMask">
+render() {  
+  if(this.isWeb3) {      
+   return (        
+   <div>
+   <div className="sidenav">
+   {this.renderTokenSelector()}
+   </div>
+   <div className="main-content">
+   {this.renderTokenPoolDetails()}
+   {this.renderVolumeChart()}
+   {this.renderTokenPoolHistory()}  
+    {this.renderAttribution()}
+   </div>
+   </div>        
+   ) 
+ } else{  
+   return(  
+   <div className="InstallMetaMask">
 
-	  		<div>
-	  		<img src="./metamask-locked.png"/>
-	  		<br/>
-	  		<br/>
-	  		<a href="https://metamask.io/" target="_blank">Get MetaMask</a>
+   <div>
+   <img src="./metamask-locked.png"/>
+   <br/>
+   <br/>
+   <a href="https://metamask.io/" target="_blank">Get MetaMask</a>
 
-	  		<p className="InstallMetaMaskText">or</p>
+   <p className="InstallMetaMaskText">or</p>
 
-	  		<a href="https://brave.com" target="_blank">Switch to Brave</a>
-	  		</div>
-	  		</div>
-	  		) 
-	  	}
-	  }
-	} 
+   <a href="https://brave.com" target="_blank">Switch to Brave</a>
+   </div>
+   </div>
+   ) 
+ }
+}
+} 
 
-	export default App; 
+export default App; 
