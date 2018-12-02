@@ -1,8 +1,8 @@
 # Uniswap History
 
-An event viewer for exchanges created on https://uniswap.exchange.
+Transaction and liquidity pool stats for http://Uniswap.exchange
 
-Check it out live: https://conlan.github.io/uniswap-history
+Check it out live: http://uniswap.info
 
 # TODO
 
