@@ -325,7 +325,8 @@ const retrieveData = () => {
       let curEthTotal = 0;
       let curTokenTotal = 0;
 
-      let curPoolShare = 0.0;
+      curPoolShare = 0.0;
+      
       let curPoolShareDisplay = 0.0;
 
       let numMyShareTokens = new BigNumber(0);
