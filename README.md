@@ -1,6 +1,6 @@
 # Uniswap History
 
-Transaction and liquidity pool stats for http://Uniswap.exchange
+Transaction and liquidity pool stats for http://uniswap.io
 
 Check it out live: http://uniswap.info
 
