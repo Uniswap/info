@@ -48,7 +48,13 @@ class TokenPoolHistory extends React.Component {
   }
 
   render () {
-    
+    var eventList = this.props.eventList;
+
+    if (this.props.didReceiveData == false) {
+      return (
+        <img className= "LoadingImage" src="./loading3.gif"/>
+      ) 
+    }
 
     return (
       <table className="TokenPoolHistory">

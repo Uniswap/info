@@ -1,614 +1,586 @@
-import React, { Component } from 'react';
-import { defaults } from 'react-chartjs-2';
+import React, { Component } from "react";
+import lifecycle from "react-pure-lifecycle";
 
-import {Bar} from 'react-chartjs-2';
+import { defaults } from "react-chartjs-2";
 
-import {BigNumber} from 'bignumber.js';
+import { Bar } from "react-chartjs-2";
 
-import TokenPoolDetails from './TokenPoolDetails/TokenPoolDetails.js';
-import TokenPoolHistory from './TokenPoolHistory/TokenPoolHistory.js';
+import { BigNumber } from "bignumber.js";
 
-import Factory from './Factory.js'; 
-import ExchangeABI from './ExchangeABI.js';
+import TokenPoolDetails from "./TokenPoolDetails/TokenPoolDetails.js";
+import TokenPoolHistory from "./TokenPoolHistory/TokenPoolHistory.js";
 
-import Web3 from 'web3'  
+import Factory from "./Factory.js";
+import ExchangeABI from "./ExchangeABI.js";
 
-import './App.css';
+import { useWeb3Context } from "web3-react/hooks";
 
-function TokenSelectorSingleRow(props) {
-	var activeFactory = props.activeFactory;
-	var tokensInRow = props.tokensInRow;
+import "./App.css";
 
-	var link = ""
+var app;
 
-	return (
-		tokensInRow.map((token) => {
-			var link = "?token=" + token;
-			var isActiveFactory = (token === activeFactory);
+var web3 = null;
 
-			if (isActiveFactory) {
-				return (
-					<td key={token} className="token-selector-active"><div className="token-selector-active">{token}</div></td>
-					)
-			} else {
-				return (
-					<td key={token}><a href= {link}>{token}</a></td>
-					)
-			}
-		})
-		)
-}
+var didRequestData = false;
+var didReceiveData = false;
 
+var eventList = [];
+var volumeDataMap = {};
 
-function TokenSelectorRows(props) {
-	var tokenRows = [];
+var curFactory = "";
 
-	tokenRows.push([]);
+var curEthPoolTotal = "-";
+var curTokenPoolTotal = "-";
+var curPoolShare = "-";
 
-	var activeFactory = props.activeFactory;
+var myCollectedEthFees = "";
+var myCollectedTokenFees = "";
 
-	var tokensPerRow = 1;
+var myAddress = "";
+var tokenAddress = "";
 
-	var tokenKeys = Object.keys(Factory.tokens);
+var providerFeePercent = 0.003;
 
-	for (var i = 0; i < tokenKeys.length; i++) {
-		if (tokenRows[tokenRows.length - 1].length === tokensPerRow) {
-			tokenRows.push([]);
-		}
+class App extends React.Component {
+  constructor(props) {
+    super(props);
 
-		var key = tokenKeys[i];
+    app = this;
 
-		tokenRows[tokenRows.length - 1].push(key);
-	}
+    defaults.global.animation = false;
+  }
 
-	return (
-		tokenRows.map((row, index) => {
-			return (
-				<tr key={index}>
-				<TokenSelectorSingleRow tokensInRow={row} activeFactory={activeFactory}/>
-				</tr>
-				)        
-			})
-			);
-		}
+  componentDidMount(props) {
+    retrieveData();
+  }
 
-		class App extends React.Component {  
-			constructor() {
-				super(); 
+  componentWillMount(props) {
+    var factory = Factory.initial;
 
-        defaults.global.animation = false;
-
-				this.appName = 'Uniswap Events'; 
-				this.isWeb3 = true;
-				this.isWeb3Locked = false; //If metamask account is locked
-				this.didReceiveData = false;
-
-
-				var factory = Factory.initial;
-
-    // check for URL Search Params support    
-    if ('URLSearchParams' in window) {
+    // check for URL Search Params support
+    if ("URLSearchParams" in window) {
       // extract factory token from URL if found
       var urlParams = new URLSearchParams(window.location.search);
-      
+
       if (urlParams.has("token")) {
-      	factory = urlParams.get("token");
+        factory = urlParams.get("token");
       }
     }
 
-    this.curFactory = factory;
+    curFactory = factory;
+  }
 
-    this.state = {
-     myAddress : "Locked",
-     tokenAddress : "",
+  render() {
+    var exchange = Factory.tokens[curFactory].address;
 
-     curEthPoolTotal : "-",
-     curTokenPoolTotal : "-",
-     curPoolShare : "-",
+    return (
+      <div>
+        <div className="sidenav">
+          <TokenSelector curFactory={curFactory} />
+        </div>
+        <div className="main-content">
+          <TokenPoolDetails
+            curFactory={curFactory}
+            tokenAddress={tokenAddress}
+            curEthPoolTotal={curEthPoolTotal}
+            curTokenPoolTotal={curTokenPoolTotal}
+            curPoolShare={curPoolShare}
+            myCollectedEthFees={myCollectedEthFees}
+            myCollectedTokenFees={myCollectedTokenFees}
+            exchangeAddress={exchange}
+          />
+          <TokenVolumeChart />
+          <TokenPoolHistory
+            eventList={eventList}
+            curFactory={curFactory}
+            myAddress={myAddress}
+            didReceiveData={didReceiveData}
+          />
+          <Attribution />
+        </div>
+      </div>
+    );
+  }
+}
 
-     myCollectedEthFees : "",
-     myCollectedTokenFees : "",
+const Attribution = props => {
+  return (
+    <p className="attribution">
+      <a href="https://github.com/conlan/uniswap-info" target="_blank">
+        Github
+      </a>{" "}
+      -{" "}
+      <a href="https://uniswap.io" target="_blank">
+        Uniswap
+      </a>{" "}
+      -{" "}
+      <a href="https://gifer.com/en/1Atv" target="_blank">
+        GIF
+      </a>
+    </p>
+  );
+};
 
-     didRequestData : false,
-     didReceiveData : false,
+const TokenSelector = props => {
+  if (web3 == null) {
+    web3 = useWeb3Context();
+  }
 
-     curFactory : factory,
-     providerFeePercent : 0.003,
+  return (
+    <table className="token-selector">
+      <tbody>
+        <TokenSelectorRows activeFactory={props.curFactory} />
+      </tbody>
+    </table>
+  );
+};
 
-     eventList : [],
-     volumeDataMap : {}
-   };
+const TokenSelectorRows = props => {
+  var tokenRows = [];
 
-    // check for new modern dapp browsers
-    if (window.ethereum) {
-      // request access to account
-      let enableRequest = async () => {
-      	try {
-      		await window.ethereum.enable();          
+  tokenRows.push([]);
 
-      		this.retrieveData();
-      	} catch (error) {            
-      		console.log(error);
+  var activeFactory = props.activeFactory;
 
-      		this.retrieveData();
-      	}
-      }
+  var tokensPerRow = 1;
 
-      enableRequest();      
+  var tokenKeys = Object.keys(Factory.tokens);
 
-      
-    } else if (window.web3) {
-      // legacy dapp browsers
-      this.retrieveData();      
+  for (var i = 0; i < tokenKeys.length; i++) {
+    if (tokenRows[tokenRows.length - 1].length === tokensPerRow) {
+      tokenRows.push([]);
+    }
+
+    var key = tokenKeys[i];
+
+    tokenRows[tokenRows.length - 1].push(key);
+  }
+
+  return tokenRows.map((row, index) => {
+    return (
+      <tr key={index}>
+        <TokenSelectorSingleRow
+          tokensInRow={row}
+          activeFactory={activeFactory}
+        />
+      </tr>
+    );
+  });
+};
+
+const TokenSelectorSingleRow = props => {
+  var activeFactory = props.activeFactory;
+  var tokensInRow = props.tokensInRow;
+
+  var link = "";
+
+  return tokensInRow.map(token => {
+    var link = "?token=" + token;
+    var isActiveFactory = token === activeFactory;
+
+    if (isActiveFactory) {
+      return (
+        <td key={token} className="token-selector-active">
+          <div className="token-selector-active">{token}</div>
+        </td>
+      );
     } else {
-     this.isWeb3 = false;
-   }
- }
+      return (
+        <td key={token}>
+          <a href={link}>{token}</a>
+        </td>
+      );
+    }
+  });
+};
 
- retrieveData = () => {
-   if (this.didRequestData) {
+const TokenVolumeChart = props => {
+  // don't render anything if we haven't loaded the events yet
+  if (didReceiveData == false) {
+    return <div />;
+  }
+
+  var labels = [];
+  var volumeData = [];
+
+  var monthNames = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec"
+  ];
+
+  // calculate dataset
+  var daysToShow = 30;
+
+  var oneDayOffset = 24 * 60 * 60 * 1000;
+
+  for (var daysBack = daysToShow - 1; daysBack >= 0; daysBack--) {
+    var date = new Date(Date.now() - oneDayOffset * daysBack);
+    // console.log(date);
+
+    labels.push(
+      monthNames[date.getMonth()] +
+        " " +
+        date.getDate() +
+        ", " +
+        date.getFullYear()
+    );
+
+    var dateKey =
+      date.getMonth() + "-" + date.getDate() + "-" + date.getFullYear();
+
+    if (dateKey in volumeDataMap) {
+      volumeData.push(volumeDataMap[dateKey].toFixed(4));
+    } else {
+      volumeData.push(0);
+    }
+  }
+
+  var data = {
+    labels: labels,
+    datasets: [
+      {
+        label: "Swap Volume (ETH)",
+        backgroundColor: "rgba(160,160,160,0.4)",
+        borderWidth: 0,
+        hoverBackgroundColor: "rgba(102,153,203,1)",
+        hoverBorderWidth: 0,
+        data: volumeData
+      }
+    ]
+  };
+
+  return (
+    <div className="volumeChart">
+      <Bar
+        data={data}
+        height={250}
+        options={{
+          maintainAspectRatio: false
+        }}
+      />
+    </div>
+  );
+};
+
+const retrieveData = () => {
+  if (didRequestData) {
     return;
   }
 
-  if (typeof web3 !== 'undefined') {
-    this.web3Provider = window.web3.currentProvider;
+  let exchangeAddress = Factory.tokens[curFactory].address;
 
-    window.web3 = new Web3(window.web3.currentProvider);
+  // get the token address
+  var tokenDecimals = Math.pow(10, Factory.tokens[curFactory].decimals);
 
-    console.log(this.state.curFactory);
-    if (typeof this.state.curFactory === 'undefined') {
-     return;
-   }
+  var contract = new web3.web3js.eth.Contract(ExchangeABI.abi, exchangeAddress);
 
-   let exchangeAddress = Factory.tokens[this.state.curFactory].address;
+  let that = this;
 
-      // get the token address
-      var tokenDecimals = Math.pow(10, Factory.tokens[this.state.curFactory].decimals);
+  contract.methods
+    .tokenAddress()
+    .call()
+    .then(function(tokenAddress_) {
+      tokenAddress = tokenAddress_;
 
-      var contract = new window.web3.eth.Contract(ExchangeABI.abi, exchangeAddress);
+      app.setState({});
+    });
 
-      let that = this;
+  didRequestData = true;
 
-      contract.methods.tokenAddress().call().then(function(tokenAddress) {      	
-      	that.setState({ 
-      		tokenAddress : tokenAddress
-      	});
-      });
+  // get the user address
+  web3.web3js.eth.getCoinbase().then(coinbase => {
+    if (coinbase === null) {
+      coinbase = "Locked";
+    }
 
-      this.didRequestData = true;
+    myAddress = coinbase;
 
-      // get the user address
-      window.web3.eth.getCoinbase().then((coinbase) => {
-      	if (coinbase === null) {
-      		coinbase = "Locked";
-      	}
+    let options = {
+      address: exchangeAddress,
+      fromBlock: 6627944,
+      toBlock: "latest"
+    };
 
-      	this.myAddress = coinbase;
-      	this.setState({ 
-      		myAddress : coinbase
-      	});
+    // topics
+    // 0xcd60aa75dea3072fbc07ae6d7d856b5dc5f4eee88854f5b4abf7b680ef8bc50f = TokenPurchase
+    // 0x06239653922ac7bea6aa2b19dc486b9361821d37712eb796adfd38d81de278ca = AddLiquidity
+    // 0x7f4091b46c33e918a0f3aa42307641d17bb67029427a5369e54b353984238705 = EthPurchase
+    // 0x0fbf06c058b90cb038a618f8c2acbf6145f8b3570fd1fa56abb8f0f3f05b36e8 = RemoveLiquidity
 
-      	let options = {
-      		address: exchangeAddress,
-      		fromBlock : 6627944,
-      		toBlock: 'latest',
-          // topics: [["0xcd60aa75dea3072fbc07ae6d7d856b5dc5f4eee88854f5b4abf7b680ef8bc50f",
-          // "0x06239653922ac7bea6aa2b19dc486b9361821d37712eb796adfd38d81de278ca",
-          // "0x7f4091b46c33e918a0f3aa42307641d17bb67029427a5369e54b353984238705"]]
-          // "0x0fbf06c058b90cb038a618f8c2acbf6145f8b3570fd1fa56abb8f0f3f05b36e8"]]
+    var events = contract.getPastEvents("allEvents", options).then(events => {
+      console.log(events);
 
+      let eventListTemp = [];
+
+      let curEthTotal = 0;
+      let curTokenTotal = 0;
+
+      let curPoolShare = 0.0;
+      let curPoolShareDisplay = 0.0;
+
+      let numMyShareTokens = new BigNumber(0);
+      let numMintedShareTokens = new BigNumber(0);
+
+      let numMyDepositedEth = 0.0;
+      let numMyDepositedTokens = 0.0;
+
+      let lastEventObj;
+
+      events.forEach(e => {
+        let eventType = e.event;
+
+        let eventObj = {
+          type: eventType,
+
+          curPoolShare: 0.0,
+
+          numEth: 0,
+          numTokens: 0,
+
+          id: e.id,
+
+          tx: e.transactionHash,
+          provider: e.returnValues.provider,
+          block: e.blockNumber,
+
+          liquidtyProviderFee: "-",
+
+          volume: 0 // how much swapping volume was in this event (set by purchase events only)
         };
 
-        // topics
-        // 0xcd60aa75dea3072fbc07ae6d7d856b5dc5f4eee88854f5b4abf7b680ef8bc50f = TokenPurchase      
-        // 0x06239653922ac7bea6aa2b19dc486b9361821d37712eb796adfd38d81de278ca = AddLiquidity
-        // 0x7f4091b46c33e918a0f3aa42307641d17bb67029427a5369e54b353984238705 = EthPurchase
-        // 0x0fbf06c058b90cb038a618f8c2acbf6145f8b3570fd1fa56abb8f0f3f05b36e8 = RemoveLiquidity 
+        let eth, tokens;
 
-        var events = contract.getPastEvents("allEvents", options).then((events) => {
-        	console.log(events);
+        if (eventType === "AddLiquidity") {
+          eth = e.returnValues[1] / 1e18;
+          tokens = e.returnValues.token_amount / tokenDecimals;
 
-        	let eventListTemp = [];
+          eventObj.type = "Add Liquidty";
 
-        	let curEthTotal = 0;
-        	let curTokenTotal = 0;
-
-        	let curPoolShare = 0.0;
-        	let curPoolShareDisplay = 0.0;
-
-        	let numMyShareTokens = new BigNumber(0);
-        	let numMintedShareTokens = new BigNumber(0);
-
-        	let numMyDepositedEth = 0.0;
-        	let numMyDepositedTokens = 0.0;
-
-        	let lastEventObj;
-
-        	events.forEach((e) => {
-        		let eventType = e.event;
-
-        		let eventObj = {
-        			type : eventType,
-
-        			curPoolShare : 0.0,
-
-        			numEth : 0,
-        			numTokens : 0,
-
-        			id : e.id,
-
-        			tx : e.transactionHash,
-        			provider : e.returnValues.provider,
-        			block : e.blockNumber,
-
-        			liquidtyProviderFee : "-",
-
-              volume : 0 // how much swapping volume was in this event (set by purchase events only)
-            }
-
-            let eth, tokens;
-
-            if (eventType === "AddLiquidity") {
-             eth = e.returnValues[1] / 1e18;
-             tokens = e.returnValues.token_amount / tokenDecimals;
-
-             eventObj.type = "Add Liquidty";
-
-             if (eventObj.provider.toUpperCase() === this.state.myAddress.toUpperCase()) {
-              numMyDepositedEth += eth;
-              numMyDepositedTokens += tokens;
-            }
-          } else if (eventType === "RemoveLiquidity") {
-          	eth = -e.returnValues.eth_amount / 1e18;
-          	tokens = -e.returnValues.token_amount / tokenDecimals;
-
-          	eventObj.type = "Remove Liquidty";
-
-          	if (eventObj.provider.toUpperCase() === this.state.myAddress.toUpperCase()) {
-          		numMyDepositedEth += eth;
-          		numMyDepositedTokens += tokens;
-          	}
-          } else if (eventType === "TokenPurchase") {
-          	eth = e.returnValues.eth_sold / 1e18;
-          	tokens = -e.returnValues.tokens_bought / tokenDecimals;
-
-          	eventObj.provider = e.returnValues.buyer; 
-          	eventObj.type = "Token Purchase";
-
-          	eventObj.volume = eth;
-
-              // calculate the eth fee that liquidity providers will receive
-              eventObj.liquidtyProviderFee = (eth * this.state.providerFeePercent).toFixed(4) + " ETH";
-            } else if (eventType === "EthPurchase") {
-             eth = -e.returnValues.eth_bought / 1e18;
-             tokens = e.returnValues.tokens_sold / tokenDecimals;
-
-             eventObj.provider = e.returnValues.buyer; 
-             eventObj.type = "Eth Purchase";
-
-             eventObj.volume = -eth;
-
-              // calculate the token fee that liquidity providers will receive
-              eventObj.liquidtyProviderFee = (tokens * this.state.providerFeePercent).toFixed(4) + " " + this.state.curFactory;
-            } else if (eventType === "Transfer") {
-              // Track share tokens
-              let sender = e.returnValues[0];
-              let receiver = e.returnValues[1];              
-              let numShareTokens = new BigNumber(e.returnValues[2]);// / 1e18;
-              
-              // check if this was mint or burn share tokens        
-              if (receiver === "0x0000000000000000000000000000000000000000") {
-                // burn share tokens
-                numMintedShareTokens = numMintedShareTokens.minus(numShareTokens);
-
-                // check if the sender was user
-                if (sender.toUpperCase() === this.myAddress.toUpperCase()) {
-                	numMyShareTokens = numMyShareTokens.minus(numShareTokens);
-                }
-              } else {
-                // mint share tokens
-                numMintedShareTokens = numMintedShareTokens.plus(numShareTokens);
-
-                if (receiver.toUpperCase() === this.myAddress.toUpperCase()) {
-                	numMyShareTokens = numMyShareTokens.plus(numShareTokens);
-                }
-              }
-
-              // update current pool share. take users's share tokens and divide by total minted share tokens
-              curPoolShare = new BigNumber(numMyShareTokens.dividedBy(numMintedShareTokens));
-              
-              if (isNaN(curPoolShare) || (curPoolShare.toFixed(4) == 0)) {
-              	curPoolShare = 0;
-              	numMyDepositedEth = 0;
-              	numMyDepositedTokens = 0;
-              }
-
-              // get a percentage from the pool share
-              curPoolShareDisplay = (curPoolShare * 100).toFixed(2);
-
-              // if the user's pool share is 0, don't show a number
-              if (curPoolShareDisplay == 0.0) {
-              	curPoolShareDisplay = "-";
-              } else {
-                curPoolShareDisplay = curPoolShareDisplay  + "%"; // add a percentage symbol
-              }
-
-              // set it on the last event object before this transfer
-              lastEventObj.curPoolShare = curPoolShareDisplay;
-
-              return;
-            }
-
-            // save a reference to the last event object (transfer events follow add/remove liquidity)
-            lastEventObj = eventObj;
-
-            // update the total pool eth total
-            curEthTotal += eth;              
-
-            // update the total pool token total
-            curTokenTotal += tokens;
-
-            // set the number of eth and tokens for this event
-            eventObj.numEth = eth.toFixed(4);
-            eventObj.numTokens = tokens.toFixed(4);
-
-            // set the user's current pool share %
-            eventObj.curPoolShare = curPoolShareDisplay;
-
-            // push this event object onto the array
-            eventListTemp.push(eventObj);
-
-          });
-
-          // reverse the list so the most recent events are first
-          eventListTemp.reverse();
-
-          // calculate how much fees we've accrued by determining how much eth/tokens we own minus what we've deposited/withdrawn
-          let myEstimatedAccruedEthFees = (curPoolShare * curEthTotal - numMyDepositedEth).toFixed(2);
-          let myEstimatedAccruedTokenFees = (curPoolShare * curTokenTotal - numMyDepositedTokens).toFixed(2);
-
-          if (myEstimatedAccruedEthFees == 0) {
-          	myEstimatedAccruedEthFees = "";
-          } else {
-          	myEstimatedAccruedEthFees = myEstimatedAccruedEthFees + " ETH";
+          if (eventObj.provider.toUpperCase() === myAddress.toUpperCase()) {
+            numMyDepositedEth += eth;
+            numMyDepositedTokens += tokens;
           }
-          
-          if (myEstimatedAccruedTokenFees == 0) {
-          	myEstimatedAccruedTokenFees = "";
-          } else {
-          	if (myEstimatedAccruedEthFees.length == 0) {
-          		myEstimatedAccruedTokenFees = myEstimatedAccruedTokenFees + " " + this.state.curFactory;
-          	} else {
-          		myEstimatedAccruedTokenFees = ", " + myEstimatedAccruedTokenFees + " " + this.state.curFactory;
-          	}              
+        } else if (eventType === "RemoveLiquidity") {
+          eth = -e.returnValues.eth_amount / 1e18;
+          tokens = -e.returnValues.token_amount / tokenDecimals;
+
+          eventObj.type = "Remove Liquidty";
+
+          if (eventObj.provider.toUpperCase() === myAddress.toUpperCase()) {
+            numMyDepositedEth += eth;
+            numMyDepositedTokens += tokens;
           }
-          this.didReceiveData = true;
+        } else if (eventType === "TokenPurchase") {
+          eth = e.returnValues.eth_sold / 1e18;
+          tokens = -e.returnValues.tokens_bought / tokenDecimals;
 
-          // update our state
-          that.setState({  
-          	eventList : eventListTemp,
+          eventObj.provider = e.returnValues.buyer;
+          eventObj.type = "Token Purchase";
 
-          	curEthPoolTotal : curEthTotal.toFixed(4),
-          	curTokenPoolTotal : curTokenTotal.toFixed(4),
+          eventObj.volume = eth;
 
-          	curPoolShare : curPoolShareDisplay,
+          // calculate the eth fee that liquidity providers will receive
+          eventObj.liquidtyProviderFee =
+            (eth * providerFeePercent).toFixed(4) + " ETH";
+        } else if (eventType === "EthPurchase") {
+          eth = -e.returnValues.eth_bought / 1e18;
+          tokens = e.returnValues.tokens_sold / tokenDecimals;
 
-          	myCollectedEthFees : myEstimatedAccruedEthFees,
-          	myCollectedTokenFees : myEstimatedAccruedTokenFees
-          });
+          eventObj.provider = e.returnValues.buyer;
+          eventObj.type = "Eth Purchase";
 
-          if (eventListTemp.length > 0) {
-          	var recentEvent = eventListTemp[0];
-          	var oldestEvent = eventListTemp[eventListTemp.length - 1];
-          	var dateKeyToVolumeMap = {};
+          eventObj.volume = -eth;
 
-	          // get the timestamp for the most recent block
-	          window.web3.eth.getBlock(recentEvent.block).then(function(recentBlock) {
-	          	var mostRecentBlockTimestamp = recentBlock.timestamp;
-	          	var mostRecentBlockNum = recentBlock.number;
+          // calculate the token fee that liquidity providers will receive
+          eventObj.liquidtyProviderFee =
+            (tokens * providerFeePercent).toFixed(4) + " " + curFactory;
+        } else if (eventType === "Transfer") {
+          // Track share tokens
+          let sender = e.returnValues[0];
+          let receiver = e.returnValues[1];
+          let numShareTokens = new BigNumber(e.returnValues[2]); // / 1e18;
 
-				// get the timestamp for the oldest block
-				window.web3.eth.getBlock(oldestEvent.block).then(function(oldestBlock) {
-					var oldestBlockTimestamp = oldestBlock.timestamp;
-					var oldestBlockNum = oldestBlock.number;
+          // check if this was mint or burn share tokens
+          if (receiver === "0x0000000000000000000000000000000000000000") {
+            // burn share tokens
+            numMintedShareTokens = numMintedShareTokens.minus(numShareTokens);
 
-					var blockBounds = mostRecentBlockNum - oldestBlockNum;
-					var timestampBoundsInSeconds = mostRecentBlockTimestamp - oldestBlockTimestamp;
+            // check if the sender was user
+            if (sender.toUpperCase() === myAddress.toUpperCase()) {
+              numMyShareTokens = numMyShareTokens.minus(numShareTokens);
+            }
+          } else {
+            // mint share tokens
+            numMintedShareTokens = numMintedShareTokens.plus(numShareTokens);
 
-		  			// now we have our bounds. determine a timestamp for each of the block numbers in the event list
-		  			that.state.eventList.forEach((e) => {
-		  				var blockRatio = (e.block - oldestBlockNum) / blockBounds;
-		  				var blockTimestampInSeconds = blockRatio * timestampBoundsInSeconds + oldestBlockTimestamp;
+            if (receiver.toUpperCase() === myAddress.toUpperCase()) {
+              numMyShareTokens = numMyShareTokens.plus(numShareTokens);
+            }
+          }
 
-		  				// calculate which date time this block number falls under
-		  				var blockDay = new Date(blockTimestampInSeconds * 1000);
+          // update current pool share. take users's share tokens and divide by total minted share tokens
+          curPoolShare = new BigNumber(
+            numMyShareTokens.dividedBy(numMintedShareTokens)
+          );
 
-		  				var dateKey = blockDay.getMonth() + "-" + blockDay.getDate() + "-" + blockDay.getFullYear();
+          if (isNaN(curPoolShare) || curPoolShare.toFixed(4) == 0) {
+            curPoolShare = 0;
+            numMyDepositedEth = 0;
+            numMyDepositedTokens = 0;
+          }
 
-		  				// console.log(e.block + "  " + oldestBlockNum  + "  " + dateKey + "  " + e.volume);//+ "  "  + mostRecentBlockNum + "   " + blockRatio + "  " + dateKey);
+          // get a percentage from the pool share
+          curPoolShareDisplay = (curPoolShare * 100).toFixed(2);
 
-		  				if (e.volume > 0) {
-		  					if (!(dateKey in dateKeyToVolumeMap)) {
-		  						dateKeyToVolumeMap[dateKey] = 0;
-		  					}
+          // if the user's pool share is 0, don't show a number
+          if (curPoolShareDisplay == 0.0) {
+            curPoolShareDisplay = "-";
+          } else {
+            curPoolShareDisplay = curPoolShareDisplay + "%"; // add a percentage symbol
+          }
 
-		  					dateKeyToVolumeMap[dateKey] += e.volume;
-		  				}
-		  			});
+          // set it on the last event object before this transfer
+          lastEventObj.curPoolShare = curPoolShareDisplay;
 
-		  			that.setState({
-		  				volumeDataMap : dateKeyToVolumeMap,
-		  				didReceiveData : true
-		  			});
-		  		});
-			});
-         } else {
-          that.setState({
-           didReceiveData : true
-         });
+          return;
         }
+
+        // save a reference to the last event object (transfer events follow add/remove liquidity)
+        lastEventObj = eventObj;
+
+        // update the total pool eth total
+        curEthTotal += eth;
+
+        // update the total pool token total
+        curTokenTotal += tokens;
+
+        // set the number of eth and tokens for this event
+        eventObj.numEth = eth.toFixed(4);
+        eventObj.numTokens = tokens.toFixed(4);
+
+        // set the user's current pool share %
+        eventObj.curPoolShare = curPoolShareDisplay;
+
+        // push this event object onto the array
+        eventListTemp.push(eventObj);
       });
-});
-} else {
-	this.isWeb3 = false;
-}
-}
 
-renderTokenPoolHistory() {	
-	if (this.didReceiveData == false) {
-		return (
-			<img className= "LoadingImage" src="./loading3.gif"/>
-			) 
-	}
+      // reverse the list so the most recent events are first
+      eventListTemp.reverse();
 
-	return (
-		<TokenPoolHistory eventList={this.state.eventList} curFactory={this.state.curFactory} myAddress={this.state.myAddress}/>
-		);
-}
+      // calculate how much fees we've accrued by determining how much eth/tokens we own minus what we've deposited/withdrawn
+      let myEstimatedAccruedEthFees = (
+        curPoolShare * curEthTotal -
+        numMyDepositedEth
+      ).toFixed(2);
+      let myEstimatedAccruedTokenFees = (
+        curPoolShare * curTokenTotal -
+        numMyDepositedTokens
+      ).toFixed(2);
 
-renderTokenPoolDetails() {
-	if (this.curFactory.length == 0) {
-		return (
-			<div/>
-			)
-	}	
+      if (myEstimatedAccruedEthFees == 0) {
+        myEstimatedAccruedEthFees = "";
+      } else {
+        myEstimatedAccruedEthFees = myEstimatedAccruedEthFees + " ETH";
+      }
 
-	var exchange = Factory.tokens[this.state.curFactory].address;
+      if (myEstimatedAccruedTokenFees == 0) {
+        myEstimatedAccruedTokenFees = "";
+      } else {
+        if (myEstimatedAccruedEthFees.length == 0) {
+          myEstimatedAccruedTokenFees =
+            myEstimatedAccruedTokenFees + " " + curFactory;
+        } else {
+          myEstimatedAccruedTokenFees =
+            ", " + myEstimatedAccruedTokenFees + " " + curFactory;
+        }
+      }
+      didReceiveData = true;
 
-	return (
-		<TokenPoolDetails 
-		curFactory = {this.state.curFactory} 
-		tokenAddress = {this.state.tokenAddress}
-		curEthPoolTotal = {this.state.curEthPoolTotal}
-		curTokenPoolTotal = {this.state.curTokenPoolTotal}
-		curPoolShare = {this.state.curPoolShare}
-		myCollectedEthFees = {this.state.myCollectedEthFees}
-		myCollectedTokenFees = {this.state.myCollectedTokenFees}
-		exchangeAddress = {exchange}
-		/>    
-		);
-}
+      eventList = eventListTemp;
 
-renderVolumeChart() {
-	// don't render anything if we haven't loaded the events yet
-	if (this.didReceiveData == false) {
-		return (
-			<div/>
-			) 
-	}
+      curEthPoolTotal = curEthTotal.toFixed(4);
+      curTokenPoolTotal = curTokenTotal.toFixed(4);
 
-	var labels = [];
-	var volumeData = [];
+      curPoolShare = curPoolShareDisplay;
 
-  var monthNames = [
-  "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-  ];
+      myCollectedEthFees = myEstimatedAccruedEthFees;
+      myCollectedTokenFees = myEstimatedAccruedTokenFees;
 
-	  	// calculate dataset
-	  	var daysToShow = 30;
+      // update our state
+      app.setState({});
 
-	  	var oneDayOffset = (24 * 60 * 60 * 1000);
+      if (eventListTemp.length > 0) {
+        var recentEvent = eventListTemp[0];
+        var oldestEvent = eventListTemp[eventListTemp.length - 1];
+        var dateKeyToVolumeMap = {};
 
-	  	for (var daysBack = (daysToShow - 1); daysBack >= 0; daysBack--) {
-	  		var date = new Date(Date.now() - oneDayOffset * daysBack);
-	  		// console.log(date);
+        // get the timestamp for the most recent block
+        web3.web3js.eth.getBlock(recentEvent.block).then(function(recentBlock) {
+          var mostRecentBlockTimestamp = recentBlock.timestamp;
+          var mostRecentBlockNum = recentBlock.number;
 
-	  		labels.push(monthNames[date.getMonth()] + " " + date.getDate() + ", " + date.getFullYear());
+          // get the timestamp for the oldest block
+          web3.web3js.eth
+            .getBlock(oldestEvent.block)
+            .then(function(oldestBlock) {
+              var oldestBlockTimestamp = oldestBlock.timestamp;
+              var oldestBlockNum = oldestBlock.number;
 
-	  		var dateKey = date.getMonth() + "-" + date.getDate() + "-" + date.getFullYear();
+              var blockBounds = mostRecentBlockNum - oldestBlockNum;
+              var timestampBoundsInSeconds =
+                mostRecentBlockTimestamp - oldestBlockTimestamp;
 
-	  		if (dateKey in this.state.volumeDataMap) {
-	  			volumeData.push(this.state.volumeDataMap[dateKey].toFixed(4));
-	  		} else {
-	  			volumeData.push(0);
-	  		}
-	  	}
+              // now we have our bounds. determine a timestamp for each of the block numbers in the event list
+              eventList.forEach(e => {
+                var blockRatio = (e.block - oldestBlockNum) / blockBounds;
+                var blockTimestampInSeconds =
+                  blockRatio * timestampBoundsInSeconds + oldestBlockTimestamp;
 
-     var data = {
-      labels: labels,
-      datasets: [
-      {
-       label: 'Swap Volume (ETH)',
-       backgroundColor: 'rgba(160,160,160,0.4)',
-       borderWidth: 0,
-       hoverBackgroundColor: 'rgba(102,153,203,1)',
-       hoverBorderWidth: 0,
-       data: volumeData
-     }
-     ]
-   };
+                // calculate which date time this block number falls under
+                var blockDay = new Date(blockTimestampInSeconds * 1000);
 
-   return (
-    <div className="volumeChart">
-    <Bar 
-    data={data} 
-    height={250}
+                var dateKey =
+                  blockDay.getMonth() +
+                  "-" +
+                  blockDay.getDate() +
+                  "-" +
+                  blockDay.getFullYear();
 
-    options={
-     {
-      maintainAspectRatio: false
-    }
-  }
-  />
-  </div>
-  )
-}
+                // console.log(e.block + "  " + oldestBlockNum  + "  " + dateKey + "  " + e.volume);//+ "  "  + mostRecentBlockNum + "   " + blockRatio + "  " + dateKey);
 
-renderTokenSelector() {
-  return (
-  <table className="token-selector">
-  <tbody> 
-  <TokenSelectorRows activeFactory={this.state.curFactory}/>
-  </tbody>
-  </table>    
-  );
-}
+                if (e.volume > 0) {
+                  if (!(dateKey in dateKeyToVolumeMap)) {
+                    dateKeyToVolumeMap[dateKey] = 0;
+                  }
 
-renderAttribution() {
-  return (
-  <p className="attribution"><a href="https://github.com/conlan/uniswap-info" target="_blank">Github</a> - <a href="https://uniswap.io" target="_blank">Uniswap</a> - <a href="https://gifer.com/en/1Atv" target="_blank">GIF</a></p>
-  )
-}
+                  dateKeyToVolumeMap[dateKey] += e.volume;
+                }
+              });
 
-render() {  
-  if(this.isWeb3) {      
-   return (        
-   <div>
-   <div className="sidenav">
-   {this.renderTokenSelector()}
-   </div>
-   <div className="main-content">
-   {this.renderTokenPoolDetails()}
-   {this.renderVolumeChart()}
-   {this.renderTokenPoolHistory()}  
-    {this.renderAttribution()}
-   </div>
-   </div>        
-   ) 
- } else{  
-   return(  
-   <div className="InstallMetaMask">
+              volumeDataMap = dateKeyToVolumeMap;
+              didReceiveData = true;
 
-   <div>
-   <img src="./metamask-locked.png"/>
-   <p className="InstallMetaMaskText">Web3 Required</p>   
-   <br/>
-   <b><p className="InstallMetaMaskText">Desktop</p></b>
+              app.setState({});
+            });
+        });
+      } else {
+        didReceiveData = true;
 
-   <a href="https://metamask.io/" target="_blank">MetaMask</a>
+        app.setState({});
+      }
+    });
+  });
+};
 
-   <p/>
-  
-   <a href="https://brave.com" target="_blank">Brave</a>
-<br/>
-   <b><p className="InstallMetaMaskText">Mobile</p></b>
-
-   <a href="https://trustwallet.com" target="_blank">Trust</a>
-   </div>
-   </div>
-   ) 
- }
-}
-} 
-
-export default App; 
+export default App;
