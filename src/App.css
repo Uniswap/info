@@ -1,7 +1,8 @@
 .volumeChart {
-  background:#0f0f0f;
-  margin-left: 10px;
-  width:calc(100% - 20px);
+  /*background:#0f0f0f;*/
+  /*margin-left: 10px;*/
+  width:100%; 
+  display:inline-block;
 }
 
 .sidenav {
@@ -19,13 +20,14 @@
 .main-content {
     position: absolute;
     left: 110px;
+
     width:calc(100% - 120px);
+    height:100%
 }
 
 /* Default token selector cell */
 .token-selector {
-  text-align: left;
-  
+  text-align: left; 
 }
 
 /* The active token selector cell */
@@ -34,16 +36,25 @@
 	
 }
 
+div.rt-tr {
+  align-items: center;
+}
+
+.right {
+  text-align: right;
+}
+
 /* attribution text for loading gif */
 .attribution {
-  color:#FFFFFF;
-  font-size: 12px;
+  /*color:#FFFFFF;*/
+  font-size: 14px;
   text-align: center;
+  margin-bottom: 15px;
 }
 
 /* truncated text */
 .truncate {
-  width: 100px;
+  width: 150px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;  
@@ -53,20 +64,6 @@
 .myTransaction {
   background:#363f49;  
 }
-
-/* Image to install metamask when web3 not detected */
-.InstallMetaMask {
-  position: relative;
-  height: 200px;
-  margin-top:200px;
-  
-  text-align: center;
- }
-
-/* Text to install metamask when web3 not detected */
- .InstallMetaMaskText {
-  color:#a0a0a0;
- }
  
  /* Loading gif */
  .LoadingImage {

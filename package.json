@@ -12,6 +12,7 @@
     "react-dom": "^16.7.0-alpha.0",
     "react-pure-lifecycle": "^3.0.0",
     "react-scripts": "2.1.1",
+    "react-table": "^6.8.6",
     "web3": "^1.0.0-beta.36",
     "web3-react": "^1.1.2"
   },

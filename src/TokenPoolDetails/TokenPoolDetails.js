@@ -1,41 +1,107 @@
-import React, { Component } from 'react';
-import './TokenPoolDetails.css';
+import React, { Component } from "react";
 
-class TokenPoolDetails extends React.Component {  
+import ReactTable from "react-table";
+
+import "./TokenPoolDetails.css";
+
+class TokenPoolDetails extends React.Component {
   constructor(props) {
-    super(props); 
+    super(props);
   }
 
-  render () {
-    var tokenLink = "https://www.etherscan.io/address/" + this.props.tokenAddress;
-    var exchangeLink = "https://www.etherscan.io/address/" + this.props.exchangeAddress;
+  render() {
+    var tokenLink =
+      "https://www.etherscan.io/address/" + this.props.tokenAddress;
+    var exchangeLink =
+      "https://www.etherscan.io/address/" + this.props.exchangeAddress;
+
+    var accruedFees = this.props.myCollectedEthFees + this.props.myCollectedTokenFees;
+
+    if (accruedFees.length == 0) {
+      accruedFees = "-";
+    }
+
+    const data = [
+      {
+        "symbol" : this.props.curFactory,
+        "token" : this.props.tokenAddress,
+        "exchange" : this.props.exchangeAddress,
+        "poolSize" : this.props.curEthPoolTotal,
+        "poolSizeToken" : this.props.curTokenPoolTotal,
+        "poolShare" : this.props.curPoolShare,
+        "accruedFees" : accruedFees,
+        "rate" : "-"
+      }
+    ];
+
+    var headerTokenLiquidity = "Liquidity (" + this.props.curFactory + ")";
+
+    const columns = [
+      {
+        Header: "Symbol",
+        accessor: "symbol"
+      },
+      {
+        Header: "Token",
+        accessor: "token",
+        Cell: row => (
+            <a href={tokenLink} target="_blank">
+              <div className="truncate">{row.value}</div>
+            </a>
+        )
+      },
+      {
+        Header: "Exchange",
+        accessor: "exchange",
+        Cell: row => (
+          <div style={{
+          padding: "5px"
+        }}>
+            <a href={exchangeLink} target="_blank">
+              <div className="truncate">{row.value}</div>
+            </a>
+            </div>
+
+        )
+      },
+      {
+        Header: "Rate",
+        accessor: "rate",
+        className: "right"
+      },
+      {
+        Header: "Liquidty (ETH)",
+        accessor: "poolSize",
+        className: "right"
+      },
+      {
+        Header: headerTokenLiquidity,
+        accessor: "poolSizeToken",
+        className: "right"
+      },
+      {
+        Header: "Pool Share",
+        accessor: "poolShare",
+        className: "right"
+      },
+      {
+        Header: "Accrued Fees",
+        accessor: "accruedFees",
+        className: "right"
+      }
+    ];
 
     return (
-      <table className="TokenPoolDetails">
-      <thead>
-      <tr>
-        <th>Symbol</th>
-        <th>Token</th>
-        <th>Exchange</th>
-        <th>Pool Size (ETH)</th>
-        <th>Pool Size ({this.props.curFactory})</th>
-        <th>Pool Share</th>
-        <th>Accrued Fees (Estimated)</th>
-        </tr> 
-      </thead>
-      <tbody>
-        <tr>
-          <td>{this.props.curFactory}</td> 
-          <td><a href={tokenLink} target="_blank"><div className="truncate">{this.props.tokenAddress}</div></a></td>
-          <td><a href={exchangeLink} target="_blank"><div className="truncate">{this.props.exchangeAddress}</div></a></td>
-          <td>{this.props.curEthPoolTotal}</td> 
-          <td>{this.props.curTokenPoolTotal}</td> 
-          <td>{this.props.curPoolShare}</td>
-          <td>{this.props.myCollectedEthFees}{this.props.myCollectedTokenFees}</td> 
-        </tr>
-      </tbody>      
-      </table>
-      )
+      <ReactTable
+      className="TokenPoolDetails"
+        data={data}
+        minRows={1}
+        showPagination={false}
+        sortable={false}
+        columns={columns}
+        resizable={false}
+      />
+    );
   }
 }
 

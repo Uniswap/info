@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import lifecycle from "react-pure-lifecycle";
 
+import "react-table/react-table.css";
+
 import { defaults } from "react-chartjs-2";
 
 import { Bar } from "react-chartjs-2";
@@ -10,8 +12,7 @@ import { BigNumber } from "bignumber.js";
 import TokenPoolDetails from "./TokenPoolDetails/TokenPoolDetails.js";
 import TokenPoolHistory from "./TokenPoolHistory/TokenPoolHistory.js";
 
-import Factory from "./Factory.js";
-import ExchangeABI from "./ExchangeABI.js";
+import Uniswap from "./Uniswap.js";
 
 import { useWeb3Context } from "web3-react/hooks";
 
@@ -55,7 +56,7 @@ class App extends React.Component {
   }
 
   componentWillMount(props) {
-    var factory = Factory.initial;
+    var factory = Uniswap.initial;
 
     // check for URL Search Params support
     if ("URLSearchParams" in window) {
@@ -71,7 +72,7 @@ class App extends React.Component {
   }
 
   render() {
-    var exchange = Factory.tokens[curFactory].address;
+    var exchange = Uniswap.tokens[curFactory].address;
 
     return (
       <div>
@@ -79,7 +80,7 @@ class App extends React.Component {
           <TokenSelector curFactory={curFactory} />
         </div>
         <div className="main-content">
-          <TokenPoolDetails
+          <TokenPoolDetails          	
             curFactory={curFactory}
             tokenAddress={tokenAddress}
             curEthPoolTotal={curEthPoolTotal}
@@ -89,7 +90,9 @@ class App extends React.Component {
             myCollectedTokenFees={myCollectedTokenFees}
             exchangeAddress={exchange}
           />
-          <TokenVolumeChart />
+          <div>
+            <TokenVolumeChart />
+          </div>
           <TokenPoolHistory
             eventList={eventList}
             curFactory={curFactory}
@@ -109,12 +112,12 @@ const Attribution = props => {
       <a href="https://github.com/conlan/uniswap-info" target="_blank">
         Github
       </a>{" "}
-      -{" "}
+      |{" "}
       <a href="https://uniswap.io" target="_blank">
         Uniswap
       </a>{" "}
-      -{" "}
-      <a href="https://gifer.com/en/1Atv" target="_blank">
+      |{" "}
+      <a href="https://gifer.com/en/9mvB" target="_blank">
         GIF
       </a>
     </p>
@@ -144,7 +147,7 @@ const TokenSelectorRows = props => {
 
   var tokensPerRow = 1;
 
-  var tokenKeys = Object.keys(Factory.tokens);
+  var tokenKeys = Object.keys(Uniswap.tokens);
 
   for (var i = 0; i < tokenKeys.length; i++) {
     if (tokenRows[tokenRows.length - 1].length === tokensPerRow) {
@@ -250,10 +253,10 @@ const TokenVolumeChart = props => {
     datasets: [
       {
         label: "Swap Volume (ETH)",
-        backgroundColor: "rgba(160,160,160,0.4)",
-        borderWidth: 0,
+        backgroundColor: "rgba(160,160,160,1)",
+        // borderWidth: 0,
         hoverBackgroundColor: "rgba(102,153,203,1)",
-        hoverBorderWidth: 0,
+        // hoverBorderWidth: 0,
         data: volumeData
       }
     ]
@@ -265,7 +268,11 @@ const TokenVolumeChart = props => {
         data={data}
         height={250}
         options={{
-          maintainAspectRatio: false
+          maintainAspectRatio: false,
+          legend: {
+            display: false
+          }
+
         }}
       />
     </div>
@@ -277,12 +284,12 @@ const retrieveData = () => {
     return;
   }
 
-  let exchangeAddress = Factory.tokens[curFactory].address;
+  let exchangeAddress = Uniswap.tokens[curFactory].address;
 
   // get the token address
-  var tokenDecimals = Math.pow(10, Factory.tokens[curFactory].decimals);
+  var tokenDecimals = Math.pow(10, Uniswap.tokens[curFactory].decimals);
 
-  var contract = new web3.web3js.eth.Contract(ExchangeABI.abi, exchangeAddress);
+  var contract = new web3.web3js.eth.Contract(Uniswap.abi, exchangeAddress);
 
   let that = this;
 
@@ -326,7 +333,7 @@ const retrieveData = () => {
       let curTokenTotal = 0;
 
       curPoolShare = 0.0;
-      
+
       let curPoolShareDisplay = 0.0;
 
       let numMyShareTokens = new BigNumber(0);

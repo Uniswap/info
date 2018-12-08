@@ -1,12 +1,12 @@
 body {
   /*background:#17181a;*/
-  background:#000000;
+  /*background:#ededed;*/
   margin: 0;
   padding: 0;  
-  font-family:PxGrotesk,sans-serif;
-  
-  line-height:1;
-  font-size: 14px;
+
+  font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif; 
+  font-weight: 300;
+  font-size: 16px;
 
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -36,24 +36,4 @@ th, td {
   padding: 15px;
   border: 1px solid #252526;
   
-}
-
-a {
-  color: #6699cb;
-}
-
-a:link {
-    text-decoration: none;
-}
-
-a:visited {
-    text-decoration: none;
-}
-
-a:hover {
-    text-decoration: underline;
-}
-
-a:active {
-    text-decoration: none;
 }
