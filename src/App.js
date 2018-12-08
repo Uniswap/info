@@ -57,7 +57,9 @@ class App extends React.Component {
   }
 
   componentDidMount(props) {
-    retrieveData();
+    let exchangeAddress = Uniswap.tokens[curFactory].address;
+
+    retrieveData(curFactory, exchangeAddress);
   }
 
   componentWillMount(props) {
@@ -74,22 +76,48 @@ class App extends React.Component {
     }
 
     curFactory = factory;
+    tokenAddress = "";
 
     for (var token in Uniswap.tokens) {
       tokenOptions.push(token + " - " + Uniswap.tokens[token].address);
     };
   }
 
-  onTokenSelected() {
+  onTokenSelected(option) {
+    var endIndex = option.value.indexOf(" - ");
 
+    var token = option.value.substring(0, endIndex);
+
+    curFactory = token;
+    tokenAddress = "";
+
+    didRequestData = false;
+    didReceiveData = false;
+
+    eventList = [];
+    volumeDataMap = {};
+
+    curEthPoolTotal = "-";
+    curTokenPoolTotal = "-";
+    curPoolShare = "-";
+
+    myCollectedEthFees = "";
+    myCollectedTokenFees = "";
+
+    app.setState({});
+
+    let exchangeAddress = Uniswap.tokens[curFactory].address;
+
+    retrieveData(curFactory, exchangeAddress);
   }
 
   render() {
-    var exchange = Uniswap.tokens[curFactory].address;
+    var exchangeAddress = Uniswap.tokens[curFactory].address;
 
     return (
       <div>
         <Web3Setter/>
+        <p className="Logo">🦄</p>
         <Dropdown 
           options={tokenOptions} 
           onChange={this.onTokenSelected} 
@@ -104,7 +132,7 @@ class App extends React.Component {
             curPoolShare={curPoolShare}
             myCollectedEthFees={myCollectedEthFees}
             myCollectedTokenFees={myCollectedTokenFees}
-            exchangeAddress={exchange}
+            exchangeAddress={exchangeAddress}
           />
           
           <TokenVolumeChart />
@@ -125,10 +153,6 @@ class App extends React.Component {
     );
   }
 }
-
-// <div className="sidenav">
-    // <TokenSelector curFactory={curFactory} />
-  // </div>
 
 const Web3Setter = props => {
   web3 = useWeb3Context();
@@ -156,85 +180,13 @@ const Attribution = props => {
   );
 };
 
-const TokenSelector = props => {
-  if (web3 == null) {
-    web3 = useWeb3Context();
-  }
-
-  return (
-    <table className="token-selector">
-      <tbody>
-        <TokenSelectorRows activeFactory={props.curFactory} />
-      </tbody>
-    </table>
-  );
-};
-
-const TokenSelectorRows = props => {
-  var tokenRows = [];
-
-  tokenRows.push([]);
-
-  var activeFactory = props.activeFactory;
-
-  var tokensPerRow = 1;
-
-  var tokenKeys = Object.keys(Uniswap.tokens);
-
-  for (var i = 0; i < tokenKeys.length; i++) {
-    if (tokenRows[tokenRows.length - 1].length === tokensPerRow) {
-      tokenRows.push([]);
-    }
-
-    var key = tokenKeys[i];
-
-    tokenRows[tokenRows.length - 1].push(key);
-  }
-
-  return tokenRows.map((row, index) => {
-    return (
-      <tr key={index}>
-        <TokenSelectorSingleRow
-          tokensInRow={row}
-          activeFactory={activeFactory}
-        />
-      </tr>
-    );
-  });
-};
-
-const TokenSelectorSingleRow = props => {
-  var activeFactory = props.activeFactory;
-  var tokensInRow = props.tokensInRow;
-
-  var link = "";
-
-  return tokensInRow.map(token => {
-    var link = "?token=" + token;
-    var isActiveFactory = token === activeFactory;
-
-    if (isActiveFactory) {
-      return (
-        <td key={token} className="token-selector-active">
-          <div className="token-selector-active">{token}</div>
-        </td>
-      );
-    } else {
-      return (
-        <td key={token}>
-          <a href={link}>{token}</a>
-        </td>
-      );
-    }
-  });
-};
 
 const TokenSizeChart = props => {
   // don't render anything if we haven't loaded the events yet
   if (didReceiveData == false) {
     return <div />;
   }
-  
+
   return (
     <div className="SizeChart"/>
   )  
@@ -297,9 +249,7 @@ const TokenVolumeChart = props => {
       {
         label: "Swap Volume (ETH)",
         backgroundColor: "rgba(160,160,160,1)",
-        // borderWidth: 0,
         hoverBackgroundColor: "rgba(102,153,203,1)",
-        // hoverBorderWidth: 0,
         data: volumeData
       }
     ]
@@ -312,30 +262,24 @@ const TokenVolumeChart = props => {
         height={250}
         options={{
           maintainAspectRatio: false,
-          legend: {
-            display: false
-          }
-
+          legend: {display: false}
         }}
       />
     </div>
   );
 };
 
-const retrieveData = () => {
+const retrieveData = (tokenSymbol, exchangeAddress) => {
   if (didRequestData) {
     return;
   }
 
-  let exchangeAddress = Uniswap.tokens[curFactory].address;
-
   // get the token address
-  var tokenDecimals = Math.pow(10, Uniswap.tokens[curFactory].decimals);
+  var tokenDecimals = Math.pow(10, Uniswap.tokens[tokenSymbol].decimals);
 
   var contract = new web3.web3js.eth.Contract(Uniswap.abi, exchangeAddress);
 
-  let that = this;
-
+  // fetch the token address
   contract.methods
     .tokenAddress()
     .call()
@@ -347,13 +291,9 @@ const retrieveData = () => {
 
   didRequestData = true;
 
-  // get the user address
-  web3.web3js.eth.getCoinbase().then(coinbase => {
-    if (coinbase === null) {
-      coinbase = "Locked";
-    }
+  console.log("Retrieving data...");
 
-    myAddress = coinbase;
+  myAddress = web3.account;
 
     let options = {
       address: exchangeAddress,
@@ -454,7 +394,7 @@ const retrieveData = () => {
 
           // calculate the token fee that liquidity providers will receive
           eventObj.liquidtyProviderFee =
-            (tokens * providerFeePercent).toFixed(4) + " " + curFactory;
+            (tokens * providerFeePercent).toFixed(4) + " " + tokenSymbol;
         } else if (eventType === "Transfer") {
           // Track share tokens
           let sender = e.returnValues[0];
@@ -550,10 +490,10 @@ const retrieveData = () => {
       } else {
         if (myEstimatedAccruedEthFees.length == 0) {
           myEstimatedAccruedTokenFees =
-            myEstimatedAccruedTokenFees + " " + curFactory;
+            myEstimatedAccruedTokenFees + " " + tokenSymbol;
         } else {
           myEstimatedAccruedTokenFees =
-            ", " + myEstimatedAccruedTokenFees + " " + curFactory;
+            ", " + myEstimatedAccruedTokenFees + " " + tokenSymbol;
         }
       }
       didReceiveData = true;
@@ -630,7 +570,7 @@ const retrieveData = () => {
 
         app.setState({});
       }
-    });
+    // });
   });
 };
 

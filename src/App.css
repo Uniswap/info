@@ -42,16 +42,20 @@ div.rt-tr {
   position: fixed;
   top:200px;
   left:calc(50% - 250px);
-    /*display:block; 
-    margin:0 auto;
-    text-align:center*/
+ }
+
+ .Logo {
+  position: fixed;
+  font-size: 30px;
+  top:-20px;
+  left:15px;
  }
 
  .Dropdown-root {
   position: fixed;
-  width:calc(100% - 70px);
+  width:calc(100% - 80px);
   z-index: 999;
-  left:50px;
+  left:60px;
 }
 
 .TokenDetails {
@@ -59,7 +63,6 @@ div.rt-tr {
   top:50px;
   
   width:calc(100% - 30px);
-
 }
 
 .TokenHistory {

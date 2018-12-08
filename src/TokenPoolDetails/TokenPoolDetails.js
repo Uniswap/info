@@ -39,7 +39,10 @@ class TokenPoolDetails extends React.Component {
     const columns = [
       {
         Header: "Symbol",
-        accessor: "symbol"
+        accessor: "symbol",
+        Cell: row => (
+          <b>{row.value}</b>            
+        )
       },
       {
         Header: "Token",
