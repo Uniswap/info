@@ -10,6 +10,7 @@
     "react": "^16.7.0-alpha.0",
     "react-chartjs-2": "^2.7.4",
     "react-dom": "^16.7.0-alpha.0",
+    "react-dropdown": "^1.6.2",
     "react-pure-lifecycle": "^3.0.0",
     "react-scripts": "2.1.1",
     "react-table": "^6.8.6",

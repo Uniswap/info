@@ -9,6 +9,9 @@ import { Bar } from "react-chartjs-2";
 
 import { BigNumber } from "bignumber.js";
 
+import Dropdown from 'react-dropdown'
+import 'react-dropdown/style.css'
+
 import TokenPoolDetails from "./TokenPoolDetails/TokenPoolDetails.js";
 import TokenPoolHistory from "./TokenPoolHistory/TokenPoolHistory.js";
 
@@ -42,6 +45,8 @@ var tokenAddress = "";
 
 var providerFeePercent = 0.003;
 
+const tokenOptions = []
+
 class App extends React.Component {
   constructor(props) {
     super(props);
@@ -69,6 +74,14 @@ class App extends React.Component {
     }
 
     curFactory = factory;
+
+    for (var token in Uniswap.tokens) {
+      tokenOptions.push(token + " - " + Uniswap.tokens[token].address);
+    };
+  }
+
+  onTokenSelected() {
+
   }
 
   render() {
@@ -76,10 +89,13 @@ class App extends React.Component {
 
     return (
       <div>
-        <div className="sidenav">
-          <TokenSelector curFactory={curFactory} />
-        </div>
-        <div className="main-content">
+        <Web3Setter/>
+        <Dropdown 
+          options={tokenOptions} 
+          onChange={this.onTokenSelected} 
+          
+          placeholder="Select a token" />
+        <div className="TokenDetails">
           <TokenPoolDetails          	
             curFactory={curFactory}
             tokenAddress={tokenAddress}
@@ -90,20 +106,36 @@ class App extends React.Component {
             myCollectedTokenFees={myCollectedTokenFees}
             exchangeAddress={exchange}
           />
-          <div>
-            <TokenVolumeChart />
-          </div>
+          
+          <TokenVolumeChart />
+          <TokenSizeChart />
+        </div>
+        <div className="TokenHistory">          
           <TokenPoolHistory
             eventList={eventList}
             curFactory={curFactory}
             myAddress={myAddress}
             didReceiveData={didReceiveData}
-          />
+          />          
+        </div>
+        <div className="Attribution">
           <Attribution />
         </div>
       </div>
     );
   }
+}
+
+// <div className="sidenav">
+    // <TokenSelector curFactory={curFactory} />
+  // </div>
+
+const Web3Setter = props => {
+  web3 = useWeb3Context();
+
+  return (
+    <div/>
+  )
 }
 
 const Attribution = props => {
@@ -197,6 +229,17 @@ const TokenSelectorSingleRow = props => {
   });
 };
 
+const TokenSizeChart = props => {
+  // don't render anything if we haven't loaded the events yet
+  if (didReceiveData == false) {
+    return <div />;
+  }
+  
+  return (
+    <div className="SizeChart"/>
+  )  
+}
+
 const TokenVolumeChart = props => {
   // don't render anything if we haven't loaded the events yet
   if (didReceiveData == false) {
@@ -263,7 +306,7 @@ const TokenVolumeChart = props => {
   };
 
   return (
-    <div className="volumeChart">
+    <div className="VolumeChart">
       <Bar
         data={data}
         height={250}

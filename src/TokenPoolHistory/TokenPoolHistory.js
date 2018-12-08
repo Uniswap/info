@@ -124,6 +124,7 @@ class TokenPoolHistory extends React.Component {
         columns={columns}
         showPageSizeOptions={false}
         defaultPageSize={10}
+        minRows={10}
         resizable={false}
       />
     );

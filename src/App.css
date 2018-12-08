@@ -1,39 +1,16 @@
-.volumeChart {
-  /*background:#0f0f0f;*/
-  /*margin-left: 10px;*/
-  width:100%; 
-  display:inline-block;
+.VolumeChart {
+  width:calc(50% - 5px);
+  display: inline-block;
+  height:200px;
+  border:1px solid #cccccc;
 }
 
-.sidenav {
-  height: 100%; /* Full-height: remove this if you want "auto" height */
-  width: 100px; /* Set the width of the sidebar */
-  position: fixed; /* Fixed Sidebar (stay in place on scroll) */
-  z-index: 1;  // Stay on top 
-  top: 0; /* Stay at the top */
-  left: 0;
-  
-  overflow-x: hidden; /* Disable horizontal scroll */
-  /*padding-top: 20px;*/
-}
-
-.main-content {
-    position: absolute;
-    left: 110px;
-
-    width:calc(100% - 120px);
-    height:100%
-}
-
-/* Default token selector cell */
-.token-selector {
-  text-align: left; 
-}
-
-/* The active token selector cell */
-.token-selector-active {
-	background:#252526;
-	
+.SizeChart {
+  width:calc(50% - 5px);
+  display: inline-block;
+  margin-left:5px;
+  height:200px;
+  border:1px solid #cccccc;   
 }
 
 div.rt-tr {
@@ -45,29 +22,51 @@ div.rt-tr {
 }
 
 /* attribution text for loading gif */
-.attribution {
-  /*color:#FFFFFF;*/
-  font-size: 14px;
-  text-align: center;
-  margin-bottom: 15px;
+.Attribution {
+  position: fixed;
+  top:calc(100% - 50px);
+  height:50px;
+  width:calc(100% - 20px);
 }
 
 /* truncated text */
 .truncate {
-  width: 150px;
+  width: 100px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;  
 }
-
-/* table cell when it's a transaction that the user made */
-.myTransaction {
-  background:#363f49;  
-}
  
  /* Loading gif */
  .LoadingImage {
-    display:block; 
+  position: fixed;
+  top:200px;
+  left:calc(50% - 250px);
+    /*display:block; 
     margin:0 auto;
-    text-align:center
+    text-align:center*/
  }
+
+ .Dropdown-root {
+  position: fixed;
+  width:calc(100% - 70px);
+  z-index: 999;
+  left:50px;
+}
+
+.TokenDetails {
+  position: fixed;
+  top:50px;
+  
+  width:calc(100% - 30px);
+
+}
+
+.TokenHistory {
+  overflow-y: scroll;
+
+  position: absolute;
+  top:360px; 
+  bottom:50px;
+  width:calc(100% - 25px);
+}
