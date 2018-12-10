@@ -41,7 +41,7 @@ div.rt-tr {
  .LoadingImage {
   position: fixed;
   top:200px;
-  left:calc(50% - 250px);
+  left:calc(50% - 120px);
  }
 
  .Logo {
