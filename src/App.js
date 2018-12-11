@@ -153,7 +153,9 @@ class App extends Component {
 }
 
 const Web3Setter = props => {
-  web3 = useWeb3Context();
+  if (web3 === null) {
+    web3 = useWeb3Context();
+  }
 
   return <div />;
 };
@@ -506,6 +508,11 @@ const retrieveData = (tokenSymbol, exchangeAddress) => {
 
         // get the timestamp for the oldest block
         web3.web3js.eth.getBlock(oldestEvent.block).then(function(oldestBlock) {
+          // only continue if the current exchange is the original symbol we requested
+          if (curExchange !== tokenSymbol) {
+            return;
+          }
+
           var oldestBlockTimestamp = oldestBlock.timestamp;
           var oldestBlockNum = oldestBlock.number;
 
@@ -544,6 +551,8 @@ const retrieveData = (tokenSymbol, exchangeAddress) => {
           didReceiveData = true;
 
           app.setState({});
+
+          // retrieve current date
         });
       });
     } else {
