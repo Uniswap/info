@@ -3,18 +3,14 @@ import ReactTable from "react-table";
 
 import "./TokenPoolHistory.css";
 
-function GetTime(block) {
-  return "-"; // TODO
-}
+// function GetTime(block) {
+  // return "-"; // TODO
+// }
 
-class TokenPoolHistory extends React.Component {
-  constructor(props) {
-    super(props);
-  }
-
+class TokenPoolHistory extends Component {
   render() {
-    if (this.props.didReceiveData == false) {
-      return <img className="LoadingImage" src="./loading3.gif" />;
+    if (this.props.didReceiveData === false) {
+      return <img alt="Loading" className="LoadingImage" src="./loading3.gif" />;
     }
 
     const data = [];
@@ -60,7 +56,7 @@ class TokenPoolHistory extends React.Component {
           <div style={{
             padding: "5px"
           }}>
-            <a href={row.original.txLink} target="_blank">
+            <a href={row.original.txLink} rel="noopener noreferrer" target="_blank">
               <div className="truncate">{row.value}</div>
             </a>
             </div>
@@ -74,7 +70,7 @@ class TokenPoolHistory extends React.Component {
           <div style={{
             padding: "5px"
           }}>
-            <a href={row.original.blockLink} target="_blank">
+            <a href={row.original.blockLink} rel="noopener noreferrer" target="_blank">
               <div className="truncate">{row.value}</div>
             </a>
             </div>
@@ -88,7 +84,7 @@ class TokenPoolHistory extends React.Component {
           <div style={{
             padding: "5px"
           }}>
-            <a href={row.original.addressLink} target="_blank">
+            <a href={row.original.addressLink} rel="noopener noreferrer" target="_blank">
               <div className="truncate">{row.value}</div>
             </a>
             </div>

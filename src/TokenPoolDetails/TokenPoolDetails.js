@@ -4,10 +4,7 @@ import ReactTable from "react-table";
 
 import "./TokenPoolDetails.css";
 
-class TokenPoolDetails extends React.Component {
-  constructor(props) {
-    super(props);
-  }
+class TokenPoolDetails extends Component {
 
   render() {
     var tokenLink =
@@ -17,7 +14,7 @@ class TokenPoolDetails extends React.Component {
 
     var accruedFees = this.props.myCollectedEthFees + this.props.myCollectedTokenFees;
 
-    if (accruedFees.length == 0) {
+    if (accruedFees.length === 0) {
       accruedFees = "-";
     }
 
@@ -48,7 +45,7 @@ class TokenPoolDetails extends React.Component {
         Header: "Token",
         accessor: "token",
         Cell: row => (
-            <a href={tokenLink} target="_blank">
+            <a href={tokenLink} rel="noopener noreferrer" target="_blank">
               <div className="truncate">{row.value}</div>
             </a>
         )
@@ -60,7 +57,7 @@ class TokenPoolDetails extends React.Component {
           <div style={{
           padding: "5px"
         }}>
-            <a href={exchangeLink} target="_blank">
+            <a href={exchangeLink} rel="noopener noreferrer" target="_blank">
               <div className="truncate">{row.value}</div>
             </a>
             </div>
