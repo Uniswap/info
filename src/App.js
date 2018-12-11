@@ -559,10 +559,14 @@ const retrieveData = (tokenSymbol, exchangeAddress) => {
 
           // retrieve current rate
           var singleEth = 1;
-          var singleEthWei = new BigNumber(singleEth * 1e18);
-          var singleEthHex = web3.web3js.utils.toHex(singleEthWei);
+          var singleEthWei = new BigNumber(singleEth * 1e18);          
 
-          exchangeContract.methods.getEthToTokenInputPrice(singleEthHex).call().then((exchangeRate_) => {
+          exchangeContract.methods.getEthToTokenInputPrice(singleEthWei.toFixed()).call().then((exchangeRate_) => {
+          	// only continue if the current exchange is the original symbol we requested
+          	if (curExchange !== tokenSymbol) {
+          		return;
+          	}
+          	console.log(exchangeRate_);
             exchangeRate = exchangeRate_ / tokenDecimals;
 
             app.setState({});
