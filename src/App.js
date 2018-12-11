@@ -134,8 +134,7 @@ class App extends Component {
             exchangeAddress={exchangeAddress}
           />
 
-          <TokenVolumeChart />
-          <TokenSizeChart />
+          <TokenChart />
         </div>
         <div className="TokenHistory">
           <TokenPoolHistory
@@ -177,16 +176,8 @@ const Attribution = props => {
   );
 };
 
-const TokenSizeChart = props => {
-  // don't render anything if we haven't loaded the events yet
-  if (didReceiveData === false) {
-    return <div />;
-  }
 
-  return <div className="SizeChart" />;
-};
-
-const TokenVolumeChart = props => {
+const TokenChart = props => {
   // don't render anything if we haven't loaded the events yet
   if (didReceiveData === false) {
     return <div />;
@@ -250,7 +241,7 @@ const TokenVolumeChart = props => {
   };
 
   return (
-    <div className="VolumeChart">
+    <div className="TokenChart">
       <Bar
         data={data}
         height={250}

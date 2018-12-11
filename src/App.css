@@ -1,16 +1,8 @@
-.VolumeChart {
-  width:calc(50% - 5px);
+.TokenChart {
+  width:calc(100% - 5px);
   display: inline-block;
   height:200px;
   border:1px solid #cccccc;
-}
-
-.SizeChart {
-  width:calc(50% - 5px);
-  display: inline-block;
-  margin-left:5px;
-  height:200px;
-  border:1px solid #cccccc;   
 }
 
 div.rt-tr {
