@@ -18,6 +18,8 @@ class TokenPoolDetails extends Component {
       accruedFees = "-";
     }
 
+    var rateDisplay = (this.props.exchangeRate > 0) ? ("1 ETH = " + this.props.exchangeRate.toFixed(4)) : "-";
+
     const data = [
       {
         "symbol" : this.props.curFactory,
@@ -27,7 +29,7 @@ class TokenPoolDetails extends Component {
         "poolSizeToken" : this.props.curTokenPoolTotal,
         "poolShare" : this.props.curPoolShare,
         "accruedFees" : accruedFees,
-        "rate" : "-"
+        "rate" : rateDisplay
       }
     ];
 
@@ -39,7 +41,8 @@ class TokenPoolDetails extends Component {
         accessor: "symbol",
         Cell: row => (
           <b>{row.value}</b>            
-        )
+        ),
+        maxWidth : 100
       },
       {
         Header: "Token",
@@ -80,12 +83,12 @@ class TokenPoolDetails extends Component {
         className: "right"
       },
       {
-        Header: "Pool Share",
+        Header: "Your Share",
         accessor: "poolShare",
         className: "right"
       },
       {
-        Header: "Accrued Fees",
+        Header: "Your Fees",
         accessor: "accruedFees",
         className: "right"
       }

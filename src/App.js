@@ -42,6 +42,8 @@ var myCollectedTokenFees = "";
 var myAddress = "";
 var tokenAddress = "";
 
+var exchangeRate = 0;
+
 var providerFeePercent = 0.003;
 
 const tokenOptions = [];
@@ -103,6 +105,8 @@ class App extends Component {
     myCollectedEthFees = "";
     myCollectedTokenFees = "";
 
+    exchangeRate = 0;
+
     app.setState({});
 
     let exchangeAddress = Uniswap.tokens[curExchange].address;
@@ -125,6 +129,7 @@ class App extends Component {
         <div className="TokenDetails">
           <TokenPoolDetails
             curFactory={curExchange}
+            exchangeRate={exchangeRate}
             tokenAddress={tokenAddress}
             curEthPoolTotal={curEthPoolTotal}
             curTokenPoolTotal={curTokenPoolTotal}
@@ -264,7 +269,7 @@ const retrieveData = (tokenSymbol, exchangeAddress) => {
   // get the token address
   var tokenDecimals = Math.pow(10, Uniswap.tokens[tokenSymbol].decimals);
 
-  var contract = new web3.web3js.eth.Contract(Uniswap.abi, exchangeAddress);
+  var exchangeContract = new web3.web3js.eth.Contract(Uniswap.abi, exchangeAddress);
 
   // fetch the token address
   tokenAddress = Uniswap.tokens[tokenSymbol].tokenAddress;
@@ -287,7 +292,7 @@ const retrieveData = (tokenSymbol, exchangeAddress) => {
   // 0x7f4091b46c33e918a0f3aa42307641d17bb67029427a5369e54b353984238705 = EthPurchase
   // 0x0fbf06c058b90cb038a618f8c2acbf6145f8b3570fd1fa56abb8f0f3f05b36e8 = RemoveLiquidity
 
-  contract.getPastEvents("allEvents", options).then(events => {
+  exchangeContract.getPastEvents("allEvents", options).then(events => {
     // only continue if the current exchange is the original symbol we requested
     if (curExchange !== tokenSymbol) {
       return;
@@ -552,7 +557,16 @@ const retrieveData = (tokenSymbol, exchangeAddress) => {
 
           app.setState({});
 
-          // retrieve current date
+          // retrieve current rate
+          var singleEth = 1;
+          var singleEthWei = new BigNumber(singleEth * 1e18);
+          var singleEthHex = web3.web3js.utils.toHex(singleEthWei);
+
+          exchangeContract.methods.getEthToTokenInputPrice(singleEthHex).call().then((exchangeRate_) => {
+            exchangeRate = exchangeRate_ / tokenDecimals;
+
+            app.setState({});
+          });
         });
       });
     } else {
