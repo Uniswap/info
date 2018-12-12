@@ -9,12 +9,13 @@ import { Bar } from "react-chartjs-2";
 import { BigNumber } from "bignumber.js";
 
 import Dropdown from "react-dropdown";
+
 import "react-dropdown/style.css";
 
-import TokenPoolDetails from "./TokenPoolDetails/TokenPoolDetails.js";
-import TokenPoolHistory from "./TokenPoolHistory/TokenPoolHistory.js";
+import TokenPoolDetails from "./components/TokenPoolDetails/index.js";
+import TokenPoolHistory from "./components/TokenPoolHistory/index.js";
 
-import Uniswap from "./Uniswap.js";
+import Uniswap from "./constants/Uniswap.js";
 
 import { useWeb3Context } from "web3-react/hooks";
 
