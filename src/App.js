@@ -53,6 +53,14 @@ var providerFeePercent = 0.003;
 
 const tokenOptions = [];
 
+function GetEthToTokenPrice(ethReserve, tokenReserve) {
+	var inputEthWithFee = 1 - providerFeePercent;
+	var numerator = inputEthWithFee * tokenReserve;
+	var denominator = (ethReserve) + inputEthWithFee;
+
+	return (numerator / denominator);
+}
+
 class App extends Component {
   constructor(props) {
     super(props);
@@ -216,6 +224,7 @@ const TokenChart = props => {
   
   var ethLiquidityData = [];
   var tokenLiquidityData = [];
+  var ethPriceData = [];
 
   var monthNames = [
     "Jan",
@@ -239,7 +248,6 @@ const TokenChart = props => {
 
   var currentEthLiquidity = 0;
   var currentTokenLiquidity = 0;
-
 
   for (var daysBack = daysToShow; daysBack >= 0; daysBack--) {
     var date = new Date(Date.now() - oneDayOffset * daysBack);
@@ -272,6 +280,9 @@ const TokenChart = props => {
     	currentTokenLiquidity += tokenLiquidityDataMap[dateKey];
     }
     tokenLiquidityData.push(currentTokenLiquidity.toFixed(4));
+
+    // calculate the price of the token on this given day
+    ethPriceData.push(GetEthToTokenPrice(currentEthLiquidity, currentTokenLiquidity).toFixed(4));
   }
 
   // don't even show liquidity points if there was no liquidity at all
@@ -291,36 +302,49 @@ const TokenChart = props => {
         label: "Liquidity (ETH)",
         type: "line",
         data: ethLiquidityData,
-        borderColor: "rgba(231,82,232,1)",
-
-
-        lineTension : 0,
-                
-        pointBorderColor: "rgba(231,82,232,1)",
-        pointBackgroundColor: "rgba(231,82,232,1)",
-
-        pointHoverBackgroundColor: "rgba(255,255,255,1)",
-        pointHoverBorderColor: "rgba(231,82,232,1)",
         
-        pointRadius: 2,
+        lineTension : 0,
+
+		borderColor: "rgba(251,167,27,1)",
+        pointBorderColor: "rgba(251,167,27,1)",        
+        pointBackgroundColor: "rgba(251,167,27,1)",
+        
+        pointRadius: 1,
+        pointHitRadius: 4,
         pointHoverRadius: 3,
+
         yAxisID: "y-axis-2"
       },
       {
         label: tokenLiquidityLabel,
         type: "line",
-        data: tokenLiquidityData,
-        borderColor: "rgba(231,82,232,1)",
+        data: tokenLiquidityData,        
+
+        lineTension : 0,
+
+        borderColor: "rgba(87,183,87,1)",        
+        pointBorderColor: "rgba(87,183,87,1)",
+        pointBackgroundColor: "rgba(87,183,87,1)",
+        
+        pointRadius: 1,
+        pointHitRadius: 4,
+        pointHoverRadius: 3,
+        yAxisID: "y-axis-2"
+      },
+      {
+        label: "Rate",
+        type: "line",
+        data: ethPriceData,
+        
 
         lineTension : 0,
                 
-        pointBorderColor: "rgba(231,82,232,1)",
-        pointBackgroundColor: "rgba(231,82,232,1)",
-
-        pointHoverBackgroundColor: "rgba(255,255,255,1)",
-        pointHoverBorderColor: "rgba(231,82,232,1)",
+		borderColor: "rgba(243, 98, 45,1)",                
+        pointBorderColor: "rgba(243, 98, 45,1)",
+        pointBackgroundColor: "rgba(243, 98, 45,1)",
         
-        pointRadius: 2,
+        pointRadius: 1,
+        pointHitRadius: 4,
         pointHoverRadius: 3,
         yAxisID: "y-axis-2"
       },
@@ -329,10 +353,11 @@ const TokenChart = props => {
         label: "Trade Volume (ETH)",
         data: volumeData,
         fill: false,
-        backgroundColor: "rgba(160,160,160,1)",
-        // borderColor: "#71B37C",
-        hoverBackgroundColor: "rgba(231,82,232,1)",
-        hoverBorderColor: "rgba(102,153,203,1)",
+        backgroundColor: "rgba(160,160,160, 0.4)",
+
+        hoverBackgroundColor: "rgba(231,82,232,0.4)",
+        hoverBorderColor: "rgba(102,153,203,0.4)",
+
         yAxisID: "y-axis-1"
       }
     ]
@@ -724,25 +749,9 @@ const retrieveData = (tokenSymbol, exchangeAddress) => {
 
           didReceiveData = true;
 
+          exchangeRate = GetEthToTokenPrice(curEthTotal, curTokenTotal);
+          
           app.setState({});
-
-          // retrieve current rate
-          var singleEth = 1;
-          var singleEthWei = new BigNumber(singleEth * 1e18);
-
-          exchangeContract.methods
-            .getEthToTokenInputPrice(singleEthWei.toFixed())
-            .call()
-            .then(exchangeRate_ => {
-              // only continue if the current exchange is the original symbol we requested
-              if (curExchange !== tokenSymbol) {
-                return;
-              }
-              
-              exchangeRate = exchangeRate_ / tokenDecimals;
-
-              app.setState({});
-            });
         });
       });
     } else {
