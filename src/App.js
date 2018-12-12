@@ -231,7 +231,9 @@ const TokenChart = props => {
 
   var oneDayOffset = 24 * 60 * 60 * 1000; // in milliseconds
 
-  for (var daysBack = daysToShow - 1; daysBack >= 0; daysBack--) {
+  var currentLiquidity = 0;
+
+  for (var daysBack = daysToShow; daysBack >= 0; daysBack--) {
     var date = new Date(Date.now() - oneDayOffset * daysBack);
     // console.log(date);
 
@@ -253,10 +255,10 @@ const TokenChart = props => {
     }
 
     if (dateKey in liquidityDataMap) {
-      liquidityData.push(liquidityDataMap[dateKey].toFixed(4));
-    } else {
-      liquidityData.push(0);
+      currentLiquidity += liquidityDataMap[dateKey];
     }
+
+    liquidityData.push(currentLiquidity.toFixed(4));
   }
 
   // don't even show liquidity points if there was no liquidity at all
@@ -271,6 +273,9 @@ const TokenChart = props => {
         type: "line",
         data: liquidityData,
         borderColor: "rgba(231,82,232,1)",
+
+        // borderJoinStyle: 'miter',
+        lineTension : 0,
                 
         pointBorderColor: "rgba(231,82,232,1)",
         pointBackgroundColor: "rgba(231,82,232,1)",
@@ -545,8 +550,8 @@ const retrieveData = (tokenSymbol, exchangeAddress) => {
       curTokenTotal += tokens;
 
       // set the number of eth and tokens for this event
-      eventObj.numEth = eth.toFixed(4);
-      eventObj.numTokens = tokens.toFixed(4);
+      eventObj.numEth = eth;
+      eventObj.numTokens = tokens;
 
       // set the user's current pool share %
       eventObj.curPoolShare = curPoolShareDisplay;
@@ -603,7 +608,9 @@ const retrieveData = (tokenSymbol, exchangeAddress) => {
     if (eventListTemp.length > 0) {
       var recentEvent = eventListTemp[0];
       var oldestEvent = eventListTemp[eventListTemp.length - 1];
+      
       var dateKeyToVolumeMap = {};
+      var dateKeyToLiquidityMap = {};
 
       // get the timestamp for the most recent block
       web3.web3js.eth.getBlock(recentEvent.block).then(function(recentBlock) {
@@ -623,10 +630,11 @@ const retrieveData = (tokenSymbol, exchangeAddress) => {
           var blockBounds = mostRecentBlockNum - oldestBlockNum;
           var timestampBoundsInSeconds =
             mostRecentBlockTimestamp - oldestBlockTimestamp;
-
+            
           // now we have our bounds. determine a timestamp for each of the block numbers in the event list
           eventList.forEach(e => {
-            var blockRatio = (e.block - oldestBlockNum) / blockBounds;
+            var blockRatio = (blockBounds > 0) ? (e.block - oldestBlockNum) / blockBounds : 1;
+
             var blockTimestampInSeconds =
               blockRatio * timestampBoundsInSeconds + oldestBlockTimestamp;
 
@@ -642,16 +650,31 @@ const retrieveData = (tokenSymbol, exchangeAddress) => {
 
             // console.log(e.block + "  " + oldestBlockNum  + "  " + dateKey + "  " + e.volume);//+ "  "  + mostRecentBlockNum + "   " + blockRatio + "  " + dateKey);
 
-            if (e.volume > 0) {
+            // update volume bucket for this date
+            if (e.volume > 0) {              
               if (!(dateKey in dateKeyToVolumeMap)) {
                 dateKeyToVolumeMap[dateKey] = 0;
               }
-
               dateKeyToVolumeMap[dateKey] += e.volume;
             }
+
+            if (e.numEth != 0) {
+              // update liquidity bucket for this date
+              if (!(dateKey in dateKeyToLiquidityMap)) {
+                dateKeyToLiquidityMap[dateKey] = 0;
+              }
+
+              dateKeyToLiquidityMap[dateKey] += e.numEth;
+
+              console.log(dateKey + "     " + e.numEth + "     " + dateKeyToLiquidityMap[dateKey]);
+            }            
           });
 
+          console.log("---");
+
           volumeDataMap = dateKeyToVolumeMap;
+          liquidityDataMap = dateKeyToLiquidityMap;
+
           didReceiveData = true;
 
           app.setState({});
