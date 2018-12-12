@@ -31,7 +31,9 @@ var didReceiveData = false;
 var eventList = [];
 
 var volumeDataMap = {}; // how much trading volume keyed by day
-var liquidityDataMap = {}; // how much liquidity in pool keyed by day
+
+var ethLiquidityDataMap = {}; // how much liquidity in pool keyed by day (eth)
+var tokenLiquidityDataMap = {} // how much liquidity in pool keyed by day (token)
 
 var curExchange = "";
 
@@ -101,7 +103,9 @@ class App extends Component {
     eventList = [];
     
     volumeDataMap = {};
-    liquidityDataMap = {};
+    
+    ethLiquidityDataMap = {};
+    tokenLiquidityDataMap = {};
 
     curEthPoolTotal = "-";
     curTokenPoolTotal = "-";
@@ -209,7 +213,9 @@ const TokenChart = props => {
   var labels = [];
   
   var volumeData = [];
-  var liquidityData = [];
+  
+  var ethLiquidityData = [];
+  var tokenLiquidityData = [];
 
   var monthNames = [
     "Jan",
@@ -231,11 +237,12 @@ const TokenChart = props => {
 
   var oneDayOffset = 24 * 60 * 60 * 1000; // in milliseconds
 
-  var currentLiquidity = 0;
+  var currentEthLiquidity = 0;
+  var currentTokenLiquidity = 0;
+
 
   for (var daysBack = daysToShow; daysBack >= 0; daysBack--) {
     var date = new Date(Date.now() - oneDayOffset * daysBack);
-    // console.log(date);
 
     labels.push(
       monthNames[date.getMonth()] +
@@ -254,27 +261,57 @@ const TokenChart = props => {
       volumeData.push(0);
     }
 
-    if (dateKey in liquidityDataMap) {
-      currentLiquidity += liquidityDataMap[dateKey];
+    // track eth liquidity
+    if (dateKey in ethLiquidityDataMap) {
+      currentEthLiquidity += ethLiquidityDataMap[dateKey];
     }
+    ethLiquidityData.push(currentEthLiquidity.toFixed(4));
 
-    liquidityData.push(currentLiquidity.toFixed(4));
+    // track token liquidity
+    if (dateKey in tokenLiquidityDataMap) {
+    	currentTokenLiquidity += tokenLiquidityDataMap[dateKey];
+    }
+    tokenLiquidityData.push(currentTokenLiquidity.toFixed(4));
   }
 
   // don't even show liquidity points if there was no liquidity at all
-  if (Object.keys(liquidityDataMap).length === 0) {
-    liquidityData = [];
+  if (Object.keys(ethLiquidityDataMap).length === 0) {
+    ethLiquidityData = [];
   }
+  // don't even show liquidity points if there was no liquidity at all
+  if (Object.keys(tokenLiquidityDataMap).length === 0) {
+    tokenLiquidityData = [];
+  }
+
+  var tokenLiquidityLabel = "Liquidity (" + curExchange + ")";
 
   const data = {
     datasets: [
       {
         label: "Liquidity (ETH)",
         type: "line",
-        data: liquidityData,
+        data: ethLiquidityData,
         borderColor: "rgba(231,82,232,1)",
 
-        // borderJoinStyle: 'miter',
+
+        lineTension : 0,
+                
+        pointBorderColor: "rgba(231,82,232,1)",
+        pointBackgroundColor: "rgba(231,82,232,1)",
+
+        pointHoverBackgroundColor: "rgba(255,255,255,1)",
+        pointHoverBorderColor: "rgba(231,82,232,1)",
+        
+        pointRadius: 2,
+        pointHoverRadius: 3,
+        yAxisID: "y-axis-2"
+      },
+      {
+        label: tokenLiquidityLabel,
+        type: "line",
+        data: tokenLiquidityData,
+        borderColor: "rgba(231,82,232,1)",
+
         lineTension : 0,
                 
         pointBorderColor: "rgba(231,82,232,1)",
@@ -610,7 +647,9 @@ const retrieveData = (tokenSymbol, exchangeAddress) => {
       var oldestEvent = eventListTemp[eventListTemp.length - 1];
       
       var dateKeyToVolumeMap = {};
-      var dateKeyToLiquidityMap = {};
+
+      var dateKeyToEthLiquidityMap = {};
+      var dateKeyToTokenLiquidityMap = {};
 
       // get the timestamp for the most recent block
       web3.web3js.eth.getBlock(recentEvent.block).then(function(recentBlock) {
@@ -658,22 +697,30 @@ const retrieveData = (tokenSymbol, exchangeAddress) => {
               dateKeyToVolumeMap[dateKey] += e.volume;
             }
 
-            if (e.numEth != 0) {
-              // update liquidity bucket for this date
-              if (!(dateKey in dateKeyToLiquidityMap)) {
-                dateKeyToLiquidityMap[dateKey] = 0;
+			// update eth liquidity bucket for this date
+            if (e.numEth != 0) {              
+              if (!(dateKey in dateKeyToEthLiquidityMap)) {
+                dateKeyToEthLiquidityMap[dateKey] = 0;
               }
 
-              dateKeyToLiquidityMap[dateKey] += e.numEth;
+              dateKeyToEthLiquidityMap[dateKey] += e.numEth;
+            }
 
-              console.log(dateKey + "     " + e.numEth + "     " + dateKeyToLiquidityMap[dateKey]);
-            }            
+            // update token liquidity bucket for this date
+            if (e.numTokens != 0) {              
+              if (!(dateKey in dateKeyToTokenLiquidityMap)) {
+                dateKeyToTokenLiquidityMap[dateKey] = 0;
+              }
+
+              dateKeyToTokenLiquidityMap[dateKey] += e.numTokens;
+            }
+
           });
 
-          console.log("---");
-
           volumeDataMap = dateKeyToVolumeMap;
-          liquidityDataMap = dateKeyToLiquidityMap;
+
+          ethLiquidityDataMap = dateKeyToEthLiquidityMap;
+          tokenLiquidityDataMap = dateKeyToTokenLiquidityMap;
 
           didReceiveData = true;
 
@@ -691,7 +738,7 @@ const retrieveData = (tokenSymbol, exchangeAddress) => {
               if (curExchange !== tokenSymbol) {
                 return;
               }
-              console.log(exchangeRate_);
+              
               exchangeRate = exchangeRate_ / tokenDecimals;
 
               app.setState({});
