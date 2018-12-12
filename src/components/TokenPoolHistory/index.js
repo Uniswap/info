@@ -34,8 +34,8 @@ class TokenPoolHistory extends Component {
         address : e.provider,
         addressLink : providerLink,
 
-        poolAdjustmentEth : Number(e.numEth),
-        poolAdjustmentToken : Number(e.numTokens),
+        poolAdjustmentEth : Number(e.numEth).toFixed(4),
+        poolAdjustmentToken : Number(e.numTokens).toFixed(4),
         providerFee : e.liquidtyProviderFee,
         poolShare : e.curPoolShare
       }
