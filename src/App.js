@@ -29,7 +29,9 @@ var didRequestData = false;
 var didReceiveData = false;
 
 var eventList = [];
-var volumeDataMap = {};
+
+var volumeDataMap = {}; // how much trading volume keyed by day
+var liquidityDataMap = {}; // how much liquidity in pool keyed by day
 
 var curExchange = "";
 
@@ -69,7 +71,7 @@ class App extends Component {
 
     // check for URL Search Params support
     if ("URLSearchParams" in window) {
-      // extract factory token from URL if found
+      // extract exchange token from URL if found
       var urlParams = new URLSearchParams(window.location.search);
 
       if (urlParams.has("token")) {
@@ -97,7 +99,9 @@ class App extends Component {
     didReceiveData = false;
 
     eventList = [];
+    
     volumeDataMap = {};
+    liquidityDataMap = {};
 
     curEthPoolTotal = "-";
     curTokenPoolTotal = "-";
@@ -121,7 +125,11 @@ class App extends Component {
     return (
       <div>
         <Web3Setter />
-        <p className="Logo"><span role="img" aria-label="Unicorn">🦄</span></p>
+        <p className="Logo">
+          <span role="img" aria-label="Unicorn">
+            🦄
+          </span>
+        </p>
         <Dropdown
           options={tokenOptions}
           onChange={this.onTokenSelected}
@@ -129,7 +137,7 @@ class App extends Component {
         />
         <div className="TokenDetails">
           <TokenPoolDetails
-            curFactory={curExchange}
+            curExchange={curExchange}
             exchangeRate={exchangeRate}
             tokenAddress={tokenAddress}
             curEthPoolTotal={curEthPoolTotal}
@@ -169,7 +177,11 @@ const Web3Setter = props => {
 const Attribution = props => {
   return (
     <p className="attribution">
-      <a href="https://github.com/conlan/uniswap-info" rel="noopener noreferrer" target="_blank">
+      <a
+        href="https://github.com/conlan/uniswap-info"
+        rel="noopener noreferrer"
+        target="_blank"
+      >
         Github
       </a>{" "}
       |{" "}
@@ -177,13 +189,16 @@ const Attribution = props => {
         Uniswap
       </a>{" "}
       |{" "}
-      <a href="https://gifer.com/en/9mvB" rel="noopener noreferrer" target="_blank">
+      <a
+        href="https://gifer.com/en/9mvB"
+        rel="noopener noreferrer"
+        target="_blank"
+      >
         GIF
       </a>
     </p>
   );
 };
-
 
 const TokenChart = props => {
   // don't render anything if we haven't loaded the events yet
@@ -192,7 +207,9 @@ const TokenChart = props => {
   }
 
   var labels = [];
+  
   var volumeData = [];
+  var liquidityData = [];
 
   var monthNames = [
     "Jan",
@@ -210,9 +227,9 @@ const TokenChart = props => {
   ];
 
   // calculate dataset
-  var daysToShow = 30;
+  var daysToShow = 60;
 
-  var oneDayOffset = 24 * 60 * 60 * 1000;
+  var oneDayOffset = 24 * 60 * 60 * 1000; // in milliseconds
 
   for (var daysBack = daysToShow - 1; daysBack >= 0; daysBack--) {
     var date = new Date(Date.now() - oneDayOffset * daysBack);
@@ -234,29 +251,107 @@ const TokenChart = props => {
     } else {
       volumeData.push(0);
     }
+
+    if (dateKey in liquidityDataMap) {
+      liquidityData.push(liquidityDataMap[dateKey].toFixed(4));
+    } else {
+      liquidityData.push(0);
+    }
   }
 
-  var data = {
-    labels: labels,
+  // don't even show liquidity points if there was no liquidity at all
+  if (Object.keys(liquidityDataMap).length === 0) {
+    liquidityData = [];
+  }
+
+  const data = {
     datasets: [
       {
-        label: "Swap Volume (ETH)",
+        label: "Liquidity (ETH)",
+        type: "line",
+        data: liquidityData,
+        borderColor: "rgba(231,82,232,1)",
+                
+        pointBorderColor: "rgba(231,82,232,1)",
+        pointBackgroundColor: "rgba(231,82,232,1)",
+
+        pointHoverBackgroundColor: "rgba(255,255,255,1)",
+        pointHoverBorderColor: "rgba(231,82,232,1)",
+        
+        pointRadius: 2,
+        pointHoverRadius: 3,
+        yAxisID: "y-axis-2"
+      },
+      {
+        type: "bar",
+        label: "Trade Volume (ETH)",
+        data: volumeData,
+        fill: false,
         backgroundColor: "rgba(160,160,160,1)",
-        hoverBackgroundColor: "rgba(102,153,203,1)",
-        data: volumeData
+        // borderColor: "#71B37C",
+        hoverBackgroundColor: "rgba(231,82,232,1)",
+        hoverBorderColor: "rgba(102,153,203,1)",
+        yAxisID: "y-axis-1"
       }
     ]
+  };
+
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    tooltips: {
+      mode: "label"
+    },
+    elements: {
+      line: {
+        fill: false
+      }
+    },
+    scales: {
+      xAxes: [
+        {
+          display: true,
+          gridLines: {
+            display: false
+          },
+          labels: labels
+        }
+      ],
+      yAxes: [
+        {
+          type: "linear",
+          display: true,
+          position: "left",
+          id: "y-axis-1",
+          gridLines: {
+            display: false
+          },
+          labels: {
+            show: true
+          }
+        },
+        {
+          type: "linear",
+          display: true,
+          position: "right",
+          id: "y-axis-2",
+          gridLines: {
+            display: false
+          },
+          labels: {
+            show: true
+          }
+        }
+      ]
+    }
   };
 
   return (
     <div className="TokenChart">
       <Bar
         data={data}
-        height={250}
-        options={{
-          maintainAspectRatio: false,
-          legend: { display: false }
-        }}
+        // height={250}
+        options={chartOptions}
       />
     </div>
   );
@@ -270,7 +365,10 @@ const retrieveData = (tokenSymbol, exchangeAddress) => {
   // get the token address
   var tokenDecimals = Math.pow(10, Uniswap.tokens[tokenSymbol].decimals);
 
-  var exchangeContract = new web3.web3js.eth.Contract(Uniswap.abi, exchangeAddress);
+  var exchangeContract = new web3.web3js.eth.Contract(
+    Uniswap.abi,
+    exchangeAddress
+  );
 
   // fetch the token address
   tokenAddress = Uniswap.tokens[tokenSymbol].tokenAddress;
@@ -298,7 +396,7 @@ const retrieveData = (tokenSymbol, exchangeAddress) => {
     if (curExchange !== tokenSymbol) {
       return;
     }
-    
+
     console.log(events);
 
     let eventListTemp = [];
@@ -560,18 +658,21 @@ const retrieveData = (tokenSymbol, exchangeAddress) => {
 
           // retrieve current rate
           var singleEth = 1;
-          var singleEthWei = new BigNumber(singleEth * 1e18);          
+          var singleEthWei = new BigNumber(singleEth * 1e18);
 
-          exchangeContract.methods.getEthToTokenInputPrice(singleEthWei.toFixed()).call().then((exchangeRate_) => {
-          	// only continue if the current exchange is the original symbol we requested
-          	if (curExchange !== tokenSymbol) {
-          		return;
-          	}
-          	console.log(exchangeRate_);
-            exchangeRate = exchangeRate_ / tokenDecimals;
+          exchangeContract.methods
+            .getEthToTokenInputPrice(singleEthWei.toFixed())
+            .call()
+            .then(exchangeRate_ => {
+              // only continue if the current exchange is the original symbol we requested
+              if (curExchange !== tokenSymbol) {
+                return;
+              }
+              console.log(exchangeRate_);
+              exchangeRate = exchangeRate_ / tokenDecimals;
 
-            app.setState({});
-          });
+              app.setState({});
+            });
         });
       });
     } else {

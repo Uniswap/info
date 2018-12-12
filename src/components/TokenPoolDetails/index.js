@@ -22,7 +22,7 @@ class TokenPoolDetails extends Component {
 
     const data = [
       {
-        "symbol" : this.props.curFactory,
+        "symbol" : this.props.curExchange,
         "token" : this.props.tokenAddress,
         "exchange" : this.props.exchangeAddress,
         "poolSize" : this.props.curEthPoolTotal,
@@ -33,7 +33,7 @@ class TokenPoolDetails extends Component {
       }
     ];
 
-    var headerTokenLiquidity = "Liquidity (" + this.props.curFactory + ")";
+    var headerTokenLiquidity = "Liquidity (" + this.props.curExchange + ")";
 
     const columns = [
       {
