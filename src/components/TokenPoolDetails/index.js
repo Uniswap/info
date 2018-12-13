@@ -58,7 +58,7 @@ class TokenPoolDetails extends Component {
         accessor: "exchange",
         Cell: row => (
           <div style={{
-          padding: "5px"
+          padding: "2px"
         }}>
             <a href={exchangeLink} rel="noopener noreferrer" target="_blank">
               <div className="truncate">{row.value}</div>

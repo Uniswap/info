@@ -629,11 +629,11 @@ const retrieveData = (tokenSymbol, exchangeAddress) => {
     let myEstimatedAccruedEthFees = (
       curPoolShare * curEthTotal -
       numMyDepositedEth
-    ).toFixed(2);
+    ).toFixed(4);
     let myEstimatedAccruedTokenFees = (
       curPoolShare * curTokenTotal -
       numMyDepositedTokens
-    ).toFixed(2);
+    ).toFixed(4);
 
     if (Number(myEstimatedAccruedEthFees) === 0) {
       myEstimatedAccruedEthFees = "";
