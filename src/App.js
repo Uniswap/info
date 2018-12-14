@@ -58,7 +58,12 @@ function GetEthToTokenPrice(ethReserve, tokenReserve) {
 	var numerator = inputEthWithFee * tokenReserve;
 	var denominator = (ethReserve) + inputEthWithFee;
 
-	return (numerator / denominator);
+  var rate = (numerator / denominator);
+  if (rate > 0) {
+    return 1 / rate;
+  } else {
+    return 0;
+  }
 }
 
 class App extends Component {
@@ -442,7 +447,7 @@ const retrieveData = (tokenSymbol, exchangeAddress) => {
 
   didRequestData = true;
 
-  console.log("Retrieving data...");
+  console.log("Retrieving data for exchange=" + exchangeAddress);
 
   myAddress = web3.account;
 

@@ -18,7 +18,7 @@ class TokenPoolDetails extends Component {
       accruedFees = "-";
     }
 
-    var rateDisplay = (this.props.exchangeRate > 0) ? ("1 ETH = " + this.props.exchangeRate.toFixed(4)) : "-";
+    var rateDisplay = (this.props.exchangeRate > 0) ? (this.props.exchangeRate.toFixed(4) + " ETH") : "-";
 
     const data = [
       {
