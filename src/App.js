@@ -207,7 +207,7 @@ const Attribution = props => {
       </a>{" "}
       |{" "}
       <a
-        href="https://gifer.com/en/9mvB"
+        href="https://gifer.com/en/1Atv"
         rel="noopener noreferrer"
         target="_blank"
       >
@@ -728,7 +728,7 @@ const retrieveData = (tokenSymbol, exchangeAddress) => {
             }
 
 			// update eth liquidity bucket for this date
-            if (e.numEth != 0) {              
+            if (e.numEth !== 0) {              
               if (!(dateKey in dateKeyToEthLiquidityMap)) {
                 dateKeyToEthLiquidityMap[dateKey] = 0;
               }
@@ -737,7 +737,7 @@ const retrieveData = (tokenSymbol, exchangeAddress) => {
             }
 
             // update token liquidity bucket for this date
-            if (e.numTokens != 0) {              
+            if (e.numTokens !== 0) {              
               if (!(dateKey in dateKeyToTokenLiquidityMap)) {
                 dateKeyToTokenLiquidityMap[dateKey] = 0;
               }
