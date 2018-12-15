@@ -6,6 +6,7 @@
   "dependencies": {
     "bignumber.js": "^8.0.1",
     "gh-pages": "^2.0.1",
+    "chart.js": "^2.7.3",
     "react": "^16.7.0-alpha.0",
     "react-chartjs-2": "^2.7.4",
     "react-dom": "^16.7.0-alpha.0",
