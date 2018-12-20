@@ -33,7 +33,7 @@ var eventList = [];
 var volumeDataMap = {}; // how much trading volume keyed by day
 
 var ethLiquidityDataMap = {}; // how much liquidity in pool keyed by day (eth)
-var tokenLiquidityDataMap = {} // how much liquidity in pool keyed by day (token)
+var tokenLiquidityDataMap = {}; // how much liquidity in pool keyed by day (token)
 
 var curExchange = "";
 
@@ -54,11 +54,11 @@ var providerFeePercent = 0.003;
 const tokenOptions = [];
 
 function GetEthToTokenPrice(ethReserve, tokenReserve) {
-	var inputEthWithFee = 1 - providerFeePercent;
-	var numerator = inputEthWithFee * tokenReserve;
-	var denominator = (ethReserve) + inputEthWithFee;
+  var inputEthWithFee = 1 - providerFeePercent;
+  var numerator = inputEthWithFee * tokenReserve;
+  var denominator = ethReserve + inputEthWithFee;
 
-  var rate = (numerator / denominator);
+  var rate = numerator / denominator;
   if (rate > 0) {
     return 1 / rate;
   } else {
@@ -114,9 +114,9 @@ class App extends Component {
     didReceiveData = false;
 
     eventList = [];
-    
+
     volumeDataMap = {};
-    
+
     ethLiquidityDataMap = {};
     tokenLiquidityDataMap = {};
 
@@ -224,9 +224,9 @@ const TokenChart = props => {
   }
 
   var labels = [];
-  
+
   var volumeData = [];
-  
+
   var ethLiquidityData = [];
   var tokenLiquidityData = [];
   var ethPriceData = [];
@@ -282,12 +282,14 @@ const TokenChart = props => {
 
     // track token liquidity
     if (dateKey in tokenLiquidityDataMap) {
-    	currentTokenLiquidity += tokenLiquidityDataMap[dateKey];
+      currentTokenLiquidity += tokenLiquidityDataMap[dateKey];
     }
     tokenLiquidityData.push(currentTokenLiquidity.toFixed(4));
 
     // calculate the price of the token on this given day
-    ethPriceData.push(GetEthToTokenPrice(currentEthLiquidity, currentTokenLiquidity).toFixed(4));
+    ethPriceData.push(
+      GetEthToTokenPrice(currentEthLiquidity, currentTokenLiquidity).toFixed(4)
+    );
   }
 
   // don't even show liquidity points if there was no liquidity at all
@@ -307,13 +309,13 @@ const TokenChart = props => {
         label: "Liquidity (ETH)",
         type: "line",
         data: ethLiquidityData,
-        
-        lineTension : 0,
 
-		borderColor: "rgba(251,167,27,1)",
-        pointBorderColor: "rgba(251,167,27,1)",        
+        lineTension: 0,
+
+        borderColor: "rgba(251,167,27,1)",
+        pointBorderColor: "rgba(251,167,27,1)",
         pointBackgroundColor: "rgba(251,167,27,1)",
-        
+
         pointRadius: 1,
         pointHitRadius: 4,
         pointHoverRadius: 3,
@@ -323,14 +325,14 @@ const TokenChart = props => {
       {
         label: tokenLiquidityLabel,
         type: "line",
-        data: tokenLiquidityData,        
+        data: tokenLiquidityData,
 
-        lineTension : 0,
+        lineTension: 0,
 
-        borderColor: "rgba(87,183,87,1)",        
+        borderColor: "rgba(87,183,87,1)",
         pointBorderColor: "rgba(87,183,87,1)",
         pointBackgroundColor: "rgba(87,183,87,1)",
-        
+
         pointRadius: 1,
         pointHitRadius: 4,
         pointHoverRadius: 3,
@@ -340,14 +342,13 @@ const TokenChart = props => {
         label: "Rate",
         type: "line",
         data: ethPriceData,
-        
 
-        lineTension : 0,
-                
-		borderColor: "rgba(243, 98, 45,1)",                
+        lineTension: 0,
+
+        borderColor: "rgba(243, 98, 45,1)",
         pointBorderColor: "rgba(243, 98, 45,1)",
         pointBackgroundColor: "rgba(243, 98, 45,1)",
-        
+
         pointRadius: 1,
         pointHitRadius: 4,
         pointHoverRadius: 3,
@@ -675,7 +676,7 @@ const retrieveData = (tokenSymbol, exchangeAddress) => {
     if (eventListTemp.length > 0) {
       var recentEvent = eventListTemp[0];
       var oldestEvent = eventListTemp[eventListTemp.length - 1];
-      
+
       var dateKeyToVolumeMap = {};
 
       var dateKeyToEthLiquidityMap = {};
@@ -699,10 +700,11 @@ const retrieveData = (tokenSymbol, exchangeAddress) => {
           var blockBounds = mostRecentBlockNum - oldestBlockNum;
           var timestampBoundsInSeconds =
             mostRecentBlockTimestamp - oldestBlockTimestamp;
-            
+
           // now we have our bounds. determine a timestamp for each of the block numbers in the event list
           eventList.forEach(e => {
-            var blockRatio = (blockBounds > 0) ? (e.block - oldestBlockNum) / blockBounds : 1;
+            var blockRatio =
+              blockBounds > 0 ? (e.block - oldestBlockNum) / blockBounds : 1;
 
             var blockTimestampInSeconds =
               blockRatio * timestampBoundsInSeconds + oldestBlockTimestamp;
@@ -720,15 +722,15 @@ const retrieveData = (tokenSymbol, exchangeAddress) => {
             // console.log(e.block + "  " + oldestBlockNum  + "  " + dateKey + "  " + e.volume);//+ "  "  + mostRecentBlockNum + "   " + blockRatio + "  " + dateKey);
 
             // update volume bucket for this date
-            if (e.volume > 0) {              
+            if (e.volume > 0) {
               if (!(dateKey in dateKeyToVolumeMap)) {
                 dateKeyToVolumeMap[dateKey] = 0;
               }
               dateKeyToVolumeMap[dateKey] += e.volume;
             }
 
-			// update eth liquidity bucket for this date
-            if (e.numEth !== 0) {              
+            // update eth liquidity bucket for this date
+            if (e.numEth !== 0) {
               if (!(dateKey in dateKeyToEthLiquidityMap)) {
                 dateKeyToEthLiquidityMap[dateKey] = 0;
               }
@@ -737,14 +739,13 @@ const retrieveData = (tokenSymbol, exchangeAddress) => {
             }
 
             // update token liquidity bucket for this date
-            if (e.numTokens !== 0) {              
+            if (e.numTokens !== 0) {
               if (!(dateKey in dateKeyToTokenLiquidityMap)) {
                 dateKeyToTokenLiquidityMap[dateKey] = 0;
               }
 
               dateKeyToTokenLiquidityMap[dateKey] += e.numTokens;
             }
-
           });
 
           volumeDataMap = dateKeyToVolumeMap;
@@ -755,7 +756,7 @@ const retrieveData = (tokenSymbol, exchangeAddress) => {
           didReceiveData = true;
 
           exchangeRate = GetEthToTokenPrice(curEthTotal, curTokenTotal);
-          
+
           app.setState({});
         });
       });

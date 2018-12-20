@@ -1,8 +1,8 @@
 .TokenChart {
-  width:calc(100% - 5px);
+  width: calc(100% - 5px);
   display: inline-block;
-  height:200px;
-  border:1px solid #cccccc;
+  height: 200px;
+  border: 1px solid #cccccc;
 }
 
 div.rt-tr {
@@ -16,9 +16,9 @@ div.rt-tr {
 /* attribution text for loading gif */
 .Attribution {
   position: fixed;
-  top:calc(100% - 50px);
-  height:50px;
-  width:calc(100% - 20px);
+  top: calc(100% - 50px);
+  height: 50px;
+  width: calc(100% - 20px);
 }
 
 /* truncated text */
@@ -26,42 +26,42 @@ div.rt-tr {
   width: 100px;
   white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis;  
+  text-overflow: ellipsis;
 }
- 
- /* Loading gif */
- .LoadingImage {
-  position: fixed;
-  top:200px;
-  left:calc(50% - 120px);
- }
 
- .Logo {
+/* Loading gif */
+.LoadingImage {
+  position: fixed;
+  top: 200px;
+  left: calc(50% - 120px);
+}
+
+.Logo {
   position: fixed;
   font-size: 30px;
-  top:-20px;
-  left:15px;
- }
+  top: -20px;
+  left: 15px;
+}
 
- .Dropdown-root {
+.Dropdown-root {
   position: fixed;
-  width:calc(100% - 80px);
+  width: calc(100% - 80px);
   z-index: 999;
-  left:60px;
+  left: 60px;
 }
 
 .TokenDetails {
   position: fixed;
-  top:50px;
-  
-  width:calc(100% - 30px);
+  top: 50px;
+
+  width: calc(100% - 30px);
 }
 
 .TokenHistory {
   overflow-y: scroll;
 
   position: absolute;
-  top:360px; 
-  bottom:50px;
-  width:calc(100% - 25px);
+  top: 360px;
+  bottom: 50px;
+  width: calc(100% - 25px);
 }
