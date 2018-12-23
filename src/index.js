@@ -2,10 +2,10 @@
  * @prettier
  */
 
-import React from 'react';
-import ReactDOM from 'react-dom';
+import React from "react";
+import ReactDOM from "react-dom";
 
-import './index.css'
-import AppWrapper from './AppWrapper'
+import "./index.css";
+import AppWrapper from "./AppWrapper";
 
-ReactDOM.render(<AppWrapper />, document.getElementById('root'))
+ReactDOM.render(<AppWrapper />, document.getElementById("root"));

@@ -2,15 +2,15 @@
  * @prettier
  */
 
-import React from 'react';
-import Web3Provider from 'web3-react';
+import React from "react";
+import Web3Provider from "web3-react";
 
-import App from './App'
+import App from "./App";
 
-export default function AppWrapper () {
+export default function AppWrapper() {
   return (
-      <Web3Provider>
-          <App />
-      </Web3Provider>
-  )
+    <Web3Provider>
+      <App />
+    </Web3Provider>
+  );
 }

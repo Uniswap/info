@@ -3,10 +3,10 @@
  */
 
 .TokenChart {
-  width:calc(100% - 5px);
+  width: calc(100% - 5px);
   display: inline-block;
-  height:200px;
-  border:1px solid #cccccc;
+  height: 200px;
+  border: 1px solid #cccccc;
 }
 
 div.rt-tr {
@@ -33,7 +33,7 @@ div.rt-tr {
   text-overflow: ellipsis;
 }
 
- /* Loading gif */
+/* Loading gif */
 .LoadingWrapper {
   pointer-events: none;
   position: fixed;

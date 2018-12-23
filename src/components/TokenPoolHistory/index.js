@@ -10,41 +10,41 @@ import Loader from "../Loader";
 import "./TokenPoolHistory.css";
 
 // function GetTime(block) {
-  // return "-"; // TODO
+// return "-"; // TODO
 // }
 
 class TokenPoolHistory extends Component {
   render() {
     if (this.props.didReceiveData === false) {
-      return <Loader/>;
+      return <Loader />;
     }
 
     const data = [];
 
-    this.props.eventList.forEach((e) => {
+    this.props.eventList.forEach(e => {
       var txLink = "https://etherscan.io/tx/" + e.tx;
       var blockLink = "https://etherscan.io/block/" + e.block;
       var providerLink = "https://etherscan.io/address/" + e.provider;
 
       var event = {
-        event : e.type,
+        event: e.type,
 
-        tx : e.tx,
-        txLink : txLink,
+        tx: e.tx,
+        txLink: txLink,
 
-        block : Number(e.block),
-        blockLink : blockLink,
+        block: Number(e.block),
+        blockLink: blockLink,
 
-        time : "-",
+        time: "-",
 
-        address : e.provider,
-        addressLink : providerLink,
+        address: e.provider,
+        addressLink: providerLink,
 
-        poolAdjustmentEth : Number(e.numEth).toFixed(4),
-        poolAdjustmentToken : Number(e.numTokens).toFixed(4),
-        providerFee : e.liquidtyProviderFee,
-        poolShare : e.curPoolShare
-      }
+        poolAdjustmentEth: Number(e.numEth).toFixed(4),
+        poolAdjustmentToken: Number(e.numTokens).toFixed(4),
+        providerFee: e.liquidtyProviderFee,
+        poolShare: e.curPoolShare
+      };
       data.push(event);
     });
 
@@ -59,42 +59,57 @@ class TokenPoolHistory extends Component {
         Header: "Tx",
         accessor: "tx",
         Cell: row => (
-          <div style={{
-            padding: "5px"
-          }}>
-            <a href={row.original.txLink} rel="noopener noreferrer" target="_blank">
+          <div
+            style={{
+              padding: "5px"
+            }}
+          >
+            <a
+              href={row.original.txLink}
+              rel="noopener noreferrer"
+              target="_blank"
+            >
               <div className="truncate">{row.value}</div>
             </a>
-            </div>
-
+          </div>
         )
       },
       {
         Header: "Block",
         accessor: "block",
         Cell: row => (
-          <div style={{
-            padding: "5px"
-          }}>
-            <a href={row.original.blockLink} rel="noopener noreferrer" target="_blank">
+          <div
+            style={{
+              padding: "5px"
+            }}
+          >
+            <a
+              href={row.original.blockLink}
+              rel="noopener noreferrer"
+              target="_blank"
+            >
               <div className="truncate">{row.value}</div>
             </a>
-            </div>
-
+          </div>
         )
       },
       {
         Header: "Address",
         accessor: "address",
         Cell: row => (
-          <div style={{
-            padding: "5px"
-          }}>
-            <a href={row.original.addressLink} rel="noopener noreferrer" target="_blank">
+          <div
+            style={{
+              padding: "5px"
+            }}
+          >
+            <a
+              href={row.original.addressLink}
+              rel="noopener noreferrer"
+              target="_blank"
+            >
               <div className="truncate">{row.value}</div>
             </a>
-            </div>
-
+          </div>
         )
       },
       {

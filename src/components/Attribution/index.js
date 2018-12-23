@@ -28,4 +28,4 @@ const Attribution = () => (
   </p>
 );
 
-export default Attribution
+export default Attribution;
