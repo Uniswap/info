@@ -1,3 +1,7 @@
+/**
+ * @prettier
+ */
+
 import React from "react";
 
 const Loader = () => (
