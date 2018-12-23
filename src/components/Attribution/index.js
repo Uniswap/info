@@ -1,3 +1,7 @@
+/**
+ * @prettier
+ */
+
 import React from "react";
 
 const Attribution = () => (
@@ -24,4 +28,4 @@ const Attribution = () => (
   </p>
 );
 
-export default Attribution
+export default Attribution;
