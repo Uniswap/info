@@ -15,10 +15,10 @@ div.rt-tr {
 
 /* attribution text for loading gif */
 .Attribution {
-  position: fixed;
+  /* position: fixed;
   top:calc(100% - 50px);
   height:50px;
-  width:calc(100% - 20px);
+  width:calc(100% - 20px); */
 }
 
 /* truncated text */
@@ -26,42 +26,33 @@ div.rt-tr {
   width: 100px;
   white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis;  
+  text-overflow: ellipsis;
 }
- 
+
  /* Loading gif */
- .LoadingImage {
+.LoadingWrapper {
+  pointer-events: none;
   position: fixed;
-  top:200px;
-  left:calc(50% - 120px);
- }
-
- .Logo {
-  position: fixed;
-  font-size: 30px;
-  top:-20px;
-  left:15px;
- }
-
- .Dropdown-root {
-  position: fixed;
-  width:calc(100% - 80px);
-  z-index: 999;
-  left:60px;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  display: grid;
+  place-items: center;
 }
 
 .TokenDetails {
-  position: fixed;
+  /* position: fixed;
   top:50px;
-  
-  width:calc(100% - 30px);
+
+  width:calc(100% - 30px); */
 }
 
 .TokenHistory {
-  overflow-y: scroll;
+  /* overflow-y: scroll; */
 
-  position: absolute;
-  top:360px; 
+  /* position: absolute;
+  top:360px;
   bottom:50px;
-  width:calc(100% - 25px);
+  width:calc(100% - 25px); */
 }
