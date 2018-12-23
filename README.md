@@ -1,8 +1,8 @@
 # Uniswap History
 
-Transaction and liquidity pool stats for http://uniswap.io
+Transaction and liquidity pool stats for https://uniswap.io
 
-Check it out live: http://uniswap.info
+Check it out live: https://uniswap.info
 
 ### To Start Development
 
