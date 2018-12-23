@@ -14,6 +14,7 @@ import "react-dropdown/style.css";
 
 import TokenPoolDetails from "./components/TokenPoolDetails/index.js";
 import TokenPoolHistory from "./components/TokenPoolHistory/index.js";
+import Attribution from "./components/Attribution";
 
 import Uniswap from "./constants/Uniswap.js";
 
@@ -189,32 +190,6 @@ const Web3Setter = props => {
   }
 
   return <div />;
-};
-
-const Attribution = props => {
-  return (
-    <p className="attribution">
-      <a
-        href="https://github.com/conlan/uniswap-info"
-        rel="noopener noreferrer"
-        target="_blank"
-      >
-        Github
-      </a>{" "}
-      |{" "}
-      <a href="https://uniswap.io" rel="noopener noreferrer" target="_blank">
-        Uniswap
-      </a>{" "}
-      |{" "}
-      <a
-        href="https://gifer.com/en/1Atv"
-        rel="noopener noreferrer"
-        target="_blank"
-      >
-        GIF
-      </a>
-    </p>
-  );
 };
 
 const TokenChart = props => {
