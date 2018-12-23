@@ -8,12 +8,12 @@ import { Bar } from "react-chartjs-2";
 
 import { BigNumber } from "bignumber.js";
 
-import Dropdown from "react-dropdown";
-
-import "react-dropdown/style.css";
-
-import TokenPoolDetails from "./components/TokenPoolDetails/index.js";
-import TokenPoolHistory from "./components/TokenPoolHistory/index.js";
+import TokenPoolDetails from "./components/TokenPoolDetails";
+import TokenPoolHistory from "./components/TokenPoolHistory";
+import TokenDropdown from "./components/TokenDropdown";
+import Header from "./components/Header";
+import Container from "./components/Container";
+import Attribution from "./components/Attribution";
 
 import Uniswap from "./constants/Uniswap.js";
 
@@ -98,14 +98,17 @@ class App extends Component {
     tokenAddress = "";
 
     for (var token in Uniswap.tokens) {
-      tokenOptions.push(token + " - " + Uniswap.tokens[token].address);
+			tokenOptions.push({
+				value: token,
+				label: `${token} - ${Uniswap.tokens[token].address}`
+			})
     }
   }
 
   onTokenSelected(option) {
-    var endIndex = option.value.indexOf(" - ");
+    var token = option.value
 
-    var token = option.value.substring(0, endIndex);
+		console.log(token);
 
     curExchange = token;
     tokenAddress = "";
@@ -114,9 +117,9 @@ class App extends Component {
     didReceiveData = false;
 
     eventList = [];
-    
+
     volumeDataMap = {};
-    
+
     ethLiquidityDataMap = {};
     tokenLiquidityDataMap = {};
 
@@ -140,18 +143,18 @@ class App extends Component {
     var exchangeAddress = Uniswap.tokens[curExchange].address;
 
     return (
-      <div>
-        <Web3Setter />
-        <p className="Logo">
-          <span role="img" aria-label="Unicorn">
-            🦄
-          </span>
-        </p>
-        <Dropdown
-          options={tokenOptions}
-          onChange={this.onTokenSelected}
-          placeholder="Select a token"
-        />
+      <Container>
+				{/* @TODO: find better way to handle this */}
+				<div hidden>
+				  <Web3Setter />
+				</div>
+
+				<Header>
+					<TokenDropdown
+						options={tokenOptions}
+						onChange={this.onTokenSelected} />
+				</Header>
+
         <div className="TokenDetails">
           <TokenPoolDetails
             curExchange={curExchange}
@@ -167,6 +170,7 @@ class App extends Component {
 
           <TokenChart />
         </div>
+
         <div className="TokenHistory">
           <TokenPoolHistory
             eventList={eventList}
@@ -175,10 +179,12 @@ class App extends Component {
             didReceiveData={didReceiveData}
           />
         </div>
+
         <div className="Attribution">
           <Attribution />
         </div>
-      </div>
+
+      </Container>
     );
   }
 }
@@ -191,32 +197,6 @@ const Web3Setter = props => {
   return <div />;
 };
 
-const Attribution = props => {
-  return (
-    <p className="attribution">
-      <a
-        href="https://github.com/conlan/uniswap-info"
-        rel="noopener noreferrer"
-        target="_blank"
-      >
-        Github
-      </a>{" "}
-      |{" "}
-      <a href="https://uniswap.io" rel="noopener noreferrer" target="_blank">
-        Uniswap
-      </a>{" "}
-      |{" "}
-      <a
-        href="https://gifer.com/en/1Atv"
-        rel="noopener noreferrer"
-        target="_blank"
-      >
-        GIF
-      </a>
-    </p>
-  );
-};
-
 const TokenChart = props => {
   // don't render anything if we haven't loaded the events yet
   if (didReceiveData === false) {
@@ -224,9 +204,9 @@ const TokenChart = props => {
   }
 
   var labels = [];
-  
+
   var volumeData = [];
-  
+
   var ethLiquidityData = [];
   var tokenLiquidityData = [];
   var ethPriceData = [];
@@ -307,13 +287,13 @@ const TokenChart = props => {
         label: "Liquidity (ETH)",
         type: "line",
         data: ethLiquidityData,
-        
+
         lineTension : 0,
 
 		borderColor: "rgba(251,167,27,1)",
-        pointBorderColor: "rgba(251,167,27,1)",        
+        pointBorderColor: "rgba(251,167,27,1)",
         pointBackgroundColor: "rgba(251,167,27,1)",
-        
+
         pointRadius: 1,
         pointHitRadius: 4,
         pointHoverRadius: 3,
@@ -323,14 +303,14 @@ const TokenChart = props => {
       {
         label: tokenLiquidityLabel,
         type: "line",
-        data: tokenLiquidityData,        
+        data: tokenLiquidityData,
 
         lineTension : 0,
 
-        borderColor: "rgba(87,183,87,1)",        
+        borderColor: "rgba(87,183,87,1)",
         pointBorderColor: "rgba(87,183,87,1)",
         pointBackgroundColor: "rgba(87,183,87,1)",
-        
+
         pointRadius: 1,
         pointHitRadius: 4,
         pointHoverRadius: 3,
@@ -340,14 +320,14 @@ const TokenChart = props => {
         label: "Rate",
         type: "line",
         data: ethPriceData,
-        
+
 
         lineTension : 0,
-                
-		borderColor: "rgba(243, 98, 45,1)",                
+
+		borderColor: "rgba(243, 98, 45,1)",
         pointBorderColor: "rgba(243, 98, 45,1)",
         pointBackgroundColor: "rgba(243, 98, 45,1)",
-        
+
         pointRadius: 1,
         pointHitRadius: 4,
         pointHoverRadius: 3,
@@ -675,7 +655,7 @@ const retrieveData = (tokenSymbol, exchangeAddress) => {
     if (eventListTemp.length > 0) {
       var recentEvent = eventListTemp[0];
       var oldestEvent = eventListTemp[eventListTemp.length - 1];
-      
+
       var dateKeyToVolumeMap = {};
 
       var dateKeyToEthLiquidityMap = {};
@@ -699,7 +679,7 @@ const retrieveData = (tokenSymbol, exchangeAddress) => {
           var blockBounds = mostRecentBlockNum - oldestBlockNum;
           var timestampBoundsInSeconds =
             mostRecentBlockTimestamp - oldestBlockTimestamp;
-            
+
           // now we have our bounds. determine a timestamp for each of the block numbers in the event list
           eventList.forEach(e => {
             var blockRatio = (blockBounds > 0) ? (e.block - oldestBlockNum) / blockBounds : 1;
@@ -720,7 +700,7 @@ const retrieveData = (tokenSymbol, exchangeAddress) => {
             // console.log(e.block + "  " + oldestBlockNum  + "  " + dateKey + "  " + e.volume);//+ "  "  + mostRecentBlockNum + "   " + blockRatio + "  " + dateKey);
 
             // update volume bucket for this date
-            if (e.volume > 0) {              
+            if (e.volume > 0) {
               if (!(dateKey in dateKeyToVolumeMap)) {
                 dateKeyToVolumeMap[dateKey] = 0;
               }
@@ -728,7 +708,7 @@ const retrieveData = (tokenSymbol, exchangeAddress) => {
             }
 
 			// update eth liquidity bucket for this date
-            if (e.numEth !== 0) {              
+            if (e.numEth !== 0) {
               if (!(dateKey in dateKeyToEthLiquidityMap)) {
                 dateKeyToEthLiquidityMap[dateKey] = 0;
               }
@@ -737,7 +717,7 @@ const retrieveData = (tokenSymbol, exchangeAddress) => {
             }
 
             // update token liquidity bucket for this date
-            if (e.numTokens !== 0) {              
+            if (e.numTokens !== 0) {
               if (!(dateKey in dateKeyToTokenLiquidityMap)) {
                 dateKeyToTokenLiquidityMap[dateKey] = 0;
               }
@@ -755,7 +735,7 @@ const retrieveData = (tokenSymbol, exchangeAddress) => {
           didReceiveData = true;
 
           exchangeRate = GetEthToTokenPrice(curEthTotal, curTokenTotal);
-          
+
           app.setState({});
         });
       });

@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import ReactTable from "react-table";
 
+import Loader from "../Loader";
+
 import "./TokenPoolHistory.css";
 
 // function GetTime(block) {
@@ -10,7 +12,7 @@ import "./TokenPoolHistory.css";
 class TokenPoolHistory extends Component {
   render() {
     if (this.props.didReceiveData === false) {
-      return <img alt="Loading" className="LoadingImage" src="./loading3.gif" />;
+      return <Loader/>;
     }
 
     const data = [];
@@ -22,7 +24,7 @@ class TokenPoolHistory extends Component {
 
       var event = {
         event : e.type,
-        
+
         tx : e.tx,
         txLink : txLink,
 
@@ -30,7 +32,7 @@ class TokenPoolHistory extends Component {
         blockLink : blockLink,
 
         time : "-",
-        
+
         address : e.provider,
         addressLink : providerLink,
 
