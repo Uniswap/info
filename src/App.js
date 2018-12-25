@@ -60,7 +60,7 @@ function GetEthToTokenPrice(ethReserve, tokenReserve) {
 
   var rate = (numerator / denominator);
   if (rate > 0) {
-    return 1 / rate;
+    return rate;
   } else {
     return 0;
   }
