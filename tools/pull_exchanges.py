@@ -28,7 +28,7 @@ w3 = Web3(Web3.HTTPProvider(INPUT_PROVIDER))
 raw_exchanges = {}
 sorted_exchanges = {} #python 3.7 preserves key insertion order into objects
 
-print("Pulling exchange details...");
+print("Pulling exchange details into " + fname);
 
 with open(fname) as json_file:  
 	data = json.load(json_file)
@@ -52,27 +52,30 @@ with open(fname) as json_file:
 				continue;		
 
 		try:
-			symbol = erc20.functions.symbol().call();
-		except OverflowError:
-			#print("Overflow... trying DSToken ABI");
-			
-			#some tokens specify their symbol as bytes32 instead of string
-			erc20 = w3.eth.contract(address=token, abi=DSTOKEN_ABI)
-			
-			symbol = erc20.functions.symbol().call();
-			symbol = symbol.hex().rstrip("0")
+			try:
+				symbol = erc20.functions.symbol().call();
+			except OverflowError:
+				#print("Overflow... trying DSToken ABI");
+				
+				#some tokens specify their symbol as bytes32 instead of string
+				erc20 = w3.eth.contract(address=token, abi=DSTOKEN_ABI)
+				
+				symbol = erc20.functions.symbol().call();
+				symbol = symbol.hex().rstrip("0")
 
-			if (len(symbol) % 2 != 0):
-				symbol = symbol + '0'
-			symbol = bytes.fromhex(symbol).decode('utf8')
+				if (len(symbol) % 2 != 0):
+					symbol = symbol + '0'
+				symbol = bytes.fromhex(symbol).decode('utf8')
+
+			raw_exchanges[symbol] = {
+				"address" : exchange,
+				"tokenAddress" : token,
+				"decimals" : decimals
+			}
+		except Exception as e:
+			print("Unexpected exception! Skipping... " + str(e));			
 				
 		# print(str(token) + "\n" + str(exchange) + "\n" + str(symbol) + "\n" + str(decimals));
-		
-		raw_exchanges[symbol] = {
-			"address" : exchange,
-			"tokenAddress" : token,
-			"decimals" : decimals
-		}
 
 print() #newline
 
