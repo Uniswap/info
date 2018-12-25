@@ -14,7 +14,7 @@
     "react-scripts": "2.1.1",
     "react-select": "^2.1.2",
     "react-table": "^6.8.6",
-    "web3": "^1.0.0-beta.36",
+    "web3": "^1.0.0-beta.37",
     "web3-react": "^1.1.2"
   },
   "scripts": {
