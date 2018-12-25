@@ -48,7 +48,7 @@ class TokenPoolHistory extends Component {
       data.push(event);
     });
 
-    var poolAdjustmentTokenHeader = this.props.curFactory;
+    var poolAdjustmentTokenHeader = this.props.curSymbol;
 
     const columns = [
       {
@@ -145,27 +145,6 @@ class TokenPoolHistory extends Component {
         resizable={false}
       />
     );
-
-    // return (
-    //   <table className="TokenPoolHistory">
-    //   <thead>
-    //   <tr>
-    //   <th>Event</th>
-    //   <th>Tx</th>
-    //   <th>Block</th>
-    //   <th>Time</th>
-    //   <th>Address</th>
-    //   <th>Pool Adjustment (ETH)</th>
-    //   <th>Pool Adjustment ({this.props.curFactory})</th>
-    //   <th>Provider Fee</th>
-    //   <th>Pool Share</th>
-    //   </tr>
-    //   </thead>
-    //    <tbody>
-    //     {EventTableBody(this.props)}
-    //   </tbody>
-    //   </table>
-    //   )
   }
 }
 

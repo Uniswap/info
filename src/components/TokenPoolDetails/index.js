@@ -24,12 +24,12 @@ class TokenPoolDetails extends Component {
 
     var rateDisplay =
       this.props.exchangeRate > 0
-        ? ("1 ETH = " + this.props.exchangeRate.toFixed(4) + " " + this.props.curExchange)
+        ? ("1 ETH = " + this.props.exchangeRate.toFixed(4) + " " + this.props.curSymbol)
         : "-";
 
     const data = [
       {
-        symbol: this.props.curExchange,
+        symbol: this.props.curSymbol,
         token: this.props.tokenAddress,
         exchange: this.props.exchangeAddress,
         poolSize: this.props.curEthPoolTotal,
@@ -40,7 +40,7 @@ class TokenPoolDetails extends Component {
       }
     ];
 
-    var headerTokenLiquidity = "Liquidity (" + this.props.curExchange + ")";
+    var headerTokenLiquidity = "Liquidity (" + this.props.curSymbol + ")";
 
     const columns = [
       {

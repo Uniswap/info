@@ -35,7 +35,7 @@ var volumeDataMap = {}; // how much trading volume keyed by day
 var ethLiquidityDataMap = {}; // how much liquidity in pool keyed by day (eth)
 var tokenLiquidityDataMap = {} // how much liquidity in pool keyed by day (token)
 
-var curExchange = "";
+var curSymbol = "";
 
 var curEthPoolTotal = "-";
 var curTokenPoolTotal = "-";
@@ -76,13 +76,13 @@ class App extends Component {
   }
 
   componentDidMount(props) {
-    let exchangeAddress = Uniswap.tokens[curExchange].address;
+    let exchangeAddress = Uniswap.tokens[curSymbol].address;
 
-    retrieveData(curExchange, exchangeAddress);
+    retrieveData(curSymbol, exchangeAddress);
   }
 
   componentWillMount(props) {
-    var exchange = Uniswap.initial;
+    var symbol = Uniswap.initial;
 
     // check for URL Search Params support
     if ("URLSearchParams" in window) {
@@ -90,11 +90,11 @@ class App extends Component {
       var urlParams = new URLSearchParams(window.location.search);
 
       if (urlParams.has("token")) {
-        exchange = urlParams.get("token");
+        symbol = urlParams.get("token");
       }
     }
 
-    curExchange = exchange;
+    curSymbol = symbol;
     tokenAddress = "";
 
     for (var token in Uniswap.tokens) {
@@ -106,11 +106,11 @@ class App extends Component {
   }
 
   onTokenSelected(option) {
-    var token = option.value
+    var symbol = option.value
 
-		console.log(token);
+		console.log(symbol);
 
-    curExchange = token;
+    curSymbol = symbol;
     tokenAddress = "";
 
     didRequestData = false;
@@ -134,13 +134,13 @@ class App extends Component {
 
     app.setState({});
 
-    let exchangeAddress = Uniswap.tokens[curExchange].address;
+    let exchangeAddress = Uniswap.tokens[curSymbol].address;
 
-    retrieveData(curExchange, exchangeAddress);
+    retrieveData(curSymbol, exchangeAddress);
   }
 
   render() {
-    var exchangeAddress = Uniswap.tokens[curExchange].address;
+    var exchangeAddress = Uniswap.tokens[curSymbol].address;
 
     return (
       <Container>
@@ -157,7 +157,7 @@ class App extends Component {
 
         <div className="TokenDetails">
           <TokenPoolDetails
-            curExchange={curExchange}
+            curSymbol={curSymbol}
             exchangeRate={exchangeRate}
             tokenAddress={tokenAddress}
             curEthPoolTotal={curEthPoolTotal}
@@ -174,7 +174,7 @@ class App extends Component {
         <div className="TokenHistory">
           <TokenPoolHistory
             eventList={eventList}
-            curFactory={curExchange}
+            curSymbol={curSymbol}
             myAddress={myAddress}
             didReceiveData={didReceiveData}
           />
@@ -279,7 +279,7 @@ const TokenChart = props => {
     tokenLiquidityData = [];
   }
 
-  var tokenLiquidityLabel = "Liquidity (" + curExchange + ")";
+  var tokenLiquidityLabel = "Liquidity (" + curSymbol + ")";
 
   const data = {
     datasets: [
@@ -445,7 +445,7 @@ const retrieveData = (tokenSymbol, exchangeAddress) => {
 
   exchangeContract.getPastEvents("allEvents", options).then(events => {
     // only continue if the current exchange is the original symbol we requested
-    if (curExchange !== tokenSymbol) {
+    if (curSymbol !== tokenSymbol) {
       return;
     }
 
@@ -669,7 +669,7 @@ const retrieveData = (tokenSymbol, exchangeAddress) => {
         // get the timestamp for the oldest block
         web3.web3js.eth.getBlock(oldestEvent.block).then(function(oldestBlock) {
           // only continue if the current exchange is the original symbol we requested
-          if (curExchange !== tokenSymbol) {
+          if (curSymbol !== tokenSymbol) {
             return;
           }
 
