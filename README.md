@@ -13,10 +13,6 @@ Check it out live: https://uniswap.info
 npm i
 ```
 
-###### Edit web3-eth-abi file
-
-Follow [these instructions](https://github.com/ethereum/web3.js/issues/1916#issuecomment-427398031). This should only be temporary until a proper fix is found.
-
 ###### Running locally
 ```bash
 npm start
