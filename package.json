@@ -2,7 +2,7 @@
   "name": "uniswap",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://conlan.github.io/",
+  "homepage": ".",
   "dependencies": {
     "bignumber.js": "^8.0.1",
     "chart.js": "^2.7.3",
