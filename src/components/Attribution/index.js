@@ -7,7 +7,7 @@ import React from "react";
 const Attribution = () => (
   <p className="attribution">
     <a
-      href="https://github.com/conlan/uniswap-info"
+      href="https://github.com/Uniswap/uniswap-info"
       rel="noopener noreferrer"
       target="_blank"
     >
