@@ -9,17 +9,29 @@ import Emoji from "../Emoji";
 export const Logo = () => (
   <div
     style={{
-      fontSize: 32,
-      height: 32,
-      width: 32,
-      marginRight: 16
+      fontSize: "1.5rem",
+      lineHeight: "1.75rem"
     }}
   >
     <Emoji symbol="🦄" label="Unicorn" />
   </div>
 );
 
-const Header = ({ children }) => (
+export const Title = () => (
+  <div
+    style={{
+      fontSize: "1rem",
+      fontWeight: 500,
+      marginLeft: "1rem",
+      marginRight: "1rem",
+      lineHeight: "1.5rem"
+    }}
+  >
+    <span>Info</span>
+  </div>
+);
+
+export const LogoTitle = () => (
   <div
     style={{
       display: "flex",
@@ -27,13 +39,21 @@ const Header = ({ children }) => (
     }}
   >
     <Logo />
-    <div
-      style={{
-        flex: 1
-      }}
-    >
-      {children}
-    </div>
+    <Title />
+  </div>
+);
+
+const Header = ({ children }) => (
+  <div
+    style={{
+      padding: "1.5rem",
+      display: "grid",
+      gridTemplateColumns: "minmax(max-content, 2fr) minmax(200px, 1fr)",
+      alignItems: "center"
+    }}
+  >
+    <LogoTitle />
+    {children}
   </div>
 );
 
