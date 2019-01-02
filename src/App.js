@@ -19,6 +19,7 @@ import Uniswap from "./constants/Uniswap.js";
 
 import { useWeb3Context } from "web3-react/hooks";
 
+import "typeface-inter";
 import "./App.css";
 
 var app;
