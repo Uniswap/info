@@ -12,7 +12,7 @@ import TokenPoolDetails from "./components/TokenPoolDetails";
 import TokenPoolHistory from "./components/TokenPoolHistory";
 import TokenDropdown from "./components/TokenDropdown";
 import Header from "./components/Header";
-import Container from "./components/Container";
+import Container, { Grid } from "./components/Container";
 import Attribution from "./components/Attribution";
 
 import Uniswap from "./constants/Uniswap.js";
@@ -33,7 +33,7 @@ var eventList = [];
 var volumeDataMap = {}; // how much trading volume keyed by day
 
 var ethLiquidityDataMap = {}; // how much liquidity in pool keyed by day (eth)
-var tokenLiquidityDataMap = {} // how much liquidity in pool keyed by day (token)
+var tokenLiquidityDataMap = {}; // how much liquidity in pool keyed by day (token)
 
 var curSymbol = "";
 
@@ -54,11 +54,11 @@ var providerFeePercent = 0.003;
 const tokenOptions = [];
 
 function GetEthToTokenPrice(ethReserve, tokenReserve) {
-	var inputEthWithFee = 1 - providerFeePercent;
-	var numerator = inputEthWithFee * tokenReserve;
-	var denominator = (ethReserve) + inputEthWithFee;
+  var inputEthWithFee = 1 - providerFeePercent;
+  var numerator = inputEthWithFee * tokenReserve;
+  var denominator = ethReserve + inputEthWithFee;
 
-  var rate = (numerator / denominator);
+  var rate = numerator / denominator;
   if (rate > 0) {
     return rate;
   } else {
@@ -98,17 +98,17 @@ class App extends Component {
     tokenAddress = "";
 
     for (var token in Uniswap.tokens) {
-			tokenOptions.push({
-				value: token,
-				label: `${token} - ${Uniswap.tokens[token].address}`
-			})
+      tokenOptions.push({
+        value: token,
+        label: `${token} - ${Uniswap.tokens[token].address}`
+      });
     }
   }
 
   onTokenSelected(option) {
-    var symbol = option.value
+    var symbol = option.value;
 
-		console.log(symbol);
+    console.log(symbol);
 
     curSymbol = symbol;
     tokenAddress = "";
@@ -144,46 +144,48 @@ class App extends Component {
 
     return (
       <Container>
-				{/* @TODO: find better way to handle this */}
-				<div hidden>
-				  <Web3Setter />
-				</div>
+        {/* @TODO: find better way to handle this */}
+        <div hidden>
+          <Web3Setter />
+        </div>
 
-				<Header>
-					<TokenDropdown
-						options={tokenOptions}
-						onChange={this.onTokenSelected} />
-				</Header>
-
-        <div className="TokenDetails">
-          <TokenPoolDetails
-            curSymbol={curSymbol}
-            exchangeRate={exchangeRate}
-            tokenAddress={tokenAddress}
-            curEthPoolTotal={curEthPoolTotal}
-            curTokenPoolTotal={curTokenPoolTotal}
-            curPoolShare={curPoolShare}
-            myCollectedEthFees={myCollectedEthFees}
-            myCollectedTokenFees={myCollectedTokenFees}
-            exchangeAddress={exchangeAddress}
+        <Header>
+          <TokenDropdown
+            options={tokenOptions}
+            onChange={this.onTokenSelected}
           />
+        </Header>
 
-          <TokenChart />
-        </div>
+        <Grid>
+          <div className="TokenDetails">
+            <TokenPoolDetails
+              curSymbol={curSymbol}
+              exchangeRate={exchangeRate}
+              tokenAddress={tokenAddress}
+              curEthPoolTotal={curEthPoolTotal}
+              curTokenPoolTotal={curTokenPoolTotal}
+              curPoolShare={curPoolShare}
+              myCollectedEthFees={myCollectedEthFees}
+              myCollectedTokenFees={myCollectedTokenFees}
+              exchangeAddress={exchangeAddress}
+            />
 
-        <div className="TokenHistory">
-          <TokenPoolHistory
-            eventList={eventList}
-            curSymbol={curSymbol}
-            myAddress={myAddress}
-            didReceiveData={didReceiveData}
-          />
-        </div>
+            <TokenChart />
+          </div>
 
-        <div className="Attribution">
-          <Attribution />
-        </div>
+          <div className="TokenHistory">
+            <TokenPoolHistory
+              eventList={eventList}
+              curSymbol={curSymbol}
+              myAddress={myAddress}
+              didReceiveData={didReceiveData}
+            />
+          </div>
 
+          <div className="Attribution">
+            <Attribution />
+          </div>
+        </Grid>
       </Container>
     );
   }
@@ -262,12 +264,14 @@ const TokenChart = props => {
 
     // track token liquidity
     if (dateKey in tokenLiquidityDataMap) {
-    	currentTokenLiquidity += tokenLiquidityDataMap[dateKey];
+      currentTokenLiquidity += tokenLiquidityDataMap[dateKey];
     }
     tokenLiquidityData.push(currentTokenLiquidity.toFixed(4));
 
     // calculate the price of the token on this given day
-    ethPriceData.push(GetEthToTokenPrice(currentEthLiquidity, currentTokenLiquidity).toFixed(4));
+    ethPriceData.push(
+      GetEthToTokenPrice(currentEthLiquidity, currentTokenLiquidity).toFixed(4)
+    );
   }
 
   // don't even show liquidity points if there was no liquidity at all
@@ -288,9 +292,9 @@ const TokenChart = props => {
         type: "line",
         data: ethLiquidityData,
 
-        lineTension : 0,
+        lineTension: 0,
 
-		borderColor: "rgba(251,167,27,1)",
+        borderColor: "rgba(251,167,27,1)",
         pointBorderColor: "rgba(251,167,27,1)",
         pointBackgroundColor: "rgba(251,167,27,1)",
 
@@ -305,7 +309,7 @@ const TokenChart = props => {
         type: "line",
         data: tokenLiquidityData,
 
-        lineTension : 0,
+        lineTension: 0,
 
         borderColor: "rgba(87,183,87,1)",
         pointBorderColor: "rgba(87,183,87,1)",
@@ -321,10 +325,9 @@ const TokenChart = props => {
         type: "line",
         data: ethPriceData,
 
+        lineTension: 0,
 
-        lineTension : 0,
-
-		borderColor: "rgba(243, 98, 45,1)",
+        borderColor: "rgba(243, 98, 45,1)",
         pointBorderColor: "rgba(243, 98, 45,1)",
         pointBackgroundColor: "rgba(243, 98, 45,1)",
 
@@ -682,7 +685,8 @@ const retrieveData = (tokenSymbol, exchangeAddress) => {
 
           // now we have our bounds. determine a timestamp for each of the block numbers in the event list
           eventList.forEach(e => {
-            var blockRatio = (blockBounds > 0) ? (e.block - oldestBlockNum) / blockBounds : 1;
+            var blockRatio =
+              blockBounds > 0 ? (e.block - oldestBlockNum) / blockBounds : 1;
 
             var blockTimestampInSeconds =
               blockRatio * timestampBoundsInSeconds + oldestBlockTimestamp;
@@ -707,7 +711,7 @@ const retrieveData = (tokenSymbol, exchangeAddress) => {
               dateKeyToVolumeMap[dateKey] += e.volume;
             }
 
-			// update eth liquidity bucket for this date
+            // update eth liquidity bucket for this date
             if (e.numEth !== 0) {
               if (!(dateKey in dateKeyToEthLiquidityMap)) {
                 dateKeyToEthLiquidityMap[dateKey] = 0;
@@ -724,7 +728,6 @@ const retrieveData = (tokenSymbol, exchangeAddress) => {
 
               dateKeyToTokenLiquidityMap[dateKey] += e.numTokens;
             }
-
           });
 
           volumeDataMap = dateKeyToVolumeMap;
