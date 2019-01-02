@@ -24,11 +24,12 @@ const customStyles = {
   })
 };
 
-const TokenDropdown = ({ options, onChange }) => (
+const TokenDropdown = ({ options, onChange, defaultValue }) => (
   <Select
     placeholder="Select a token..."
     isSearchable={true}
     onChange={onChange}
+    defaultValue={defaultValue}
     options={options}
     styles={customStyles}
   />
