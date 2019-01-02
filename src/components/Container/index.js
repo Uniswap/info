@@ -4,21 +4,15 @@
 
 import React from "react";
 
-const Container = ({ children }) => (
-  <div
-    style={{
-      margin: 15
-    }}
-  >
-    <Grid>{children}</Grid>
-  </div>
-);
+const Container = ({ children }) => <>{children}</>;
 
 export const Grid = ({ children }) => (
   <div
     style={{
       display: "grid",
-      gridGap: 15
+      gridGap: "1rem",
+      padding: "1.5rem",
+      paddingTop: 0
     }}
   >
     {children}
