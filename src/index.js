@@ -5,7 +5,12 @@
 import React from "react";
 import ReactDOM from "react-dom";
 
-import "./index.css";
-import AppWrapper from "./AppWrapper";
+// Working old app
+// import "./_old/index.css";
+// import AppWrapper from "./_old/AppWrapper";
 
-ReactDOM.render(<AppWrapper />, document.getElementById("root"));
+// ReactDOM.render(<AppWrapper />, document.getElementById("root"));
+
+import App from "./App";
+
+ReactDOM.render(<App />, document.getElementById("root"));
