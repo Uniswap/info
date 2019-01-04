@@ -5,7 +5,16 @@ const Panel = styled(RebassBox)`
   position: relative;
 
   ${props => (props.area ? `grid-area: ${props.area};` : null)}
-  ${props => (props.rounded ? "border-radius: 10px 10px 0 0;" : null)};
+
+  ${props =>
+    props.rounded
+      ? `
+    border-radius: 10px 10px 0 0;
+    @media only screen and (min-width: 40em) {
+      border-radius: 10px;
+    }
+  `
+      : null};
 
   &:not(:last-child) {
     :after {
@@ -16,6 +25,12 @@ const Panel = styled(RebassBox)`
       right: 0;
       height: 10px;
       background-color: inherit;
+    }
+
+    @media only screen and (min-width: 40em) {
+      :after {
+        content: unset;
+      }
     }
   }
 `;
