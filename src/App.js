@@ -6,26 +6,10 @@ import React from "react";
 import styled from "styled-components";
 import { Box, Flex, Text, Image } from "rebass";
 
-import Theme from "./components/Theme";
+import Wrapper from "./components/Theme";
 import Title from "./components/Title";
-
-const Panel = styled(Box)`
-  position: relative;
-
-  ${props => (props.rounded ? "border-radius: 10px 10px 0 0;" : null)};
-
-  &:not(:last-child) {
-    :after {
-      content: "";
-      position: absolute;
-      bottom: -10px;
-      left: 0;
-      right: 0;
-      height: 10px;
-      background-color: inherit;
-    }
-  }
-`;
+import FourByFour from "./components/FourByFour";
+import Panel from "./components/Panel";
 
 const Header = styled(Panel)`
   display: grid;
@@ -33,88 +17,118 @@ const Header = styled(Panel)`
   align-items: center;
 `;
 
+const Divider = styled(Box)`
+  height: 1px;
+  background-color: rgba(43, 43, 43, 0.05);
+`;
+
+const Dashboard = styled(Box)`
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-areas:
+    "volume statistics statistics statistics"
+    "liquidity statistics statistics statistics"
+    "exchange transactions transactions transactions";
+  max-width: 1280px;
+  margin: 0 auto;
+`;
+
 const Hint = props => (
   <Text
     {...props}
     fontSize={12}
-    color={props.light ? "rgba(255, 255, 255, 0.6)" : "#737373"}
+    color={props.light ? "rgba(255, 255, 255, 0.6)" : "textSubtext"}
   >
     {props.children}
   </Text>
 );
 
 const App = () => (
-  <Theme>
-    <>
-      <Header px={24} py={3} bg="#333333" color="white">
-        <Title />
-        {/* DROPDOWN */}
-      </Header>
+  <Wrapper>
+    <Header px={24} py={3} bg="mineshaft" color="white">
+      <Title />
+      {/* DROPDOWN */}
+    </Header>
 
-      <Panel color="white" bg="#2B2B2B" p={24} rounded>
-        <Flex>
-          <Flex flexDirection="column" width={1}>
-            <Hint light mb={2}>
-              DAI Volume
-            </Hint>
+    <Dashboard>
+      <Panel color="white" bg="jaguar" p={24} rounded area="volume">
+        <FourByFour
+          topLeft={<Hint light>DAI Volume</Hint>}
+          bottomLeft={
             <Text fontSize={24} lineHeight={1.4} fontWeight={500}>
               130.83 ETH
             </Text>
-          </Flex>
-          <Flex flexDirection="column" alignItems="flex-end" width={1}>
-            <Hint light mb={2}>
-              24h
-            </Hint>
+          }
+          topRight={<Hint light>24h</Hint>}
+          bottomRight={
             <Text fontSize={20} lineHeight={1.4}>
               +2.01%
             </Text>
-          </Flex>
-        </Flex>
+          }
+        />
       </Panel>
 
-      <Panel bg="white" rounded>
+      <Panel bg="white" rounded area="statistics">
         <Box p={24}>
           <Flex alignItems="space-around">
             <Hint>Pool Statistics</Hint>
           </Flex>
         </Box>
-        <Box bg="rgba(43, 43, 43, 0.05)" style={{ height: 1 }} />
+        <Divider />
         <Box p={24}>
-          <Flex>
-            <Flex flexDirection="column" width={1}>
-              <Hint mb={2}>Liquidity</Hint>
+          <FourByFour
+            topLeft={<Hint>DAI Liquidity</Hint>}
+            bottomLeft={
               <Text
                 fontSize={20}
-                color="#71C4AD"
+                color="maker"
                 lineHeight={1.4}
                 fontWeight={500}
               >
                 42561.31 DAI
               </Text>
-            </Flex>
-            <Flex
-              flexDirection="column"
-              justifyContent="flex-end"
-              alignItems="flex-end"
-              width={1}
-            >
+            }
+            topRight={<Hint>ETH Liquidity</Hint>}
+            bottomRight={
               <Text
                 fontSize={20}
-                color="#DC6BE5"
+                color="uniswappink"
                 lineHeight={1.4}
                 fontWeight={500}
               >
                 419.27 ETH
               </Text>
-            </Flex>
-          </Flex>
+            }
+          />
         </Box>
         <Box p={24}>
-          <Image src="./chart.png"/>
+          <Image src="./chart.png" />
         </Box>
       </Panel>
-    </>
-  </Theme>
+
+      <Panel bg="white" rounded area="transactions">
+        <Flex p={24} justifyContent="space-between">
+          <Text color="text">Latest Transactions</Text>
+          <Text>↓</Text>
+        </Flex>
+        <Divider />
+        <Box p={24}>
+          <Flex mb={24} justifyContent="space-between">
+            <Text color="button">0.002 ETH for 25.76 OMG</Text>
+            <Text color="textDim">1 min ago</Text>
+          </Flex>
+          <Flex mb={24} justifyContent="space-between">
+            <Text color="button">0.002 ETH for 25.76 OMG</Text>
+            <Text color="textDim">1 min ago</Text>
+          </Flex>
+          <Flex mb={24} justifyContent="space-between">
+            <Text color="button">0.002 ETH for 25.76 OMG</Text>
+            <Text color="textDim">1 min ago</Text>
+          </Flex>
+        </Box>
+      </Panel>
+    </Dashboard>
+  </Wrapper>
 );
 
 export default App;

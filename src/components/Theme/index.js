@@ -10,24 +10,31 @@ import "typeface-inter";
 
 import theme from "./theme";
 
-const GlobalStyles = createGlobalStyle`
+export const GlobalStyles = createGlobalStyle`
   html {
     font-size: 16px;
+    background-color: ${props => props.theme.colors.alabaster};
   }
 
   body {
     margin: 0;
-    font-family: "Inter UI", -apple-system, BlinkMacSystemFont, Segoe UI,
-    Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji,
-    Segoe UI Symbol;
+    font-family: ${props => props.theme.fonts.sans};
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 `;
 
-export default props => (
-  <>
-    <GlobalStyles />
-    <ThemeProvider theme={theme}>{props.children}</ThemeProvider>
-  </>
+export const Theme = props => (
+  <ThemeProvider theme={theme}>{props.children}</ThemeProvider>
 );
+
+export const Wrapper = ({ children }) => (
+  <Theme>
+    <>
+      <GlobalStyles />
+      {children}
+    </>
+  </Theme>
+);
+
+export default Wrapper;
