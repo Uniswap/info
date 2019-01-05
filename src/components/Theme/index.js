@@ -13,7 +13,7 @@ import theme from "./theme";
 export const GlobalStyles = createGlobalStyle`
   html {
     font-size: 16px;
-    background-color: ${props => props.theme.colors.concrete};
+    background-color: ${props => props.theme.colors.alabaster};
   }
 
   body {

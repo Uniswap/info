@@ -11,6 +11,9 @@ import Title from "./components/Title";
 import FourByFour from "./components/FourByFour";
 import Panel from "./components/Panel";
 import Dashboard from "./components/Dashboard";
+import Select from "./components/Select";
+
+import { tokenOptions } from "./helpers/";
 
 const Header = styled(Panel)`
   display: grid;
@@ -29,6 +32,12 @@ const Hint = props => (
   </Text>
 );
 
+const timeframeOptions = [
+  { value: "day", label: "1 day" },
+  { value: "week", label: "1 week" },
+  { value: "month", label: "1 month" }
+];
+
 const App = () => (
   <Wrapper>
     <Header
@@ -38,9 +47,7 @@ const App = () => (
       color={["white", "black"]}
     >
       <Title />
-      <Box bg="uniswappink">
-        <code>Main Dropdown</code>
-      </Box>
+      <Select defaultValue={tokenOptions[22]} options={tokenOptions} />
     </Header>
 
     <Dashboard mx="auto" px={[0, 3]}>
@@ -87,8 +94,12 @@ const App = () => (
         <Box p={24}>
           <Flex alignItems="center" justifyContent="space-between">
             <Text>Pool Statistics</Text>
-            <Box bg="uniswappink">
-              <code>Timeframe Dropdown</code>
+            <Box width={120}>
+              <Select
+                placeholder="..."
+                defaultValue={timeframeOptions[1]}
+                options={timeframeOptions}
+              />
             </Box>
           </Flex>
         </Box>
