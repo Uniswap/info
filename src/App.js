@@ -12,6 +12,7 @@ import FourByFour from "./components/FourByFour";
 import Panel from "./components/Panel";
 import Dashboard from "./components/Dashboard";
 import Select from "./components/Select";
+import Footer from "./components/Footer";
 
 import { tokenOptions } from "./helpers/";
 
@@ -166,6 +167,8 @@ const App = () => (
         </Box>
       </Panel>
     </Dashboard>
+
+    <Footer />
   </Wrapper>
 );
 
