@@ -7,3 +7,9 @@ export const tokenOptions = Object.keys(Uniswap.tokens).map(key => {
     label: key
   };
 });
+
+export const urls = {
+  showTransaction: tx => `https://etherscan.io/tx/${tx}/`,
+  showAddress: address => `https://www.etherscan.io/address/${address}/`,
+  showBlock: block => `https://etherscan.io/block/${block}/`
+};

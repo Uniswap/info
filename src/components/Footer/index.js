@@ -1,25 +1,35 @@
-import React from "react";
-import { Flex, Link as RebassLink } from "rebass";
+/**
+ * @prettier
+ */
 
-const Link = props => (
-  <RebassLink
+import React from "react";
+import { Flex } from "rebass";
+
+import Link from "../Link";
+
+const links = [
+  { url: "https://github.com/Uniswap/uniswap-info", text: "GitHub" },
+  { url: "https://uniswap.io", text: "Uniswap" }
+];
+
+const FooterLink = props => (
+  <Link
     {...props}
-    style={{
-      textDecoration: "none",
-      fontWeight: 500
-    }}
+    external
+    color="text"
+    style={{ fontWeight: 500 }}
     fontSize={12}
     mr={"8px"}
   >
     {props.children}
-  </RebassLink>
+  </Link>
 );
 
 const Footer = () => (
-  <Flex bg="white" as="footer" p={24}>
-    <Link href="https://github.com/Uniswap/uniswap-info">GitHub</Link>
-    <Link>Slack</Link>
-    <Link href="https://uniswap.io">Uniswap.io</Link>
+  <Flex as="footer" p={24}>
+    {links.map(link => (
+      <FooterLink href={link.url}>{link.text}</FooterLink>
+    ))}
   </Flex>
 );
 

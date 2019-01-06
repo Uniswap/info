@@ -25,11 +25,25 @@ export default {
     textLightSubtext: "rgba(255, 255, 255, 0.80)",
     textLightDim: "rgba(255, 255, 255, 0.60)"
   },
+  buttons: {
+    outline: {
+      paddingLeft: 16 - 1,
+      paddingRight: 16 - 1,
+      paddingTop: 8 - 1,
+      paddingBottom: 8 - 1,
+      backgroundColor: "transparent",
+      borderWidth: 1,
+      borderStyle: "solid"
+    }
+  },
   Button: {
     fontFamily: `"Inter UI", -apple-system, BlinkMacSystemFont, Segoe UI,
     Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji,
-    Segoe UI Symbol`, 
+    Segoe UI Symbol`,
     borderRadius: 40,
     fontWeight: 500
+  },
+  Link: {
+    textDecoration: "none"
   }
 };

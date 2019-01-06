@@ -13,8 +13,16 @@ import Panel from "./components/Panel";
 import Dashboard from "./components/Dashboard";
 import Select from "./components/Select";
 import Footer from "./components/Footer";
+import TransactionsList from "./components/TransactionsList";
+import Link from "./components/Link";
 
-import { tokenOptions } from "./helpers/";
+import { tokenOptions, urls } from "./helpers/";
+
+const Address = props => (
+  <Link {...props} color="button" external style={{ wordBreak: "break-all" }}>
+    {props.children}
+  </Link>
+);
 
 const Header = styled(Panel)`
   display: grid;
@@ -115,10 +123,16 @@ const App = () => (
             <Button mr={[1, 2]} fontSize={[0, 1]} bg="uniswappink">
               ETH
             </Button>
-            <Button mr={[1, 2]} fontSize={[0, 1]} bg="ronchi">
+            <Button
+              mr={[1, 2]}
+              fontSize={[0, 1]}
+              variant="outline"
+              borderColor="ronchi"
+              color="ronchi"
+            >
               Rate
             </Button>
-            <Button fontSize={[0, 1]} bg="zircon">
+            <Button fontSize={[0, 1]} color="text" bg="zircon">
               Volume
             </Button>
           </Flex>
@@ -130,18 +144,26 @@ const App = () => (
           <Hint color="textSubtext" mb={3}>
             Exchange Address
           </Hint>
-          <Text style={{ wordBreak: "break-all" }} color="button">
-            0x89d24A6b4CcB1B6fAA2625fE562bDD9a23260359
-          </Text>
+          <Address
+            href={urls.showAddress(
+              "0x09cabec1ead1c0ba254b09efb3ee13841712be14"
+            )}
+          >
+            0x09cabec1ead1c0ba254b09efb3ee13841712be14
+          </Address>
         </Box>
 
         <Box p={24}>
           <Hint color="textSubtext" mb={3}>
             Token Address
           </Hint>
-          <Text style={{ wordBreak: "break-all" }} color="button">
+          <Address
+            href={urls.showAddress(
+              "0x89d24A6b4CcB1B6fAA2625fE562bDD9a23260359"
+            )}
+          >
             0x89d24A6b4CcB1B6fAA2625fE562bDD9a23260359
-          </Text>
+          </Address>
         </Box>
       </Panel>
 
@@ -151,20 +173,7 @@ const App = () => (
           <Text>↓</Text>
         </Flex>
         <Divider />
-        <Box p={24}>
-          <Flex mb={24} justifyContent="space-between">
-            <Text color="button">0.002 ETH for 25.76 OMG</Text>
-            <Text color="textDim">1 min ago</Text>
-          </Flex>
-          <Flex mb={24} justifyContent="space-between">
-            <Text color="button">0.002 ETH for 25.76 OMG</Text>
-            <Text color="textDim">1 min ago</Text>
-          </Flex>
-          <Flex mb={24} justifyContent="space-between">
-            <Text color="button">0.002 ETH for 25.76 OMG</Text>
-            <Text color="textDim">1 min ago</Text>
-          </Flex>
-        </Box>
+        <TransactionsList />
       </Panel>
     </Dashboard>
 

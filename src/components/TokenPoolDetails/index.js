@@ -24,7 +24,10 @@ class TokenPoolDetails extends Component {
 
     var rateDisplay =
       this.props.exchangeRate > 0
-        ? ("1 ETH = " + this.props.exchangeRate.toFixed(4) + " " + this.props.curSymbol)
+        ? "1 ETH = " +
+          this.props.exchangeRate.toFixed(4) +
+          " " +
+          this.props.curSymbol
         : "-";
 
     const data = [

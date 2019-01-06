@@ -20,7 +20,7 @@ const Select = ({ options, onChange, defaultValue, placeholder }) => (
 );
 
 Select.defaultProps = {
-  placeholder: "Select a token..."
+  placeholder: "Find Exchanges"
 };
 
 Select.propTypes = {
