@@ -232,15 +232,32 @@ const TokenChart = props => {
   ];
 
   // calculate dataset
-  var daysToShow = 60;
+  var numDaysBackToCalculate = 720;
+  var numDaysToShowOnChart = 60;
 
   var oneDayOffset = 24 * 60 * 60 * 1000; // in milliseconds
 
   var currentEthLiquidity = 0;
   var currentTokenLiquidity = 0;
 
-  for (var daysBack = daysToShow; daysBack >= 0; daysBack--) {
+  for (var daysBack = numDaysBackToCalculate; daysBack >= 0; daysBack--) {
     var date = new Date(Date.now() - oneDayOffset * daysBack);
+    
+    var dateKey = date.getMonth() + "-" + date.getDate() + "-" + date.getFullYear();
+
+    // track eth liquidity
+    if (dateKey in ethLiquidityDataMap) {
+      currentEthLiquidity += ethLiquidityDataMap[dateKey];
+    }
+
+    // track token liquidity
+    if (dateKey in tokenLiquidityDataMap) {
+      currentTokenLiquidity += tokenLiquidityDataMap[dateKey];
+    }
+
+    if (daysBack > numDaysToShowOnChart) {
+      continue;
+    }
 
     labels.push(
       monthNames[date.getMonth()] +
@@ -250,31 +267,18 @@ const TokenChart = props => {
         date.getFullYear()
     );
 
-    var dateKey =
-      date.getMonth() + "-" + date.getDate() + "-" + date.getFullYear();
-
     if (dateKey in volumeDataMap) {
       volumeData.push(volumeDataMap[dateKey].toFixed(4));
     } else {
       volumeData.push(0);
     }
-
-    // track eth liquidity
-    if (dateKey in ethLiquidityDataMap) {
-      currentEthLiquidity += ethLiquidityDataMap[dateKey];
-    }
+    
     ethLiquidityData.push(currentEthLiquidity.toFixed(4));
 
-    // track token liquidity
-    if (dateKey in tokenLiquidityDataMap) {
-      currentTokenLiquidity += tokenLiquidityDataMap[dateKey];
-    }
     tokenLiquidityData.push(currentTokenLiquidity.toFixed(4));
 
     // calculate the price of the token on this given day
-    ethPriceData.push(
-      GetEthToTokenPrice(currentEthLiquidity, currentTokenLiquidity).toFixed(4)
-    );
+    ethPriceData.push(GetEthToTokenPrice(currentEthLiquidity, currentTokenLiquidity).toFixed(4));
   }
 
   // don't even show liquidity points if there was no liquidity at all
