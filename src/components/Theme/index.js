@@ -1,7 +1,3 @@
-/**
- * @prettier
- */
-
 import React from "react";
 import { ThemeProvider, createGlobalStyle } from "styled-components";
 

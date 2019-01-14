@@ -9,8 +9,8 @@ import { urls } from "../../helpers";
 
 const TransactionsList = ({ transactions }) => (
   <Box p={24}>
-    {transactions.map(tx => (
-      <Flex mb={24} justifyContent="space-between">
+    {transactions.map((tx, index) => (
+      <Flex key={index} mb={24} justifyContent="space-between">
         <Link color="button" external href={urls.showTransaction(tx.tx)}>
           {tx.poolAdjustmentEth} ETH for {tx.poolAdjustmentToken} DAI
         </Link>

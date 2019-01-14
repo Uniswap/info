@@ -1,7 +1,3 @@
-/**
- * @prettier
- */
-
 import React from "react";
 import { Flex } from "rebass";
 
@@ -27,8 +23,10 @@ const FooterLink = props => (
 
 const Footer = () => (
   <Flex as="footer" p={24}>
-    {links.map(link => (
-      <FooterLink href={link.url}>{link.text}</FooterLink>
+    {links.map((link, index) => (
+      <FooterLink key={index} href={link.url}>
+        {link.text}
+      </FooterLink>
     ))}
   </Flex>
 );

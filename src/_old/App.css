@@ -1,7 +1,3 @@
-/**
- * @prettier
- */
-
 .TokenChart {
   width: calc(100% - 5px);
   display: inline-block;

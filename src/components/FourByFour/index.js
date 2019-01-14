@@ -1,13 +1,14 @@
 import React from "react";
 import { Box as RebassBox } from "rebass";
 import styled from "styled-components";
+import PropTypes from "prop-types";
 
 const Box = styled(RebassBox)`
   display: grid;
   grid-template-columns: repeat(2, minmax(max-content, 1fr));
-  grid-template-rows: repeat(2, minmax(max-content, 1fr));
+  /* grid-template-rows: repeat(2, minmax(max-content, 1fr)); */
 
-  grid-gap: ${props => (props.gap ? props.gap : "unset")};
+  row-gap: ${props => (props.gap ? `${props.gap}px` : "unset")};
 `;
 
 const pos = {
@@ -17,13 +18,32 @@ const pos = {
   bottomRight: "flex-end"
 };
 
-const FourByFour = props => (
-  <Box {...props}>
-    <div style={{ placeSelf: pos.topLeft }}>{props.topLeft}</div>
-    <div style={{ placeSelf: pos.topRight }}>{props.topRight}</div>
-    <div style={{ placeSelf: pos.bottomLeft }}>{props.bottomLeft}</div>
-    <div style={{ placeSelf: pos.bottomRight }}>{props.bottomRight}</div>
+const FourByFour = ({
+  gap,
+  topLeft,
+  topRight,
+  bottomLeft,
+  bottomRight,
+  ...rest
+}) => (
+  <Box gap={gap} {...rest}>
+    <div style={{ placeSelf: pos.topLeft }}>{topLeft}</div>
+    <div style={{ placeSelf: pos.topRight }}>{topRight}</div>
+    <div style={{ placeSelf: pos.bottomLeft }}>{bottomLeft}</div>
+    <div style={{ placeSelf: pos.bottomRight }}>{bottomRight}</div>
   </Box>
 );
+
+FourByFour.defaultProps = {
+  gap: 8
+};
+
+FourByFour.propTypes = {
+  gap: PropTypes.number,
+  topLeft: PropTypes.node,
+  topRight: PropTypes.node,
+  bottomLeft: PropTypes.node,
+  bottomRight: PropTypes.node
+};
 
 export default FourByFour;

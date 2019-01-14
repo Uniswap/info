@@ -1,7 +1,3 @@
-/**
- * @prettier
- */
-
 import React from "react";
 import styled from "styled-components";
 import { Box, Button, Flex, Text, Image } from "rebass";
@@ -26,7 +22,7 @@ const Address = props => (
 
 const Header = styled(Panel)`
   display: grid;
-  grid-template-columns: 1fr 200px;
+  grid-template-columns: 1fr 216px;
   align-items: center;
 `;
 
@@ -60,22 +56,54 @@ const App = () => (
     </Header>
 
     <Dashboard mx="auto" px={[0, 3]}>
-      <Panel rounded color="white" bg="jaguar" p={24} area="volume">
-        <FourByFour
-          topLeft={<Hint color="textLightDim">DAI Volume</Hint>}
-          bottomLeft={
-            <Text fontSize={24} lineHeight={1.4} fontWeight={500}>
-              130.83 ETH
-            </Text>
-          }
-          topRight={<Hint color="textLightDim">24h</Hint>}
-          bottomRight={
-            <Text fontSize={20} lineHeight={1.4}>
-              +2.01%
-            </Text>
-          }
-        />
-      </Panel>
+      <Box style={{ gridArea: "volume" }}>
+        <Panel grouped rounded color="white" bg="jaguar" p={24}>
+          <FourByFour
+            gap={24}
+            topLeft={<Hint color="textLightDim">DAI Volume</Hint>}
+            bottomLeft={
+              <Text fontSize={24} lineHeight={1.4} fontWeight={500}>
+                130.83 ETH
+              </Text>
+            }
+            topRight={<Hint color="textLightDim">24h</Hint>}
+            bottomRight={
+              <Text fontSize={20} lineHeight={1.4}>
+                +2.01%
+              </Text>
+            }
+          />
+        </Panel>
+        <Panel grouped rounded color="white" bg="maker" p={24}>
+          <FourByFour
+            topLeft={<Hint color="textLight">Your share</Hint>}
+            bottomLeft={
+              <Text fontSize={20} lineHeight={1.4} fontWeight={500}>
+                47 Pool Tokens
+              </Text>
+            }
+            bottomRight={
+              <Text fontSize={20} lineHeight={1.4}>
+                2.5%
+              </Text>
+            }
+          />
+          <FourByFour
+            mt={3}
+            topLeft={<Hint color="textLight">Your fees</Hint>}
+            bottomLeft={
+              <Text fontSize={20} lineHeight={1.4} fontWeight={500}>
+                0.0841 DAI
+              </Text>
+            }
+            bottomRight={
+              <Text fontSize={20} lineHeight={1.4}>
+                -0.0004 ETH
+              </Text>
+            }
+          />
+        </Panel>
+      </Box>
 
       <Panel rounded p={24} bg="white" area="liquidity">
         <FourByFour
@@ -103,7 +131,7 @@ const App = () => (
         <Box p={24}>
           <Flex alignItems="center" justifyContent="space-between">
             <Text>Pool Statistics</Text>
-            <Box width={120}>
+            <Box width={144}>
               <Select
                 placeholder="..."
                 defaultValue={timeframeOptions[1]}
