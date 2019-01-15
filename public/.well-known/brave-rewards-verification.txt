@@ -1,0 +1,4 @@
+This is a Brave Rewards publisher verification file.
+
+Domain: uniswap.info
+Token: e2007a8c4cdd12c68513f0db0fd910299d6ae3ff81eab20124e90d2e9d5d2acc
