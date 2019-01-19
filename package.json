@@ -4,6 +4,7 @@
   "private": true,
   "homepage": ".",
   "dependencies": {
+    "axios": "^0.18.0",
     "bignumber.js": "^8.0.2",
     "chart.js": "^2.7.3",
     "gh-pages": "^2.0.1",
