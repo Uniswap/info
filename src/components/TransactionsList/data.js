@@ -1,7 +1,7 @@
 // fake data
 export default [
   {
-    event: "ETH Purchase",
+    event: "Eth Purchase",
     tx: "0xdd0b2c232236769fa243ce8e1cc4fffa779800426b7fac0cd55032d4f5a68296",
     block: "7021199",
     address: "0x85C5c26DC2aF5546341Fc1988B9d178148b4838B",
@@ -11,7 +11,7 @@ export default [
     poolShare: "-"
   },
   {
-    event: "Token Purchase",
+    event: "Remove Liquidity",
     tx: "0x5eccff20c4d634be7ac2953459081e1489bfa1b93ccd8738f5f68d2392e365d9",
     block: "7021193",
     address: "0x6942B6a8F3D8084d8DEcAbFED15acEEad5cCb83E",
@@ -31,7 +31,7 @@ export default [
     poolShare: "-"
   },
   {
-    event: "ETH Purchase",
+    event: "Eth Purchase",
     tx: "0xdd0b2c232236769fa243ce8e1cc4fffa779800426b7fac0cd55032d4f5a68296",
     block: "7021199",
     address: "0x85C5c26DC2aF5546341Fc1988B9d178148b4838B",
