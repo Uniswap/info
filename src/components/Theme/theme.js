@@ -1,29 +1,32 @@
 export default {
   fonts: {
-    sans: `"Inter UI", -apple-system, BlinkMacSystemFont, Segoe UI,
-    Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji,
-    Segoe UI Symbol`
+    sans: `var(--font-family), var(--system-ui)`
   },
   colors: {
-    white: "#fff",
+    white: "var(--c-white)",
+
     // greys
-    alabaster: "#FBFBFB",
-    zircon: "#e1e1e1",
-    mineshaft: "#333333",
-    concrete: "#f2f2f2",
-    jaguar: "#2b2b2b",
+    alabaster: "var(--c-alabaster)",
+    zircon: "var(--c-zircon)",
+    mineshaft: "var(--c-mineshaft)",
+    concrete: "var(--c-concrete)",
+    jaguar: "var(--c-jaguar)",
+
     // colors
-    uniswappink: "#dc6be5",
-    ronchi: "#F2C94C",
-    maker: "#71c4ad",
-    button: "#2f80ed",
+    uniswappink: "var(--c-uniswappink)",
+    ronchi: "var(--c-ronchi)",
+    maker: "var(--c-maker)",
+    button: "var(--c-button)",
+    connected: "var(--c-connected)",
+    warningDim: "var(--c-warning-dim)",
+
     // text colors
-    text: "#2b2b2b",
-    textSubtext: "#737373",
-    textDim: "#aeaeae",
-    textLight: "#fff",
-    textLightSubtext: "rgba(255, 255, 255, 0.80)",
-    textLightDim: "rgba(255, 255, 255, 0.60)"
+    text: "var(--c-text)",
+    textSubtext: "var(--c-text-subtext)",
+    textDim: "var(--c-text-dim)",
+    textLight: "var(--c-text-light)",
+    textLightSubtext: "var(--c-text-light-subtext)",
+    textLightDim: "var(--c-text-light-dim)"
   },
   buttons: {
     outline: {
@@ -37,9 +40,7 @@ export default {
     }
   },
   Button: {
-    fontFamily: `"Inter UI", -apple-system, BlinkMacSystemFont, Segoe UI,
-    Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji,
-    Segoe UI Symbol`,
+    fontFamily: `var(--font-family), var(--system-ui)`,
     borderRadius: 40,
     fontWeight: 500
   },

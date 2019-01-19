@@ -7,8 +7,40 @@ import "typeface-inter";
 import theme from "./theme";
 
 export const GlobalStyles = createGlobalStyle`
+  :root {
+    --root-font-size: 16px;
+    --font-family: Inter UI;
+    --system-ui: -apple-system, BlinkMacSystemFont, Segoe UI,
+    Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji,
+    Segoe UI Symbol;
+
+    /* greys */
+    --c-white: #fff;
+    --c-alabaster: #FBFBFB;
+    --c-zircon: #e1e1e1;
+    --c-mineshaft: #333333;
+    --c-concrete: #f2f2f2;
+    --c-jaguar: #2b2b2b;
+
+    /* colors */
+    --c-uniswappink: #dc6be5;
+    --c-ronchi: #F2C94C;
+    --c-maker: #71c4ad;
+    --c-button: #2f80ed;
+    --c-connected: #27AE60;
+    --c-warning-dim: #FF6871;
+
+    /* text colors */
+    --c-text: #2b2b2b;
+    --c-text-subtext: #737373;
+    --c-text-dim: #aeaeae;
+    --c-text-light: #fff;
+    --c-text-light-subtext: rgba(255 255, 255, 0.80);
+    --c-text-light-dim: rgba(255, 255, 255, 0.60);
+  }
+
   html {
-    font-size: 16px;
+    font-size: var(--root-font-size);
     background-color: ${props => props.theme.colors.alabaster};
   }
 
