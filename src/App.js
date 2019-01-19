@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import { Box, Button, Flex, Text, Image } from "rebass";
+import { Box, Button, Flex, Text } from "rebass";
 
 import Wrapper from "./components/Theme";
 import Title from "./components/Title";
@@ -11,6 +11,7 @@ import Select from "./components/Select";
 import Footer from "./components/Footer";
 import TransactionsList from "./components/TransactionsList";
 import Link from "./components/Link";
+import Chart from "./components/Chart";
 
 import { tokenOptions, urls } from "./helpers/";
 
@@ -143,27 +144,7 @@ const App = () => (
         <Divider />
 
         <Box p={24}>
-          <Image src="./chart.png" />
-          <Flex mt={3} justifyContent="flex-end">
-            <Button mr={[1, 2]} fontSize={[0, 1]} bg="maker">
-              DAI
-            </Button>
-            <Button mr={[1, 2]} fontSize={[0, 1]} bg="uniswappink">
-              ETH
-            </Button>
-            <Button
-              mr={[1, 2]}
-              fontSize={[0, 1]}
-              variant="outline"
-              borderColor="ronchi"
-              color="ronchi"
-            >
-              Rate
-            </Button>
-            <Button fontSize={[0, 1]} color="text" bg="zircon">
-              Volume
-            </Button>
-          </Flex>
+          <Chart />
         </Box>
       </Panel>
 
