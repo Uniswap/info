@@ -18,7 +18,7 @@ import { urls } from "./helpers/";
 import axios from "axios";
 
 // all our exchange options keyed by exchange address
-let exchangeOptionsRaw = {};
+let exchangeDataRaw = {};
 let exchangeSelectOptions = [];
 
 let currentExchangeSymbol;
@@ -60,12 +60,18 @@ class App extends Component {
     app = this;
   }
 
+  getExchangeData(exchange_address) {
+    return exchangeDataRaw[exchange_address];
+  }
+
   componentDidMount(props) {
     // Load exchange list
     axios({
       method: "get",
       url: "http://uniswap-analytics.appspot.com/api/v1/directory",      
-    }).then(response => {    
+    }).then(response => {
+      // TODO set this in config
+      var defaultExchangeAddress = "";
 
       response.data.forEach(function(exchange) {
         var symbol = exchange["symbol"];
@@ -78,16 +84,37 @@ class App extends Component {
           value : exchange_address
         });
 
-        exchangeOptionsRaw[exchange_address] = {
+        exchangeDataRaw[exchange_address] = {
           symbol : symbol,
           exchangeAddress : exchange_address,
           tokenAddress : token_address,
           tokenDecimals : token_decimals
         };
+
+        defaultExchangeAddress = exchange_address;
       });      
 
       this.setState({})
+
+      this.retrieveExchangeHistory(defaultExchangeAddress);
     });      
+  }
+
+  retrieveExchangeHistory(exchange_address) {
+    // load exchange history
+    // by default, get exchange history for past 30 days
+    var utcEndTimeInSeconds = Date.now() / 1000;
+    var utcStartTimeInSeconds = utcEndTimeInSeconds - (60 * 60 * 24 * 30);
+
+    console.log(utcEndTimeInSeconds);
+    axios({
+      method: "get",
+      url: "http://uniswap-analytics.appspot.com/api/v1/history?exchangeAddress=" + exchange_address + 
+      "&startTime=" + utcStartTimeInSeconds + "&endTime=" + utcEndTimeInSeconds,
+    }).then(response => {
+      // TODO parse history into buckets segmented by day
+      console.log(response.data);
+    });
   }
 
   render() {
@@ -107,11 +134,13 @@ class App extends Component {
           >
             <Title />
             <Select options={exchangeSelectOptions} onChange={(newOption)=>{            
-              var exchangeData = exchangeOptionsRaw[newOption.value];
+              var exchangeData = app.getExchangeData(newOption.value);
 
               currentExchangeSymbol = exchangeData.symbol;
 
               app.setState({});
+
+              app.retrieveExchangeHistory(exchangeData.exchangeAddress);
             }}
             />
           </Header>
