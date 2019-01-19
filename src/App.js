@@ -17,7 +17,9 @@ import { urls } from "./helpers/";
 
 import axios from "axios";
 
-let tokenOptions = [];
+// all our exchange options keyed by exchange address
+let exchangeOptionsRaw = {};
+let exchangeSelectOptions = [];
 
 let currentExchangeSymbol;
 let app;
@@ -66,10 +68,22 @@ class App extends Component {
     }).then(response => {    
 
       response.data.forEach(function(exchange) {
-        tokenOptions.push({
-          label : exchange["symbol"],
-          value : exchange["tokenAddress"],
+        var symbol = exchange["symbol"];
+        var exchange_address =  exchange["exchangeAddress"];
+        var token_address = exchange["tokenAddress"];
+        var token_decimals = exchange["tokenDecimals"];
+
+        exchangeSelectOptions.push({        
+          label : (symbol + " - " + exchange_address),          
+          value : exchange_address
         });
+
+        exchangeOptionsRaw[exchange_address] = {
+          symbol : symbol,
+          exchangeAddress : exchange_address,
+          tokenAddress : token_address,
+          tokenDecimals : token_decimals
+        };
       });      
 
       this.setState({})
@@ -77,7 +91,7 @@ class App extends Component {
   }
 
   render() {
-    if (tokenOptions.length === 0) {
+    if (exchangeSelectOptions.length === 0) {
       // TODO Show loading indicator
       return (
         <Wrapper/>
@@ -92,8 +106,10 @@ class App extends Component {
             color={["white", "black"]}
           >
             <Title />
-            <Select options={tokenOptions} onChange={(newOption)=>{
-              currentExchangeSymbol = newOption.label;
+            <Select options={exchangeSelectOptions} onChange={(newOption)=>{            
+              var exchangeData = exchangeOptionsRaw[newOption.value];
+
+              currentExchangeSymbol = exchangeData.symbol;
 
               app.setState({});
             }}
