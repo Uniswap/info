@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import styled from "styled-components";
-import { Box, Button, Flex, Text } from "rebass";
-
+import { Box, Flex, Text } from "rebass";
+import axios from "axios";
 import { BigNumber } from "bignumber.js";
 
 import Wrapper from "./components/Theme";
@@ -16,8 +16,6 @@ import Link from "./components/Link";
 import Chart from "./components/Chart";
 
 import { urls } from "./helpers/";
-
-import axios from "axios";
 
 const BASE_URL = "http://uniswap-analytics.appspot.com/api/";
 
@@ -65,80 +63,84 @@ class App extends Component {
     app = this;
   }
 
-  getExchangeData(exchange_address) {
-    return exchangeDataRaw[exchange_address];
-  }
+  // Retreive Data for exchange by it's address
+  // @TODO: move this data into state
+  getExchangeData = address => exchangeDataRaw[address];
 
   componentDidMount(props) {
     // Load exchange list
     axios({
       method: "get",
-      url: BASE_URL + "v1/directory",      
+      url: `${BASE_URL}v1/directory`
     }).then(response => {
       // TODO set this in config
       var defaultExchangeAddress = "";
 
-      response.data.forEach(function(exchange) {
-        var symbol = exchange["symbol"];
-        var exchange_address =  exchange["exchangeAddress"];
-        var token_address = exchange["tokenAddress"];
-        var token_decimals = exchange["tokenDecimals"];
+      response.data.forEach(exchange => {
+        const {
+          symbol,
+          exchangeAddress,
+          tokenAddress,
+          tokenDecimals
+        } = exchange;
 
-        exchangeSelectOptions.push({        
-          label : (symbol + " - " + exchange_address),          
-          value : exchange_address
+        // Create Exchange Select Options
+        exchangeSelectOptions.push({
+          label: `${symbol} - ${exchangeAddress}`,
+          value: exchangeAddress
         });
 
-        exchangeDataRaw[exchange_address] = {
-          symbol : symbol,
-          exchangeAddress : exchange_address,
-          
-          tokenAddress : token_address,
-          tokenDecimals : token_decimals,
-
-          tradeVolume : ".",
-          percentChange : "%",
-
-          "ethLiquidity" : ".",
-          
-          recentTransactions : [],
-          chartData : []
+        // Create Exchange Data
+        exchangeDataRaw[exchangeAddress] = {
+          symbol,
+          exchangeAddress,
+          tokenAddress,
+          tokenDecimals,
+          tradeVolume: ".",
+          percentChange: "%",
+          ethLiquidity: ".",
+          recentTransactions: [],
+          chartData: []
         };
 
-        defaultExchangeAddress = exchange_address;
+        defaultExchangeAddress = exchangeAddress;
       });
 
       this.setCurrentExchange(defaultExchangeAddress);
-    });      
+    });
   }
 
   retrieveExchangeTicker(exchange_address, ticker_retrieved_callback) {
     console.log("retrieving ticker...");
 
-    var url = BASE_URL + "v1/ticker?exchangeAddress=" + exchange_address;
-
     axios({
       method: "get",
-      url: url,
+      url: `${BASE_URL}v1/ticker?exchangeAddress=${exchange_address}`
     }).then(response => {
       // grab the exchange data object for this exchange address
       var exchangeData = app.getExchangeData(exchange_address);
-      
+
       // update the values from the API response
       var responseData = response.data;
 
-      // TODO convert value to eth using helper method?      
-      var tradeVolume = (responseData["tradeVolume"] / 1e18).toFixed(4);      
+      // TODO convert value to eth using helper method?
+      var tradeVolume = (responseData["tradeVolume"] / 1e18).toFixed(4);
       var ethLiquidity = (responseData["ethLiquidity"] / 1e18).toFixed(4);
 
-      var priceChangePercent = (responseData["priceChangePercent"] * 100).toFixed(2);
+      var priceChangePercent = (
+        responseData["priceChangePercent"] * 100
+      ).toFixed(2);
 
-      var erc20Liquidity = (responseData["erc20Liquidity"] / Math.pow(10, exchangeData.tokenDecimals)).toFixed(4);
+      var erc20Liquidity = (
+        responseData["erc20Liquidity"] /
+        Math.pow(10, exchangeData.tokenDecimals)
+      ).toFixed(4);
 
-      exchangeData["tradeVolume"] = tradeVolume + " ETH";
-      exchangeData["ethLiquidity"] = ethLiquidity + " ETH";
-      exchangeData["erc20Liquidity"] = erc20Liquidity + " " + exchangeData.symbol;
-
+      exchangeData["tradeVolume"] = `${tradeVolume} ETH`;
+      exchangeData["ethLiquidity"] = `${ethLiquidity} ETH`;
+      exchangeData["erc20Liquidity"] = `${erc20Liquidity} ${
+        exchangeData.symbol
+      }`;
 
       if (priceChangePercent > 0) {
         exchangeData["percentChange"] = "+";
@@ -166,62 +168,75 @@ class App extends Component {
 
     // use current time as now
     var utcEndTimeInSeconds = Date.now() / 1000;
-    // go back x days
-    var utcStartTimeInSeconds = utcEndTimeInSeconds - (60 * 60 * 24 * days_to_query);
 
-    var url = BASE_URL + "v1/history?exchangeAddress=" + exchange_address + 
-      "&startTime=" + utcStartTimeInSeconds + "&endTime=" + utcEndTimeInSeconds;
+    // go back x days
+    var utcStartTimeInSeconds =
+      utcEndTimeInSeconds - 60 * 60 * 24 * days_to_query;
 
     axios({
       method: "get",
-      url: url,
+      url: `${BASE_URL}v1/history?exchangeAddress=${exchange_address}&startTime=${utcStartTimeInSeconds}&endTime=${utcEndTimeInSeconds}`
     }).then(response => {
       // parse history into buckets segmented by day
       var exchangeData = app.getExchangeData(exchange_address);
 
       var chartBucketDatas = {}; // chart data grouped by hour or day
-      
+
       var chartBucketOrderedLabels = []; // the order of the buckets from left to right (x axis)
       var chartBucketOrderedTimestamps = [];
 
-
       if (days_to_query === 1) {
         // TODO buckets will be by hour
-      } else {      
+      } else {
         var startOfTodayUTC = new Date();
 
         startOfTodayUTC.setUTCHours(0, 0, 0, 0);
 
         startOfTodayUTC = startOfTodayUTC.getTime() / 1000;
 
-        var dateNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        var dateNames = [
+          "Jan",
+          "Feb",
+          "Mar",
+          "Apr",
+          "May",
+          "Jun",
+          "Jul",
+          "Aug",
+          "Sep",
+          "Oct",
+          "Nov",
+          "Dec"
+        ];
 
         // buckets will be by day
         for (var i = days_to_query; i >= 0; i--) {
-          var startUTCforBucket = startOfTodayUTC - (60 * 60 * 24 * i);
+          var startUTCforBucket = startOfTodayUTC - 60 * 60 * 24 * i;
 
           var date = new Date(startUTCforBucket * 1000);
 
-          var bucketLabel = dateNames[date.getUTCMonth()] + "/" + date.getUTCDate();
+          var bucketLabel = `${
+            dateNames[date.getUTCMonth()]
+          } ${date.getUTCDate()}`;
 
           chartBucketOrderedTimestamps.push(startUTCforBucket);
           // put an empty data object in for this bucket
           chartBucketDatas[startUTCforBucket] = {
-            tradeVolume : new BigNumber(0),
-            label : bucketLabel
+            tradeVolume: new BigNumber(0),
+            label: bucketLabel
           };
         }
       }
 
-      response.data.forEach(function(transaction) {
+      response.data.forEach(transaction => {
         exchangeData.recentTransactions.push(transaction);
 
         var tx_timestamp = transaction["timestamp"];
         var tx_event = transaction["event"];
         var eth_amount = new BigNumber(transaction["ethAmount"]);
 
-        // if this was a trading event, we can consider its volume 
-        if ((tx_event === "EthPurchase") || (tx_event === "TokenPurchase")) {
+        // if this was a trading event, we can consider its volume
+        if (tx_event === "EthPurchase" || tx_event === "TokenPurchase") {
           // determine the bucket this tx falls into based on its timestamp
           // iterate backwards through bucket timestamps
           for (var i = chartBucketOrderedTimestamps.length - 1; i >= 0; i--) {
@@ -229,24 +244,28 @@ class App extends Component {
             if (tx_timestamp >= chartBucketOrderedTimestamps[i]) {
               var bucket = chartBucketDatas[chartBucketOrderedTimestamps[i]];
 
-              bucket.tradeVolume = bucket.tradeVolume.plus(eth_amount.absoluteValue());
+              bucket.tradeVolume = bucket.tradeVolume.plus(
+                eth_amount.absoluteValue()
+              );
 
               break;
             }
           }
         }
-        // console.log(transaction);
       });
 
-          
-      chartBucketOrderedTimestamps.forEach(function(timestamp) {
+      chartBucketOrderedTimestamps.forEach(timestamp => {
         // get the bucket data for this name
         var bucket = chartBucketDatas[timestamp];
 
         // console.log(timestamp + "     " + bucket.tradeVolume.toFixed());
         bucket.tradeVolume = bucket.tradeVolume.dividedBy(1e18);
 
-        exchangeData.chartData.push({ name: bucket.label, uv: 0, pv: bucket.tradeVolume.toFixed(), amt: 0 });
+        // Data Object for Chart
+        exchangeData.chartData.push({
+          date: bucket.label,
+          volume: bucket.tradeVolume.toFixed(4)
+        });
       });
 
       // only update UI if we're still displaying the initial requested address
@@ -256,22 +275,23 @@ class App extends Component {
     });
   }
 
-  setCurrentExchange(exchange_address) {
-    currentExchangeData = app.getExchangeData(exchange_address);
+  // Set the current exchange's data to be shown
+  setCurrentExchange(address) {
+    currentExchangeData = app.getExchangeData(address);
 
+    // What is this for?
     app.setState({});
 
-    app.retrieveExchangeTicker(exchange_address, () => {
-      app.retrieveExchangeHistory(exchange_address, historyDaysToQuery);
-    });
+    app.retrieveExchangeTicker(address, () =>
+      app.retrieveExchangeHistory(address, historyDaysToQuery)
+    );
   }
 
   render() {
     if (exchangeSelectOptions.length === 0) {
       // TODO Show loading indicator
-      return (
-        <Wrapper/>
-      );
+      console.log("loading");
+      return <Wrapper />;
     } else {
       return (
         <Wrapper>
@@ -282,9 +302,9 @@ class App extends Component {
             color={["white", "black"]}
           >
             <Title />
-            <Select options={exchangeSelectOptions} onChange={(newOption)=>{
-              app.setCurrentExchange(newOption.value);
-            }}
+            <Select
+              options={exchangeSelectOptions}
+              onChange={newOption => app.setCurrentExchange(newOption.value)}
             />
           </Header>
 
@@ -293,7 +313,11 @@ class App extends Component {
               <Panel grouped rounded color="white" bg="jaguar" p={24}>
                 <FourByFour
                   gap={24}
-                  topLeft={<Hint color="textLightDim">{currentExchangeData.symbol} Volume</Hint>}
+                  topLeft={
+                    <Hint color="textLightDim">
+                      {currentExchangeData.symbol} Volume
+                    </Hint>
+                  }
                   bottomLeft={
                     <Text fontSize={24} lineHeight={1.4} fontWeight={500}>
                       {currentExchangeData.tradeVolume}
@@ -342,8 +366,13 @@ class App extends Component {
               <FourByFour
                 topLeft={<Hint>{currentExchangeData.symbol} Liquidity</Hint>}
                 bottomLeft={
-                  <Text fontSize={20} color="maker" lineHeight={1.4} fontWeight={500}>
-                  {currentExchangeData.erc20Liquidity}
+                  <Text
+                    fontSize={20}
+                    color="maker"
+                    lineHeight={1.4}
+                    fontWeight={500}
+                  >
+                    {currentExchangeData.erc20Liquidity}
                   </Text>
                 }
                 topRight={<Hint>ETH Liquidity</Hint>}
@@ -353,7 +382,8 @@ class App extends Component {
                     color="uniswappink"
                     lineHeight={1.4}
                     fontWeight={500}
-                  >{currentExchangeData.ethLiquidity}
+                  >
+                    {currentExchangeData.ethLiquidity}
                   </Text>
                 }
               />
@@ -367,10 +397,13 @@ class App extends Component {
                     <Select
                       placeholder="..."
                       options={timeframeOptions}
-                      onChange={(newOption)=>{
+                      onChange={newOption => {
                         historyDaysToQuery = newOption.value;
 
-                        app.retrieveExchangeHistory(currentExchangeData.exchangeAddress, historyDaysToQuery);
+                        app.retrieveExchangeHistory(
+                          currentExchangeData.exchangeAddress,
+                          historyDaysToQuery
+                        );
 
                         app.setState({});
                       }}
@@ -381,7 +414,7 @@ class App extends Component {
               <Divider />
 
               <Box p={24}>
-                <Chart data={currentExchangeData.chartData}/>
+                <Chart data={currentExchangeData.chartData} />
               </Box>
             </Panel>
 
@@ -391,9 +424,7 @@ class App extends Component {
                   Exchange Address
                 </Hint>
                 <Address
-                  href={urls.showAddress(
-                    currentExchangeData.exchangeAddress
-                  )}
+                  href={urls.showAddress(currentExchangeData.exchangeAddress)}
                 >
                   {currentExchangeData.exchangeAddress}
                 </Address>
@@ -404,9 +435,7 @@ class App extends Component {
                   Token Address
                 </Hint>
                 <Address
-                  href={urls.showAddress(
-                    currentExchangeData.tokenAddress
-                  )}
+                  href={urls.showAddress(currentExchangeData.tokenAddress)}
                 >
                   {currentExchangeData.tokenAddress}
                 </Address>
@@ -419,13 +448,15 @@ class App extends Component {
                 <Text>↓</Text>
               </Flex>
               <Divider />
-              <TransactionsList transactions={currentExchangeData.recentTransactions}/>
+              <TransactionsList
+                transactions={currentExchangeData.recentTransactions}
+              />
             </Panel>
           </Dashboard>
 
           <Footer />
         </Wrapper>
-      )
+      );
     }
   }
 }

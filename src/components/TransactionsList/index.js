@@ -39,11 +39,10 @@ const TransactionItem = ({ transaction }) => (
         external
         href={urls.showTransaction(transaction.tx)}
       >
-        {transaction.poolAdjustmentEth} ETH for{" "}
-        {transaction.poolAdjustmentToken} DAI
+        {transaction.ethAmount} ETH for {transaction.tokenAmount} TOKEN
       </Link>
     </Flex>
-    <Text color="textDim">1 min ago</Text>
+    <Text color="textDim">{transaction.timestamp}</Text>
   </Flex>
 );
 

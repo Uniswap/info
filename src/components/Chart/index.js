@@ -12,35 +12,6 @@ import { Flex, Button } from "rebass";
 import styled from "styled-components";
 import PropTypes from "prop-types";
 
-// const data = [
-//   { name: "Page A", uv: 590, pv: 800, amt: 1400 },
-//   { name: "Page B", uv: 868, pv: 967, amt: 1506 },
-//   { name: "Page C", uv: 1397, pv: 1098, amt: 989 },
-//   { name: "Page D", uv: 1480, pv: 1200, amt: 1228 },
-//   { name: "Page E", uv: 1520, pv: 1108, amt: 1100 },
-//   { name: "Page F", uv: 1400, pv: 680, amt: 1700 },
-//   { name: "Page A", uv: 590, pv: 800, amt: 1400 },
-//   { name: "Page B", uv: 868, pv: 967, amt: 1506 },
-//   { name: "Page C", uv: 1397, pv: 1098, amt: 989 },
-//   { name: "Page D", uv: 1480, pv: 1200, amt: 1228 },
-//   { name: "Page E", uv: 1520, pv: 1108, amt: 1100 },
-//   { name: "Page F", uv: 1400, pv: 680, amt: 1700 },
-//   { name: "Page A", uv: 590, pv: 800, amt: 1400 },
-//   { name: "Page B", uv: 868, pv: 967, amt: 2380 },
-//   { name: "Page C", uv: 1397, pv: 1098, amt: 989 },
-//   { name: "Page D", uv: 1480, pv: 1200, amt: 1228 },
-//   { name: "Page E", uv: 1520, pv: 1108, amt: 1100 },
-//   { name: "Page F", uv: 1400, pv: 680, amt: 1700 },
-//   { name: "Page C", uv: 1397, pv: 1098, amt: 989 },
-//   { name: "Page D", uv: 1480, pv: 1200, amt: 1228 },
-//   { name: "Page E", uv: 1520, pv: 1108, amt: 1100 },
-//   { name: "Page F", uv: 1400, pv: 680, amt: 1700 },
-//   { name: "Page D", uv: 1480, pv: 1200, amt: 1228 },
-//   { name: "Page E", uv: 1520, pv: 1108, amt: 1100 },
-//   { name: "Page F", uv: 1400, pv: 680, amt: 1700 },
-//   { name: "Page A", uv: 590, pv: 800, amt: 1400 }
-// ];
-
 const CustomBar = props => {
   const { fill, x, y, width, height } = props;
 
@@ -75,38 +46,38 @@ const Chart = ({data}) => {
             tickLine={false}
             axisLine={false}
             interval="preserveStartEnd"
-            dataKey="name"
+            dataKey="date"
           />
-          <YAxis
+          {/* <YAxis
             axisLine={false}
             tickLine={false}
             interval="preserveStartEnd"
-          />
+          /> */}
           {/* <Tooltip /> */}
           <Bar
             hide={volume}
-            dataKey="pv"
+            dataKey="volume"
             shape={<CustomBar />}
             fill="var(--c-zircon)"
           />
-          <Line
+          {/* <Line
             hide={token}
             type="monotone"
             dataKey="amt"
             stroke="var(--c-maker)"
-          />
-          <Line
+          /> */}
+          {/* <Line
             hide={rate}
             type="monotone"
             dataKey="pv"
             stroke="var(--c-ronchi)"
-          />
-          <Line
+          /> */}
+          {/* <Line
             hide={eth}
             type="monotone"
             dataKey="uv"
             stroke="var(--c-uniswappink)"
-          />
+          /> */}
         </ComposedChart>
       </ResponsiveContainer>
       <Flex mt={3} justifyContent="flex-end">
