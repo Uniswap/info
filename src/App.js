@@ -17,10 +17,13 @@ import { urls } from "./helpers/";
 
 import axios from "axios";
 
+const BASE_URL = "http://uniswap-analytics.appspot.com/api/";
+
 // all our exchange options keyed by exchange address
 let exchangeDataRaw = {};
 let exchangeSelectOptions = [];
 
+let historyDaysToQuery = 7;
 let currentExchangeData;
 let app;
 
@@ -48,9 +51,9 @@ const Hint = props => (
 );
 
 const timeframeOptions = [
-  { value: "day", label: "1 day" },
-  { value: "week", label: "1 week" },
-  { value: "month", label: "1 month" }
+  { value: "1", label: "1 day" },
+  { value: "7", label: "1 week" },
+  { value: "30", label: "1 month" }
 ];
 
 class App extends Component {
@@ -68,7 +71,7 @@ class App extends Component {
     // Load exchange list
     axios({
       method: "get",
-      url: "http://uniswap-analytics.appspot.com/api/v1/directory",      
+      url: BASE_URL + "v1/directory",      
     }).then(response => {
       // TODO set this in config
       var defaultExchangeAddress = "";
@@ -100,8 +103,7 @@ class App extends Component {
   }
 
   retrieveExchangeTicker(exchange_address) {
-    // TODO extract out URL into parameter
-    var url = "http://uniswap-analytics.appspot.com/api/v1/ticker?exchangeAddress=" + exchange_address;
+    var url = BASE_URL + "v1/ticker?exchangeAddress=" + exchange_address;
 
     axios({
       method: "get",
@@ -140,17 +142,17 @@ class App extends Component {
     });
   }
 
-  retrieveExchangeHistory(exchange_address) {
-    // load exchange history
-    // by default, get exchange history for past 30 days?
-    // TODO base this off of the Pool Statistics dropdown
-    var daysBackToQuery = 30;
+  // load exchange history for X days back
+  retrieveExchangeHistory(exchange_address, days_to_query) {
+    var exchangeData = app.getExchangeData(exchange_address);
+    exchangeData.recentTransactions = [];
 
+    // use current time as now
     var utcEndTimeInSeconds = Date.now() / 1000;
-    var utcStartTimeInSeconds = utcEndTimeInSeconds - (60 * 60 * 24 * daysBackToQuery);
+    // go back x days
+    var utcStartTimeInSeconds = utcEndTimeInSeconds - (60 * 60 * 24 * days_to_query);
 
-    // TODO extract out URL into parameter
-    var url = "http://uniswap-analytics.appspot.com/api/v1/history?exchangeAddress=" + exchange_address + 
+    var url = BASE_URL + "v1/history?exchangeAddress=" + exchange_address + 
       "&startTime=" + utcStartTimeInSeconds + "&endTime=" + utcEndTimeInSeconds;
 
     axios({
@@ -160,13 +162,8 @@ class App extends Component {
       // TODO parse history into buckets segmented by day
       var exchangeData = app.getExchangeData(exchange_address);
 
-      console.log(response.data);
-
-      exchangeData.recentTransactions = [];
-
       response.data.forEach(function(transaction) {
-        exchangeData.recentTransactions.push(transaction);        
-        console.log(transaction.event);
+        exchangeData.recentTransactions.push(transaction);
       }); 
 
       // only update UI if we're still displaying the initial requested address
@@ -183,7 +180,7 @@ class App extends Component {
 
     app.retrieveExchangeTicker(exchange_address);
 
-    app.retrieveExchangeHistory(exchange_address);
+    app.retrieveExchangeHistory(exchange_address, historyDaysToQuery);
   }
 
   render() {
@@ -202,7 +199,7 @@ class App extends Component {
             color={["white", "black"]}
           >
             <Title />
-            <Select options={exchangeSelectOptions} onChange={(newOption)=>{            
+            <Select options={exchangeSelectOptions} onChange={(newOption)=>{
               app.setCurrentExchange(newOption.value);
             }}
             />
@@ -287,6 +284,13 @@ class App extends Component {
                     <Select
                       placeholder="..."
                       options={timeframeOptions}
+                      onChange={(newOption)=>{
+                        historyDaysToQuery = newOption.value;
+
+                        app.retrieveExchangeHistory(currentExchangeData.exchangeAddress, historyDaysToQuery);
+
+                        app.setState({});
+                      }}
                     />
                   </Box>
                 </Flex>
