@@ -90,8 +90,15 @@ class App extends Component {
         exchangeDataRaw[exchange_address] = {
           symbol : symbol,
           exchangeAddress : exchange_address,
+          
           tokenAddress : token_address,
           tokenDecimals : token_decimals,
+
+          tradeVolume : ".",
+          percentChange : "%",
+
+          "ethLiquidity" : ".",
+          
           recentTransactions : []
         };
 
@@ -102,7 +109,9 @@ class App extends Component {
     });      
   }
 
-  retrieveExchangeTicker(exchange_address) {
+  retrieveExchangeTicker(exchange_address, ticker_retrieved_callback) {
+    console.log("retrieving ticker...");
+
     var url = BASE_URL + "v1/ticker?exchangeAddress=" + exchange_address;
 
     axios({
@@ -138,12 +147,16 @@ class App extends Component {
       // only update UI if we're still displaying the initial requested address
       if (exchangeData.exchangeAddress === exchange_address) {
         app.setState({});
+
+        ticker_retrieved_callback();
       }
     });
   }
 
   // load exchange history for X days back
   retrieveExchangeHistory(exchange_address, days_to_query) {
+    console.log("retrieving transaction history...");
+
     var exchangeData = app.getExchangeData(exchange_address);
     exchangeData.recentTransactions = [];
 
@@ -178,9 +191,9 @@ class App extends Component {
 
     app.setState({});
 
-    app.retrieveExchangeTicker(exchange_address);
-
-    app.retrieveExchangeHistory(exchange_address, historyDaysToQuery);
+    app.retrieveExchangeTicker(exchange_address, () => {
+      app.retrieveExchangeHistory(exchange_address, historyDaysToQuery);
+    });
   }
 
   render() {
