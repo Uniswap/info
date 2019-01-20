@@ -106,15 +106,20 @@ class App extends Component {
       method: "get",
       url: url,
     }).then(response => {
+      var exchangeData = app.getExchangeData(exchange_address);
+
       // convert value to eth using helper method?
       var responseData = response.data;
       
       var tradeVolume = (responseData["tradeVolume"] / 1e18).toFixed(4);
       var priceChangePercent = (responseData["priceChangePercent"] * 100).toFixed(2);
+      var ethLiquidity = (responseData["ethLiquidity"] / 1e18).toFixed(4);
 
-      var exchangeData = app.getExchangeData(exchange_address);
+      var erc20Liquidity = (responseData["erc20Liquidity"] / Math.pow(10, exchangeData.tokenDecimals)).toFixed(4);
 
       exchangeData["tradeVolume"] = tradeVolume + " ETH";
+      exchangeData["ethLiquidity"] = ethLiquidity + " ETH";
+      exchangeData["erc20Liquidity"] = erc20Liquidity + " " + exchangeData.symbol;
 
       if (priceChangePercent > 0) {
         exchangeData["percentChange"] = "+" + priceChangePercent + "%";
@@ -201,12 +206,12 @@ class App extends Component {
                   topLeft={<Hint color="textLight">Your share</Hint>}
                   bottomLeft={
                     <Text fontSize={20} lineHeight={1.4} fontWeight={500}>
-                      47 Pool Tokens
+                      0 Pool Tokens
                     </Text>
                   }
                   bottomRight={
                     <Text fontSize={20} lineHeight={1.4}>
-                      2.5%
+                      0%
                     </Text>
                   }
                 />
@@ -215,12 +220,12 @@ class App extends Component {
                   topLeft={<Hint color="textLight">Your fees</Hint>}
                   bottomLeft={
                     <Text fontSize={20} lineHeight={1.4} fontWeight={500}>
-                      0.0841 {currentExchangeData.symbol}
+                      0.0000 {currentExchangeData.symbol}
                     </Text>
                   }
                   bottomRight={
                     <Text fontSize={20} lineHeight={1.4}>
-                      -0.0004 ETH
+                      0.0000 ETH
                     </Text>
                   }
                 />
@@ -232,7 +237,7 @@ class App extends Component {
                 topLeft={<Hint>{currentExchangeData.symbol} Liquidity</Hint>}
                 bottomLeft={
                   <Text fontSize={20} color="maker" lineHeight={1.4} fontWeight={500}>
-                    42561.31 {currentExchangeData.symbol}
+                  {currentExchangeData.erc20Liquidity}
                   </Text>
                 }
                 topRight={<Hint>ETH Liquidity</Hint>}
@@ -242,8 +247,7 @@ class App extends Component {
                     color="uniswappink"
                     lineHeight={1.4}
                     fontWeight={500}
-                  >
-                    419.27 ETH
+                  >{currentExchangeData.ethLiquidity}
                   </Text>
                 }
               />
