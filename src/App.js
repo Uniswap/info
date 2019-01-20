@@ -2,6 +2,8 @@ import React, { Component } from "react";
 import styled from "styled-components";
 import { Box, Button, Flex, Text } from "rebass";
 
+import { BigNumber } from "bignumber.js";
+
 import Wrapper from "./components/Theme";
 import Title from "./components/Title";
 import FourByFour from "./components/FourByFour";
@@ -99,7 +101,8 @@ class App extends Component {
 
           "ethLiquidity" : ".",
           
-          recentTransactions : []
+          recentTransactions : [],
+          chartData : []
         };
 
         defaultExchangeAddress = exchange_address;
@@ -159,6 +162,7 @@ class App extends Component {
 
     var exchangeData = app.getExchangeData(exchange_address);
     exchangeData.recentTransactions = [];
+    exchangeData.chartData = [];
 
     // use current time as now
     var utcEndTimeInSeconds = Date.now() / 1000;
@@ -172,12 +176,78 @@ class App extends Component {
       method: "get",
       url: url,
     }).then(response => {
-      // TODO parse history into buckets segmented by day
+      // parse history into buckets segmented by day
       var exchangeData = app.getExchangeData(exchange_address);
+
+      var chartBucketDatas = {}; // chart data grouped by hour or day
+      
+      var chartBucketOrderedLabels = []; // the order of the buckets from left to right (x axis)
+      var chartBucketOrderedTimestamps = [];
+
+
+      if (days_to_query === 1) {
+        // TODO buckets will be by hour
+      } else {      
+        var startOfTodayUTC = new Date();
+
+        startOfTodayUTC.setUTCHours(0, 0, 0, 0);
+
+        startOfTodayUTC = startOfTodayUTC.getTime() / 1000;
+
+        var dateNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+        // buckets will be by day
+        for (var i = days_to_query; i >= 0; i--) {
+          var startUTCforBucket = startOfTodayUTC - (60 * 60 * 24 * i);
+
+          var date = new Date(startUTCforBucket * 1000);
+
+          var bucketLabel = dateNames[date.getUTCMonth()] + "/" + date.getUTCDate();
+
+          chartBucketOrderedTimestamps.push(startUTCforBucket);
+          // put an empty data object in for this bucket
+          chartBucketDatas[startUTCforBucket] = {
+            tradeVolume : new BigNumber(0),
+            label : bucketLabel
+          };
+        }
+      }
 
       response.data.forEach(function(transaction) {
         exchangeData.recentTransactions.push(transaction);
-      }); 
+
+        var tx_timestamp = transaction["timestamp"];
+        var tx_event = transaction["event"];
+        var eth_amount = new BigNumber(transaction["ethAmount"]);
+
+        // if this was a trading event, we can consider its volume 
+        if ((tx_event === "EthPurchase") || (tx_event === "TokenPurchase")) {
+          // determine the bucket this tx falls into based on its timestamp
+          // iterate backwards through bucket timestamps
+          for (var i = chartBucketOrderedTimestamps.length - 1; i >= 0; i--) {
+            // if this tx timestamp is greater than or equal to a bucket's timestamp, it's in that bucket
+            if (tx_timestamp >= chartBucketOrderedTimestamps[i]) {
+              var bucket = chartBucketDatas[chartBucketOrderedTimestamps[i]];
+
+              bucket.tradeVolume = bucket.tradeVolume.plus(eth_amount.absoluteValue());
+
+              break;
+            }
+          }
+        }
+        // console.log(transaction);
+      });
+
+          
+      chartBucketOrderedTimestamps.forEach(function(timestamp) {
+        // get the bucket data for this name
+        var bucket = chartBucketDatas[timestamp];
+
+        // console.log(timestamp + "     " + bucket.tradeVolume.toFixed());
+        bucket.tradeVolume = bucket.tradeVolume.dividedBy(1e18);
+
+        exchangeData.chartData.push({ name: bucket.label, uv: 0, pv: bucket.tradeVolume.toFixed(), amt: 0 });
+      });
 
       // only update UI if we're still displaying the initial requested address
       if (exchangeData.exchangeAddress === exchange_address) {
@@ -311,7 +381,7 @@ class App extends Component {
               <Divider />
 
               <Box p={24}>
-                <Chart />
+                <Chart data={currentExchangeData.chartData}/>
               </Box>
             </Panel>
 
