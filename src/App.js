@@ -106,8 +106,23 @@ class App extends Component {
       method: "get",
       url: url,
     }).then(response => {
-      // TODO parse history into buckets segmented by day
-      console.log(response.data["tradeVolume"]);
+      // convert value to eth using helper method?
+      var responseData = response.data;
+      
+      var tradeVolume = (responseData["tradeVolume"] / 1e18).toFixed(4);
+      var priceChangePercent = (responseData["priceChangePercent"] * 100).toFixed(2);
+
+      var exchangeData = app.getExchangeData(exchange_address);
+
+      exchangeData["tradeVolume"] = tradeVolume + " ETH";
+
+      if (priceChangePercent > 0) {
+        exchangeData["percentChange"] = "+" + priceChangePercent + "%";
+      } else {
+        exchangeData["percentChange"] = priceChangePercent + "%";
+      }
+
+      app.setState({});
     });
   }
 
@@ -135,9 +150,9 @@ class App extends Component {
 
     app.setState({});
 
-    app.retrieveExchangeHistory(exchange_address);
-
     app.retrieveExchangeTicker(exchange_address);
+
+    app.retrieveExchangeHistory(exchange_address);
   }
 
   render() {
@@ -170,13 +185,13 @@ class App extends Component {
                   topLeft={<Hint color="textLightDim">{currentExchangeData.symbol} Volume</Hint>}
                   bottomLeft={
                     <Text fontSize={24} lineHeight={1.4} fontWeight={500}>
-                      130.83 ETH
+                      {currentExchangeData.tradeVolume}
                     </Text>
                   }
                   topRight={<Hint color="textLightDim">24h</Hint>}
                   bottomRight={
                     <Text fontSize={20} lineHeight={1.4}>
-                      +2.01%
+                      {currentExchangeData.percentChange}
                     </Text>
                   }
                 />
