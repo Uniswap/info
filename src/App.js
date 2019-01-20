@@ -21,7 +21,7 @@ import axios from "axios";
 let exchangeDataRaw = {};
 let exchangeSelectOptions = [];
 
-let currentExchangeSymbol;
+let currentExchangeData;
 let app;
 
 const Address = props => (
@@ -92,12 +92,23 @@ class App extends Component {
         };
 
         defaultExchangeAddress = exchange_address;
-      });      
+      });
 
-      this.setState({})
-
-      this.retrieveExchangeHistory(defaultExchangeAddress);
+      this.setCurrentExchange(defaultExchangeAddress);
     });      
+  }
+
+  retrieveExchangeTicker(exchange_address) {
+    // TODO extract out URL into parameter
+    var url = "http://uniswap-analytics.appspot.com/api/v1/ticker?exchangeAddress=" + exchange_address;
+
+    axios({
+      method: "get",
+      url: url,
+    }).then(response => {
+      // TODO parse history into buckets segmented by day
+      console.log(response.data["tradeVolume"]);
+    });
   }
 
   retrieveExchangeHistory(exchange_address) {
@@ -106,15 +117,27 @@ class App extends Component {
     var utcEndTimeInSeconds = Date.now() / 1000;
     var utcStartTimeInSeconds = utcEndTimeInSeconds - (60 * 60 * 24 * 30);
 
-    console.log(utcEndTimeInSeconds);
+    // TODO extract out URL into parameter
+    var url = "http://uniswap-analytics.appspot.com/api/v1/history?exchangeAddress=" + exchange_address + 
+      "&startTime=" + utcStartTimeInSeconds + "&endTime=" + utcEndTimeInSeconds;
+
     axios({
       method: "get",
-      url: "http://uniswap-analytics.appspot.com/api/v1/history?exchangeAddress=" + exchange_address + 
-      "&startTime=" + utcStartTimeInSeconds + "&endTime=" + utcEndTimeInSeconds,
+      url: url,
     }).then(response => {
       // TODO parse history into buckets segmented by day
       console.log(response.data);
     });
+  }
+
+  setCurrentExchange(exchange_address) {
+    currentExchangeData = app.getExchangeData(exchange_address);
+
+    app.setState({});
+
+    app.retrieveExchangeHistory(exchange_address);
+
+    app.retrieveExchangeTicker(exchange_address);
   }
 
   render() {
@@ -134,13 +157,7 @@ class App extends Component {
           >
             <Title />
             <Select options={exchangeSelectOptions} onChange={(newOption)=>{            
-              var exchangeData = app.getExchangeData(newOption.value);
-
-              currentExchangeSymbol = exchangeData.symbol;
-
-              app.setState({});
-
-              app.retrieveExchangeHistory(exchangeData.exchangeAddress);
+              app.setCurrentExchange(newOption.value);
             }}
             />
           </Header>
@@ -150,7 +167,7 @@ class App extends Component {
               <Panel grouped rounded color="white" bg="jaguar" p={24}>
                 <FourByFour
                   gap={24}
-                  topLeft={<Hint color="textLightDim">{currentExchangeSymbol} Volume</Hint>}
+                  topLeft={<Hint color="textLightDim">{currentExchangeData.symbol} Volume</Hint>}
                   bottomLeft={
                     <Text fontSize={24} lineHeight={1.4} fontWeight={500}>
                       130.83 ETH
@@ -183,7 +200,7 @@ class App extends Component {
                   topLeft={<Hint color="textLight">Your fees</Hint>}
                   bottomLeft={
                     <Text fontSize={20} lineHeight={1.4} fontWeight={500}>
-                      0.0841 DAI
+                      0.0841 {currentExchangeData.symbol}
                     </Text>
                   }
                   bottomRight={
@@ -197,10 +214,10 @@ class App extends Component {
 
             <Panel rounded p={24} bg="white" area="liquidity">
               <FourByFour
-                topLeft={<Hint>{currentExchangeSymbol} Liquidity</Hint>}
+                topLeft={<Hint>{currentExchangeData.symbol} Liquidity</Hint>}
                 bottomLeft={
                   <Text fontSize={20} color="maker" lineHeight={1.4} fontWeight={500}>
-                    42561.31 DAI
+                    42561.31 {currentExchangeData.symbol}
                   </Text>
                 }
                 topRight={<Hint>ETH Liquidity</Hint>}
@@ -243,10 +260,10 @@ class App extends Component {
                 </Hint>
                 <Address
                   href={urls.showAddress(
-                    "0x09cabec1ead1c0ba254b09efb3ee13841712be14"
+                    currentExchangeData.exchangeAddress
                   )}
                 >
-                  0x09cabec1ead1c0ba254b09efb3ee13841712be14
+                  {currentExchangeData.exchangeAddress}
                 </Address>
               </Box>
 
@@ -256,10 +273,10 @@ class App extends Component {
                 </Hint>
                 <Address
                   href={urls.showAddress(
-                    "0x89d24A6b4CcB1B6fAA2625fE562bDD9a23260359"
+                    currentExchangeData.tokenAddress
                   )}
                 >
-                  0x89d24A6b4CcB1B6fAA2625fE562bDD9a23260359
+                  {currentExchangeData.tokenAddress}
                 </Address>
               </Box>
             </Panel>
