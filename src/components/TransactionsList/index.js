@@ -6,7 +6,6 @@ import Link from "../Link";
 
 import { urls } from "../../helpers";
 
-import data from "./data";
 import {
   TokenSwap,
   AddLiquidity,
@@ -15,15 +14,15 @@ import {
 
 const TransactionType = ({ event }) => {
   switch (event) {
-    case "Add Liquidity":
+    case "AddLiquidity":
       return <AddLiquidity />;
-    case "Remove Liquidity":
+    case "RemoveLiquidity":
       return <RemoveLiquidity />;
     case "Token Swap":
       return <TokenSwap />;
-    case "Eth Purchase":
+    case "EthPurchase":
       return "Eth Purchase";
-    case "Token Purchase":
+    case "TokenPurchase":
       return "Token Purchase";
     default:
       return null;
@@ -57,7 +56,7 @@ const TransactionsList = ({ transactions }) => (
 );
 
 TransactionsList.defaultProps = {
-  transactions: data
+  transactions: []
 };
 
 TransactionsList.propTypes = {

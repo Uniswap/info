@@ -88,7 +88,8 @@ class App extends Component {
           symbol : symbol,
           exchangeAddress : exchange_address,
           tokenAddress : token_address,
-          tokenDecimals : token_decimals
+          tokenDecimals : token_decimals,
+          recentTransactions : []
         };
 
         defaultExchangeAddress = exchange_address;
@@ -106,14 +107,17 @@ class App extends Component {
       method: "get",
       url: url,
     }).then(response => {
+      // grab the exchange data object for this exchange address
       var exchangeData = app.getExchangeData(exchange_address);
-
-      // convert value to eth using helper method?
-      var responseData = response.data;
       
-      var tradeVolume = (responseData["tradeVolume"] / 1e18).toFixed(4);
-      var priceChangePercent = (responseData["priceChangePercent"] * 100).toFixed(2);
+      // update the values from the API response
+      var responseData = response.data;
+
+      // TODO convert value to eth using helper method?      
+      var tradeVolume = (responseData["tradeVolume"] / 1e18).toFixed(4);      
       var ethLiquidity = (responseData["ethLiquidity"] / 1e18).toFixed(4);
+
+      var priceChangePercent = (responseData["priceChangePercent"] * 100).toFixed(2);
 
       var erc20Liquidity = (responseData["erc20Liquidity"] / Math.pow(10, exchangeData.tokenDecimals)).toFixed(4);
 
@@ -121,21 +125,29 @@ class App extends Component {
       exchangeData["ethLiquidity"] = ethLiquidity + " ETH";
       exchangeData["erc20Liquidity"] = erc20Liquidity + " " + exchangeData.symbol;
 
-      if (priceChangePercent > 0) {
-        exchangeData["percentChange"] = "+" + priceChangePercent + "%";
-      } else {
-        exchangeData["percentChange"] = priceChangePercent + "%";
-      }
 
-      app.setState({});
+      if (priceChangePercent > 0) {
+        exchangeData["percentChange"] = "+";
+      } else {
+        exchangeData["percentChange"] = "";
+      }
+      exchangeData["percentChange"] += priceChangePercent + "%";
+
+      // only update UI if we're still displaying the initial requested address
+      if (exchangeData.exchangeAddress === exchange_address) {
+        app.setState({});
+      }
     });
   }
 
   retrieveExchangeHistory(exchange_address) {
     // load exchange history
-    // by default, get exchange history for past 30 days
+    // by default, get exchange history for past 30 days?
+    // TODO base this off of the Pool Statistics dropdown
+    var daysBackToQuery = 30;
+
     var utcEndTimeInSeconds = Date.now() / 1000;
-    var utcStartTimeInSeconds = utcEndTimeInSeconds - (60 * 60 * 24 * 30);
+    var utcStartTimeInSeconds = utcEndTimeInSeconds - (60 * 60 * 24 * daysBackToQuery);
 
     // TODO extract out URL into parameter
     var url = "http://uniswap-analytics.appspot.com/api/v1/history?exchangeAddress=" + exchange_address + 
@@ -146,7 +158,21 @@ class App extends Component {
       url: url,
     }).then(response => {
       // TODO parse history into buckets segmented by day
+      var exchangeData = app.getExchangeData(exchange_address);
+
       console.log(response.data);
+
+      exchangeData.recentTransactions = [];
+
+      response.data.forEach(function(transaction) {
+        exchangeData.recentTransactions.push(transaction);        
+        console.log(transaction.event);
+      }); 
+
+      // only update UI if we're still displaying the initial requested address
+      if (exchangeData.exchangeAddress === exchange_address) {
+        app.setState({});
+      }
     });
   }
 
@@ -306,7 +332,7 @@ class App extends Component {
                 <Text>↓</Text>
               </Flex>
               <Divider />
-              <TransactionsList />
+              <TransactionsList transactions={currentExchangeData.recentTransactions}/>
             </Panel>
           </Dashboard>
 
