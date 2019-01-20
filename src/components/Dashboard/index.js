@@ -15,6 +15,7 @@ const Dashboard = styled(Box)`
 
   @media screen and (min-width: 40em) {
     grid-gap: 16px;
+    grid-template-columns: repeat(2, 1fr);
     grid-template-areas:
       "volume liquidity"
       "statistics statistics"
@@ -24,6 +25,7 @@ const Dashboard = styled(Box)`
 
   @media screen and (min-width: 64em) {
     grid-gap: 24px;
+    grid-template-columns: repeat(4, 1fr);
     grid-template-areas:
       "volume statistics statistics statistics"
       "liquidity statistics statistics statistics"

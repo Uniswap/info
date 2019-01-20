@@ -1,6 +1,7 @@
 import React from "react";
 import { Box, Flex, Text } from "rebass";
 import PropTypes from "prop-types";
+import { BigNumber } from "bignumber.js";
 
 import Link from "../Link";
 
@@ -12,6 +13,10 @@ import {
   RemoveLiquidity
 } from "./transactionTypeIcons";
 
+BigNumber.set({ EXPONENTIAL_AT: 50 });
+
+const Big = number => new BigNumber(number).dividedBy(1e18);
+
 const TransactionType = ({ event }) => {
   switch (event) {
     case "AddLiquidity":
@@ -21,9 +26,9 @@ const TransactionType = ({ event }) => {
     case "Token Swap":
       return <TokenSwap />;
     case "EthPurchase":
-      return "Eth Purchase";
+      return <TokenSwap />;
     case "TokenPurchase":
-      return "Token Purchase";
+      return <TokenSwap />;
     default:
       return null;
   }
@@ -39,7 +44,8 @@ const TransactionItem = ({ transaction }) => (
         external
         href={urls.showTransaction(transaction.tx)}
       >
-        {transaction.ethAmount} ETH for {transaction.tokenAmount} TOKEN
+        {Big(transaction.ethAmount).toFixed(4)} ETH for{" "}
+        {Big(transaction.tokenAmount).toFixed(4)} "TOKEN"
       </Link>
     </Flex>
     <Text color="textDim">{formatTime(transaction.timestamp)}</Text>

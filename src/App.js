@@ -350,12 +350,12 @@ class App extends Component {
                   topLeft={<Hint color="textLight">Your fees</Hint>}
                   bottomLeft={
                     <Text fontSize={20} lineHeight={1.4} fontWeight={500}>
-                      0.0000 {currentExchangeData.symbol}
+                      0.00 {currentExchangeData.symbol}
                     </Text>
                   }
                   bottomRight={
                     <Text fontSize={20} lineHeight={1.4}>
-                      0.0000 ETH
+                      0.00 ETH
                     </Text>
                   }
                 />

@@ -32,7 +32,7 @@ const Controls = styled.div`
   grid-column-gap: 8px;
 `;
 
-const Chart = ({data}) => {
+const Chart = ({ data }) => {
   const [volume, toggleVolume] = useState(false);
   const [eth, toggleEth] = useState(false);
   const [token, toggleToken] = useState(false);
@@ -41,19 +41,32 @@ const Chart = ({data}) => {
   return (
     <>
       <ResponsiveContainer aspect={21 / 9}>
-        <ComposedChart barCategoryGap={1} data={data}>
+        <ComposedChart
+          margin={{ top: 0, right: 0, bottom: 0, left: 0 }}
+          barCategoryGap={1}
+          data={data}
+        >
           <XAxis
             tickLine={false}
             axisLine={false}
             interval="preserveStartEnd"
             dataKey="date"
           />
-          {/* <YAxis
+          <YAxis
+            dataKey="volume"
             axisLine={false}
             tickLine={false}
             interval="preserveStartEnd"
-          /> */}
-          {/* <Tooltip /> */}
+          />
+          <Tooltip
+            cursor={false}
+            labelStyle={{ paddingTop: 4 }}
+            contentStyle={{
+              padding: "10px 14px",
+              borderRadius: 10,
+              border: "none"
+            }}
+          />
           <Bar
             hide={volume}
             dataKey="volume"
