@@ -176,7 +176,9 @@ class App extends Component {
     // if not then just call pool_share_retrieved_callback() immediately
     axios({
       method: "get",
-      url: `${BASE_URL}v1/user?exchangeAddress=${exchange_address}&userAddress=${web3.account}`
+      url: `${BASE_URL}v1/user?exchangeAddress=${exchange_address}&userAddress=${
+        web3.account
+      }`
     }).then(response => {
       // update the values from the API response
       var responseData = response.data;
@@ -184,17 +186,20 @@ class App extends Component {
       // grab the exchange data object for this exchange address
       var exchangeData = app.getExchangeData(exchange_address);
 
-      var user_pool_tokens = (new BigNumber(responseData["userNumPoolTokens"])).dividedBy(1e18);
+      var user_pool_tokens = new BigNumber(
+        responseData["userNumPoolTokens"]
+      ).dividedBy(1e18);
       var user_pool_percentage = responseData["userPoolPercent"] * 100;
 
-      exchangeData.userPoolTokens = user_pool_tokens.toFixed(4) + " Pool Tokens";
+      exchangeData.userPoolTokens =
+        user_pool_tokens.toFixed(4) + " Pool Tokens";
       exchangeData.userPoolPercent = user_pool_percentage.toFixed(1) + "%";
 
       if (exchangeData.exchangeAddress === exchange_address) {
         app.setState({});
 
         pool_share_retrieved_callback();
-      };
+      }
     });
   }
 
@@ -323,7 +328,7 @@ class App extends Component {
     app.setState({});
 
     app.retrieveExchangeTicker(address, () =>
-      app.retrieveUserPoolShare(address, () => 
+      app.retrieveUserPoolShare(address, () =>
         app.retrieveExchangeHistory(address, historyDaysToQuery)
       )
     );
@@ -336,12 +341,12 @@ class App extends Component {
 
       return (
         <Wrapper>
-        {/* @TODO: find better way to handle this */}
+          {/* @TODO: find better way to handle this */}
           <div>
             <Web3Setter />
           </div>
         </Wrapper>
-      )
+      );
     } else {
       return (
         <Wrapper>
@@ -356,9 +361,8 @@ class App extends Component {
               options={exchangeSelectOptions}
               onChange={newOption => {
                 // only update current exchange if we're picking a new one
-                if (currentExchangeData.exchangeAddress != newOption.value) {
-                  app.setCurrentExchange(newOption.value)
-                }                
+                if (currentExchangeData.exchangeAddress !== newOption.value)
+                  app.setCurrentExchange(newOption.value);
               }}
             />
           </Header>
@@ -391,7 +395,7 @@ class App extends Component {
                   topLeft={<Hint color="textLight">Your share</Hint>}
                   bottomLeft={
                     <Text fontSize={20} lineHeight={1.4} fontWeight={500}>
-                      {currentExchangeData.userPoolTokens}                      
+                      {currentExchangeData.userPoolTokens}
                     </Text>
                   }
                   bottomRight={
