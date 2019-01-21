@@ -1,5 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import Web3Provider from "web3-react";
 
 // Working old app
 // import "./_old/index.css";
@@ -9,4 +10,12 @@ import ReactDOM from "react-dom";
 
 import App from "./App";
 
-ReactDOM.render(<App />, document.getElementById("root"));
+export default function AppWrapper() {
+  return (
+    <Web3Provider>
+      <App />
+    </Web3Provider>
+  );
+}
+
+ReactDOM.render(<AppWrapper />, document.getElementById("root"));

@@ -17,6 +17,8 @@ import Chart from "./components/Chart";
 
 import { urls } from "./helpers/";
 
+import { useWeb3Context } from "web3-react/hooks";
+
 const BASE_URL = "http://uniswap-analytics.appspot.com/api/";
 
 // all our exchange options keyed by exchange address
@@ -26,6 +28,7 @@ let exchangeSelectOptions = [];
 let historyDaysToQuery = 7;
 let currentExchangeData;
 let app;
+let web3 = null;
 
 const Address = props => (
   <Link {...props} color="button" external style={{ wordBreak: "break-all" }}>
@@ -55,6 +58,14 @@ const timeframeOptions = [
   { value: "7", label: "1 week" },
   { value: "30", label: "1 month" }
 ];
+
+const Web3Setter = props => {
+  if (web3 === null) {
+    web3 = useWeb3Context();
+  }
+
+  return <div className="dlfkjd" />;
+};
 
 class App extends Component {
   constructor(props) {
@@ -100,7 +111,9 @@ class App extends Component {
           percentChange: "%",
           ethLiquidity: ".",
           recentTransactions: [],
-          chartData: []
+          chartData: [],
+          userPoolTokens: ".",
+          userPoolPercent: "%"
         };
 
         defaultExchangeAddress = exchangeAddress;
@@ -111,7 +124,7 @@ class App extends Component {
   }
 
   retrieveExchangeTicker(exchange_address, ticker_retrieved_callback) {
-    console.log("retrieving ticker...");
+    console.log("retrieving ticker for " + exchange_address + "...");
 
     axios({
       method: "get",
@@ -155,6 +168,33 @@ class App extends Component {
 
         ticker_retrieved_callback();
       }
+    });
+  }
+
+  retrieveUserPoolShare(exchange_address, pool_share_retrieved_callback) {
+    // TODO when we update to newer web3-react, check if we have a valid user account to query,
+    // if not then just call pool_share_retrieved_callback() immediately
+    axios({
+      method: "get",
+      url: `${BASE_URL}v1/user?exchangeAddress=${exchange_address}&userAddress=${web3.account}`
+    }).then(response => {
+      // update the values from the API response
+      var responseData = response.data;
+
+      // grab the exchange data object for this exchange address
+      var exchangeData = app.getExchangeData(exchange_address);
+
+      var user_pool_tokens = (new BigNumber(responseData["userNumPoolTokens"])).dividedBy(1e18);
+      var user_pool_percentage = responseData["userPoolPercent"] * 100;
+
+      exchangeData.userPoolTokens = user_pool_tokens.toFixed(4) + " Pool Tokens";
+      exchangeData.userPoolPercent = user_pool_percentage.toFixed(1) + "%";
+
+      if (exchangeData.exchangeAddress === exchange_address) {
+        app.setState({});
+
+        pool_share_retrieved_callback();
+      };
     });
   }
 
@@ -283,7 +323,9 @@ class App extends Component {
     app.setState({});
 
     app.retrieveExchangeTicker(address, () =>
-      app.retrieveExchangeHistory(address, historyDaysToQuery)
+      app.retrieveUserPoolShare(address, () => 
+        app.retrieveExchangeHistory(address, historyDaysToQuery)
+      )
     );
   }
 
@@ -291,7 +333,15 @@ class App extends Component {
     if (exchangeSelectOptions.length === 0) {
       // TODO Show loading indicator
       console.log("loading");
-      return <Wrapper />;
+
+      return (
+        <Wrapper>
+        {/* @TODO: find better way to handle this */}
+          <div>
+            <Web3Setter />
+          </div>
+        </Wrapper>
+      )
     } else {
       return (
         <Wrapper>
@@ -304,7 +354,12 @@ class App extends Component {
             <Title />
             <Select
               options={exchangeSelectOptions}
-              onChange={newOption => app.setCurrentExchange(newOption.value)}
+              onChange={newOption => {
+                // only update current exchange if we're picking a new one
+                if (currentExchangeData.exchangeAddress != newOption.value) {
+                  app.setCurrentExchange(newOption.value)
+                }                
+              }}
             />
           </Header>
 
@@ -336,12 +391,12 @@ class App extends Component {
                   topLeft={<Hint color="textLight">Your share</Hint>}
                   bottomLeft={
                     <Text fontSize={20} lineHeight={1.4} fontWeight={500}>
-                      0 Pool Tokens
+                      {currentExchangeData.userPoolTokens}                      
                     </Text>
                   }
                   bottomRight={
                     <Text fontSize={20} lineHeight={1.4}>
-                      0%
+                      {currentExchangeData.userPoolPercent}
                     </Text>
                   }
                 />
