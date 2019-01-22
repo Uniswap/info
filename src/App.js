@@ -107,13 +107,13 @@ class App extends Component {
           exchangeAddress,
           tokenAddress,
           tokenDecimals,
-          tradeVolume: ".",
-          percentChange: "%",
-          ethLiquidity: ".",
+          tradeVolume: "0 ETH",
+          percentChange: "0.00%",
+          ethLiquidity: "0 ETH",
           recentTransactions: [],
           chartData: [],
-          userPoolTokens: ".",
-          userPoolPercent: "%"
+          userPoolTokens: "0.0000",
+          userPoolPercent: "0.00%"
         };
 
         defaultExchangeAddress = exchangeAddress;
@@ -151,6 +151,7 @@ class App extends Component {
 
       exchangeData["tradeVolume"] = `${tradeVolume} ETH`;
       exchangeData["ethLiquidity"] = `${ethLiquidity} ETH`;
+
       exchangeData["erc20Liquidity"] = `${erc20Liquidity} ${
         exchangeData.symbol
       }`;
@@ -192,8 +193,8 @@ class App extends Component {
       var user_pool_percentage = responseData["userPoolPercent"] * 100;
 
       exchangeData.userPoolTokens =
-        user_pool_tokens.toFixed(4) + " Pool Tokens";
-      exchangeData.userPoolPercent = user_pool_percentage.toFixed(1) + "%";
+        `${user_pool_tokens.toFixed(4)} Pool Tokens`;
+      exchangeData.userPoolPercent =  `${user_pool_percentage.toFixed(2)}%`;
 
       if (exchangeData.exchangeAddress === exchange_address) {
         app.setState({});
@@ -431,7 +432,7 @@ class App extends Component {
                     lineHeight={1.4}
                     fontWeight={500}
                   >
-                    {currentExchangeData.erc20Liquidity}
+                    {currentExchangeData.erc20Liquidity || `0.00`}
                   </Text>
                 }
                 topRight={<Hint>ETH Liquidity</Hint>}
@@ -442,7 +443,7 @@ class App extends Component {
                     lineHeight={1.4}
                     fontWeight={500}
                   >
-                    {currentExchangeData.ethLiquidity}
+                    {currentExchangeData.ethLiquidity || `0.00 ETH`}
                   </Text>
                 }
               />
