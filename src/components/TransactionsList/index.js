@@ -1,6 +1,7 @@
 import React from "react";
 import { Box, Flex, Text } from "rebass";
 import PropTypes from "prop-types";
+import styled from "styled-components";
 import { BigNumber } from "bignumber.js";
 
 import Link from "../Link";
@@ -52,12 +53,18 @@ const TransactionItem = ({ transaction }) => (
   </Flex>
 );
 
+const List = styled(Box)`
+  height: 300px;
+  max-height: 300px;
+  overflow-y: scroll;
+`;
+
 const TransactionsList = ({ transactions }) => (
-  <Box p={24}>
+  <List p={24}>
     {transactions.map((tx, index) => (
       <TransactionItem key={index} transaction={tx} />
     ))}
-  </Box>
+  </List>
 );
 
 TransactionsList.defaultProps = {
