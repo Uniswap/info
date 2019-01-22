@@ -9,7 +9,7 @@ import Title from "./components/Title";
 import FourByFour from "./components/FourByFour";
 import Panel from "./components/Panel";
 import Dashboard from "./components/Dashboard";
-import Select from "./components/Select";
+import Select, { Popout } from "./components/Select";
 import Footer from "./components/Footer";
 import TransactionsList from "./components/TransactionsList";
 import Link from "./components/Link";
@@ -192,9 +192,10 @@ class App extends Component {
       ).dividedBy(1e18);
       var user_pool_percentage = responseData["userPoolPercent"] * 100;
 
-      exchangeData.userPoolTokens =
-        `${user_pool_tokens.toFixed(4)} Pool Tokens`;
-      exchangeData.userPoolPercent =  `${user_pool_percentage.toFixed(2)}%`;
+      exchangeData.userPoolTokens = `${user_pool_tokens.toFixed(
+        4
+      )} Pool Tokens`;
+      exchangeData.userPoolPercent = `${user_pool_percentage.toFixed(2)}%`;
 
       if (exchangeData.exchangeAddress === exchange_address) {
         app.setState({});
@@ -343,9 +344,9 @@ class App extends Component {
       return (
         <Wrapper>
           {/* @TODO: find better way to handle this */}
-          <div>
+          <>
             <Web3Setter />
-          </div>
+          </>
         </Wrapper>
       );
     } else {
@@ -358,6 +359,9 @@ class App extends Component {
             color={["white", "black"]}
           >
             <Title />
+            
+            {/* <Popout data={exchangeSelectOptions} /> */}
+
             <Select
               options={exchangeSelectOptions}
               onChange={newOption => {
@@ -505,7 +509,7 @@ class App extends Component {
             <Panel rounded bg="white" area="transactions">
               <Flex p={24} justifyContent="space-between">
                 <Text color="text">Latest Transactions</Text>
-                <Text>↓</Text>
+                {/* <Text>↓</Text> */}
               </Flex>
               <Divider />
               <TransactionsList

@@ -2,6 +2,8 @@ import React from "react";
 import PropTypes from "prop-types";
 import { default as ReactSelect } from "react-select";
 
+import Popout from "./popout";
+
 import customStyles from "./styles";
 
 const Select = ({ options, onChange, defaultValue, placeholder }) => (
@@ -26,3 +28,5 @@ Select.propTypes = {
 };
 
 export default Select;
+
+export { Popout };
