@@ -358,7 +358,7 @@ class App extends Component {
           date: bucket.label,
           
           ethLiquidity : bucket.curEthLiquidity.dividedBy(1e18).toFixed(4),
-          curTokenLiquidity : bucket.curTokenLiquidity.dividedBy(tokenDecimalExp).toFixed(4),
+          tokenLiquidity : bucket.curTokenLiquidity.dividedBy(tokenDecimalExp).toFixed(4),
 
           volume: bucket.tradeVolume.toFixed(4),
           rate: marginalRate.toFixed(4)
