@@ -125,11 +125,13 @@ class App extends Component {
   }
 
   retrieveExchangeTicker(exchange_address, ticker_retrieved_callback) {
-    console.log("retrieving ticker for " + exchange_address + "...");
+    var url = `${BASE_URL}v1/ticker?exchangeAddress=${exchange_address}`;
+
+    console.log("retrieving ticker for " + exchange_address + "...(" + url + ")");
 
     axios({
       method: "get",
-      url: `${BASE_URL}v1/ticker?exchangeAddress=${exchange_address}`
+      url: url
     }).then(response => {
       // grab the exchange data object for this exchange address
       var exchangeData = app.getExchangeData(exchange_address);
@@ -207,9 +209,7 @@ class App extends Component {
   }
 
   // load exchange history for X days back
-  retrieveExchangeHistory(exchange_address, days_to_query) {
-    console.log("retrieving transaction history...");
-
+  retrieveExchangeHistory(exchange_address, days_to_query) {    
     var exchangeData = app.getExchangeData(exchange_address);
     exchangeData.recentTransactions = [];
     exchangeData.chartData = [];
@@ -221,9 +221,13 @@ class App extends Component {
     var utcStartTimeInSeconds =
       utcEndTimeInSeconds - 60 * 60 * 24 * days_to_query;
 
+    var url = `${BASE_URL}v1/history?exchangeAddress=${exchange_address}&startTime=${utcStartTimeInSeconds}&endTime=${utcEndTimeInSeconds}`;
+
+    console.log("retrieving transaction history...(" + url + ")");
+
     axios({
       method: "get",
-      url: `${BASE_URL}v1/history?exchangeAddress=${exchange_address}&startTime=${utcStartTimeInSeconds}&endTime=${utcEndTimeInSeconds}`
+      url: url
     }).then(response => {
       // parse history into buckets segmented by day
       var exchangeData = app.getExchangeData(exchange_address);
@@ -343,12 +347,21 @@ class App extends Component {
           curTokenLiquidityCarryOver = bucket.curTokenLiquidity;
         }
 
+        var marginalRate = new BigNumber(0);
+
+        if (bucket.curTokenLiquidity != 0) {
+          marginalRate = bucket.curEthLiquidity.dividedBy(bucket.curTokenLiquidity);
+        }
+
         // Data Object for Chart
         exchangeData.chartData.push({
           date: bucket.label,
+          
           ethLiquidity : bucket.curEthLiquidity.dividedBy(1e18).toFixed(4),
           curTokenLiquidity : bucket.curTokenLiquidity.dividedBy(tokenDecimalExp).toFixed(4),
-          volume: bucket.tradeVolume.toFixed(4)
+
+          volume: bucket.tradeVolume.toFixed(4),
+          rate: marginalRate.toFixed(4)
         });
       });
 
