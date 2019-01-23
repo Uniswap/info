@@ -54,9 +54,10 @@ const Hint = props => (
 );
 
 const timeframeOptions = [
-  { value: "1", label: "1 day" },
+  // { value: "1", label: "1 day" },
   { value: "7", label: "1 week" },
-  { value: "30", label: "1 month" }
+  { value: "30", label: "1 month" },
+  { value: "365", label: "1 year" }
 ];
 
 const Web3Setter = props => {
@@ -232,15 +233,13 @@ class App extends Component {
       var chartBucketOrderedLabels = []; // the order of the buckets from left to right (x axis)
       var chartBucketOrderedTimestamps = [];
 
+      var startOfTodayUTC = new Date();
+        startOfTodayUTC.setUTCHours(0, 0, 0, 0);
+        startOfTodayUTC = startOfTodayUTC.getTime() / 1000;
+
       if (days_to_query === 1) {
         // TODO buckets will be by hour
       } else {
-        var startOfTodayUTC = new Date();
-
-        startOfTodayUTC.setUTCHours(0, 0, 0, 0);
-
-        startOfTodayUTC = startOfTodayUTC.getTime() / 1000;
-
         var dateNames = [
           "Jan",
           "Feb",
@@ -270,6 +269,8 @@ class App extends Component {
           // put an empty data object in for this bucket
           chartBucketDatas[startUTCforBucket] = {
             tradeVolume: new BigNumber(0),
+            curEthLiquidity: null,
+            curTokenLiquidity: null,
             label: bucketLabel
           };
         }
@@ -280,26 +281,48 @@ class App extends Component {
 
         var tx_timestamp = transaction["timestamp"];
         var tx_event = transaction["event"];
+        
         var eth_amount = new BigNumber(transaction["ethAmount"]);
+        var cur_eth_liquidity = new BigNumber(transaction["curEthLiquidity"]);
+
+        var token_amount = new BigNumber(transaction["tokenAmount"]);
+        var cur_token_liquidity = new BigNumber(transaction["curTokenLiquidity"]);
+
+        var bucket = null;
+
+        for (var i = chartBucketOrderedTimestamps.length - 1; i >= 0; i--) {
+          // if this tx timestamp is greater than or equal to a bucket's timestamp, it's in that bucket
+          if (tx_timestamp >= chartBucketOrderedTimestamps[i]) {
+            bucket = chartBucketDatas[chartBucketOrderedTimestamps[i]];
+            break;
+          }
+        }
 
         // if this was a trading event, we can consider its volume
         if (tx_event === "EthPurchase" || tx_event === "TokenPurchase") {
-          // determine the bucket this tx falls into based on its timestamp
-          // iterate backwards through bucket timestamps
-          for (var i = chartBucketOrderedTimestamps.length - 1; i >= 0; i--) {
-            // if this tx timestamp is greater than or equal to a bucket's timestamp, it's in that bucket
-            if (tx_timestamp >= chartBucketOrderedTimestamps[i]) {
-              var bucket = chartBucketDatas[chartBucketOrderedTimestamps[i]];
-
-              bucket.tradeVolume = bucket.tradeVolume.plus(
-                eth_amount.absoluteValue()
-              );
-
-              break;
-            }
-          }
+          bucket.tradeVolume = bucket.tradeVolume.plus(
+            eth_amount.absoluteValue()
+          );
         }
+
+        // transactions are ordered from newest to oldest, so set it on the first time we encounter a null liquidity value for a bucket
+        // update current eth liquidity for the bucket
+        if (bucket.curEthLiquidity == null) {
+          bucket.curEthLiquidity = cur_eth_liquidity;
+        }
+
+        // update current token liquidity for the bucket
+        if (bucket.curTokenLiquidity == null) {
+          bucket.curTokenLiquidity = cur_token_liquidity;
+        }        
       });
+
+      // for buckets without any transactions, they can refer to the carry over values from the previous bucket
+      // TODO this could be an issue for exchanges with long periods of no trades. Init thse to the current liquidity at a given date
+      var curEthLiquidityCarryOver = new BigNumber(0);
+      var curTokenLiquidityCarryOver = new BigNumber(0);
+
+      var tokenDecimalExp = (new BigNumber(10)).exponentiatedBy(exchangeData.tokenDecimals);
 
       chartBucketOrderedTimestamps.forEach(timestamp => {
         // get the bucket data for this name
@@ -308,9 +331,23 @@ class App extends Component {
         // console.log(timestamp + "     " + bucket.tradeVolume.toFixed());
         bucket.tradeVolume = bucket.tradeVolume.dividedBy(1e18);
 
+        if (bucket.curEthLiquidity == null) {
+          bucket.curEthLiquidity = curEthLiquidityCarryOver;
+        } else {
+          curEthLiquidityCarryOver = bucket.curEthLiquidity;
+        }
+
+        if (bucket.curTokenLiquidity == null) {
+          bucket.curTokenLiquidity = curTokenLiquidityCarryOver;
+        } else {
+          curTokenLiquidityCarryOver = bucket.curTokenLiquidity;
+        }
+
         // Data Object for Chart
         exchangeData.chartData.push({
           date: bucket.label,
+          ethLiquidity : bucket.curEthLiquidity.dividedBy(1e18).toFixed(4),
+          curTokenLiquidity : bucket.curTokenLiquidity.dividedBy(tokenDecimalExp).toFixed(4),
           volume: bucket.tradeVolume.toFixed(4)
         });
       });
