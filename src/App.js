@@ -256,8 +256,6 @@ class App extends Component {
                         retrieveExchangeHistory(currentExchangeData, historyDaysToQuery, () => {
                           app.setState({});                          
                         });
-
-                        app.setState({});
                       }}
                     />
                   </Box>
