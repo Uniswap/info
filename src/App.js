@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import styled from "styled-components";
 import { Box, Flex, Text } from "rebass";
-import axios from "axios";
 import Wrapper from "./components/Theme";
 import Title from "./components/Title";
 import FourByFour from "./components/FourByFour";
@@ -13,7 +12,10 @@ import TransactionsList from "./components/TransactionsList";
 import Link from "./components/Link";
 import Chart from "./components/Chart";
 
-import { urls, retrieveExchangeTicker, retrieveUserPoolShare, retrieveExchangeHistory } from "./helpers/";
+import { 
+    urls, retrieveExchangeTicker, retrieveUserPoolShare, retrieveExchangeHistory,
+    retrieveExchangeDirectory 
+  } from "./helpers/";
 
 import { useWeb3Context } from "web3-react/hooks";
 
@@ -78,47 +80,14 @@ class App extends Component {
   getExchangeData = address => exchangeDataRaw[address];
 
   componentDidMount(props) {
-    // Load exchange list
-    axios({
-      method: "get",
-      url: `${BASE_URL}v1/directory`
-    }).then(response => {
-      // TODO set this in config
-      var defaultExchangeAddress = "";
+    // load the list of all exchanges
+    retrieveExchangeDirectory((directoryLabels, directoryObjects) => {
+      exchangeSelectOptions = directoryLabels;
+      exchangeDataRaw = directoryObjects;     
 
-      response.data.forEach(exchange => {
-        const {
-          symbol,
-          exchangeAddress,
-          tokenAddress,
-          tokenDecimals
-        } = exchange;
+      var defaultExchangeAddress = directoryLabels[0].value;
 
-        // Create Exchange Select Options
-        exchangeSelectOptions.push({
-          label: `${symbol} - ${exchangeAddress}`,
-          value: exchangeAddress
-        });
-
-        // Create Exchange Data
-        exchangeDataRaw[exchangeAddress] = {
-          symbol,
-          exchangeAddress,
-          tokenAddress,
-          tokenDecimals,
-          tradeVolume: "0 ETH",
-          percentChange: "0.00%",
-          ethLiquidity: "0 ETH",
-          recentTransactions: [],
-          chartData: [],
-          userPoolTokens: "0.0000",
-          userPoolPercent: "0.00%"
-        };
-
-        defaultExchangeAddress = exchangeAddress;
-      });
-
-      this.setCurrentExchange(defaultExchangeAddress);
+      app.setCurrentExchange(defaultExchangeAddress);
     });
   }
 
@@ -281,10 +250,12 @@ class App extends Component {
                       onChange={newOption => {
                         historyDaysToQuery = newOption.value;
 
-                        app.retrieveExchangeHistory(
-                          currentExchangeData.exchangeAddress,
-                          historyDaysToQuery
-                        );
+                        currentExchangeData.recentTransactions = [];
+                        currentExchangeData.chartData = [];                        
+
+                        retrieveExchangeHistory(currentExchangeData, historyDaysToQuery, () => {
+                          app.setState({});                          
+                        });
 
                         app.setState({});
                       }}
