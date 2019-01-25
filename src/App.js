@@ -19,7 +19,7 @@ import { urls } from "./helpers/";
 
 import { useWeb3Context } from "web3-react/hooks";
 
-const BASE_URL = "http://uniswap-analytics.appspot.com/api/";
+const BASE_URL = "https://uniswap-analytics.appspot.com/api/";
 
 // all our exchange options keyed by exchange address
 let exchangeDataRaw = {};
@@ -289,7 +289,7 @@ class App extends Component {
         var eth_amount = new BigNumber(transaction["ethAmount"]);
         var cur_eth_liquidity = new BigNumber(transaction["curEthLiquidity"]);
 
-        var token_amount = new BigNumber(transaction["tokenAmount"]);
+        // var token_amount = new BigNumber(transaction["tokenAmount"]);
         var cur_token_liquidity = new BigNumber(transaction["curTokenLiquidity"]);
 
         var bucket = null;
