@@ -564,6 +564,7 @@ class App extends Component {
               <Divider />
               <TransactionsList
                 transactions={currentExchangeData.recentTransactions}
+                tokenSymbol={currentExchangeData.symbol}
               />
             </Panel>
           </Dashboard>
