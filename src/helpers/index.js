@@ -220,9 +220,29 @@ export function retrieveExchangeHistory(
       // each bucket will be a month
       var startOfThisMonthUTC = new Date(Date.UTC(nowUTC.getFullYear(), nowUTC.getMonth()));
 
-      // for (var monthsBack = 12; monthsBack >= 0; monthsBack--) {
-      //   var startUTCforBucket = startOfTodayUTC - 60 * 60 * 24 * i;
-      // }
+      // buckets will be by month
+      for (var monthsBack = 0; monthsBack <= 11; monthsBack++) {
+        var startUTCforBucket_seconds = (startOfThisMonthUTC.getTime() / 1000);
+
+        var date = new Date(startUTCforBucket_seconds * 1000);
+
+        var bucketLabel = `${
+          monthNames[date.getUTCMonth()]
+        }`;
+
+        chartBucketOrderedTimestamps.splice(0, 0, startUTCforBucket_seconds);
+        
+        // put an empty data object in for this bucket
+        chartBucketDatas[startUTCforBucket_seconds] = {
+          tradeVolume: new BigNumber(0),
+          curEthLiquidity: null,
+          curTokenLiquidity: null,
+          label: bucketLabel
+        };
+
+        // subtract a month
+        startOfThisMonthUTC.setUTCMonth(startOfThisMonthUTC.getUTCMonth() - 1);
+      }
     }
 
     response.data.forEach(transaction => {
@@ -279,7 +299,6 @@ export function retrieveExchangeHistory(
       // get the bucket data for this name
       var bucket = chartBucketDatas[timestamp];
 
-      // console.log(timestamp + "     " + bucket.tradeVolume.toFixed());
       bucket.tradeVolume = bucket.tradeVolume.dividedBy(1e18);
 
       if (bucket.curEthLiquidity == null) {
@@ -297,8 +316,8 @@ export function retrieveExchangeHistory(
       var marginalRate = new BigNumber(0);
 
       if (bucket.curTokenLiquidity != 0) {
-        marginalRate = bucket.curEthLiquidity.dividedBy(
-          bucket.curTokenLiquidity
+        marginalRate = bucket.curTokenLiquidity.dividedBy(
+          bucket.curEthLiquidity
         );
       }
 

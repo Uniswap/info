@@ -19,8 +19,6 @@ import {
 
 import { useWeb3Context } from "web3-react/hooks";
 
-const BASE_URL = "https://uniswap-analytics.appspot.com/api/";
-
 // all our exchange options keyed by exchange address
 let exchangeDataRaw = {};
 let exchangeSelectOptions = [];
