@@ -44,7 +44,7 @@ const Chart = ({ data }) => {
   const [volume, toggleVolume] = useState(false);
   const [eth, toggleEth] = useState(false);
   const [token, toggleToken] = useState(false);
-  const [rate, toggleRate] = useState(true);
+  const [rate, toggleRate] = useState(false);
 
   return (
     <>
@@ -61,7 +61,7 @@ const Chart = ({ data }) => {
             dataKey="date"
           />
           <YAxis
-            dataKey="volume"
+            /*dataKey="volume"*/
             axisLine={false}
             tickLine={false}
             interval="preserveStartEnd"
@@ -81,24 +81,24 @@ const Chart = ({ data }) => {
             shape={<CustomBar />}
             fill="var(--c-zircon)"
           />
-          {/* <Line
+          {<Line
             hide={token}
             type="monotone"
-            dataKey="amt"
+            dataKey="tokenLiquidity"
             stroke="var(--c-maker)"
-          /> */}
-          {/* <Line
+          />}
+          {<Line
             hide={rate}
             type="monotone"
-            dataKey="pv"
+            dataKey="rate"
             stroke="var(--c-ronchi)"
-          /> */}
-          {/* <Line
+          />}
+          {<Line
             hide={eth}
             type="monotone"
-            dataKey="uv"
+            dataKey="ethLiquidity"
             stroke="var(--c-uniswappink)"
-          /> */}
+          />}
         </ComposedChart>
       </ResponsiveContainer>
       <Flex mt={3} justifyContent="flex-end">
