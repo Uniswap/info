@@ -174,12 +174,7 @@ export function retrieveExchangeHistory(
     var chartBucketOrderedLabels = []; // the order of the buckets from left to right (x axis)
     var chartBucketOrderedTimestamps = [];
 
-    var startOfTodayUTC = new Date();
-    startOfTodayUTC.setUTCHours(0, 0, 0, 0);
-    startOfTodayUTC = startOfTodayUTC.getTime() / 1000;
-
-    if (daysToQuery > 1 && daysToQuery <= 31) {
-      var monthNames = [
+    var monthNames = [
         "Jan",
         "Feb",
         "Mar",
@@ -194,25 +189,40 @@ export function retrieveExchangeHistory(
         "Dec"
       ];
 
-      // buckets will be by day
-      for (var i = daysToQuery; i >= 0; i--) {
-        var startUTCforBucket = startOfTodayUTC - 60 * 60 * 24 * i;
+    var nowUTC = new Date();
+        
+    // TODO when daysToQuery <= 1 (each bucket will be an hour)
+    // each bucket will be a day
+    if (daysToQuery > 1 && daysToQuery <= 31) { 
+      // get the date for the very beginning of today's day (the recent most bucket)
+      var startOfTodayUTC = new Date(Date.UTC(nowUTC.getUTCFullYear(), nowUTC.getUTCMonth(), nowUTC.getUTCDate()));
 
-        var date = new Date(startUTCforBucket * 1000);
+      // buckets will be by day
+      for (var daysBack = daysToQuery; daysBack >= 0; daysBack--) {
+        var startUTCforBucket_seconds = (startOfTodayUTC.getTime() / 1000) - (60 * 60 * 24 * daysBack);
+
+        var date = new Date(startUTCforBucket_seconds * 1000);
 
         var bucketLabel = `${
           monthNames[date.getUTCMonth()]
         } ${date.getUTCDate()}`;
 
-        chartBucketOrderedTimestamps.push(startUTCforBucket);
+        chartBucketOrderedTimestamps.push(startUTCforBucket_seconds);
         // put an empty data object in for this bucket
-        chartBucketDatas[startUTCforBucket] = {
+        chartBucketDatas[startUTCforBucket_seconds] = {
           tradeVolume: new BigNumber(0),
           curEthLiquidity: null,
           curTokenLiquidity: null,
           label: bucketLabel
         };
       }
+    } else if (daysToQuery > 31) {
+      // each bucket will be a month
+      var startOfThisMonthUTC = new Date(Date.UTC(nowUTC.getFullYear(), nowUTC.getMonth()));
+
+      // for (var monthsBack = 12; monthsBack >= 0; monthsBack--) {
+      //   var startUTCforBucket = startOfTodayUTC - 60 * 60 * 24 * i;
+      // }
     }
 
     response.data.forEach(transaction => {
