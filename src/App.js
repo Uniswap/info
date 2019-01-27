@@ -181,7 +181,7 @@ class App extends Component {
                   topRight={<Hint color="textLightDim">24h</Hint>}
                   bottomRight={
                     <Text fontSize={20} lineHeight={1.4}>
-                      {percentChange}
+                      {percentChange}%
                     </Text>
                   }
                 />

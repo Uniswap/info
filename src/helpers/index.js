@@ -65,8 +65,8 @@ export async function retrieveExchangeTicker(
     var responseData = response.data;
 
     // TODO convert value to eth using helper method?
-    var tradeVolume = (responseData["tradeVolume"] / 1e18).toFixed(4);
-    var ethLiquidity = (responseData["ethLiquidity"] / 1e18).toFixed(4);
+    var tradeVolume = Big(responseData["tradeVolume"]).toFixed(4);
+    var ethLiquidity = Big(responseData["ethLiquidity"]).toFixed(4);
 
     var priceChangePercent = (responseData["priceChangePercent"] * 100).toFixed(
       2
@@ -76,17 +76,17 @@ export async function retrieveExchangeTicker(
       responseData["erc20Liquidity"] / Math.pow(10, exchangeData.tokenDecimals)
     ).toFixed(4);
 
-    exchangeData["tradeVolume"] = `${tradeVolume} ETH`;
-    exchangeData["ethLiquidity"] = `${ethLiquidity} ETH`;
+    exchangeData["tradeVolume"] = tradeVolume;
+    exchangeData["ethLiquidity"] = ethLiquidity;
 
-    exchangeData["erc20Liquidity"] = `${erc20Liquidity} ${exchangeData.symbol}`;
+    exchangeData["erc20Liquidity"] = erc20Liquidity;
 
     if (priceChangePercent > 0) {
       exchangeData["percentChange"] = "+";
     } else {
       exchangeData["percentChange"] = "";
     }
-    exchangeData["percentChange"] += priceChangePercent + "%";
+    exchangeData["percentChange"] += priceChangePercent;
 
     tickerRetrievedCallback();
   });
