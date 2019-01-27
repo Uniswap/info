@@ -169,178 +169,182 @@ export async function retrieveExchangeHistory(
     method: "get",
     url: url
   }).then(response => {
-    console.log("received history (" + exchangeData.exchangeAddress + ")");
+    processExchangeHistory(response, exchangeData, daysToQuery, historyRetrievedCallback);
+  });
+}
 
-    var chartBucketDatas = {}; // chart data grouped by hour or day
+async function processExchangeHistory(response, exchangeData, daysToQuery, historyProcessedCallback) {
+  console.log("received history (" + exchangeData.exchangeAddress + "), " + response.data.length + " tx");
 
-    var chartBucketOrderedTimestamps = [];
+  var chartBucketDatas = {}; // chart data grouped by hour or day
 
-    var monthNames = [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sep",
-        "Oct",
-        "Nov",
-        "Dec"
-      ];
+  var chartBucketOrderedTimestamps = [];
 
-    var nowUTC = new Date();
-    
-    var startUTCforBucket_seconds;
-    var date;
-    var bucketLabel;
-        
-    // TODO when daysToQuery <= 1 (each bucket will be an hour)
-    // each bucket will be a day
-    if (daysToQuery > 1 && daysToQuery <= 31) { 
-      // get the date for the very beginning of today's day (the recent most bucket)
-      var startOfTodayUTC = new Date(Date.UTC(nowUTC.getUTCFullYear(), nowUTC.getUTCMonth(), nowUTC.getUTCDate()));
+  var monthNames = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec"
+    ];
 
-      // buckets will be by day
-      for (var daysBack = daysToQuery; daysBack >= 0; daysBack--) {
-        startUTCforBucket_seconds = (startOfTodayUTC.getTime() / 1000) - (60 * 60 * 24 * daysBack);
+  var nowUTC = new Date();
+  
+  var startUTCforBucket_seconds;
+  var date;
+  var bucketLabel;
+      
+  // TODO when daysToQuery <= 1 (each bucket will be an hour)
+  // each bucket will be a day
+  if (daysToQuery > 1 && daysToQuery <= 31) { 
+    // get the date for the very beginning of today's day (the recent most bucket)
+    var startOfTodayUTC = new Date(Date.UTC(nowUTC.getUTCFullYear(), nowUTC.getUTCMonth(), nowUTC.getUTCDate()));
 
-        date = new Date(startUTCforBucket_seconds * 1000);
+    // buckets will be by day
+    for (var daysBack = daysToQuery; daysBack >= 0; daysBack--) {
+      startUTCforBucket_seconds = (startOfTodayUTC.getTime() / 1000) - (60 * 60 * 24 * daysBack);
 
-        bucketLabel = `${
-          monthNames[date.getUTCMonth()]
-        } ${date.getUTCDate()}`;
+      date = new Date(startUTCforBucket_seconds * 1000);
 
-        chartBucketOrderedTimestamps.push(startUTCforBucket_seconds);
-        // put an empty data object in for this bucket
-        chartBucketDatas[startUTCforBucket_seconds] = {
-          tradeVolume: new BigNumber(0),
-          curEthLiquidity: null,
-          curTokenLiquidity: null,
-          label: bucketLabel
-        };
-      }
-    } else if (daysToQuery > 31) {
-      // each bucket will be a month
-      var startOfThisMonthUTC = new Date(Date.UTC(nowUTC.getFullYear(), nowUTC.getMonth()));
+      bucketLabel = `${
+        monthNames[date.getUTCMonth()]
+      } ${date.getUTCDate()}`;
 
-      // buckets will be by month
-      for (var monthsBack = 0; monthsBack <= 11; monthsBack++) {
-        startUTCforBucket_seconds = (startOfThisMonthUTC.getTime() / 1000);
+      chartBucketOrderedTimestamps.push(startUTCforBucket_seconds);
+      // put an empty data object in for this bucket
+      chartBucketDatas[startUTCforBucket_seconds] = {
+        tradeVolume: new BigNumber(0),
+        curEthLiquidity: null,
+        curTokenLiquidity: null,
+        label: bucketLabel
+      };
+    }
+  } else if (daysToQuery > 31) {
+    // each bucket will be a month
+    var startOfThisMonthUTC = new Date(Date.UTC(nowUTC.getFullYear(), nowUTC.getMonth()));
 
-        date = new Date(startUTCforBucket_seconds * 1000);
+    // buckets will be by month
+    for (var monthsBack = 0; monthsBack <= 11; monthsBack++) {
+      startUTCforBucket_seconds = (startOfThisMonthUTC.getTime() / 1000);
 
-        bucketLabel = `${
-          monthNames[date.getUTCMonth()]
-        }`;
+      date = new Date(startUTCforBucket_seconds * 1000);
 
-        chartBucketOrderedTimestamps.splice(0, 0, startUTCforBucket_seconds);
-        
-        // put an empty data object in for this bucket
-        chartBucketDatas[startUTCforBucket_seconds] = {
-          tradeVolume: new BigNumber(0),
-          curEthLiquidity: null,
-          curTokenLiquidity: null,
-          label: bucketLabel
-        };
+      bucketLabel = `${
+        monthNames[date.getUTCMonth()]
+      }`;
 
-        // subtract a month
-        startOfThisMonthUTC.setUTCMonth(startOfThisMonthUTC.getUTCMonth() - 1);
+      chartBucketOrderedTimestamps.splice(0, 0, startUTCforBucket_seconds);
+      
+      // put an empty data object in for this bucket
+      chartBucketDatas[startUTCforBucket_seconds] = {
+        tradeVolume: new BigNumber(0),
+        curEthLiquidity: null,
+        curTokenLiquidity: null,
+        label: bucketLabel
+      };
+
+      // subtract a month
+      startOfThisMonthUTC.setUTCMonth(startOfThisMonthUTC.getUTCMonth() - 1);
+    }
+  }
+
+  response.data.forEach(transaction => {
+    exchangeData.recentTransactions.push(transaction);
+
+    var tx_timestamp = transaction["timestamp"];
+    var tx_event = transaction["event"];
+
+    var eth_amount = new BigNumber(transaction["ethAmount"]);
+    var cur_eth_liquidity = new BigNumber(transaction["curEthLiquidity"]);
+
+    // var token_amount = new BigNumber(transaction["tokenAmount"]);
+    var cur_token_liquidity = new BigNumber(transaction["curTokenLiquidity"]);
+
+    var bucket = null;
+
+    for (var i = chartBucketOrderedTimestamps.length - 1; i >= 0; i--) {
+      // if this tx timestamp is greater than or equal to a bucket's timestamp, it's in that bucket
+      if (tx_timestamp >= chartBucketOrderedTimestamps[i]) {
+        bucket = chartBucketDatas[chartBucketOrderedTimestamps[i]];
+        break;
       }
     }
 
-    response.data.forEach(transaction => {
-      exchangeData.recentTransactions.push(transaction);
+    // if this was a trading event, we can consider its volume
+    if (tx_event === "EthPurchase" || tx_event === "TokenPurchase") {
+      bucket.tradeVolume = bucket.tradeVolume.plus(
+        eth_amount.absoluteValue()
+      );
+    }
 
-      var tx_timestamp = transaction["timestamp"];
-      var tx_event = transaction["event"];
+    // transactions are ordered from newest to oldest, so set it on the first time we encounter a null liquidity value for a bucket
+    // update current eth liquidity for the bucket
+    if (bucket.curEthLiquidity == null) {
+      bucket.curEthLiquidity = cur_eth_liquidity;
+    }
 
-      var eth_amount = new BigNumber(transaction["ethAmount"]);
-      var cur_eth_liquidity = new BigNumber(transaction["curEthLiquidity"]);
-
-      // var token_amount = new BigNumber(transaction["tokenAmount"]);
-      var cur_token_liquidity = new BigNumber(transaction["curTokenLiquidity"]);
-
-      var bucket = null;
-
-      for (var i = chartBucketOrderedTimestamps.length - 1; i >= 0; i--) {
-        // if this tx timestamp is greater than or equal to a bucket's timestamp, it's in that bucket
-        if (tx_timestamp >= chartBucketOrderedTimestamps[i]) {
-          bucket = chartBucketDatas[chartBucketOrderedTimestamps[i]];
-          break;
-        }
-      }
-
-      // if this was a trading event, we can consider its volume
-      if (tx_event === "EthPurchase" || tx_event === "TokenPurchase") {
-        bucket.tradeVolume = bucket.tradeVolume.plus(
-          eth_amount.absoluteValue()
-        );
-      }
-
-      // transactions are ordered from newest to oldest, so set it on the first time we encounter a null liquidity value for a bucket
-      // update current eth liquidity for the bucket
-      if (bucket.curEthLiquidity == null) {
-        bucket.curEthLiquidity = cur_eth_liquidity;
-      }
-
-      // update current token liquidity for the bucket
-      if (bucket.curTokenLiquidity == null) {
-        bucket.curTokenLiquidity = cur_token_liquidity;
-      }
-    });
-
-    // for buckets without any transactions, they can refer to the carry over values from the previous bucket
-    // TODO this could be an issue for exchanges with long periods of no trades. Init thse to the current liquidity at a given date
-    var curEthLiquidityCarryOver = new BigNumber(0);
-    var curTokenLiquidityCarryOver = new BigNumber(0);
-
-    var tokenDecimalExp = new BigNumber(10).exponentiatedBy(
-      exchangeData.tokenDecimals
-    );
-
-    chartBucketOrderedTimestamps.forEach(timestamp => {
-      // get the bucket data for this name
-      var bucket = chartBucketDatas[timestamp];
-
-      bucket.tradeVolume = bucket.tradeVolume.dividedBy(1e18);
-
-      if (bucket.curEthLiquidity == null) {
-        bucket.curEthLiquidity = curEthLiquidityCarryOver;
-      } else {
-        curEthLiquidityCarryOver = bucket.curEthLiquidity;
-      }
-
-      if (bucket.curTokenLiquidity == null) {
-        bucket.curTokenLiquidity = curTokenLiquidityCarryOver;
-      } else {
-        curTokenLiquidityCarryOver = bucket.curTokenLiquidity;
-      }
-
-      var marginalRate = new BigNumber(0);
-
-      if (bucket.curEthLiquidity.toFixed() != 0) {
-        marginalRate = bucket.curTokenLiquidity.dividedBy(
-          bucket.curEthLiquidity
-        );
-      }
-
-
-      // Data Object for Chart
-      exchangeData.chartData.push({
-        date: bucket.label,
-
-        ethLiquidity: bucket.curEthLiquidity.dividedBy(1e18).toFixed(4),
-        tokenLiquidity: bucket.curTokenLiquidity
-          .dividedBy(tokenDecimalExp)
-          .toFixed(4),
-
-        volume: bucket.tradeVolume.toFixed(4),
-        rate: marginalRate.toFixed(4)
-      });
-    });
-
-    historyRetrievedCallback();
+    // update current token liquidity for the bucket
+    if (bucket.curTokenLiquidity == null) {
+      bucket.curTokenLiquidity = cur_token_liquidity;
+    }
   });
+
+  // for buckets without any transactions, they can refer to the carry over values from the previous bucket
+  // TODO this could be an issue for exchanges with long periods of no trades. Init thse to the current liquidity at a given date
+  var curEthLiquidityCarryOver = new BigNumber(0);
+  var curTokenLiquidityCarryOver = new BigNumber(0);
+
+  var tokenDecimalExp = new BigNumber(10).exponentiatedBy(
+    exchangeData.tokenDecimals
+  );
+
+  chartBucketOrderedTimestamps.forEach(timestamp => {
+    // get the bucket data for this name
+    var bucket = chartBucketDatas[timestamp];
+
+    bucket.tradeVolume = bucket.tradeVolume.dividedBy(1e18);
+
+    if (bucket.curEthLiquidity == null) {
+      bucket.curEthLiquidity = curEthLiquidityCarryOver;
+    } else {
+      curEthLiquidityCarryOver = bucket.curEthLiquidity;
+    }
+
+    if (bucket.curTokenLiquidity == null) {
+      bucket.curTokenLiquidity = curTokenLiquidityCarryOver;
+    } else {
+      curTokenLiquidityCarryOver = bucket.curTokenLiquidity;
+    }
+
+    var marginalRate = new BigNumber(0);
+
+    if (bucket.curEthLiquidity.toFixed() != 0) {
+      marginalRate = bucket.curTokenLiquidity.dividedBy(
+        bucket.curEthLiquidity
+      );
+    }
+
+
+    // Data Object for Chart
+    exchangeData.chartData.push({
+      date: bucket.label,
+
+      ethLiquidity: bucket.curEthLiquidity.dividedBy(1e18).toFixed(4),
+      tokenLiquidity: bucket.curTokenLiquidity
+        .dividedBy(tokenDecimalExp)
+        .toFixed(4),
+
+      volume: bucket.tradeVolume.toFixed(4),
+      rate: marginalRate.toFixed(4)
+    });
+  });
+
+  historyProcessedCallback();
 }
