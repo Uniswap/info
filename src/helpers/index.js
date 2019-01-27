@@ -13,7 +13,15 @@ export const tokenOptions = Object.keys(Uniswap.tokens).map(key => ({
   label: key
 }));
 
-export const toK = num => (num > 999 ? `${num / 1000}K` : num);
+export const toK = num => {
+  if (num > 999999) {
+    return `${num / 1000000}M`
+  } else if (num > 999) {
+    return `${num / 1000}K`
+  } else {
+    return num
+  }
+};
 
 export const Big = number => new BigNumber(number).dividedBy(1e18);
 
