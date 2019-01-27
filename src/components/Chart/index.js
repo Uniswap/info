@@ -81,7 +81,6 @@ const Chart = ({ data, symbol }) => {
           />
           <Line
             hide={token}
-            dot={isNotMobile}
             type="monotone"
             yAxisId={1}
             dataKey="tokenLiquidity"
@@ -90,7 +89,6 @@ const Chart = ({ data, symbol }) => {
           />
           <Line
             hide={rate}
-            dot={isNotMobile}
             type="monotone"
             name="Rate"
             yAxisId={0}
@@ -99,7 +97,6 @@ const Chart = ({ data, symbol }) => {
           />
           <Line
             hide={eth}
-            dot={isNotMobile}
             type="monotone"
             name="ETH Liquidity"
             dataKey="ethLiquidity"
