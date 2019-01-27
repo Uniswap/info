@@ -6,7 +6,7 @@ import Title from "./components/Title";
 import FourByFour from "./components/FourByFour";
 import Panel from "./components/Panel";
 import Dashboard from "./components/Dashboard";
-import Select, { Popout } from "./components/Select";
+import Select from "./components/Select";
 import Footer from "./components/Footer";
 import TransactionsList from "./components/TransactionsList";
 import Link from "./components/Link";
@@ -151,8 +151,6 @@ class App extends Component {
             color={["white", "black"]}
           >
             <Title />
-
-            {/* <Popout data={exchangeSelectOptions} /> */}
 
             <Select
               options={exchangeSelectOptions}
