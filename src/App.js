@@ -128,10 +128,7 @@ class App extends Component {
       recentTransactions
     } = this.state.activeExchangeData;
 
-    if (this.state.exchangeOptions.length === 0) {
-      // TODO Show loading indicator
-      console.log("loading");
-
+    if (this.state.exchangeOptions.length === 0)
       return (
         <Wrapper>
           {/* @TODO: find better way to handle this */}
@@ -141,184 +138,184 @@ class App extends Component {
           </>
         </Wrapper>
       );
-    } else {
-      return (
-        <Wrapper>
-          <Header
-            px={24}
-            py={3}
-            bg={["mineshaft", "transparent"]}
-            color={["white", "black"]}
-          >
-            <Title />
 
-            <Select
-              options={this.state.exchangeOptions}
-              onChange={select => {
-                if (exchangeAddress !== select.value)
-                  this.setState({
-                    activeExchangeData: this.state.exchangeData[select.value]
-                  });
+    return (
+      <Wrapper>
+        <Header
+          px={24}
+          py={3}
+          bg={["mineshaft", "transparent"]}
+          color={["white", "black"]}
+        >
+          <Title />
 
-                // only update current exchange if we're picking a new one
-                if (currentExchangeData.exchangeAddress !== select.value)
-                  this.setCurrentExchange(select.value);
-              }}
-            />
-          </Header>
+          <Select
+            options={this.state.exchangeOptions}
+            onChange={select => {
+              // @NOTE stateful way to do things, duplicated atm
+              if (exchangeAddress !== select.value)
+                this.setState({
+                  activeExchangeData: this.state.exchangeData[select.value]
+                });
 
-          <Dashboard mx="auto" px={[0, 3]}>
-            <Box style={{ gridArea: "volume" }}>
-              <Panel grouped rounded color="white" bg="jaguar" p={24}>
-                <FourByFour
-                  gap={24}
-                  topLeft={<Hint color="textLightDim">{symbol} Volume</Hint>}
-                  bottomLeft={
-                    <Text fontSize={24} lineHeight={1.4} fontWeight={500}>
-                      {tradeVolume}
-                    </Text>
-                  }
-                  topRight={<Hint color="textLightDim">24h</Hint>}
-                  bottomRight={
-                    <Text fontSize={20} lineHeight={1.4}>
-                      {percentChange}%
-                    </Text>
-                  }
-                />
-              </Panel>
-              <Panel grouped rounded color="white" bg="maker" p={24}>
-                <FourByFour
-                  topLeft={<Hint color="textLight">Your share</Hint>}
-                  bottomLeft={
-                    <Text fontSize={20} lineHeight={1.4} fontWeight={500}>
-                      {userPoolTokens} Pool Tokens
-                    </Text>
-                  }
-                  bottomRight={
-                    <Text fontSize={20} lineHeight={1.4}>
-                      {userPoolPercent}%
-                    </Text>
-                  }
-                />
-                <FourByFour
-                  mt={3}
-                  topLeft={<Hint color="textLight">Your fees</Hint>}
-                  bottomLeft={
-                    <Text fontSize={20} lineHeight={1.4} fontWeight={500}>
-                      0.00 {symbol}
-                    </Text>
-                  }
-                  bottomRight={
-                    <Text fontSize={20} lineHeight={1.4}>
-                      0.00 ETH
-                    </Text>
-                  }
-                />
-              </Panel>
-            </Box>
+              // only update current exchange if we're picking a new one
+              if (currentExchangeData.exchangeAddress !== select.value)
+                this.setCurrentExchange(select.value);
+            }}
+          />
+        </Header>
 
-            <Panel rounded p={24} bg="white" area="liquidity">
+        <Dashboard mx="auto" px={[0, 3]}>
+          <Box style={{ gridArea: "volume" }}>
+            <Panel grouped rounded color="white" bg="jaguar" p={24}>
               <FourByFour
-                topLeft={<Hint>{symbol} Liquidity</Hint>}
+                gap={24}
+                topLeft={<Hint color="textLightDim">{symbol} Volume</Hint>}
                 bottomLeft={
-                  <Text
-                    fontSize={20}
-                    color="maker"
-                    lineHeight={1.4}
-                    fontWeight={500}
-                  >
-                    {erc20Liquidity || `0.00`}
+                  <Text fontSize={24} lineHeight={1.4} fontWeight={500}>
+                    {tradeVolume}
                   </Text>
                 }
-                topRight={<Hint>ETH Liquidity</Hint>}
+                topRight={<Hint color="textLightDim">24h</Hint>}
                 bottomRight={
-                  <Text
-                    fontSize={20}
-                    color="uniswappink"
-                    lineHeight={1.4}
-                    fontWeight={500}
-                  >
-                    {ethLiquidity || `0.00`}
+                  <Text fontSize={20} lineHeight={1.4}>
+                    {percentChange}%
                   </Text>
                 }
               />
             </Panel>
-
-            <Panel rounded bg="white" area="statistics">
-              <Box p={24}>
-                <Flex alignItems="center" justifyContent="space-between">
-                  <Text>Pool Statistics</Text>
-                  <Box width={144}>
-                    <Select
-                      placeholder="Timeframe"
-                      options={timeframeOptions}
-                      onChange={select => {
-                        historyDaysToQuery = select.value;
-
-                        currentExchangeData.recentTransactions = [];
-                        currentExchangeData.chartData = [];
-
-                        retrieveExchangeHistory(
-                          currentExchangeData,
-                          historyDaysToQuery,
-                          () => {
-                            this.setState({});
-                          }
-                        );
-                      }}
-                    />
-                  </Box>
-                </Flex>
-              </Box>
-              <Divider />
-
-              <Box p={24}>
-                {chartData && chartData.length > 0 ? (
-                  <Chart symbol={symbol} data={chartData} />
-                ) : (
-                  <Loader />
-                )}
-              </Box>
+            <Panel grouped rounded color="white" bg="maker" p={24}>
+              <FourByFour
+                topLeft={<Hint color="textLight">Your share</Hint>}
+                bottomLeft={
+                  <Text fontSize={20} lineHeight={1.4} fontWeight={500}>
+                    {userPoolTokens} Pool Tokens
+                  </Text>
+                }
+                bottomRight={
+                  <Text fontSize={20} lineHeight={1.4}>
+                    {userPoolPercent}%
+                  </Text>
+                }
+              />
+              <FourByFour
+                mt={3}
+                topLeft={<Hint color="textLight">Your fees</Hint>}
+                bottomLeft={
+                  <Text fontSize={20} lineHeight={1.4} fontWeight={500}>
+                    0.00 {symbol}
+                  </Text>
+                }
+                bottomRight={
+                  <Text fontSize={20} lineHeight={1.4}>
+                    0.00 ETH
+                  </Text>
+                }
+              />
             </Panel>
+          </Box>
 
-            <Panel rounded bg="white" area="exchange">
-              <Box p={24}>
-                <Hint color="textSubtext" mb={3}>
-                  Exchange Address
-                </Hint>
-                <Address address={exchangeAddress} />
-              </Box>
+          <Panel rounded p={24} bg="white" area="liquidity">
+            <FourByFour
+              topLeft={<Hint>{symbol} Liquidity</Hint>}
+              bottomLeft={
+                <Text
+                  fontSize={20}
+                  color="maker"
+                  lineHeight={1.4}
+                  fontWeight={500}
+                >
+                  {erc20Liquidity || `0.00`}
+                </Text>
+              }
+              topRight={<Hint>ETH Liquidity</Hint>}
+              bottomRight={
+                <Text
+                  fontSize={20}
+                  color="uniswappink"
+                  lineHeight={1.4}
+                  fontWeight={500}
+                >
+                  {ethLiquidity || `0.00`}
+                </Text>
+              }
+            />
+          </Panel>
 
-              <Box p={24}>
-                <Hint color="textSubtext" mb={3}>
-                  Token Address
-                </Hint>
-                <Address address={tokenAddress} />
-              </Box>
-            </Panel>
+          <Panel rounded bg="white" area="statistics">
+            <Box p={24}>
+              <Flex alignItems="center" justifyContent="space-between">
+                <Text>Pool Statistics</Text>
+                <Box width={144}>
+                  <Select
+                    placeholder="Timeframe"
+                    options={timeframeOptions}
+                    onChange={select => {
+                      historyDaysToQuery = select.value;
 
-            <Panel rounded bg="white" area="transactions">
-              <Flex p={24} justifyContent="space-between">
-                <Text color="text">Latest Transactions</Text>
-                <Text>↓</Text>
+                      currentExchangeData.recentTransactions = [];
+                      currentExchangeData.chartData = [];
+
+                      retrieveExchangeHistory(
+                        currentExchangeData,
+                        historyDaysToQuery,
+                        () => {
+                          this.setState({});
+                        }
+                      );
+                    }}
+                  />
+                </Box>
               </Flex>
-              <Divider />
+            </Box>
+            <Divider />
 
-              {recentTransactions && recentTransactions.length > 0 ? (
-                <TransactionsList
-                  transactions={recentTransactions}
-                  tokenSymbol={symbol}
-                />
+            <Box p={24}>
+              {chartData && chartData.length > 0 ? (
+                <Chart symbol={symbol} data={chartData} />
               ) : (
                 <Loader />
               )}
-            </Panel>
-          </Dashboard>
+            </Box>
+          </Panel>
 
-          <Footer />
-        </Wrapper>
-      );
-    }
+          <Panel rounded bg="white" area="exchange">
+            <Box p={24}>
+              <Hint color="textSubtext" mb={3}>
+                Exchange Address
+              </Hint>
+              <Address address={exchangeAddress} />
+            </Box>
+
+            <Box p={24}>
+              <Hint color="textSubtext" mb={3}>
+                Token Address
+              </Hint>
+              <Address address={tokenAddress} />
+            </Box>
+          </Panel>
+
+          <Panel rounded bg="white" area="transactions">
+            <Flex p={24} justifyContent="space-between">
+              <Text color="text">Latest Transactions</Text>
+              <Text>↓</Text>
+            </Flex>
+            <Divider />
+
+            {recentTransactions && recentTransactions.length > 0 ? (
+              <TransactionsList
+                transactions={recentTransactions}
+                tokenSymbol={symbol}
+              />
+            ) : (
+              <Loader />
+            )}
+          </Panel>
+        </Dashboard>
+
+        <Footer />
+      </Wrapper>
+    );
   }
 }
 
