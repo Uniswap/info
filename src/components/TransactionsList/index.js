@@ -2,44 +2,18 @@ import React from "react";
 import { Box, Flex, Text } from "rebass";
 import PropTypes from "prop-types";
 import styled from "styled-components";
-import { BigNumber } from "bignumber.js";
 
 import Link from "../Link";
+import TransactionType from "./transactionTypeIcons";
 
-import { urls, formatTime } from "../../helpers";
-
-import {
-  TokenSwap,
-  AddLiquidity,
-  RemoveLiquidity
-} from "./transactionTypeIcons";
-
-BigNumber.set({ EXPONENTIAL_AT: 50 });
-
-const Big = number => new BigNumber(number).dividedBy(1e18);
-
-const TransactionType = ({ event }) => {
-  switch (event) {
-    case "AddLiquidity":
-      return <AddLiquidity />;
-    case "RemoveLiquidity":
-      return <RemoveLiquidity />;
-    case "Token Swap":
-      return <TokenSwap />;
-    case "EthPurchase":
-      return <TokenSwap />;
-    case "TokenPurchase":
-      return <TokenSwap />;
-    default:
-      return null;
-  }
-};
+import { urls, formatTime, Big } from "../../helpers";
 
 const TransactionItem = ({ transaction, tokenSymbol }) => (
-  <Flex mb={24} justifyContent="space-between">
+  <Flex mb={24} alignItems="center" justifyContent="space-between">
     <Flex alignItems="center">
       <TransactionType event={transaction.event} />
       <Link
+        fontSize={[12, 16]}
         ml="3"
         color="button"
         external
@@ -49,7 +23,9 @@ const TransactionItem = ({ transaction, tokenSymbol }) => (
         {Big(transaction.tokenAmount).toFixed(4)} {tokenSymbol}
       </Link>
     </Flex>
-    <Text color="textDim">{formatTime(transaction.timestamp)}</Text>
+    <Text fontSize={[12, 16]} color="textDim">
+      {formatTime(transaction.timestamp)}
+    </Text>
   </Flex>
 );
 
@@ -59,9 +35,10 @@ const List = styled(Box)`
   overflow-y: scroll;
 `;
 
+// @TODO rework into virtualized list
 const TransactionsList = ({ transactions, tokenSymbol }) => (
   <List p={24}>
-    {transactions.map((tx, index) => (
+    {transactions.slice(0, 20).map((tx, index) => (
       <TransactionItem key={index} transaction={tx} tokenSymbol={tokenSymbol} />
     ))}
   </List>

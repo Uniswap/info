@@ -127,4 +127,22 @@ const TokenSwap = props => (
   </svg>
 );
 
+const TransactionType = ({ event }) => {
+  switch (event) {
+    case "AddLiquidity":
+      return <AddLiquidity />;
+    case "RemoveLiquidity":
+      return <RemoveLiquidity />;
+    case "Token Swap":
+      return <TokenSwap />;
+    case "EthPurchase":
+      return <TokenSwap />;
+    case "TokenPurchase":
+      return <TokenSwap />;
+    default:
+      return null;
+  }
+};
+
+export default TransactionType;
 export { TokenSwap, AddLiquidity, RemoveLiquidity };
