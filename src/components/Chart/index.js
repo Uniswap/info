@@ -10,7 +10,7 @@ import {
 } from "recharts";
 import { Flex, Button } from "rebass";
 import styled from "styled-components";
-import PropTypes from "prop-types";
+import { useMedia } from "react-use";
 
 import CustomBar from "./customBar";
 import { toK } from "../../helpers";
@@ -27,6 +27,8 @@ const Chart = ({ data, symbol }) => {
   const [token, toggleToken] = useState(false);
   const [rate, toggleRate] = useState(false);
 
+  const isNotMobile = useMedia("(max-width: 40em)");
+
   return (
     <>
       <ResponsiveContainer aspect={21 / 9}>
@@ -42,6 +44,7 @@ const Chart = ({ data, symbol }) => {
             dataKey="date"
           />
           <YAxis
+            hide={isNotMobile}
             type="number"
             axisLine={false}
             tickFormatter={tick => toK(tick)}
@@ -50,6 +53,7 @@ const Chart = ({ data, symbol }) => {
             yAxisId={0}
           />
           <YAxis
+            hide={isNotMobile}
             orientation="right"
             type="number"
             tickFormatter={tick => toK(tick)}
@@ -77,6 +81,7 @@ const Chart = ({ data, symbol }) => {
           />
           <Line
             hide={token}
+            dot={isNotMobile}
             type="monotone"
             yAxisId={1}
             dataKey="tokenLiquidity"
@@ -85,6 +90,7 @@ const Chart = ({ data, symbol }) => {
           />
           <Line
             hide={rate}
+            dot={isNotMobile}
             type="monotone"
             name="Rate"
             yAxisId={0}
@@ -93,6 +99,7 @@ const Chart = ({ data, symbol }) => {
           />
           <Line
             hide={eth}
+            dot={isNotMobile}
             type="monotone"
             name="ETH Liquidity"
             dataKey="ethLiquidity"
