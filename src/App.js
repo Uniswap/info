@@ -12,10 +12,13 @@ import TransactionsList from "./components/TransactionsList";
 import Link from "./components/Link";
 import Chart from "./components/Chart";
 
-import { 
-    urls, retrieveExchangeTicker, retrieveUserPoolShare, retrieveExchangeHistory,
-    retrieveExchangeDirectory 
-  } from "./helpers/";
+import {
+  urls,
+  retrieveExchangeTicker,
+  retrieveUserPoolShare,
+  retrieveExchangeHistory,
+  retrieveExchangeDirectory
+} from "./helpers/";
 
 import { useWeb3Context } from "web3-react/hooks";
 
@@ -81,7 +84,7 @@ class App extends Component {
     // load the list of all exchanges
     retrieveExchangeDirectory((directoryLabels, directoryObjects) => {
       exchangeSelectOptions = directoryLabels;
-      exchangeDataRaw = directoryObjects;     
+      exchangeDataRaw = directoryObjects;
 
       var defaultExchangeAddress = directoryLabels[0].value;
 
@@ -108,12 +111,16 @@ class App extends Component {
             // refresh the UI
             app.setState({});
 
-            retrieveExchangeHistory(currentExchangeData, historyDaysToQuery, () => {
-              if (currentExchangeData.exchangeAddress === address) {
-                // refresh the UI
-                app.setState({});
+            retrieveExchangeHistory(
+              currentExchangeData,
+              historyDaysToQuery,
+              () => {
+                if (currentExchangeData.exchangeAddress === address) {
+                  // refresh the UI
+                  app.setState({});
+                }
               }
-            });
+            );
           }
         });
       }
@@ -143,7 +150,7 @@ class App extends Component {
             color={["white", "black"]}
           >
             <Title />
-            
+
             {/* <Popout data={exchangeSelectOptions} /> */}
 
             <Select
@@ -249,11 +256,15 @@ class App extends Component {
                         historyDaysToQuery = newOption.value;
 
                         currentExchangeData.recentTransactions = [];
-                        currentExchangeData.chartData = [];                        
+                        currentExchangeData.chartData = [];
 
-                        retrieveExchangeHistory(currentExchangeData, historyDaysToQuery, () => {
-                          app.setState({});                          
-                        });
+                        retrieveExchangeHistory(
+                          currentExchangeData,
+                          historyDaysToQuery,
+                          () => {
+                            app.setState({});
+                          }
+                        );
                       }}
                     />
                   </Box>

@@ -101,7 +101,8 @@ const Chart = ({ data }) => {
             type="monotone"
             dataKey="rate"
             stroke="var(--c-ronchi)"
-          />}
+          />
+          }
           <Line
             hide={eth}
             type="monotone"

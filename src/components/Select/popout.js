@@ -131,4 +131,8 @@ const Dropdown = ({ children, isOpen, target, onClose }) => (
   </>
 );
 
-const DropdownIndicator = () => <span role="img" aria-label="Search">🔎</span>;
+const DropdownIndicator = () => (
+  <span role="img" aria-label="Search">
+    🔎
+  </span>
+);

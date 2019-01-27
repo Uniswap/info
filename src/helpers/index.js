@@ -37,8 +37,13 @@ export const formatTime = unix => {
   }
 };
 
-export async function retrieveExchangeTicker(exchangeData, tickerRetrievedCallback) {
-  var url = `${BASE_URL}v1/ticker?exchangeAddress=${exchangeData.exchangeAddress}`;
+export async function retrieveExchangeTicker(
+  exchangeData,
+  tickerRetrievedCallback
+) {
+  var url = `${BASE_URL}v1/ticker?exchangeAddress=${
+    exchangeData.exchangeAddress
+  }`;
 
   console.log(
     "retrieving ticker for " + exchangeData.exchangeAddress + "...(" + url + ")"
@@ -169,53 +174,74 @@ export async function retrieveExchangeHistory(
     method: "get",
     url: url
   }).then(response => {
-    processExchangeHistory(response, exchangeData, daysToQuery, historyRetrievedCallback);
+    processExchangeHistory(
+      response,
+      exchangeData,
+      daysToQuery,
+      historyRetrievedCallback
+    );
   });
 }
 
-async function processExchangeHistory(response, exchangeData, daysToQuery, historyProcessedCallback) {
-  console.log("received history (" + exchangeData.exchangeAddress + "), " + response.data.length + " tx");
+async function processExchangeHistory(
+  response,
+  exchangeData,
+  daysToQuery,
+  historyProcessedCallback
+) {
+  console.log(
+    "received history (" +
+      exchangeData.exchangeAddress +
+      "), " +
+      response.data.length +
+      " tx"
+  );
 
   var chartBucketDatas = {}; // chart data grouped by hour or day
 
   var chartBucketOrderedTimestamps = [];
 
   var monthNames = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec"
-    ];
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec"
+  ];
 
   var nowUTC = new Date();
-  
+
   var startUTCforBucket_seconds;
   var date;
   var bucketLabel;
-      
+
   // TODO when daysToQuery <= 1 (each bucket will be an hour)
   // each bucket will be a day
-  if (daysToQuery > 1 && daysToQuery <= 31) { 
+  if (daysToQuery > 1 && daysToQuery <= 31) {
     // get the date for the very beginning of today's day (the recent most bucket)
-    var startOfTodayUTC = new Date(Date.UTC(nowUTC.getUTCFullYear(), nowUTC.getUTCMonth(), nowUTC.getUTCDate()));
+    var startOfTodayUTC = new Date(
+      Date.UTC(
+        nowUTC.getUTCFullYear(),
+        nowUTC.getUTCMonth(),
+        nowUTC.getUTCDate()
+      )
+    );
 
     // buckets will be by day
     for (var daysBack = daysToQuery; daysBack >= 0; daysBack--) {
-      startUTCforBucket_seconds = (startOfTodayUTC.getTime() / 1000) - (60 * 60 * 24 * daysBack);
+      startUTCforBucket_seconds =
+        startOfTodayUTC.getTime() / 1000 - 60 * 60 * 24 * daysBack;
 
       date = new Date(startUTCforBucket_seconds * 1000);
 
-      bucketLabel = `${
-        monthNames[date.getUTCMonth()]
-      } ${date.getUTCDate()}`;
+      bucketLabel = `${monthNames[date.getUTCMonth()]} ${date.getUTCDate()}`;
 
       chartBucketOrderedTimestamps.push(startUTCforBucket_seconds);
       // put an empty data object in for this bucket
@@ -228,20 +254,20 @@ async function processExchangeHistory(response, exchangeData, daysToQuery, histo
     }
   } else if (daysToQuery > 31) {
     // each bucket will be a month
-    var startOfThisMonthUTC = new Date(Date.UTC(nowUTC.getFullYear(), nowUTC.getMonth()));
+    var startOfThisMonthUTC = new Date(
+      Date.UTC(nowUTC.getFullYear(), nowUTC.getMonth())
+    );
 
     // buckets will be by month
     for (var monthsBack = 0; monthsBack <= 11; monthsBack++) {
-      startUTCforBucket_seconds = (startOfThisMonthUTC.getTime() / 1000);
+      startUTCforBucket_seconds = startOfThisMonthUTC.getTime() / 1000;
 
       date = new Date(startUTCforBucket_seconds * 1000);
 
-      bucketLabel = `${
-        monthNames[date.getUTCMonth()]
-      }`;
+      bucketLabel = `${monthNames[date.getUTCMonth()]}`;
 
       chartBucketOrderedTimestamps.splice(0, 0, startUTCforBucket_seconds);
-      
+
       // put an empty data object in for this bucket
       chartBucketDatas[startUTCforBucket_seconds] = {
         tradeVolume: new BigNumber(0),
@@ -279,9 +305,7 @@ async function processExchangeHistory(response, exchangeData, daysToQuery, histo
 
     // if this was a trading event, we can consider its volume
     if (tx_event === "EthPurchase" || tx_event === "TokenPurchase") {
-      bucket.tradeVolume = bucket.tradeVolume.plus(
-        eth_amount.absoluteValue()
-      );
+      bucket.tradeVolume = bucket.tradeVolume.plus(eth_amount.absoluteValue());
     }
 
     // transactions are ordered from newest to oldest, so set it on the first time we encounter a null liquidity value for a bucket
@@ -326,11 +350,8 @@ async function processExchangeHistory(response, exchangeData, daysToQuery, histo
     var marginalRate = new BigNumber(0);
 
     if (bucket.curEthLiquidity.toFixed() != 0) {
-      marginalRate = bucket.curTokenLiquidity.dividedBy(
-        bucket.curEthLiquidity
-      );
+      marginalRate = bucket.curTokenLiquidity.dividedBy(bucket.curEthLiquidity);
     }
-
 
     // Data Object for Chart
     exchangeData.chartData.push({
