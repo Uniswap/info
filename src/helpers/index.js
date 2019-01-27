@@ -171,16 +171,15 @@ export async function retrieveExchangeHistory(
   daysToQuery,
   historyRetrievedCallback
 ) {
-  // @TODO rework into dayjs
-  // use current time as now
-  var utcEndTimeInSeconds = Date.now() / 1000;
+  // current time
+  const utcEndTime = dayjs();
 
-  // go back x days
-  var utcStartTimeInSeconds = utcEndTimeInSeconds - 60 * 60 * 24 * daysToQuery;
+  // go back n days
+  const utcStartTime = utcEndTime.subtract(daysToQuery, "day");
 
   var url = `${BASE_URL}v1/history?exchangeAddress=${
     exchangeData.exchangeAddress
-  }&startTime=${utcStartTimeInSeconds}&endTime=${utcEndTimeInSeconds}`;
+  }&startTime=${utcStartTime.unix()}&endTime=${utcEndTime.unix()}`;
 
   console.log(`retrieving transaction history...(${url})`);
 

@@ -27,10 +27,9 @@ let currentExchangeData;
 let web3 = null;
 
 const timeframeOptions = [
-  // { value: "1", label: "1 day" },
-  { value: "7", label: "1 week" },
-  { value: "30", label: "1 month" },
-  { value: "365", label: "1 year" }
+  { value: 7, label: "1 week" },
+  { value: 30, label: "1 month" },
+  { value: 365, label: "1 year" }
 ];
 
 const Web3Setter = props => {
@@ -46,7 +45,9 @@ class App extends Component {
     exchangeData: [],
     exchangeOptions: [],
     defaultExchangeAddress: "",
-    activeExchangeData: {}
+    activeExchangeData: {},
+    activeExchangeChartData: [],
+    activeExchangeTransactions: []
   };
 
   componentDidMount(props) {
@@ -249,10 +250,10 @@ class App extends Component {
                   <Text>Pool Statistics</Text>
                   <Box width={144}>
                     <Select
-                      placeholder="..."
+                      placeholder="Timeframe"
                       options={timeframeOptions}
-                      onChange={newOption => {
-                        historyDaysToQuery = newOption.value;
+                      onChange={select => {
+                        historyDaysToQuery = select.value;
 
                         currentExchangeData.recentTransactions = [];
                         currentExchangeData.chartData = [];
