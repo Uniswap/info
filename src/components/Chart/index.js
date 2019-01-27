@@ -61,10 +61,19 @@ const Chart = ({ data }) => {
             dataKey="date"
           />
           <YAxis
-            dataKey="volume"
+            orientation="left"
+            type="number"
             axisLine={false}
             tickLine={false}
             interval="preserveStartEnd"
+          />
+          <YAxis
+            orientation="right"
+            type="number"
+            axisLine={false}
+            tickLine={false}
+            interval="preserveStartEnd"
+            yAxisId={1}
           />
           <Tooltip
             cursor={false}
@@ -81,24 +90,24 @@ const Chart = ({ data }) => {
             shape={<CustomBar />}
             fill="var(--c-zircon)"
           />
-          {/* <Line
-            hide={token}
-            type="monotone"
-            dataKey="amt"
-            stroke="var(--c-maker)"
-          /> */}
-          {/* <Line
-            hide={rate}
-            type="monotone"
-            dataKey="pv"
-            stroke="var(--c-ronchi)"
-          /> */}
-          {/* <Line
+          <Line
             hide={eth}
             type="monotone"
-            dataKey="uv"
+            dataKey="ethLiquidity"
             stroke="var(--c-uniswappink)"
-          /> */}
+          />
+          <Line
+            hide={token}
+            type="monotone"
+            dataKey="tokenLiquidity"
+            stroke="var(--c-maker)"
+          />
+          <Line
+            hide={rate}
+            type="monotone"
+            dataKey="rate"
+            stroke="var(--c-ronchi)"
+          />
         </ComposedChart>
       </ResponsiveContainer>
       <Flex mt={3} justifyContent="flex-end">
