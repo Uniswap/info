@@ -1,6 +1,6 @@
 import React, { Component } from "react";
-import styled from "styled-components";
 import { Box, Flex, Text } from "rebass";
+
 import Wrapper from "./components/Theme";
 import Title from "./components/Title";
 import FourByFour from "./components/FourByFour";
@@ -9,12 +9,11 @@ import Dashboard from "./components/Dashboard";
 import Select from "./components/Select";
 import Footer from "./components/Footer";
 import TransactionsList from "./components/TransactionsList";
-import Link from "./components/Link";
 import Chart from "./components/Chart";
 import Loader from "./components/Loader";
+import { Header, Divider, Hint, Address } from "./components";
 
 import {
-  urls,
   retrieveExchangeTicker,
   retrieveUserPoolShare,
   retrieveExchangeHistory,
@@ -23,37 +22,9 @@ import {
 
 import { useWeb3Context } from "web3-react/hooks";
 
-// all our exchange options keyed by exchange address
-let exchangeDataRaw = {};
-let exchangeSelectOptions = [];
-
 let historyDaysToQuery = 7;
 let currentExchangeData;
-let app;
 let web3 = null;
-
-const Address = props => (
-  <Link {...props} color="button" external style={{ wordBreak: "break-all" }}>
-    {props.children}
-  </Link>
-);
-
-const Header = styled(Panel)`
-  display: grid;
-  grid-template-columns: 1fr 216px;
-  align-items: center;
-`;
-
-const Divider = styled(Box)`
-  height: 1px;
-  background-color: rgba(43, 43, 43, 0.05);
-`;
-
-const Hint = props => (
-  <Text {...props} fontSize={12}>
-    {props.children}
-  </Text>
-);
 
 const timeframeOptions = [
   // { value: "1", label: "1 day" },
@@ -71,54 +42,66 @@ const Web3Setter = props => {
 };
 
 class App extends Component {
-  constructor(props) {
-    super(props);
-
-    app = this;
-  }
-
-  // Retreive Data for exchange by it's address
-  // @TODO: move this data into state
-  getExchangeData = address => exchangeDataRaw[address];
+  state = {
+    exchangeData: [],
+    exchangeOptions: [],
+    defaultExchangeAddress: "",
+    activeExchangeData: {}
+  };
 
   componentDidMount(props) {
     // load the list of all exchanges
     retrieveExchangeDirectory((directoryLabels, directoryObjects) => {
-      exchangeSelectOptions = directoryLabels;
-      exchangeDataRaw = directoryObjects;
+      this.setState({
+        exchangeData: directoryObjects,
+        exchangeOptions: directoryLabels,
+        defaultExchangeAddress: directoryLabels[0].value
+      });
 
-      var defaultExchangeAddress = directoryLabels[0].value;
+      this.setCurrentExchange(this.state.defaultExchangeAddress);
 
-      app.setCurrentExchange(defaultExchangeAddress);
+      // set 'activeExchangeData' equal to 'defaultExchangeAddress's' value from 'exchangeData' but better cause stateful
+      this.setState({
+        activeExchangeData: this.state.exchangeData[
+          this.state.defaultExchangeAddress
+        ]
+      });
     });
   }
 
-  // Set the current exchange's data to be shown
-  setCurrentExchange(address) {
-    currentExchangeData = app.getExchangeData(address);
+  // Retreive Data for exchange by it's address
+  getExchangeData = address => this.state.exchangeData[address];
 
-    // What is this for?
-    app.setState({});
+  // Set the current exchange's data to be shown
+  // @TOOD improve callback hell
+  setCurrentExchange = address => {
+    // make a var hold the data from exhange in state
+    currentExchangeData = this.getExchangeData(address);
+
+    // refresh the UI
+    this.setState({});
 
     // retrieve the ticker which displays the latest 24hr details
     retrieveExchangeTicker(currentExchangeData, () => {
       // only update UI if we're still displaying the initial requested address
       if (currentExchangeData.exchangeAddress === address) {
         // refresh the UI
-        app.setState({});
+        this.setState({});
 
         retrieveUserPoolShare(currentExchangeData, web3.account, () => {
+          // only update UI if we're still displaying the initial requested address
           if (currentExchangeData.exchangeAddress === address) {
             // refresh the UI
-            app.setState({});
+            this.setState({});
 
             retrieveExchangeHistory(
               currentExchangeData,
               historyDaysToQuery,
               () => {
+                // only update UI if we're still displaying the initial requested address
                 if (currentExchangeData.exchangeAddress === address) {
                   // refresh the UI
-                  app.setState({});
+                  this.setState({});
                 }
               }
             );
@@ -126,10 +109,25 @@ class App extends Component {
         });
       }
     });
-  }
+  };
 
   render() {
-    if (exchangeSelectOptions.length === 0) {
+    // spread state into cleaner vars
+    const {
+      exchangeAddress,
+      tradeVolume,
+      percentChange,
+      userPoolTokens,
+      userPoolPercent,
+      symbol,
+      chartData,
+      erc20Liquidity,
+      ethLiquidity,
+      tokenAddress,
+      recentTransactions
+    } = this.state.activeExchangeData;
+
+    if (this.state.exchangeOptions.length === 0) {
       // TODO Show loading indicator
       console.log("loading");
 
@@ -137,6 +135,7 @@ class App extends Component {
         <Wrapper>
           {/* @TODO: find better way to handle this */}
           <>
+            <Loader />
             <Web3Setter />
           </>
         </Wrapper>
@@ -153,11 +152,16 @@ class App extends Component {
             <Title />
 
             <Select
-              options={exchangeSelectOptions}
-              onChange={newOption => {
+              options={this.state.exchangeOptions}
+              onChange={select => {
+                if (exchangeAddress !== select.value)
+                  this.setState({
+                    activeExchangeData: this.state.exchangeData[select.value]
+                  });
+
                 // only update current exchange if we're picking a new one
-                if (currentExchangeData.exchangeAddress !== newOption.value)
-                  app.setCurrentExchange(newOption.value);
+                if (currentExchangeData.exchangeAddress !== select.value)
+                  this.setCurrentExchange(select.value);
               }}
             />
           </Header>
@@ -167,20 +171,16 @@ class App extends Component {
               <Panel grouped rounded color="white" bg="jaguar" p={24}>
                 <FourByFour
                   gap={24}
-                  topLeft={
-                    <Hint color="textLightDim">
-                      {currentExchangeData.symbol} Volume
-                    </Hint>
-                  }
+                  topLeft={<Hint color="textLightDim">{symbol} Volume</Hint>}
                   bottomLeft={
                     <Text fontSize={24} lineHeight={1.4} fontWeight={500}>
-                      {currentExchangeData.tradeVolume}
+                      {tradeVolume}
                     </Text>
                   }
                   topRight={<Hint color="textLightDim">24h</Hint>}
                   bottomRight={
                     <Text fontSize={20} lineHeight={1.4}>
-                      {currentExchangeData.percentChange}
+                      {percentChange}
                     </Text>
                   }
                 />
@@ -190,12 +190,12 @@ class App extends Component {
                   topLeft={<Hint color="textLight">Your share</Hint>}
                   bottomLeft={
                     <Text fontSize={20} lineHeight={1.4} fontWeight={500}>
-                      {currentExchangeData.userPoolTokens}
+                      {userPoolTokens} Pool Tokens
                     </Text>
                   }
                   bottomRight={
                     <Text fontSize={20} lineHeight={1.4}>
-                      {currentExchangeData.userPoolPercent}
+                      {userPoolPercent}%
                     </Text>
                   }
                 />
@@ -204,7 +204,7 @@ class App extends Component {
                   topLeft={<Hint color="textLight">Your fees</Hint>}
                   bottomLeft={
                     <Text fontSize={20} lineHeight={1.4} fontWeight={500}>
-                      0.00 {currentExchangeData.symbol}
+                      0.00 {symbol}
                     </Text>
                   }
                   bottomRight={
@@ -218,7 +218,7 @@ class App extends Component {
 
             <Panel rounded p={24} bg="white" area="liquidity">
               <FourByFour
-                topLeft={<Hint>{currentExchangeData.symbol} Liquidity</Hint>}
+                topLeft={<Hint>{symbol} Liquidity</Hint>}
                 bottomLeft={
                   <Text
                     fontSize={20}
@@ -226,7 +226,7 @@ class App extends Component {
                     lineHeight={1.4}
                     fontWeight={500}
                   >
-                    {currentExchangeData.erc20Liquidity || `0.00`}
+                    {erc20Liquidity || `0.00`}
                   </Text>
                 }
                 topRight={<Hint>ETH Liquidity</Hint>}
@@ -237,7 +237,7 @@ class App extends Component {
                     lineHeight={1.4}
                     fontWeight={500}
                   >
-                    {currentExchangeData.ethLiquidity || `0.00 ETH`}
+                    {ethLiquidity || `0.00`}
                   </Text>
                 }
               />
@@ -261,7 +261,7 @@ class App extends Component {
                           currentExchangeData,
                           historyDaysToQuery,
                           () => {
-                            app.setState({});
+                            this.setState({});
                           }
                         );
                       }}
@@ -272,8 +272,8 @@ class App extends Component {
               <Divider />
 
               <Box p={24}>
-                {currentExchangeData.chartData.length > 0 ? (
-                  <Chart data={currentExchangeData.chartData} />
+                {chartData && chartData.length > 0 ? (
+                  <Chart symbol={symbol} data={chartData} />
                 ) : (
                   <Loader />
                 )}
@@ -285,36 +285,28 @@ class App extends Component {
                 <Hint color="textSubtext" mb={3}>
                   Exchange Address
                 </Hint>
-                <Address
-                  href={urls.showAddress(currentExchangeData.exchangeAddress)}
-                >
-                  {currentExchangeData.exchangeAddress}
-                </Address>
+                <Address address={exchangeAddress} />
               </Box>
 
               <Box p={24}>
                 <Hint color="textSubtext" mb={3}>
                   Token Address
                 </Hint>
-                <Address
-                  href={urls.showAddress(currentExchangeData.tokenAddress)}
-                >
-                  {currentExchangeData.tokenAddress}
-                </Address>
+                <Address address={tokenAddress} />
               </Box>
             </Panel>
 
             <Panel rounded bg="white" area="transactions">
               <Flex p={24} justifyContent="space-between">
                 <Text color="text">Latest Transactions</Text>
-                {/* <Text>↓</Text> */}
+                <Text>↓</Text>
               </Flex>
               <Divider />
 
-              {currentExchangeData.recentTransactions.length > 0 ? (
+              {recentTransactions && recentTransactions.length > 0 ? (
                 <TransactionsList
-                  transactions={currentExchangeData.recentTransactions}
-                  tokenSymbol={currentExchangeData.symbol}
+                  transactions={recentTransactions}
+                  tokenSymbol={symbol}
                 />
               ) : (
                 <Loader />
