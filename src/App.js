@@ -11,6 +11,7 @@ import Footer from "./components/Footer";
 import TransactionsList from "./components/TransactionsList";
 import Link from "./components/Link";
 import Chart from "./components/Chart";
+import Loader from "./components/Loader";
 
 import {
   urls,
@@ -273,7 +274,11 @@ class App extends Component {
               <Divider />
 
               <Box p={24}>
-                <Chart data={currentExchangeData.chartData} />
+                {currentExchangeData.chartData.length > 0 ? (
+                  <Chart data={currentExchangeData.chartData} />
+                ) : (
+                  <Loader />
+                )}
               </Box>
             </Panel>
 
@@ -307,10 +312,15 @@ class App extends Component {
                 {/* <Text>↓</Text> */}
               </Flex>
               <Divider />
-              <TransactionsList
-                transactions={currentExchangeData.recentTransactions}
-                tokenSymbol={currentExchangeData.symbol}
-              />
+
+              {currentExchangeData.recentTransactions.length > 0 ? (
+                <TransactionsList
+                  transactions={currentExchangeData.recentTransactions}
+                  tokenSymbol={currentExchangeData.symbol}
+                />
+              ) : (
+                <Loader />
+              )}
             </Panel>
           </Dashboard>
 
