@@ -253,6 +253,7 @@ class App extends Component {
                     onChange={select => {
                       historyDaysToQuery = select.value;
 
+                      // wipes chart and transaction data, will need to work into state
                       currentExchangeData.recentTransactions = [];
                       currentExchangeData.chartData = [];
 
