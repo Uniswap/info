@@ -37,7 +37,7 @@ export const formatTime = unix => {
   }
 };
 
-export function retrieveExchangeTicker(exchangeData, tickerRetrievedCallback) {
+export async function retrieveExchangeTicker(exchangeData, tickerRetrievedCallback) {
   var url = `${BASE_URL}v1/ticker?exchangeAddress=${exchangeData.exchangeAddress}`;
 
   console.log(
@@ -48,6 +48,8 @@ export function retrieveExchangeTicker(exchangeData, tickerRetrievedCallback) {
     method: "get",
     url: url
   }).then(response => {
+    console.log("received ticker for " + exchangeData.exchangeAddress);
+
     // update the values from the API response
     var responseData = response.data;
 
@@ -79,7 +81,7 @@ export function retrieveExchangeTicker(exchangeData, tickerRetrievedCallback) {
   });
 }
 
-export function retrieveExchangeDirectory(directoryRetrievedCallback) {
+export async function retrieveExchangeDirectory(directoryRetrievedCallback) {
   // Load exchange list
   axios({
     method: "get",
@@ -117,7 +119,7 @@ export function retrieveExchangeDirectory(directoryRetrievedCallback) {
   });
 }
 
-export function retrieveUserPoolShare(
+export async function retrieveUserPoolShare(
   exchangeData,
   userAccount,
   poolShareRetrievedCallback
@@ -146,7 +148,7 @@ export function retrieveUserPoolShare(
 }
 
 // load exchange history for X days back
-export function retrieveExchangeHistory(
+export async function retrieveExchangeHistory(
   exchangeData,
   daysToQuery,
   historyRetrievedCallback
@@ -171,7 +173,6 @@ export function retrieveExchangeHistory(
 
     var chartBucketDatas = {}; // chart data grouped by hour or day
 
-    var chartBucketOrderedLabels = []; // the order of the buckets from left to right (x axis)
     var chartBucketOrderedTimestamps = [];
 
     var monthNames = [
@@ -190,6 +191,10 @@ export function retrieveExchangeHistory(
       ];
 
     var nowUTC = new Date();
+    
+    var startUTCforBucket_seconds;
+    var date;
+    var bucketLabel;
         
     // TODO when daysToQuery <= 1 (each bucket will be an hour)
     // each bucket will be a day
@@ -199,11 +204,11 @@ export function retrieveExchangeHistory(
 
       // buckets will be by day
       for (var daysBack = daysToQuery; daysBack >= 0; daysBack--) {
-        var startUTCforBucket_seconds = (startOfTodayUTC.getTime() / 1000) - (60 * 60 * 24 * daysBack);
+        startUTCforBucket_seconds = (startOfTodayUTC.getTime() / 1000) - (60 * 60 * 24 * daysBack);
 
-        var date = new Date(startUTCforBucket_seconds * 1000);
+        date = new Date(startUTCforBucket_seconds * 1000);
 
-        var bucketLabel = `${
+        bucketLabel = `${
           monthNames[date.getUTCMonth()]
         } ${date.getUTCDate()}`;
 
@@ -222,11 +227,11 @@ export function retrieveExchangeHistory(
 
       // buckets will be by month
       for (var monthsBack = 0; monthsBack <= 11; monthsBack++) {
-        var startUTCforBucket_seconds = (startOfThisMonthUTC.getTime() / 1000);
+        startUTCforBucket_seconds = (startOfThisMonthUTC.getTime() / 1000);
 
-        var date = new Date(startUTCforBucket_seconds * 1000);
+        date = new Date(startUTCforBucket_seconds * 1000);
 
-        var bucketLabel = `${
+        bucketLabel = `${
           monthNames[date.getUTCMonth()]
         }`;
 
@@ -315,11 +320,12 @@ export function retrieveExchangeHistory(
 
       var marginalRate = new BigNumber(0);
 
-      if (bucket.curTokenLiquidity != 0) {
+      if (bucket.curEthLiquidity.toFixed() != 0) {
         marginalRate = bucket.curTokenLiquidity.dividedBy(
           bucket.curEthLiquidity
         );
       }
+
 
       // Data Object for Chart
       exchangeData.chartData.push({
