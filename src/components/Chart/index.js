@@ -44,7 +44,7 @@ const Chart = ({ data }) => {
   const [volume, toggleVolume] = useState(false);
   const [eth, toggleEth] = useState(false);
   const [token, toggleToken] = useState(false);
-  const [rate, toggleRate] = useState(true);
+  const [rate, toggleRate] = useState(false);
 
   return (
     <>
@@ -91,12 +91,6 @@ const Chart = ({ data }) => {
             fill="var(--c-zircon)"
           />
           <Line
-            hide={eth}
-            type="monotone"
-            dataKey="ethLiquidity"
-            stroke="var(--c-uniswappink)"
-          />
-          <Line
             hide={token}
             type="monotone"
             dataKey="tokenLiquidity"
@@ -107,6 +101,12 @@ const Chart = ({ data }) => {
             type="monotone"
             dataKey="rate"
             stroke="var(--c-ronchi)"
+          />}
+          <Line
+            hide={eth}
+            type="monotone"
+            dataKey="ethLiquidity"
+            stroke="var(--c-uniswappink)"
           />
         </ComposedChart>
       </ResponsiveContainer>

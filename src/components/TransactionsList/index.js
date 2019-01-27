@@ -35,7 +35,7 @@ const TransactionType = ({ event }) => {
   }
 };
 
-const TransactionItem = ({ transaction }) => (
+const TransactionItem = ({ transaction, tokenSymbol }) => (
   <Flex mb={24} justifyContent="space-between">
     <Flex alignItems="center">
       <TransactionType event={transaction.event} />
@@ -46,7 +46,7 @@ const TransactionItem = ({ transaction }) => (
         href={urls.showTransaction(transaction.tx)}
       >
         {Big(transaction.ethAmount).toFixed(4)} ETH for{" "}
-        {Big(transaction.tokenAmount).toFixed(4)} "TOKEN"
+        {Big(transaction.tokenAmount).toFixed(4)} {tokenSymbol}
       </Link>
     </Flex>
     <Text color="textDim">{formatTime(transaction.timestamp)}</Text>
@@ -59,10 +59,10 @@ const List = styled(Box)`
   overflow-y: scroll;
 `;
 
-const TransactionsList = ({ transactions }) => (
+const TransactionsList = ({ transactions, tokenSymbol }) => (
   <List p={24}>
     {transactions.map((tx, index) => (
-      <TransactionItem key={index} transaction={tx} />
+      <TransactionItem key={index} transaction={tx} tokenSymbol={tokenSymbol} />
     ))}
   </List>
 );
