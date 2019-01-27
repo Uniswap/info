@@ -12,27 +12,8 @@ import { Flex, Button } from "rebass";
 import styled from "styled-components";
 import PropTypes from "prop-types";
 
-const CustomBar = props => {
-  const { fill, x, y, width, height } = props;
-
-  return <rect x={x} y={y} width={width} height={height} rx={2} fill={fill} />;
-};
-
-CustomBar.defaultProps = {
-  fill: "transparent",
-  x: 0,
-  y: 0,
-  width: 0,
-  height: 0
-};
-
-CustomBar.propTypes = {
-  fill: PropTypes.string,
-  x: PropTypes.number,
-  y: PropTypes.number,
-  width: PropTypes.number,
-  height: PropTypes.number
-};
+import CustomBar from "./customBar";
+import { toK } from "../../helpers";
 
 const Controls = styled.div`
   display: grid;
@@ -40,7 +21,7 @@ const Controls = styled.div`
   grid-column-gap: 8px;
 `;
 
-const Chart = ({ data }) => {
+const Chart = ({ data, symbol }) => {
   const [volume, toggleVolume] = useState(false);
   const [eth, toggleEth] = useState(false);
   const [token, toggleToken] = useState(false);
@@ -61,15 +42,17 @@ const Chart = ({ data }) => {
             dataKey="date"
           />
           <YAxis
-            orientation="left"
             type="number"
             axisLine={false}
+            tickFormatter={tick => toK(tick)}
             tickLine={false}
             interval="preserveStartEnd"
+            yAxisId={0}
           />
           <YAxis
             orientation="right"
             type="number"
+            tickFormatter={tick => toK(tick)}
             axisLine={false}
             tickLine={false}
             interval="preserveStartEnd"
@@ -81,32 +64,39 @@ const Chart = ({ data }) => {
             contentStyle={{
               padding: "10px 14px",
               borderRadius: 10,
-              border: "none"
+              borderColor: "var(--c-zircon)"
             }}
           />
           <Bar
             hide={volume}
             dataKey="volume"
+            name="Volume"
+            yAxisId={0}
             shape={<CustomBar />}
             fill="var(--c-zircon)"
           />
           <Line
             hide={token}
             type="monotone"
+            yAxisId={1}
             dataKey="tokenLiquidity"
+            name={`${symbol} Liquidity`}
             stroke="var(--c-maker)"
           />
           <Line
             hide={rate}
             type="monotone"
+            name="Rate"
+            yAxisId={0}
             dataKey="rate"
             stroke="var(--c-ronchi)"
           />
-          }
           <Line
             hide={eth}
             type="monotone"
+            name="ETH Liquidity"
             dataKey="ethLiquidity"
+            yAxisId={1}
             stroke="var(--c-uniswappink)"
           />
         </ComposedChart>
@@ -121,7 +111,7 @@ const Chart = ({ data }) => {
             borderColor="maker"
             bg="maker"
           >
-            DAI
+            {symbol}
           </Button>
           <Button
             onClick={() => toggleEth(!eth)}

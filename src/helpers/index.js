@@ -3,13 +3,19 @@ import { BigNumber } from "bignumber.js";
 import dayjs from "dayjs";
 import Uniswap from "../constants/Uniswap";
 
-const BASE_URL = "https://uniswap-analytics.appspot.com/api/";
+BigNumber.set({ EXPONENTIAL_AT: 50 });
+
+export const BASE_URL = "https://uniswap-analytics.appspot.com/api/";
 
 export const tokenOptions = Object.keys(Uniswap.tokens).map(key => ({
   value: `${Uniswap.tokens[key].address}`,
   // label: `${key} - ${Uniswap.tokens[key].address}`
   label: key
 }));
+
+export const toK = num => (num > 999 ? `${num / 1000}K` : num);
+
+export const Big = number => new BigNumber(number).dividedBy(1e18);
 
 export const urls = {
   showTransaction: tx => `https://etherscan.io/tx/${tx}/`,
@@ -46,14 +52,14 @@ export async function retrieveExchangeTicker(
   }`;
 
   console.log(
-    "retrieving ticker for " + exchangeData.exchangeAddress + "...(" + url + ")"
+    `retrieving ticker for ${exchangeData.exchangeAddress} ...(${url})`
   );
 
   axios({
     method: "get",
     url: url
   }).then(response => {
-    console.log("received ticker for " + exchangeData.exchangeAddress);
+    console.log(`received ticker for ${exchangeData.exchangeAddress}`);
 
     // update the values from the API response
     var responseData = response.data;
@@ -86,40 +92,51 @@ export async function retrieveExchangeTicker(
   });
 }
 
+const buildDirectoryLabel = exchange => {
+  const { symbol, exchangeAddress } = exchange;
+
+  return {
+    label: `${symbol} - ${exchangeAddress}`,
+    value: exchangeAddress
+  };
+};
+
+const buildDirectoryObject = exchange => {
+  const { symbol, exchangeAddress, tokenAddress, tokenDecimals } = exchange;
+
+  return {
+    symbol,
+    exchangeAddress,
+    tokenAddress,
+    tokenDecimals,
+    tradeVolume: 0,
+    percentChange: 0.0,
+    ethLiquidity: 0,
+    recentTransactions: [],
+    chartData: [],
+    userPoolTokens: 0,
+    userPoolPercent: 0.0
+  };
+};
+
 export async function retrieveExchangeDirectory(directoryRetrievedCallback) {
   // Load exchange list
   axios({
     method: "get",
     url: `${BASE_URL}v1/directory`
   }).then(response => {
-    var directoryLabels = [];
-    var directoryObjects = {};
+    const directoryLabels = response.data.map(exchange =>
+      buildDirectoryLabel(exchange)
+    );
 
+    let directoryObjects = {};
     response.data.forEach(exchange => {
-      const { symbol, exchangeAddress, tokenAddress, tokenDecimals } = exchange;
-
-      // Create Exchange Select Options
-      directoryLabels.push({
-        label: `${symbol} - ${exchangeAddress}`,
-        value: exchangeAddress
-      });
-
-      // Create Exchange Data
-      directoryObjects[exchangeAddress] = {
-        symbol,
-        exchangeAddress,
-        tokenAddress,
-        tokenDecimals,
-        tradeVolume: "0 ETH",
-        percentChange: "0.00%",
-        ethLiquidity: "0 ETH",
-        recentTransactions: [],
-        chartData: [],
-        userPoolTokens: "0.0000",
-        userPoolPercent: "0.00%"
-      };
+      directoryObjects[exchange.exchangeAddress] = buildDirectoryObject(
+        exchange
+      );
     });
 
+    // pass directoryLabels and directoryObjects arrays and objects to the callback
     directoryRetrievedCallback(directoryLabels, directoryObjects);
   });
 }
@@ -138,15 +155,11 @@ export async function retrieveUserPoolShare(
     }&userAddress=${userAccount}`
   }).then(response => {
     // update the values from the API response
-    var responseData = response.data;
 
-    var user_pool_tokens = new BigNumber(
-      responseData["userNumPoolTokens"]
-    ).dividedBy(1e18);
-    var user_pool_percentage = responseData["userPoolPercent"] * 100;
+    const { userNumPoolTokens, userPoolPercent } = response.data;
 
-    exchangeData.userPoolTokens = `${user_pool_tokens.toFixed(4)} Pool Tokens`;
-    exchangeData.userPoolPercent = `${user_pool_percentage.toFixed(2)}%`;
+    exchangeData.userPoolTokens = Big(userNumPoolTokens).toFixed(4);
+    exchangeData.userPoolPercent = (userPoolPercent * 100).toFixed(2);
 
     poolShareRetrievedCallback();
   });
@@ -158,6 +171,7 @@ export async function retrieveExchangeHistory(
   daysToQuery,
   historyRetrievedCallback
 ) {
+  // @TODO rework into dayjs
   // use current time as now
   var utcEndTimeInSeconds = Date.now() / 1000;
 
@@ -168,7 +182,7 @@ export async function retrieveExchangeHistory(
     exchangeData.exchangeAddress
   }&startTime=${utcStartTimeInSeconds}&endTime=${utcEndTimeInSeconds}`;
 
-  console.log("retrieving transaction history...(" + url + ")");
+  console.log(`retrieving transaction history...(${url})`);
 
   axios({
     method: "get",
