@@ -15,11 +15,11 @@ export const tokenOptions = Object.keys(Uniswap.tokens).map(key => ({
 
 export const toK = num => {
   if (num > 999999) {
-    return `${num / 1000000}M`
+    return `${num / 1000000}M`;
   } else if (num > 999) {
-    return `${num / 1000}K`
+    return `${num / 1000}K`;
   } else {
-    return num
+    return num;
   }
 };
 
