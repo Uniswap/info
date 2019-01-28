@@ -50,7 +50,8 @@ class App extends Component {
     activeExchangeTransactions: []
   };
 
-  componentDidMount(props) {
+  componentDidMount() {
+    console.log("props: ", this.props);
     // load the list of all exchanges
     retrieveExchangeDirectory((directoryLabels, directoryObjects) => {
       this.setState({
@@ -67,6 +68,12 @@ class App extends Component {
           this.state.defaultExchangeAddress
         ]
       });
+
+      // Fetch User Pool Information
+      this.props.poolStore.fetchUser(
+        this.state.activeExchangeData.exchangeAddress,
+        web3.account
+      );
     });
   }
 
@@ -89,23 +96,11 @@ class App extends Component {
         // refresh the UI
         this.setState({});
 
-        retrieveUserPoolShare(currentExchangeData, web3.account, () => {
+        retrieveExchangeHistory(currentExchangeData, historyDaysToQuery, () => {
           // only update UI if we're still displaying the initial requested address
           if (currentExchangeData.exchangeAddress === address) {
             // refresh the UI
             this.setState({});
-
-            retrieveExchangeHistory(
-              currentExchangeData,
-              historyDaysToQuery,
-              () => {
-                // only update UI if we're still displaying the initial requested address
-                if (currentExchangeData.exchangeAddress === address) {
-                  // refresh the UI
-                  this.setState({});
-                }
-              }
-            );
           }
         });
       }
@@ -118,8 +113,8 @@ class App extends Component {
       exchangeAddress,
       tradeVolume,
       percentChange,
-      userPoolTokens,
-      userPoolPercent,
+      // userPoolTokens,
+      // userPoolPercent,
       symbol,
       chartData,
       erc20Liquidity,
@@ -127,6 +122,10 @@ class App extends Component {
       tokenAddress,
       recentTransactions
     } = this.state.activeExchangeData;
+
+    const {
+      state: { userNumPoolTokens, userPoolPercent }
+    } = this.props.poolStore;
 
     if (this.state.exchangeOptions.length === 0)
       return (
@@ -189,7 +188,7 @@ class App extends Component {
                 topLeft={<Hint color="textLight">Your share</Hint>}
                 bottomLeft={
                   <Text fontSize={20} lineHeight={1.4} fontWeight={500}>
-                    {userPoolTokens} Pool Tokens
+                    {userNumPoolTokens} Pool Tokens
                   </Text>
                 }
                 bottomRight={

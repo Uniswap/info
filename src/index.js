@@ -1,21 +1,25 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import Web3Provider from "web3-react";
+import { Subscribe, Provider } from "unstated";
 
-// Working old app
-// import "./_old/index.css";
-// import AppWrapper from "./_old/AppWrapper";
-
-// ReactDOM.render(<AppWrapper />, document.getElementById("root"));
-
+import { PoolContainer } from "./containers/poolContainer";
 import App from "./App";
 
-export default function AppWrapper() {
-  return (
-    <Web3Provider>
-      <App />
-    </Web3Provider>
-  );
-}
+const StateWrapper = () => (
+  <Provider>
+    <Subscribe to={[PoolContainer]}>
+      {poolStore => <App poolStore={poolStore} />}
+    </Subscribe>
+  </Provider>
+);
+
+const AppWrapper = () => (
+  <Web3Provider>
+    <StateWrapper />
+  </Web3Provider>
+);
+
+export default AppWrapper;
 
 ReactDOM.render(<AppWrapper />, document.getElementById("root"));
