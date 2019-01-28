@@ -15,7 +15,6 @@ import { Header, Divider, Hint, Address } from "./components";
 
 import {
   retrieveExchangeTicker,
-  retrieveUserPoolShare,
   retrieveExchangeHistory,
   retrieveExchangeDirectory
 } from "./helpers/";
@@ -113,8 +112,6 @@ class App extends Component {
       exchangeAddress,
       tradeVolume,
       percentChange,
-      // userPoolTokens,
-      // userPoolPercent,
       symbol,
       chartData,
       erc20Liquidity,

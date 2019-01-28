@@ -121,9 +121,7 @@ const buildDirectoryObject = exchange => {
     percentChange: 0.0,
     ethLiquidity: 0,
     recentTransactions: [],
-    chartData: [],
-    userPoolTokens: 0,
-    userPoolPercent: 0.0
+    chartData: []
   };
 };
 
@@ -146,30 +144,6 @@ export async function retrieveExchangeDirectory(directoryRetrievedCallback) {
 
     // pass directoryLabels and directoryObjects arrays and objects to the callback
     directoryRetrievedCallback(directoryLabels, directoryObjects);
-  });
-}
-
-export async function retrieveUserPoolShare(
-  exchangeData,
-  userAccount,
-  poolShareRetrievedCallback
-) {
-  // TODO when we update to newer web3-react, check if we have a valid user account to query,
-  // if not then just call pool_share_retrieved_callback() immediately
-  axios({
-    method: "get",
-    url: `${BASE_URL}v1/user?exchangeAddress=${
-      exchangeData.exchangeAddress
-    }&userAddress=${userAccount}`
-  }).then(response => {
-    // update the values from the API response
-
-    const { userNumPoolTokens, userPoolPercent } = response.data;
-
-    exchangeData.userPoolTokens = Big(userNumPoolTokens).toFixed(4);
-    exchangeData.userPoolPercent = (userPoolPercent * 100).toFixed(2);
-
-    poolShareRetrievedCallback();
   });
 }
 
