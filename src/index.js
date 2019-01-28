@@ -4,12 +4,16 @@ import Web3Provider from "web3-react";
 import { Subscribe, Provider } from "unstated";
 
 import { PoolContainer } from "./containers/poolContainer";
+import { TransactionsContainer } from "./containers/transactionsContainer";
+
 import App from "./App";
 
 const StateWrapper = () => (
   <Provider>
-    <Subscribe to={[PoolContainer]}>
-      {poolStore => <App poolStore={poolStore} />}
+    <Subscribe to={[PoolContainer, TransactionsContainer]}>
+      {(poolStore, transactionsStore) => (
+        <App poolStore={poolStore} transactionsStore={transactionsStore} />
+      )}
     </Subscribe>
   </Provider>
 );

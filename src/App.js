@@ -45,8 +45,23 @@ class App extends Component {
     exchangeOptions: [],
     defaultExchangeAddress: "",
     activeExchangeData: {},
-    activeExchangeChartData: [],
-    activeExchangeTransactions: []
+    historyDaysToQuery: 7
+  };
+
+  // Fetch Exchange's Transactions
+  fetchTransactions = () => {
+    this.props.transactionsStore.fetchTransactions(
+      this.state.activeExchangeData.exchangeAddress,
+      this.state.historyDaysToQuery
+    );
+  };
+
+  // Fetch User Pool Information
+  fetchUserPoolShare = () => {
+    this.props.poolStore.fetchUser(
+      this.state.activeExchangeData.exchangeAddress,
+      web3.account
+    );
   };
 
   componentDidMount() {
@@ -68,11 +83,9 @@ class App extends Component {
         ]
       });
 
-      // Fetch User Pool Information
-      this.props.poolStore.fetchUser(
-        this.state.activeExchangeData.exchangeAddress,
-        web3.account
-      );
+      this.fetchTransactions();
+
+      this.fetchUserPoolShare();
     });
   }
 
@@ -116,10 +129,15 @@ class App extends Component {
       chartData,
       erc20Liquidity,
       ethLiquidity,
-      tokenAddress,
-      recentTransactions
+      tokenAddress
     } = this.state.activeExchangeData;
 
+    // Transactions Store
+    const {
+      state: { transactions }
+    } = this.props.transactionsStore;
+
+    // Pool Store
     const {
       state: { userNumPoolTokens, userPoolPercent }
     } = this.props.poolStore;
@@ -246,11 +264,23 @@ class App extends Component {
                   <Select
                     placeholder="Timeframe"
                     options={timeframeOptions}
+                    defaultValue={timeframeOptions[0]}
                     onChange={select => {
+                      // @NOTE: NEW
+                      // retrigger the fetchTransactions call only when historyDaysToQuery changes
+                      if (this.state.historyDaysToQuery !== select.value) {
+                        this.setState(
+                          {
+                            historyDaysToQuery: select.value
+                          },
+                          () => this.fetchTransactions()
+                        );
+                      }
+
+                      // @NOTE: OLD
                       historyDaysToQuery = select.value;
 
                       // wipes chart and transaction data, will need to work into state
-                      currentExchangeData.recentTransactions = [];
                       currentExchangeData.chartData = [];
 
                       retrieveExchangeHistory(
@@ -299,9 +329,9 @@ class App extends Component {
             </Flex>
             <Divider />
 
-            {recentTransactions && recentTransactions.length > 0 ? (
+            {transactions && transactions.length > 0 ? (
               <TransactionsList
-                transactions={recentTransactions}
+                transactions={transactions}
                 tokenSymbol={symbol}
               />
             ) : (

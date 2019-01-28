@@ -16,6 +16,8 @@ export class PoolContainer extends Container {
 
       const json = await data.json();
 
+      console.log(`fetched ${userAccount}'s pool share for ${exchangeAddress}`);
+
       this.setState({
         userNumPoolTokens: Big(json.userNumPoolTokens).toFixed(4),
         userPoolPercent: (json.userPoolPercent * 100).toFixed(2)
