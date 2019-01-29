@@ -213,20 +213,6 @@ class App extends Component {
                   </Text>
                 }
               />
-              <FourByFour
-                mt={3}
-                topLeft={<Hint color="textLight">Your fees</Hint>}
-                bottomLeft={
-                  <Text fontSize={20} lineHeight={1.4} fontWeight={500}>
-                    0.00 {symbol}
-                  </Text>
-                }
-                bottomRight={
-                  <Text fontSize={20} lineHeight={1.4}>
-                    0.00 ETH
-                  </Text>
-                }
-              />
             </Panel>
           </Box>
 
