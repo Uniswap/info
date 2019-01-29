@@ -25,7 +25,7 @@ export const GlobalStyles = createGlobalStyle`
     /* colors */
     --c-uniswappink: #dc6be5;
     --c-ronchi: #F2C94C;
-    --c-maker: #71c4ad;
+    --c-token: #71c4ad;
     --c-button: #2f80ed;
     --c-connected: #27AE60;
     --c-warning-dim: #FF6871;

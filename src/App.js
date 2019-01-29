@@ -128,6 +128,7 @@ class App extends Component {
       symbol,
       chartData,
       erc20Liquidity,
+      price,
       ethLiquidity,
       tokenAddress
     } = this.state.activeExchangeData;
@@ -198,7 +199,7 @@ class App extends Component {
                 }
               />
             </Panel>
-            <Panel grouped rounded color="white" bg="maker" p={24}>
+            <Panel grouped rounded color="white" bg="token" p={24}>
               <FourByFour
                 topLeft={<Hint color="textLight">Your share</Hint>}
                 bottomLeft={
@@ -229,20 +230,21 @@ class App extends Component {
             </Panel>
           </Box>
 
-          <Panel rounded p={24} bg="white" area="liquidity">
+          <Panel rounded bg="white" area="liquidity">
             <FourByFour
-              topLeft={<Hint>{symbol} Liquidity</Hint>}
+              p={24}
+              topLeft={<Hint color="text">{symbol} Liquidity</Hint>}
               bottomLeft={
                 <Text
                   fontSize={20}
-                  color="maker"
+                  color="token"
                   lineHeight={1.4}
                   fontWeight={500}
                 >
                   {erc20Liquidity || `0.00`}
                 </Text>
               }
-              topRight={<Hint>ETH Liquidity</Hint>}
+              topRight={<Hint color="text">ETH Liquidity</Hint>}
               bottomRight={
                 <Text
                   fontSize={20}
@@ -251,6 +253,33 @@ class App extends Component {
                   fontWeight={500}
                 >
                   {ethLiquidity || `0.00`}
+                </Text>
+              }
+            />
+            <Divider />
+            <FourByFour
+              p={24}
+              topLeft={<Hint color="text">{symbol} / ETH</Hint>}
+              bottomLeft={
+                <Text
+                  color="token"
+                  fontSize={20}
+                  lineHeight={1.4}
+                  fontWeight={500}
+                >
+                  {Number(price).toFixed(2)}
+                </Text>
+              }
+              topRight={<Hint color="text">ETH / {symbol}</Hint>}
+              bottomRight={
+                <Text
+                  color="uniswappink"
+                  fontSize={20}
+                  lineHeight={1.4}
+                  fontWeight={500}
+                >
+                  {/* @TODO: swap to programatic value */}
+                  0.0095
                 </Text>
               }
             />

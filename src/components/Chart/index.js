@@ -85,7 +85,7 @@ const Chart = ({ data, symbol }) => {
             yAxisId={1}
             dataKey="tokenLiquidity"
             name={`${symbol} Liquidity`}
-            stroke="var(--c-maker)"
+            stroke="var(--c-token)"
           />
           <Line
             hide={rate}
@@ -111,9 +111,9 @@ const Chart = ({ data, symbol }) => {
             onClick={() => toggleToken(!token)}
             variant={token ? "outline" : null}
             fontSize={[0, 1]}
-            color={token ? "maker" : "white"}
-            borderColor="maker"
-            bg="maker"
+            color={token ? "token" : "white"}
+            borderColor="token"
+            bg="token"
           >
             {symbol}
           </Button>

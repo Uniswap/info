@@ -86,7 +86,7 @@ export async function retrieveExchangeTicker(
 
     exchangeData["tradeVolume"] = tradeVolume;
     exchangeData["ethLiquidity"] = ethLiquidity;
-
+    exchangeData["price"] = responseData["price"];
     exchangeData["erc20Liquidity"] = erc20Liquidity;
 
     if (priceChangePercent > 0) {
@@ -119,8 +119,8 @@ const buildDirectoryObject = exchange => {
     tokenDecimals,
     tradeVolume: 0,
     percentChange: 0.0,
+    price: 0,
     ethLiquidity: 0,
-    recentTransactions: [],
     chartData: []
   };
 };
@@ -277,8 +277,6 @@ async function processExchangeHistory(
   }
 
   response.data.forEach(transaction => {
-    exchangeData.recentTransactions.push(transaction);
-
     var tx_timestamp = transaction["timestamp"];
     var tx_event = transaction["event"];
 

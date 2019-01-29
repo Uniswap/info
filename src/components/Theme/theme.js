@@ -15,7 +15,7 @@ export default {
     // colors
     uniswappink: "var(--c-uniswappink)",
     ronchi: "var(--c-ronchi)",
-    maker: "var(--c-maker)",
+    token: "var(--c-token)",
     button: "var(--c-button)",
     connected: "var(--c-connected)",
     warningDim: "var(--c-warning-dim)",
