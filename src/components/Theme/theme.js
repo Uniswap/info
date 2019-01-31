@@ -45,6 +45,9 @@ export default {
     fontWeight: 500
   },
   Link: {
-    textDecoration: "none"
+    textDecoration: "none",
+    ":hover": {
+      textDecoration: "underline"
+    }
   }
 };

@@ -15,7 +15,7 @@ const TransactionItem = ({ transaction, tokenSymbol }) => (
       <Link
         fontSize={[12, 16]}
         ml="3"
-        color="button"
+        color="uniswappink"
         external
         href={urls.showTransaction(transaction.tx)}
       >
@@ -33,6 +33,7 @@ const List = styled(Box)`
   height: 300px;
   max-height: 300px;
   overflow-y: scroll;
+  -webkit-overflow-scrolling: touch;
 `;
 
 // @TODO rework into virtualized list

@@ -26,7 +26,7 @@ const Hint = ({ children, ...rest }) => (
 
 const Address = ({ address, ...rest }) => (
   <Link
-    color="button"
+    color="uniswappink"
     href={urls.showAddress(address)}
     external
     style={{ wordBreak: "break-all" }}
