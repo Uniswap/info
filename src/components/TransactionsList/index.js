@@ -15,7 +15,7 @@ const TransactionItem = ({ transaction, tokenSymbol }) => (
       <Link
         fontSize={[12, 16]}
         ml="3"
-        color="uniswappink"
+        color="button"
         external
         href={urls.showTransaction(transaction.tx)}
       >

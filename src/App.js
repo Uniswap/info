@@ -135,6 +135,7 @@ class App extends Component {
       chartData,
       erc20Liquidity,
       price,
+      invPrice,
       ethLiquidity,
       tokenAddress
     } = this.state.activeExchangeData;
@@ -205,7 +206,14 @@ class App extends Component {
                 }
               />
             </Panel>
-            <Panel grouped rounded color="white" bg="token" p={24}>
+            <Panel
+              grouped
+              rounded
+              color="white"
+              bg="token"
+              p={24}
+              className="-transition"
+            >
               <FourByFour
                 topLeft={<Hint color="textLight">Your share</Hint>}
                 bottomLeft={
@@ -230,6 +238,7 @@ class App extends Component {
                 <Text
                   fontSize={20}
                   color="token"
+                  className="-transition"
                   lineHeight={1.4}
                   fontWeight={500}
                 >
@@ -255,6 +264,7 @@ class App extends Component {
               bottomLeft={
                 <Text
                   color="token"
+                  className="-transition"
                   fontSize={20}
                   lineHeight={1.4}
                   fontWeight={500}
@@ -270,8 +280,7 @@ class App extends Component {
                   lineHeight={1.4}
                   fontWeight={500}
                 >
-                  {/* @TODO: swap to programatic value */}
-                  0.0095
+                  {Number(invPrice).toFixed(4)}
                 </Text>
               }
             />

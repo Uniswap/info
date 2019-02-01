@@ -50,6 +50,12 @@ export const GlobalStyles = createGlobalStyle`
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
+
+  .-transition {
+    transition-property: background-color, color;
+    transition-timing-function: ease-in;
+    transition-duration: .5s;
+  }
 `;
 
 export const Theme = props => (

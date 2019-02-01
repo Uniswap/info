@@ -72,7 +72,6 @@ export async function retrieveExchangeTicker(
     // update the values from the API response
     var responseData = response.data;
 
-    // TODO convert value to eth using helper method?
     var tradeVolume = Big(responseData["tradeVolume"]).toFixed(4);
     var ethLiquidity = Big(responseData["ethLiquidity"]).toFixed(4);
 
@@ -87,6 +86,7 @@ export async function retrieveExchangeTicker(
     exchangeData["tradeVolume"] = tradeVolume;
     exchangeData["ethLiquidity"] = ethLiquidity;
     exchangeData["price"] = responseData["price"];
+    exchangeData["invPrice"] = responseData["invPrice"];
     exchangeData["erc20Liquidity"] = erc20Liquidity;
 
     if (priceChangePercent > 0) {
@@ -127,6 +127,7 @@ const buildDirectoryObject = exchange => {
     percentChange: 0.0,
     theme,
     price: 0,
+    invPrice: 0,
     ethLiquidity: 0,
     chartData: []
   };

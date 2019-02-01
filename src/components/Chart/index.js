@@ -93,7 +93,7 @@ const Chart = ({ data, symbol }) => {
             name="Rate"
             yAxisId={0}
             dataKey="rate"
-            stroke="var(--c-ronchi)"
+            stroke="var(--c-button)"
           />
           <Line
             hide={eth}
@@ -131,9 +131,9 @@ const Chart = ({ data, symbol }) => {
             onClick={() => toggleRate(!rate)}
             variant={rate ? "outline" : null}
             fontSize={[0, 1]}
-            color={rate ? "ronchi" : "text"}
-            borderColor="ronchi"
-            bg="ronchi"
+            color={rate ? "button" : "white"}
+            borderColor="button"
+            bg="button"
           >
             Rate
           </Button>
