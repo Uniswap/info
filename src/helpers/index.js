@@ -13,6 +13,25 @@ export const tokenOptions = Object.keys(Uniswap.tokens).map(key => ({
   label: key
 }));
 
+export const isWeb3Available = async () => {
+  /* eslint-disable */
+  if (typeof window.ethereum !== "undefined") {
+    window.web3 = new Web3(ethereum);
+    try {
+      await ethereum.enable();
+      return true;
+    } catch (error) {
+      return false;
+    }
+  } else if (typeof window.web3 !== "undefined") {
+    window.web3 = new Web3(web3.currentProvider);
+    return true;
+  } else {
+    return false;
+  }
+  /* eslint-enable */
+};
+
 export const toK = num => {
   if (num > 999999) {
     return `${num / 1000000}M`;

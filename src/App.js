@@ -16,28 +16,18 @@ import { Header, Divider, Hint, Address } from "./components";
 import {
   retrieveExchangeTicker,
   retrieveExchangeHistory,
-  retrieveExchangeDirectory
+  retrieveExchangeDirectory,
+  isWeb3Available
 } from "./helpers/";
-
-import { useWeb3Context } from "web3-react/hooks";
 
 let historyDaysToQuery = 7;
 let currentExchangeData;
-let web3 = null;
 
 const timeframeOptions = [
   { value: 7, label: "1 week" },
   { value: 30, label: "1 month" },
   { value: 365, label: "1 year" }
 ];
-
-const Web3Setter = props => {
-  if (web3 === null) {
-    web3 = useWeb3Context();
-  }
-
-  return <div className="dlfkjd" />;
-};
 
 class App extends Component {
   state = {
@@ -62,7 +52,7 @@ class App extends Component {
   fetchUserPoolShare = () => {
     this.props.poolStore.fetchUser(
       this.state.activeExchangeData.exchangeAddress,
-      web3.account
+      web3.eth.accounts[0] // eslint-disable-line
     );
   };
 
@@ -87,7 +77,13 @@ class App extends Component {
 
       this.fetchTransactions();
 
-      this.fetchUserPoolShare();
+      (async () => {
+        try {
+          await isWeb3Available();
+
+          this.fetchUserPoolShare();
+        } catch {}
+      })();
     });
   }
 
@@ -155,11 +151,7 @@ class App extends Component {
     if (this.state.exchangeOptions.length === 0)
       return (
         <Wrapper>
-          {/* @TODO: find better way to handle this */}
-          <>
-            <Loader />
-            <Web3Setter />
-          </>
+          <Loader />
         </Wrapper>
       );
 
