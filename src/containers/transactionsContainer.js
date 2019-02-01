@@ -8,6 +8,8 @@ export class TransactionsContainer extends Container {
     transactions: []
   };
 
+  resetTransactions = () => this.setState({ transactions: [] });
+
   async fetchTransactions(exchangeAddress, daysToQuery) {
     try {
       // current time

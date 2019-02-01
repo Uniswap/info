@@ -50,6 +50,8 @@ class App extends Component {
 
   // Fetch Exchange's Transactions
   fetchTransactions = () => {
+    this.props.transactionsStore.resetTransactions();
+
     this.props.transactionsStore.fetchTransactions(
       this.state.activeExchangeData.exchangeAddress,
       this.state.historyDaysToQuery
