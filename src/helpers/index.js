@@ -342,7 +342,7 @@ async function processExchangeHistory(
 
     var marginalRate = new BigNumber(0);
 
-    if (bucket.curEthLiquidity.toFixed() !== 0) {
+    if (bucket.curEthLiquidity.toFixed() != 0) {
       marginalRate = bucket.curTokenLiquidity.dividedBy(bucket.curEthLiquidity);
     }
 
