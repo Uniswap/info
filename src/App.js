@@ -98,6 +98,12 @@ class App extends Component {
     // make a var hold the data from exhange in state
     currentExchangeData = this.getExchangeData(address);
 
+    // update theme color from exchnage
+    document.documentElement.style.setProperty(
+      "--c-token",
+      currentExchangeData.theme || "#333333"
+    );
+
     // refresh the UI
     this.setState({});
 

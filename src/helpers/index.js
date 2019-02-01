@@ -110,7 +110,13 @@ const buildDirectoryLabel = exchange => {
 };
 
 const buildDirectoryObject = exchange => {
-  const { symbol, exchangeAddress, tokenAddress, tokenDecimals } = exchange;
+  const {
+    symbol,
+    exchangeAddress,
+    tokenAddress,
+    tokenDecimals,
+    theme
+  } = exchange;
 
   return {
     symbol,
@@ -119,6 +125,7 @@ const buildDirectoryObject = exchange => {
     tokenDecimals,
     tradeVolume: 0,
     percentChange: 0.0,
+    theme,
     price: 0,
     ethLiquidity: 0,
     chartData: []
