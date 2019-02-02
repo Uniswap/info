@@ -72,8 +72,6 @@ class App extends Component {
   };
 
   async componentDidMount() {
-    console.log("props: ", this.props);
-
     try {
       // gets directory of exchanges
       await this.props.directoryStore.fetchDirectory();

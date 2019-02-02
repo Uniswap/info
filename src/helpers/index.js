@@ -73,55 +73,6 @@ export const formatTime = unix => {
   }
 };
 
-export async function retrieveExchangeTicker(
-  exchangeData,
-  tickerRetrievedCallback
-) {
-  var url = `${BASE_URL}v1/ticker?exchangeAddress=${
-    exchangeData.exchangeAddress
-  }`;
-
-  console.log(
-    `retrieving ticker for ${exchangeData.exchangeAddress} ...(${url})`
-  );
-
-  axios({
-    method: "get",
-    url: url
-  }).then(response => {
-    console.log(`received ticker for ${exchangeData.exchangeAddress}`);
-
-    // update the values from the API response
-    var responseData = response.data;
-
-    var tradeVolume = Big(responseData["tradeVolume"]).toFixed(4);
-    var ethLiquidity = Big(responseData["ethLiquidity"]).toFixed(4);
-
-    var priceChangePercent = (responseData["priceChangePercent"] * 100).toFixed(
-      2
-    );
-
-    var erc20Liquidity = (
-      responseData["erc20Liquidity"] / Math.pow(10, exchangeData.tokenDecimals)
-    ).toFixed(4);
-
-    exchangeData["tradeVolume"] = tradeVolume;
-    exchangeData["ethLiquidity"] = ethLiquidity;
-    exchangeData["price"] = responseData["price"];
-    exchangeData["invPrice"] = responseData["invPrice"];
-    exchangeData["erc20Liquidity"] = erc20Liquidity;
-
-    if (priceChangePercent > 0) {
-      exchangeData["percentChange"] = "+";
-    } else {
-      exchangeData["percentChange"] = "";
-    }
-    exchangeData["percentChange"] += priceChangePercent;
-
-    tickerRetrievedCallback();
-  });
-}
-
 // load exchange history for X days back
 export async function retrieveExchangeHistory(
   exchangeData,
@@ -317,7 +268,7 @@ async function processExchangeHistory(
 
     var marginalRate = new BigNumber(0);
 
-    if (bucket.curEthLiquidity.toFixed() != 0) {
+    if (bucket.curEthLiquidity.toFixed() !== 0) {
       marginalRate = bucket.curTokenLiquidity.dividedBy(bucket.curEthLiquidity);
     }
 
