@@ -28,12 +28,16 @@ class App extends Component {
 
   // Fetch Exchange's Transactions
   fetchTransactions = () => {
-    this.props.transactionsStore.resetTransactions();
-
     this.props.transactionsStore.fetchTransactions(
       this.props.directoryStore.state.activeExchange.exchangeAddress,
       this.state.historyDaysToQuery
     );
+  };
+
+  clearCurrentExchange = () => {
+    // TODO this.props.chartStore.resetChart();
+    this.props.transactionsStore.resetTransactions();
+    this.props.poolStore.resetUserPool();
   };
 
   // Fetch User Pool Information
@@ -41,7 +45,7 @@ class App extends Component {
     try {
       await isWeb3Available();
 
-      this.props.poolStore.fetchUser(
+      this.props.poolStore.fetchUserPool(
         this.props.directoryStore.state.activeExchange.exchangeAddress,
         web3.eth.accounts[0] // eslint-disable-line
       );
@@ -51,6 +55,9 @@ class App extends Component {
   // switch active exchane
   switchActiveExchange = async address => {
     try {
+      // prep, clear current exchange's data
+      await this.clearCurrentExchange();
+
       // first, set the active exchange
       await this.props.directoryStore.setActiveExchange(address);
 
@@ -140,6 +147,7 @@ class App extends Component {
 
           <Select
             options={directory}
+            defaultValue={directory[0]}
             onChange={select => {
               if (exchangeAddress !== select.value)
                 this.switchActiveExchange(select.value);
