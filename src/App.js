@@ -27,12 +27,11 @@ class App extends Component {
   };
 
   // Fetch Exchange's Transactions
-  fetchTransactions = () => {
+  fetchTransactions = () =>
     this.props.transactionsStore.fetchTransactions(
       this.props.directoryStore.state.activeExchange.exchangeAddress,
       this.state.historyDaysToQuery
     );
-  };
 
   clearCurrentExchange = () => {
     // TODO this.props.chartStore.resetChart();
@@ -81,8 +80,13 @@ class App extends Component {
   };
 
   // switch exchange history & transaction timeline
-  switchExchangeTimeframe = () => {
+  switchExchangeTimeframe = async () => {
+    await this.props.transactionsStore.resetTransactions();
+    // TODO await this.props.chartStore.resetChart();
+
     this.fetchTransactions();
+
+    // TODO this.fetchChart();
   };
 
   async componentDidMount() {
@@ -269,21 +273,7 @@ class App extends Component {
                           {
                             historyDaysToQuery: select.value
                           },
-                          () => {
-                            this.fetchTransactions();
-
-                            // // CHART
-                            // // wipes chart data, will need to work into state
-                            // currentExchangeData.chartData = [];
-
-                            // retrieveExchangeHistory(
-                            //   currentExchangeData,
-                            //   this.state.historyDaysToQuery,
-                            //   () => {
-                            //     this.setState({});
-                            //   }
-                            // );
-                          }
+                          () => this.switchExchangeTimeframe()
                         );
                     }}
                   />
