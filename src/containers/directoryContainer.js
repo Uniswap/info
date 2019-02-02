@@ -2,6 +2,110 @@ import { Container } from "unstated";
 
 import { BASE_URL, Big } from "../helpers";
 
+export class DirectoryContainer extends Container {
+  state = {
+    directory: [],
+    exchanges: [],
+    defaultExchangeAddress: "",
+    activeExchange: {}
+  };
+
+  setActiveExchange = address =>
+    this.setState({ activeExchange: this.state.exchanges[address] });
+
+  async fetchDirectory() {
+    try {
+      const data = await fetch(`${BASE_URL}v1/directory`);
+
+      if (!data.ok) {
+        throw Error(data.status);
+      }
+
+      const json = await data.json();
+
+      let directoryObjects = {};
+      json.forEach(exchange => {
+        directoryObjects[exchange.exchangeAddress] = buildDirectoryObject(
+          exchange
+        );
+      });
+
+      console.log(`fetched ${json.length} exchanges`);
+
+      await this.setState({
+        directory: json.map(exchange => buildDirectoryLabel(exchange)),
+        exchanges: directoryObjects
+      });
+
+      // set default exchange address
+      await this.setState({
+        defaultExchangeAddress: this.state.directory[0].value
+      });
+    } catch (err) {
+      console.log("error: ", err);
+    }
+  }
+
+  // fetch exchange information via address
+  async fetchTicker(address) {
+    try {
+      const data = await fetch(
+        `${BASE_URL}v1/ticker?exchangeAddress=${address}`
+      );
+
+      if (!data.ok) {
+        throw Error(data.status);
+      }
+
+      const json = await data.json();
+
+      const {
+        tradeVolume,
+        ethLiquidity,
+        priceChangePercent,
+        erc20Liquidity,
+        price,
+        invPrice
+      } = json;
+
+      let percentChange = "";
+      const adjustedPriceChangePercent = (priceChangePercent * 100).toFixed(2);
+
+      adjustedPriceChangePercent > 0
+        ? (percentChange = "+")
+        : (percentChange = "");
+
+      percentChange += adjustedPriceChangePercent;
+
+      console.log(`fetched ticker for ${address}`);
+
+      // update "exchanges" with new information
+      await this.setState(prevState => ({
+        exchanges: {
+          ...prevState.exchanges,
+          [address]: {
+            ...prevState.exchanges[address],
+            price,
+            invPrice,
+            percentChange,
+            tradeVolume: Big(tradeVolume).toFixed(4),
+            ethLiquidity: Big(ethLiquidity).toFixed(4),
+            erc20Liquidity: (
+              erc20Liquidity /
+              Math.pow(10, this.state.exchanges[address].tokenDecimals)
+            ).toFixed(4)
+          }
+        }
+      }));
+
+      // update "activeExchange" from now updated "exchanges"
+      await this.setActiveExchange(address);
+    } catch (err) {
+      console.log("error: ", err);
+    }
+  }
+}
+
 const buildDirectoryLabel = exchange => {
   const { symbol, exchangeAddress } = exchange;
 
@@ -37,89 +141,3 @@ const buildDirectoryObject = exchange => {
     erc20Liquidity: 0
   };
 };
-
-export class DirectoryContainer extends Container {
-  state = {
-    directory: [],
-    exchanges: []
-  };
-
-  async fetchDirectory() {
-    try {
-      const data = await fetch(`${BASE_URL}v1/directory`);
-
-      if (!data.ok) {
-        throw Error(data.status);
-      }
-
-      const json = await data.json();
-
-      let directoryObjects = {};
-      json.forEach(exchange => {
-        directoryObjects[exchange.exchangeAddress] = buildDirectoryObject(
-          exchange
-        );
-      });
-
-      console.log(`fetched ${json.length} exchanges`);
-
-      this.setState({
-        directory: json.map(exchange => buildDirectoryLabel(exchange)),
-        exchanges: directoryObjects
-      });
-    } catch (err) {
-      console.log("error: ", err);
-    }
-  }
-
-  async fetchTicker(exchangeAddress, decimals) {
-    try {
-      const data = await fetch(
-        `${BASE_URL}v1/ticker?exchangeAddress=${exchangeAddress}`
-      );
-
-      if (!data.ok) {
-        throw Error(data.status);
-      }
-
-      const json = await data.json();
-
-      const {
-        tradeVolume,
-        ethLiquidity,
-        priceChangePercent,
-        erc20Liquidity,
-        price,
-        invPrice
-      } = json;
-
-      let percentChange = "";
-      const adjustedPriceChangePercent = (priceChangePercent * 100).toFixed(2);
-
-      adjustedPriceChangePercent > 0
-        ? (percentChange = "+")
-        : (percentChange = "");
-
-      percentChange += adjustedPriceChangePercent;
-
-      console.log(`fetched ticker for ${exchangeAddress}`);
-
-      this.setState(prevState => ({
-        exchanges: {
-          ...prevState.exchanges,
-          [exchangeAddress]: {
-            ...prevState.exchanges[exchangeAddress],
-            price,
-            invPrice,
-            percentChange,
-            tradeVolume: Big(tradeVolume).toFixed(4),
-            ethLiquidity: Big(ethLiquidity).toFixed(4),
-            erc20Liquidity: (erc20Liquidity / Math.pow(10, decimals)).toFixed(4)
-          }
-        }
-      }));
-    } catch (err) {
-      console.log("error: ", err);
-    }
-  }
-}
