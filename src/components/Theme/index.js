@@ -53,7 +53,7 @@ export const GlobalStyles = createGlobalStyle`
 
   .-transition {
     transition-property: background-color, color;
-    transition-timing-function: ease-in;
+    transition-timing-function: ease;
     transition-duration: .5s;
   }
 `;

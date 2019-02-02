@@ -14,6 +14,10 @@ export class PoolContainer extends Container {
         `${BASE_URL}v1/user?exchangeAddress=${exchangeAddress}&userAddress=${userAccount}`
       );
 
+      if (!data.ok) {
+        throw Error(data.status);
+      }
+
       const json = await data.json();
 
       console.log(`fetched ${userAccount}'s pool share for ${exchangeAddress}`);

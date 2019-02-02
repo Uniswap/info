@@ -9,7 +9,7 @@ import { urls } from "../helpers";
 
 const Header = styled(Panel)`
   display: grid;
-  grid-template-columns: 1fr minmax(224px, .25fr);
+  grid-template-columns: 1fr minmax(224px, 0.25fr);
   align-items: center;
 `;
 

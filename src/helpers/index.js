@@ -42,6 +42,9 @@ export const toK = num => {
   }
 };
 
+export const setThemeColor = theme =>
+  document.documentElement.style.setProperty("--c-token", theme || "#333333");
+
 export const Big = number => new BigNumber(number).dividedBy(1e18);
 
 export const urls = {
@@ -116,61 +119,6 @@ export async function retrieveExchangeTicker(
     exchangeData["percentChange"] += priceChangePercent;
 
     tickerRetrievedCallback();
-  });
-}
-
-const buildDirectoryLabel = exchange => {
-  const { symbol, exchangeAddress } = exchange;
-
-  return {
-    label: `${symbol} - ${exchangeAddress}`,
-    value: exchangeAddress
-  };
-};
-
-const buildDirectoryObject = exchange => {
-  const {
-    symbol,
-    exchangeAddress,
-    tokenAddress,
-    tokenDecimals,
-    theme
-  } = exchange;
-
-  return {
-    symbol,
-    exchangeAddress,
-    tokenAddress,
-    tokenDecimals,
-    tradeVolume: 0,
-    percentChange: 0.0,
-    theme,
-    price: 0,
-    invPrice: 0,
-    ethLiquidity: 0,
-    chartData: []
-  };
-};
-
-export async function retrieveExchangeDirectory(directoryRetrievedCallback) {
-  // Load exchange list
-  axios({
-    method: "get",
-    url: `${BASE_URL}v1/directory`
-  }).then(response => {
-    const directoryLabels = response.data.map(exchange =>
-      buildDirectoryLabel(exchange)
-    );
-
-    let directoryObjects = {};
-    response.data.forEach(exchange => {
-      directoryObjects[exchange.exchangeAddress] = buildDirectoryObject(
-        exchange
-      );
-    });
-
-    // pass directoryLabels and directoryObjects arrays and objects to the callback
-    directoryRetrievedCallback(directoryLabels, directoryObjects);
   });
 }
 
