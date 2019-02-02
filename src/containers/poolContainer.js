@@ -4,11 +4,17 @@ import { BASE_URL, Big } from "../helpers";
 
 export class PoolContainer extends Container {
   state = {
-    userNumPoolTokens: 0,
-    userPoolPercent: 0
+    userNumPoolTokens: (0).toFixed(4),
+    userPoolPercent: (0).toFixed(2)
   };
 
-  async fetchUser(exchangeAddress, userAccount) {
+  resetUserPool = () =>
+    this.setState({
+      userNumPoolTokens: (0).toFixed(4),
+      userPoolPercent: (0).toFixed(2)
+    });
+
+  async fetchUserPool(exchangeAddress, userAccount) {
     try {
       const data = await fetch(
         `${BASE_URL}v1/user?exchangeAddress=${exchangeAddress}&userAddress=${userAccount}`
