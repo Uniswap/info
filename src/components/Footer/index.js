@@ -8,16 +8,16 @@ const links = [
   { url: "https://uniswap.io", text: "Uniswap" }
 ];
 
-const FooterLink = props => (
+const FooterLink = ({ children, ...rest }) => (
   <Link
-    {...props}
     external
-    color="text"
-    style={{ fontWeight: 500 }}
+    color="uniswappink"
+    fontWeight={500}
     fontSize={12}
     mr={"8px"}
+    {...rest}
   >
-    {props.children}
+    {children}
   </Link>
 );
 
