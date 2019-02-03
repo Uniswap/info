@@ -60,7 +60,8 @@ export const customStyles = {
   menu: styles => ({
     ...styles,
     borderRadius: 16,
-    borderColor: "var(--c-zircon)",
+    boxShadow:
+      "0 4px 8px 0 rgba(47, 128, 237, 0.1), 0 0 0 0.5px var(--c-zircon)",
     overflow: "hidden"
   }),
   menuList: styles => ({
