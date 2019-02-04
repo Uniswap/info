@@ -546,6 +546,9 @@ const retrieveData = (tokenSymbol, exchangeAddress) => {
         // calculate the token fee that liquidity providers will receive
         eventObj.liquidtyProviderFee =
           (tokens * providerFeePercent).toFixed(4) + " " + tokenSymbol;
+      } else if (eventType === "Approval") {
+      	// ignore Approval events
+      	return;
       } else if (eventType === "Transfer") {
         // Track share tokens
         let sender = e.returnValues[0];
