@@ -419,7 +419,7 @@ const TokenChart = props => {
   );
 };
 
-const retrieveData = (tokenSymbol, exchangeAddress) => {
+const retrieveData = async (tokenSymbol, exchangeAddress) => {
   if (didRequestData) {
     return;
   }
@@ -437,327 +437,354 @@ const retrieveData = (tokenSymbol, exchangeAddress) => {
 
   didRequestData = true;
 
-  console.log("Retrieving data for exchange=" + exchangeAddress);
-
   myAddress = web3.account;
 
-  let options = {
-    address: exchangeAddress,
-    fromBlock: Uniswap.originBlock,
-    toBlock: "latest"
+  var latestBlockObj = await web3.web3js.eth.getBlock('latest');
+
+  var latestBlock = latestBlockObj["number"];
+
+  // paginate through the logs to load all the events
+  var events = [];
+
+  var blockPageAmount = 200000;
+
+  var fromBlock = Uniswap.originBlock;
+  var toBlock = fromBlock + blockPageAmount;
+
+  var options = {
+    address: exchangeAddress    
   };
 
-  // topics
-  // 0xcd60aa75dea3072fbc07ae6d7d856b5dc5f4eee88854f5b4abf7b680ef8bc50f = TokenPurchase
-  // 0x06239653922ac7bea6aa2b19dc486b9361821d37712eb796adfd38d81de278ca = AddLiquidity
-  // 0x7f4091b46c33e918a0f3aa42307641d17bb67029427a5369e54b353984238705 = EthPurchase
-  // 0x0fbf06c058b90cb038a618f8c2acbf6145f8b3570fd1fa56abb8f0f3f05b36e8 = RemoveLiquidity
+  while (true) {
+    options["fromBlock"] = fromBlock;
+    options["toBlock"] = toBlock;
 
-  exchangeContract.getPastEvents("allEvents", options).then(events => {
-    // only continue if the current exchange is the original symbol we requested
+    console.log("Retrieving data for exchange " + exchangeAddress + " from block " + fromBlock + " to " + toBlock);  
+
+    await exchangeContract.getPastEvents("allEvents", options).then(responseEvents => {
+      responseEvents.forEach(event => {
+        events.push(event);
+      });
+    });
+
+    // if we've reached the end of the pages
+    if (toBlock >= latestBlock) {
+      break;
+    }
+
+    // if the symbol has changed while we were loading
     if (curSymbol !== tokenSymbol) {
+      break;
+    }
+
+    fromBlock = toBlock + 1;
+    toBlock = fromBlock + blockPageAmount;
+    toBlock = Math.min(toBlock, latestBlock);
+  }
+
+  // only continue if the current exchange is the original symbol we requested
+  if (curSymbol !== tokenSymbol) {
+    return;
+  }
+
+  console.log(events);
+
+  let eventListTemp = [];
+
+  let curEthTotal = 0;
+  let curTokenTotal = 0;
+
+  curPoolShare = 0.0;
+
+  let curPoolShareDisplay = 0.0;
+
+  let numMyShareTokens = new BigNumber(0);
+  let numMintedShareTokens = new BigNumber(0);
+
+  let numMyDepositedEth = 0.0;
+  let numMyDepositedTokens = 0.0;
+
+  let lastEventObj;
+
+  events.forEach(e => {
+    let eventType = e.event;
+
+    let eventObj = {
+      type: eventType,
+
+      curPoolShare: 0.0,
+
+      numEth: 0,
+      numTokens: 0,
+
+      id: e.id,
+
+      tx: e.transactionHash,
+      provider: e.returnValues.provider,
+      block: e.blockNumber,
+
+      liquidtyProviderFee: "-",
+
+      volume: 0 // how much swapping volume was in this event (set by purchase events only)
+    };
+
+    let eth, tokens;
+
+    if (eventType === "AddLiquidity") {
+      eth = e.returnValues[1] / 1e18;
+      tokens = e.returnValues.token_amount / tokenDecimals;
+
+      eventObj.type = "Add Liquidty";
+
+      if (eventObj.provider.toUpperCase() === myAddress.toUpperCase()) {
+        numMyDepositedEth += eth;
+        numMyDepositedTokens += tokens;
+      }
+    } else if (eventType === "RemoveLiquidity") {
+      eth = -e.returnValues.eth_amount / 1e18;
+      tokens = -e.returnValues.token_amount / tokenDecimals;
+
+      eventObj.type = "Remove Liquidty";
+
+      if (eventObj.provider.toUpperCase() === myAddress.toUpperCase()) {
+        numMyDepositedEth += eth;
+        numMyDepositedTokens += tokens;
+      }
+    } else if (eventType === "TokenPurchase") {
+      eth = e.returnValues.eth_sold / 1e18;
+      tokens = -e.returnValues.tokens_bought / tokenDecimals;
+
+      eventObj.provider = e.returnValues.buyer;
+      eventObj.type = "Token Purchase";
+
+      eventObj.volume = eth;
+
+      // calculate the eth fee that liquidity providers will receive
+      eventObj.liquidtyProviderFee =
+        (eth * providerFeePercent).toFixed(4) + " ETH";
+    } else if (eventType === "EthPurchase") {
+      eth = -e.returnValues.eth_bought / 1e18;
+      tokens = e.returnValues.tokens_sold / tokenDecimals;
+
+      eventObj.provider = e.returnValues.buyer;
+      eventObj.type = "Eth Purchase";
+
+      eventObj.volume = -eth;
+
+      // calculate the token fee that liquidity providers will receive
+      eventObj.liquidtyProviderFee =
+        (tokens * providerFeePercent).toFixed(4) + " " + tokenSymbol;
+    } else if (eventType === "Approval") {
+    	// ignore Approval events
+    	return;
+    } else if (eventType === "Transfer") {
+      // Track share tokens
+      let sender = e.returnValues[0];
+      let receiver = e.returnValues[1];
+      let numShareTokens = new BigNumber(e.returnValues[2]); // / 1e18;
+
+      // check if this was mint or burn share tokens
+      if (receiver === "0x0000000000000000000000000000000000000000") {
+        // burn share tokens
+        numMintedShareTokens = numMintedShareTokens.minus(numShareTokens);
+
+        // check if the sender was user
+        if (sender.toUpperCase() === myAddress.toUpperCase()) {
+          numMyShareTokens = numMyShareTokens.minus(numShareTokens);
+        }
+      } else {
+        // mint share tokens
+        numMintedShareTokens = numMintedShareTokens.plus(numShareTokens);
+
+        if (receiver.toUpperCase() === myAddress.toUpperCase()) {
+          numMyShareTokens = numMyShareTokens.plus(numShareTokens);
+        }
+      }
+
+      // update current pool share. take users's share tokens and divide by total minted share tokens
+      curPoolShare = new BigNumber(
+        numMyShareTokens.dividedBy(numMintedShareTokens)
+      );
+
+      if (isNaN(curPoolShare) || curPoolShare.toFixed(4) === 0) {
+        curPoolShare = 0;
+        numMyDepositedEth = 0;
+        numMyDepositedTokens = 0;
+      }
+
+      // get a percentage from the pool share
+      curPoolShareDisplay = (curPoolShare * 100).toFixed(2);
+
+      // if the user's pool share is 0, don't show a number
+      if (Number(curPoolShareDisplay) === 0.0) {
+        curPoolShareDisplay = "-";
+      } else {
+        curPoolShareDisplay = curPoolShareDisplay + "%"; // add a percentage symbol
+      }
+
+      // set it on the last event object before this transfer
+      lastEventObj.curPoolShare = curPoolShareDisplay;
+
       return;
     }
 
-    console.log(events);
+    // save a reference to the last event object (transfer events follow add/remove liquidity)
+    lastEventObj = eventObj;
 
-    let eventListTemp = [];
+    // update the total pool eth total
+    curEthTotal += eth;
 
-    let curEthTotal = 0;
-    let curTokenTotal = 0;
+    // update the total pool token total
+    curTokenTotal += tokens;
 
-    curPoolShare = 0.0;
+    // set the number of eth and tokens for this event
+    eventObj.numEth = eth;
+    eventObj.numTokens = tokens;
 
-    let curPoolShareDisplay = 0.0;
+    // set the user's current pool share %
+    eventObj.curPoolShare = curPoolShareDisplay;
 
-    let numMyShareTokens = new BigNumber(0);
-    let numMintedShareTokens = new BigNumber(0);
+    // push this event object onto the array
+    eventListTemp.push(eventObj);
+  });
 
-    let numMyDepositedEth = 0.0;
-    let numMyDepositedTokens = 0.0;
+  // reverse the list so the most recent events are first
+  eventListTemp.reverse();
 
-    let lastEventObj;
+  // calculate how much fees we've accrued by determining how much eth/tokens we own minus what we've deposited/withdrawn
+  let myEstimatedAccruedEthFees = (
+    curPoolShare * curEthTotal -
+    numMyDepositedEth
+  ).toFixed(4);
+  let myEstimatedAccruedTokenFees = (
+    curPoolShare * curTokenTotal -
+    numMyDepositedTokens
+  ).toFixed(4);
 
-    events.forEach(e => {
-      let eventType = e.event;
+  if (Number(myEstimatedAccruedEthFees) === 0) {
+    myEstimatedAccruedEthFees = "";
+  } else {
+    myEstimatedAccruedEthFees = myEstimatedAccruedEthFees + " ETH";
+  }
 
-      let eventObj = {
-        type: eventType,
+  if (Number(myEstimatedAccruedTokenFees) === 0) {
+    myEstimatedAccruedTokenFees = "";
+  } else {
+    if (myEstimatedAccruedEthFees.length === 0) {
+      myEstimatedAccruedTokenFees =
+        myEstimatedAccruedTokenFees + " " + tokenSymbol;
+    } else {
+      myEstimatedAccruedTokenFees =
+        ", " + myEstimatedAccruedTokenFees + " " + tokenSymbol;
+    }
+  }
+  didReceiveData = true;
 
-        curPoolShare: 0.0,
+  eventList = eventListTemp;
 
-        numEth: 0,
-        numTokens: 0,
+  curEthPoolTotal = curEthTotal.toFixed(4);
+  curTokenPoolTotal = curTokenTotal.toFixed(4);
 
-        id: e.id,
+  curPoolShare = curPoolShareDisplay;
 
-        tx: e.transactionHash,
-        provider: e.returnValues.provider,
-        block: e.blockNumber,
+  myCollectedEthFees = myEstimatedAccruedEthFees;
+  myCollectedTokenFees = myEstimatedAccruedTokenFees;
 
-        liquidtyProviderFee: "-",
+  // update our state
+  app.setState({});
 
-        volume: 0 // how much swapping volume was in this event (set by purchase events only)
-      };
+  if (eventListTemp.length > 0) {
+    var recentEvent = eventListTemp[0];
+    var oldestEvent = eventListTemp[eventListTemp.length - 1];
 
-      let eth, tokens;
+    var dateKeyToVolumeMap = {};
 
-      if (eventType === "AddLiquidity") {
-        eth = e.returnValues[1] / 1e18;
-        tokens = e.returnValues.token_amount / tokenDecimals;
+    var dateKeyToEthLiquidityMap = {};
+    var dateKeyToTokenLiquidityMap = {};
 
-        eventObj.type = "Add Liquidty";
+    // get the timestamp for the most recent block
+    web3.web3js.eth.getBlock(recentEvent.block).then(function(recentBlock) {
+      var mostRecentBlockTimestamp = recentBlock.timestamp;
+      var mostRecentBlockNum = recentBlock.number;
 
-        if (eventObj.provider.toUpperCase() === myAddress.toUpperCase()) {
-          numMyDepositedEth += eth;
-          numMyDepositedTokens += tokens;
+      // get the timestamp for the oldest block
+      web3.web3js.eth.getBlock(oldestEvent.block).then(function(oldestBlock) {
+        // only continue if the current exchange is the original symbol we requested
+        if (curSymbol !== tokenSymbol) {
+          return;
         }
-      } else if (eventType === "RemoveLiquidity") {
-        eth = -e.returnValues.eth_amount / 1e18;
-        tokens = -e.returnValues.token_amount / tokenDecimals;
 
-        eventObj.type = "Remove Liquidty";
+        var oldestBlockTimestamp = oldestBlock.timestamp;
+        var oldestBlockNum = oldestBlock.number;
 
-        if (eventObj.provider.toUpperCase() === myAddress.toUpperCase()) {
-          numMyDepositedEth += eth;
-          numMyDepositedTokens += tokens;
-        }
-      } else if (eventType === "TokenPurchase") {
-        eth = e.returnValues.eth_sold / 1e18;
-        tokens = -e.returnValues.tokens_bought / tokenDecimals;
+        var blockBounds = mostRecentBlockNum - oldestBlockNum;
+        var timestampBoundsInSeconds =
+          mostRecentBlockTimestamp - oldestBlockTimestamp;
 
-        eventObj.provider = e.returnValues.buyer;
-        eventObj.type = "Token Purchase";
+        // now we have our bounds. determine a timestamp for each of the block numbers in the event list
+        eventList.forEach(e => {
+          var blockRatio =
+            blockBounds > 0 ? (e.block - oldestBlockNum) / blockBounds : 1;
 
-        eventObj.volume = eth;
+          var blockTimestampInSeconds =
+            blockRatio * timestampBoundsInSeconds + oldestBlockTimestamp;
 
-        // calculate the eth fee that liquidity providers will receive
-        eventObj.liquidtyProviderFee =
-          (eth * providerFeePercent).toFixed(4) + " ETH";
-      } else if (eventType === "EthPurchase") {
-        eth = -e.returnValues.eth_bought / 1e18;
-        tokens = e.returnValues.tokens_sold / tokenDecimals;
+          // calculate which date time this block number falls under
+          var blockDay = new Date(blockTimestampInSeconds * 1000);
 
-        eventObj.provider = e.returnValues.buyer;
-        eventObj.type = "Eth Purchase";
+          var dateKey =
+            blockDay.getMonth() +
+            "-" +
+            blockDay.getDate() +
+            "-" +
+            blockDay.getFullYear();
 
-        eventObj.volume = -eth;
+          // console.log(e.block + "  " + oldestBlockNum  + "  " + dateKey + "  " + e.volume);//+ "  "  + mostRecentBlockNum + "   " + blockRatio + "  " + dateKey);
 
-        // calculate the token fee that liquidity providers will receive
-        eventObj.liquidtyProviderFee =
-          (tokens * providerFeePercent).toFixed(4) + " " + tokenSymbol;
-      } else if (eventType === "Approval") {
-      	// ignore Approval events
-      	return;
-      } else if (eventType === "Transfer") {
-        // Track share tokens
-        let sender = e.returnValues[0];
-        let receiver = e.returnValues[1];
-        let numShareTokens = new BigNumber(e.returnValues[2]); // / 1e18;
-
-        // check if this was mint or burn share tokens
-        if (receiver === "0x0000000000000000000000000000000000000000") {
-          // burn share tokens
-          numMintedShareTokens = numMintedShareTokens.minus(numShareTokens);
-
-          // check if the sender was user
-          if (sender.toUpperCase() === myAddress.toUpperCase()) {
-            numMyShareTokens = numMyShareTokens.minus(numShareTokens);
+          // update volume bucket for this date
+          if (e.volume > 0) {
+            if (!(dateKey in dateKeyToVolumeMap)) {
+              dateKeyToVolumeMap[dateKey] = 0;
+            }
+            dateKeyToVolumeMap[dateKey] += e.volume;
           }
-        } else {
-          // mint share tokens
-          numMintedShareTokens = numMintedShareTokens.plus(numShareTokens);
 
-          if (receiver.toUpperCase() === myAddress.toUpperCase()) {
-            numMyShareTokens = numMyShareTokens.plus(numShareTokens);
+          // update eth liquidity bucket for this date
+          if (e.numEth !== 0) {
+            if (!(dateKey in dateKeyToEthLiquidityMap)) {
+              dateKeyToEthLiquidityMap[dateKey] = 0;
+            }
+
+            dateKeyToEthLiquidityMap[dateKey] += e.numEth;
           }
-        }
 
-        // update current pool share. take users's share tokens and divide by total minted share tokens
-        curPoolShare = new BigNumber(
-          numMyShareTokens.dividedBy(numMintedShareTokens)
-        );
+          // update token liquidity bucket for this date
+          if (e.numTokens !== 0) {
+            if (!(dateKey in dateKeyToTokenLiquidityMap)) {
+              dateKeyToTokenLiquidityMap[dateKey] = 0;
+            }
 
-        if (isNaN(curPoolShare) || curPoolShare.toFixed(4) === 0) {
-          curPoolShare = 0;
-          numMyDepositedEth = 0;
-          numMyDepositedTokens = 0;
-        }
+            dateKeyToTokenLiquidityMap[dateKey] += e.numTokens;
+          }
+        });
 
-        // get a percentage from the pool share
-        curPoolShareDisplay = (curPoolShare * 100).toFixed(2);
+        volumeDataMap = dateKeyToVolumeMap;
 
-        // if the user's pool share is 0, don't show a number
-        if (Number(curPoolShareDisplay) === 0.0) {
-          curPoolShareDisplay = "-";
-        } else {
-          curPoolShareDisplay = curPoolShareDisplay + "%"; // add a percentage symbol
-        }
+        ethLiquidityDataMap = dateKeyToEthLiquidityMap;
+        tokenLiquidityDataMap = dateKeyToTokenLiquidityMap;
 
-        // set it on the last event object before this transfer
-        lastEventObj.curPoolShare = curPoolShareDisplay;
+        didReceiveData = true;
 
-        return;
-      }
+        exchangeRate = GetEthToTokenPrice(curEthTotal, curTokenTotal);
 
-      // save a reference to the last event object (transfer events follow add/remove liquidity)
-      lastEventObj = eventObj;
-
-      // update the total pool eth total
-      curEthTotal += eth;
-
-      // update the total pool token total
-      curTokenTotal += tokens;
-
-      // set the number of eth and tokens for this event
-      eventObj.numEth = eth;
-      eventObj.numTokens = tokens;
-
-      // set the user's current pool share %
-      eventObj.curPoolShare = curPoolShareDisplay;
-
-      // push this event object onto the array
-      eventListTemp.push(eventObj);
+        app.setState({});
+      });
     });
-
-    // reverse the list so the most recent events are first
-    eventListTemp.reverse();
-
-    // calculate how much fees we've accrued by determining how much eth/tokens we own minus what we've deposited/withdrawn
-    let myEstimatedAccruedEthFees = (
-      curPoolShare * curEthTotal -
-      numMyDepositedEth
-    ).toFixed(4);
-    let myEstimatedAccruedTokenFees = (
-      curPoolShare * curTokenTotal -
-      numMyDepositedTokens
-    ).toFixed(4);
-
-    if (Number(myEstimatedAccruedEthFees) === 0) {
-      myEstimatedAccruedEthFees = "";
-    } else {
-      myEstimatedAccruedEthFees = myEstimatedAccruedEthFees + " ETH";
-    }
-
-    if (Number(myEstimatedAccruedTokenFees) === 0) {
-      myEstimatedAccruedTokenFees = "";
-    } else {
-      if (myEstimatedAccruedEthFees.length === 0) {
-        myEstimatedAccruedTokenFees =
-          myEstimatedAccruedTokenFees + " " + tokenSymbol;
-      } else {
-        myEstimatedAccruedTokenFees =
-          ", " + myEstimatedAccruedTokenFees + " " + tokenSymbol;
-      }
-    }
+  } else {
     didReceiveData = true;
 
-    eventList = eventListTemp;
-
-    curEthPoolTotal = curEthTotal.toFixed(4);
-    curTokenPoolTotal = curTokenTotal.toFixed(4);
-
-    curPoolShare = curPoolShareDisplay;
-
-    myCollectedEthFees = myEstimatedAccruedEthFees;
-    myCollectedTokenFees = myEstimatedAccruedTokenFees;
-
-    // update our state
     app.setState({});
-
-    if (eventListTemp.length > 0) {
-      var recentEvent = eventListTemp[0];
-      var oldestEvent = eventListTemp[eventListTemp.length - 1];
-
-      var dateKeyToVolumeMap = {};
-
-      var dateKeyToEthLiquidityMap = {};
-      var dateKeyToTokenLiquidityMap = {};
-
-      // get the timestamp for the most recent block
-      web3.web3js.eth.getBlock(recentEvent.block).then(function(recentBlock) {
-        var mostRecentBlockTimestamp = recentBlock.timestamp;
-        var mostRecentBlockNum = recentBlock.number;
-
-        // get the timestamp for the oldest block
-        web3.web3js.eth.getBlock(oldestEvent.block).then(function(oldestBlock) {
-          // only continue if the current exchange is the original symbol we requested
-          if (curSymbol !== tokenSymbol) {
-            return;
-          }
-
-          var oldestBlockTimestamp = oldestBlock.timestamp;
-          var oldestBlockNum = oldestBlock.number;
-
-          var blockBounds = mostRecentBlockNum - oldestBlockNum;
-          var timestampBoundsInSeconds =
-            mostRecentBlockTimestamp - oldestBlockTimestamp;
-
-          // now we have our bounds. determine a timestamp for each of the block numbers in the event list
-          eventList.forEach(e => {
-            var blockRatio =
-              blockBounds > 0 ? (e.block - oldestBlockNum) / blockBounds : 1;
-
-            var blockTimestampInSeconds =
-              blockRatio * timestampBoundsInSeconds + oldestBlockTimestamp;
-
-            // calculate which date time this block number falls under
-            var blockDay = new Date(blockTimestampInSeconds * 1000);
-
-            var dateKey =
-              blockDay.getMonth() +
-              "-" +
-              blockDay.getDate() +
-              "-" +
-              blockDay.getFullYear();
-
-            // console.log(e.block + "  " + oldestBlockNum  + "  " + dateKey + "  " + e.volume);//+ "  "  + mostRecentBlockNum + "   " + blockRatio + "  " + dateKey);
-
-            // update volume bucket for this date
-            if (e.volume > 0) {
-              if (!(dateKey in dateKeyToVolumeMap)) {
-                dateKeyToVolumeMap[dateKey] = 0;
-              }
-              dateKeyToVolumeMap[dateKey] += e.volume;
-            }
-
-            // update eth liquidity bucket for this date
-            if (e.numEth !== 0) {
-              if (!(dateKey in dateKeyToEthLiquidityMap)) {
-                dateKeyToEthLiquidityMap[dateKey] = 0;
-              }
-
-              dateKeyToEthLiquidityMap[dateKey] += e.numEth;
-            }
-
-            // update token liquidity bucket for this date
-            if (e.numTokens !== 0) {
-              if (!(dateKey in dateKeyToTokenLiquidityMap)) {
-                dateKeyToTokenLiquidityMap[dateKey] = 0;
-              }
-
-              dateKeyToTokenLiquidityMap[dateKey] += e.numTokens;
-            }
-          });
-
-          volumeDataMap = dateKeyToVolumeMap;
-
-          ethLiquidityDataMap = dateKeyToEthLiquidityMap;
-          tokenLiquidityDataMap = dateKeyToTokenLiquidityMap;
-
-          didReceiveData = true;
-
-          exchangeRate = GetEthToTokenPrice(curEthTotal, curTokenTotal);
-
-          app.setState({});
-        });
-      });
-    } else {
-      didReceiveData = true;
-
-      app.setState({});
-    }
-  });
+  }
 
   app.setState({});
 };
