@@ -79,7 +79,7 @@ class TokenPoolDetails extends Component {
         className: "right"
       },
       {
-        Header: "Liquidty (ETH)",
+        Header: "Liquidity (ETH)",
         accessor: "poolSize",
         className: "right"
       },
