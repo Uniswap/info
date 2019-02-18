@@ -13,7 +13,7 @@ import styled from "styled-components";
 import { useMedia } from "react-use";
 
 import CustomBar from "./customBar";
-import { toK } from "../../helpers";
+import { toK, toNiceDate } from "../../helpers";
 
 const Controls = styled.div`
   display: grid;
@@ -41,6 +41,7 @@ const Chart = ({ data, symbol }) => {
             tickLine={false}
             axisLine={false}
             interval="preserveStartEnd"
+            tickFormatter={tick => toNiceDate(tick)}
             dataKey="date"
           />
           <YAxis

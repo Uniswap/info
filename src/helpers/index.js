@@ -12,6 +12,8 @@ export const tokenOptions = Object.keys(Uniswap.tokens).map(key => ({
   label: key
 }));
 
+export const toNiceDate = date => dayjs(date).format("MMM DD")
+
 export const isWeb3Available = async () => {
   /* eslint-disable */
   if (typeof window.ethereum !== "undefined") {
