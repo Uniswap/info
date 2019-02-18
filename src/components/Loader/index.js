@@ -1,33 +1,22 @@
-import React from "react";
 import styled, { css } from "styled-components";
 
-const Loading = styled.div`
+const Loader = styled.div`
   pointer-events: none;
   display: grid;
   place-items: center;
+  background-image: url("./loading3.gif");
+  background-size: 72px;
+  background-repeat: no-repeat;
+  background-position: center;
 
   ${props =>
-    props.fill &&
-    css`
-      height: 100vh;
-    `}
-
-  ${props =>
-    props.height &&
-    css`
-      height: ${props.height}px;
-    `}
-
-  > img {
-    height: 128px;
-  }
+    props.fill && !props.height
+      ? css`
+          height: 100vh;
+        `
+      : css`
+          height: 240px;
+        `}
 `;
-
-const Loader = ({ ...rest }) => (
-  <Loading {...rest}>
-    <img alt="Loading" src="./loading3.gif" />
-    {/* <span>Loading...</span> */}
-  </Loading>
-);
 
 export default Loader;
