@@ -33,8 +33,14 @@ class App extends Component {
       this.state.historyDaysToQuery
     );
 
+  fetchChart = () =>
+    this.props.chartStore.fetchChart(
+      this.props.directoryStore.state.activeExchange.exchangeAddress,
+      this.state.historyDaysToQuery
+    );
+
   clearCurrentExchange = () => {
-    // TODO this.props.chartStore.resetChart();
+    this.props.chartStore.resetChart();
     this.props.transactionsStore.resetTransactions();
     this.props.poolStore.resetUserPool();
   };
@@ -73,7 +79,7 @@ class App extends Component {
       this.fetchUserPoolShare();
 
       // fourth - c, fetch the chart data for default exchange
-      // TODO this.fetchChart();
+      this.fetchChart();
     } catch (err) {
       console.log("error:", err);
     }
@@ -82,11 +88,11 @@ class App extends Component {
   // switch exchange history & transaction timeline
   switchExchangeTimeframe = async () => {
     await this.props.transactionsStore.resetTransactions();
-    // TODO await this.props.chartStore.resetChart();
+    this.props.chartStore.resetChart();
 
     this.fetchTransactions();
 
-    // TODO this.fetchChart();
+    this.fetchChart();
   };
 
   async componentDidMount() {
@@ -126,6 +132,11 @@ class App extends Component {
     const {
       state: { transactions }
     } = this.props.transactionsStore;
+
+    // Chart Store
+    const {
+      state: { data }
+    } = this.props.chartStore;
 
     // Pool Store
     const {
@@ -282,14 +293,13 @@ class App extends Component {
             </Box>
             <Divider />
 
-            {/* <Box p={24}>
-              {currentExchangeData.chartData &&
-              currentExchangeData.chartData.length > 0 ? (
-                <Chart symbol={symbol} data={currentExchangeData.chartData} />
+            <Box p={24}>
+              {data && data.length > 0 ? (
+                <Chart symbol={symbol} data={data} />
               ) : (
                 <Loader />
               )}
-            </Box> */}
+            </Box>
           </Panel>
 
           <Panel rounded bg="white" area="exchange">

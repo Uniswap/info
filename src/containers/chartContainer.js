@@ -35,8 +35,6 @@ export class ChartContainer extends Container {
           break;
       }
 
-      console.log(utcStartTime);
-
       const data = await fetch(
         `${BASE_URL}v1/chart?exchangeAddress=${exchangeAddress}&startTime=${utcStartTime.unix()}&endTime=${utcEndTime.unix()}&unit=${unit}`
       );

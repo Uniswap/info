@@ -73,7 +73,7 @@ const Chart = ({ data, symbol }) => {
           />
           <Bar
             hide={volume}
-            dataKey="volume"
+            dataKey="ethVolume"
             name="Volume"
             yAxisId={0}
             shape={<CustomBar />}
@@ -92,7 +92,7 @@ const Chart = ({ data, symbol }) => {
             type="monotone"
             name="Rate"
             yAxisId={0}
-            dataKey="rate"
+            dataKey="marginalEthRate"
             stroke="var(--c-button)"
           />
           <Line
