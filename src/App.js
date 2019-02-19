@@ -18,6 +18,7 @@ import { setThemeColor, isWeb3Available } from "./helpers/";
 const timeframeOptions = [
   { value: 7, label: "1 week" },
   { value: 30, label: "1 month" },
+  { value: "three", label: "3 months"},
   { value: 365, label: "1 year" }
 ];
 

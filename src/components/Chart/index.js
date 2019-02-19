@@ -81,6 +81,8 @@ const Chart = ({ data, symbol }) => {
             fill="var(--c-zircon)"
           />
           <Line
+            strokeWidth={2}
+            dot={false}
             hide={token}
             type="monotone"
             yAxisId={1}
@@ -89,6 +91,8 @@ const Chart = ({ data, symbol }) => {
             stroke="var(--c-token)"
           />
           <Line
+            strokeWidth={2}
+            dot={false}
             hide={rate}
             type="monotone"
             name="Rate"
@@ -97,6 +101,8 @@ const Chart = ({ data, symbol }) => {
             stroke="var(--c-button)"
           />
           <Line
+            strokeWidth={2}
+            dot={false}
             hide={eth}
             type="monotone"
             name="ETH Liquidity"

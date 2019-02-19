@@ -20,9 +20,17 @@ export class ChartContainer extends Container {
 
       // go back, go way way back
       switch (daysToQuery) {
+        case "all":
+          utcStartTime = utcEndTime.subtract(1, "year").startOf("year");
+          unit = "month";
+          break;
         case 365:
           utcStartTime = utcEndTime.subtract(1, "year").startOf("year");
           unit = "month";
+          break;
+        case "three":
+          utcStartTime = utcEndTime.subtract(3, "month").startOf("month");
+          unit = "day";
           break;
         case 30:
           utcStartTime = utcEndTime.subtract(1, "month").startOf("month");
