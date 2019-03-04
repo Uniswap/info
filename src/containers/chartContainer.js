@@ -24,19 +24,15 @@ export class ChartContainer extends Container {
           utcStartTime = utcEndTime.subtract(1, "year").startOf("year");
           unit = "month";
           break;
-        case 365:
-          utcStartTime = utcEndTime.subtract(1, "year").startOf("year");
-          unit = "month";
-          break;
-        case "three":
+        case "3month":
           utcStartTime = utcEndTime.subtract(3, "month").startOf("month");
           unit = "day";
           break;
-        case 30:
+        case "1month":
           utcStartTime = utcEndTime.subtract(1, "month").startOf("month");
           unit = "day";
           break;
-        case 7:
+        case "1week":
         default:
           utcStartTime = utcEndTime.subtract(7, "day").startOf("day");
           unit = "day";

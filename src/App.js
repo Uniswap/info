@@ -16,10 +16,10 @@ import { Header, Divider, Hint, Address } from "./components";
 import { setThemeColor, isWeb3Available } from "./helpers/";
 
 const timeframeOptions = [
-  { value: 7, label: "1 week" },
-  { value: 30, label: "1 month" },
-  { value: "three", label: "3 months"},
-  { value: 365, label: "1 year" }
+  { value: "1week", label: "1 week" },
+  { value: "1month", label: "1 month" },
+  { value: "3months", label: "3 months"},
+  { value: "all", label: "All time" }
 ];
 
 class App extends Component {

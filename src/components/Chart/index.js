@@ -96,7 +96,7 @@ const Chart = ({ data, symbol }) => {
             hide={rate}
             type="monotone"
             name="Rate"
-            yAxisId={0}
+            yAxisId={1}
             dataKey="marginalEthRate"
             stroke="var(--c-button)"
           />
