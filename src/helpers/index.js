@@ -12,7 +12,7 @@ export const tokenOptions = Object.keys(Uniswap.tokens).map(key => ({
   label: key
 }));
 
-export const toNiceDate = date => dayjs(date).format("MMM DD")
+export const toNiceDate = date => dayjs(date).format("MMM DD");
 
 export const isWeb3Available = async () => {
   /* eslint-disable */
@@ -34,12 +34,14 @@ export const isWeb3Available = async () => {
 };
 
 export const toK = num => {
-  if (num > 999999) {
-    return `${num / 1000000}M`;
-  } else if (num > 999) {
-    return `${num / 1000}K`;
+  const number = Number(num);
+
+  if (number > 999999 || number < -999999) {
+    return `${number / 1000000}M`;
+  } else if (number > 999 || number < -999) {
+    return `${number / 1000}K`;
   } else {
-    return num;
+    return number;
   }
 };
 
