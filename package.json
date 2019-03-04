@@ -11,7 +11,7 @@
     "react": "^16.8.2",
     "react-dom": "^16.8.2",
     "react-scripts": "^2.1.5",
-    "react-select": "^2.4.0",
+    "react-select": "^2.4.1",
     "react-use": "^5.3.1",
     "rebass": "^3.0.1",
     "recharts": "^1.5.0",
