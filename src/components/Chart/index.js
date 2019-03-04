@@ -13,7 +13,7 @@ import styled from "styled-components";
 import { useMedia } from "react-use";
 
 import CustomBar from "./customBar";
-import { toK, toNiceDate } from "../../helpers";
+import { toK, toNiceDate, toNiceDateYear } from "../../helpers";
 
 const Controls = styled.div`
   display: grid;
@@ -65,6 +65,8 @@ const Chart = ({ data, symbol }) => {
           />
           <Tooltip
             cursor={false}
+            formatter={val => toK(val, true)}
+            labelFormatter={label => toNiceDateYear(label)}
             labelStyle={{ paddingTop: 4 }}
             contentStyle={{
               padding: "10px 14px",
@@ -82,6 +84,7 @@ const Chart = ({ data, symbol }) => {
           />
           <Line
             strokeWidth={2}
+            s
             dot={false}
             hide={token}
             type="monotone"

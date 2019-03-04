@@ -14,6 +14,8 @@ export const tokenOptions = Object.keys(Uniswap.tokens).map(key => ({
 
 export const toNiceDate = date => dayjs(date).format("MMM DD");
 
+export const toNiceDateYear = date => dayjs(date).format("MMMM DD, YYYY");
+
 export const isWeb3Available = async () => {
   /* eslint-disable */
   if (typeof window.ethereum !== "undefined") {
@@ -33,15 +35,16 @@ export const isWeb3Available = async () => {
   /* eslint-enable */
 };
 
-export const toK = num => {
-  const number = Number(num);
+export const toK = (num, fixed) => {
+  const formatter = divideBy =>
+    fixed === true ? Number(num / divideBy).toFixed(4) : Number(num / divideBy);
 
-  if (number > 999999 || number < -999999) {
-    return `${number / 1000000}M`;
-  } else if (number > 999 || number < -999) {
-    return `${number / 1000}K`;
+  if (num > 999999 || num < -999999) {
+    return `${formatter(1000000)}M`;
+  } else if (num > 999 || num < -999) {
+    return `${formatter(1000)}K`;
   } else {
-    return number;
+    return formatter(1);
   }
 };
 
