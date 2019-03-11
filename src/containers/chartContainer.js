@@ -1,7 +1,10 @@
 import { Container } from "unstated";
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
 
 import { BASE_URL } from "../helpers";
+
+dayjs.extend(utc);
 
 export class ChartContainer extends Container {
   state = {
@@ -13,7 +16,7 @@ export class ChartContainer extends Container {
   async fetchChart(exchangeAddress, daysToQuery) {
     try {
       // current time
-      const utcEndTime = dayjs();
+      const utcEndTime = dayjs.utc();
 
       let utcStartTime;
       let unit;

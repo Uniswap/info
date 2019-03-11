@@ -5,7 +5,7 @@
   "homepage": ".",
   "dependencies": {
     "bignumber.js": "^8.1.1",
-    "dayjs": "^1.8.8",
+    "dayjs": "^1.8.10",
     "gh-pages": "^2.0.1",
     "react": "^16.8.3",
     "react-dom": "^16.8.3",
