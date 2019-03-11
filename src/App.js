@@ -13,115 +13,102 @@ import Chart from "./components/Chart";
 import Loader from "./components/Loader";
 import { Header, Divider, Hint, Address } from "./components";
 
-import {
-  retrieveExchangeTicker,
-  retrieveExchangeHistory,
-  retrieveExchangeDirectory,
-  isWeb3Available
-} from "./helpers/";
-
-let historyDaysToQuery = 7;
-let currentExchangeData;
+import { setThemeColor, isWeb3Available } from "./helpers/";
 
 const timeframeOptions = [
-  { value: 7, label: "1 week" },
-  { value: 30, label: "1 month" },
-  { value: 365, label: "1 year" }
+  { value: "1week", label: "1 week" },
+  { value: "1month", label: "1 month" },
+  { value: "3months", label: "3 months"},
+  { value: "all", label: "All time" }
 ];
 
 class App extends Component {
   state = {
-    exchangeData: [],
-    exchangeOptions: [],
-    defaultExchangeAddress: "",
-    activeExchangeData: {},
     historyDaysToQuery: 7
   };
 
   // Fetch Exchange's Transactions
-  fetchTransactions = () => {
-    this.props.transactionsStore.resetTransactions();
-
+  fetchTransactions = () =>
     this.props.transactionsStore.fetchTransactions(
-      this.state.activeExchangeData.exchangeAddress,
+      this.props.directoryStore.state.activeExchange.exchangeAddress,
       this.state.historyDaysToQuery
     );
+
+  fetchChart = () =>
+    this.props.chartStore.fetchChart(
+      this.props.directoryStore.state.activeExchange.exchangeAddress,
+      this.state.historyDaysToQuery
+    );
+
+  clearCurrentExchange = () => {
+    this.props.chartStore.resetChart();
+    this.props.transactionsStore.resetTransactions();
+    this.props.poolStore.resetUserPool();
   };
 
   // Fetch User Pool Information
-  fetchUserPoolShare = () => {
-    this.props.poolStore.fetchUser(
-      this.state.activeExchangeData.exchangeAddress,
-      web3.eth.accounts[0] // eslint-disable-line
-    );
+  fetchUserPoolShare = async () => {
+    try {
+      await isWeb3Available();
+
+      this.props.poolStore.fetchUserPool(
+        this.props.directoryStore.state.activeExchange.exchangeAddress,
+        web3.eth.accounts[0] // eslint-disable-line
+      );
+    } catch {}
   };
 
-  componentDidMount() {
-    console.log("props: ", this.props);
-    // load the list of all exchanges
-    retrieveExchangeDirectory((directoryLabels, directoryObjects) => {
-      this.setState({
-        exchangeData: directoryObjects,
-        exchangeOptions: directoryLabels,
-        defaultExchangeAddress: directoryLabels[0].value
-      });
+  // switch active exchane
+  switchActiveExchange = async address => {
+    try {
+      // prep, clear current exchange's data
+      await this.clearCurrentExchange();
 
-      this.setCurrentExchange(this.state.defaultExchangeAddress);
+      // first, set the active exchange
+      await this.props.directoryStore.setActiveExchange(address);
 
-      // set 'activeExchangeData' equal to 'defaultExchangeAddress's' value from 'exchangeData' but better cause stateful
-      this.setState({
-        activeExchangeData: this.state.exchangeData[
-          this.state.defaultExchangeAddress
-        ]
-      });
+      // second, set the new theme color from active exchange
+      await setThemeColor(this.props.directoryStore.state.activeExchange.theme);
 
+      // third, fetch the new ticker information
+      await this.props.directoryStore.fetchTicker(address);
+
+      // fourth - a, fetch new transaction information
       this.fetchTransactions();
 
-      (async () => {
-        try {
-          await isWeb3Available();
+      // fourth - b, fetch new user pool share information if web3
+      this.fetchUserPoolShare();
 
-          this.fetchUserPoolShare();
-        } catch {}
-      })();
-    });
-  }
-
-  // Retreive Data for exchange by it's address
-  getExchangeData = address => this.state.exchangeData[address];
-
-  // Set the current exchange's data to be shown
-  // @TOOD improve callback hell
-  setCurrentExchange = address => {
-    // make a var hold the data from exhange in state
-    currentExchangeData = this.getExchangeData(address);
-
-    // update theme color from exchnage
-    document.documentElement.style.setProperty(
-      "--c-token",
-      currentExchangeData.theme || "#333333"
-    );
-
-    // refresh the UI
-    this.setState({});
-
-    // retrieve the ticker which displays the latest 24hr details
-    retrieveExchangeTicker(currentExchangeData, () => {
-      // only update UI if we're still displaying the initial requested address
-      if (currentExchangeData.exchangeAddress === address) {
-        // refresh the UI
-        this.setState({});
-
-        retrieveExchangeHistory(currentExchangeData, historyDaysToQuery, () => {
-          // only update UI if we're still displaying the initial requested address
-          if (currentExchangeData.exchangeAddress === address) {
-            // refresh the UI
-            this.setState({});
-          }
-        });
-      }
-    });
+      // fourth - c, fetch the chart data for default exchange
+      this.fetchChart();
+    } catch (err) {
+      console.log("error:", err);
+    }
   };
+
+  // switch exchange history & transaction timeline
+  switchExchangeTimeframe = async () => {
+    await this.props.transactionsStore.resetTransactions();
+    this.props.chartStore.resetChart();
+
+    this.fetchTransactions();
+
+    this.fetchChart();
+  };
+
+  async componentDidMount() {
+    try {
+      // first, fetch directory & set default exchange address
+      await this.props.directoryStore.fetchDirectory();
+
+      // second, run "switchActiveExchange" with default exchange address
+      await this.switchActiveExchange(
+        this.props.directoryStore.state.defaultExchangeAddress
+      );
+    } catch (err) {
+      console.log("error:", err);
+    }
+  }
 
   render() {
     // spread state into cleaner vars
@@ -130,28 +117,37 @@ class App extends Component {
       tradeVolume,
       percentChange,
       symbol,
-      chartData,
       erc20Liquidity,
       price,
       invPrice,
       ethLiquidity,
       tokenAddress
-    } = this.state.activeExchangeData;
+    } = this.props.directoryStore.state.activeExchange;
+
+    // Directory Store
+    const {
+      state: { directory }
+    } = this.props.directoryStore;
 
     // Transactions Store
     const {
       state: { transactions }
     } = this.props.transactionsStore;
 
+    // Chart Store
+    const {
+      state: { data }
+    } = this.props.chartStore;
+
     // Pool Store
     const {
       state: { userNumPoolTokens, userPoolPercent }
     } = this.props.poolStore;
 
-    if (this.state.exchangeOptions.length === 0)
+    if (directory.length === 0)
       return (
         <Wrapper>
-          <Loader />
+          <Loader fill={true} />
         </Wrapper>
       );
 
@@ -166,17 +162,11 @@ class App extends Component {
           <Title />
 
           <Select
-            options={this.state.exchangeOptions}
+            options={directory}
+            defaultValue={directory[0]}
             onChange={select => {
-              // @NOTE stateful way to do things, duplicated atm
               if (exchangeAddress !== select.value)
-                this.setState({
-                  activeExchangeData: this.state.exchangeData[select.value]
-                });
-
-              // only update current exchange if we're picking a new one
-              if (currentExchangeData.exchangeAddress !== select.value)
-                this.setCurrentExchange(select.value);
+                this.switchActiveExchange(select.value);
             }}
           />
         </Header>
@@ -290,30 +280,13 @@ class App extends Component {
                     options={timeframeOptions}
                     defaultValue={timeframeOptions[0]}
                     onChange={select => {
-                      // @NOTE: NEW
-                      // retrigger the fetchTransactions call only when historyDaysToQuery changes
-                      if (this.state.historyDaysToQuery !== select.value) {
+                      if (this.state.historyDaysToQuery !== select.value)
                         this.setState(
                           {
                             historyDaysToQuery: select.value
                           },
-                          () => this.fetchTransactions()
+                          () => this.switchExchangeTimeframe()
                         );
-                      }
-
-                      // @NOTE: OLD
-                      historyDaysToQuery = select.value;
-
-                      // wipes chart and transaction data, will need to work into state
-                      currentExchangeData.chartData = [];
-
-                      retrieveExchangeHistory(
-                        currentExchangeData,
-                        historyDaysToQuery,
-                        () => {
-                          this.setState({});
-                        }
-                      );
                     }}
                   />
                 </Box>
@@ -322,8 +295,8 @@ class App extends Component {
             <Divider />
 
             <Box p={24}>
-              {chartData && chartData.length > 0 ? (
-                <Chart symbol={symbol} data={chartData} />
+              {data && data.length > 0 ? (
+                <Chart symbol={symbol} data={data} />
               ) : (
                 <Loader />
               )}

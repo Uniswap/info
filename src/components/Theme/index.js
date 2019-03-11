@@ -25,10 +25,12 @@ export const GlobalStyles = createGlobalStyle`
     /* colors */
     --c-uniswappink: #dc6be5;
     --c-ronchi: #F2C94C;
-    --c-token: #71c4ad;
     --c-button: #2f80ed;
     --c-connected: #27AE60;
     --c-warning-dim: #FF6871;
+
+    /* dynamic theme */
+    --c-token: #333333;
 
     /* text colors */
     --c-text: #2b2b2b;
@@ -53,7 +55,7 @@ export const GlobalStyles = createGlobalStyle`
 
   .-transition {
     transition-property: background-color, color;
-    transition-timing-function: ease-in;
+    transition-timing-function: ease;
     transition-duration: .5s;
   }
 `;

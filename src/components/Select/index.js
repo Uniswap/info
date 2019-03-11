@@ -6,14 +6,14 @@ import Popout from "./popout";
 
 import customStyles from "./styles";
 
-const Select = ({ options, onChange, defaultValue, placeholder }) => (
+const Select = ({ options, onChange, placeholder, ...rest }) => (
   <ReactSelect
     placeholder={placeholder}
     isSearchable={true}
     onChange={onChange}
-    defaultValue={defaultValue}
     options={options}
     styles={customStyles}
+    {...rest}
   />
 );
 
@@ -23,8 +23,7 @@ Select.defaultProps = {
 
 Select.propTypes = {
   options: PropTypes.array.isRequired,
-  onChange: PropTypes.func,
-  defaultValue: PropTypes.string
+  onChange: PropTypes.func
 };
 
 export default Select;

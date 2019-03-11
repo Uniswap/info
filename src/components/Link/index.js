@@ -2,13 +2,13 @@ import React from "react";
 import { Link as RebassLink } from "rebass";
 import PropTypes from "prop-types";
 
-const Link = props => (
+const Link = ({ external, children, ...rest }) => (
   <RebassLink
-    target={props.external ? "_blank" : null}
-    rel={props.external ? "noopener noreferrer" : null}
-    {...props}
+    target={external ? "_blank" : null}
+    rel={external ? "noopener noreferrer" : null}
+    {...rest}
   >
-    {props.children}
+    {children}
   </RebassLink>
 );
 
