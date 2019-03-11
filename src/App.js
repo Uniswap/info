@@ -446,7 +446,7 @@ const retrieveData = async (tokenSymbol, exchangeAddress) => {
   // paginate through the logs to load all the events
   var events = [];
 
-  var blockPageAmount = 200000;
+  var blockPageAmount = 100000;
 
   var fromBlock = Uniswap.originBlock;
   var toBlock = fromBlock + blockPageAmount;
