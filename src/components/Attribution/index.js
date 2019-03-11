@@ -1,7 +1,3 @@
-/**
- * @prettier
- */
-
 import React from "react";
 
 const Attribution = () => (

@@ -4,19 +4,24 @@
   "private": true,
   "homepage": ".",
   "dependencies": {
-    "bignumber.js": "^8.0.1",
+    "axios": "^0.18.0",
+    "bignumber.js": "^8.0.2",
     "chart.js": "^2.7.3",
+    "dayjs": "^1.8.0",
     "gh-pages": "^2.0.1",
-    "react": "^16.7.0-alpha.0",
+    "react": "^16.8.0-alpha.1",
     "react-chartjs-2": "^2.7.4",
-    "react-dom": "^16.7.0-alpha.0",
+    "react-dom": "^16.8.0-alpha.1",
     "react-pure-lifecycle": "^3.0.0",
-    "react-scripts": "2.1.1",
-    "react-select": "^2.1.2",
+    "react-scripts": "^2.1.3",
+    "react-select": "^2.3.0",
     "react-table": "^6.8.6",
+    "react-use": "^5.2.1",
+    "rebass": "^3.0.1",
+    "recharts": "^1.4.2",
+    "styled-components": "^4.1.3",
     "typeface-inter": "^3.2.0",
-    "web3": "^1.0.0-beta.37",
-    "web3-react": "^1.1.2"
+    "unstated": "^2.1.1"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -25,7 +30,7 @@
     "eject": "react-scripts eject",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build",
-    "format": "prettier --require-pragma --write \"./src/**/*.js\" \"./src/**/*.css\""
+    "format": "prettier --write \"./src/**/*.js\" \"./src/**/*.css\""
   },
   "eslintConfig": {
     "extends": "react-app"
