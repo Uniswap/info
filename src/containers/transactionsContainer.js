@@ -22,6 +22,10 @@ export class TransactionsContainer extends Container {
         `${BASE_URL}v1/history?exchangeAddress=${exchangeAddress}&startTime=${utcStartTime.unix()}&endTime=${utcEndTime.unix()}`
       );
 
+      if (!data.ok) {
+        throw Error(data.status);
+      }
+
       const json = await data.json();
 
       console.log(`fetched ${json.length} tx for ${exchangeAddress}`);

@@ -13,7 +13,7 @@ import styled from "styled-components";
 import { useMedia } from "react-use";
 
 import CustomBar from "./customBar";
-import { toK } from "../../helpers";
+import { toK, toNiceDate, toNiceDateYear } from "../../helpers";
 
 const Controls = styled.div`
   display: grid;
@@ -41,6 +41,7 @@ const Chart = ({ data, symbol }) => {
             tickLine={false}
             axisLine={false}
             interval="preserveStartEnd"
+            tickFormatter={tick => toNiceDate(tick)}
             dataKey="date"
           />
           <YAxis
@@ -64,6 +65,8 @@ const Chart = ({ data, symbol }) => {
           />
           <Tooltip
             cursor={false}
+            formatter={val => toK(val, true)}
+            labelFormatter={label => toNiceDateYear(label)}
             labelStyle={{ paddingTop: 4 }}
             contentStyle={{
               padding: "10px 14px",
@@ -73,13 +76,16 @@ const Chart = ({ data, symbol }) => {
           />
           <Bar
             hide={volume}
-            dataKey="volume"
+            dataKey="ethVolume"
             name="Volume"
             yAxisId={0}
             shape={<CustomBar />}
             fill="var(--c-zircon)"
           />
           <Line
+            strokeWidth={2}
+            s
+            dot={false}
             hide={token}
             type="monotone"
             yAxisId={1}
@@ -88,14 +94,18 @@ const Chart = ({ data, symbol }) => {
             stroke="var(--c-token)"
           />
           <Line
+            strokeWidth={2}
+            dot={false}
             hide={rate}
             type="monotone"
             name="Rate"
-            yAxisId={0}
-            dataKey="rate"
+            yAxisId={1}
+            dataKey="marginalEthRate"
             stroke="var(--c-button)"
           />
           <Line
+            strokeWidth={2}
+            dot={false}
             hide={eth}
             type="monotone"
             name="ETH Liquidity"
