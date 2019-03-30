@@ -592,13 +592,16 @@ const retrieveData = async (tokenSymbol, exchangeAddress) => {
         if (sender.toUpperCase() === myAddress.toUpperCase()) {
           numMyShareTokens = numMyShareTokens.minus(numShareTokens);
         }
-      } else {
+      } else if (sender === "0x0000000000000000000000000000000000000000") {
         // mint share tokens
         numMintedShareTokens = numMintedShareTokens.plus(numShareTokens);
 
         if (receiver.toUpperCase() === myAddress.toUpperCase()) {
           numMyShareTokens = numMyShareTokens.plus(numShareTokens);
         }
+      } else {
+        // this is a normal transfer, not a mint or burn
+        return;
       }
 
       // update current pool share. take users's share tokens and divide by total minted share tokens
