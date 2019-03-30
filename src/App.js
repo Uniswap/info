@@ -153,10 +153,10 @@ class App extends Component {
         </div>
 
         <Header>
-          {/* @NOTE: Index 27 of tokenOptions is DAI */}
+          {/* @NOTE: Index 49 of tokenOptions is DAI */}
           <TokenDropdown
             options={tokenOptions}
-            defaultValue={tokenOptions[27]}
+            defaultValue={tokenOptions[49]}
             onChange={this.onTokenSelected}
           />
         </Header>

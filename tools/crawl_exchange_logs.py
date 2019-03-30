@@ -16,7 +16,7 @@ if (len(sys.argv) < 3):
 blockNumber = int(sys.argv[1]);
 infura_project_id = sys.argv[2];
 
-factory_address = "0xc0a47dFe034B400B47bDaD5FecDa2621de6c4d95"
+factory_address = "0xc0a47dFe034B400B47bDaD5FecDa2621de6c4d95" # 6627917
 
 params = [
     {
