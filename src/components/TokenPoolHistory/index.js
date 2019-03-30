@@ -16,7 +16,9 @@ import "./TokenPoolHistory.css";
 class TokenPoolHistory extends Component {
   render() {
     if (this.props.didReceiveData === false) {
-      return <Loader />;
+      return <Loader 
+        blockNum={this.props.loadingUpToBlockNum}
+      />;
     }
 
     const data = [];

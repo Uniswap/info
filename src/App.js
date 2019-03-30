@@ -28,6 +28,7 @@ var web3 = null;
 
 var didRequestData = false;
 var didReceiveData = false;
+var loadingUpToBlockNum = 0;
 
 var eventList = [];
 
@@ -116,6 +117,7 @@ class App extends Component {
 
     didRequestData = false;
     didReceiveData = false;
+    loadingUpToBlockNum = 0;
 
     eventList = [];
 
@@ -182,6 +184,7 @@ class App extends Component {
               curSymbol={curSymbol}
               myAddress={myAddress}
               didReceiveData={didReceiveData}
+              loadingUpToBlockNum={loadingUpToBlockNum}
             />
           </div>
 
@@ -461,11 +464,21 @@ const retrieveData = async (tokenSymbol, exchangeAddress) => {
 
     console.log("Retrieving data for exchange " + exchangeAddress + " from block " + fromBlock + " to " + toBlock);  
 
-    await exchangeContract.getPastEvents("allEvents", options).then(responseEvents => {
-      responseEvents.forEach(event => {
-        events.push(event);
+    loadingUpToBlockNum = toBlock;
+
+    // update our state
+    app.setState({});
+
+    try {
+      await exchangeContract.getPastEvents("allEvents", options).then(responseEvents => {
+        responseEvents.forEach(event => {
+          events.push(event);
+        });
       });
-    });
+    } catch (error) {
+      console.log(error);
+      continue;
+    };
 
     // if we've reached the end of the pages
     if (toBlock >= latestBlock) {
