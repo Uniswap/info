@@ -4,10 +4,10 @@ import Uniswap from "../constants/Uniswap";
 
 BigNumber.set({ EXPONENTIAL_AT: 50 });
 
-export const BASE_URL = "https://uniswap-analytics.appspot.com/api/";
+export const BASE_URL = "https://uniswap-api-staging.loanscan.io/";
 
 export const tokenOptions = Object.keys(Uniswap.tokens).map(key => ({
-  value: `${Uniswap.tokens[key].address}`,
+  value: `${Uniswap.tokens[key].address}`,  
   // label: `${key} - ${Uniswap.tokens[key].address}`
   label: key
 }));
@@ -51,7 +51,7 @@ export const toK = (num, fixed) => {
 export const setThemeColor = theme =>
   document.documentElement.style.setProperty("--c-token", theme || "#333333");
 
-export const Big = number => new BigNumber(number).dividedBy(1e18);
+export const Big = number => new BigNumber(number);
 
 export const urls = {
   showTransaction: tx => `https://etherscan.io/tx/${tx}/`,
