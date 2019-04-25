@@ -24,16 +24,16 @@ export class DirectoryContainer extends Container {
       const json = await data.json();
 
       let directoryObjects = {};
-      json.forEach(exchange => {
+      json.exchanges.forEach(exchange => {
         directoryObjects[exchange.exchangeAddress] = buildDirectoryObject(
           exchange
         );
       });
 
-      console.log(`fetched ${json.length} exchanges`);
+      console.log(`fetched ${json.exchanges.length} exchanges`);
 
       await this.setState({
-        directory: json.map(exchange => buildDirectoryLabel(exchange)),
+        directory: json.exchanges.map(exchange => buildDirectoryLabel(exchange)),
         exchanges: directoryObjects
       });
 
@@ -90,10 +90,7 @@ export class DirectoryContainer extends Container {
             percentChange,
             tradeVolume: Big(tradeVolume).toFixed(4),
             ethLiquidity: Big(ethLiquidity).toFixed(4),
-            erc20Liquidity: (
-              erc20Liquidity /
-              Math.pow(10, this.state.exchanges[address].tokenDecimals)
-            ).toFixed(4)
+            erc20Liquidity: Big(erc20Liquidity).toFixed(4)
           }
         }
       }));

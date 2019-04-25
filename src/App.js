@@ -147,7 +147,7 @@ class App extends Component {
     if (directory.length === 0)
       return (
         <Wrapper>
-          <Loader fill={true} />
+          <Loader fill="true" />
         </Wrapper>
       );
 

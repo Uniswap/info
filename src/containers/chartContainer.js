@@ -27,7 +27,7 @@ export class ChartContainer extends Container {
           utcStartTime = utcEndTime.subtract(1, "year").startOf("year");
           unit = "month";
           break;
-        case "3month":
+        case "3months":
           utcStartTime = utcEndTime.subtract(3, "month").startOf("month");
           unit = "day";
           break;
