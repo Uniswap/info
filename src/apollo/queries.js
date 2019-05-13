@@ -14,6 +14,7 @@ export const TRANSACTIONS_QUERY = gql`
       fee
       event
       timestamp
+      tx
     }
   }
 `

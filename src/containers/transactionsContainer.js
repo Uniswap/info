@@ -57,7 +57,7 @@ export class TransactionsContainer extends Container {
       if (result){
         data = result.data
         console.log(`fetched ${data.transactions.length} tx for ${exchangeAddress}`);
-
+        console.log(data)
         this.setState({
           transactions: data.transactions
         });
