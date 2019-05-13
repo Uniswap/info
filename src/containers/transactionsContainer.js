@@ -43,13 +43,11 @@ export class TransactionsContainer extends Container {
           break;
       }
 
-      // const data = await fetch(
-      //   `${BASE_URL}v1/history?exchangeAddress=${exchangeAddress}&startTime=${utcStartTime.unix()}&endTime=${utcEndTime.unix()}`
-      // );
-      // console.log(`${BASE_URL}v1/history?exchangeAddress=${exchangeAddress}&startTime=${utcStartTime.unix()}&endTime=${utcEndTime.unix()}`)
-
       const result = await client.query({
         query: TRANSACTIONS_QUERY,
+        variables: {
+          exchangeAddr: exchangeAddress
+        },
         fetchPolicy: 'network-only',
 
       })
@@ -57,12 +55,10 @@ export class TransactionsContainer extends Container {
       if (result){
         data = result.data
         console.log(`fetched ${data.transactions.length} tx for ${exchangeAddress}`);
-        console.log(data)
         this.setState({
           transactions: data.transactions
         });
       }
-
 
     } catch (err) {
       console.log("error: ", err);
