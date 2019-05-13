@@ -52,6 +52,7 @@ export class DirectoryContainer extends Container {
       const data = await fetch(
         `${BASE_URL}v1/ticker?exchangeAddress=${address}`
       );
+      console.log(`${BASE_URL}v1/ticker?exchangeAddress=${address}`)
 
       if (!data.ok) {
         throw Error(data.status);

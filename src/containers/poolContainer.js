@@ -19,6 +19,7 @@ export class PoolContainer extends Container {
       const data = await fetch(
         `${BASE_URL}v1/user?exchangeAddress=${exchangeAddress}&userAddress=${userAccount}`
       );
+      console.log(`${BASE_URL}v1/user?exchangeAddress=${exchangeAddress}&userAddress=${userAccount}`)
 
       if (!data.ok) {
         throw Error(data.status);

@@ -24,7 +24,7 @@ const TransactionItem = ({ transaction, tokenSymbol }) => (
       </Link>
     </Flex>
     <Text fontSize={[12, 16]} color="textDim">
-      {formatTime(transaction.timestamp)}
+      {formatTime(transaction.timeStamp)}
     </Text>
   </Flex>
 );

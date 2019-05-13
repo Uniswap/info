@@ -3,6 +3,9 @@ import dayjs from "dayjs";
 
 import { BASE_URL } from "../helpers";
 
+import { client } from "../apollo/client"
+import { TRANSACTIONS_QUERY } from '../apollo/queries'
+
 export class TransactionsContainer extends Container {
   state = {
     transactions: []
@@ -40,21 +43,27 @@ export class TransactionsContainer extends Container {
           break;
       }
 
-      const data = await fetch(
-        `${BASE_URL}v1/history?exchangeAddress=${exchangeAddress}&startTime=${utcStartTime.unix()}&endTime=${utcEndTime.unix()}`
-      );
+      // const data = await fetch(
+      //   `${BASE_URL}v1/history?exchangeAddress=${exchangeAddress}&startTime=${utcStartTime.unix()}&endTime=${utcEndTime.unix()}`
+      // );
+      // console.log(`${BASE_URL}v1/history?exchangeAddress=${exchangeAddress}&startTime=${utcStartTime.unix()}&endTime=${utcEndTime.unix()}`)
 
-      if (!data.ok) {
-        throw Error(data.status);
+      const result = await client.query({
+        query: TRANSACTIONS_QUERY,
+        fetchPolicy: 'network-only',
+
+      })
+      let data
+      if (result){
+        data = result.data
+        console.log(`fetched ${data.transactions.length} tx for ${exchangeAddress}`);
+
+        this.setState({
+          transactions: data.transactions
+        });
       }
 
-      const json = await data.json();
 
-      console.log(`fetched ${json.length} tx for ${exchangeAddress}`);
-
-      this.setState({
-        transactions: json
-      });
     } catch (err) {
       console.log("error: ", err);
     }

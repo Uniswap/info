@@ -42,9 +42,13 @@ export class ChartContainer extends Container {
           break;
       }
 
+      // TODO - replace this with the graph
+      // Decide how to present the data. will probably just be every single event, not averaged over the day
+      // TODO - might be able to add in some more information too, like ROI
       const data = await fetch(
         `${BASE_URL}v1/chart?exchangeAddress=${exchangeAddress}&startTime=${utcStartTime.unix()}&endTime=${utcEndTime.unix()}&unit=${unit}`
       );
+      // console.log(`${BASE_URL}v1/chart?exchangeAddress=${exchangeAddress}&startTime=${utcStartTime.unix()}&endTime=${utcEndTime.unix()}&unit=${unit}`)
 
       if (!data.ok) {
         throw Error(data.status);
@@ -52,7 +56,7 @@ export class ChartContainer extends Container {
 
       const json = await data.json();
 
-      console.log(`fetched ${json.length} chart data for ${exchangeAddress}`);
+      // console.log(`fetched ${json.length} chart data for ${exchangeAddress}`);
 
       this.setState({
         data: json
