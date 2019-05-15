@@ -15,11 +15,8 @@ import { Header, Divider, Hint, Address } from './components'
 
 import { setThemeColor, isWeb3Available } from './helpers/'
 
-import { ApolloProvider, Query } from 'react-apollo'
+import { ApolloProvider } from 'react-apollo'
 import { client } from './apollo/client'
-import { TRANSACTIONS_QUERY } from './apollo/queries'
-
-
 
 const timeframeOptions = [
   { value: '1week', label: '1 week' },

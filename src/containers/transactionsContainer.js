@@ -1,8 +1,6 @@
 import { Container } from "unstated";
 import dayjs from "dayjs";
 
-import { BASE_URL } from "../helpers";
-
 import { client } from "../apollo/client"
 import { TRANSACTIONS_QUERY } from '../apollo/queries'
 

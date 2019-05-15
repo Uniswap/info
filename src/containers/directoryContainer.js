@@ -1,84 +1,107 @@
-import { Container } from "unstated";
+import { Container } from 'unstated'
 
-import { BASE_URL, Big } from "../helpers";
+import { Big } from '../helpers'
+import { client } from '../apollo/client'
+import { DIRECTORY_QUERY, TICKER_QUERY } from '../apollo/queries'
 
 export class DirectoryContainer extends Container {
   state = {
     directory: [],
     exchanges: [],
-    defaultExchangeAddress: "",
+    defaultExchangeAddress: '',
     activeExchange: {}
-  };
+  }
 
   setActiveExchange = address =>
-    this.setState({ activeExchange: this.state.exchanges[address] });
+    this.setState({ activeExchange: this.state.exchanges[address] })
 
-  async fetchDirectory() {
+  async fetchDirectory () {
     try {
-      const data = await fetch(`${BASE_URL}v1/directory`);
-
-      if (!data.ok) {
-        throw Error(data.status);
+      let data = []
+      let dataEnd = false
+      let skip = 0
+      while (!dataEnd) {
+        let result = await client.query({
+          query: DIRECTORY_QUERY,
+          variables: {
+            first: 100,
+            skip: skip
+          },
+          fetchPolicy: 'network-only',
+        })
+        data = data.concat(result.data.exchanges)
+        skip = skip + 100
+        if (result.data.exchanges.length !== 100) {
+          dataEnd = true
+        }
       }
-
-      const json = await data.json();
-
-      let directoryObjects = {};
-      json.exchanges.forEach(exchange => {
-        directoryObjects[exchange.exchangeAddress] = buildDirectoryObject(
-          exchange
-        );
-      });
-
-      console.log(`fetched ${json.exchanges.length} exchanges`);
+      console.log(`fetched ${data.length} exchanges for directory`)
+      let directoryObjects = {}
+      data.forEach(exchange => {
+        directoryObjects[exchange.id] = buildDirectoryObject(exchange)
+      })
 
       await this.setState({
-        directory: json.exchanges.map(exchange => buildDirectoryLabel(exchange)),
+        directory: data.map(exchange => buildDirectoryLabel(exchange)),
         exchanges: directoryObjects
-      });
+      })
 
+      let mkrDefault
+      for (let i = 0; i < this.state.directory.length; i++) {
+        if (this.state.directory[i].label === 'MKR') {
+          mkrDefault = this.state.directory[i].value
+          break
+        }
+      }
       // set default exchange address
       await this.setState({
-        defaultExchangeAddress: this.state.directory[0].value
-      });
+        defaultExchangeAddress: mkrDefault
+      })
+
     } catch (err) {
-      console.log("error: ", err);
+      console.log('error: ', err)
     }
   }
 
   // fetch exchange information via address
-  async fetchTicker(address) {
+  async fetchTicker (address) {
     try {
-      const data = await fetch(
-        `${BASE_URL}v1/ticker?exchangeAddress=${address}`
-      );
-      console.log(`${BASE_URL}v1/ticker?exchangeAddress=${address}`)
-
-      if (!data.ok) {
-        throw Error(data.status);
+      const result = await client.query({
+        query: TICKER_QUERY,
+        variables: {
+          id: address
+        },
+        fetchPolicy: 'network-only',
+      })
+      let data
+      if (result) {
+        data = result.data.exchange
+        console.log(data)
       }
 
-      const json = await data.json();
-
       const {
-        tradeVolume,
-        ethLiquidity,
-        priceChangePercent,
-        erc20Liquidity,
         price,
-        invPrice
-      } = json;
+        ethBalance,
+        tokenBalance,
+        tradeVolumeEth,
+        tradeVolumeToken
+      } = data
 
-      let percentChange = "";
-      const adjustedPriceChangePercent = (priceChangePercent * 100).toFixed(2);
+      // TODO - real percent price change, match their real volume
 
-      adjustedPriceChangePercent > 0
-        ? (percentChange = "+")
-        : (percentChange = "");
+      const invPrice = 1 / price
+      let percentChange = '0.555'
 
-      percentChange += adjustedPriceChangePercent;
+      // let percentChange = ''
+      // const adjustedPriceChangePercent = (priceChangePercent * 100).toFixed(2)
+      //
+      // adjustedPriceChangePercent > 0
+      //   ? (percentChange = '+')
+      //   : (percentChange = '')
+      //
+      // percentChange += adjustedPriceChangePercent
 
-      console.log(`fetched ticker for ${address}`);
+      console.log(`fetched ticker for ${address}`)
 
       // update "exchanges" with new information
       await this.setState(prevState => ({
@@ -89,44 +112,46 @@ export class DirectoryContainer extends Container {
             price,
             invPrice,
             percentChange,
-            tradeVolume: Big(tradeVolume).toFixed(4),
-            ethLiquidity: Big(ethLiquidity).toFixed(4),
-            erc20Liquidity: Big(erc20Liquidity).toFixed(4)
+            tradeVolume: Big(tradeVolumeEth).toFixed(4),
+            ethLiquidity: Big(ethBalance).toFixed(4),
+            erc20Liquidity: Big(tokenBalance).toFixed(4)
           }
         }
-      }));
+      }))
 
       // update "activeExchange" from now updated "exchanges"
-      await this.setActiveExchange(address);
+      await this.setActiveExchange(address)
     } catch (err) {
-      console.log("error: ", err);
+      console.log('error: ', err)
     }
   }
 }
 
 const buildDirectoryLabel = exchange => {
-  const { symbol, exchangeAddress } = exchange;
+  const { tokenSymbol, id } = exchange
+  const exchangeAddress = id
 
   return {
-    // label: `${symbol} - ${exchangeAddress}`,
-    label: symbol,
+    label: tokenSymbol,
     value: exchangeAddress
-  };
-};
+  }
+}
 
 const buildDirectoryObject = exchange => {
   const {
-    name,
-    symbol,
-    exchangeAddress,
+    tokenName,
+    tokenSymbol,
+    id,
     tokenAddress,
     tokenDecimals,
     theme
-  } = exchange;
+  } = exchange
+
+  const exchangeAddress = id
 
   return {
-    name,
-    symbol,
+    tokenName,
+    tokenSymbol,
     exchangeAddress,
     tokenAddress,
     tokenDecimals,
@@ -137,5 +162,5 @@ const buildDirectoryObject = exchange => {
     invPrice: 0,
     ethLiquidity: 0,
     erc20Liquidity: 0
-  };
-};
+  }
+}
