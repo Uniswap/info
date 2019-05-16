@@ -1,8 +1,8 @@
 import { Container } from 'unstated'
-
+import dayjs from "dayjs";
 import { Big } from '../helpers'
 import { client } from '../apollo/client'
-import { DIRECTORY_QUERY, TICKER_QUERY } from '../apollo/queries'
+import { DIRECTORY_QUERY, TICKER_QUERY, TICKER_24HOUR_QUERY } from '../apollo/queries'
 
 export class DirectoryContainer extends Container {
   state = {
@@ -76,7 +76,6 @@ export class DirectoryContainer extends Container {
       let data
       if (result) {
         data = result.data.exchange
-        console.log(data)
       }
 
       const {
@@ -84,22 +83,38 @@ export class DirectoryContainer extends Container {
         ethBalance,
         tokenBalance,
         tradeVolumeEth,
-        tradeVolumeToken
       } = data
 
       // TODO - real percent price change, match their real volume
-
+      let data24HoursAgo
+      try {
+        const utcCurrentTime = dayjs()
+        const utcOneDayBack = utcCurrentTime.subtract(1, "day")
+        const result24HoursAgo = await client.query({
+          query: TICKER_24HOUR_QUERY,
+          variables: {
+            exchangeAddr: address,
+            timestamp: utcOneDayBack.unix()
+          },
+          fetchPolicy: 'network-only',
+        })
+        if (result24HoursAgo) {
+          data24HoursAgo = result24HoursAgo.data.exchangeHistories[0]
+        }
+      } catch (err) {
+        console.log('error: ', err)
+      }
       const invPrice = 1 / price
-      let percentChange = '0.555'
 
-      // let percentChange = ''
-      // const adjustedPriceChangePercent = (priceChangePercent * 100).toFixed(2)
-      //
-      // adjustedPriceChangePercent > 0
-      //   ? (percentChange = '+')
-      //   : (percentChange = '')
-      //
-      // percentChange += adjustedPriceChangePercent
+      let percentChange = ''
+      const adjustedPriceChangePercent = ((price - data24HoursAgo.price) /price * 100).toFixed(2)
+      adjustedPriceChangePercent > 0
+        ? (percentChange = '+')
+        : (percentChange = '')
+
+      percentChange += adjustedPriceChangePercent
+
+      let oneDayVolume = tradeVolumeEth - data24HoursAgo.tradeVolumeEth
 
       console.log(`fetched ticker for ${address}`)
 
@@ -112,7 +127,7 @@ export class DirectoryContainer extends Container {
             price,
             invPrice,
             percentChange,
-            tradeVolume: Big(tradeVolumeEth).toFixed(4),
+            tradeVolume: Big(oneDayVolume).toFixed(4),
             ethLiquidity: Big(ethBalance).toFixed(4),
             erc20Liquidity: Big(tokenBalance).toFixed(4)
           }

@@ -32,23 +32,20 @@ export const CHART_QUERY = gql`
   }
 `
 export const TICKER_QUERY = gql`
-  query userExchnageData($id: String!) {
+  query exchange($id: String!) {
     exchange(id: $id) {
-        price
-        ethBalance
-        tokenBalance
-        tradeVolumeEth
-        tradeVolumeToken
+      price
+      tokenBalance
+      ethBalance
+      tradeVolumeEth
     }
   }
 `
-// TODO - figure out how to get roughly a 24 hour time
 export const TICKER_24HOUR_QUERY = gql`
-  query userExchnageData($id: String!) {
-    exchange(id: $id) {
+  query exchangeHistories($timestamp: Int!, $exchangeAddr: String!) {
+    exchangeHistories(where:{timestamp_lt: $timestamp, exchangeAddress: $exchangeAddr}, first: 1){
       price
       tradeVolumeEth
-      tradeVolumeToken
     }
   }
 `
@@ -66,7 +63,7 @@ export const DIRECTORY_QUERY = gql`
 `
 
 export const USER_POOL_QUERY = gql`
-  query exchange ($id: String!) {
+  query userExchangeData ($id: String!) {
     userExchangeData(id: $id){
       uniTokenBalance
     }
@@ -74,7 +71,7 @@ export const USER_POOL_QUERY = gql`
 `
 
 export const TOTAL_POOL_QUERY = gql`
-  query userExchnageData($id: String!) {
+  query exchange($id: String!) {
     exchange(id: $id) {
       totalUniToken
       tokenAddress
