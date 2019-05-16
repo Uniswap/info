@@ -57,7 +57,7 @@ export class ChartContainer extends Container {
           break
       }
 
-      console.log((utcStartTime.unix() - 1)/1000)
+      let startTime = utcStartTime.unix() - 1 // -1 because we filter on greater than in the query
       let data = []
       let dataEnd = false
       while (!dataEnd) {
@@ -65,58 +65,31 @@ export class ChartContainer extends Container {
           query: CHART_QUERY,
           variables: {
             exchangeAddr: exchangeAddress,
-            date: utcStartTime.unix() - 1 // -1 because we filter on greater than in the query
+            date: startTime
           },
           fetchPolicy: 'network-only',
         })
-        console.log(result)
+        data = data.concat(result.data.exchangeDayDatas)
         if (result.data.exchangeDayDatas.length !== 100) {
           dataEnd = true
+        } else {
+          startTime = result.data.exchangeDayDatas[99].date - 1
         }
       }
+      console.log(data)
+      data.forEach((dayData, i) => {
+        let dayTimestamp = dayjs.unix(data[i].date)
+        // note, the dayjs api says date starts at 1, but it appears it doesnt, as I had to add 1
+        let dayString = dayTimestamp.year().toString().concat('-').concat((dayTimestamp.month() + 1).toString()).concat('-').concat((dayTimestamp.date() + 1).toString())
+        data[i].date = dayString
+      })
+      console.log(data)
 
 
 
-      /*
-      // If all time we need to run an initial query to figure out when this exchange was created
-      // Then get dates from then on
-      if (allTime) {
-        let initialResult = await client.query({
-          query: INITIAL_CHART_QUERY,
-          variables: {
-            exchangeAddr: exchangeAddress
-          },
-          fetchPolicy: 'network-only',
-        })
-        console.log(initialResult.data)
-        console.log(dayjs.unix(initialResult.data.exchangeHistories[0].timestamp))
-        utcStartTime = dayjs.unix(initialResult.data.exchangeHistories[0].timestamp)
-        let utcStartConverted = utcStartTime.year().toString().concat('-').concat((utcStartTime.month() + 1).toString()).concat('-').concat(utcStartTime.date().toString())
-        console.log(utcStartConverted)
-        let baseDate = dayjs(utcStartConverted).unix()
-        console.log(baseDate)
-      }
-      while (!dataEnd) {
-        let loopingResult = await client.query({
-          query: LOOPING_CHART_QUERY,
-          variables: {
-            exchangeAddr: exchangeAddress,
-            timestamp: utcStartTime.unix()
-
-          },
-          fetchPolicy: 'network-only',
-        })
-        console.log(loopingResult)
-        if (utcStartTime + 86400 > utcEndTime) {
-          dataEnd = true
-        }
-      }
-*/
-      // console.log(`fetched ${data.length} exchange history points for chart`)
-
-      // await this.setState({
-      //   data: data
-      // });
+      await this.setState({
+        data: data
+      });
     } catch (err) {
       console.log('error: ', err)
     }

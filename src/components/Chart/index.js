@@ -89,7 +89,7 @@ const Chart = ({ data, symbol }) => {
             hide={token}
             type="monotone"
             yAxisId={1}
-            dataKey="tokenLiquidity"
+            dataKey="tokenBalance"
             name={`${symbol} Liquidity`}
             stroke="var(--c-token)"
           />
@@ -109,7 +109,7 @@ const Chart = ({ data, symbol }) => {
             hide={eth}
             type="monotone"
             name="ETH Liquidity"
-            dataKey="ethLiquidity"
+            dataKey="ethBalance"
             yAxisId={1}
             stroke="var(--c-uniswappink)"
           />

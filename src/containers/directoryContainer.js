@@ -46,6 +46,7 @@ export class DirectoryContainer extends Container {
         exchanges: directoryObjects
       })
 
+      console.log(directoryObjects)
       let mkrDefault
       for (let i = 0; i < this.state.directory.length; i++) {
         if (this.state.directory[i].label === 'MKR') {
@@ -53,6 +54,7 @@ export class DirectoryContainer extends Container {
           break
         }
       }
+
       // set default exchange address
       await this.setState({
         defaultExchangeAddress: mkrDefault
