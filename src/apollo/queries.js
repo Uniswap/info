@@ -15,22 +15,21 @@ export const TRANSACTIONS_QUERY = gql`
     }
   }
 `
-// TODO
 export const CHART_QUERY = gql`
-  query transactions {
-    transactions(where:{exchangeAddress: "0x2c4bd064b998838076fa341a83d007fc2fa50957"}, orderBy: timestamp, orderDirection: desc){
-      id
-      user
-      block
-      ethAmount
-      tokenAmount
-      fee
-      event
-      timestamp
-      tx
+  query exchangeDayDatas($date: Int!, $exchangeAddr: String!) {
+    exchangeDayDatas(where:{ exchangeAddress: $exchangeAddr, date_gt: $date}, orderBy: date, orderDirection: asc){
+      date
+      ethBalance
+      tokenBalance
+      marginalEthRate
+      ethVolume
+      ROI
+      tokenPriceUSD
+      totalEvents
     }
   }
 `
+
 export const TICKER_QUERY = gql`
   query exchange($id: String!) {
     exchange(id: $id) {
@@ -42,7 +41,7 @@ export const TICKER_QUERY = gql`
   }
 `
 export const TICKER_24HOUR_QUERY = gql`
-  query exchangeHistories($timestamp: Int!, $exchangeAddr: String!) {
+  query exchangeHistoricalDatas($timestamp: Int!, $exchangeAddr: String!) {
     exchangeHistories(where:{timestamp_lt: $timestamp, exchangeAddress: $exchangeAddr}, first: 1){
       price
       tradeVolumeEth
