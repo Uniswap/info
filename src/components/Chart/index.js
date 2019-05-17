@@ -17,7 +17,7 @@ import { toK, toNiceDate, toNiceDateYear } from "../../helpers";
 
 const Controls = styled.div`
   display: grid;
-  grid-template-columns: repeat(6, max-content);
+  grid-template-columns: repeat(7, max-content);
   grid-column-gap: 8px;
 `;
 
@@ -28,6 +28,8 @@ const Chart = ({ data, symbol }) => {
   const [rate, toggleRate] = useState(false);
   const [roi, toggleROI] = useState(false);
   const [usd, toggleUSD] = useState(false);
+  const [txs, toggleTxs] = useState(false);
+
 
   const isNotMobile = useMedia("(max-width: 40em)");
 
@@ -108,6 +110,16 @@ const Chart = ({ data, symbol }) => {
           <Line
             strokeWidth={2}
             dot={false}
+            hide={txs}
+            type="monotone"
+            name="Transactions"
+            yAxisId={1}
+            dataKey="totalEvents"
+            stroke="orange"
+          />
+          <Line
+            strokeWidth={2}
+            dot={false}
             hide={usd}
             type="monotone"
             name="Token Price USD"
@@ -168,6 +180,16 @@ const Chart = ({ data, symbol }) => {
             bg="red"
           >
             ROI
+          </Button>
+          <Button
+            onClick={() => toggleTxs(!txs)}
+            variant={txs ? "outline" : null}
+            fontSize={[0, 1]}
+            color={txs ? "orange" : "white"}
+            borderColor="orange"
+            bg="orange"
+          >
+            Transactions
           </Button>
           <Button
             onClick={() => toggleUSD(!usd)}

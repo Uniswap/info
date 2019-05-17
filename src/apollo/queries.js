@@ -51,7 +51,7 @@ export const TICKER_24HOUR_QUERY = gql`
 
 export const DIRECTORY_QUERY = gql`
   query exchanges($first: Int!, $skip: Int!) {
-    exchanges(first: $first, skip: $skip) {
+    exchanges(first: $first, skip: $skip, orderBy: tradeVolumeEth, orderDirection: desc) {
       id
       tokenSymbol
       tokenName

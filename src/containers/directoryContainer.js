@@ -46,17 +46,19 @@ export class DirectoryContainer extends Container {
         exchanges: directoryObjects
       })
 
-      let mkrDefault
-      for (let i = 0; i < this.state.directory.length; i++) {
-        if (this.state.directory[i].label === 'MKR') {
-          mkrDefault = this.state.directory[i].value
-          break
-        }
-      }
+
+      let defaultExchange = this.state.directory[0].value
+      // let mkrDefault
+      // for (let i = 0; i < this.state.directory.length; i++) {
+      //   if (this.state.directory[i].label === 'MKR') {
+      //     mkrDefault = this.state.directory[i].value
+      //     break
+      //   }
+      // }
 
       // set default exchange address
       await this.setState({
-        defaultExchangeAddress: mkrDefault
+        defaultExchangeAddress: defaultExchange
       })
 
     } catch (err) {
@@ -142,8 +144,11 @@ export class DirectoryContainer extends Container {
 }
 
 const buildDirectoryLabel = exchange => {
-  const { tokenSymbol, id } = exchange
+  let { tokenSymbol, id } = exchange
   const exchangeAddress = id
+  if (tokenSymbol === null){
+    tokenSymbol = "unknown"
+  }
 
   return {
     label: tokenSymbol,
