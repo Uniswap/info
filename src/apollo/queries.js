@@ -41,8 +41,8 @@ export const TICKER_QUERY = gql`
   }
 `
 export const TICKER_24HOUR_QUERY = gql`
-  query exchangeHistories($timestamp: Int!, $exchangeAddr: String!) {
-    exchangeHistories(where:{timestamp_lt: $timestamp, exchangeAddress: $exchangeAddr}, first: 1){
+  query exchangeHistoricalDatas($timestamp: Int!, $exchangeAddr: String!) {
+    exchangeHistoricalDatas(where:{timestamp_lt: $timestamp, exchangeAddress: $exchangeAddr}, first: 1){
       price
       tradeVolumeEth
     }

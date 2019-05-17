@@ -46,7 +46,6 @@ export class DirectoryContainer extends Container {
         exchanges: directoryObjects
       })
 
-      console.log(directoryObjects)
       let mkrDefault
       for (let i = 0; i < this.state.directory.length; i++) {
         if (this.state.directory[i].label === 'MKR') {
@@ -79,7 +78,6 @@ export class DirectoryContainer extends Container {
       if (result) {
         data = result.data.exchange
       }
-
       const {
         price,
         ethBalance,
@@ -87,7 +85,6 @@ export class DirectoryContainer extends Container {
         tradeVolumeEth,
       } = data
 
-      // TODO - real percent price change, match their real volume
       let data24HoursAgo
       try {
         const utcCurrentTime = dayjs()
@@ -101,7 +98,7 @@ export class DirectoryContainer extends Container {
           fetchPolicy: 'network-only',
         })
         if (result24HoursAgo) {
-          data24HoursAgo = result24HoursAgo.data.exchangeHistories[0]
+          data24HoursAgo = result24HoursAgo.data.exchangeHistoricalDatas[0]
         }
       } catch (err) {
         console.log('error: ', err)
@@ -161,14 +158,18 @@ const buildDirectoryObject = exchange => {
     id,
     tokenAddress,
     tokenDecimals,
-    theme
   } = exchange
 
   const exchangeAddress = id
+  const symbol = tokenSymbol
+  let theme = hardcodeThemes[exchangeAddress]
+  if (theme == undefined){
+    theme = ""
+  }
 
   return {
     tokenName,
-    tokenSymbol,
+    symbol,
     exchangeAddress,
     tokenAddress,
     tokenDecimals,
@@ -180,4 +181,13 @@ const buildDirectoryObject = exchange => {
     ethLiquidity: 0,
     erc20Liquidity: 0
   }
+}
+
+// These are previously received from the loanscan api. Only 5 were found
+const hardcodeThemes = {
+  "0x2c4bd064b998838076fa341a83d007fc2fa50957": "#1abc9c",
+  "0xae76c84c9262cdb9abc0c2c8888e62db8e22a0bf": "#302c2c",
+  "0x09cabec1ead1c0ba254b09efb3ee13841712be14": "#fdc134",
+  "0x4e395304655f0796bc3bc63709db72173b9ddf98": "#00b4f4",
+  "0x2e642b8d59b45a1d8c5aef716a84ff44ea665914": "#ff5000",
 }

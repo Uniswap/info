@@ -2,20 +2,8 @@ import { Container } from 'unstated'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 
-// import { client } from '../apollo/client'
+import { client } from '../apollo/client'
 import { CHART_QUERY } from '../apollo/queries'
-import { ApolloClient } from 'apollo-client'
-import { HttpLink } from 'apollo-link-http'
-import { InMemoryCache } from 'apollo-cache-inmemory'
-
-// TODO - remove this once mainnet is synced up , and use the normal
-export const client = new ApolloClient({
-  link: new HttpLink({
-    uri: 'http://127.0.0.1:8000/subgraphs/name/davekaj/uniswap'
-  }),
-  cache: new InMemoryCache(),
-})
-
 
 dayjs.extend(utc)
 
@@ -76,16 +64,13 @@ export class ChartContainer extends Container {
           startTime = result.data.exchangeDayDatas[99].date - 1
         }
       }
-      console.log(data)
       data.forEach((dayData, i) => {
         let dayTimestamp = dayjs.unix(data[i].date)
         // note, the dayjs api says date starts at 1, but it appears it doesnt, as I had to add 1
         let dayString = dayTimestamp.year().toString().concat('-').concat((dayTimestamp.month() + 1).toString()).concat('-').concat((dayTimestamp.date() + 1).toString())
         data[i].date = dayString
       })
-      console.log(data)
-
-
+      console.log(`fetched ${data.length} days worth of chart data`)
 
       await this.setState({
         data: data
