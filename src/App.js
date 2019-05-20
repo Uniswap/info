@@ -476,6 +476,10 @@ const retrieveData = async (tokenSymbol, exchangeAddress) => {
         });
       });
     } catch (error) {
+      // reduce block page size if the results are too large
+      blockPageAmount = Math.ceil(blockPageAmount / 2);
+      toBlock = fromBlock + blockPageAmount;
+
       console.log(error);
       continue;
     };
