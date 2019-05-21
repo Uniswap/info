@@ -20,33 +20,25 @@ export class ChartContainer extends Container {
       const utcEndTime = dayjs.utc()
 
       let utcStartTime
-      let unit
-      let allTime = false
 
       // go back, go way way back
       switch (daysToQuery) {
         case 'all':
           utcStartTime = utcEndTime.subtract(1, 'year').startOf('year')
-          unit = 'month'
-          allTime = true
           break
         case '3months':
           utcStartTime = utcEndTime.subtract(3, 'month').startOf('month')
-          unit = 'day'
           break
         case '1month':
           utcStartTime = utcEndTime.subtract(1, 'month').startOf('month')
-          unit = 'day'
           break
         case '1week':
         default:
           utcStartTime = utcEndTime.subtract(7, 'day').startOf('day')
-          unit = 'day'
           break
       }
-
       let startTime = utcStartTime.unix() - 1 // -1 because we filter on greater than in the query
-      let data = []
+       let data = []
       let dataEnd = false
       while (!dataEnd) {
         let result = await client.query({
@@ -68,14 +60,14 @@ export class ChartContainer extends Container {
         let dayTimestamp = dayjs.unix(data[i].date)
         // note, the dayjs api says date starts at 1, but it appears it doesnt, as I had to add 1
         let dayString = dayTimestamp.year().toString().concat('-').concat((dayTimestamp.month() + 1).toString()).concat('-').concat((dayTimestamp.date() + 1).toString())
-        data[i].date = dayString
+        data[i].dayString = dayString
       })
       console.log(`fetched ${data.length} days worth of chart data`)
 
       await this.setState({
         data: data
       });
-    } catch (err) {
+     } catch (err) {
       console.log('error: ', err)
     }
   }

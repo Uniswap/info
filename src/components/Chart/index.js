@@ -46,7 +46,7 @@ const Chart = ({ data, symbol }) => {
             axisLine={false}
             interval="preserveStartEnd"
             tickFormatter={tick => toNiceDate(tick)}
-            dataKey="date"
+            dataKey="dayString"
           />
           <YAxis
             hide={isNotMobile}
@@ -115,7 +115,7 @@ const Chart = ({ data, symbol }) => {
             name="Transactions"
             yAxisId={1}
             dataKey="totalEvents"
-            stroke="orange"
+            stroke="orange "
           />
           <Line
             strokeWidth={2}
