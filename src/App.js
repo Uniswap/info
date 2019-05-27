@@ -11,12 +11,14 @@ import Footer from './components/Footer'
 import TransactionsList from './components/TransactionsList'
 import Chart from './components/Chart'
 import Loader from './components/Loader'
-import { Header, Divider, Hint, Address } from './components'
+import { Header, Divider, Hint, Address, FrontPageTitle, FrontPageHeader } from './components'
 
 import { setThemeColor, isWeb3Available } from './helpers/'
 
 import { ApolloProvider } from 'react-apollo'
 import { client } from './apollo/client'
+import PoolSizeList from './components/ExchangeTable'
+import Emoji from './components/Emoji'
 
 const timeframeOptions = [
   { value: '1week', label: '1 week' },
@@ -27,7 +29,8 @@ const timeframeOptions = [
 
 class App extends Component {
   state = {
-    historyDaysToQuery: 7
+    historyDaysToQuery: 7,
+    homePage: true
   }
 
   // Fetch Exchange's Transactions
@@ -152,6 +155,27 @@ class App extends Component {
         <Wrapper>
           <Loader fill="true"/>
         </Wrapper>
+      )
+
+    if (this.state.homePage)
+      return (
+        <ApolloProvider client={client}>
+          <Wrapper>
+            <FrontPageHeader
+              px={24}
+              py={3}
+              bg={['mineshaft', 'transparent']}
+              color={['white', 'black']}
+            >
+              <FrontPageTitle/>
+            </FrontPageHeader>
+
+            <PoolSizeList
+              transactions={transactions}
+              tokenSymbol={symbol}
+            />
+        </Wrapper>
+        </ApolloProvider>
       )
 
     return (

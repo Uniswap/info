@@ -61,6 +61,15 @@ export const DIRECTORY_QUERY = gql`
   }
 `
 
+export const FRONT_PAGE_QUERY = gql`
+  query exchanges($first: Int!) {
+    exchanges(first: $first, orderBy: tradeVolumeEth, orderDirection: desc) {
+      id
+      tradeVolumeEth
+    }
+  }
+`
+
 export const USER_POOL_QUERY = gql`
   query userExchangeData ($id: String!) {
     userExchangeData(id: $id){

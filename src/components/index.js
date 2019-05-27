@@ -1,6 +1,7 @@
 import React from "react";
 import styled from "styled-components";
-import { Text, Box } from "rebass";
+import { Text, Flex, Box } from "rebass";
+import Emoji from "./Emoji";
 
 import Link from "./Link";
 import Panel from "./Panel";
@@ -36,4 +37,22 @@ const Address = ({ address, ...rest }) => (
   </Link>
 );
 
-export { Hint, Divider, Header, Address };
+const FrontPageHeader = styled(Panel)`
+  display: grid;
+  grid-template-columns: 1fr minmax(224px);
+  align-items: center;
+`;
+
+
+const FrontPageTitle = () => (
+  <Flex alignItems="center" justifyContent='center'>
+    <Text fontSize="1.5rem" lineHeight="1">
+      <Emoji symbol="🦄" label="Unicorn" />
+    </Text>
+    <Text fontWeight={500} mx="1rem" lineHeight="1.5rem">
+      Uniswap Total Stats
+    </Text>
+  </Flex>
+);
+
+export { Hint, Divider, Header, Address, FrontPageHeader, FrontPageTitle };
