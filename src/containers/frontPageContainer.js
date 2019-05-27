@@ -1,29 +1,47 @@
 import { Container } from 'unstated'
 import dayjs from 'dayjs'
 import { client } from '../apollo/client'
-import { FRONT_PAGE_QUERY, FRONT_PAGE_24HOUR } from '../apollo/queries'
+import { FRONT_PAGE_QUERY, FRONT_PAGE_24HOUR, TOTALS_QUERY } from '../apollo/queries'
 
 export class FrontPageContainer extends Container {
   state = {
     topTen: [],
-    yesterdaysVolume: [],
+    totals: {},
+  }
+
+  async fetchTotals () {
+    try {
+      let data = []
+      let result = await client.query({
+        query: TOTALS_QUERY,
+        fetchPolicy: 'network-only',
+      })
+
+      console.log(result)
+      console.log(`fetched uniswap total data`)
+      //
+      await this.setState({
+        totals: result.data.uniswap
+      })
+
+      console.log(this.state.totals)
+    } catch (err) {
+      console.log('error: ', err)
+    }
   }
 
   async fetchFrontTwenty () {
     try {
       let data = []
-      let dataEnd = false
-      let skip = 0
       let result = await client.query({
         query: FRONT_PAGE_QUERY,
         variables: {
-          first: 50,
+          first: 10, // TODO optimize , and probably call 50 of them
         },
         fetchPolicy: 'network-only',
       })
       data = data.concat(result.data.exchanges)
 
-      console.log('TOP TWENTY: ', data)
       console.log(`fetched ${data.length} exchanges ordered by trade volume`)
 
       await this.setState({
@@ -51,14 +69,15 @@ export class FrontPageContainer extends Container {
           fetchPolicy: 'network-only',
         })
         if (result) {
-          addresses[i].tradeVolumeEth = addresses[i].tradeVolumeEth - result.data.exchangeHistoricalDatas[0].tradeVolumeEth
+          addresses[i].tradeVolumeEth = (addresses[i].tradeVolumeEth - result.data.exchangeHistoricalDatas[0].tradeVolumeEth).toFixed(4)
         }
 
       }
       addresses.sort(function(a, b){
         return b.tradeVolumeEth -a.tradeVolumeEth
       })
-      console.log("updated:", addresses)
+      console.log(`fetched ${addresses.length} exchanges 24 hour trade volume`)
+      console.log("Top Ten:", addresses)
 
       await this.setState({
         topTen: addresses

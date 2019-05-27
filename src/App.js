@@ -104,6 +104,7 @@ class App extends Component {
   async componentDidMount () {
     try {
 
+      await this.props.frontPageStore.fetchTotals()
       await this.props.frontPageStore.fetchFrontTwenty()
       // first, fetch directory & set default exchange address
       await this.props.directoryStore.fetchDirectory()
@@ -116,6 +117,11 @@ class App extends Component {
       console.log('error:', err)
     }
   }
+
+   formatNumber = (num) => {
+    return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
+  }
+
 
   render () {
     // spread state into cleaner vars
@@ -131,8 +137,17 @@ class App extends Component {
       tokenAddress
     } = this.props.directoryStore.state.activeExchange
 
-    // FrontPage Store
     const {
+      exchangeCount,
+      totalLiquidityInEth,
+      totalLiquidityUSD,
+      totalVolumeInEth,
+      totalVolumeUSD,
+      txCount
+    } = this.props.frontPageStore.state.totals
+
+    // FrontPage Store
+    const { // tOdo dk - why doest this work when calling below in the component
       state: {frontPage}
     } = this.props.frontPageStore
 
@@ -175,8 +190,89 @@ class App extends Component {
             >
               <FrontPageTitle/>
             </FrontPageHeader>
+            <Panel rounded bg="white" area="liquidity">
+              <FourByFour
+                p={24}
+                topLeft={<Hint color="text">Total All Time Volume ETH</Hint>}
+                bottomLeft={
+                  <Text
+                    fontSize={20}
+                    color="token"
+                    className="-transition"
+                    lineHeight={1.4}
+                    fontWeight={500}
+                  >
+                    {this.formatNumber(Number(totalVolumeInEth).toFixed(2))}
+                  </Text>
+                }
+                topRight={<Hint color="text">Total All Time Volume USD</Hint>}
+                bottomRight={
+                  <Text
+                    fontSize={20}
+                    color="uniswappink"
+                    lineHeight={1.4}
+                    fontWeight={500}
+                  >
+                    ${this.formatNumber(Number(totalVolumeUSD).toFixed(2))}
+                  </Text>
+                }
+              />
+              <Divider/>
+              <FourByFour
+                p={24}
+                topLeft={<Hint color="text">Total Liquidity in ETH</Hint>}
+                bottomLeft={
+                  <Text
+                    color="token"
+                    className="-transition"
+                    fontSize={20}
+                    lineHeight={1.4}
+                    fontWeight={500}
+                  >
+                    {this.formatNumber(Number(totalLiquidityInEth).toFixed(2))}
+                  </Text>
+                }
+                topRight={<Hint color="text">Total Liquidity in USD</Hint>}
+                bottomRight={
+                  <Text
+                    color="uniswappink"
+                    fontSize={20}
+                    lineHeight={1.4}
+                    fontWeight={500}
+                  >
+                    ${this.formatNumber(Number(totalLiquidityUSD).toFixed(2))}
+                  </Text>
+                }
+              />
+              <FourByFour
+                p={24}
+                topLeft={<Hint color="text">Total Exchanges</Hint>}
+                bottomLeft={
+                  <Text
+                    color="token"
+                    className="-transition"
+                    fontSize={20}
+                    lineHeight={1.4}
+                    fontWeight={500}
+                  >
+                    {Number(exchangeCount)}
+                  </Text>
+                }
+                topRight={<Hint color="text">Total Transactions</Hint>}
+                bottomRight={
+                  <Text
+                    color="uniswappink"
+                    fontSize={20}
+                    lineHeight={1.4}
+                    fontWeight={500}
+                  >
+                    {this.formatNumber(Number(txCount))}
+                  </Text>
+                }
+              />
+            </Panel>
             <PoolSizeList
-              topTen={this.props.frontPageStore.state.topTwenty}
+              topTen={this.props.frontPageStore.state.topTen}
             />
         </Wrapper>
         </ApolloProvider>

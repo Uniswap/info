@@ -70,7 +70,18 @@ export const FRONT_PAGE_QUERY = gql`
     }
   }
 `
-
+export const TOTALS_QUERY = gql`
+  query totals {
+    uniswap(id: "1"){
+      totalVolumeUSD
+      totalVolumeInEth
+      totalLiquidityUSD
+      totalLiquidityInEth
+      txCount
+      exchangeCount
+    }
+  }
+`
 export const FRONT_PAGE_24HOUR = gql`
   query exchangeHistoricalDatas($timestamp: Int!, $exchangeAddr: String!) {
     exchangeHistoricalDatas(where:{timestamp_lt: $timestamp, exchangeAddress: $exchangeAddr}, first: 1){
