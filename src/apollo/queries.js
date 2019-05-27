@@ -66,6 +66,15 @@ export const FRONT_PAGE_QUERY = gql`
     exchanges(first: $first, orderBy: tradeVolumeEth, orderDirection: desc) {
       id
       tradeVolumeEth
+      tokenName
+    }
+  }
+`
+
+export const FRONT_PAGE_24HOUR = gql`
+  query exchangeHistoricalDatas($timestamp: Int!, $exchangeAddr: String!) {
+    exchangeHistoricalDatas(where:{timestamp_lt: $timestamp, exchangeAddress: $exchangeAddr}, first: 1){
+      tradeVolumeEth
     }
   }
 `

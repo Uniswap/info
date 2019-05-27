@@ -9,6 +9,7 @@ import Dashboard from './components/Dashboard'
 import Select from './components/Select'
 import Footer from './components/Footer'
 import TransactionsList from './components/TransactionsList'
+import PoolSizeList from './components/ExchangeTable'
 import Chart from './components/Chart'
 import Loader from './components/Loader'
 import { Header, Divider, Hint, Address, FrontPageTitle, FrontPageHeader } from './components'
@@ -17,8 +18,6 @@ import { setThemeColor, isWeb3Available } from './helpers/'
 
 import { ApolloProvider } from 'react-apollo'
 import { client } from './apollo/client'
-import PoolSizeList from './components/ExchangeTable'
-import Emoji from './components/Emoji'
 
 const timeframeOptions = [
   { value: '1week', label: '1 week' },
@@ -104,6 +103,8 @@ class App extends Component {
 
   async componentDidMount () {
     try {
+
+      await this.props.frontPageStore.fetchFrontTwenty()
       // first, fetch directory & set default exchange address
       await this.props.directoryStore.fetchDirectory()
 
@@ -129,6 +130,11 @@ class App extends Component {
       ethLiquidity,
       tokenAddress
     } = this.props.directoryStore.state.activeExchange
+
+    // FrontPage Store
+    const {
+      state: {frontPage}
+    } = this.props.frontPageStore
 
     // Directory Store
     const {
@@ -169,10 +175,8 @@ class App extends Component {
             >
               <FrontPageTitle/>
             </FrontPageHeader>
-
             <PoolSizeList
-              transactions={transactions}
-              tokenSymbol={symbol}
+              topTen={this.props.frontPageStore.state.topTwenty}
             />
         </Wrapper>
         </ApolloProvider>

@@ -10,13 +10,13 @@ import { urls, formatTime, Big } from "../../helpers";
 // TODO - gonna have to query top twenty exchanges, and then all their histories from 20 pages ago
 // Might shrink it down to 10 if the query is too long
 
-const PoolSizeItem = ({ transaction, tokenSymbol }) => (
+const PoolSizeItem = ({ topTen }) => (
   <Flex  mb={24} alignItems="center" justifyContent='center'>
     <Flex alignItems="center" pr={24}>
-        Pool Name Here: TODO
+        {topTen.tokenName}
     </Flex>
     <Text fontSize={[12, 16]}>
-      Total Liquidty in ETH: [TODO]
+      Total Liquidty in ETH: {topTen.tradeVolumeEth}
     </Text>
   </Flex>
 );
@@ -29,10 +29,10 @@ const List = styled(Box)`
 `;
 
 // @TODO rework into virtualized list
-const PoolSizeList = ({ transactions, tokenSymbol }) => (
+const PoolSizeList = ({ topTen }) => (
   <List p={24}>
-    {transactions.slice(0, 20).map((tx, index) => (
-      <PoolSizeItem key={index} transaction={tx} tokenSymbol={tokenSymbol} />
+    {topTen.slice(0, 10).map((exchanges, index) => (
+      <PoolSizeItem key={index} topTen={exchanges} />
     ))}
   </List>
 );
