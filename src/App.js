@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Box, Flex, Text } from 'rebass'
+import { Box, Button, Flex, Text } from 'rebass'
 
 import Wrapper from './components/Theme'
 import Title from './components/Title'
@@ -14,7 +14,7 @@ import Chart from './components/Chart'
 import Loader from './components/Loader'
 import { Header, Divider, Hint, Address, FrontPageTitle, FrontPageHeader } from './components'
 
-import { setThemeColor, isWeb3Available } from './helpers/'
+import { setThemeColor, isWeb3Available, formatNumber } from './helpers/'
 
 import { ApolloProvider } from 'react-apollo'
 import { client } from './apollo/client'
@@ -118,10 +118,13 @@ class App extends Component {
     }
   }
 
-   formatNumber = (num) => {
-    return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
+  togglePage = () => {
+    if (this.state.homePage){
+      this.setState({homePage: false })
+    } else {
+      this.setState({homePage: true })
+    }
   }
-
 
   render () {
     // spread state into cleaner vars
@@ -147,8 +150,8 @@ class App extends Component {
     } = this.props.frontPageStore.state.totals
 
     // FrontPage Store
-    const { // tOdo dk - why doest this work when calling below in the component
-      state: {frontPage}
+    const {
+      state: { topTen }
     } = this.props.frontPageStore
 
     // Directory Store
@@ -190,19 +193,19 @@ class App extends Component {
             >
               <FrontPageTitle/>
             </FrontPageHeader>
-            <Panel rounded bg="white" area="liquidity">
+            <Panel rounded bg="white" area="liquidity" width={1 / 3} alignItems='center'>
               <FourByFour
                 p={24}
                 topLeft={<Hint color="text">Total All Time Volume ETH</Hint>}
                 bottomLeft={
                   <Text
                     fontSize={20}
-                    color="token"
+                    color="uniswappink"
                     className="-transition"
                     lineHeight={1.4}
                     fontWeight={500}
                   >
-                    {this.formatNumber(Number(totalVolumeInEth).toFixed(2))}
+                    {formatNumber(Number(totalVolumeInEth).toFixed(2))}
                   </Text>
                 }
                 topRight={<Hint color="text">Total All Time Volume USD</Hint>}
@@ -213,7 +216,7 @@ class App extends Component {
                     lineHeight={1.4}
                     fontWeight={500}
                   >
-                    ${this.formatNumber(Number(totalVolumeUSD).toFixed(2))}
+                    ${formatNumber(Number(totalVolumeUSD).toFixed(2))}
                   </Text>
                 }
               />
@@ -223,13 +226,13 @@ class App extends Component {
                 topLeft={<Hint color="text">Total Liquidity in ETH</Hint>}
                 bottomLeft={
                   <Text
-                    color="token"
+                    color="uniswappink"
                     className="-transition"
                     fontSize={20}
                     lineHeight={1.4}
                     fontWeight={500}
                   >
-                    {this.formatNumber(Number(totalLiquidityInEth).toFixed(2))}
+                    {formatNumber(Number(totalLiquidityInEth).toFixed(2))}
                   </Text>
                 }
                 topRight={<Hint color="text">Total Liquidity in USD</Hint>}
@@ -240,7 +243,7 @@ class App extends Component {
                     lineHeight={1.4}
                     fontWeight={500}
                   >
-                    ${this.formatNumber(Number(totalLiquidityUSD).toFixed(2))}
+                    ${formatNumber(Number(totalLiquidityUSD).toFixed(2))}
                   </Text>
                 }
               />
@@ -249,7 +252,7 @@ class App extends Component {
                 topLeft={<Hint color="text">Total Exchanges</Hint>}
                 bottomLeft={
                   <Text
-                    color="token"
+                    color="uniswappink"
                     className="-transition"
                     fontSize={20}
                     lineHeight={1.4}
@@ -266,15 +269,40 @@ class App extends Component {
                     lineHeight={1.4}
                     fontWeight={500}
                   >
-                    {this.formatNumber(Number(txCount))}
+                    {formatNumber(Number(txCount))}
                   </Text>
                 }
               />
             </Panel>
+            <Flex p={24} justifyContent="center">
+              <Button
+                fontSize={20}
+                lineHeight={1.4}
+                fontWeight={500}
+                color="uniswappink"
+                borderColor="uniswappink"
+                bg={"lightblue"}
+                onClick={() => this.togglePage()}
+              >
+                Click Here to View Individual Exchange Data
+              </Button>
+            </Flex>
+            <Divider/>
+            <Flex p={24} justifyContent="center">
+              <Text
+                color="uniswappink"
+                fontSize={20}
+                lineHeight={1.4}
+                fontWeight={500}
+              >
+                Exchanges By 24 Hour Volume
+              </Text>
+            </Flex>
+            <Divider/>
             <PoolSizeList
-              topTen={this.props.frontPageStore.state.topTen}
+              topTen={topTen}
             />
-        </Wrapper>
+          </Wrapper>
         </ApolloProvider>
       )
 
@@ -288,7 +316,17 @@ class App extends Component {
             color={['white', 'black']}
           >
             <Title/>
-
+            <Button
+              fontSize={15}
+              lineHeight={1.4}
+              fontWeight={500}
+              color="uniswappink"
+              borderColor="uniswappink"
+              bg={"lightblue"}
+              onClick={() => this.togglePage()}
+            >
+              Click Here to View Individual Exchange Data
+            </Button>
             <Select
               options={directory}
               defaultValue={directory[0]}
@@ -452,7 +490,7 @@ class App extends Component {
                 <Text color="text">Latest Transactions</Text>
                 <Text>↓</Text>
               </Flex>
-              <Divider />
+              <Divider/>
 
               {transactions && transactions.length > 0 ? (
                 <TransactionsList
@@ -460,7 +498,7 @@ class App extends Component {
                   tokenSymbol={symbol}
                 />
               ) : (
-                <Loader />
+                <Loader/>
               )}
             </Panel>
           </Dashboard>
