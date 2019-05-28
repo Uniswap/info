@@ -29,6 +29,7 @@ var web3 = null;
 var didRequestData = false;
 var didReceiveData = false;
 var loadingUpToBlockNum = 0;
+var maxBlockNum = 0;
 
 var eventList = [];
 
@@ -118,6 +119,7 @@ class App extends Component {
     didRequestData = false;
     didReceiveData = false;
     loadingUpToBlockNum = 0;
+    maxBlockNum = 0;
 
     eventList = [];
 
@@ -185,6 +187,7 @@ class App extends Component {
               myAddress={myAddress}
               didReceiveData={didReceiveData}
               loadingUpToBlockNum={loadingUpToBlockNum}
+              maxBlockNum={maxBlockNum}
             />
           </div>
 
@@ -446,10 +449,15 @@ const retrieveData = async (tokenSymbol, exchangeAddress) => {
 
   var latestBlock = latestBlockObj["number"];
 
+  maxBlockNum = latestBlock;
+
   // paginate through the logs to load all the events
   var events = [];
 
-  var blockPageAmount = 100000;
+  var DEFAULT_BLOCK_PAGE_AMOUNT = 100000;
+  
+  var blockPageAmount = DEFAULT_BLOCK_PAGE_AMOUNT; // this will adjust to get around a known Infura issue for 1000+ RPC return results 
+  // https://github.com/AugurProject/augur-node/issues/848
 
   var fromBlock = Uniswap.originBlock;
   var toBlock = fromBlock + blockPageAmount;
@@ -464,11 +472,6 @@ const retrieveData = async (tokenSymbol, exchangeAddress) => {
 
     console.log("Retrieving data for exchange " + exchangeAddress + " from block " + fromBlock + " to " + toBlock);  
 
-    loadingUpToBlockNum = toBlock;
-
-    // update our state
-    app.setState({});
-
     try {
       await exchangeContract.getPastEvents("allEvents", options).then(responseEvents => {
         responseEvents.forEach(event => {
@@ -477,6 +480,14 @@ const retrieveData = async (tokenSymbol, exchangeAddress) => {
       });
     } catch (error) {
       console.log(error);
+
+      // if we encounter an error, try again with fetching less blocks
+      blockPageAmount = Math.round(blockPageAmount / 2);
+
+      // re-adjust the toblock
+      toBlock = fromBlock + blockPageAmount;
+      toBlock = Math.min(toBlock, latestBlock);
+      
       continue;
     };
 
@@ -490,9 +501,17 @@ const retrieveData = async (tokenSymbol, exchangeAddress) => {
       break;
     }
 
+    // reset the block page amount once we have a successful fetch
+    blockPageAmount = DEFAULT_BLOCK_PAGE_AMOUNT;
+
     fromBlock = toBlock + 1;
     toBlock = fromBlock + blockPageAmount;
     toBlock = Math.min(toBlock, latestBlock);
+
+    loadingUpToBlockNum = toBlock;
+
+    // update our state
+    app.setState({});
   }
 
   // only continue if the current exchange is the original symbol we requested

@@ -18,6 +18,7 @@ class TokenPoolHistory extends Component {
     if (this.props.didReceiveData === false) {
       return <Loader 
         blockNum={this.props.loadingUpToBlockNum}
+        maxBlockNum={this.props.maxBlockNum}
       />;
     }
 
