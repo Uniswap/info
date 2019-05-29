@@ -61,7 +61,7 @@ export const DIRECTORY_QUERY = gql`
   }
 `
 
-export const FRONT_PAGE_QUERY = gql`
+export const OVERVIEW_PAGE_QUERY = gql`
   query exchanges($first: Int!) {
     exchanges(first: $first, orderBy: tradeVolumeEth, orderDirection: desc) {
       id
@@ -82,7 +82,7 @@ export const TOTALS_QUERY = gql`
     }
   }
 `
-export const FRONT_PAGE_24HOUR = gql`
+export const OVERVIEW_PAGE_24HOUR = gql`
   query exchangeHistoricalDatas($timestamp: Int!, $exchangeAddr: String!) {
     exchangeHistoricalDatas(where:{timestamp_lt: $timestamp, exchangeAddress: $exchangeAddr}, first: 1){
       tradeVolumeEth

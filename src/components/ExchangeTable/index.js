@@ -64,7 +64,7 @@ const List = styled(Box)`
 // @TODO rework into virtualized list
 const PoolSizeList = ({ topTen }) => (
   <List p={24}>
-    {topTen.slice(0, 10).map((exchanges, index) => (
+    {topTen.slice(0, 20).map((exchanges, index) => (
       <PoolSizeItem2 key={index} topTen={exchanges} />
     ))}
   </List>

@@ -12,7 +12,7 @@ import TransactionsList from './components/TransactionsList'
 import PoolSizeList from './components/ExchangeTable'
 import Chart from './components/Chart'
 import Loader from './components/Loader'
-import { Header, Divider, Hint, Address, FrontPageTitle, FrontPageHeader } from './components'
+import { Header, Divider, Hint, Address, OverviewPageTitle, OverviewPageHeader } from './components'
 
 import { setThemeColor, isWeb3Available, formatNumber } from './helpers/'
 
@@ -29,7 +29,7 @@ const timeframeOptions = [
 class App extends Component {
   state = {
     historyDaysToQuery: 7,
-    homePage: true
+    homePage: false
   }
 
   // Fetch Exchange's Transactions
@@ -104,8 +104,7 @@ class App extends Component {
   async componentDidMount () {
     try {
 
-      await this.props.frontPageStore.fetchTotals()
-      await this.props.frontPageStore.fetchFrontTwenty()
+
       // first, fetch directory & set default exchange address
       await this.props.directoryStore.fetchDirectory()
 
@@ -113,6 +112,11 @@ class App extends Component {
       await this.switchActiveExchange(
         this.props.directoryStore.state.defaultExchangeAddress
       )
+
+      await this.props.overviewPageStore.fetchTotals()
+      this.props.overviewPageStore.fetchExchanges(25)
+      await this.props.overviewPageStore.fetchExchanges(100)
+
     } catch (err) {
       console.log('error:', err)
     }
@@ -147,12 +151,12 @@ class App extends Component {
       totalVolumeInEth,
       totalVolumeUSD,
       txCount
-    } = this.props.frontPageStore.state.totals
+    } = this.props.overviewPageStore.state.totals
 
-    // FrontPage Store
+    // OverviewPage Store
     const {
       state: { topTen }
-    } = this.props.frontPageStore
+    } = this.props.overviewPageStore
 
     // Directory Store
     const {
@@ -185,14 +189,14 @@ class App extends Component {
       return (
         <ApolloProvider client={client}>
           <Wrapper>
-            <FrontPageHeader
+            <OverviewPageHeader
               px={24}
               py={3}
               bg={['mineshaft', 'transparent']}
               color={['white', 'black']}
             >
-              <FrontPageTitle/>
-            </FrontPageHeader>
+              <OverviewPageTitle/>
+            </OverviewPageHeader>
             <Panel rounded bg="white" area="liquidity" width={1 / 3} alignItems='center'>
               <FourByFour
                 p={24}

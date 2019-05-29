@@ -37,14 +37,14 @@ const Address = ({ address, ...rest }) => (
   </Link>
 );
 
-const FrontPageHeader = styled(Panel)`
+const OverviewPageHeader = styled(Panel)`
   display: grid;
   grid-template-columns: 1fr minmax(224px);
   align-items: center;
 `;
 
 
-const FrontPageTitle = () => (
+const OverviewPageTitle = () => (
   <Flex alignItems="center" justifyContent='center'>
     <Text fontSize="1.5rem" lineHeight="1">
       <Emoji symbol="🦄" label="Unicorn" />
@@ -55,4 +55,4 @@ const FrontPageTitle = () => (
   </Flex>
 );
 
-export { Hint, Divider, Header, Address, FrontPageHeader, FrontPageTitle };
+export { Hint, Divider, Header, Address, OverviewPageHeader, OverviewPageTitle };

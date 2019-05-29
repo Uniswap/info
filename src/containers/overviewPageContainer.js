@@ -1,9 +1,9 @@
 import { Container } from 'unstated'
 import dayjs from 'dayjs'
 import { client } from '../apollo/client'
-import { FRONT_PAGE_QUERY, FRONT_PAGE_24HOUR, TOTALS_QUERY } from '../apollo/queries'
+import { OVERVIEW_PAGE_QUERY, OVERVIEW_PAGE_24HOUR, TOTALS_QUERY } from '../apollo/queries'
 
-export class FrontPageContainer extends Container {
+export class OverviewPageContainer extends Container {
   state = {
     topTen: [],
     totals: {},
@@ -17,26 +17,24 @@ export class FrontPageContainer extends Container {
         fetchPolicy: 'network-only',
       })
 
-      console.log(result)
       console.log(`fetched uniswap total data`)
       //
       await this.setState({
         totals: result.data.uniswap
       })
 
-      console.log(this.state.totals)
     } catch (err) {
       console.log('error: ', err)
     }
   }
 
-  async fetchFrontTwenty () {
+  async fetchExchanges(numberOfExchanges) {
     try {
       let data = []
       let result = await client.query({
-        query: FRONT_PAGE_QUERY,
+        query: OVERVIEW_PAGE_QUERY,
         variables: {
-          first: 10, // TODO optimize , and probably call 50 of them
+          first: numberOfExchanges,
         },
         fetchPolicy: 'network-only',
       })
@@ -44,9 +42,6 @@ export class FrontPageContainer extends Container {
 
       console.log(`fetched ${data.length} exchanges ordered by trade volume`)
 
-      await this.setState({
-        topTen: data
-      })
       await this.fetchYesterdaysVolume(data)
 
     } catch (err) {
@@ -61,7 +56,7 @@ export class FrontPageContainer extends Container {
       const utcOneDayBack = utcCurrentTime.subtract(1, 'day')
       for (let i = 0; i < addresses.length; i++) {
         const result = await client.query({
-          query: FRONT_PAGE_24HOUR,
+          query: OVERVIEW_PAGE_24HOUR,
           variables: {
             exchangeAddr: addresses[i].id,
             timestamp: utcOneDayBack.unix()
@@ -73,11 +68,10 @@ export class FrontPageContainer extends Container {
         }
 
       }
-      addresses.sort(function(a, b){
-        return b.tradeVolumeEth -a.tradeVolumeEth
+      addresses.sort(function (a, b) {
+        return b.tradeVolumeEth - a.tradeVolumeEth
       })
       console.log(`fetched ${addresses.length} exchanges 24 hour trade volume`)
-      console.log("Top Ten:", addresses)
 
       await this.setState({
         topTen: addresses
