@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import { Text, Flex, Box } from "rebass";
+import { Text, Flex, Box, Button } from 'rebass'
 import Emoji from "./Emoji";
 
 import Link from "./Link";
@@ -10,7 +10,13 @@ import { urls } from "../helpers";
 
 const Header = styled(Panel)`
   display: grid;
-  grid-template-columns: 1fr minmax(224px, 0.25fr);
+  grid-template-columns: 0.5fr 0.25fr 0.25fr
+  align-items: end;
+`;
+
+const OverviewPageHeader = styled(Panel)`
+  display: grid;
+  grid-template-columns: 0.6fr 0.40fr minmax(224px, 0.25fr);
   align-items: center;
 `;
 
@@ -37,20 +43,16 @@ const Address = ({ address, ...rest }) => (
   </Link>
 );
 
-const OverviewPageHeader = styled(Panel)`
-  display: grid;
-  grid-template-columns: 1fr minmax(224px);
-  align-items: center;
-`;
+
 
 
 const OverviewPageTitle = () => (
-  <Flex alignItems="center" justifyContent='center'>
+  <Flex>
     <Text fontSize="1.5rem" lineHeight="1">
       <Emoji symbol="🦄" label="Unicorn" />
     </Text>
     <Text fontWeight={500} mx="1rem" lineHeight="1.5rem">
-      Uniswap Total Stats
+      Uniswap Stats
     </Text>
   </Flex>
 );

@@ -6,6 +6,7 @@ import Title from './components/Title'
 import FourByFour from './components/FourByFour'
 import Panel from './components/Panel'
 import Dashboard from './components/Dashboard'
+import Overview from './components/Overview'
 import Select from './components/Select'
 import Footer from './components/Footer'
 import TransactionsList from './components/TransactionsList'
@@ -29,7 +30,7 @@ const timeframeOptions = [
 class App extends Component {
   state = {
     historyDaysToQuery: 7,
-    homePage: false
+    overviewPage: false
   }
 
   // Fetch Exchange's Transactions
@@ -104,7 +105,6 @@ class App extends Component {
   async componentDidMount () {
     try {
 
-
       // first, fetch directory & set default exchange address
       await this.props.directoryStore.fetchDirectory()
 
@@ -123,10 +123,10 @@ class App extends Component {
   }
 
   togglePage = () => {
-    if (this.state.homePage){
-      this.setState({homePage: false })
+    if (this.state.overviewPage) {
+      this.setState({ overviewPage: false })
     } else {
-      this.setState({homePage: true })
+      this.setState({ overviewPage: true })
     }
   }
 
@@ -185,7 +185,7 @@ class App extends Component {
         </Wrapper>
       )
 
-    if (this.state.homePage)
+    if (this.state.overviewPage)
       return (
         <ApolloProvider client={client}>
           <Wrapper>
@@ -196,12 +196,38 @@ class App extends Component {
               color={['white', 'black']}
             >
               <OverviewPageTitle/>
+              <Flex>
+                <Button
+                  fontSize={15}
+                  lineHeight={1.4}
+                  fontWeight={250}
+                  color="black"
+                  bg='alabaster'
+                  onClick={() => this.togglePage()}
+                >
+                  Charts
+                </Button>
+              </Flex>
             </OverviewPageHeader>
-            <Panel rounded bg="white" area="liquidity" width={1 / 3} alignItems='center'>
-              <FourByFour
-                p={24}
-                topLeft={<Hint color="text">Total All Time Volume ETH</Hint>}
-                bottomLeft={
+
+            <Overview mx="auto">
+
+
+              <Panel rounded bg="white" alignItems='center' area='totals'>
+                <Flex p={24} justifyContent="center" bg="alabaster">
+                  <Text
+                    color="uniswappink"
+                    fontSize={20}
+                    lineHeight={1.4}
+                    fontWeight={500}
+                  >
+                    All Time
+                  </Text>
+                </Flex>
+                <Box p={24}>
+                  <Hint color="textSubtext" mb={3}>
+                    Total Volume ETH
+                  </Hint>
                   <Text
                     fontSize={20}
                     color="uniswappink"
@@ -211,9 +237,6 @@ class App extends Component {
                   >
                     {formatNumber(Number(totalVolumeInEth).toFixed(2))}
                   </Text>
-                }
-                topRight={<Hint color="text">Total All Time Volume USD</Hint>}
-                bottomRight={
                   <Text
                     fontSize={20}
                     color="uniswappink"
@@ -222,13 +245,11 @@ class App extends Component {
                   >
                     ${formatNumber(Number(totalVolumeUSD).toFixed(2))}
                   </Text>
-                }
-              />
-              <Divider/>
-              <FourByFour
-                p={24}
-                topLeft={<Hint color="text">Total Liquidity in ETH</Hint>}
-                bottomLeft={
+                </Box>
+                <Box p={24}>
+                  <Hint color="textSubtext" mb={3}>
+                    Total Volume ETH
+                  </Hint>
                   <Text
                     color="uniswappink"
                     className="-transition"
@@ -238,9 +259,6 @@ class App extends Component {
                   >
                     {formatNumber(Number(totalLiquidityInEth).toFixed(2))}
                   </Text>
-                }
-                topRight={<Hint color="text">Total Liquidity in USD</Hint>}
-                bottomRight={
                   <Text
                     color="uniswappink"
                     fontSize={20}
@@ -249,12 +267,11 @@ class App extends Component {
                   >
                     ${formatNumber(Number(totalLiquidityUSD).toFixed(2))}
                   </Text>
-                }
-              />
-              <FourByFour
-                p={24}
-                topLeft={<Hint color="text">Total Exchanges</Hint>}
-                bottomLeft={
+                </Box>
+                <Box p={24}>
+                  <Hint color="textSubtext" mb={3}>
+                    Exchanges
+                  </Hint>
                   <Text
                     color="uniswappink"
                     className="-transition"
@@ -264,9 +281,11 @@ class App extends Component {
                   >
                     {Number(exchangeCount)}
                   </Text>
-                }
-                topRight={<Hint color="text">Total Transactions</Hint>}
-                bottomRight={
+                </Box>
+                <Box p={24}>
+                  <Hint color="textSubtext" mb={3}>
+                    Total Volume ETH
+                  </Hint>
                   <Text
                     color="uniswappink"
                     fontSize={20}
@@ -275,37 +294,25 @@ class App extends Component {
                   >
                     {formatNumber(Number(txCount))}
                   </Text>
-                }
-              />
-            </Panel>
-            <Flex p={24} justifyContent="center">
-              <Button
-                fontSize={20}
-                lineHeight={1.4}
-                fontWeight={500}
-                color="uniswappink"
-                borderColor="uniswappink"
-                bg={"lightblue"}
-                onClick={() => this.togglePage()}
-              >
-                Click Here to View Individual Exchange Data
-              </Button>
-            </Flex>
-            <Divider/>
-            <Flex p={24} justifyContent="center">
-              <Text
-                color="uniswappink"
-                fontSize={20}
-                lineHeight={1.4}
-                fontWeight={500}
-              >
-                Exchanges By 24 Hour Volume
-              </Text>
-            </Flex>
-            <Divider/>
-            <PoolSizeList
-              topTen={topTen}
-            />
+                </Box>
+
+              </Panel>
+              <Panel rounded bg="white" alignItems='center' area='exchanges'>
+                <Flex p={24} justifyContent="center" bg='alabaster'>
+                  <Text
+                    color="uniswappink"
+                    fontSize={20}
+                    lineHeight={1.4}
+                    fontWeight={500}
+                  >
+                    Exchanges By 24 Hour Volume
+                  </Text>
+                </Flex>
+                <PoolSizeList
+                  topTen={topTen}
+                />
+              </Panel>
+            </Overview>
           </Wrapper>
         </ApolloProvider>
       )
@@ -320,19 +327,21 @@ class App extends Component {
             color={['white', 'black']}
           >
             <Title/>
-            <Button
-              fontSize={15}
-              lineHeight={1.4}
-              fontWeight={500}
-              color="uniswappink"
-              borderColor="uniswappink"
-              bg={"lightblue"}
-              onClick={() => this.togglePage()}
-            >
-              Click Here to View Individual Exchange Data
-            </Button>
+            <Flex>
+              <Button
+                fontSize={15}
+                lineHeight={1.4}
+                fontWeight={250}
+                color="black"
+                bg='alabaster'
+                onClick={() => this.togglePage()}
+              >
+                Overview
+              </Button>
+            </Flex>
             <Select
               options={directory}
+
               defaultValue={directory[0]}
               onChange={select => {
                 if (exchangeAddress !== select.value)
