@@ -1,5 +1,5 @@
 import React from 'react'
-import { Box, Text, Flex } from 'rebass'
+import { Box, Text } from 'rebass'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import FourByFour from '../FourByFour'
@@ -60,7 +60,7 @@ const ExchangeItem = ({ topTen }) => (
           color="uniswappink"
           className="-transition"
           fontSize={20}
-          lineHeight={0}
+          lineHeight={0.15}
           fontWeight={250}
         >
           {topTen.tokenName}
@@ -70,7 +70,7 @@ const ExchangeItem = ({ topTen }) => (
         <Text
           color="uniswappink"
           fontSize={20}
-          lineHeight={0}
+          lineHeight={0.15}
           fontWeight={250}
         >
           {topTen.tradeVolumeEth}
@@ -90,7 +90,7 @@ const List = styled(Box)`
 `
 
 // @TODO rework into virtualized list
-const PoolSizeList = ({ topTen }) => {
+const TopExchanges = ({ topTen }) => {
   if (topTen.length == 0) {
     return (
       <Loader/>
@@ -99,7 +99,7 @@ const PoolSizeList = ({ topTen }) => {
     return (
       <List p={24}>
         <FirstExchangeItem topTen={topTen.slice(0, 1)}/>
-        {topTen.slice(1, 20).map((exchanges, index) => (
+        {topTen.slice(1, 11).map((exchanges, index) => (
           <ExchangeItem key={index} topTen={exchanges}/>
         ))}
       </List>
@@ -107,12 +107,12 @@ const PoolSizeList = ({ topTen }) => {
   }
 }
 
-PoolSizeList.defaultProps = {
+TopExchanges.defaultProps = {
   transactions: []
 }
 
-PoolSizeList.propTypes = {
+TopExchanges.propTypes = {
   transactions: PropTypes.array.isRequired
 }
 
-export default PoolSizeList
+export default TopExchanges

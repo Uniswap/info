@@ -10,7 +10,7 @@ import Overview from './components/Overview'
 import Select from './components/Select'
 import Footer from './components/Footer'
 import TransactionsList from './components/TransactionsList'
-import PoolSizeList from './components/ExchangeTable'
+import TopExchanges from './components/ExchangeTable'
 import Chart from './components/Chart'
 import Loader from './components/Loader'
 import { Header, Divider, Hint, Address, OverviewPageTitle, OverviewPageHeader } from './components'
@@ -114,8 +114,7 @@ class App extends Component {
       )
 
       await this.props.overviewPageStore.fetchTotals()
-      this.props.overviewPageStore.fetchExchanges(25)
-      await this.props.overviewPageStore.fetchExchanges(100)
+      await this.props.overviewPageStore.fetchExchanges(50)
 
     } catch (err) {
       console.log('error:', err)
@@ -357,10 +356,10 @@ class App extends Component {
                     lineHeight={1}
                     fontWeight={700}
                   >
-                    Exchanges By 24 Hour Volume
+                    Top Ten Exchanges By 24 Hour Volume
                   </Text>
                 </Flex>
-                <PoolSizeList
+                <TopExchanges
                   topTen={topTen}
                 />
               </Panel>
