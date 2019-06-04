@@ -201,31 +201,47 @@ class App extends Component {
                   fontSize={15}
                   lineHeight={1.4}
                   fontWeight={250}
-                  color="black"
+                  py={10}
+                  mx={10}
+                  color={this.state.overviewPage ? 'grey' : 'black'}
                   bg='alabaster'
                   onClick={() => this.togglePage()}
                 >
                   Charts
                 </Button>
+                <Button
+                  fontSize={15}
+                  lineHeight={1.4}
+                  fontWeight={250}
+                  mx={10}
+                  color={this.state.overviewPage ? 'black' : 'grey'}
+                  py={10}
+                  bg='alabaster'
+                >
+                  Overview
+                </Button>
               </Flex>
             </OverviewPageHeader>
 
             <Overview mx="auto">
-
-
               <Panel rounded bg="white" alignItems='center' area='totals'>
                 <Flex p={24} justifyContent="center" bg="alabaster">
                   <Text
-                    color="uniswappink"
-                    fontSize={20}
-                    lineHeight={1.4}
-                    fontWeight={500}
+                    color="grey"
+                    fontSize={14}
+                    lineHeight={1}
+                    fontWeight={700}
                   >
-                    All Time
+                    All Time Stats
                   </Text>
                 </Flex>
                 <Box p={24}>
-                  <Hint color="textSubtext" mb={3}>
+                  <Hint
+                    color="text"
+                    fontSize={15}
+                    fontWeight={500}
+                    mb={3}
+                  >
                     Total Volume ETH
                   </Hint>
                   <Text
@@ -235,20 +251,26 @@ class App extends Component {
                     lineHeight={1.4}
                     fontWeight={500}
                   >
-                    {formatNumber(Number(totalVolumeInEth).toFixed(2))}
+                    {formatNumber(Number(totalVolumeInEth).toFixed(2))} ETH
                   </Text>
                   <Text
-                    fontSize={20}
+                    fontSize={15}
                     color="uniswappink"
-                    lineHeight={1.4}
+                    lineHeight={4}
                     fontWeight={500}
                   >
                     ${formatNumber(Number(totalVolumeUSD).toFixed(2))}
                   </Text>
+                  <Divider/>
                 </Box>
                 <Box p={24}>
-                  <Hint color="textSubtext" mb={3}>
-                    Total Volume ETH
+                  <Hint
+                    color="text"
+                    fontSize={15}
+                    fontWeight={500}
+                    mb={3}
+                  >
+                    Total Liquidity
                   </Hint>
                   <Text
                     color="uniswappink"
@@ -257,53 +279,83 @@ class App extends Component {
                     lineHeight={1.4}
                     fontWeight={500}
                   >
-                    {formatNumber(Number(totalLiquidityInEth).toFixed(2))}
+                    {formatNumber(Number(totalLiquidityInEth).toFixed(2))} ETH
                   </Text>
                   <Text
                     color="uniswappink"
-                    fontSize={20}
-                    lineHeight={1.4}
+                    fontSize={15}
+                    lineHeight={4}
                     fontWeight={500}
                   >
                     ${formatNumber(Number(totalLiquidityUSD).toFixed(2))}
                   </Text>
+                  <Divider/>
                 </Box>
                 <Box p={24}>
-                  <Hint color="textSubtext" mb={3}>
-                    Exchanges
+                  <Hint
+                    color="text"
+                    fontSize={15}
+                    fontWeight={500}
+                    mb={3}
+                  >
+                    Total Exchanges
                   </Hint>
                   <Text
                     color="uniswappink"
                     className="-transition"
                     fontSize={20}
-                    lineHeight={1.4}
+                    lineHeight={4}
                     fontWeight={500}
                   >
                     {Number(exchangeCount)}
                   </Text>
+                  <Divider/>
                 </Box>
                 <Box p={24}>
-                  <Hint color="textSubtext" mb={3}>
-                    Total Volume ETH
+                  <Hint
+                    color="text"
+                    fontSize={15}
+                    fontWeight={500}
+                    mb={3}
+                  >
+                    Total Transactions
                   </Hint>
                   <Text
                     color="uniswappink"
                     fontSize={20}
-                    lineHeight={1.4}
+                    lineHeight={4}
                     fontWeight={500}
                   >
                     {formatNumber(Number(txCount))}
                   </Text>
+                  <Divider/>
+                  <Flex
+                    alignItems='end'
+                    justifyContent='center'
+                    p={24}
+                    mb={-24}
+                  >
+                    <Button
+                      fontSize={16}
+                      lineHeight={1.4}
+                      fontWeight={400}
+                      color="uniswappink"
+                      bg='white'
+                      onClick={() => this.togglePage()}
+                    >
+                      View Individual Exchange Data
+                    </Button>
+                  </Flex>
                 </Box>
 
               </Panel>
               <Panel rounded bg="white" alignItems='center' area='exchanges'>
                 <Flex p={24} justifyContent="center" bg='alabaster'>
                   <Text
-                    color="uniswappink"
-                    fontSize={20}
-                    lineHeight={1.4}
-                    fontWeight={500}
+                    color="grey"
+                    fontSize={14}
+                    lineHeight={1}
+                    fontWeight={700}
                   >
                     Exchanges By 24 Hour Volume
                   </Text>
@@ -332,13 +384,29 @@ class App extends Component {
                 fontSize={15}
                 lineHeight={1.4}
                 fontWeight={250}
-                color="black"
+                mx={10}
+                py={10}
+                color={this.state.overviewPage ? 'grey' : 'black'}
+                bg='alabaster'
+              >
+                Charts
+              </Button>
+
+              <Button
+                fontSize={15}
+                lineHeight={1.4}
+                fontWeight={250}
+                mx={10}
+                py={10}
+                color={this.state.overviewPage ? 'black' : 'grey'}
                 bg='alabaster'
                 onClick={() => this.togglePage()}
               >
                 Overview
               </Button>
+
             </Flex>
+            <Flex/>
             <Select
               options={directory}
 
@@ -496,6 +564,25 @@ class App extends Component {
                 </Hint>
                 <Address address={tokenAddress}/>
               </Box>
+              <Divider/>
+              <Flex
+                alignItems='end'
+                justifyContent='center'
+                p={24}
+                mb={-24}
+              >
+                <Button
+                  fontSize={16}
+                  lineHeight={1.4}
+                  fontWeight={400}
+                  mb={24}
+                  color="uniswappink"
+                  bg='white'
+                  onClick={() => this.togglePage()}
+                >
+                  View Total Uniswap Stats
+                </Button>
+              </Flex>
             </Panel>
 
             <Panel rounded bg="white" area="transactions">

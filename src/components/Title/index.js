@@ -9,7 +9,7 @@ export const Title = () => (
       <Emoji symbol="🦄" label="Unicorn" />
     </Text>
     <Text fontWeight={500} mx="1rem" lineHeight="1.5rem">
-      Info
+      Uniswap
     </Text>
   </Flex>
 );

@@ -35,7 +35,7 @@ const FirstExchangeItem = ({ topTen }) => (
         fontSize={15}
         fontWeight={500}
       >
-        Total Volume In Eth
+        24 Hour Volume ETH
       </Hint>}
     bottomRight={
       <Text
