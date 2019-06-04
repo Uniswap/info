@@ -6,7 +6,6 @@ const Overview = styled(Box)`
 
   display: grid;
 
-  grid-template-columns: 1fr
   grid-template-areas:
     "totals"
     "exchanges"
@@ -14,7 +13,7 @@ const Overview = styled(Box)`
 
   @media screen and (min-width: 40em) {
     grid-gap: 16px;
-    grid-template-columns: minmax(380px, 1fr) repeat(2, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     grid-template-areas:
       "totals totals"
       "exchanges exchanges"
