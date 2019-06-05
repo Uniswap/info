@@ -3,6 +3,7 @@ import { Box, Button, Flex, Text } from 'rebass'
 
 import Wrapper from './components/Theme'
 import Title from './components/Title'
+import OverviewTitle from './components/OverviewTitle'
 import FourByFour from './components/FourByFour'
 import Panel from './components/Panel'
 import Dashboard from './components/Dashboard'
@@ -13,7 +14,7 @@ import TransactionsList from './components/TransactionsList'
 import TopExchanges from './components/ExchangeTable'
 import Chart from './components/Chart'
 import Loader from './components/Loader'
-import { Header, Divider, Hint, Address, OverviewPageTitle, OverviewPageHeader } from './components'
+import { Header, Divider, Hint, Address, OverviewPageHeader } from './components'
 
 import { setThemeColor, isWeb3Available, formatNumber } from './helpers/'
 
@@ -194,7 +195,7 @@ class App extends Component {
               bg={['mineshaft', 'transparent']}
               color={['white', 'black']}
             >
-              <OverviewPageTitle/>
+              <OverviewTitle/>
               <Flex>
                 <Button
                   fontSize={15}
@@ -221,7 +222,6 @@ class App extends Component {
                 </Button>
               </Flex>
             </OverviewPageHeader>
-
             <Overview mx="auto">
               <Panel rounded bg="white" alignItems='center' area='totals'>
                 <Flex p={24} justifyContent="center" bg="alabaster">
@@ -262,7 +262,6 @@ class App extends Component {
                   </Text>
                   <Divider/>
                 </Box>
-
                 <Box p={24}>
                   <Hint
                     color="text"
@@ -346,7 +345,6 @@ class App extends Component {
                     </Button>
                   </Flex>
                 </Box>
-
               </Panel>
               <Panel rounded bg="white" alignItems='center' area='exchanges'>
                 <Flex p={24} justifyContent="center" bg='alabaster'>

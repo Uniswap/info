@@ -73,7 +73,6 @@ export class OverviewPageContainer extends Container {
       })
       console.log(`fetched ${addresses.length} exchanges 24 hour trade volume`)
 
-      console.log(addresses)
       await this.setState({
         topTen: addresses
       })

@@ -1,7 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import { Text, Flex, Box } from 'rebass'
-import Emoji from "./Emoji";
+import { Text, Box } from 'rebass'
 
 import Link from "./Link";
 import Panel from "./Panel";
@@ -45,18 +44,4 @@ const Address = ({ address, ...rest }) => (
   </Link>
 );
 
-
-
-
-const OverviewPageTitle = () => (
-  <Flex>
-    <Text fontSize="1.5rem" lineHeight="1">
-      <Emoji symbol="🦄" label="Unicorn" />
-    </Text>
-    <Text fontWeight={500} mx="1rem" lineHeight="1.5rem">
-      Uniswap
-    </Text>
-  </Flex>
-);
-
-export { Hint, Divider, Header, Address, OverviewPageHeader, OverviewPageTitle };
+export { Hint, Divider, Header, Address, OverviewPageHeader };
