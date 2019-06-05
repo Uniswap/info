@@ -262,6 +262,7 @@ class App extends Component {
                   </Text>
                   <Divider/>
                 </Box>
+
                 <Box p={24}>
                   <Hint
                     color="text"
@@ -310,7 +311,7 @@ class App extends Component {
                   </Text>
                   <Divider/>
                 </Box>
-                <Box p={24}>
+                <Box p={24} >
                   <Hint
                     color="text"
                     fontSize={15}
@@ -329,7 +330,6 @@ class App extends Component {
                   </Text>
                   <Divider/>
                   <Flex
-                    alignItems='end'
                     justifyContent='center'
                     p={24}
                     mb={-24}
