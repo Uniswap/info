@@ -122,9 +122,15 @@ class App extends Component {
     }
   }
 
-  togglePage = () => {
+  async togglePage () {
     if (this.state.overviewPage) {
-      this.setState({ overviewPage: false })
+      this.setState({
+        overviewPage: false,
+        historyDaysToQuery: 7
+      })
+      await this.switchActiveExchange(
+        this.props.directoryStore.state.defaultExchangeAddress
+      )
     } else {
       this.setState({ overviewPage: true })
     }

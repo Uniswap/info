@@ -15,6 +15,7 @@ const FirstExchangeItem = ({ topTen }) => (
         color="text"
         fontSize={15}
         fontWeight={500}
+        mb={40}
       >
         Token
       </Hint>}
@@ -23,10 +24,10 @@ const FirstExchangeItem = ({ topTen }) => (
         color="uniswappink"
         className="-transition"
         fontSize={20}
-        lineHeight={0.1}
-        fontWeight={350}
+        lineHeight={0.15}
+        fontWeight={250}
       >
-        {topTen.tokenName}
+        {topTen[0].tokenName}
       </Text>
     }
     topRight={
@@ -34,6 +35,7 @@ const FirstExchangeItem = ({ topTen }) => (
         color="text"
         fontSize={15}
         fontWeight={500}
+        mb={40}
       >
         24 Hour Volume ETH
       </Hint>}
@@ -41,10 +43,10 @@ const FirstExchangeItem = ({ topTen }) => (
       <Text
         color="uniswappink"
         fontSize={20}
-        lineHeight={0.1}
-        fontWeight={350}
+        lineHeight={0.15}
+        fontWeight={250}
       >
-        {topTen.tradeVolumeEth}
+        {topTen[0].tradeVolumeEth}
       </Text>
     }
   />
@@ -96,10 +98,12 @@ const TopExchanges = ({ topTen }) => {
       <Loader/>
     )
   } else {
+    console.log("GHAGF", topTen.slice(0,1))
     return (
       <List p={24}>
         <FirstExchangeItem topTen={topTen.slice(0, 1)}/>
-        {topTen.slice(1, 11).map((exchanges, index) => (
+        <Divider/>
+        {topTen.slice(1, 10).map((exchanges, index) => (
           <ExchangeItem key={index} topTen={exchanges}/>
         ))}
       </List>

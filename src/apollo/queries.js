@@ -42,7 +42,7 @@ export const TICKER_QUERY = gql`
 `
 export const TICKER_24HOUR_QUERY = gql`
   query exchangeHistoricalDatas($timestamp: Int!, $exchangeAddr: String!) {
-    exchangeHistoricalDatas(where:{timestamp_lt: $timestamp, exchangeAddress: $exchangeAddr}, first: 1){
+    exchangeHistoricalDatas(where:{timestamp_lt: $timestamp, exchangeAddress: $exchangeAddr}, first: 1, orderBy: tradeVolumeEth, orderDirection: desc,){
       price
       tradeVolumeEth
     }
@@ -84,7 +84,7 @@ export const TOTALS_QUERY = gql`
 `
 export const OVERVIEW_PAGE_24HOUR = gql`
   query exchangeHistoricalDatas($timestamp: Int!, $exchangeAddr: String!) {
-    exchangeHistoricalDatas(where:{timestamp_lt: $timestamp, exchangeAddress: $exchangeAddr}, first: 1){
+    exchangeHistoricalDatas(where:{timestamp_lt: $timestamp, exchangeAddress: $exchangeAddr}, first: 1, orderBy: tradeVolumeEth, orderDirection: desc,){
       tradeVolumeEth
     }
   }

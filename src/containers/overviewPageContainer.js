@@ -73,6 +73,12 @@ export class OverviewPageContainer extends Container {
       })
       console.log(`fetched ${addresses.length} exchanges 24 hour trade volume`)
 
+      for (let j = 0; j < addresses.length; j++){
+        if(addresses[j].tokenName === null){
+          addresses[j].tokenName = addresses[j].id
+        }
+      }
+      console.log(addresses)
       await this.setState({
         topTen: addresses
       })
