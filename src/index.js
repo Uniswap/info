@@ -6,6 +6,7 @@ import { PoolContainer } from "./containers/poolContainer";
 import { DirectoryContainer } from "./containers/directoryContainer";
 import { TransactionsContainer } from "./containers/transactionsContainer";
 import { ChartContainer } from "./containers/chartContainer";
+import { OverviewPageContainer} from './containers/overviewPageContainer'
 
 import App from "./App";
 
@@ -16,15 +17,17 @@ const AppWrapper = () => (
         PoolContainer,
         TransactionsContainer,
         DirectoryContainer,
-        ChartContainer
+        ChartContainer,
+        OverviewPageContainer
       ]}
     >
-      {(poolStore, transactionsStore, directoryStore, chartStore) => (
+      {(poolStore, transactionsStore, directoryStore, chartStore, overviewPageStore) => (
         <App
           poolStore={poolStore}
           transactionsStore={transactionsStore}
           directoryStore={directoryStore}
           chartStore={chartStore}
+          overviewPageStore = {overviewPageStore}
         />
       )}
     </Subscribe>

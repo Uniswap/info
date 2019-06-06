@@ -42,7 +42,7 @@ export const TICKER_QUERY = gql`
 `
 export const TICKER_24HOUR_QUERY = gql`
   query exchangeHistoricalDatas($timestamp: Int!, $exchangeAddr: String!) {
-    exchangeHistoricalDatas(where:{timestamp_lt: $timestamp, exchangeAddress: $exchangeAddr}, first: 1){
+    exchangeHistoricalDatas(where:{timestamp_lt: $timestamp, exchangeAddress: $exchangeAddr}, first: 1, orderBy: tradeVolumeEth, orderDirection: desc,){
       price
       tradeVolumeEth
     }
@@ -57,6 +57,35 @@ export const DIRECTORY_QUERY = gql`
       tokenName
       tokenDecimals
       tokenAddress
+    }
+  }
+`
+
+export const OVERVIEW_PAGE_QUERY = gql`
+  query exchanges($first: Int!) {
+    exchanges(first: $first, orderBy: tradeVolumeEth, orderDirection: desc) {
+      id
+      tradeVolumeEth
+      tokenName
+    }
+  }
+`
+export const TOTALS_QUERY = gql`
+  query totals {
+    uniswap(id: "1"){
+      totalVolumeUSD
+      totalVolumeInEth
+      totalLiquidityUSD
+      totalLiquidityInEth
+      txCount
+      exchangeCount
+    }
+  }
+`
+export const OVERVIEW_PAGE_24HOUR = gql`
+  query exchangeHistoricalDatas($timestamp: Int!, $exchangeAddr: String!) {
+    exchangeHistoricalDatas(where:{timestamp_lt: $timestamp, exchangeAddress: $exchangeAddr}, first: 1, orderBy: tradeVolumeEth, orderDirection: desc,){
+      tradeVolumeEth
     }
   }
 `

@@ -1,19 +1,22 @@
 import React, { Component } from 'react'
-import { Box, Flex, Text } from 'rebass'
+import { Box, Button, Flex, Text } from 'rebass'
 
 import Wrapper from './components/Theme'
 import Title from './components/Title'
+import OverviewTitle from './components/OverviewTitle'
 import FourByFour from './components/FourByFour'
 import Panel from './components/Panel'
 import Dashboard from './components/Dashboard'
+import Overview from './components/Overview'
 import Select from './components/Select'
 import Footer from './components/Footer'
 import TransactionsList from './components/TransactionsList'
+import TopExchanges from './components/ExchangeTable'
 import Chart from './components/Chart'
 import Loader from './components/Loader'
-import { Header, Divider, Hint, Address } from './components'
+import { Header, Divider, Hint, Address, OverviewPageHeader } from './components'
 
-import { setThemeColor, isWeb3Available } from './helpers/'
+import { setThemeColor, isWeb3Available, formatNumber } from './helpers/'
 
 import { ApolloProvider } from 'react-apollo'
 import { client } from './apollo/client'
@@ -27,7 +30,8 @@ const timeframeOptions = [
 
 class App extends Component {
   state = {
-    historyDaysToQuery: 7
+    historyDaysToQuery: 7,
+    overviewPage: false
   }
 
   // Fetch Exchange's Transactions
@@ -101,6 +105,7 @@ class App extends Component {
 
   async componentDidMount () {
     try {
+
       // first, fetch directory & set default exchange address
       await this.props.directoryStore.fetchDirectory()
 
@@ -108,8 +113,26 @@ class App extends Component {
       await this.switchActiveExchange(
         this.props.directoryStore.state.defaultExchangeAddress
       )
+
+      await this.props.overviewPageStore.fetchTotals()
+      await this.props.overviewPageStore.fetchExchanges(50)
+
     } catch (err) {
       console.log('error:', err)
+    }
+  }
+
+  async togglePage () {
+    if (this.state.overviewPage) {
+      this.setState({
+        overviewPage: false,
+        historyDaysToQuery: 7
+      })
+      await this.switchActiveExchange(
+        this.props.directoryStore.state.defaultExchangeAddress
+      )
+    } else {
+      this.setState({ overviewPage: true })
     }
   }
 
@@ -126,6 +149,20 @@ class App extends Component {
       ethLiquidity,
       tokenAddress
     } = this.props.directoryStore.state.activeExchange
+
+    const {
+      exchangeCount,
+      totalLiquidityInEth,
+      totalLiquidityUSD,
+      totalVolumeInEth,
+      totalVolumeUSD,
+      txCount
+    } = this.props.overviewPageStore.state.totals
+
+    // OverviewPage Store
+    const {
+      state: { topTen }
+    } = this.props.overviewPageStore
 
     // Directory Store
     const {
@@ -154,6 +191,187 @@ class App extends Component {
         </Wrapper>
       )
 
+    if (this.state.overviewPage)
+      return (
+        <ApolloProvider client={client}>
+          <Wrapper>
+            <OverviewPageHeader
+              px={24}
+              py={3}
+              bg={['mineshaft', 'transparent']}
+              color={['white', 'black']}
+            >
+              <OverviewTitle/>
+              <Flex>
+                <Button
+                  fontSize={15}
+                  lineHeight={1.4}
+                  fontWeight={250}
+                  py={10}
+                  mx={10}
+                  color={this.state.overviewPage ? 'grey' : 'black'}
+                  bg='alabaster'
+                  onClick={() => this.togglePage()}
+                >
+                  Charts
+                </Button>
+                <Button
+                  fontSize={15}
+                  lineHeight={1.4}
+                  fontWeight={250}
+                  mx={10}
+                  color={this.state.overviewPage ? 'black' : 'grey'}
+                  py={10}
+                  bg='alabaster'
+                >
+                  Overview
+                </Button>
+              </Flex>
+            </OverviewPageHeader>
+            <Overview mx="auto">
+              <Panel rounded bg="white" alignItems='center' area='totals'>
+                <Flex p={24} justifyContent="center" bg="alabaster">
+                  <Text
+                    color="grey"
+                    fontSize={14}
+                    lineHeight={1}
+                    fontWeight={700}
+                  >
+                    All Time Stats
+                  </Text>
+                </Flex>
+                <Box p={24}>
+                  <Hint
+                    color="text"
+                    fontSize={15}
+                    fontWeight={500}
+                    mb={3}
+                  >
+                    Total Volume ETH
+                  </Hint>
+                  <Text
+                    fontSize={20}
+                    color="uniswappink"
+                    className="-transition"
+                    lineHeight={1.4}
+                    fontWeight={500}
+                  >
+                    {formatNumber(Number(totalVolumeInEth).toFixed(2))} ETH
+                  </Text>
+                  <Text
+                    fontSize={15}
+                    color="uniswappink"
+                    lineHeight={4}
+                    fontWeight={500}
+                  >
+                    ${formatNumber(Number(totalVolumeUSD).toFixed(2))}
+                  </Text>
+                  <Divider/>
+                </Box>
+                <Box p={24}>
+                  <Hint
+                    color="text"
+                    fontSize={15}
+                    fontWeight={500}
+                    mb={3}
+                  >
+                    Total Liquidity
+                  </Hint>
+                  <Text
+                    color="uniswappink"
+                    className="-transition"
+                    fontSize={20}
+                    lineHeight={1.4}
+                    fontWeight={500}
+                  >
+                    {formatNumber(Number(totalLiquidityInEth).toFixed(2))} ETH
+                  </Text>
+                  <Text
+                    color="uniswappink"
+                    fontSize={15}
+                    lineHeight={4}
+                    fontWeight={500}
+                  >
+                    ${formatNumber(Number(totalLiquidityUSD).toFixed(2))}
+                  </Text>
+                  <Divider/>
+                </Box>
+                <Box p={24}>
+                  <Hint
+                    color="text"
+                    fontSize={15}
+                    fontWeight={500}
+                    mb={3}
+                  >
+                    Total Exchanges
+                  </Hint>
+                  <Text
+                    color="uniswappink"
+                    className="-transition"
+                    fontSize={20}
+                    lineHeight={4}
+                    fontWeight={500}
+                  >
+                    {Number(exchangeCount)}
+                  </Text>
+                  <Divider/>
+                </Box>
+                <Box p={24} >
+                  <Hint
+                    color="text"
+                    fontSize={15}
+                    fontWeight={500}
+                    mb={3}
+                  >
+                    Total Transactions
+                  </Hint>
+                  <Text
+                    color="uniswappink"
+                    fontSize={20}
+                    lineHeight={4}
+                    fontWeight={500}
+                  >
+                    {formatNumber(Number(txCount))}
+                  </Text>
+                  <Divider/>
+                  <Flex
+                    justifyContent='center'
+                    p={24}
+                    mb={-24}
+                  >
+                    <Button
+                      fontSize={16}
+                      lineHeight={1.4}
+                      fontWeight={400}
+                      color="uniswappink"
+                      bg='white'
+                      onClick={() => this.togglePage()}
+                    >
+                      View Individual Exchange Data
+                    </Button>
+                  </Flex>
+                </Box>
+              </Panel>
+              <Panel rounded bg="white" alignItems='center' area='exchanges'>
+                <Flex p={24} justifyContent="center" bg='alabaster'>
+                  <Text
+                    color="grey"
+                    fontSize={14}
+                    lineHeight={1}
+                    fontWeight={700}
+                  >
+                    Top Ten Exchanges By 24 Hour Volume
+                  </Text>
+                </Flex>
+                <TopExchanges
+                  topTen={topTen}
+                />
+              </Panel>
+            </Overview>
+          </Wrapper>
+        </ApolloProvider>
+      )
+
     return (
       <ApolloProvider client={client}>
         <Wrapper>
@@ -164,9 +382,37 @@ class App extends Component {
             color={['white', 'black']}
           >
             <Title/>
+            <Flex>
+              <Button
+                fontSize={15}
+                lineHeight={1.4}
+                fontWeight={250}
+                mx={10}
+                py={10}
+                color={this.state.overviewPage ? 'grey' : 'black'}
+                bg='alabaster'
+              >
+                Charts
+              </Button>
 
+              <Button
+                fontSize={15}
+                lineHeight={1.4}
+                fontWeight={250}
+                mx={10}
+                py={10}
+                color={this.state.overviewPage ? 'black' : 'grey'}
+                bg='alabaster'
+                onClick={() => this.togglePage()}
+              >
+                Overview
+              </Button>
+
+            </Flex>
+            <Flex/>
             <Select
               options={directory}
+
               defaultValue={directory[0]}
               onChange={select => {
                 if (exchangeAddress !== select.value)
@@ -321,6 +567,25 @@ class App extends Component {
                 </Hint>
                 <Address address={tokenAddress}/>
               </Box>
+              <Divider/>
+              <Flex
+                alignItems='end'
+                justifyContent='center'
+                p={24}
+                mb={-24}
+              >
+                <Button
+                  fontSize={16}
+                  lineHeight={1.4}
+                  fontWeight={400}
+                  mb={24}
+                  color="uniswappink"
+                  bg='white'
+                  onClick={() => this.togglePage()}
+                >
+                  View Total Uniswap Stats
+                </Button>
+              </Flex>
             </Panel>
 
             <Panel rounded bg="white" area="transactions">
@@ -328,7 +593,7 @@ class App extends Component {
                 <Text color="text">Latest Transactions</Text>
                 <Text>↓</Text>
               </Flex>
-              <Divider />
+              <Divider/>
 
               {transactions && transactions.length > 0 ? (
                 <TransactionsList
@@ -336,7 +601,7 @@ class App extends Component {
                   tokenSymbol={symbol}
                 />
               ) : (
-                <Loader />
+                <Loader/>
               )}
             </Panel>
           </Dashboard>

@@ -3,8 +3,8 @@ import { Text, Flex } from "rebass";
 
 import Emoji from "../Emoji";
 
-export const Title = () => (
-  <Flex alignItems="center">
+const OverviewTitle = () => (
+  <Flex>
     <Text fontSize="1.5rem" lineHeight="1">
       <Emoji symbol="🦄" label="Unicorn" />
     </Text>
@@ -14,4 +14,4 @@ export const Title = () => (
   </Flex>
 );
 
-export default Title;
+export default OverviewTitle;

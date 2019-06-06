@@ -46,15 +46,7 @@ export class DirectoryContainer extends Container {
         exchanges: directoryObjects
       })
 
-
       let defaultExchange = this.state.directory[0].value
-      // let mkrDefault
-      // for (let i = 0; i < this.state.directory.length; i++) {
-      //   if (this.state.directory[i].label === 'MKR') {
-      //     mkrDefault = this.state.directory[i].value
-      //     break
-      //   }
-      // }
 
       // set default exchange address
       await this.setState({

@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import { Text, Box } from "rebass";
+import { Text, Box } from 'rebass'
 
 import Link from "./Link";
 import Panel from "./Panel";
@@ -9,8 +9,16 @@ import { urls } from "../helpers";
 
 const Header = styled(Panel)`
   display: grid;
-  grid-template-columns: 1fr minmax(224px, 0.25fr);
-  align-items: center;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  align-items: end;
+  justify-content: center;
+`;
+
+const OverviewPageHeader = styled(Panel)`
+  display: grid;
+  grid-template-columns: 2fr 1fr 2fr;
+  align-items: end;
+  justify-content: center;
 `;
 
 const Divider = styled(Box)`
@@ -36,4 +44,4 @@ const Address = ({ address, ...rest }) => (
   </Link>
 );
 
-export { Hint, Divider, Header, Address };
+export { Hint, Divider, Header, Address, OverviewPageHeader };
