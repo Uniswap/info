@@ -9,7 +9,7 @@ import { toK, toNiceDate, toNiceDateYear } from '../../helpers'
 
 const Controls = styled.div`
   display: grid;
-  grid-template-columns: repeat(4, max-content);
+  grid-template-columns: repeat(7, max-content);
   grid-column-gap: 8px;
 `
 
@@ -18,6 +18,9 @@ const Chart = ({ data, symbol }) => {
   const [eth, toggleEth] = useState(false)
   const [token, toggleToken] = useState(false)
   const [rate, toggleRate] = useState(false)
+  const [roi, toggleROI] = useState(false)
+  const [usd, toggleUSD] = useState(false)
+  const [txs, toggleTxs] = useState(false)
 
   const isNotMobile = useMedia('(max-width: 40em)')
 
@@ -30,7 +33,7 @@ const Chart = ({ data, symbol }) => {
             axisLine={false}
             interval="preserveStartEnd"
             tickFormatter={tick => toNiceDate(tick)}
-            dataKey="date"
+            dataKey="dayString"
           />
           <YAxis
             hide={isNotMobile}
@@ -77,9 +80,39 @@ const Chart = ({ data, symbol }) => {
             hide={token}
             type="monotone"
             yAxisId={1}
-            dataKey="tokenLiquidity"
+            dataKey="tokenBalance"
             name={`${symbol} Liquidity`}
             stroke="var(--c-token)"
+          />
+          <Line
+            strokeWidth={2}
+            dot={false}
+            hide={roi}
+            type="monotone"
+            name="ROI"
+            yAxisId={1}
+            dataKey="ROI"
+            stroke="red"
+          />
+          <Line
+            strokeWidth={2}
+            dot={false}
+            hide={txs}
+            type="monotone"
+            name="Transactions"
+            yAxisId={1}
+            dataKey="totalEvents"
+            stroke="orange "
+          />
+          <Line
+            strokeWidth={2}
+            dot={false}
+            hide={usd}
+            type="monotone"
+            name="Token Price USD"
+            dataKey="tokenPriceUSD"
+            yAxisId={1}
+            stroke="green"
           />
           <Line
             strokeWidth={2}
@@ -97,7 +130,7 @@ const Chart = ({ data, symbol }) => {
             hide={eth}
             type="monotone"
             name="ETH Liquidity"
-            dataKey="ethLiquidity"
+            dataKey="ethBalance"
             yAxisId={1}
             stroke="var(--c-uniswappink)"
           />
@@ -124,6 +157,36 @@ const Chart = ({ data, symbol }) => {
             bg="uniswappink"
           >
             ETH
+          </Button>
+          <Button
+            onClick={() => toggleROI(!roi)}
+            variant={roi ? 'outline' : null}
+            fontSize={[0, 1]}
+            color={roi ? 'red' : 'white'}
+            borderColor="red"
+            bg="red"
+          >
+            ROI
+          </Button>
+          <Button
+            onClick={() => toggleTxs(!txs)}
+            variant={txs ? 'outline' : null}
+            fontSize={[0, 1]}
+            color={txs ? 'orange' : 'white'}
+            borderColor="orange"
+            bg="orange"
+          >
+            Transactions
+          </Button>
+          <Button
+            onClick={() => toggleUSD(!usd)}
+            variant={usd ? 'outline' : null}
+            fontSize={[0, 1]}
+            color={usd ? 'green' : 'white'}
+            borderColor="green"
+            bg="green"
+          >
+            USD
           </Button>
           <Button
             onClick={() => toggleRate(!rate)}
