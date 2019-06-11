@@ -6,7 +6,6 @@
   "dependencies": {
     "bignumber.js": "^8.0.1",
     "chart.js": "^2.7.3",
-    "gh-pages": "^2.0.1",
     "react": "^16.7.0-alpha.0",
     "react-chartjs-2": "^2.7.4",
     "react-dom": "^16.7.0-alpha.0",
@@ -23,8 +22,6 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d build -t",
     "format": "prettier --require-pragma --write \"./src/**/*.js\" \"./src/**/*.css\""
   },
   "eslintConfig": {

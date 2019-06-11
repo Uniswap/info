@@ -2,20 +2,18 @@
 
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 
-Transaction and liquidity pool stats for https://uniswap.io
-
-Check it out live: https://uniswap.info
+**Note: This is the original version of [https://uniswap.io](https://uniswap.io); it now is hosted at [https://original.uniswap.info](https://original.uniswap.info).**
 
 ### To Start Development
 
-###### Installing dependency
+###### Installing dependencies
 ```bash
-npm i
+yarn
 ```
 
 ###### Running locally
 ```bash
-npm start
+yarn start
 ```
 
 # Loading Exchange Logs and Token Data
