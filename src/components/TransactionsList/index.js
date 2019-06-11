@@ -8,12 +8,27 @@ import TransactionType from './transactionTypeIcons'
 
 import { urls, formatTime, Big } from '../../helpers'
 
+function determineSigns(event) {
+  switch (event) {
+    case 'AddLiquidity':
+      return [1, 1]
+    case 'RemoveLiquidity':
+      return [-1, -1]
+    case 'TokenPurchase':
+      return [-1, 1]
+    case 'EthPurchase':
+      return [1, -1]
+  }
+}
+
 const TransactionItem = ({ transaction, tokenSymbol }) => (
   <Flex mb={24} alignItems="center" justifyContent="space-between">
     <Flex alignItems="center">
       <TransactionType event={transaction.event} />
       <Link fontSize={[12, 16]} ml="3" color="button" external href={urls.showTransaction(transaction.tx)}>
-        {Big(transaction.ethAmount).toFixed(4)} ETH for {Big(transaction.tokenAmount).toFixed(4)} {tokenSymbol}
+        {transaction.event == 'AddLiquidity' ? true : false}
+        {Big(transaction.ethAmount * determineSigns(transaction.event)[0]).toFixed(4)} ETH for{' '}
+        {Big(transaction.tokenAmount * determineSigns(transaction.event)[1]).toFixed(4)} {tokenSymbol}
       </Link>
     </Flex>
     <Text fontSize={[12, 16]} color="textDim">

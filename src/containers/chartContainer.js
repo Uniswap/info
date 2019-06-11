@@ -2,7 +2,8 @@ import { Container } from 'unstated'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 
-import { BASE_URL } from '../helpers'
+import { client } from '../apollo/client'
+import { CHART_QUERY } from '../apollo/queries'
 
 dayjs.extend(utc)
 
@@ -19,43 +20,58 @@ export class ChartContainer extends Container {
       const utcEndTime = dayjs.utc()
 
       let utcStartTime
-      let unit
 
       // go back, go way way back
       switch (daysToQuery) {
         case 'all':
           utcStartTime = utcEndTime.subtract(1, 'year').startOf('year')
-          unit = 'month'
           break
         case '3months':
           utcStartTime = utcEndTime.subtract(3, 'month').startOf('month')
-          unit = 'day'
           break
         case '1month':
           utcStartTime = utcEndTime.subtract(1, 'month').startOf('month')
-          unit = 'day'
           break
         case '1week':
         default:
           utcStartTime = utcEndTime.subtract(7, 'day').startOf('day')
-          unit = 'day'
           break
       }
-
-      const data = await fetch(
-        `${BASE_URL}v1/chart?exchangeAddress=${exchangeAddress}&startTime=${utcStartTime.unix()}&endTime=${utcEndTime.unix()}&unit=${unit}`
-      )
-
-      if (!data.ok) {
-        throw Error(data.status)
+      let startTime = utcStartTime.unix() - 1 // -1 because we filter on greater than in the query
+      let data = []
+      let dataEnd = false
+      while (!dataEnd) {
+        let result = await client.query({
+          query: CHART_QUERY,
+          variables: {
+            exchangeAddr: exchangeAddress,
+            date: startTime
+          },
+          fetchPolicy: 'network-only'
+        })
+        data = data.concat(result.data.exchangeDayDatas)
+        if (result.data.exchangeDayDatas.length !== 100) {
+          dataEnd = true
+        } else {
+          startTime = result.data.exchangeDayDatas[99].date - 1
+        }
       }
+      data.forEach((dayData, i) => {
+        let dayTimestamp = dayjs.unix(data[i].date)
+        // note, the dayjs api says date starts at 1, but it appears it doesnt, as I had to add 1
+        let dayString = dayTimestamp
+          .year()
+          .toString()
+          .concat('-')
+          .concat((dayTimestamp.month() + 1).toString())
+          .concat('-')
+          .concat((dayTimestamp.date() + 1).toString())
+        data[i].dayString = dayString
+      })
+      console.log(`fetched ${data.length} days worth of chart data`)
 
-      const json = await data.json()
-
-      console.log(`fetched ${json.length} chart data for ${exchangeAddress}`)
-
-      this.setState({
-        data: json
+      await this.setState({
+        data: data
       })
     } catch (err) {
       console.log('error: ', err)

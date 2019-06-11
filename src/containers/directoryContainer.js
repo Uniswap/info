@@ -1,6 +1,8 @@
 import { Container } from 'unstated'
-
-import { BASE_URL, Big } from '../helpers'
+import dayjs from 'dayjs'
+import { Big } from '../helpers'
+import { client } from '../apollo/client'
+import { DIRECTORY_QUERY, TICKER_QUERY, TICKER_24HOUR_QUERY } from '../apollo/queries'
 
 export class DirectoryContainer extends Container {
   state = {
@@ -14,29 +16,40 @@ export class DirectoryContainer extends Container {
 
   async fetchDirectory() {
     try {
-      const data = await fetch(`${BASE_URL}v1/directory`)
-
-      if (!data.ok) {
-        throw Error(data.status)
+      let data = []
+      let dataEnd = false
+      let skip = 0
+      while (!dataEnd) {
+        let result = await client.query({
+          query: DIRECTORY_QUERY,
+          variables: {
+            first: 100,
+            skip: skip
+          },
+          fetchPolicy: 'network-only'
+        })
+        data = data.concat(result.data.exchanges)
+        skip = skip + 100
+        if (result.data.exchanges.length !== 100) {
+          dataEnd = true
+        }
       }
-
-      const json = await data.json()
-
+      console.log(`fetched ${data.length} exchanges for directory`)
       let directoryObjects = {}
-      json.exchanges.forEach(exchange => {
-        directoryObjects[exchange.exchangeAddress] = buildDirectoryObject(exchange)
+      data.forEach(exchange => {
+        directoryObjects[exchange.id] = buildDirectoryObject(exchange)
       })
 
-      console.log(`fetched ${json.exchanges.length} exchanges`)
-
       await this.setState({
-        directory: json.exchanges.map(exchange => buildDirectoryLabel(exchange)),
+        directory: data.map(exchange => buildDirectoryLabel(exchange)),
         exchanges: directoryObjects
       })
 
+      let defaultExchange = this.state.directory[0].value
+
       // set default exchange address
       await this.setState({
-        defaultExchangeAddress: this.state.directory[0].value
+        defaultExchangeAddress: defaultExchange
       })
     } catch (err) {
       console.log('error: ', err)
@@ -46,22 +59,46 @@ export class DirectoryContainer extends Container {
   // fetch exchange information via address
   async fetchTicker(address) {
     try {
-      const data = await fetch(`${BASE_URL}v1/ticker?exchangeAddress=${address}`)
-
-      if (!data.ok) {
-        throw Error(data.status)
+      const result = await client.query({
+        query: TICKER_QUERY,
+        variables: {
+          id: address
+        },
+        fetchPolicy: 'network-only'
+      })
+      let data
+      if (result) {
+        data = result.data.exchange
       }
+      const { price, ethBalance, tokenBalance, tradeVolumeEth } = data
 
-      const json = await data.json()
-
-      const { tradeVolume, ethLiquidity, priceChangePercent, erc20Liquidity, price, invPrice } = json
+      let data24HoursAgo
+      try {
+        const utcCurrentTime = dayjs()
+        const utcOneDayBack = utcCurrentTime.subtract(1, 'day')
+        const result24HoursAgo = await client.query({
+          query: TICKER_24HOUR_QUERY,
+          variables: {
+            exchangeAddr: address,
+            timestamp: utcOneDayBack.unix()
+          },
+          fetchPolicy: 'network-only'
+        })
+        if (result24HoursAgo) {
+          data24HoursAgo = result24HoursAgo.data.exchangeHistoricalDatas[0]
+        }
+      } catch (err) {
+        console.log('error: ', err)
+      }
+      const invPrice = 1 / price
 
       let percentChange = ''
-      const adjustedPriceChangePercent = (priceChangePercent * 100).toFixed(2)
-
+      const adjustedPriceChangePercent = (((price - data24HoursAgo.price) / price) * 100).toFixed(2)
       adjustedPriceChangePercent > 0 ? (percentChange = '+') : (percentChange = '')
 
       percentChange += adjustedPriceChangePercent
+
+      let oneDayVolume = tradeVolumeEth - data24HoursAgo.tradeVolumeEth
 
       console.log(`fetched ticker for ${address}`)
 
@@ -74,9 +111,9 @@ export class DirectoryContainer extends Container {
             price,
             invPrice,
             percentChange,
-            tradeVolume: Big(tradeVolume).toFixed(4),
-            ethLiquidity: Big(ethLiquidity).toFixed(4),
-            erc20Liquidity: Big(erc20Liquidity).toFixed(4)
+            tradeVolume: Big(oneDayVolume).toFixed(4),
+            ethLiquidity: Big(ethBalance).toFixed(4),
+            erc20Liquidity: Big(tokenBalance).toFixed(4)
           }
         }
       }))
@@ -90,20 +127,30 @@ export class DirectoryContainer extends Container {
 }
 
 const buildDirectoryLabel = exchange => {
-  const { symbol, exchangeAddress } = exchange
+  let { tokenSymbol, id } = exchange
+  const exchangeAddress = id
+  if (tokenSymbol === null) {
+    tokenSymbol = 'unknown'
+  }
 
   return {
-    // label: `${symbol} - ${exchangeAddress}`,
-    label: symbol,
+    label: tokenSymbol,
     value: exchangeAddress
   }
 }
 
 const buildDirectoryObject = exchange => {
-  const { name, symbol, exchangeAddress, tokenAddress, tokenDecimals, theme } = exchange
+  const { tokenName, tokenSymbol, id, tokenAddress, tokenDecimals } = exchange
+
+  const exchangeAddress = id
+  const symbol = tokenSymbol
+  let theme = hardcodeThemes[exchangeAddress]
+  if (theme == undefined) {
+    theme = ''
+  }
 
   return {
-    name,
+    tokenName,
     symbol,
     exchangeAddress,
     tokenAddress,
@@ -116,4 +163,13 @@ const buildDirectoryObject = exchange => {
     ethLiquidity: 0,
     erc20Liquidity: 0
   }
+}
+
+// These are previously received from the loanscan api. Only 5 were found
+const hardcodeThemes = {
+  '0x2c4bd064b998838076fa341a83d007fc2fa50957': '#1abc9c',
+  '0xae76c84c9262cdb9abc0c2c8888e62db8e22a0bf': '#302c2c',
+  '0x09cabec1ead1c0ba254b09efb3ee13841712be14': '#fdc134',
+  '0x4e395304655f0796bc3bc63709db72173b9ddf98': '#00b4f4',
+  '0x2e642b8d59b45a1d8c5aef716a84ff44ea665914': '#ff5000'
 }
