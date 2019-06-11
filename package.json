@@ -1,12 +1,11 @@
 {
-  "name": "uniswap",
+  "name": "uniswap-info",
   "version": "0.1.0",
   "private": true,
   "homepage": ".",
   "dependencies": {
     "bignumber.js": "^8.1.1",
     "dayjs": "^1.8.10",
-    "gh-pages": "^2.0.1",
     "react": "^16.8.3",
     "react-dom": "^16.8.3",
     "react-scripts": "^2.1.5",
@@ -23,20 +22,32 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d build",
-    "format": "prettier --write \"./src/**/*.js\" \"./src/**/*.css\""
+    "lint:base": "yarn eslint './src/**/*.{js,jsx}'",
+    "format:base": "yarn prettier './src/**/*.{js,jsx,scss}'",
+    "fix:lint": "yarn lint:base --fix",
+    "fix:format": "yarn format:base --write",
+    "fix:all": "yarn fix:lint && yarn fix:format",
+    "check:lint": "yarn lint:base",
+    "check:format": "yarn format:base --check",
+    "check:all": "yarn check:lint && yarn check:format"
   },
   "eslintConfig": {
     "extends": "react-app"
   },
-  "browserslist": [
-    ">0.2%",
-    "not dead",
-    "not ie <= 11",
-    "not op_mini all"
-  ],
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "license": "GPL-3.0-or-later",
   "devDependencies": {
-    "prettier": "^1.16.4"
+    "prettier": "^1.18.2"
   }
 }

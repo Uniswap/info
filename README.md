@@ -1,20 +1,19 @@
 # Uniswap History
 
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
-[![Netlify Status](https://api.netlify.com/api/v1/badges/299555b7-55bf-47e6-8c06-74cc4630828a/deploy-status)](https://app.netlify.com/sites/beta-uniswap-info/deploys)
 
-Transaction and liquidity pool stats for https://uniswap.io
+Transaction and liquidity pool stats for [https://uniswap.io](https://uniswap.io).
 
-Check it out live: https://uniswap.info
+Check it out live: [https://uniswap.info](https://uniswap.info).
 
 ### To Start Development
 
-###### Installing dependency
+###### Installing dependencies
 ```bash
-npm i
+yarn
 ```
 
 ###### Running locally
 ```bash
-npm start
+yarn start start
 ```
