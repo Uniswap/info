@@ -1,42 +1,30 @@
-import React, { useState } from "react";
-import {
-  Line,
-  Bar,
-  XAxis,
-  YAxis,
-  ResponsiveContainer,
-  Tooltip,
-  ComposedChart
-} from "recharts";
-import { Flex, Button } from "rebass";
-import styled from "styled-components";
-import { useMedia } from "react-use";
+import React, { useState } from 'react'
+import { Line, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, ComposedChart } from 'recharts'
+import { Flex, Button } from 'rebass'
+import styled from 'styled-components'
+import { useMedia } from 'react-use'
 
-import CustomBar from "./customBar";
-import { toK, toNiceDate, toNiceDateYear } from "../../helpers";
+import CustomBar from './customBar'
+import { toK, toNiceDate, toNiceDateYear } from '../../helpers'
 
 const Controls = styled.div`
   display: grid;
   grid-template-columns: repeat(4, max-content);
   grid-column-gap: 8px;
-`;
+`
 
 const Chart = ({ data, symbol }) => {
-  const [volume, toggleVolume] = useState(false);
-  const [eth, toggleEth] = useState(false);
-  const [token, toggleToken] = useState(false);
-  const [rate, toggleRate] = useState(false);
+  const [volume, toggleVolume] = useState(false)
+  const [eth, toggleEth] = useState(false)
+  const [token, toggleToken] = useState(false)
+  const [rate, toggleRate] = useState(false)
 
-  const isNotMobile = useMedia("(max-width: 40em)");
+  const isNotMobile = useMedia('(max-width: 40em)')
 
   return (
     <>
       <ResponsiveContainer aspect={21 / 9}>
-        <ComposedChart
-          margin={{ top: 0, right: 0, bottom: 0, left: 0 }}
-          barCategoryGap={1}
-          data={data}
-        >
+        <ComposedChart margin={{ top: 0, right: 0, bottom: 0, left: 0 }} barCategoryGap={1} data={data}>
           <XAxis
             tickLine={false}
             axisLine={false}
@@ -69,9 +57,9 @@ const Chart = ({ data, symbol }) => {
             labelFormatter={label => toNiceDateYear(label)}
             labelStyle={{ paddingTop: 4 }}
             contentStyle={{
-              padding: "10px 14px",
+              padding: '10px 14px',
               borderRadius: 10,
-              borderColor: "var(--c-zircon)"
+              borderColor: 'var(--c-zircon)'
             }}
           />
           <Bar
@@ -119,9 +107,9 @@ const Chart = ({ data, symbol }) => {
         <Controls>
           <Button
             onClick={() => toggleToken(!token)}
-            variant={token ? "outline" : null}
+            variant={token ? 'outline' : null}
             fontSize={[0, 1]}
-            color={token ? "token" : "white"}
+            color={token ? 'token' : 'white'}
             borderColor="token"
             bg="token"
           >
@@ -129,9 +117,9 @@ const Chart = ({ data, symbol }) => {
           </Button>
           <Button
             onClick={() => toggleEth(!eth)}
-            variant={eth ? "outline" : null}
+            variant={eth ? 'outline' : null}
             fontSize={[0, 1]}
-            color={eth ? "uniswappink" : "white"}
+            color={eth ? 'uniswappink' : 'white'}
             borderColor="uniswappink"
             bg="uniswappink"
           >
@@ -139,9 +127,9 @@ const Chart = ({ data, symbol }) => {
           </Button>
           <Button
             onClick={() => toggleRate(!rate)}
-            variant={rate ? "outline" : null}
+            variant={rate ? 'outline' : null}
             fontSize={[0, 1]}
-            color={rate ? "button" : "white"}
+            color={rate ? 'button' : 'white'}
             borderColor="button"
             bg="button"
           >
@@ -149,9 +137,9 @@ const Chart = ({ data, symbol }) => {
           </Button>
           <Button
             onClick={() => toggleVolume(!volume)}
-            variant={volume ? "outline" : null}
+            variant={volume ? 'outline' : null}
             fontSize={[0, 1]}
-            color={volume ? "zircon" : "text"}
+            color={volume ? 'zircon' : 'text'}
             borderColor="zircon"
             bg="zircon"
           >
@@ -160,7 +148,7 @@ const Chart = ({ data, symbol }) => {
         </Controls>
       </Flex>
     </>
-  );
-};
+  )
+}
 
-export default Chart;
+export default Chart

@@ -1,10 +1,10 @@
-import React from "react";
-import PropTypes from "prop-types";
-import { default as ReactSelect } from "react-select";
+import React from 'react'
+import PropTypes from 'prop-types'
+import { default as ReactSelect } from 'react-select'
 
-import Popout from "./popout";
+import Popout from './popout'
 
-import customStyles from "./styles";
+import customStyles from './styles'
 
 const Select = ({ options, onChange, placeholder, ...rest }) => (
   <ReactSelect
@@ -15,17 +15,17 @@ const Select = ({ options, onChange, placeholder, ...rest }) => (
     styles={customStyles}
     {...rest}
   />
-);
+)
 
 Select.defaultProps = {
-  placeholder: "Find Exchanges"
-};
+  placeholder: 'Find Exchanges'
+}
 
 Select.propTypes = {
   options: PropTypes.array.isRequired,
   onChange: PropTypes.func
-};
+}
 
-export default Select;
+export default Select
 
-export { Popout };
+export { Popout }

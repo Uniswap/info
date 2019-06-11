@@ -1,83 +1,69 @@
-import { Container } from "unstated";
+import { Container } from 'unstated'
 
-import { BASE_URL, Big } from "../helpers";
+import { BASE_URL, Big } from '../helpers'
 
 export class DirectoryContainer extends Container {
   state = {
     directory: [],
     exchanges: [],
-    defaultExchangeAddress: "",
+    defaultExchangeAddress: '',
     activeExchange: {}
-  };
+  }
 
-  setActiveExchange = address =>
-    this.setState({ activeExchange: this.state.exchanges[address] });
+  setActiveExchange = address => this.setState({ activeExchange: this.state.exchanges[address] })
 
   async fetchDirectory() {
     try {
-      const data = await fetch(`${BASE_URL}v1/directory`);
+      const data = await fetch(`${BASE_URL}v1/directory`)
 
       if (!data.ok) {
-        throw Error(data.status);
+        throw Error(data.status)
       }
 
-      const json = await data.json();
+      const json = await data.json()
 
-      let directoryObjects = {};
+      let directoryObjects = {}
       json.exchanges.forEach(exchange => {
-        directoryObjects[exchange.exchangeAddress] = buildDirectoryObject(
-          exchange
-        );
-      });
+        directoryObjects[exchange.exchangeAddress] = buildDirectoryObject(exchange)
+      })
 
-      console.log(`fetched ${json.exchanges.length} exchanges`);
+      console.log(`fetched ${json.exchanges.length} exchanges`)
 
       await this.setState({
         directory: json.exchanges.map(exchange => buildDirectoryLabel(exchange)),
         exchanges: directoryObjects
-      });
+      })
 
       // set default exchange address
       await this.setState({
         defaultExchangeAddress: this.state.directory[0].value
-      });
+      })
     } catch (err) {
-      console.log("error: ", err);
+      console.log('error: ', err)
     }
   }
 
   // fetch exchange information via address
   async fetchTicker(address) {
     try {
-      const data = await fetch(
-        `${BASE_URL}v1/ticker?exchangeAddress=${address}`
-      );
+      const data = await fetch(`${BASE_URL}v1/ticker?exchangeAddress=${address}`)
 
       if (!data.ok) {
-        throw Error(data.status);
+        throw Error(data.status)
       }
 
-      const json = await data.json();
+      const json = await data.json()
 
-      const {
-        tradeVolume,
-        ethLiquidity,
-        priceChangePercent,
-        erc20Liquidity,
-        price,
-        invPrice
-      } = json;
+      const { tradeVolume, ethLiquidity, priceChangePercent, erc20Liquidity, price, invPrice } = json
 
-      let percentChange = "";
-      const adjustedPriceChangePercent = (priceChangePercent * 100).toFixed(2);
+      let percentChange = ''
+      const adjustedPriceChangePercent = (priceChangePercent * 100).toFixed(2)
 
-      adjustedPriceChangePercent > 0
-        ? (percentChange = "+")
-        : (percentChange = "");
+      adjustedPriceChangePercent > 0 ? (percentChange = '+') : (percentChange = '')
 
-      percentChange += adjustedPriceChangePercent;
+      percentChange += adjustedPriceChangePercent
 
-      console.log(`fetched ticker for ${address}`);
+      console.log(`fetched ticker for ${address}`)
 
       // update "exchanges" with new information
       await this.setState(prevState => ({
@@ -93,35 +79,28 @@ export class DirectoryContainer extends Container {
             erc20Liquidity: Big(erc20Liquidity).toFixed(4)
           }
         }
-      }));
+      }))
 
       // update "activeExchange" from now updated "exchanges"
-      await this.setActiveExchange(address);
+      await this.setActiveExchange(address)
     } catch (err) {
-      console.log("error: ", err);
+      console.log('error: ', err)
     }
   }
 }
 
 const buildDirectoryLabel = exchange => {
-  const { symbol, exchangeAddress } = exchange;
+  const { symbol, exchangeAddress } = exchange
 
   return {
     // label: `${symbol} - ${exchangeAddress}`,
     label: symbol,
     value: exchangeAddress
-  };
-};
+  }
+}
 
 const buildDirectoryObject = exchange => {
-  const {
-    name,
-    symbol,
-    exchangeAddress,
-    tokenAddress,
-    tokenDecimals,
-    theme
-  } = exchange;
+  const { name, symbol, exchangeAddress, tokenAddress, tokenDecimals, theme } = exchange
 
   return {
     name,
@@ -136,5 +115,5 @@ const buildDirectoryObject = exchange => {
     invPrice: 0,
     ethLiquidity: 0,
     erc20Liquidity: 0
-  };
-};
+  }
+}

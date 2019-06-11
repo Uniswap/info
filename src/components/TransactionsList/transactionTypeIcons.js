@@ -1,49 +1,22 @@
-import React from "react";
+import React from 'react'
 
 const AddLiquidity = props => (
   <svg width={24} height={24} fill="none" {...props}>
-    <rect
-      opacity={0.2}
-      x={0.5}
-      y={0.5}
-      width={23}
-      height={23}
-      rx={11.5}
-      stroke="#27AE60"
-    />
-    <path
-      d="M12.875 7h-1.75v4.125H7v1.75h4.125V17h1.75v-4.125H17v-1.75h-4.125V7z"
-      fill="#27AE60"
-    />
+    <rect opacity={0.2} x={0.5} y={0.5} width={23} height={23} rx={11.5} stroke="#27AE60" />
+    <path d="M12.875 7h-1.75v4.125H7v1.75h4.125V17h1.75v-4.125H17v-1.75h-4.125V7z" fill="#27AE60" />
   </svg>
-);
+)
 
 const RemoveLiquidity = props => (
   <svg width={24} height={24} fill="none" {...props}>
-    <rect
-      opacity={0.2}
-      x={0.5}
-      y={0.5}
-      width={23}
-      height={23}
-      rx={11.5}
-      stroke="#FF6871"
-    />
+    <rect opacity={0.2} x={0.5} y={0.5} width={23} height={23} rx={11.5} stroke="#FF6871" />
     <path stroke="#FF6871" strokeWidth={2} d="M7 12h10" />
   </svg>
-);
+)
 
 const TokenSwap = props => (
   <svg width={24} height={24} fill="none" {...props}>
-    <rect
-      opacity={0.2}
-      x={0.5}
-      y={0.5}
-      width={23}
-      height={23}
-      rx={11.5}
-      stroke="#DC6BE5"
-    />
+    <rect opacity={0.2} x={0.5} y={0.5} width={23} height={23} rx={11.5} stroke="#DC6BE5" />
     <g filter="url(#prefix__filter0_d)">
       <path
         fillRule="evenodd"
@@ -71,10 +44,7 @@ const TokenSwap = props => (
         colorInterpolationFilters="sRGB"
       >
         <feFlood floodOpacity={0} result="BackgroundImageFix" />
-        <feColorMatrix
-          in="SourceAlpha"
-          values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
-        />
+        <feColorMatrix in="SourceAlpha" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" />
         <feOffset dy={2} />
         <feGaussianBlur stdDeviation={2} />
         <feColorMatrix values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.13 0" />
@@ -91,10 +61,7 @@ const TokenSwap = props => (
         colorInterpolationFilters="sRGB"
       >
         <feFlood floodOpacity={0} result="BackgroundImageFix" />
-        <feColorMatrix
-          in="SourceAlpha"
-          values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
-        />
+        <feColorMatrix in="SourceAlpha" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" />
         <feOffset dy={2} />
         <feGaussianBlur stdDeviation={2} />
         <feColorMatrix values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.13 0" />
@@ -125,24 +92,24 @@ const TokenSwap = props => (
       </linearGradient>
     </defs>
   </svg>
-);
+)
 
 const TransactionType = ({ event }) => {
   switch (event) {
-    case "AddLiquidity":
-      return <AddLiquidity />;
-    case "RemoveLiquidity":
-      return <RemoveLiquidity />;
-    case "Token Swap":
-      return <TokenSwap />;
-    case "EthPurchase":
-      return <TokenSwap />;
-    case "TokenPurchase":
-      return <TokenSwap />;
+    case 'AddLiquidity':
+      return <AddLiquidity />
+    case 'RemoveLiquidity':
+      return <RemoveLiquidity />
+    case 'Token Swap':
+      return <TokenSwap />
+    case 'EthPurchase':
+      return <TokenSwap />
+    case 'TokenPurchase':
+      return <TokenSwap />
     default:
-      return null;
+      return null
   }
-};
+}
 
-export default TransactionType;
-export { TokenSwap, AddLiquidity, RemoveLiquidity };
+export default TransactionType
+export { TokenSwap, AddLiquidity, RemoveLiquidity }

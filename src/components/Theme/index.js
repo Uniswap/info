@@ -1,10 +1,10 @@
-import React from "react";
-import { ThemeProvider, createGlobalStyle } from "styled-components";
+import React from 'react'
+import { ThemeProvider, createGlobalStyle } from 'styled-components'
 
 // import "modern-normalize";
-import "typeface-inter";
+import 'typeface-inter'
 
-import theme from "./theme";
+import theme from './theme'
 
 export const GlobalStyles = createGlobalStyle`
   :root {
@@ -58,11 +58,9 @@ export const GlobalStyles = createGlobalStyle`
     transition-timing-function: ease;
     transition-duration: .5s;
   }
-`;
+`
 
-export const Theme = props => (
-  <ThemeProvider theme={theme}>{props.children}</ThemeProvider>
-);
+export const Theme = props => <ThemeProvider theme={theme}>{props.children}</ThemeProvider>
 
 export const Wrapper = ({ children }) => (
   <Theme>
@@ -71,6 +69,6 @@ export const Wrapper = ({ children }) => (
       {children}
     </>
   </Theme>
-);
+)
 
-export default Wrapper;
+export default Wrapper

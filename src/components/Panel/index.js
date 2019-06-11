@@ -1,9 +1,9 @@
-import { Box as RebassBox } from "rebass";
-import styled, { css } from "styled-components";
+import { Box as RebassBox } from 'rebass'
+import styled, { css } from 'styled-components'
 
 const panelPseudo = css`
   :after {
-    content: "";
+    content: '';
     position: absolute;
     bottom: -10px;
     left: 0;
@@ -17,7 +17,7 @@ const panelPseudo = css`
       content: unset;
     }
   }
-`;
+`
 
 const Panel = styled(RebassBox)`
   position: relative;
@@ -47,6 +47,6 @@ const Panel = styled(RebassBox)`
     `};
 
   ${props => !props.last && panelPseudo}
-`;
+`
 
-export default Panel;
+export default Panel
