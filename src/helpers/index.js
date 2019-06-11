@@ -1,16 +1,9 @@
 import { BigNumber } from 'bignumber.js'
 import dayjs from 'dayjs'
-import Uniswap from '../constants/Uniswap'
 
 BigNumber.set({ EXPONENTIAL_AT: 50 })
 
 export const BASE_URL = 'https://uniswap-api-staging.loanscan.io/'
-
-export const tokenOptions = Object.keys(Uniswap.tokens).map(key => ({
-  value: `${Uniswap.tokens[key].address}`,
-  // label: `${key} - ${Uniswap.tokens[key].address}`
-  label: key
-}))
 
 export const toNiceDate = date => dayjs(date).format('MMM DD')
 
