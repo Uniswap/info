@@ -145,7 +145,7 @@ const buildDirectoryObject = exchange => {
   const exchangeAddress = id
   const symbol = tokenSymbol
   let theme = hardcodeThemes[exchangeAddress]
-  if (theme == undefined) {
+  if (theme === undefined) {
     theme = ''
   }
 

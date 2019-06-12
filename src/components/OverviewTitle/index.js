@@ -1,7 +1,7 @@
-import React from "react";
-import { Text, Flex } from "rebass";
+import React from 'react'
+import { Text, Flex } from 'rebass'
 
-import Emoji from "../Emoji";
+import Emoji from '../Emoji'
 
 const OverviewTitle = () => (
   <Flex>
@@ -12,6 +12,6 @@ const OverviewTitle = () => (
       Uniswap
     </Text>
   </Flex>
-);
+)
 
-export default OverviewTitle;
+export default OverviewTitle

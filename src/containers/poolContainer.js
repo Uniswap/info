@@ -1,6 +1,6 @@
 import { Container } from 'unstated'
 
-import { BASE_URL, Big } from '../helpers'
+import { Big } from '../helpers'
 
 import { client } from '../apollo/client'
 import { TOTAL_POOL_QUERY, USER_POOL_QUERY } from '../apollo/queries'

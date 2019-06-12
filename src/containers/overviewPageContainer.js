@@ -6,15 +6,14 @@ import { OVERVIEW_PAGE_QUERY, OVERVIEW_PAGE_24HOUR, TOTALS_QUERY } from '../apol
 export class OverviewPageContainer extends Container {
   state = {
     topTen: [],
-    totals: {},
+    totals: {}
   }
 
-  async fetchTotals () {
+  async fetchTotals() {
     try {
-      let data = []
       let result = await client.query({
         query: TOTALS_QUERY,
-        fetchPolicy: 'network-only',
+        fetchPolicy: 'network-only'
       })
 
       console.log(`fetched uniswap total data`)
@@ -22,7 +21,6 @@ export class OverviewPageContainer extends Container {
       await this.setState({
         totals: result.data.uniswap
       })
-
     } catch (err) {
       console.log('error: ', err)
     }
@@ -34,23 +32,22 @@ export class OverviewPageContainer extends Container {
       let result = await client.query({
         query: OVERVIEW_PAGE_QUERY,
         variables: {
-          first: numberOfExchanges,
+          first: numberOfExchanges
         },
-        fetchPolicy: 'network-only',
+        fetchPolicy: 'network-only'
       })
       data = data.concat(result.data.exchanges)
 
       console.log(`fetched ${data.length} exchanges ordered by trade volume`)
 
       await this.fetchYesterdaysVolume(data)
-
     } catch (err) {
       console.log('error: ', err)
     }
   }
 
   // fetch exchange information via address
-  async fetchYesterdaysVolume (addresses) {
+  async fetchYesterdaysVolume(addresses) {
     try {
       const utcCurrentTime = dayjs()
       const utcOneDayBack = utcCurrentTime.subtract(1, 'day')
@@ -61,20 +58,21 @@ export class OverviewPageContainer extends Container {
             exchangeAddr: addresses[i].id,
             timestamp: utcOneDayBack.unix()
           },
-          fetchPolicy: 'network-only',
+          fetchPolicy: 'network-only'
         })
         if (result) {
-          addresses[i].tradeVolumeEth = (addresses[i].tradeVolumeEth - result.data.exchangeHistoricalDatas[0].tradeVolumeEth).toFixed(4)
+          addresses[i].tradeVolumeEth = (
+            addresses[i].tradeVolumeEth - result.data.exchangeHistoricalDatas[0].tradeVolumeEth
+          ).toFixed(4)
         }
-
       }
-      addresses.sort(function (a, b) {
+      addresses.sort(function(a, b) {
         return b.tradeVolumeEth - a.tradeVolumeEth
       })
       console.log(`fetched ${addresses.length} exchanges 24 hour trade volume`)
 
-      for (let j = 0; j < addresses.length; j++){
-        if(addresses[j].tokenName === null){
+      for (let j = 0; j < addresses.length; j++) {
+        if (addresses[j].tokenName === null) {
           addresses[j].tokenName = addresses[j].id
         }
       }
@@ -82,7 +80,6 @@ export class OverviewPageContainer extends Container {
       await this.setState({
         topTen: addresses
       })
-
     } catch (err) {
       console.log('error: ', err)
     }

@@ -9,43 +9,25 @@ import Loader from '../Loader'
 const FirstExchangeItem = ({ topTen }) => (
   <FourByFour
     p={24}
-    rounded bg="white"
+    rounded
+    bg="white"
     topLeft={
-      <Hint
-        color="text"
-        fontSize={15}
-        fontWeight={500}
-        mb={40}
-      >
+      <Hint color="text" fontSize={15} fontWeight={500} mb={40}>
         Token
-      </Hint>}
+      </Hint>
+    }
     bottomLeft={
-      <Text
-        color="uniswappink"
-        className="-transition"
-        fontSize={20}
-        lineHeight={0.15}
-        fontWeight={250}
-      >
+      <Text color="uniswappink" className="-transition" fontSize={20} lineHeight={0.15} fontWeight={250}>
         {topTen[0].tokenName}
       </Text>
     }
     topRight={
-      <Hint
-        color="text"
-        fontSize={15}
-        fontWeight={500}
-        mb={40}
-      >
+      <Hint color="text" fontSize={15} fontWeight={500} mb={40}>
         24 Hour Volume ETH
-      </Hint>}
+      </Hint>
+    }
     bottomRight={
-      <Text
-        color="uniswappink"
-        fontSize={20}
-        lineHeight={0.15}
-        fontWeight={250}
-      >
+      <Text color="uniswappink" fontSize={20} lineHeight={0.15} fontWeight={250}>
         {topTen[0].tradeVolumeEth}
       </Text>
     }
@@ -56,31 +38,21 @@ const ExchangeItem = ({ topTen }) => (
   <Box>
     <FourByFour
       p={24}
-      rounded bg="white"
+      rounded
+      bg="white"
       bottomLeft={
-        <Text
-          color="uniswappink"
-          className="-transition"
-          fontSize={20}
-          lineHeight={0.15}
-          fontWeight={250}
-        >
+        <Text color="uniswappink" className="-transition" fontSize={20} lineHeight={0.15} fontWeight={250}>
           {topTen.tokenName}
         </Text>
       }
       bottomRight={
-        <Text
-          color="uniswappink"
-          fontSize={20}
-          lineHeight={0.15}
-          fontWeight={250}
-        >
+        <Text color="uniswappink" fontSize={20} lineHeight={0.15} fontWeight={250}>
           {topTen.tradeVolumeEth}
         </Text>
       }
     />
 
-    <Divider/>
+    <Divider />
   </Box>
 )
 
@@ -93,18 +65,16 @@ const List = styled(Box)`
 
 // @TODO rework into virtualized list
 const TopExchanges = ({ topTen }) => {
-  if (topTen.length == 0) {
-    return (
-      <Loader/>
-    )
+  if (topTen.length === 0) {
+    return <Loader />
   } else {
-    console.log("GHAGF", topTen.slice(0,1))
+    console.log('GHAGF', topTen.slice(0, 1))
     return (
       <List p={24}>
-        <FirstExchangeItem topTen={topTen.slice(0, 1)}/>
-        <Divider/>
+        <FirstExchangeItem topTen={topTen.slice(0, 1)} />
+        <Divider />
         {topTen.slice(1, 10).map((exchanges, index) => (
-          <ExchangeItem key={index} topTen={exchanges}/>
+          <ExchangeItem key={index} topTen={exchanges} />
         ))}
       </List>
     )

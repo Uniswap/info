@@ -18,6 +18,8 @@ function determineSigns(event) {
       return [-1, 1]
     case 'EthPurchase':
       return [1, -1]
+    default:
+      throw Error(`Unexpected event ${event}.`)
   }
 }
 
@@ -26,7 +28,7 @@ const TransactionItem = ({ transaction, tokenSymbol }) => (
     <Flex alignItems="center">
       <TransactionType event={transaction.event} />
       <Link fontSize={[12, 16]} ml="3" color="button" external href={urls.showTransaction(transaction.tx)}>
-        {transaction.event == 'AddLiquidity' ? true : false}
+        {transaction.event === 'AddLiquidity' ? true : false}
         {Big(transaction.ethAmount * determineSigns(transaction.event)[0]).toFixed(4)} ETH for{' '}
         {Big(transaction.tokenAmount * determineSigns(transaction.event)[1]).toFixed(4)} {tokenSymbol}
       </Link>

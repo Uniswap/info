@@ -1,5 +1,5 @@
-import styled from "styled-components";
-import { Box } from "rebass";
+import styled from 'styled-components'
+import { Box } from 'rebass'
 
 const Overview = styled(Box)`
   max-width: 1280px;
@@ -25,6 +25,6 @@ const Overview = styled(Box)`
       "totals exchanges exchanges exchanges"
       "totals exchanges exchanges exchanges";
   }
-`;
+`
 
-export default Overview;
+export default Overview
