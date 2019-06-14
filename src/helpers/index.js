@@ -3,7 +3,7 @@ import dayjs from 'dayjs'
 
 BigNumber.set({ EXPONENTIAL_AT: 50 })
 
-export const BASE_URL = 'https://uniswap-api-staging.loanscan.io/'
+export const BASE_URL = 'https://uniswap-api.loanscan.io/'
 
 export const toNiceDate = date => dayjs(date).format('MMM DD')
 
