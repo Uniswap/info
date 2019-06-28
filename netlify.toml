@@ -3,3 +3,9 @@
   from = "/*"
   to = "/index.html"
   status = 200
+
+# beta.uniswap.info -> uniswap.info
+[[redirects]]
+  from = "https://beta.uniswap.info/*"
+  to = "https://uniswap.info/:splat"
+  status = 301
