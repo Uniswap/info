@@ -36,7 +36,8 @@ const FirstExchangeItem = () => (
 
 const Flex = styled.div`
   display: flex;
-  align-items: center;
+  flex-direction: ${({ column }) => (column ? 'column' : 'row')};
+  align-items: ${({ left }) => (left ? 'left' : 'center')};
 `
 
 const InlineText = styled(Text)`
@@ -45,10 +46,11 @@ const InlineText = styled(Text)`
 `
 
 const StyledTokenLogo = styled(TokenLogo)`
+  margin-left: 0.25rem;
   margin-right: 0.25rem;
 `
 
-function ExchangeItem({ topN }) {
+function ExchangeItem({ i, topN }) {
   return (
     <Box>
       <FourByFour
@@ -56,22 +58,28 @@ function ExchangeItem({ topN }) {
         rounded
         bg="white"
         bottomLeft={
-          <>
-            <Flex>
-              <StyledTokenLogo address={topN.tokenAddress} />
-              <InlineText color="uniswappink" className="-transition" fontSize={20} fontWeight={250}>
-                {topN.tokenName}
-              </InlineText>
+          <Flex>
+            <div style={{ marginRight: '.5rem' }}>{i + 1}.</div>
+
+            <Flex column left>
+              <Flex>
+                <StyledTokenLogo address={topN.tokenAddress} />
+                <InlineText color="uniswappink" className="-transition" fontSize={20} fontWeight={250}>
+                  {topN.tokenName}
+                </InlineText>
+              </Flex>
+              <Text color="uniswappink" className="-transition" fontSize={12} fontWeight={200}>
+                <Address address={topN.tokenAddress} token="true" />
+              </Text>
             </Flex>
-            <Text color="uniswappink" className="-transition" fontSize={12} fontWeight={200}>
-              <Address address={topN.tokenAddress} token="true" />
-            </Text>
-          </>
+          </Flex>
         }
         bottomRight={
-          <Text color="uniswappink" fontSize={20} fontWeight={250}>
-            {topN.tradeVolumeEth}
-          </Text>
+          <Flex style={{ height: '100%' }}>
+            <Text color="uniswappink" fontSize={20} fontWeight={250}>
+              {topN.tradeVolumeEth}
+            </Text>
+          </Flex>
         }
       />
       <Divider />
@@ -96,7 +104,7 @@ const TopExchanges = ({ topN }) => {
         <FirstExchangeItem />
         <Divider />
         {topN.map((exchanges, index) => (
-          <ExchangeItem key={index} topN={exchanges} />
+          <ExchangeItem key={index} topN={exchanges} i={index} />
         ))}
       </List>
     )
