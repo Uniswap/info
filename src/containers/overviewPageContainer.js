@@ -5,7 +5,7 @@ import { OVERVIEW_PAGE_QUERY, OVERVIEW_PAGE_24HOUR, TOTALS_QUERY } from '../apol
 
 export class OverviewPageContainer extends Container {
   state = {
-    topTen: [],
+    topN: [],
     totals: {}
   }
 
@@ -46,39 +46,42 @@ export class OverviewPageContainer extends Container {
     }
   }
 
-  // fetch exchange information via address
+  // fetch exchange information for each token
   async fetchYesterdaysVolume(addresses) {
     try {
       const utcCurrentTime = dayjs()
       const utcOneDayBack = utcCurrentTime.subtract(1, 'day')
+      // for each token...
+      const historicalVolumes = await Promise.all(
+        addresses.map(address =>
+          client.query({
+            query: OVERVIEW_PAGE_24HOUR,
+            variables: {
+              tokenAddress: address.tokenAddress,
+              timestamp: utcOneDayBack.unix()
+            },
+            fetchPolicy: 'network-only'
+          })
+        )
+      )
+
       for (let i = 0; i < addresses.length; i++) {
-        const result = await client.query({
-          query: OVERVIEW_PAGE_24HOUR,
-          variables: {
-            exchangeAddr: addresses[i].id,
-            timestamp: utcOneDayBack.unix()
-          },
-          fetchPolicy: 'network-only'
-        })
-        if (result) {
+        if (addresses[i].tokenName === null || addresses[i].tokenName === 'unknown' || addresses[i].tokenName === ' ') {
+          addresses[i].tokenName = addresses[i].tokenAddress
+        }
+
+        if (historicalVolumes[i]) {
           addresses[i].tradeVolumeEth = (
-            addresses[i].tradeVolumeEth - result.data.exchangeHistoricalDatas[0].tradeVolumeEth
+            addresses[i].tradeVolumeEth - historicalVolumes[i].data.exchangeHistoricalDatas[0].tradeVolumeEth
           ).toFixed(4)
         }
       }
-      addresses.sort(function(a, b) {
-        return b.tradeVolumeEth - a.tradeVolumeEth
-      })
+
+      addresses.sort((a, b) => b.tradeVolumeEth - a.tradeVolumeEth)
       console.log(`fetched ${addresses.length} exchanges 24 hour trade volume`)
 
-      for (let j = 0; j < addresses.length; j++) {
-        if (addresses[j].tokenName === null) {
-          addresses[j].tokenName = addresses[j].id
-        }
-      }
-      console.log(addresses)
       await this.setState({
-        topTen: addresses
+        topN: addresses
       })
     } catch (err) {
       console.log('error: ', err)

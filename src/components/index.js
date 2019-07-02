@@ -14,13 +14,6 @@ const Header = styled(Panel)`
   justify-content: center;
 `
 
-const OverviewPageHeader = styled(Panel)`
-  display: grid;
-  grid-template-columns: 2fr 1fr 2fr;
-  align-items: end;
-  justify-content: center;
-`
-
 const Divider = styled(Box)`
   height: 1px;
   background-color: rgba(43, 43, 43, 0.05);
@@ -32,10 +25,16 @@ const Hint = ({ children, ...rest }) => (
   </Text>
 )
 
-const Address = ({ address, ...rest }) => (
-  <Link color="button" href={urls.showAddress(address)} external style={{ wordBreak: 'break-all' }} {...rest}>
+const Address = ({ address, token, ...rest }) => (
+  <Link
+    color="button"
+    href={token ? urls.showToken(address) : urls.showAddress(address)}
+    external
+    style={{ wordBreak: 'break-all' }}
+    {...rest}
+  >
     {address}
   </Link>
 )
 
-export { Hint, Divider, Header, Address, OverviewPageHeader }
+export { Hint, Divider, Header, Address }
