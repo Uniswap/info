@@ -67,11 +67,11 @@ export const DIRECTORY_QUERY = gql`
 `
 
 export const OVERVIEW_PAGE_QUERY = gql`
-  query exchanges($first: Int!) {
-    exchanges(first: $first, orderBy: tradeVolumeEth, orderDirection: desc) {
-      id
+  query exchanges {
+    exchanges(orderBy: tradeVolumeEth, orderDirection: desc) {
       tradeVolumeEth
       tokenName
+      tokenAddress
     }
   }
 `
@@ -88,11 +88,11 @@ export const TOTALS_QUERY = gql`
   }
 `
 export const OVERVIEW_PAGE_24HOUR = gql`
-  query exchangeHistoricalDatas($timestamp: Int!, $exchangeAddr: String!) {
+  query exchangeHistoricalDatas($timestamp: Int!, $tokenAddress: String!) {
     exchangeHistoricalDatas(
-      where: { timestamp_lt: $timestamp, exchangeAddress: $exchangeAddr }
+      where: { timestamp_lt: $timestamp, tokenAddress: $tokenAddress }
       first: 1
-      orderBy: tradeVolumeEth
+      orderBy: timestamp
       orderDirection: desc
     ) {
       tradeVolumeEth

@@ -3,15 +3,15 @@ import { Text, Flex } from 'rebass'
 
 import Emoji from '../Emoji'
 
-export const Title = () => (
-  <Flex alignItems="center">
-    <Text fontSize="1.5rem" lineHeight="1">
-      <Emoji symbol="🦄" label="Unicorn" />
-    </Text>
-    <Text fontWeight={500} mx="1rem" lineHeight="1.5rem">
-      Uniswap
-    </Text>
-  </Flex>
-)
-
-export default Title
+export default function Title() {
+  return (
+    <Flex alignItems="center">
+      <Text fontSize="1.5rem" lineHeight="1">
+        <Emoji symbol="🦄" label="Unicorn" />
+      </Text>
+      <Text fontWeight={500} mx="1rem" lineHeight="1.5rem">
+        Uniswap
+      </Text>
+    </Flex>
+  )
+}
