@@ -9,9 +9,16 @@ import { urls } from '../helpers'
 
 const Header = styled(Panel)`
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr;
-  align-items: end;
+  grid-template-columns: 1fr 4fr 1fr;
+  align-items: center;
   justify-content: center;
+  margin-bottom: 3rem;
+
+  @media (max-width: 640px) {
+    margin-bottom: 0;
+    grid-template-columns: 1fr 1fr;
+    grid-row-gap: 1em;
+  }
 `
 
 const Divider = styled(Box)`

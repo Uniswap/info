@@ -24,6 +24,8 @@ const Chart = ({ data, symbol }) => {
 
   const isNotMobile = useMedia('(max-width: 40em)')
 
+  console.log(data)
+
   return (
     <>
       <ResponsiveContainer aspect={21 / 9}>
@@ -43,6 +45,7 @@ const Chart = ({ data, symbol }) => {
             tickLine={false}
             interval="preserveStartEnd"
             yAxisId={0}
+            height={990}
           />
           <YAxis
             hide={isNotMobile}
