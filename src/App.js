@@ -1,18 +1,19 @@
-import React, { Component } from 'react'
+import React, { Component, useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 import { Flex } from 'rebass'
 import { ApolloProvider } from 'react-apollo'
 import { Router, Link } from '@reach/router'
-
+import { useWeb3Context } from 'web3-react'
+import Jazzicon from 'jazzicon'
 import { client } from './apollo/client'
 import Wrapper from './components/Theme'
 import Title from './components/Title'
 import Select from './components/Select'
 import Loader from './components/Loader'
+import CurrencySelect from './components/CurrencySelect'
 import { Header } from './components'
 import { setThemeColor, isWeb3Available } from './helpers/'
 import { MainPage } from './pages/MainPage'
-import { OverviewPage } from './pages/OverviewPage'
 
 const timeframeOptions = [
   { value: '1week', label: '1 week' },
@@ -39,41 +40,150 @@ const NavWrapper = styled.div`
   align-items: center;
 `
 
-function NavHeader({ location, directory, exchangeAddress, switchActiveExchange }) {
+const AccountBar = styled.div`
+  width: 130px;
+  background-color: rgba(255, 255, 255, 0.15);
+  border-radius: 38px;
+  margin-left: 0.8em;
+  height: 38px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: white;
+  padding: 0 12px;
+`
+
+const NavSelect = styled(Select)`
+  min-width: 200px;
+
+  @media screen and (max-width: 40em) {
+    color: black;
+  }
+`
+
+const CurrencySelectFormatted = styled(CurrencySelect)`
+  min-width: 100px;
+  margin-right: 0.8em;
+`
+
+const FlexEnd = styled(Flex)`
+  justify-content: flex-end;
+
+  @media screen and (max-width: 40em) {
+    margin-top: 1em;
+  }
+`
+
+const Identicon = styled.div`
+  height: 1rem;
+  width: 1rem;
+  border-radius: 1.125rem;
+  background-color: grey;
+`
+
+function NavHeader({
+  location,
+  directory,
+  defaultExchangeAddress,
+  exchangeAddress,
+  switchActiveExchange,
+  setCurrencyUnit
+}) {
   const main = location.pathname === '/'
+
+  // for now exclude broken tokens
+  let filteredDirectory = []
+  for (var i = 0; i < directory.length; i++) {
+    if (directory[i].label !== 'unknown') {
+      // console.log(directory[i])
+      filteredDirectory.push(directory[i])
+    }
+  }
+
+  const web3 = useWeb3Context()
+
+  // setup connection if user ahs metamask
+  useEffect(() => {
+    web3.setFirstValidConnector(['MetaMask'])
+  }, [web3])
+
+  const ref = useRef()
+  useEffect(() => {
+    if (ref.current) {
+      ref.current.innerHTML = ''
+      if (web3.account) {
+        ref.current.appendChild(Jazzicon(16, parseInt(web3.account.slice(2, 10), 16)))
+      }
+    }
+  }, [web3.account])
+
+  function getDirectoryIndex() {
+    let def = {}
+    directory.forEach(element => {
+      if (element.value === defaultExchangeAddress) {
+        def = element
+      }
+    })
+    return (
+      <NavSelect
+        options={filteredDirectory}
+        defaultValue={def}
+        onChange={select => {
+          if (exchangeAddress !== select.value) {
+            switchActiveExchange(select.value)
+          }
+        }}
+      />
+    )
+  }
 
   return (
     <Header px={24} py={3} bg={['mineshaft', 'transparent']} color={['white', 'black']}>
       <Title />
       <Flex>
-        <NavWrapper>
-          <StyledLink to="/" active={main}>
-            Charts
-          </StyledLink>
-          <StyledLink to="/overview" active={!main}>
-            Overview
-          </StyledLink>
-        </NavWrapper>
+        <NavWrapper></NavWrapper>
       </Flex>
-      {main && (
-        <Select
-          options={directory}
-          defaultValue={directory[0]}
+      <FlexEnd>
+        <CurrencySelectFormatted
+          options={[
+            {
+              label: 'ETH',
+              value: 'ETH'
+            },
+            { label: 'USD', value: 'USD' }
+          ]}
+          defaultValue={{ label: 'USD', value: 'USD' }}
           onChange={select => {
-            if (exchangeAddress !== select.value) {
-              switchActiveExchange(select.value)
-            }
+            setCurrencyUnit(select.value)
           }}
         />
-      )}
+        {main && defaultExchangeAddress && getDirectoryIndex()}
+        {web3.account ? (
+          <AccountBar>
+            {web3.account.slice(0, 6) + '...' + web3.account.slice(38, 42)} <Identicon ref={ref} />
+          </AccountBar>
+        ) : (
+          ''
+        )}
+      </FlexEnd>
     </Header>
   )
 }
 
 class App extends Component {
-  state = {
-    historyDaysToQuery: timeframeOptions[0].value,
-    overviewPage: false
+  constructor(props) {
+    super(props)
+    this.state = {
+      historyDaysToQuery: timeframeOptions[3].value,
+      overviewPage: false,
+      currencyUnit: 'USD'
+    }
+  }
+
+  setCurrencyUnit = unit => {
+    this.setState({
+      currencyUnit: unit
+    })
   }
 
   // Fetch Exchange's Transactions
@@ -157,8 +267,8 @@ class App extends Component {
       // second, run "switchActiveExchange" with default exchange address
       await this.switchActiveExchange(this.props.directoryStore.state.defaultExchangeAddress)
 
-      await this.props.overviewPageStore.fetchTotals()
-      await this.props.overviewPageStore.fetchExchanges()
+      // await this.props.overviewPageStore.fetchTotals()
+      // await this.props.overviewPageStore.fetchExchanges()
     } catch (err) {
       console.log('error:', err)
     }
@@ -166,31 +276,38 @@ class App extends Component {
 
   render() {
     // spread state into cleaner vars
+
     const {
       exchangeAddress,
       tradeVolume,
-      percentChange,
+      tokenName,
+      volumePercentChange,
+      pricePercentChange,
       symbol,
       erc20Liquidity,
       price,
       invPrice,
+      priceUSD,
       ethLiquidity,
-      tokenAddress
+      tokenAddress,
+      liquidityPercentChange
     } = this.props.directoryStore.state.activeExchange
 
-    const {
-      exchangeCount,
-      totalLiquidityInEth,
-      totalLiquidityUSD,
-      totalVolumeInEth,
-      totalVolumeUSD,
-      txCount
-    } = this.props.overviewPageStore.state.totals
+    const defaultExchangeAddress = this.props.directoryStore.state.defaultExchangeAddress
+
+    // const {
+    //   exchangeCount,
+    //   totalLiquidityInEth,
+    //   totalLiquidityUSD,
+    //   totalVolumeInEth,
+    //   totalVolumeUSD,
+    //   txCount
+    // } = this.props.overviewPageStore.state.totals
 
     // OverviewPage Store
-    const {
-      state: { topN }
-    } = this.props.overviewPageStore
+    // const {
+    //   state: { topN }
+    // } = this.props.overviewPageStore
 
     // Directory Store
     const {
@@ -227,39 +344,35 @@ class App extends Component {
             <NavHeader
               default
               directory={directory}
+              setCurrencyUnit={this.setCurrencyUnit}
               exchangeAddress={exchangeAddress}
+              defaultExchangeAddress={defaultExchangeAddress}
               switchActiveExchange={this.switchActiveExchange}
             />
           </Router>
-
           <Router>
             <MainPage
               path="/"
+              currencyUnit={this.state.currencyUnit}
+              tokenName={tokenName}
               directory={directory}
               exchangeAddress={exchangeAddress}
               symbol={symbol}
               tradeVolume={tradeVolume}
-              percentChange={percentChange}
+              pricePercentChange={pricePercentChange}
+              volumePercentChange={volumePercentChange}
+              liquidityPercentChange={liquidityPercentChange}
               userNumPoolTokens={userNumPoolTokens}
               userPoolPercent={userPoolPercent}
               erc20Liquidity={erc20Liquidity}
               ethLiquidity={ethLiquidity}
               price={price}
               invPrice={invPrice}
+              priceUSD={priceUSD}
               data={data}
               tokenAddress={tokenAddress}
               transactions={transactions}
               updateTimeframe={this.updateTimeframe}
-            />
-            <OverviewPage
-              path="/overview"
-              totalVolumeInEth={totalVolumeInEth}
-              totalVolumeUSD={totalVolumeUSD}
-              totalLiquidityInEth={totalLiquidityInEth}
-              totalLiquidityUSD={totalLiquidityUSD}
-              exchangeCount={exchangeCount}
-              txCount={txCount}
-              topN={topN}
             />
           </Router>
         </Wrapper>

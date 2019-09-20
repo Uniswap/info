@@ -29,7 +29,7 @@ export class PoolContainer extends Container {
       let poolData
       if (resultPool) {
         poolData = resultPool.data
-        console.log(`fetched total uni tokens  for ${exchangeAddress}`)
+        // console.log(`fetched total uni tokens  for ${exchangeAddress}`)
         const resultUser = await client.query({
           query: USER_POOL_QUERY,
           variables: {
@@ -41,13 +41,13 @@ export class PoolContainer extends Container {
         if (resultUser) {
           userData = resultUser.data
           if (userData.userExchangeData == null) {
-            console.log(`user ${exchangeAddress}-${userAccount} has no balance`)
+            // console.log(`user ${exchangeAddress}-${userAccount} has no balance`)
             this.setState({
               userNumPoolTokens: Big(0).toFixed(4),
               userPoolPercent: ((0 / poolData.exchange.totalUniToken) * 100).toFixed(2)
             })
           } else {
-            console.log(`fetched user balance for ${exchangeAddress}-${userAccount}`)
+            // console.log(`fetched user balance for ${exchangeAddress}-${userAccount}`)
             this.setState({
               userNumPoolTokens: Big(userData.userExchangeData.uniTokenBalance).toFixed(4),
               userPoolPercent: (

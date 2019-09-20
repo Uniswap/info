@@ -15,7 +15,7 @@ const Loader = styled.div`
           height: 100vh;
         `
       : css`
-          height: 240px;
+          height: 180px;
         `}
 `
 

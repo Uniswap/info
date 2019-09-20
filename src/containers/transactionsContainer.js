@@ -22,7 +22,7 @@ export class TransactionsContainer extends Container {
       let data
       if (result) {
         data = result.data
-        console.log(`fetched ${data.transactions.length} tx for ${exchangeAddress}`)
+        // console.log(`fetched ${data.transactions.length} tx for ${exchangeAddress}`)
         this.setState({
           transactions: data.transactions
         })

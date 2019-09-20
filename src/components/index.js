@@ -9,10 +9,10 @@ import { urls } from '../helpers'
 
 const Header = styled(Panel)`
   display: grid;
-  grid-template-columns: 1fr 4fr 1fr;
+  grid-template-columns: 1fr 4fr 4fr;
   align-items: center;
   justify-content: center;
-  margin-bottom: 3rem;
+  margin-bottom: 1rem;
 
   @media (max-width: 640px) {
     margin-bottom: 0;

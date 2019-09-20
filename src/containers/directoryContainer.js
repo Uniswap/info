@@ -8,12 +8,14 @@ export class DirectoryContainer extends Container {
   state = {
     directory: [],
     exchanges: [],
+    defaultIndex: 0,
     defaultExchangeAddress: '',
-    activeExchange: {}
+    activeExchange: { exchangeAddress: '' }
   }
 
   setActiveExchange = address => this.setState({ activeExchange: this.state.exchanges[address] })
 
+  // fetch all exchanges data
   async fetchDirectory() {
     try {
       let data = []
@@ -34,10 +36,21 @@ export class DirectoryContainer extends Container {
           dataEnd = true
         }
       }
-      console.log(`fetched ${data.length} exchanges for directory`)
+
+      let query = window.location.search.match(new RegExp('[?&]' + 'token' + '=([^&#?]*)'))
+
       let directoryObjects = {}
+
+      let defaultExchange = null
+
       data.forEach(exchange => {
-        directoryObjects[exchange.id] = buildDirectoryObject(exchange)
+        if (
+          (query && exchange.tokenAddress.toString().toUpperCase() === query[1].toString().toUpperCase()) ||
+          (query && exchange.tokenSymbol && query[1].toString().toUpperCase() === exchange.tokenSymbol.toUpperCase())
+        ) {
+          defaultExchange = exchange.id
+        }
+        return (directoryObjects[exchange.id] = buildDirectoryObject(exchange))
       })
 
       await this.setState({
@@ -45,7 +58,9 @@ export class DirectoryContainer extends Container {
         exchanges: directoryObjects
       })
 
-      let defaultExchange = this.state.directory[0].value
+      if (!defaultExchange) {
+        defaultExchange = this.state.directory[0].value
+      }
 
       // set default exchange address
       await this.setState({
@@ -70,7 +85,7 @@ export class DirectoryContainer extends Container {
       if (result) {
         data = result.data.exchange
       }
-      const { price, ethBalance, tokenBalance, tradeVolumeEth } = data
+      const { price, ethBalance, tokenBalance, tradeVolumeEth, priceUSD } = data
 
       let data24HoursAgo
       try {
@@ -92,15 +107,26 @@ export class DirectoryContainer extends Container {
       }
       const invPrice = 1 / price
 
-      let percentChange = ''
-      const adjustedPriceChangePercent = (((price - data24HoursAgo.price) / price) * 100).toFixed(2)
-      adjustedPriceChangePercent > 0 ? (percentChange = '+') : (percentChange = '')
+      let volumePercentChange = ''
+      const adjustedVolumeChangePercent = (
+        ((tradeVolumeEth - data24HoursAgo.tradeVolumeEth) / tradeVolumeEth) *
+        100
+      ).toFixed(2)
+      adjustedVolumeChangePercent > 0 ? (volumePercentChange = '+') : (volumePercentChange = '')
+      volumePercentChange += adjustedVolumeChangePercent
 
-      percentChange += adjustedPriceChangePercent
+      let pricePercentChange = ''
+
+      const adjustedPriceChangePercent = (((priceUSD - data24HoursAgo.tokenPriceUSD) / priceUSD) * 100).toFixed(2)
+      adjustedPriceChangePercent > 0 ? (pricePercentChange = '+') : (pricePercentChange = '')
+      pricePercentChange += adjustedPriceChangePercent
+
+      let liquidityPercentChange = ''
+      const adjustedPriceChangeLiquidity = (((ethBalance - data24HoursAgo.ethBalance) / ethBalance) * 100).toFixed(2)
+      adjustedPriceChangeLiquidity > 0 ? (liquidityPercentChange = '+') : (liquidityPercentChange = '')
+      liquidityPercentChange += adjustedPriceChangeLiquidity
 
       let oneDayVolume = tradeVolumeEth - data24HoursAgo.tradeVolumeEth
-
-      console.log(`fetched ticker for ${address}`)
 
       // update "exchanges" with new information
       await this.setState(prevState => ({
@@ -110,8 +136,11 @@ export class DirectoryContainer extends Container {
             ...prevState.exchanges[address],
             price,
             invPrice,
-            percentChange,
-            tradeVolume: Big(oneDayVolume).toFixed(4),
+            priceUSD,
+            pricePercentChange,
+            volumePercentChange,
+            liquidityPercentChange,
+            tradeVolume: parseFloat(Big(oneDayVolume).toFixed(4)),
             ethLiquidity: Big(ethBalance).toFixed(4),
             erc20Liquidity: Big(tokenBalance).toFixed(4)
           }
@@ -132,7 +161,6 @@ const buildDirectoryLabel = exchange => {
   if (tokenSymbol === null) {
     tokenSymbol = 'unknown'
   }
-
   return {
     label: tokenSymbol,
     value: exchangeAddress
@@ -140,10 +168,11 @@ const buildDirectoryLabel = exchange => {
 }
 
 const buildDirectoryObject = exchange => {
-  const { tokenName, tokenSymbol, id, tokenAddress, tokenDecimals } = exchange
+  let { tokenName, tokenSymbol, id, tokenAddress, tokenDecimals } = exchange
+  let symbol = tokenSymbol
 
   const exchangeAddress = id
-  const symbol = tokenSymbol
+
   let theme = hardcodeThemes[exchangeAddress]
   if (theme === undefined) {
     theme = ''

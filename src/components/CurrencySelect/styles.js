@@ -5,11 +5,12 @@ export const customStyles = {
   control: (styles, state) => ({
     ...styles,
     borderRadius: 38,
-    backgroundColor: 'white',
-    color: 'inherit',
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    color: 'white',
+    border: 'none',
     boxShadow: 'none',
     ':hover': {
-      borderColor: color.zircon,
+      // borderColor: color.zircon,
       cursor: 'pointer'
     }
   }),
@@ -30,7 +31,11 @@ export const customStyles = {
   }),
   dropdownIndicator: styles => ({
     ...styles,
-    paddingRight: 16
+    paddingRight: 16,
+    color: 'white',
+    ':hover': {
+      color: 'white'
+    }
   }),
   valueContainer: styles => ({
     ...styles,

@@ -16,7 +16,7 @@ export class OverviewPageContainer extends Container {
         fetchPolicy: 'network-only'
       })
 
-      console.log(`fetched uniswap total data`)
+      // console.log(`fetched uniswap total data`)
       //
       await this.setState({
         totals: result.data.uniswap
@@ -38,7 +38,7 @@ export class OverviewPageContainer extends Container {
       })
       data = data.concat(result.data.exchanges)
 
-      console.log(`fetched ${data.length} exchanges ordered by trade volume`)
+      // console.log(`fetched ${data.length} exchanges ordered by trade volume`)
 
       await this.fetchYesterdaysVolume(data)
     } catch (err) {
@@ -78,7 +78,7 @@ export class OverviewPageContainer extends Container {
       }
 
       addresses.sort((a, b) => b.tradeVolumeEth - a.tradeVolumeEth)
-      console.log(`fetched ${addresses.length} exchanges 24 hour trade volume`)
+      // console.log(`fetched ${addresses.length} exchanges 24 hour trade volume`)
 
       await this.setState({
         topN: addresses

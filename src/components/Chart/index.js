@@ -1,220 +1,133 @@
-import React, { useState } from 'react'
-import { Line, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, ComposedChart } from 'recharts'
-import { Flex, Button } from 'rebass'
+import React from 'react'
+import { Area, XAxis, YAxis, ResponsiveContainer, Line, CartesianGrid, Tooltip, AreaChart } from 'recharts'
 import styled from 'styled-components'
 import { useMedia } from 'react-use'
-
-import CustomBar from './customBar'
 import { toK, toNiceDate, toNiceDateYear } from '../../helpers'
 
-const Controls = styled.div`
-  display: grid;
-  grid-template-columns: repeat(7, max-content);
-  grid-column-gap: 8px;
+const ChartWrapper = styled.div`
+  padding-top: 1em;
 `
 
-const Chart = ({ data, symbol }) => {
-  const [volume, toggleVolume] = useState(false)
-  const [eth, toggleEth] = useState(false)
-  const [token, toggleToken] = useState(false)
-  const [rate, toggleRate] = useState(false)
-  const [roi, toggleROI] = useState(false)
-  const [usd, toggleUSD] = useState(false)
-  const [txs, toggleTxs] = useState(false)
-
+const Chart = ({ data, chartOption, currencyUnit }) => {
   const isNotMobile = useMedia('(max-width: 40em)')
-
-  console.log(data)
-
-  return (
-    <>
-      <ResponsiveContainer aspect={21 / 9}>
-        <ComposedChart margin={{ top: 0, right: 0, bottom: 0, left: 0 }} barCategoryGap={1} data={data}>
-          <XAxis
-            tickLine={false}
-            axisLine={false}
-            interval="preserveStartEnd"
-            tickFormatter={tick => toNiceDate(tick)}
-            dataKey="dayString"
-          />
-          <YAxis
-            hide={isNotMobile}
-            type="number"
-            axisLine={false}
-            tickFormatter={tick => toK(tick)}
-            tickLine={false}
-            interval="preserveStartEnd"
-            yAxisId={0}
-            height={990}
-          />
-          <YAxis
-            hide={isNotMobile}
-            orientation="right"
-            type="number"
-            tickFormatter={tick => toK(tick)}
-            axisLine={false}
-            tickLine={false}
-            interval="preserveStartEnd"
-            yAxisId={1}
-          />
-          <Tooltip
-            cursor={false}
-            formatter={val => toK(val, true)}
-            labelFormatter={label => toNiceDateYear(label)}
-            labelStyle={{ paddingTop: 4 }}
-            contentStyle={{
-              padding: '10px 14px',
-              borderRadius: 10,
-              borderColor: 'var(--c-zircon)'
-            }}
-          />
-          <Bar
-            hide={volume}
-            dataKey="ethVolume"
-            name="Volume"
-            yAxisId={0}
-            shape={<CustomBar />}
-            fill="var(--c-zircon)"
-          />
-          <Line
-            strokeWidth={2}
-            s
-            dot={false}
-            hide={token}
-            type="monotone"
-            yAxisId={1}
-            dataKey="tokenBalance"
-            name={`${symbol} Liquidity`}
-            stroke="var(--c-token)"
-          />
-          <Line
-            strokeWidth={2}
-            dot={false}
-            hide={roi}
-            type="monotone"
-            name="ROI"
-            yAxisId={1}
-            dataKey="ROI"
-            stroke="red"
-          />
-          <Line
-            strokeWidth={2}
-            dot={false}
-            hide={txs}
-            type="monotone"
-            name="Transactions"
-            yAxisId={1}
-            dataKey="totalEvents"
-            stroke="orange "
-          />
-          <Line
-            strokeWidth={2}
-            dot={false}
-            hide={usd}
-            type="monotone"
-            name="Token Price USD"
-            dataKey="tokenPriceUSD"
-            yAxisId={1}
-            stroke="green"
-          />
-          <Line
-            strokeWidth={2}
-            dot={false}
-            hide={rate}
-            type="monotone"
-            name="Rate"
-            yAxisId={1}
-            dataKey="marginalEthRate"
-            stroke="var(--c-button)"
-          />
-          <Line
-            strokeWidth={2}
-            dot={false}
-            hide={eth}
-            type="monotone"
-            name="ETH Liquidity"
-            dataKey="ethBalance"
-            yAxisId={1}
-            stroke="var(--c-uniswappink)"
-          />
-        </ComposedChart>
-      </ResponsiveContainer>
-      <Flex mt={3} justifyContent="flex-end">
-        <Controls>
-          <Button
-            onClick={() => toggleToken(!token)}
-            variant={token ? 'outline' : null}
-            fontSize={[0, 1]}
-            color={token ? 'token' : 'white'}
-            borderColor="token"
-            bg="token"
-          >
-            {symbol}
-          </Button>
-          <Button
-            onClick={() => toggleEth(!eth)}
-            variant={eth ? 'outline' : null}
-            fontSize={[0, 1]}
-            color={eth ? 'uniswappink' : 'white'}
-            borderColor="uniswappink"
-            bg="uniswappink"
-          >
-            ETH
-          </Button>
-          <Button
-            onClick={() => toggleROI(!roi)}
-            variant={roi ? 'outline' : null}
-            fontSize={[0, 1]}
-            color={roi ? 'red' : 'white'}
-            borderColor="red"
-            bg="red"
-          >
-            ROI
-          </Button>
-          <Button
-            onClick={() => toggleTxs(!txs)}
-            variant={txs ? 'outline' : null}
-            fontSize={[0, 1]}
-            color={txs ? 'orange' : 'white'}
-            borderColor="orange"
-            bg="orange"
-          >
-            Transactions
-          </Button>
-          <Button
-            onClick={() => toggleUSD(!usd)}
-            variant={usd ? 'outline' : null}
-            fontSize={[0, 1]}
-            color={usd ? 'green' : 'white'}
-            borderColor="green"
-            bg="green"
-          >
-            USD
-          </Button>
-          <Button
-            onClick={() => toggleRate(!rate)}
-            variant={rate ? 'outline' : null}
-            fontSize={[0, 1]}
-            color={rate ? 'button' : 'white'}
-            borderColor="button"
-            bg="button"
-          >
-            Rate
-          </Button>
-          <Button
-            onClick={() => toggleVolume(!volume)}
-            variant={volume ? 'outline' : null}
-            fontSize={[0, 1]}
-            color={volume ? 'zircon' : 'text'}
-            borderColor="zircon"
-            bg="zircon"
-          >
-            Volume
-          </Button>
-        </Controls>
-      </Flex>
-    </>
-  )
+  if (chartOption !== 'volume') {
+    return (
+      <ChartWrapper>
+        <ResponsiveContainer aspect={60 / 12}>
+          <AreaChart margin={{ top: 0, right: 0, bottom: 6, left: 10 }} barCategoryGap={1} data={data}>
+            <CartesianGrid stroke="#f5f5f5" />
+            <XAxis
+              tickLine={false}
+              axisLine={false}
+              interval="preserveEnd"
+              tickMargin={14}
+              minTickGap={80}
+              tickFormatter={tick => toNiceDate(tick)}
+              dataKey="dayString"
+            />
+            <YAxis
+              hide={isNotMobile}
+              type="number"
+              tickMargin={16}
+              orientation="left"
+              tickFormatter={tick => toK(tick)}
+              axisLine={false}
+              tickLine={false}
+              interval="preserveEnd"
+              minTickGap={80}
+              yAxisId={0}
+            />
+            <Tooltip
+              cursor={true}
+              formatter={val => toK(val, true)}
+              labelFormatter={label => toNiceDateYear(label)}
+              labelStyle={{ paddingTop: 4 }}
+              contentStyle={{
+                padding: '10px 14px',
+                borderRadius: 10,
+                borderColor: 'var(--c-zircon)'
+              }}
+            />
+            <Area
+              strokeWidth={2}
+              dot={false}
+              type="monotone"
+              name={'Total Liquidity' + (currencyUnit === 'USD' ? ' (USD)' : ' (ETH)')}
+              dataKey={currencyUnit === 'USD' ? 'usdLiquidity' : 'ethLiquidity'}
+              yAxisId={0}
+              fill="var(--c-token)"
+              opacity={'0.4'}
+              stroke="var(--c-token)"
+            />
+            <Area
+              type="monotone"
+              name={'Eth Balance'}
+              dataKey={'ethBalance'}
+              fill="var(--c-token)"
+              opacity={'0'}
+              stroke="var(--c-token)"
+            />
+            <Area
+              type="monotone"
+              name={'Token Balance'}
+              dataKey={'tokenBalance'}
+              fill="var(--c-token)"
+              opacity={'0'}
+              stroke="var(--c-token)"
+            />
+          </AreaChart>
+        </ResponsiveContainer>
+      </ChartWrapper>
+    )
+  } else {
+    return (
+      <ChartWrapper>
+        <ResponsiveContainer aspect={60 / 12}>
+          <AreaChart margin={{ top: 0, right: 0, bottom: 6, left: 10 }} barCategoryGap={1} data={data}>
+            <CartesianGrid stroke="#f5f5f5" />
+            <XAxis
+              tickLine={false}
+              axisLine={false}
+              interval="preserveEnd"
+              minTickGap={80}
+              tickMargin={14}
+              tickFormatter={tick => toNiceDate(tick)}
+              dataKey="dayString"
+            />
+            <YAxis
+              hide={isNotMobile}
+              type="number"
+              axisLine={false}
+              tickMargin={16}
+              tickFormatter={tick => toK(tick)}
+              tickLine={false}
+              interval="preserveEnd"
+              minTickGap={80}
+            />
+            <Tooltip
+              cursor={true}
+              formatter={val => toK(val, true)}
+              labelFormatter={label => toNiceDateYear(label)}
+              labelStyle={{ paddingTop: 4 }}
+              contentStyle={{
+                padding: '10px 14px',
+                borderRadius: 10,
+                borderColor: 'var(--c-zircon)'
+              }}
+            />
+            <Area
+              type="monotone"
+              name={'Volume' + (currencyUnit === 'USD' ? ' (USD)' : ' (ETH)')}
+              dataKey={currencyUnit === 'USD' ? 'usdVolume' : 'ethVolume'}
+              fill="var(--c-token)"
+              opacity={'0.4'}
+              stroke="var(--c-token)"
+            />
+          </AreaChart>
+        </ResponsiveContainer>
+      </ChartWrapper>
+    )
+  }
 }
 
 export default Chart

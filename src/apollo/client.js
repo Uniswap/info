@@ -8,7 +8,7 @@ export const client = new ApolloClient({
   // Pass the configuration option { uri: YOUR_GRAPHQL_API_URL } to the `HttpLink` to connect
   // to a different host
   link: new HttpLink({
-    uri: 'https://api.thegraph.com/subgraphs/name/ianlapham/uniswap'
+    uri: 'https://api.thegraph.com/subgraphs/name/graphprotocol/uniswap'
   }),
   cache: new InMemoryCache()
 })

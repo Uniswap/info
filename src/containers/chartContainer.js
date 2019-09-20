@@ -9,7 +9,7 @@ dayjs.extend(utc)
 
 export class ChartContainer extends Container {
   state = {
-    data: []
+    data: null
   }
 
   resetChart = () => this.setState({ data: [] })
@@ -56,6 +56,15 @@ export class ChartContainer extends Container {
           startTime = result.data.exchangeDayDatas[99].date - 1
         }
       }
+      // access to the following
+      // date
+      // ethBalance
+      // tokenBalance
+      // marginalEthRate
+      // ethVolume
+      // ROI
+      // tokenPriceUSD
+      // totalEvents
       data.forEach((dayData, i) => {
         let dayTimestamp = dayjs.unix(data[i].date)
         // note, the dayjs api says date starts at 1, but it appears it doesnt, as I had to add 1
@@ -67,8 +76,19 @@ export class ChartContainer extends Container {
           .concat('-')
           .concat((dayTimestamp.date() + 1).toString())
         data[i].dayString = dayString
+        let x = data[i].ethVolume
+        let ethPriceUsd = parseFloat(data[i].marginalEthRate) * parseFloat(data[i].tokenPriceUSD)
+        data[i].ethVolume = parseFloat(x)
+        data[i].usdVolume = parseFloat(x) * ethPriceUsd
+        let y = data[i].ethBalance
+        data[i].ethBalance = parseInt(y)
+        data[i].tokenBalance = parseFloat(data[i].tokenBalance)
+        data[i].usdLiquidity =
+          parseFloat(data[i].tokenBalance) * parseFloat(data[i].tokenPriceUSD) +
+          parseFloat(data[i].ethBalance) * ethPriceUsd
+        data[i].ethLiquidity = parseFloat(data[i].ethBalance) * 2
       })
-      console.log(`fetched ${data.length} days worth of chart data`)
+      // console.log(`fetched ${data.length} days worth of chart data`)
 
       await this.setState({
         data: data
