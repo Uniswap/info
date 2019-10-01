@@ -160,7 +160,7 @@ export class DirectoryContainer extends Container {
 }
 
 const buildDirectoryLabel = exchange => {
-  let { tokenSymbol, id } = exchange
+  let { tokenSymbol, id, tokenAddress } = exchange
   const exchangeAddress = id
 
   if (tokenSymbol === null) {
@@ -173,7 +173,8 @@ const buildDirectoryLabel = exchange => {
 
   return {
     label: tokenSymbol,
-    value: exchangeAddress
+    value: exchangeAddress,
+    tokenAddress: tokenAddress
   }
 }
 

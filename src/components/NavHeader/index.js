@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 import { Flex, Link } from 'rebass'
 import { useWeb3Context } from 'web3-react'
@@ -81,13 +81,17 @@ export default function NavHeader({
   const main = location.pathname === '/'
 
   // for now exclude broken tokens
-  let filteredDirectory = []
-  for (var i = 0; i < directory.length; i++) {
-    if (parseFloat(exchanges[directory[i].value].ethBalance) > 0.5) {
-      // console.log(directory[i])
-      filteredDirectory.push(directory[i])
+  const [filteredDirectory, setDirectory] = useState([])
+
+  useEffect(() => {
+    for (var i = 0; i < directory.length; i++) {
+      if (parseFloat(exchanges[directory[i].value].ethBalance) > 0.5) {
+        let newd = filteredDirectory
+        newd.push(directory[i])
+        setDirectory(newd)
+      }
     }
-  }
+  }, [])
 
   const web3 = useWeb3Context()
 
@@ -112,6 +116,7 @@ export default function NavHeader({
       <NavSelect
         options={filteredDirectory}
         defaultValue={def}
+        tokenSelect={true}
         onChange={select => {
           if (exchangeAddress !== select.value) {
             switchActiveExchange(select.value)

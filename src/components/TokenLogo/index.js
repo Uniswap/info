@@ -5,7 +5,8 @@ const TOKEN_ICON_API = 'https://raw.githubusercontent.com/TrustWallet/tokens/mas
 const BAD_IMAGES = {}
 
 const Inline = styled.div`
-  display: inline;
+  display: flex;
+  align-items: center;
 `
 
 const Image = styled.img`
@@ -18,6 +19,8 @@ const PlaceHolder = styled.div`
   width: ${({ size }) => size};
   height: ${({ size }) => size};
   border-radius: 1rem;
+  display: flex;
+  align-items: center;
 `
 
 export default function TokenLogo({ address, size = '1rem', ...rest }) {
@@ -28,10 +31,17 @@ export default function TokenLogo({ address, size = '1rem', ...rest }) {
   }, [address])
 
   if (error || BAD_IMAGES[address]) {
-    return <PlaceHolder size={size} />
+    return (
+      <PlaceHolder size={size}>
+        <span role="img" aria-label="thinking" style={{ height: '30px', width: '30px' }}>
+          🤔
+        </span>
+      </PlaceHolder>
+    )
   }
 
   const path = `${TOKEN_ICON_API}/${address.toLowerCase()}.png`
+
   return (
     <Inline>
       <Image

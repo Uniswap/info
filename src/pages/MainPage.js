@@ -393,7 +393,6 @@ export const MainPage = function({
             )}
           </Box>
         </ChartWrapper>
-
         <Panel rounded bg="white" area="exchange" style={{ boxShadow: '0px 4px 20px rgba(239, 162, 250, 0.15)' }}>
           <Box style={{ padding: '34px 24px' }}>
             <Flex alignItems="center" justifyContent="space-between">

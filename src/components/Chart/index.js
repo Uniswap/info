@@ -17,7 +17,7 @@ const Chart = ({ data, chartOption, currencyUnit }) => {
   }, [data])
 
   const isNotMobile = useMedia('(max-width: 40em)')
-  if (chartOption !== 'volume') {
+  if (chartOption !== 'volume' && chartData && data) {
     return (
       <ChartWrapper>
         <ResponsiveContainer aspect={60 / 12}>
@@ -123,6 +123,7 @@ const Chart = ({ data, chartOption, currencyUnit }) => {
               tickLine={false}
               interval="preserveEnd"
               minTickGap={80}
+              yAxisId={0}
             />
             <Tooltip
               cursor={true}
