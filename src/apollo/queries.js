@@ -71,33 +71,7 @@ export const TICKER_QUERY = gql`
     }
   }
 `
-/*
-type ExchangeHistoricalData @entity {
-    id: ID!
-    exchangeAddress: Bytes! # Uniswap exchange address
-    tokenSymbol: String
-    tokenAddress: Bytes!
-    type: EventType!
-    timestamp: Int!
 
-    ethLiquidity: BigDecimal!               # Equals the liquidty provided. Will likely be different than ethBalance
-    tokenLiquidity: BigDecimal!             # Equals the token liquidity provided. Will likely be different thatn tokenBalance
-    ethBalance: BigDecimal!                 # Equals the ether balance of the contract
-    tokenBalance: BigDecimal!               # Equals the token balance of the contract
-    combinedBalanceInEth: BigDecimal!       # Equal to ethBalance + (tokenBalance/price). Stored to simplify users calculating their own personal return. because the ratio may have changes a lot in one direction
-    combinedBalanceInUSD: BigDecimal!       # Equal to combinedBalanceInUSD * DAI/ETH.  USD price at time of transaction
-    ROI: BigDecimal!                        # ROI for the exchanges lifetime.
-    totalUniToken: BigDecimal!              # Count of the unilying unitokens that represent liquidity provided ownership
-
-    tokenPriceUSD: BigDecimal!                   # USD / token. USD price at time of transaction
-    price: BigDecimal!                      # Price is the total amount of tokens that equal one ETH. i.e. if ETH was 100 USD, price for DAI would be 100
-
-    tradeVolumeToken: BigDecimal!           # Total tokens traded EVER. i.e. cumulative
-    tradeVolumeEth: BigDecimal!             # Total eth traded EVER. i.e. cumulative
-
-    feeInEth: BigDecimal!
-}
-*/
 export const TICKER_24HOUR_QUERY = gql`
   query exchangeHistoricalDatas($timestamp: Int!, $exchangeAddr: String!) {
     exchangeHistoricalDatas(
@@ -122,6 +96,7 @@ export const DIRECTORY_QUERY = gql`
       tokenName
       tokenDecimals
       tokenAddress
+      ethBalance
     }
   }
 `

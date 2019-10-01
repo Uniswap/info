@@ -81,7 +81,7 @@ export class ChartContainer extends Container {
         data[i].ethVolume = parseFloat(x)
         data[i].usdVolume = parseFloat(x) * ethPriceUsd
         let y = data[i].ethBalance
-        data[i].ethBalance = parseInt(y)
+        data[i].ethBalance = parseFloat(y)
         data[i].tokenBalance = parseFloat(data[i].tokenBalance)
         data[i].usdLiquidity =
           parseFloat(data[i].tokenBalance) * parseFloat(data[i].tokenPriceUSD) +
@@ -93,6 +93,7 @@ export class ChartContainer extends Container {
       await this.setState({
         data: data
       })
+      return data
     } catch (err) {
       console.log('error: ', err)
     }

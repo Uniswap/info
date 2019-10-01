@@ -13,17 +13,6 @@ const Dashboard = styled(Box)`
     'transactions';
     'statistics';
 
-  @media screen and (min-width: 40em) {
-    grid-gap: 16px;
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-areas:
-      'volume liquidity'
-      'statistics statistics'
-      'exchange exchange'
-      'listOptions'
-      'transactions transactions';
-  }
-
   @media screen and (min-width: 64em) {
     max-width: 1280px;
     grid-gap: 24px;

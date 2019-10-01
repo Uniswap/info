@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
 import { Box, Flex, Text } from 'rebass'
-import Iframe from 'react-iframe'
 import styled from 'styled-components'
 
 import FourByFour from '../components/FourByFour'
@@ -27,7 +26,7 @@ const SmallText = styled.span`
 
 const ThemedBackground = styled(Box)`
   position: absolute;
-  height: 360px;
+  height: 396px;
   z-index: -1;
   top: 0;
   width: 100vw;
@@ -46,8 +45,8 @@ const TopPanel = styled(Panel)`
   justify-content: space-between;
   height: 100px;
 
-  @media screen and (max-width: 40em) {
-    width: 100vw;
+  @media screen and (max-width: 64em) {
+    width: 100%;
     background-color: #2b2b2b;
     border-radius: 0
 
@@ -91,6 +90,10 @@ const TokenHeader = styled(Box)`
     grid-gap: 16px;
     grid-template-rows: 1fr;
     justify-content: flex-start;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
   }
 
   @media screen and (min-width: 64em) {
@@ -115,7 +118,7 @@ const ListOptions = styled(Flex)`
   align-items; center;
   width: 100%;
 
-  @media screen and (max-width: 40em) {
+  @media screen and (max-width: 64em) {
     display: none;
   }
   
@@ -153,7 +156,7 @@ const AccountSearchWrapper = styled.div`
   align-items: center;
   justify-content: space-between;
 
-  @media screen and (max-width: 40em) {
+  @media screen and (max-width: 64em) {
     display: none;
   }
 `
@@ -166,7 +169,7 @@ const EmojiWrapper = styled.span`
 `
 
 const ChartWrapper = styled(Panel)`
-  @media screen and (max-width: 40em) {
+  @media screen and (max-width: 64em) {
     display: none;
   }
 `
@@ -188,10 +191,6 @@ const TokenName = styled.div`
 
 const TokenPrice = styled.div`
   margin-left: 1em;
-
-  @media screen and (max-width: 40em) {
-    margin-left: 0;
-  }
 `
 
 const TokenGroup = styled.div`
@@ -210,7 +209,7 @@ function getPercentColor(value) {
   }
   if (parseFloat(value) === 0) {
     return (
-      <Text fontSize={14} lineHeight={1.4}>
+      <Text fontSize={14} lineHeight={1.4} color="black">
         {value}%
       </Text>
     )
@@ -235,7 +234,7 @@ export const MainPage = function({
   price,
   invPrice,
   priceUSD,
-  data,
+  chartData,
   tokenAddress,
   updateTimeframe
 }) {
@@ -252,7 +251,11 @@ export const MainPage = function({
   }, [exchangeAddress])
 
   function formattedNum(num, decimals) {
-    return Number(parseFloat(num).toFixed(decimals)).toLocaleString()
+    let number = Number(parseFloat(num).toFixed(decimals)).toLocaleString()
+    if (number < 0.0001) {
+      return '< 0.0001'
+    }
+    return number
   }
 
   return (
@@ -291,7 +294,7 @@ export const MainPage = function({
                   ? currencyUnit === 'USD'
                     ? '$' + formattedNum(tradeVolume * price * priceUSD, 2)
                     : 'Ξ ' + formattedNum(tradeVolume, 4)
-                  : 0}
+                  : '-'}
                 {currencyUnit !== 'USD' ? <SmallText> ETH</SmallText> : ''}
               </Text>
             }
@@ -315,7 +318,7 @@ export const MainPage = function({
                   ? currencyUnit !== 'USD'
                     ? 'Ξ ' + formattedNum(ethLiquidity * 2, 4)
                     : '$' + formattedNum(parseFloat(ethLiquidity) * price * priceUSD * 2, 2)
-                  : 0}
+                  : '-'}
                 {currencyUnit === 'USD' ? '' : <SmallText> ETH</SmallText>}
               </Text>
             }
@@ -383,8 +386,8 @@ export const MainPage = function({
           </Box>
           <Divider />
           <Box p={24}>
-            {data && data.length > 0 ? (
-              <Chart symbol={symbol} data={data} currencyUnit={currencyUnit} chartOption={chartOption} />
+            {chartData && chartData.length > 0 ? (
+              <Chart symbol={symbol} data={chartData} currencyUnit={currencyUnit} chartOption={chartOption} />
             ) : (
               <Loader />
             )}
@@ -464,8 +467,10 @@ export const MainPage = function({
                 setAccountInput(e.target.value)
               }}
             />
-            <EmojiWrapper role="img" aria-label="magnify">
-              🔍
+            <EmojiWrapper>
+              <span role="img" aria-label="magnify">
+                🔍
+              </span>
             </EmojiWrapper>
           </AccountSearchWrapper>
         </ListOptions>

@@ -5,7 +5,6 @@ import { client } from '../../apollo/client'
 import { TRANSACTIONS_QUERY_SKIPPABLE } from '../../apollo/queries'
 import { Box, Flex, Text } from 'rebass'
 import PropTypes from 'prop-types'
-import { keyframes } from 'styled-components'
 import styled from 'styled-components'
 
 import Link from '../Link'
@@ -50,7 +49,7 @@ const DashGrid = styled.div`
     }
   }
 
-  @media screen and (min-width: 40em) {
+  @media screen and (min-width: 64em) {
     max-width: 1280px;
     display: grid;
     grid-gap: 1em;
@@ -75,14 +74,14 @@ const ClickableText = styled(Text)`
 `
 
 const DesktopOnly = styled(Flex)`
-  @media screen and (max-width: 40em) {
+  @media screen and (max-width: 44em) {
     display: none;
   }
 `
 
 const SORT_FIELD = {
   TIME: 'timestamp',
-  USD_VALUE: 'ethAmount',
+  USD_VALUE: 'usdAmount',
   ETH_VALUE: 'ethAmount',
   TOKEN_VALUE: 'tokenAmount'
 }
@@ -112,7 +111,19 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, setTx
   const [sortedColumn, setSortedColumn] = useState(SORT_FIELD.TIME)
 
   function formattedNum(num, decimals) {
-    return Number(parseFloat(num).toFixed(decimals)).toLocaleString()
+    let number = Number(parseFloat(num).toFixed(decimals)).toLocaleString()
+    if (number < 0.0001) {
+      return '< 0.0001'
+    }
+    return number
+  }
+
+  function formattedNumUsd(num, decimals) {
+    let number = Number(parseFloat(num).toFixed(decimals)).toLocaleString()
+    if (number < 0.0001) {
+      return ' < $0.0001'
+    }
+    return '$' + number
   }
 
   useEffect(() => {
@@ -137,6 +148,9 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, setTx
   }, [accountInput, txs])
 
   function sortTxs(field) {
+    if (field === SORT_FIELD.USD_VALUE) {
+      field = SORT_FIELD.ETH_VALUE
+    }
     let newTxs = filteredTxs
       .slice()
       .sort((a, b) =>
@@ -165,8 +179,9 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, setTx
         setMaxPage(Math.floor(txs.length / TXS_PER_PAGE) + 1)
         break
     }
-  }, [txFilter])
+  }, [txFilter, adds, removes, swaps, txs])
 
+  // get the data
   useEffect(() => {
     setPage(1)
     async function getTxs() {
@@ -231,7 +246,7 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, setTx
       setMaxPage(Math.floor(validDataLength / TXS_PER_PAGE) + 1)
     }
     getTxs()
-  }, [exchangeAddress])
+  }, [exchangeAddress, setTxCount])
 
   function getTransactionType(event, symbol) {
     switch (event) {
@@ -262,7 +277,7 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, setTx
         </Flex>
         <Flex p={24}>
           <Text area={'value'}>
-            {price && priceUSD ? '$' + formattedNum(Big(transaction.ethAmount).toFixed(4) * price * priceUSD, 2) : ''}
+            {price && priceUSD ? formattedNumUsd(Big(transaction.ethAmount).toFixed(4) * price * priceUSD, 2) : ''}
           </Text>
         </Flex>
         <DesktopOnly p={24}>

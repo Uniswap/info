@@ -1,5 +1,5 @@
-import React from 'react'
-import { Area, XAxis, YAxis, ResponsiveContainer, Line, CartesianGrid, Tooltip, AreaChart } from 'recharts'
+import React, { useState, useEffect } from 'react'
+import { Area, XAxis, YAxis, ResponsiveContainer, CartesianGrid, Tooltip, AreaChart } from 'recharts-fork'
 import styled from 'styled-components'
 import { useMedia } from 'react-use'
 import { toK, toNiceDate, toNiceDateYear } from '../../helpers'
@@ -9,12 +9,19 @@ const ChartWrapper = styled.div`
 `
 
 const Chart = ({ data, chartOption, currencyUnit }) => {
+  const [chartData, setChartData] = useState([])
+
+  useEffect(() => {
+    setChartData([])
+    setChartData(data)
+  }, [data])
+
   const isNotMobile = useMedia('(max-width: 40em)')
   if (chartOption !== 'volume') {
     return (
       <ChartWrapper>
         <ResponsiveContainer aspect={60 / 12}>
-          <AreaChart margin={{ top: 0, right: 0, bottom: 6, left: 10 }} barCategoryGap={1} data={data}>
+          <AreaChart margin={{ top: 0, right: 0, bottom: 6, left: 10 }} barCategoryGap={1} data={chartData}>
             <CartesianGrid stroke="#f5f5f5" />
             <XAxis
               tickLine={false}
@@ -36,6 +43,18 @@ const Chart = ({ data, chartOption, currencyUnit }) => {
               interval="preserveEnd"
               minTickGap={80}
               yAxisId={0}
+            />
+            <YAxis
+              hide={true}
+              type="number"
+              tickMargin={16}
+              orientation="right"
+              tickFormatter={tick => toK(tick)}
+              axisLine={false}
+              tickLine={false}
+              interval="preserveEnd"
+              minTickGap={80}
+              yAxisId={1}
             />
             <Tooltip
               cursor={true}
@@ -72,6 +91,7 @@ const Chart = ({ data, chartOption, currencyUnit }) => {
               name={'Token Balance'}
               dataKey={'tokenBalance'}
               fill="var(--c-token)"
+              yAxisId={1}
               opacity={'0'}
               stroke="var(--c-token)"
             />
@@ -83,7 +103,7 @@ const Chart = ({ data, chartOption, currencyUnit }) => {
     return (
       <ChartWrapper>
         <ResponsiveContainer aspect={60 / 12}>
-          <AreaChart margin={{ top: 0, right: 0, bottom: 6, left: 10 }} barCategoryGap={1} data={data}>
+          <AreaChart margin={{ top: 0, right: 0, bottom: 6, left: 10 }} barCategoryGap={1} data={chartData}>
             <CartesianGrid stroke="#f5f5f5" />
             <XAxis
               tickLine={false}

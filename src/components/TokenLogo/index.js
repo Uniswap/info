@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
 
 const TOKEN_ICON_API = 'https://raw.githubusercontent.com/TrustWallet/tokens/master/tokens'
@@ -22,6 +22,10 @@ const PlaceHolder = styled.div`
 
 export default function TokenLogo({ address, size = '1rem', ...rest }) {
   const [error, setError] = useState(false)
+
+  useEffect(() => {
+    setError(false)
+  }, [address])
 
   if (error || BAD_IMAGES[address]) {
     return <PlaceHolder size={size} />

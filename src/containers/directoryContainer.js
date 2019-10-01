@@ -3,6 +3,8 @@ import dayjs from 'dayjs'
 import { Big } from '../helpers'
 import { client } from '../apollo/client'
 import { DIRECTORY_QUERY, TICKER_QUERY, TICKER_24HOUR_QUERY } from '../apollo/queries'
+import { hardcodedExchanges } from '../constants/exchanges'
+import { hardcodeThemes } from '../constants/theme'
 
 export class DirectoryContainer extends Container {
   state = {
@@ -13,7 +15,9 @@ export class DirectoryContainer extends Container {
     activeExchange: { exchangeAddress: '' }
   }
 
-  setActiveExchange = address => this.setState({ activeExchange: this.state.exchanges[address] })
+  setActiveExchange = address => {
+    this.setState({ activeExchange: this.state.exchanges[address] })
+  }
 
   // fetch all exchanges data
   async fetchDirectory() {
@@ -37,7 +41,7 @@ export class DirectoryContainer extends Container {
         }
       }
 
-      let query = window.location.search.match(new RegExp('[?&]' + 'token' + '=([^&#?]*)'))
+      let query = window.location.search.match(new RegExp('[?&]token=([^&#?]*)'))
 
       let directoryObjects = {}
 
@@ -158,9 +162,15 @@ export class DirectoryContainer extends Container {
 const buildDirectoryLabel = exchange => {
   let { tokenSymbol, id } = exchange
   const exchangeAddress = id
+
   if (tokenSymbol === null) {
-    tokenSymbol = 'unknown'
+    if (hardcodedExchanges.hasOwnProperty(exchangeAddress.toUpperCase())) {
+      tokenSymbol = hardcodedExchanges[exchangeAddress.toUpperCase()].symbol
+    } else {
+      tokenSymbol = 'unknown'
+    }
   }
+
   return {
     label: tokenSymbol,
     value: exchangeAddress
@@ -168,15 +178,12 @@ const buildDirectoryLabel = exchange => {
 }
 
 const buildDirectoryObject = exchange => {
-  let { tokenName, tokenSymbol, id, tokenAddress, tokenDecimals } = exchange
+  let { tokenName, tokenSymbol, id, tokenAddress, tokenDecimals, ethBalance } = exchange
   let symbol = tokenSymbol
 
   const exchangeAddress = id
 
   let theme = hardcodeThemes[exchangeAddress]
-  if (theme === undefined) {
-    theme = ''
-  }
 
   return {
     tokenName,
@@ -184,6 +191,7 @@ const buildDirectoryObject = exchange => {
     exchangeAddress,
     tokenAddress,
     tokenDecimals,
+    ethBalance,
     tradeVolume: 0,
     percentChange: 0.0,
     theme,
@@ -192,13 +200,4 @@ const buildDirectoryObject = exchange => {
     ethLiquidity: 0,
     erc20Liquidity: 0
   }
-}
-
-// These are previously received from the loanscan api. Only 5 were found
-const hardcodeThemes = {
-  '0x2c4bd064b998838076fa341a83d007fc2fa50957': '#1abc9c',
-  '0xae76c84c9262cdb9abc0c2c8888e62db8e22a0bf': '#302c2c',
-  '0x09cabec1ead1c0ba254b09efb3ee13841712be14': '#fdc134',
-  '0x4e395304655f0796bc3bc63709db72173b9ddf98': '#00b4f4',
-  '0x2e642b8d59b45a1d8c5aef716a84ff44ea665914': '#ff5000'
 }

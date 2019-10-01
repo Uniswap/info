@@ -1,5 +1,9 @@
 import { BigNumber } from 'bignumber.js'
 import dayjs from 'dayjs'
+import { client } from '../apollo/client'
+import { ExportToCsv } from 'export-to-csv'
+
+import { TRANSACTIONS_QUERY_SKIPPABLE } from '../apollo/queries'
 
 BigNumber.set({ EXPONENTIAL_AT: 50 })
 
@@ -73,4 +77,55 @@ export const formatTime = unix => {
 
 export const formatNumber = num => {
   return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
+}
+
+export const getAllTransactions = async address => {
+  // current time
+  const utcEndTime = dayjs.utc()
+  let utcStartTime
+  utcStartTime = utcEndTime.subtract(1, 'year').startOf('day')
+  let startTime = utcStartTime.unix() - 1 // -1 because we filter on greater than in the query
+  let data = []
+  let skipCount = 0
+  let fetchingData = true
+
+  while (fetchingData) {
+    console.log(skipCount)
+    let result = await client.query({
+      query: TRANSACTIONS_QUERY_SKIPPABLE,
+      variables: {
+        exchangeAddr: address,
+        skip: skipCount
+      },
+      fetchPolicy: 'network-only'
+    })
+    if (result) {
+      skipCount = skipCount + 100
+      if (result.data.transactions.length === 0) {
+        fetchingData = false
+      } else if (result.data.transactions[result.data.transactions.length - 1].timestamp < startTime) {
+        fetchingData = false
+      }
+      data = data.concat(result.data.transactions)
+    }
+  }
+
+  const options = {
+    fieldSeparator: ',',
+    quoteStrings: '"',
+    decimalSeparator: '.',
+    showLabels: true,
+    showTitle: true,
+    title: 'My Awesome CSV',
+    useTextFile: false,
+    useBom: true,
+    useKeysAsHeaders: true
+    // headers: ['Column 1', 'Column 2', etc...] <-- Won't work with useKeysAsHeaders present!
+  }
+  let csvdata = []
+  Object.keys(data).map(index => {
+    return csvdata.push(data[index])
+  })
+  const csvExporter = new ExportToCsv(options)
+  csvExporter.generateCsv(data)
 }
