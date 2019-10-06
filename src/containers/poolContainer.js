@@ -16,22 +16,33 @@ export class PoolContainer extends Container {
 
   async fetchUserPool(exchangeAddress, userAccount) {
     try {
-      const data = await fetch(`${BASE_URL}v1/user?exchangeAddress=${exchangeAddress}&userAddress=${userAccount}`)
+      const userData = await fetch(`${BASE_URL}v1/user?exchangeAddress=${exchangeAddress}&userAddress=${userAccount}`)
 
-      if (!data.ok) {
-        throw Error(data.status)
+      if (!userData.ok) {
+        throw Error(userData.status)
       }
 
-      const json = await data.json()
+      const userJson = await userData.json()
+
+      const exchangeData = await fetch(`${BASE_URL}v1/exchange?exchangeAddress=${exchangeAddress}`)
+
+      if (!exchangeData.ok) {
+        throw Error(exchangeData.status)
+      }
+
+      const exchangeJson = await exchangeData.json()
 
       console.log(`fetched ${userAccount}'s pool share for ${exchangeAddress}`)
 
       // NOTE: workaround for bug in uniswap-statistics-api
       // uniswap-statistics-api returns numbers that are 10**10 times too big
       // see: https://github.com/loanscan/uniswap-statistics-api/issues/7
+      const tokenDecimals = exchangeJson.tokenDecimals
+      const userNumPoolTokens = Big(userJson.userNumPoolTokens).dividedBy(10**(18 - tokenDecimals)).toFixed(4)
+      const userPoolPercent = Big(userJson.userPoolPercent * 100).dividedBy(10**(18 - tokenDecimals)).toFixed(2)
       this.setState({
-        userNumPoolTokens: Big(json.userNumPoolTokens).dividedBy(10**10).toFixed(4),
-        userPoolPercent: Big(json.userPoolPercent * 100).dividedBy(10**10).toFixed(2)
+        userNumPoolTokens: userNumPoolTokens,
+        userPoolPercent: userPoolPercent
       })
     } catch (err) {
       console.log('error: ', err)
