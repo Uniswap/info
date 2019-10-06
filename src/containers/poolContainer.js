@@ -26,9 +26,12 @@ export class PoolContainer extends Container {
 
       console.log(`fetched ${userAccount}'s pool share for ${exchangeAddress}`)
 
+      // NOTE: workaround for bug in uniswap-statistics-api
+      // uniswap-statistics-api returns numbers that are 10**10 times too big
+      // see: https://github.com/loanscan/uniswap-statistics-api/issues/7
       this.setState({
-        userNumPoolTokens: Big(json.userNumPoolTokens).toFixed(4),
-        userPoolPercent: (json.userPoolPercent * 100).toFixed(2)
+        userNumPoolTokens: Big(json.userNumPoolTokens).dividedBy(10**10).toFixed(4),
+        userPoolPercent: Big(json.userPoolPercent * 100).dividedBy(10**10).toFixed(2)
       })
     } catch (err) {
       console.log('error: ', err)
