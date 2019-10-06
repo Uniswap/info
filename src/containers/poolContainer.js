@@ -35,7 +35,8 @@ export class PoolContainer extends Container {
       console.log(`fetched ${userAccount}'s pool share for ${exchangeAddress}`)
 
       // NOTE: workaround for bug in uniswap-statistics-api
-      // uniswap-statistics-api returns numbers that are 10**10 times too big
+      // uniswap-statistics-api returns numbers that don't take into account
+      // tokens that have fewer than 18 decimal places
       // see: https://github.com/loanscan/uniswap-statistics-api/issues/7
       const tokenDecimals = exchangeJson.tokenDecimals
       const userNumPoolTokens = Big(userJson.userNumPoolTokens).dividedBy(10**(18 - tokenDecimals)).toFixed(4)
