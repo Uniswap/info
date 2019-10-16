@@ -41,7 +41,7 @@ function customFilter(option, searchText) {
   }
 }
 
-const Select = ({ options, onChange, tokenSelect = false, mkrLogo, placeholder, ...rest }) => {
+const Select = ({ options, onChange, tokenSelect = false, placeholder, ...rest }) => {
   return tokenSelect ? (
     <ReactSelect
       placeholder={placeholder}

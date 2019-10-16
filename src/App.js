@@ -7,7 +7,8 @@ import Loader from './components/Loader'
 import NavHeader from './components/NavHeader'
 import { setThemeColor } from './helpers/'
 import { MainPage } from './pages/MainPage'
-import { OverviewPage } from './pages/OverviewPage'
+// import { OverviewPage } from './pages/OverviewPage'
+import TokenLogo from './components/TokenLogo'
 import { useChart } from './hooks/ChartData'
 
 const timeframeOptions = [
@@ -18,35 +19,26 @@ const timeframeOptions = [
 ]
 
 function App(props) {
+  //set default chart query time box
   const [historyDaysToQuery, setHistoryDaysToQuery] = useState(timeframeOptions[3].value)
 
   const [currencyUnit, setCurrencyUnit] = useState('USD')
-
-  const TOKEN_ICON_API = 'https://raw.githubusercontent.com/TrustWallet/tokens/master/tokens'
-  const mkrLogo = `${TOKEN_ICON_API}/${'0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2'.toLowerCase()}.png`
 
   const chartData = useChart(props.directoryStore.state.activeExchange.exchangeAddress, historyDaysToQuery)
 
   // switch active exchane
   const switchActiveExchange = async address => {
     try {
-      // first, set the active exchange
+      // set the active exchange
       await props.directoryStore.setActiveExchange(address)
 
-      // second, set the new theme color from active exchange
+      // set the new theme color from active exchange
       await setThemeColor(props.directoryStore.state.activeExchange.theme)
 
-      // third, fetch the new ticker information
-      await props.directoryStore.fetchTicker(address)
+      // fetch the new ticker information
+      await props.directoryStore.fetchOverviewData(address)
     } catch (err) {
       console.log('error:', err)
-    }
-  }
-
-  // updateTimeframe
-  const updateTimeframe = async newTimeframe => {
-    if (historyDaysToQuery !== newTimeframe && props.directoryStore.state.activeExchange) {
-      setHistoryDaysToQuery(newTimeframe)
     }
   }
 
@@ -92,6 +84,13 @@ function App(props) {
     state: { directory }
   } = props.directoryStore
 
+  useEffect(() => {
+    for (var i = 0; i < directory.length; i++) {
+      const logo = <TokenLogo address={directory[i].tokenAddress} style={{ height: '20px', width: '20px' }} />
+      directory[i].logo = logo
+    }
+  }, [directory])
+
   if (directory.length === 0) {
     return (
       <Wrapper>
@@ -105,12 +104,12 @@ function App(props) {
       default
       {...props}
       directory={directory}
+      currencyUnit={currencyUnit}
       setCurrencyUnit={setCurrencyUnit}
       exchangeAddress={exchangeAddress}
       defaultExchangeAddress={defaultExchangeAddress}
       switchActiveExchange={switchActiveExchange}
       exchanges={exchanges}
-      mkrLogo={mkrLogo}
     />
   ))
 
@@ -138,7 +137,7 @@ function App(props) {
                 priceUSD={priceUSD}
                 chartData={chartData}
                 tokenAddress={tokenAddress}
-                updateTimeframe={updateTimeframe}
+                setHistoryDaysToQuery={setHistoryDaysToQuery}
               />
             </Route>
             {/* <Route path="/overview">

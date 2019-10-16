@@ -1,13 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 
 import styled from 'styled-components'
 import { Flex } from 'rebass'
-import { useWeb3Context } from 'web3-react'
-import Jazzicon from 'jazzicon'
 import Title from '../Title'
 import Select from '../Select'
-import TokenLogo from '../TokenLogo'
 import CurrencySelect from '../CurrencySelect'
 import { Header } from '../'
 
@@ -17,20 +14,6 @@ const NavWrapper = styled.div`
   justify-content: center;
   align-items: center;
 `
-
-const AccountBar = styled.div`
-  width: 130px;
-  background-color: rgba(255, 255, 255, 0.15);
-  border-radius: 38px;
-  margin-left: 0.8em;
-  height: 38px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  color: white;
-  padding: 0 12px;
-`
-
 const NavSelect = styled(Select)`
   min-width: 240px;
 
@@ -55,13 +38,6 @@ const FlexEnd = styled(Flex)`
   }
 `
 
-const Identicon = styled.div`
-  height: 1rem;
-  width: 1rem;
-  border-radius: 1.125rem;
-  background-color: grey;
-`
-
 const LinkText = styled(Link)`
   font-weight: 500;
   color: white;
@@ -76,35 +52,20 @@ export default function NavHeader({
   exchangeAddress,
   switchActiveExchange,
   setCurrencyUnit,
-  mkrLogo,
-  location
+  currencyUnit
 }) {
   // for now exclude broken tokens
   const [filteredDirectory, setDirectory] = useState([])
 
   useEffect(() => {
     for (var i = 0; i < directory.length; i++) {
-      if (parseFloat(exchanges[directory[i].value].ethBalance) > 0.5) {
+      if (parseFloat(exchanges[directory[i].value].ethBalance) > 0.1) {
         let newd = filteredDirectory
-        const logo = <TokenLogo address={directory[i].tokenAddress} style={{ height: '20px', width: '20px' }} />
-        directory[i].logo = logo
         newd.push(directory[i])
         setDirectory(newd)
       }
     }
   }, [exchanges, directory, filteredDirectory])
-
-  const web3 = useWeb3Context()
-
-  const ref = useRef()
-  useEffect(() => {
-    if (ref.current) {
-      ref.current.innerHTML = ''
-      if (web3.account) {
-        ref.current.appendChild(Jazzicon(16, parseInt(web3.account.slice(2, 10), 16)))
-      }
-    }
-  }, [web3.account])
 
   return (
     <Header px={24} py={3} bg={['mineshaft', 'transparent']} color={['white', 'black']}>
@@ -127,6 +88,7 @@ export default function NavHeader({
             },
             { label: 'USD', value: 'USD' }
           ]}
+          value={currencyUnit === 'USD' ? { label: 'USD', value: 'USD' } : { label: 'ETH', value: 'ETH' }}
           defaultValue={{ label: 'USD', value: 'USD' }}
           onChange={select => {
             setCurrencyUnit(select.value)
@@ -134,7 +96,6 @@ export default function NavHeader({
         />
         <NavSelect
           options={filteredDirectory}
-          mkrLogo={mkrLogo}
           tokenSelect={true}
           onChange={select => {
             if (exchangeAddress !== select.value) {
@@ -142,13 +103,6 @@ export default function NavHeader({
             }
           }}
         />
-        {web3.account ? (
-          <AccountBar>
-            {web3.account.slice(0, 6) + '...' + web3.account.slice(38, 42)} <Identicon ref={ref} />
-          </AccountBar>
-        ) : (
-          ''
-        )}
       </FlexEnd>
     </Header>
   )

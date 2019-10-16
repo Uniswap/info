@@ -177,6 +177,8 @@ const EmojiWrapper = styled.span`
 `
 
 const ChartWrapper = styled(Panel)`
+  boxshadow: 0px 4px 20px rgba(239, 162, 250, 0.15);
+
   @media screen and (max-width: 64em) {
     display: none;
   }
@@ -253,28 +255,6 @@ const CloseIcon = styled.div`
   right: 20px;
 `
 
-function getPercentColor(value) {
-  if (value < 0) {
-    return (
-      <Text fontSize={14} lineHeight={1.4} color="white">
-        {value}% ↓
-      </Text>
-    )
-  }
-  if (parseFloat(value) === 0) {
-    return (
-      <Text fontSize={14} lineHeight={1.4} color="white">
-        {value}%
-      </Text>
-    )
-  }
-  return (
-    <Text fontSize={14} lineHeight={1.4} color="white">
-      {value}% ↑
-    </Text>
-  )
-}
-
 export const MainPage = function({
   exchangeAddress,
   currencyUnit,
@@ -290,7 +270,7 @@ export const MainPage = function({
   priceUSD,
   chartData,
   tokenAddress,
-  updateTimeframe
+  setHistoryDaysToQuery
 }) {
   const [chartOption, setChartOption] = useState('liquidity')
 
@@ -341,7 +321,15 @@ export const MainPage = function({
               : ''}
           </TokenPrice>
           {pricePercentChange && isFinite(pricePercentChange) ? (
-            <TopPercent>{getPercentColor(pricePercentChange)}</TopPercent>
+            <TopPercent>
+              <Text fontSize={14} lineHeight={1.4} color="white">
+                {pricePercentChange > 0
+                  ? pricePercentChange + '% ↑'
+                  : pricePercentChange < 0
+                  ? pricePercentChange + '% ↓'
+                  : pricePercentChange + '%'}
+              </Text>
+            </TopPercent>
           ) : (
             ''
           )}
@@ -390,7 +378,15 @@ export const MainPage = function({
             }
             bottomRight={
               volumePercentChange && isFinite(volumePercentChange) ? (
-                <div>{getPercentColor(volumePercentChange)}</div>
+                <div>
+                  <Text fontSize={14} lineHeight={1.4} color="white">
+                    {pricePercentChange > 0
+                      ? pricePercentChange + '% ↑'
+                      : pricePercentChange < 0
+                      ? pricePercentChange + '% ↓'
+                      : pricePercentChange + '%'}
+                  </Text>
+                </div>
               ) : (
                 ''
               )
@@ -412,7 +408,15 @@ export const MainPage = function({
             }
             bottomRight={
               liquidityPercentChange && isFinite(liquidityPercentChange) ? (
-                <div>{getPercentColor(liquidityPercentChange)}</div>
+                <div>
+                  <Text fontSize={14} lineHeight={1.4} color="white">
+                    {pricePercentChange > 0
+                      ? pricePercentChange + '% ↑'
+                      : pricePercentChange < 0
+                      ? pricePercentChange + '% ↓'
+                      : pricePercentChange + '%'}
+                  </Text>
+                </div>
               ) : (
                 ''
               )
@@ -430,12 +434,7 @@ export const MainPage = function({
           />
         </TopPanel>
 
-        <ChartWrapper
-          rounded
-          bg="white"
-          area="statistics"
-          style={{ boxShadow: '0px 4px 20px rgba(239, 162, 250, 0.15)' }}
-        >
+        <ChartWrapper rounded bg="white" area="statistics">
           <Box p={24}>
             <Flex alignItems="center" justifyContent="space-between">
               <Flex alignItems="center" justifyContent="space-between">
@@ -463,7 +462,7 @@ export const MainPage = function({
                   options={timeframeOptions}
                   defaultValue={timeframeOptions[3]}
                   onChange={select => {
-                    updateTimeframe(select.value)
+                    setHistoryDaysToQuery(select.value)
                   }}
                   customStyles={{ backgroundColor: 'white' }}
                 />

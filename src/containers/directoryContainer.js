@@ -76,7 +76,7 @@ export class DirectoryContainer extends Container {
   }
 
   // fetch exchange information via address
-  async fetchTicker(address) {
+  async fetchOverviewData(address) {
     try {
       const result = await client.query({
         query: TICKER_QUERY,
