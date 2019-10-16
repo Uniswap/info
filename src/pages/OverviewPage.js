@@ -270,7 +270,7 @@ export const OverviewPage = function({
             }
           />
         </TopPanel>
-        {/* <ChartWrapper
+        <ChartWrapper
           rounded
           bg="white"
           area="statistics"
@@ -324,7 +324,7 @@ export const OverviewPage = function({
               <Loader />
             )}
           </Box>
-        </ChartWrapper> */}
+        </ChartWrapper>
         <Panel rounded bg="white" area="transactions">
           <OverviewList
             currencyUnit={currencyUnit}

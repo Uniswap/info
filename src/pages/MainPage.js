@@ -380,11 +380,11 @@ export const MainPage = function({
               volumePercentChange && isFinite(volumePercentChange) ? (
                 <div>
                   <Text fontSize={14} lineHeight={1.4} color="white">
-                    {pricePercentChange > 0
-                      ? pricePercentChange + '% ↑'
-                      : pricePercentChange < 0
-                      ? pricePercentChange + '% ↓'
-                      : pricePercentChange + '%'}
+                    {volumePercentChange > 0
+                      ? volumePercentChange + '% ↑'
+                      : volumePercentChange < 0
+                      ? volumePercentChange + '% ↓'
+                      : volumePercentChange + '%'}
                   </Text>
                 </div>
               ) : (
@@ -410,11 +410,11 @@ export const MainPage = function({
               liquidityPercentChange && isFinite(liquidityPercentChange) ? (
                 <div>
                   <Text fontSize={14} lineHeight={1.4} color="white">
-                    {pricePercentChange > 0
-                      ? pricePercentChange + '% ↑'
-                      : pricePercentChange < 0
-                      ? pricePercentChange + '% ↓'
-                      : pricePercentChange + '%'}
+                    {liquidityPercentChange > 0
+                      ? liquidityPercentChange + '% ↑'
+                      : liquidityPercentChange < 0
+                      ? liquidityPercentChange + '% ↓'
+                      : liquidityPercentChange + '%'}
                   </Text>
                 </div>
               ) : (

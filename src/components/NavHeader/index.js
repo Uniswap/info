@@ -74,10 +74,10 @@ export default function NavHeader({
         <NavWrapper></NavWrapper>
       </Flex>
       <FlexEnd>
-        {/* <LinkText to="/overview" selected={location.pathname !== '/overview'}>
+        {/* <LinkText to="/overview" selected={window.location.pathname !== '/overview'}>
           Overview
         </LinkText>
-        <LinkText to="/tokens" selected={location.pathname !== '/tokens'}>
+        <LinkText to="/tokens" selected={window.location.pathname !== '/tokens'}>
           Tokens
         </LinkText> */}
         <CurrencySelectFormatted

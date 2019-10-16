@@ -7,7 +7,7 @@ import Loader from './components/Loader'
 import NavHeader from './components/NavHeader'
 import { setThemeColor } from './helpers/'
 import { MainPage } from './pages/MainPage'
-// import { OverviewPage } from './pages/OverviewPage'
+import { OverviewPage } from './pages/OverviewPage'
 import TokenLogo from './components/TokenLogo'
 import { useChart } from './hooks/ChartData'
 
@@ -158,9 +158,9 @@ function App(props) {
                 priceUSD={priceUSD}
                 chartData={chartData}
                 tokenAddress={tokenAddress}
-                updateTimeframe={updateTimeframe}
-              />
-            </Route> */}
+                updateTimeframe={setHistoryDaysToQuery}
+              /> 
+  </Route> */}
           </Switch>
         </BrowserRouter>
       </Wrapper>
