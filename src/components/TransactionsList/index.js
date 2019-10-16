@@ -223,19 +223,61 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, setTx
       let newSwaps = []
       let newAdds = []
       let newRemoves = []
-      // eslint-disable-next-line array-callback-return
       Object.keys(data).map((item, i) => {
-        if (data[item].timestamp > startTime) {
-          ts.push(data[item])
-          validDataLength++
-          if (data[item].event === 'AddLiquidity') {
-            newAdds.push(data[item])
-          } else if (data[item].event === 'RemoveLiquidity') {
-            newRemoves.push(data[item])
-          } else {
-            newSwaps.push(data[item])
+        if (data[item].timestamp !== startTime) {
+          let newItem = {
+            tx: data[item].id,
+            ethAmount: '',
+            tokenAmount: '',
+            user: data[item].user,
+            timestamp: data[item].timestamp
+          }
+          if (data[item].addLiquidityEvents.length > 0) {
+            let entry
+            for (entry in data[item].addLiquidityEvents) {
+              newItem.ethAmount = data[item].addLiquidityEvents[entry].ethAmount
+              newItem.tokenAmount = data[item].addLiquidityEvents[entry].tokenAmount
+              newItem.event = 'AddLiquidity'
+              newAdds.push(newItem)
+              ts.push(newItem)
+              validDataLength++
+            }
+          }
+          if (data[item].removeLiquidityEvents.length > 0) {
+            let entry
+            for (entry in data[item].removeLiquidityEvents) {
+              newItem.ethAmount = data[item].removeLiquidityEvents[entry].ethAmount
+              newItem.tokenAmount = data[item].removeLiquidityEvents[entry].tokenAmount
+              newItem.event = 'RemoveLiquidity'
+              newRemoves.push(newItem)
+              ts.push(newItem)
+              validDataLength++
+            }
+          }
+          if (data[item].tokenPurchaseEvents.length > 0) {
+            let entry
+            for (entry in data[item].tokenPurchaseEvents) {
+              newItem.ethAmount = data[item].tokenPurchaseEvents[entry].eth
+              newItem.tokenAmount = data[item].tokenPurchaseEvents[entry].token
+              newItem.event = 'TokenPurchase'
+              newSwaps.push(newItem)
+              ts.push(newItem)
+              validDataLength++
+            }
+          }
+          if (data[item].ethPurchaseEvents.length > 0) {
+            let entry
+            for (entry in data[item].ethPurchaseEvents) {
+              newItem.ethAmount = data[item].ethPurchaseEvents[entry].eth
+              newItem.tokenAmount = data[item].ethPurchaseEvents[entry].token
+              newSwaps.push(newItem)
+              newItem.event = 'EthPurchase'
+              ts.push(newItem)
+              validDataLength++
+            }
           }
         }
+        return true
       })
       setTxs(ts)
       SetFilteredTxs(ts)

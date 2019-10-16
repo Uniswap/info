@@ -1,25 +1,17 @@
 import React, { useEffect, useRef, useState } from 'react'
+import { Link } from 'react-router-dom'
+
 import styled from 'styled-components'
-import { Flex, Link } from 'rebass'
+import { Flex } from 'rebass'
 import { useWeb3Context } from 'web3-react'
 import Jazzicon from 'jazzicon'
 import Title from '../Title'
 import Select from '../Select'
+import TokenLogo from '../TokenLogo'
 import CurrencySelect from '../CurrencySelect'
 import { Header } from '../'
 
-const _StyledLink = ({ active, ...rest }) => <Link {...rest} />
-const StyledLink = styled(_StyledLink)`
-  font-size: 15px;
-  font-weight: 500;
-  text-decoration: none;
-  color: ${({ active }) => (active ? 'black' : 'grey')};
-`
-
 const NavWrapper = styled.div`
-  ${StyledLink}:not(:last-child) {
-    margin-right: 0.75rem;
-  }
   display: flex;
   width: 100%;
   justify-content: center;
@@ -40,7 +32,7 @@ const AccountBar = styled.div`
 `
 
 const NavSelect = styled(Select)`
-  min-width: 200px;
+  min-width: 240px;
 
   @media screen and (max-width: 64em) {
     color: black;
@@ -55,6 +47,7 @@ const CurrencySelectFormatted = styled(CurrencySelect)`
 const FlexEnd = styled(Flex)`
   justify-content: flex-end;
   padding-bottom: 0px;
+  align-items: center;
 
   @media screen and (max-width: 64em) {
     margin-top: 1em;
@@ -69,17 +62,23 @@ const Identicon = styled.div`
   background-color: grey;
 `
 
+const LinkText = styled(Link)`
+  font-weight: 500;
+  color: white;
+  margin-right: 1em;
+  opacity: ${props => (!props.selected ? 1 : 0.4)};
+  text-decoration: none;
+`
+
 export default function NavHeader({
-  location,
   directory,
   exchanges,
-  defaultExchangeAddress,
   exchangeAddress,
   switchActiveExchange,
-  setCurrencyUnit
+  setCurrencyUnit,
+  mkrLogo,
+  location
 }) {
-  const main = location.pathname === '/'
-
   // for now exclude broken tokens
   const [filteredDirectory, setDirectory] = useState([])
 
@@ -87,11 +86,13 @@ export default function NavHeader({
     for (var i = 0; i < directory.length; i++) {
       if (parseFloat(exchanges[directory[i].value].ethBalance) > 0.5) {
         let newd = filteredDirectory
+        const logo = <TokenLogo address={directory[i].tokenAddress} style={{ height: '20px', width: '20px' }} />
+        directory[i].logo = logo
         newd.push(directory[i])
         setDirectory(newd)
       }
     }
-  }, [])
+  }, [exchanges, directory, filteredDirectory])
 
   const web3 = useWeb3Context()
 
@@ -105,27 +106,6 @@ export default function NavHeader({
     }
   }, [web3.account])
 
-  function getDirectoryIndex() {
-    let def = {}
-    directory.forEach(element => {
-      if (element.value === defaultExchangeAddress) {
-        def = element
-      }
-    })
-    return (
-      <NavSelect
-        options={filteredDirectory}
-        defaultValue={def}
-        tokenSelect={true}
-        onChange={select => {
-          if (exchangeAddress !== select.value) {
-            switchActiveExchange(select.value)
-          }
-        }}
-      />
-    )
-  }
-
   return (
     <Header px={24} py={3} bg={['mineshaft', 'transparent']} color={['white', 'black']}>
       <Title />
@@ -133,6 +113,12 @@ export default function NavHeader({
         <NavWrapper></NavWrapper>
       </Flex>
       <FlexEnd>
+        {/* <LinkText to="/overview" selected={location.pathname !== '/overview'}>
+          Overview
+        </LinkText>
+        <LinkText to="/tokens" selected={location.pathname !== '/tokens'}>
+          Tokens
+        </LinkText> */}
         <CurrencySelectFormatted
           options={[
             {
@@ -146,7 +132,16 @@ export default function NavHeader({
             setCurrencyUnit(select.value)
           }}
         />
-        {main && defaultExchangeAddress && getDirectoryIndex()}
+        <NavSelect
+          options={filteredDirectory}
+          mkrLogo={mkrLogo}
+          tokenSelect={true}
+          onChange={select => {
+            if (exchangeAddress !== select.value) {
+              switchActiveExchange(select.value)
+            }
+          }}
+        />
         {web3.account ? (
           <AccountBar>
             {web3.account.slice(0, 6) + '...' + web3.account.slice(38, 42)} <Identicon ref={ref} />

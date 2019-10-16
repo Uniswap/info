@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Box, Flex, Text } from 'rebass'
 import styled from 'styled-components'
-
+import Iframe from 'react-iframe'
 import FourByFour from '../components/FourByFour'
 import Panel from '../components/Panel'
 import Dashboard from '../components/Dashboard'
@@ -38,6 +38,11 @@ const ThemedBackground = styled(Box)`
   ${props => !props.last}
 `
 
+const TopPercent = styled.div`
+  align-self: flex-end;
+  margin-left: 20px;
+`
+
 const TopPanel = styled(Panel)`
   background-color: rgba(255, 255, 255, 0.15);
   display: flex;
@@ -64,9 +69,11 @@ const TopPanel = styled(Panel)`
 const StyledTokenLogo = styled(TokenLogo)`
   margin-left: 0;
   margin-right: 1rem;
-  height: 32px;
-  width: 32px;
-  fill-color: white;
+  height: 34px;
+  width: 34px;
+  border-radius: 50%;
+  border: 2px solid white;
+  background-color: white;
   display: flex;
   align-itmes: center;
   justify-content: center;
@@ -76,6 +83,7 @@ const TokenHeader = styled(Box)`
   color: white;
   font-weight: 600;
   font-size: 20px;
+  width: 100%;
   max-width: 1280px;
   padding: 24px;
   height: 100px;
@@ -173,15 +181,6 @@ const ChartWrapper = styled(Panel)`
     display: none;
   }
 `
-
-const PercentWrapper = styled(Text)`
-  border-radius: 30px;
-  padding: 8px 8px;
-  display: flex;
-  align-items: center;
-  background-color: rgba(255, 255, 255, 0.6);
-`
-
 const TokenName = styled.div`
   margin-right: 10px;
   @media screen and (max-width: 40em) {
@@ -199,23 +198,78 @@ const TokenGroup = styled.div`
   align-items: center;
 `
 
+const FrameWrapper = styled.div`
+  min-width: 100vw;
+  height: 100vh;
+  left: 0;
+  top: 0;
+  z-index: 9999;
+  background-color: rgba(0, 0, 0, 0.7);
+  position: fixed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  &:hover {
+    cursor: pointer;
+  }
+
+  @media screen and (max-width: 440px) {
+    padding-top: 20px;
+  }
+`
+
+const BuyButton = styled(Box)`
+  &:hover {
+    background-color: #2f80edab;
+    cursor: pointer;
+  }
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 40px;
+  font-size: 16px;
+  color: white;
+  background-color: #2f80ed;
+  width: 180px;
+  border-radius: 20px;
+  margin-left: 24px;
+  font-weight: 600;
+  width: 130px;
+`
+
+const FrameBorder = styled.div`
+  border-radius: 26px;
+  margin-bottom: 10px;
+  overflow: hidden;
+`
+
+const CloseIcon = styled.div`
+  position: absolute;
+  color: white;
+  font-size: 30px;
+  top: 20px;
+  right: 20px;
+`
+
 function getPercentColor(value) {
   if (value < 0) {
     return (
-      <Text fontSize={14} lineHeight={1.4} color="red">
+      <Text fontSize={14} lineHeight={1.4} color="white">
         {value}% ↓
       </Text>
     )
   }
   if (parseFloat(value) === 0) {
     return (
-      <Text fontSize={14} lineHeight={1.4} color="black">
+      <Text fontSize={14} lineHeight={1.4} color="white">
         {value}%
       </Text>
     )
   }
   return (
-    <Text fontSize={14} lineHeight={1.4} color="green">
+    <Text fontSize={14} lineHeight={1.4} color="white">
       {value}% ↑
     </Text>
   )
@@ -244,7 +298,11 @@ export const MainPage = function({
 
   const [txFilter, setTxFilter] = useState('All')
 
+  const [showModal, ToggleModal] = useState(false)
+
   const [accountInput, setAccountInput] = useState('')
+
+  const [buyToggle, setBuyToggle] = useState(true)
 
   useEffect(() => {
     setTxCount('-')
@@ -258,14 +316,21 @@ export const MainPage = function({
     return number
   }
 
+  function getFrameWidth() {
+    if (window.screen.width <= 440) {
+      return '300px'
+    }
+    return '400px'
+  }
+
   return (
     <>
       <ThemedBackground bg="token" />
       <TokenHeader mx="auto" px={[0, 3]}>
         <TokenGroup>
           <StyledTokenLogo address={tokenAddress ? tokenAddress : ''} />
-          <TokenName>{tokenName + ' '}</TokenName>
-          <div>({symbol})</div>
+          <TokenName>{tokenName ? tokenName + ' ' : '-'}</TokenName>
+          <div>{symbol ? '(' + symbol + ')' : ''}</div>
         </TokenGroup>
         <TokenGroup>
           <TokenPrice>
@@ -276,13 +341,38 @@ export const MainPage = function({
               : ''}
           </TokenPrice>
           {pricePercentChange && isFinite(pricePercentChange) ? (
-            <PercentWrapper fontSize={20} lineHeight={1.4} style={{ marginLeft: '1em', fontWeight: '400' }}>
-              {getPercentColor(pricePercentChange)}
-            </PercentWrapper>
+            <TopPercent>{getPercentColor(pricePercentChange)}</TopPercent>
           ) : (
             ''
           )}
         </TokenGroup>
+        {showModal && tokenAddress ? (
+          <FrameWrapper
+            onClick={() => {
+              ToggleModal(false)
+            }}
+          >
+            <CloseIcon>✕</CloseIcon>
+            <FrameBorder>
+              <Iframe
+                url={
+                  buyToggle
+                    ? 'https://uniswap.exchange/swap?outputCurrency=' + tokenAddress.toString()
+                    : 'https://uniswap.exchange/swap?inputCurrency=' + tokenAddress.toString()
+                }
+                height="680px"
+                width={getFrameWidth()}
+                id="myId"
+                frameBorder="0"
+                style={{ border: 'none', outline: 'none' }}
+                display="initial"
+                position="relative"
+              />
+            </FrameBorder>
+          </FrameWrapper>
+        ) : (
+          ''
+        )}
       </TokenHeader>
       <Dashboard mx="auto" px={[0, 3]}>
         <TopPanel rounded color="white" p={24} style={{ gridArea: 'volume' }}>
@@ -300,9 +390,7 @@ export const MainPage = function({
             }
             bottomRight={
               volumePercentChange && isFinite(volumePercentChange) ? (
-                <PercentWrapper fontSize={20} lineHeight={1.4} style={{ marginLeft: '1em' }}>
-                  {getPercentColor(volumePercentChange)}
-                </PercentWrapper>
+                <div>{getPercentColor(volumePercentChange)}</div>
               ) : (
                 ''
               )
@@ -324,9 +412,7 @@ export const MainPage = function({
             }
             bottomRight={
               liquidityPercentChange && isFinite(liquidityPercentChange) ? (
-                <PercentWrapper fontSize={20} lineHeight={1.4}>
-                  {getPercentColor(liquidityPercentChange)}
-                </PercentWrapper>
+                <div>{getPercentColor(liquidityPercentChange)}</div>
               ) : (
                 ''
               )
@@ -387,16 +473,42 @@ export const MainPage = function({
           <Divider />
           <Box p={24}>
             {chartData && chartData.length > 0 ? (
-              <Chart symbol={symbol} data={chartData} currencyUnit={currencyUnit} chartOption={chartOption} />
+              <Chart
+                symbol={symbol}
+                exchangeAddress={exchangeAddress}
+                data={chartData}
+                currencyUnit={currencyUnit}
+                chartOption={chartOption}
+              />
             ) : (
               <Loader />
             )}
           </Box>
         </ChartWrapper>
         <Panel rounded bg="white" area="exchange" style={{ boxShadow: '0px 4px 20px rgba(239, 162, 250, 0.15)' }}>
-          <Box style={{ padding: '34px 24px' }}>
-            <Flex alignItems="center" justifyContent="space-between">
-              <Text>Contract Info</Text>
+          <Box style={{ padding: '34px 0px' }}>
+            <Hint color="textSubtext" mb={3} style={{ paddingLeft: '24px', paddingBottom: '6px' }}>
+              Exchange
+            </Hint>
+            <Flex alignItems="center" justifyContent="flex-start">
+              <BuyButton
+                // bg="token"
+                onClick={() => {
+                  setBuyToggle(true)
+                  ToggleModal(true)
+                }}
+              >
+                {'Buy ' + symbol}
+              </BuyButton>
+              <BuyButton
+                bg="token"
+                onClick={() => {
+                  setBuyToggle(false)
+                  ToggleModal(true)
+                }}
+              >
+                {'Sell ' + symbol}
+              </BuyButton>
             </Flex>
           </Box>
           <Divider />
@@ -412,16 +524,6 @@ export const MainPage = function({
             </Hint>
             <Address address={exchangeAddress} />
           </Box>
-          {/* <Iframe
-            url={'https://uniswap.exchange/swap?inputCurrency=0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2'}
-            height="400px"
-            width="100%"
-            id="myId"
-            frameBorder="0"
-            style={{ border: 'none', outline: 'none' }}
-            display="initial"
-            position="relative"
-          /> */}
         </Panel>
         <ListOptions style={{ gridArea: 'listOptions' }}>
           <OptionsWrappper>

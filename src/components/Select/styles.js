@@ -15,7 +15,7 @@ export const customStyles = {
   }),
   placeholder: styles => ({
     ...styles,
-    color: 'inherit'
+    color: '#aeaeae'
   }),
   input: styles => ({
     ...styles,

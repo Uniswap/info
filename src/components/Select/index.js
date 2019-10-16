@@ -1,8 +1,7 @@
-import React, { useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import PropTypes from 'prop-types'
 import { default as ReactSelect } from 'react-select'
-import { components } from 'react-select'
 import TokenLogo from '../TokenLogo'
 
 import Popout from './popout'
@@ -22,6 +21,7 @@ const LogoBox = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  margin-left: 2px;
 `
 
 function customFilter(option, searchText) {
@@ -41,20 +41,19 @@ function customFilter(option, searchText) {
   }
 }
 
-const Select = ({ options, onChange, tokenSelect = false, placeholder, ...rest }) => {
+const Select = ({ options, onChange, tokenSelect = false, mkrLogo, placeholder, ...rest }) => {
   return tokenSelect ? (
     <ReactSelect
       placeholder={placeholder}
       isSearchable={true}
       onChange={onChange}
       options={options}
+      value={placeholder}
       filterOption={customFilter}
       getOptionLabel={option => (
         <MenuLabel>
           {option.label}
-          <LogoBox>
-            <TokenLogo address={option.tokenAddress} style={{ height: '20px', width: '20px' }} />
-          </LogoBox>
+          <LogoBox>{option.logo}</LogoBox>
         </MenuLabel>
       )}
       styles={customStyles}

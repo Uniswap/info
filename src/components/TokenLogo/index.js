@@ -23,7 +23,7 @@ const PlaceHolder = styled.div`
   align-items: center;
 `
 
-export default function TokenLogo({ address, size = '1rem', ...rest }) {
+export default function TokenLogo({ address, mkrLogo, size = '1rem', ...rest }) {
   const [error, setError] = useState(false)
 
   useEffect(() => {
@@ -33,11 +33,16 @@ export default function TokenLogo({ address, size = '1rem', ...rest }) {
   if (error || BAD_IMAGES[address]) {
     return (
       <PlaceHolder size={size}>
-        <span role="img" aria-label="thinking" style={{ height: '30px', width: '30px' }}>
+        <span role="img" aria-label="thinking" style={{ height: '20px', width: '30px' }}>
           🤔
         </span>
       </PlaceHolder>
     )
+  }
+
+  // hard coded fixes for trust wallet api issues
+  if (address.toLowerCase() === '0x5e74c9036fb86bd7ecdcb084a0673efc32ea31cb') {
+    address = '0x42456d7084eacf4083f1140d3229471bba2949a8'
   }
 
   const path = `${TOKEN_ICON_API}/${address.toLowerCase()}.png`

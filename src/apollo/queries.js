@@ -6,12 +6,20 @@ export const TRANSACTIONS_QUERY = gql`
       id
       user
       block
-      ethAmount
-      tokenAmount
       fee
-      event
       timestamp
-      tx
+      addLiquidityEvents {
+        id
+      }
+      removeLiquidityEvents {
+        id
+      }
+      tokenPurchaseEvents {
+        id
+      }
+      ethPurchaseEvents {
+        id
+      }
     }
   }
 `
@@ -22,12 +30,28 @@ export const TRANSACTIONS_QUERY_SKIPPABLE = gql`
       id
       user
       block
-      ethAmount
-      tokenAmount
       fee
-      event
       timestamp
-      tx
+      addLiquidityEvents {
+        id
+        ethAmount
+        tokenAmount
+      }
+      removeLiquidityEvents {
+        id
+        ethAmount
+        tokenAmount
+      }
+      tokenPurchaseEvents {
+        id
+        eth
+        token
+      }
+      ethPurchaseEvents {
+        id
+        eth
+        token
+      }
     }
   }
 `
@@ -90,7 +114,7 @@ export const TICKER_24HOUR_QUERY = gql`
 
 export const DIRECTORY_QUERY = gql`
   query exchanges($first: Int!, $skip: Int!) {
-    exchanges(first: $first, skip: $skip, orderBy: ethLiquidity, orderDirection: desc) {
+    exchanges(first: $first, skip: $skip, orderBy: combinedBalanceInUSD, orderDirection: desc) {
       id
       tokenSymbol
       tokenName
@@ -103,10 +127,14 @@ export const DIRECTORY_QUERY = gql`
 
 export const OVERVIEW_PAGE_QUERY = gql`
   query exchanges {
-    exchanges(orderBy: tradeVolumeEth, orderDirection: desc) {
-      tradeVolumeEth
-      tokenName
+    exchanges(orderBy: ethBalance, orderDirection: desc) {
+      id
       tokenAddress
+      tradeVolumeEth
+      ethBalance
+      tokenSymbol
+      tokenName
+      priceUSD
     }
   }
 `
@@ -122,6 +150,17 @@ export const TOTALS_QUERY = gql`
     }
   }
 `
+
+export const UNISWAP_24HOUR = gql`
+  query uniswapDayDatas($date: Int!) {
+    uniswapDayDatas(where: { date: $date }, first: 1, orderBy: date, orderDirection: desc) {
+      totalVolumeInEth
+      totalLiquidityInEth
+      txCount
+    }
+  }
+`
+
 export const OVERVIEW_PAGE_24HOUR = gql`
   query exchangeHistoricalDatas($timestamp: Int!, $tokenAddress: String!) {
     exchangeHistoricalDatas(
