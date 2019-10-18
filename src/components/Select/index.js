@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import styled from 'styled-components'
 import PropTypes from 'prop-types'
 import { default as ReactSelect } from 'react-select'
-import TokenLogo from '../TokenLogo'
+import { isMobile } from 'react-device-detect'
 
 import Popout from './popout'
 
-import customStyles from './styles'
+import { customStyles, customStylesMobile } from './styles'
 
 const MenuLabel = styled.div`
   display: flex;
@@ -56,8 +56,15 @@ const Select = ({ options, onChange, tokenSelect = false, placeholder, ...rest }
           <LogoBox>{option.logo}</LogoBox>
         </MenuLabel>
       )}
-      styles={customStyles}
+      styles={isMobile ? customStylesMobile : customStyles}
       {...rest}
+      components={{
+        DropdownIndicator: () => (
+          <span role="img" aria-label={'viewer'} style={{ marginRight: '8px' }}>
+            🔎
+          </span>
+        )
+      }}
     />
   ) : (
     <ReactSelect
@@ -69,10 +76,6 @@ const Select = ({ options, onChange, tokenSelect = false, placeholder, ...rest }
       {...rest}
     />
   )
-}
-
-Select.defaultProps = {
-  placeholder: 'Find Exchanges'
 }
 
 Select.propTypes = {

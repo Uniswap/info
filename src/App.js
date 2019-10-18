@@ -119,7 +119,7 @@ function App(props) {
         <BrowserRouter>
           <NavHeaderUpdated />
           <Switch>
-            <Route path="/">
+            <Route path="/tokens">
               <MainPage
                 currencyUnit={currencyUnit}
                 tokenName={tokenName}
@@ -140,7 +140,7 @@ function App(props) {
                 setHistoryDaysToQuery={setHistoryDaysToQuery}
               />
             </Route>
-            {/* <Route path="/overview">
+            <Route path="/">
               <OverviewPage
                 currencyUnit={currencyUnit}
                 tokenName={tokenName}
@@ -159,8 +159,8 @@ function App(props) {
                 chartData={chartData}
                 tokenAddress={tokenAddress}
                 updateTimeframe={setHistoryDaysToQuery}
-              /> 
-  </Route> */}
+              />
+            </Route>
           </Switch>
         </BrowserRouter>
       </Wrapper>

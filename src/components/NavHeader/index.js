@@ -1,49 +1,65 @@
 import React, { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useHistory } from 'react-router-dom'
 
 import styled from 'styled-components'
-import { Flex } from 'rebass'
 import Title from '../Title'
 import Select from '../Select'
 import CurrencySelect from '../CurrencySelect'
-import { Header } from '../'
+import Panel from '../Panel'
+import { isMobile } from 'react-device-detect'
+import { useMedia } from 'react-use'
 
-const NavWrapper = styled.div`
-  display: flex;
-  width: 100%;
-  justify-content: center;
+const Header = styled(Panel)`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   align-items: center;
-`
-const NavSelect = styled(Select)`
-  min-width: 240px;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  width: 100%;
 
-  @media screen and (max-width: 64em) {
-    color: black;
+  @media (max-width: 40em) {
+    margin-bottom: 0;
+    padding-right: 18px;
+    padding-left: 18px;
   }
 `
 
-const CurrencySelectFormatted = styled(CurrencySelect)`
-  min-width: 100px;
-  margin-right: 0.8em;
+const TokenSelect = styled(Select)`
+  width: 240px;
+
+  @media screen and (max-width: 40em) {
+    width: 160px;
+  }
 `
 
-const FlexEnd = styled(Flex)`
-  justify-content: flex-end;
-  padding-bottom: 0px;
+const NavRight = styled.div`
+  display: grid;
+  justify-items: end;
   align-items: center;
+  grid-template-columns: auto 240px;
+  grid-column-gap: 13px;
 
-  @media screen and (max-width: 64em) {
-    margin-top: 1em;
-    padding-bottom: 20px;
+  @media screen and (max-width: 40em) {
+    grid-template-columns: auto 160px;
   }
 `
 
 const LinkText = styled(Link)`
   font-weight: 500;
   color: white;
-  margin-right: 1em;
+  margin-left: 2em;
   opacity: ${props => (!props.selected ? 1 : 0.4)};
   text-decoration: none;
+
+  @media screen and (max-width: 40em) {
+    display: none;
+  }
+`
+
+const NavLeft = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 `
 
 export default function NavHeader({
@@ -61,49 +77,40 @@ export default function NavHeader({
     for (var i = 0; i < directory.length; i++) {
       if (parseFloat(exchanges[directory[i].value].ethBalance) > 0.1) {
         let newd = filteredDirectory
+        if (isMobile && directory[i].label.length > 5) {
+          directory[i].label = directory[i].label.slice(0, 5) + '...'
+        }
         newd.push(directory[i])
         setDirectory(newd)
       }
     }
   }, [exchanges, directory, filteredDirectory])
 
+  const belowLarge = useMedia('(max-width: 640px)')
+  const history = useHistory()
+
   return (
-    <Header px={24} py={3} bg={['mineshaft', 'transparent']} color={['white', 'black']}>
-      <Title />
-      <Flex>
-        <NavWrapper></NavWrapper>
-      </Flex>
-      <FlexEnd>
-        {/* <LinkText to="/overview" selected={window.location.pathname !== '/overview'}>
+    <Header px={24} py={3} bg={['transparent', 'transparent']} color={['white', 'black']}>
+      <NavLeft>
+        <Title />
+        <LinkText to="/" selected={window.location.pathname !== '/overview'}>
           Overview
         </LinkText>
-        <LinkText to="/tokens" selected={window.location.pathname !== '/tokens'}>
-          Tokens
-        </LinkText> */}
-        <CurrencySelectFormatted
-          options={[
-            {
-              label: 'ETH',
-              value: 'ETH'
-            },
-            { label: 'USD', value: 'USD' }
-          ]}
-          value={currencyUnit === 'USD' ? { label: 'USD', value: 'USD' } : { label: 'ETH', value: 'ETH' }}
-          defaultValue={{ label: 'USD', value: 'USD' }}
-          onChange={select => {
-            setCurrencyUnit(select.value)
-          }}
-        />
-        <NavSelect
+      </NavLeft>
+      <NavRight>
+        <CurrencySelect setCurrencyUnit={setCurrencyUnit} currencyUnit={currencyUnit} />
+        <TokenSelect
           options={filteredDirectory}
           tokenSelect={true}
+          placeholder={belowLarge ? 'Tokens' : 'Find token or account'}
           onChange={select => {
             if (exchangeAddress !== select.value) {
               switchActiveExchange(select.value)
+              history.push('/tokens')
             }
           }}
         />
-      </FlexEnd>
+      </NavRight>
     </Header>
   )
 }

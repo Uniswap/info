@@ -11,7 +11,8 @@ import TransactionsList from '../components/TransactionsList'
 import Chart from '../components/Chart'
 import Loader from '../components/Loader'
 import TokenLogo from '../components/TokenLogo'
-import { Divider, Hint, Address } from '../components'
+import { Divider, Hint } from '../components'
+import { useMedia } from 'react-use'
 
 const timeframeOptions = [
   { value: '1week', label: '1 week' },
@@ -26,13 +27,13 @@ const SmallText = styled.span`
 
 const ThemedBackground = styled(Box)`
   position: absolute;
-  height: 396px;
+  height: 358px;
   z-index: -1;
   top: 0;
   width: 100vw;
 
-  @media screen and (max-width: 40em) {
-    height: 600px;
+  @media screen and (max-width: 64em) {
+    height: 679px;
   }
 
   ${props => !props.last}
@@ -52,12 +53,11 @@ const TopPanel = styled(Panel)`
 
   @media screen and (max-width: 64em) {
     width: 100%;
-    background-color: #2b2b2b;
     border-radius: 0
 
     &:nth-of-type(3) {
-      height: 110px;
-      margin-bottom: -10px;
+      margin-bottom: 20px;
+      border-radius: 0 0 1em 1em;
     }
 
     &:first-of-type {
@@ -84,35 +84,29 @@ const TokenHeader = styled(Box)`
   font-weight: 600;
   font-size: 20px;
   width: 100%;
-  max-width: 1280px;
-  padding: 24px;
-  height: 100px;
+  padding: 20px;
+  padding-top: 24px;
+  padding-bottom: 20px;
   display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-
-  @media screen and (min-width: 40em) {
-    font-size: 32px;
-    display: grid;
-    grid-gap: 16px;
-    grid-template-rows: 1fr;
-    justify-content: flex-start;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: flex-start;
-  }
+  margin: auto;
+  max-width: 1280px;
+  flex-direction: column;
+  align-items: flex-start;
 
   @media screen and (min-width: 64em) {
     display: flex;
     flex-direction: row;
-    align-items: center;
-    padding: 0 0 24px 24px;
+    font-size: 32px;
+    align-items: flex-end;
+    justify-content: flex-start;
+    padding-left: 24px;
+    padding-right: 24px;
+    max-width: 1280px;
   }
 `
 
 const TextOption = styled(Text)`
+  font-weight: 500;
   &:hover {
     cursor: pointer;
   }
@@ -180,14 +174,12 @@ const ChartWrapper = styled(Panel)`
   boxshadow: 0px 4px 20px rgba(239, 162, 250, 0.15);
 
   @media screen and (max-width: 64em) {
-    display: none;
+    margin-bottom: 20px;
+    border-radius: 12px;
   }
 `
 const TokenName = styled.div`
   margin-right: 10px;
-  @media screen and (max-width: 40em) {
-    display: none;
-  }
 `
 
 const TokenPrice = styled.div`
@@ -230,15 +222,17 @@ const BuyButton = styled(Box)`
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 40px;
+  height: 50px;
   font-size: 16px;
   color: white;
   background-color: #2f80ed;
-  width: 180px;
-  border-radius: 20px;
-  margin-left: 24px;
+  border-radius: 32px;
   font-weight: 600;
-  width: 130px;
+  width: 46%;
+`
+
+const ExchangeButtons = styled(Flex)`
+  padding: 20px 20px;
 `
 
 const FrameBorder = styled.div`
@@ -253,6 +247,38 @@ const CloseIcon = styled.div`
   font-size: 30px;
   top: 20px;
   right: 20px;
+`
+
+const PricePanelMobile = styled(Panel)`
+  padding: 24px;
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.15);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-radius: 20px;
+  margin-top: 20px;
+
+  @media screen and (min-width: 64em) {
+    display: none;
+  }
+`
+
+const AddressLink = styled.a`
+  font-weight: 500;
+  color: #2f80ed;
+  text-decoration: none;
+`
+
+const DashboardWrapper = styled.div`
+  width: calc(100% -40px);
+  padding-left: 20px;
+  padding-right: 20px;
+
+  @media screen and (max-width: 40em) {
+    width: 100%;
+    padding: 0;
+  }
 `
 
 export const MainPage = function({
@@ -296,95 +322,40 @@ export const MainPage = function({
     return number
   }
 
-  function getFrameWidth() {
-    if (window.screen.width <= 440) {
-      return '300px'
-    }
-    return '400px'
-  }
+  const belowMedium = useMedia('(max-width: 440px)')
+
+  const belowLarge = useMedia('(max-width: 64em)')
 
   return (
-    <>
+    <div style={{ width: '100%' }}>
       <ThemedBackground bg="token" />
-      <TokenHeader mx="auto" px={[0, 3]}>
+      <TokenHeader>
         <TokenGroup>
-          <StyledTokenLogo address={tokenAddress ? tokenAddress : ''} />
+          <StyledTokenLogo address={tokenAddress ? tokenAddress : ''} header={true} size={30} />
           <TokenName>{tokenName ? tokenName + ' ' : '-'}</TokenName>
-          <div>{symbol ? '(' + symbol + ')' : ''}</div>
+          <div>{'(' + symbol + ')'}</div>
         </TokenGroup>
-        <TokenGroup>
-          <TokenPrice>
-            {invPrice && priceUSD
-              ? currencyUnit === 'USD'
-                ? '$' + formattedNum(priceUSD, 2)
-                : 'Ξ ' + formattedNum(invPrice, 4) + ' ETH'
-              : ''}
-          </TokenPrice>
-          {pricePercentChange && isFinite(pricePercentChange) ? (
-            <TopPercent>
-              <Text fontSize={14} lineHeight={1.4} color="white">
-                {pricePercentChange > 0
-                  ? pricePercentChange + '% ↑'
-                  : pricePercentChange < 0
-                  ? pricePercentChange + '% ↓'
-                  : pricePercentChange + '%'}
-              </Text>
-            </TopPercent>
-          ) : (
-            ''
-          )}
-        </TokenGroup>
-        {showModal && tokenAddress ? (
-          <FrameWrapper
-            onClick={() => {
-              ToggleModal(false)
-            }}
-          >
-            <CloseIcon>✕</CloseIcon>
-            <FrameBorder>
-              <Iframe
-                url={
-                  buyToggle
-                    ? 'https://uniswap.exchange/swap?outputCurrency=' + tokenAddress.toString()
-                    : 'https://uniswap.exchange/swap?inputCurrency=' + tokenAddress.toString()
-                }
-                height="680px"
-                width={getFrameWidth()}
-                id="myId"
-                frameBorder="0"
-                style={{ border: 'none', outline: 'none' }}
-                display="initial"
-                position="relative"
-              />
-            </FrameBorder>
-          </FrameWrapper>
-        ) : (
-          ''
-        )}
-      </TokenHeader>
-      <Dashboard mx="auto" px={[0, 3]}>
-        <TopPanel rounded color="white" p={24} style={{ gridArea: 'volume' }}>
+        <PricePanelMobile rounded bg="token" color="white">
           <FourByFour
-            topLeft={<Hint color="textLight">Volume (24hrs)</Hint>}
+            topLeft={<Hint color="textLight">Price</Hint>}
             bottomLeft={
               <Text fontSize={24} lineHeight={1.4} fontWeight={500}>
-                {invPrice && price && priceUSD
+                {invPrice && priceUSD
                   ? currencyUnit === 'USD'
-                    ? '$' + formattedNum(tradeVolume * price * priceUSD, 2)
-                    : 'Ξ ' + formattedNum(tradeVolume, 4)
-                  : '-'}
-                {currencyUnit !== 'USD' ? <SmallText> ETH</SmallText> : ''}
+                    ? '$' + formattedNum(priceUSD, 2)
+                    : 'Ξ ' + formattedNum(invPrice, 4) + ' ETH'
+                  : ''}
               </Text>
             }
             bottomRight={
               volumePercentChange && isFinite(volumePercentChange) ? (
                 <div>
                   <Text fontSize={14} lineHeight={1.4} color="white">
-                    {volumePercentChange > 0
-                      ? volumePercentChange + '% ↑'
-                      : volumePercentChange < 0
-                      ? volumePercentChange + '% ↓'
-                      : volumePercentChange + '%'}
+                    {pricePercentChange > 0
+                      ? pricePercentChange + '% ↑'
+                      : pricePercentChange < 0
+                      ? pricePercentChange + '% ↓'
+                      : pricePercentChange + '%'}
                   </Text>
                 </div>
               ) : (
@@ -392,104 +363,174 @@ export const MainPage = function({
               )
             }
           />
-        </TopPanel>
-        <TopPanel rounded color="white" p={24} style={{ gridArea: 'liquidity' }}>
-          <FourByFour
-            topLeft={<Hint color="textLight">Total Liquidity</Hint>}
-            bottomLeft={
-              <Text fontSize={24} lineHeight={1.4} fontWeight={500}>
-                {ethLiquidity && priceUSD && price && !isNaN(ethLiquidity)
-                  ? currencyUnit !== 'USD'
-                    ? 'Ξ ' + formattedNum(ethLiquidity * 2, 4)
-                    : '$' + formattedNum(parseFloat(ethLiquidity) * price * priceUSD * 2, 2)
-                  : '-'}
-                {currencyUnit === 'USD' ? '' : <SmallText> ETH</SmallText>}
-              </Text>
-            }
-            bottomRight={
-              liquidityPercentChange && isFinite(liquidityPercentChange) ? (
-                <div>
-                  <Text fontSize={14} lineHeight={1.4} color="white">
-                    {liquidityPercentChange > 0
-                      ? liquidityPercentChange + '% ↑'
-                      : liquidityPercentChange < 0
-                      ? liquidityPercentChange + '% ↓'
-                      : liquidityPercentChange + '%'}
-                  </Text>
-                </div>
-              ) : (
-                ''
-              )
-            }
-          />
-        </TopPanel>
-        <TopPanel rounded bg="white" color="white" style={{ gridArea: 'shares' }} p={24}>
-          <FourByFour
-            topLeft={<Hint color="textLight">Transactions (24hrs)</Hint>}
-            bottomLeft={
-              <Text fontSize={24} lineHeight={1.4} fontWeight={500}>
-                {txCount}
-              </Text>
-            }
-          />
-        </TopPanel>
-
-        <ChartWrapper rounded bg="white" area="statistics">
-          <Box p={24}>
-            <Flex alignItems="center" justifyContent="space-between">
-              <Flex alignItems="center" justifyContent="space-between">
-                <TextOption
-                  color={chartOption === 'liquidity' ? 'inherit' : 'grey'}
-                  onClick={e => {
-                    setChartOption('liquidity')
-                  }}
-                >
-                  Liquidity
-                </TextOption>
-                <TextOption
-                  style={{ marginLeft: '2em' }}
-                  color={chartOption === 'volume' ? 'inherit' : 'grey'}
-                  onClick={e => {
-                    setChartOption('volume')
-                  }}
-                >
-                  Volume
-                </TextOption>
-              </Flex>
-              <Box width={144}>
-                <Select
-                  placeholder="Timeframe"
-                  options={timeframeOptions}
-                  defaultValue={timeframeOptions[3]}
-                  onChange={select => {
-                    setHistoryDaysToQuery(select.value)
-                  }}
-                  customStyles={{ backgroundColor: 'white' }}
-                />
-              </Box>
-            </Flex>
-          </Box>
-          <Divider />
-          <Box p={24}>
-            {chartData && chartData.length > 0 ? (
-              <Chart
-                symbol={symbol}
-                exchangeAddress={exchangeAddress}
-                data={chartData}
-                currencyUnit={currencyUnit}
-                chartOption={chartOption}
-              />
+        </PricePanelMobile>
+        {!belowLarge ? (
+          <TokenGroup>
+            <TokenPrice>
+              {invPrice && priceUSD
+                ? currencyUnit === 'USD'
+                  ? '$' + formattedNum(priceUSD, 2)
+                  : 'Ξ ' + formattedNum(invPrice, 4) + ' ETH'
+                : ''}
+            </TokenPrice>
+            {pricePercentChange && isFinite(pricePercentChange) ? (
+              <TopPercent>
+                <Text fontSize={14} lineHeight={1.4} color="white">
+                  {pricePercentChange > 0
+                    ? pricePercentChange + '% ↑'
+                    : pricePercentChange < 0
+                    ? pricePercentChange + '% ↓'
+                    : pricePercentChange + '%'}
+                </Text>
+              </TopPercent>
             ) : (
-              <Loader />
+              ''
             )}
-          </Box>
-        </ChartWrapper>
-        <Panel rounded bg="white" area="exchange" style={{ boxShadow: '0px 4px 20px rgba(239, 162, 250, 0.15)' }}>
-          <Box style={{ padding: '34px 0px' }}>
-            <Hint color="textSubtext" mb={3} style={{ paddingLeft: '24px', paddingBottom: '6px' }}>
-              Exchange
-            </Hint>
-            <Flex alignItems="center" justifyContent="flex-start">
+          </TokenGroup>
+        ) : (
+          ''
+        )}
+      </TokenHeader>
+      <DashboardWrapper>
+        <Dashboard mx="auto" px={[0, 0]}>
+          <TopPanel rounded bg="token" color="white" p={24} style={{ gridArea: 'volume' }}>
+            <FourByFour
+              topLeft={<Hint color="textLight">Volume (24hrs)</Hint>}
+              bottomLeft={
+                <Text fontSize={24} lineHeight={1.4} fontWeight={500}>
+                  {invPrice && price && priceUSD
+                    ? currencyUnit === 'USD'
+                      ? '$' + formattedNum(tradeVolume * price * priceUSD, 2)
+                      : 'Ξ ' + formattedNum(tradeVolume, 4)
+                    : '-'}
+                  {currencyUnit !== 'USD' ? <SmallText> ETH</SmallText> : ''}
+                </Text>
+              }
+              bottomRight={
+                volumePercentChange && isFinite(volumePercentChange) ? (
+                  <div>
+                    <Text fontSize={14} lineHeight={1.4} color="white">
+                      {volumePercentChange > 0
+                        ? volumePercentChange + '% ↑'
+                        : volumePercentChange < 0
+                        ? volumePercentChange + '% ↓'
+                        : volumePercentChange + '%'}
+                    </Text>
+                  </div>
+                ) : (
+                  ''
+                )
+              }
+            />
+          </TopPanel>
+          <TopPanel rounded bg="token" color="white" p={24} style={{ gridArea: 'liquidity' }}>
+            <FourByFour
+              topLeft={<Hint color="textLight">Total Liquidity</Hint>}
+              bottomLeft={
+                <Text fontSize={24} lineHeight={1.4} fontWeight={500}>
+                  {ethLiquidity && priceUSD && price && !isNaN(ethLiquidity)
+                    ? currencyUnit !== 'USD'
+                      ? 'Ξ ' + formattedNum(ethLiquidity * 2, 4)
+                      : '$' + formattedNum(parseFloat(ethLiquidity) * price * priceUSD * 2, 2)
+                    : '-'}
+                  {currencyUnit === 'USD' ? '' : <SmallText> ETH</SmallText>}
+                </Text>
+              }
+              bottomRight={
+                liquidityPercentChange && isFinite(liquidityPercentChange) ? (
+                  <div>
+                    <Text fontSize={14} lineHeight={1.4} color="white">
+                      {liquidityPercentChange > 0
+                        ? liquidityPercentChange + '% ↑'
+                        : liquidityPercentChange < 0
+                        ? liquidityPercentChange + '% ↓'
+                        : liquidityPercentChange + '%'}
+                    </Text>
+                  </div>
+                ) : (
+                  ''
+                )
+              }
+            />
+          </TopPanel>
+          <TopPanel rounded bg="token" color="white" style={{ gridArea: 'shares' }} p={24}>
+            <FourByFour
+              topLeft={<Hint color="textLight">Transactions (24hrs)</Hint>}
+              bottomLeft={
+                <Text fontSize={24} lineHeight={1.4} fontWeight={500}>
+                  {txCount}
+                </Text>
+              }
+            />
+          </TopPanel>
+          <ChartWrapper
+            rounded
+            bg="white"
+            area="statistics"
+            style={{ boxShadow: '0px 4px 20px rgba(239, 162, 250, 0.15)' }}
+          >
+            <Box p={24}>
+              <Flex alignItems="center" justifyContent="space-between">
+                <Flex alignItems="center" justifyContent="space-between">
+                  <TextOption
+                    color={chartOption === 'liquidity' ? 'inherit' : 'grey'}
+                    onClick={e => {
+                      setChartOption('liquidity')
+                    }}
+                  >
+                    Liquidity
+                  </TextOption>
+                  <TextOption
+                    style={{ marginLeft: !belowMedium ? '2em' : '0.6em' }}
+                    color={chartOption === 'volume' ? 'inherit' : 'grey'}
+                    onClick={e => {
+                      setChartOption('volume')
+                    }}
+                  >
+                    Volume
+                  </TextOption>
+                </Flex>
+                <Box width={144}>
+                  <Select
+                    placeholder="Timeframe"
+                    options={timeframeOptions}
+                    defaultValue={timeframeOptions[3]}
+                    onChange={select => {
+                      setHistoryDaysToQuery(select.value)
+                    }}
+                    customStyles={{ backgroundColor: 'white' }}
+                  />
+                </Box>
+              </Flex>
+            </Box>
+            <Divider />
+            <Box p={24}>
+              {chartData && chartData.length > 0 ? (
+                <Chart
+                  symbol={symbol}
+                  exchangeAddress={exchangeAddress}
+                  data={chartData}
+                  currencyUnit={currencyUnit}
+                  chartOption={chartOption}
+                />
+              ) : (
+                <Loader />
+              )}
+            </Box>
+          </ChartWrapper>
+          <Panel rounded bg="white" area="exchange" style={{ boxShadow: '0px 4px 20px rgba(239, 162, 250, 0.15)' }}>
+            <Box p={24}>
+              <Flex alignItems="center" justifyContent="space-between">
+                <Flex alignItems="center" justifyContent="space-between" style={{ fontWeight: 500, height: '36px' }}>
+                  <div>Exchange</div>
+                </Flex>
+                <AddressLink href={'https://www.etherscan.io/address/' + exchangeAddress + '/'} target="_blank">
+                  View Exchange ↗
+                </AddressLink>
+              </Flex>
+            </Box>
+            <Divider />
+            <ExchangeButtons alignItems="center" justifyContent="space-between">
               <BuyButton
                 // bg="token"
                 onClick={() => {
@@ -497,7 +538,7 @@ export const MainPage = function({
                   ToggleModal(true)
                 }}
               >
-                {'Buy ' + symbol}
+                {'Buy'}
               </BuyButton>
               <BuyButton
                 bg="token"
@@ -506,92 +547,117 @@ export const MainPage = function({
                   ToggleModal(true)
                 }}
               >
-                {'Sell ' + symbol}
+                {'Sell'}
               </BuyButton>
-            </Flex>
-          </Box>
-          <Divider />
-          <Box p={24}>
-            <Hint color="textSubtext" mb={3}>
-              Token Address
-            </Hint>
-            <Address address={tokenAddress} />
-          </Box>
-          <Box p={24}>
-            <Hint color="textSubtext" mb={3}>
-              Exchange Address
-            </Hint>
-            <Address address={exchangeAddress} />
-          </Box>
-        </Panel>
-        <ListOptions style={{ gridArea: 'listOptions' }}>
-          <OptionsWrappper>
-            <Text
-              onClick={e => {
-                setTxFilter('All')
-              }}
-              color={txFilter !== 'All' ? 'textDim' : 'black'}
-            >
-              All
-            </Text>
-            <Text
-              onClick={e => {
-                setTxFilter('Swaps')
-              }}
-              color={txFilter !== 'Swaps' ? 'textDim' : 'black'}
-            >
-              Swaps
-            </Text>
-            <Text
-              onClick={e => {
-                setTxFilter('Add')
-              }}
-              color={txFilter !== 'Add' ? 'textDim' : 'black'}
-            >
-              Add
-            </Text>
-            <Text
-              onClick={e => {
-                setTxFilter('Remove')
-              }}
-              color={txFilter !== 'Remove' ? 'textDim' : 'black'}
-            >
-              Remove
-            </Text>
-          </OptionsWrappper>
-          <AccountSearchWrapper>
-            <AccountSearch
-              value={accountInput}
-              placeholder={'Filter by account'}
-              onChange={e => {
-                setAccountInput(e.target.value)
-              }}
+            </ExchangeButtons>
+            <Divider />
+            <Box p={24}>
+              <AddressLink href={'https://www.etherscan.io/token/' + tokenAddress + '/'} target="_blank">
+                Token Address ↗
+              </AddressLink>
+            </Box>
+            <Box p={24}>
+              <AddressLink href={'https://www.etherscan.io/address/' + exchangeAddress + '/'} target="_blank">
+                Exchange Address ↗
+              </AddressLink>
+            </Box>
+          </Panel>
+          <ListOptions style={{ gridArea: 'listOptions' }}>
+            <OptionsWrappper>
+              <Text
+                onClick={e => {
+                  setTxFilter('All')
+                }}
+                color={txFilter !== 'All' ? 'textDim' : 'black'}
+              >
+                All
+              </Text>
+              <Text
+                onClick={e => {
+                  setTxFilter('Swaps')
+                }}
+                color={txFilter !== 'Swaps' ? 'textDim' : 'black'}
+              >
+                Swaps
+              </Text>
+              <Text
+                onClick={e => {
+                  setTxFilter('Add')
+                }}
+                color={txFilter !== 'Add' ? 'textDim' : 'black'}
+              >
+                Add
+              </Text>
+              <Text
+                onClick={e => {
+                  setTxFilter('Remove')
+                }}
+                color={txFilter !== 'Remove' ? 'textDim' : 'black'}
+              >
+                Remove
+              </Text>
+            </OptionsWrappper>
+            <AccountSearchWrapper>
+              <AccountSearch
+                value={accountInput}
+                placeholder={'Filter by account'}
+                onChange={e => {
+                  setAccountInput(e.target.value)
+                }}
+              />
+              <EmojiWrapper>
+                <span role="img" aria-label="magnify">
+                  🔍
+                </span>
+              </EmojiWrapper>
+            </AccountSearchWrapper>
+          </ListOptions>
+          <Panel rounded bg="white" area="transactions" style={{ marginTop: '20px' }}>
+            {exchangeAddress ? (
+              <TransactionsList
+                currencyUnit={currencyUnit}
+                price={price}
+                accountInput={accountInput}
+                priceUSD={priceUSD}
+                tokenSymbol={symbol}
+                setTxCount={setTxCount}
+                exchangeAddress={exchangeAddress}
+                txFilter={txFilter}
+              />
+            ) : (
+              <Loader />
+            )}
+          </Panel>
+        </Dashboard>
+      </DashboardWrapper>
+      {showModal && tokenAddress ? (
+        <FrameWrapper
+          onClick={() => {
+            ToggleModal(false)
+          }}
+        >
+          <CloseIcon>✕</CloseIcon>
+          <FrameBorder>
+            <Iframe
+              url={
+                buyToggle
+                  ? 'https://uniswap.exchange/swap?outputCurrency=' + tokenAddress.toString()
+                  : 'https://uniswap.exchange/swap?inputCurrency=' + tokenAddress.toString()
+              }
+              height="680px"
+              width={belowMedium ? '300px' : '400px'}
+              id="myId"
+              frameBorder="0"
+              style={{ border: 'none', outline: 'none' }}
+              display="initial"
+              position="relative"
             />
-            <EmojiWrapper>
-              <span role="img" aria-label="magnify">
-                🔍
-              </span>
-            </EmojiWrapper>
-          </AccountSearchWrapper>
-        </ListOptions>
-        <Panel rounded bg="white" area="transactions">
-          {exchangeAddress ? (
-            <TransactionsList
-              currencyUnit={currencyUnit}
-              price={price}
-              accountInput={accountInput}
-              priceUSD={priceUSD}
-              tokenSymbol={symbol}
-              setTxCount={setTxCount}
-              exchangeAddress={exchangeAddress}
-              txFilter={txFilter}
-            />
-          ) : (
-            <Loader />
-          )}
-        </Panel>
-      </Dashboard>
+          </FrameBorder>
+        </FrameWrapper>
+      ) : (
+        ''
+      )}
       <Footer />
-    </>
+    </div>
   )
 }

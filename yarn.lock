@@ -12131,6 +12131,13 @@ react-dev-utils@^9.0.4:
     strip-ansi "5.2.0"
     text-table "0.2.0"
 
+react-device-detect@^1.9.10:
+  version "1.9.10"
+  resolved "https://registry.yarnpkg.com/react-device-detect/-/react-device-detect-1.9.10.tgz#3ea17e1383fef87886fb85cc850747dad306d050"
+  integrity sha512-Rb618NuNwJojJeIgI5UoONwztbd4wMT4TBofzvYOHnPNu61LYYz8b78cXQb7kXRrPn6iI5T1gFtNQh0GxHEPxw==
+  dependencies:
+    ua-parser-js "^0.7.20"
+
 react-dom@^16.9.0:
   version "16.9.0"
   resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-16.9.0.tgz#5e65527a5e26f22ae3701131bcccaee9fb0d3962"
@@ -14526,7 +14533,7 @@ u2f-api@0.2.7:
   resolved "https://registry.yarnpkg.com/u2f-api/-/u2f-api-0.2.7.tgz#17bf196b242f6bf72353d9858e6a7566cc192720"
   integrity sha512-fqLNg8vpvLOD5J/z4B6wpPg4Lvowz1nJ9xdHcCzdUPKcFE/qNCceV2gNZxSJd5vhAZemHr/K/hbzVA0zxB5mkg==
 
-ua-parser-js@^0.7.18:
+ua-parser-js@^0.7.18, ua-parser-js@^0.7.20:
   version "0.7.20"
   resolved "https://registry.yarnpkg.com/ua-parser-js/-/ua-parser-js-0.7.20.tgz#7527178b82f6a62a0f243d1f94fd30e3e3c21098"
   integrity sha512-8OaIKfzL5cpx8eCMAhhvTlft8GYF8b2eQr6JkCyVdrgjcytyOmPCXrqXFcUnhonRpLlh5yxEZVohm6mzaowUOw==

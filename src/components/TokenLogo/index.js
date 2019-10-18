@@ -21,9 +21,12 @@ const PlaceHolder = styled.div`
   border-radius: 1rem;
   display: flex;
   align-items: center;
+  justify-items: center;
+  margin-right: ${({ header }) => (header ? '0.5em' : '0')};
+  margin-top: ${({ header }) => (header ? '-0.5em' : '0')};
 `
 
-export default function TokenLogo({ address, mkrLogo, size = '1rem', ...rest }) {
+export default function TokenLogo({ address, header = false, size = '1rem', ...rest }) {
   const [error, setError] = useState(false)
 
   useEffect(() => {
@@ -32,7 +35,7 @@ export default function TokenLogo({ address, mkrLogo, size = '1rem', ...rest }) 
 
   if (error || BAD_IMAGES[address]) {
     return (
-      <PlaceHolder size={size}>
+      <PlaceHolder size={size} header={header}>
         <span role="img" aria-label="thinking" style={{ height: '20px', width: '30px' }}>
           🤔
         </span>
