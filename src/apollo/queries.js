@@ -25,8 +25,13 @@ export const TRANSACTIONS_QUERY = gql`
 `
 
 export const TRANSACTIONS_QUERY_SKIPPABLE = gql`
-  query transactions($exchangeAddr: String!, $skip: Int!) {
-    transactions(skip: $skip, where: { exchangeAddress: $exchangeAddr }, orderBy: timestamp, orderDirection: desc) {
+  query transactions($timestamp: Int!, $exchangeAddr: String!, $skip: Int!) {
+    transactions(
+      skip: $skip
+      where: { timestamp_gt: $timestamp, exchangeAddress: $exchangeAddr }
+      orderBy: timestamp
+      orderDirection: desc
+    ) {
       id
       user
       block
@@ -52,19 +57,6 @@ export const TRANSACTIONS_QUERY_SKIPPABLE = gql`
         eth
         token
       }
-    }
-  }
-`
-
-export const PRICE_AT_TIME = gql`
-  query exchangeHistoricalDatas($timestamp: Int!, $exchangeAddr: String!) {
-    exchangeHistoricalDatas(
-      where: { timestamp_lt: $timestamp, exchangeAddress: $exchangeAddr }
-      first: 1
-      orderBy: tradeVolumeEth
-      orderDirection: desc
-    ) {
-      tokenPriceUSD
     }
   }
 `
@@ -104,10 +96,13 @@ export const TICKER_24HOUR_QUERY = gql`
       orderBy: tradeVolumeEth
       orderDirection: desc
     ) {
+      id
+      exchangeAddress
       price
       tradeVolumeEth
       ethBalance
       tokenPriceUSD
+      totalTxsCount
     }
   }
 `
@@ -135,10 +130,12 @@ export const OVERVIEW_PAGE_QUERY = gql`
       tokenSymbol
       tokenName
       priceUSD
+      totalTxsCount
     }
   }
 `
-export const TOTALS_QUERY = gql`
+
+export const UNISWAP_GLOBALS_QUERY = gql`
   query totals {
     uniswap(id: "1") {
       totalVolumeUSD
@@ -151,42 +148,32 @@ export const TOTALS_QUERY = gql`
   }
 `
 
-export const UNISWAP_24HOUR = gql`
+export const UNISWAP_GLOBALS_24HOURS_AGO_QUERY = gql`
   query uniswapDayDatas($date: Int!) {
-    uniswapDayDatas(where: { date: $date }, first: 1, orderBy: date, orderDirection: desc) {
+    uniswapDayDatas(where: { date_lt: $date }, first: 1, orderBy: date, orderDirection: desc) {
+      totalVolumeInEth
+      totalVolumeUSD
+      totalLiquidityInEth
+      totalLiquidityUSD
+      txCount
+      date
+    }
+  }
+`
+
+export const UNISWAP_CHART_QUERY = gql`
+  query uniswapDayDatas($date: Int!) {
+    uniswapDayDatas(where: { date_gt: $date }, orderBy: date, orderDirection: asc) {
+      date
       totalVolumeInEth
       totalLiquidityInEth
+      totalVolumeUSD
+      totalLiquidityUSD
+      totalTokenSells
+      totalTokenBuys
+      totalAddLiquidity
+      totalRemoveLiquidity
       txCount
-    }
-  }
-`
-
-export const OVERVIEW_PAGE_24HOUR = gql`
-  query exchangeHistoricalDatas($timestamp: Int!, $tokenAddress: String!) {
-    exchangeHistoricalDatas(
-      where: { timestamp_lt: $timestamp, tokenAddress: $tokenAddress }
-      first: 1
-      orderBy: timestamp
-      orderDirection: desc
-    ) {
-      tradeVolumeEth
-    }
-  }
-`
-
-export const USER_POOL_QUERY = gql`
-  query userExchangeData($id: String!) {
-    userExchangeData(id: $id) {
-      uniTokenBalance
-    }
-  }
-`
-
-export const TOTAL_POOL_QUERY = gql`
-  query exchange($id: String!) {
-    exchange(id: $id) {
-      totalUniToken
-      tokenAddress
     }
   }
 `

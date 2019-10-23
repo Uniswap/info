@@ -5,15 +5,15 @@ import Emoji from '../Emoji'
 
 export default function Title() {
   return (
-    <Link to="/" style={{ textDecoration: 'none' }}>
-      <Flex alignItems="center">
-        <Text fontSize="1.5rem" lineHeight="1">
-          <Emoji symbol="🦄" label="Unicorn" />
-        </Text>
+    <Flex alignItems="center">
+      <Text fontSize="1.5rem" lineHeight="1">
+        <Emoji symbol="🦄" label="Unicorn" />
+      </Text>
+      <Link style={{ textDecoration: 'none' }} to="/">
         <Text fontWeight={500} mx="0.5rem" color="white" lineHeight="1.5rem">
           Info
         </Text>
-      </Flex>
-    </Link>
+      </Link>
+    </Flex>
   )
 }

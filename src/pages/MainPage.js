@@ -27,7 +27,7 @@ const SmallText = styled.span`
 
 const ThemedBackground = styled(Box)`
   position: absolute;
-  height: 358px;
+  height: 378px;
   z-index: -1;
   top: 0;
   width: 100vw;
@@ -89,7 +89,7 @@ const TokenHeader = styled(Box)`
   padding-bottom: 20px;
   display: flex;
   margin: auto;
-  max-width: 1280px;
+  max-width: 1240px;
   flex-direction: column;
   align-items: flex-start;
 
@@ -99,9 +99,9 @@ const TokenHeader = styled(Box)`
     font-size: 32px;
     align-items: flex-end;
     justify-content: flex-start;
-    padding-left: 24px;
+    padding-left: 48px;
     padding-right: 24px;
-    max-width: 1280px;
+    max-width: 1320px;
   }
 `
 
@@ -287,6 +287,7 @@ export const MainPage = function({
   symbol,
   tradeVolume,
   pricePercentChange,
+  pricePercentChangeETH,
   volumePercentChange,
   liquidityPercentChange,
   tokenName,
@@ -314,12 +315,17 @@ export const MainPage = function({
     setTxCount('-')
   }, [exchangeAddress])
 
-  function formattedNum(num, decimals) {
-    let number = Number(parseFloat(num).toFixed(decimals)).toLocaleString()
-    if (number < 0.0001) {
+  function formattedNum(num, usd = false) {
+    if (num === 0) {
+      return 0
+    }
+    if (num < 0.0001) {
       return '< 0.0001'
     }
-    return number
+    if (usd && num >= 0.01) {
+      return Number(parseFloat(num).toFixed(2)).toLocaleString()
+    }
+    return Number(parseFloat(num).toFixed(4)).toLocaleString()
   }
 
   const belowMedium = useMedia('(max-width: 440px)')
@@ -342,24 +348,28 @@ export const MainPage = function({
               <Text fontSize={24} lineHeight={1.4} fontWeight={500}>
                 {invPrice && priceUSD
                   ? currencyUnit === 'USD'
-                    ? '$' + formattedNum(priceUSD, 2)
-                    : 'Ξ ' + formattedNum(invPrice, 4) + ' ETH'
+                    ? '$' + formattedNum(priceUSD, true)
+                    : 'Ξ ' + formattedNum(invPrice) + ' ETH'
                   : ''}
               </Text>
             }
             bottomRight={
-              volumePercentChange && isFinite(volumePercentChange) ? (
-                <div>
-                  <Text fontSize={14} lineHeight={1.4} color="white">
-                    {pricePercentChange > 0
-                      ? pricePercentChange + '% ↑'
-                      : pricePercentChange < 0
-                      ? pricePercentChange + '% ↓'
-                      : pricePercentChange + '%'}
-                  </Text>
-                </div>
+              currencyUnit === 'USD' ? (
+                <Text fontSize={14} lineHeight={1.8} color="white">
+                  {pricePercentChange > 0
+                    ? pricePercentChange + '% ↑'
+                    : pricePercentChange < 0
+                    ? pricePercentChange + '% ↓'
+                    : pricePercentChange + '%'}
+                </Text>
               ) : (
-                ''
+                <Text fontSize={14} lineHeight={1.8} color="white">
+                  {pricePercentChangeETH > 0
+                    ? pricePercentChangeETH + '% ↑'
+                    : pricePercentChangeETH < 0
+                    ? pricePercentChangeETH + '% ↓'
+                    : pricePercentChangeETH + '%'}
+                </Text>
               )
             }
           />
@@ -369,19 +379,29 @@ export const MainPage = function({
             <TokenPrice>
               {invPrice && priceUSD
                 ? currencyUnit === 'USD'
-                  ? '$' + formattedNum(priceUSD, 2)
-                  : 'Ξ ' + formattedNum(invPrice, 4) + ' ETH'
+                  ? '$' + formattedNum(priceUSD, true)
+                  : 'Ξ ' + formattedNum(invPrice) + ' ETH'
                 : ''}
             </TokenPrice>
             {pricePercentChange && isFinite(pricePercentChange) ? (
               <TopPercent>
-                <Text fontSize={14} lineHeight={1.4} color="white">
-                  {pricePercentChange > 0
-                    ? pricePercentChange + '% ↑'
-                    : pricePercentChange < 0
-                    ? pricePercentChange + '% ↓'
-                    : pricePercentChange + '%'}
-                </Text>
+                {currencyUnit === 'USD' ? (
+                  <Text fontSize={14} lineHeight={1.8} color="white">
+                    {pricePercentChange > 0
+                      ? pricePercentChange + '% ↑'
+                      : pricePercentChange < 0
+                      ? pricePercentChange + '% ↓'
+                      : pricePercentChange + '%'}
+                  </Text>
+                ) : (
+                  <Text fontSize={14} lineHeight={1.8} color="white">
+                    {pricePercentChangeETH > 0
+                      ? pricePercentChangeETH + '% ↑'
+                      : pricePercentChangeETH < 0
+                      ? pricePercentChangeETH + '% ↓'
+                      : pricePercentChangeETH + '%'}
+                  </Text>
+                )}
               </TopPercent>
             ) : (
               ''
@@ -400,8 +420,8 @@ export const MainPage = function({
                 <Text fontSize={24} lineHeight={1.4} fontWeight={500}>
                   {invPrice && price && priceUSD
                     ? currencyUnit === 'USD'
-                      ? '$' + formattedNum(tradeVolume * price * priceUSD, 2)
-                      : 'Ξ ' + formattedNum(tradeVolume, 4)
+                      ? '$' + formattedNum(tradeVolume * price * priceUSD, true)
+                      : 'Ξ ' + formattedNum(tradeVolume)
                     : '-'}
                   {currencyUnit !== 'USD' ? <SmallText> ETH</SmallText> : ''}
                 </Text>
@@ -430,8 +450,8 @@ export const MainPage = function({
                 <Text fontSize={24} lineHeight={1.4} fontWeight={500}>
                   {ethLiquidity && priceUSD && price && !isNaN(ethLiquidity)
                     ? currencyUnit !== 'USD'
-                      ? 'Ξ ' + formattedNum(ethLiquidity * 2, 4)
-                      : '$' + formattedNum(parseFloat(ethLiquidity) * price * priceUSD * 2, 2)
+                      ? 'Ξ ' + formattedNum(ethLiquidity * 2)
+                      : '$' + formattedNum(parseFloat(ethLiquidity) * price * priceUSD * 2, true)
                     : '-'}
                   {currencyUnit === 'USD' ? '' : <SmallText> ETH</SmallText>}
                 </Text>

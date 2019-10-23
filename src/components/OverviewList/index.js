@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react'
+import { useHistory } from 'react-router-dom'
+import { useMedia } from 'react-use'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { client } from '../../apollo/client'
@@ -37,13 +39,36 @@ const List = styled(Box)`
 `
 
 const DashGrid = styled.div`
-  display: flex;
+  display: grid;
+  grid-gap: 1em;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-areas: 'symbol liquidity volume';
 
   > * {
     justify-content: flex-end;
+    width: 100%;
 
     &:first-child {
       justify-content: flex-start;
+      width: 100px;
+    }
+  }
+
+  @media screen and (min-width: 40em) {
+    max-width: 1280px;
+    display: grid;
+    grid-gap: 1em;
+    grid-template-columns: 0.8fr 1fr 1fr 1fr;
+    grid-template-areas: 'name txs liquidity volume';
+
+    > * {
+      justify-content: flex-end;
+      width: 100%;
+
+      &:first-child {
+        justify-content: flex-start;
+        width: 240px;
+      }
     }
   }
 
@@ -51,8 +76,15 @@ const DashGrid = styled.div`
     max-width: 1280px;
     display: grid;
     grid-gap: 1em;
-    grid-template-columns: 1.6fr 1fr 1fr 1fr 0.6fr 1fr;
-    grid-template-areas: 'name symbol price liquidity txs volume';
+    grid-template-columns: 1fr 0.8fr 0.8fr 1fr 1fr 1fr;
+    grid-template-areas: 'name symbol price txs liquidity volume';
+  }
+`
+
+const DashGridClickable = styled(DashGrid)`
+  :hover {
+    background-color: #f8f8f8;
+    cursor: pointer;
   }
 `
 
@@ -61,39 +93,74 @@ const ListWrapper = styled.div`
 `
 
 const ClickableText = styled(Text)`
+  text-align: right;
+
   &:hover {
     cursor: pointer;
     opacity: 0.6;
   }
 `
 
-const DesktopOnly = styled(Flex)`
-  @media screen and (max-width: 44em) {
-    display: none;
+const DataText = styled(Flex)`
+  @media screen and (max-width: 40em) {
+    font-size: 14px;
+  }
+
+  @media screen and (max-width: 64em) {
+    padding: 0px;
+  }
+
+  padding: 18px;
+  align-items: center;
+  text-align: right;
+
+  & > * {
+    font-size: 1em;
   }
 `
 
 const LogoBox = styled.div`
   width: 30px;
+  padding-left: 4px;
   display: flex;
   justify-content: center;
   align-items: center;
+  margin-right: 20px;
+
+  @media screen and (max-width: 40em) {
+    margin-right: 6px;
+  }
 `
 
-const SORT_FIELD = {
-  PRICE: 'priceUSD',
-  LIQUIDITY: 'ethBalance',
-  TRANSACTIIONS: 'transactions',
-  VOLUME: 'oneDayVolume'
-}
+const LogoTextWrapper = styled(Flex)`
+  align-items: center;
+  padding: 18px;
+
+  @media screen and (max-width: 64em) {
+    padding: 12px;
+  }
+
+  @media screen and (max-width: 40em) {
+    padding: 12px 0px;
+  }
+`
 
 // @TODO rework into virtualized list
-function OverviewList({ tokenSymbol, exchangeAddress, price, priceUSD, setTxCount, txFilter, accountInput }) {
+function OverviewList({
+  tokenSymbol,
+  switchActiveExchange,
+  exchangeAddress,
+  price,
+  priceUSD,
+  setTxCount,
+  txFilter,
+  accountInput
+}) {
   const [txs, setTxs] = useState([])
 
-  const [volumeMap, setVolumeMap] = useState([])
-
   const [filteredTxs, SetFilteredTxs] = useState([])
+
+  const [volumeMap, setVolumeMap] = useState({})
 
   const [page, setPage] = useState(1)
 
@@ -105,36 +172,55 @@ function OverviewList({ tokenSymbol, exchangeAddress, price, priceUSD, setTxCoun
 
   const [sortDirection, setSortDirection] = useState(true)
 
-  const [sortedColumn, setSortedColumn] = useState(SORT_FIELD.TIME)
+  const history = useHistory()
 
-  function formattedNum(num, decimals) {
-    let number = Number(parseFloat(num).toFixed(decimals)).toLocaleString()
-    if (number < 0.0001) {
+  function formattedNum(num, usd = false) {
+    if (num === 0) {
+      return 0
+    }
+    if (num < 0.0001) {
       return '< 0.0001'
     }
-    return number
+    if (usd && num >= 0.01) {
+      return Number(parseFloat(num).toFixed(2)).toLocaleString()
+    }
+    return Number(parseFloat(num).toFixed(4)).toLocaleString()
   }
 
-  function formattedNumUsd(num, decimals) {
-    let number = Number(parseFloat(num).toFixed(decimals)).toLocaleString()
-    if (number < 0.0001) {
-      return ' < $0.0001'
-    }
-    return '$' + number
+  const SORT_FIELD = {
+    PRICE: 'priceUSD',
+    LIQUIDITY: 'ethBalance',
+    TRANSACTIIONS: 'totalTxsCount',
+    VOLUME: 'volume'
   }
+
+  const [sortedColumn, setSortedColumn] = useState(SORT_FIELD.LIQUIDITY)
 
   function sortTxs(field) {
-    let newTxs = filteredTxs
-      .slice()
-      .sort((a, b) =>
-        parseFloat(a[field]) > parseFloat(b[field]) ? (sortDirection ? -1 : 1) * -1 : (sortDirection ? -1 : 1) * 1
-      )
-    SetFilteredTxs(newTxs)
+    if (field === SORT_FIELD.VOLUME) {
+      let newTxs = filteredTxs.slice().sort((a, b) => {
+        if (volumeMap.hasOwnProperty(a.id) && volumeMap.hasOwnProperty(b.id)) {
+          return parseFloat(volumeMap[a.id].volume) > parseFloat(volumeMap[b.id].volume)
+            ? (sortDirection ? -1 : 1) * 1
+            : (sortDirection ? -1 : 1) * -1
+        } else {
+          return 1
+        }
+      })
+      SetFilteredTxs(newTxs)
+    } else {
+      let newTxs = filteredTxs.slice().sort((a, b) => {
+        return parseFloat(a[field]) > parseFloat(b[field])
+          ? (sortDirection ? -1 : 1) * -1
+          : (sortDirection ? -1 : 1) * 1
+      })
+      SetFilteredTxs(newTxs)
+    }
   }
 
   useEffect(() => {
     setSortDirection(true)
-  }, [txFilter, txs])
+  }, [txs])
 
   // get the data
   useEffect(() => {
@@ -150,7 +236,7 @@ function OverviewList({ tokenSymbol, exchangeAddress, price, priceUSD, setTxCoun
         if (result) {
           setLoading(false)
           fetchingData = false
-          setMaxPage(Math.floor(result.data.exchanges.length / TXS_PER_PAGE) + 1)
+          setMaxPage(Math.floor(result.data.exchanges.length / TXS_PER_PAGE))
           SetFilteredTxs(result.data.exchanges)
           setTxs(result.data.exchanges)
         }
@@ -160,14 +246,16 @@ function OverviewList({ tokenSymbol, exchangeAddress, price, priceUSD, setTxCoun
   }, [])
 
   useEffect(() => {
-    async function get24HrVol() {
-      let newMap = []
-      txs.map(async item => {
-        let data24HoursAgo
+    function get24HrVol() {
+      let promises = []
+      let ldata = {}
+      txs.map(item => {
         try {
-          const utcCurrentTime = dayjs()
+          ldata[item.id] = item
+          // const utcCurrentTime = dayjs()
+          const utcCurrentTime = dayjs('2019-06-25')
           const utcOneDayBack = utcCurrentTime.subtract(1, 'day')
-          const result24HoursAgo = await client.query({
+          const result24HoursAgo = client.query({
             query: TICKER_24HOUR_QUERY,
             variables: {
               exchangeAddr: item.id,
@@ -175,91 +263,114 @@ function OverviewList({ tokenSymbol, exchangeAddress, price, priceUSD, setTxCoun
             },
             fetchPolicy: 'network-only'
           })
-          if (result24HoursAgo) {
-            data24HoursAgo = result24HoursAgo.data.exchangeHistoricalDatas[0]
-          }
+          promises.push(result24HoursAgo)
         } catch (err) {
           console.log('error: ', err)
         }
-
-        let volumePercentChange = ''
-        const adjustedVolumeChangePercent = (
-          ((item.tradeVolumeEth - data24HoursAgo.tradeVolumeEth) / item.tradeVolumeEth) *
-          100
-        ).toFixed(2)
-        adjustedVolumeChangePercent > 0 ? (volumePercentChange = '+') : (volumePercentChange = '')
-        volumePercentChange += adjustedVolumeChangePercent
-
-        let oneDayVolume = item.tradeVolumeEth - data24HoursAgo.tradeVolumeEth
-        newMap[item.id] = oneDayVolume
       })
-      setVolumeMap(newMap)
+
+      Promise.all(promises).then(resolved => {
+        let newVolumeMap = {}
+        resolved.map(oldItem => {
+          let data24HoursAgo = oldItem.data.exchangeHistoricalDatas[0]
+
+          if (data24HoursAgo) {
+            // get the volume difference
+            let oneDayVolume = ldata[data24HoursAgo.exchangeAddress].tradeVolumeEth - data24HoursAgo.tradeVolumeEth
+
+            newVolumeMap[ldata[data24HoursAgo.exchangeAddress].id] = {}
+            newVolumeMap[ldata[data24HoursAgo.exchangeAddress].id].volume = oneDayVolume
+
+            let oneDayTxs = ldata[data24HoursAgo.exchangeAddress].totalTxsCount - data24HoursAgo.totalTxsCount
+            newVolumeMap[ldata[data24HoursAgo.exchangeAddress].id].txs = oneDayTxs
+          }
+        })
+
+        setVolumeMap(newVolumeMap)
+      })
     }
     get24HrVol()
   }, [txs])
 
+  const belowMedium = useMedia('(max-width: 64em)')
+
+  const belowSmall = useMedia('(max-width: 40em)')
+
   const TransactionItem = ({ exchange }) => {
     return (
-      //name symbol price liquidity txs volume
-      <DashGrid>
-        <Flex p={24} alignItems={'center'}>
+      <DashGridClickable
+        onClick={() => {
+          switchActiveExchange(exchange.id)
+          history.push('/tokens')
+          window.scrollTo(0, 0)
+        }}
+      >
+        <LogoTextWrapper>
           <LogoBox>
-            <TokenLogo
-              size={24}
-              address={exchange.tokenAddress}
-              style={{ height: '24px', width: '24px', marginRight: '20px' }}
-            />
+            <TokenLogo size={24} address={exchange.tokenAddress} style={{ height: '24px', width: '24px' }} />
           </LogoBox>
-          <Text color="text" area={'name'} fontWeight="500">
-            {exchange.tokenName}
-          </Text>
-        </Flex>
-        <Flex p={24}>
-          <Text area={'symbol'}>{exchange.tokenSymbol}</Text>
-        </Flex>
-        <DesktopOnly p={24}>
-          <Text area={'price'}>{formattedNumUsd(exchange.priceUSD, 2)}</Text>
-        </DesktopOnly>
-        <DesktopOnly p={24}>
-          <Text area={'liquidity'}>{formattedNum(exchange.ethBalance, 4)} ETH</Text>
-        </DesktopOnly>
-        <DesktopOnly p={24}>
-          <Text area={'txs'}>98</Text>
-        </DesktopOnly>
-        <Flex p={24}>
-          <Text fontSize={[12, 16]} area={'volume'}>
-            {volumeMap.hasOwnProperty(exchange.id) ? formattedNum(volumeMap[exchange.id], 4) + ' ETH' : '-'}
-          </Text>
-        </Flex>
-      </DashGrid>
+          {!belowSmall ? (
+            <Text color="text" area={'name'} fontWeight="500">
+              {exchange.tokenName}
+            </Text>
+          ) : (
+            <DataText area={'symbol'}>{exchange.tokenSymbol}</DataText>
+          )}
+        </LogoTextWrapper>
+        {!belowMedium ? (
+          <>
+            <DataText area={'symbol'}>{exchange.tokenSymbol}</DataText>
+            <DataText area={'price'}>${formattedNum(exchange.priceUSD, true)}</DataText>
+          </>
+        ) : (
+          ''
+        )}
+        <DataText area={'liquidity'}>{formattedNum(exchange.ethBalance)} ETH</DataText>
+        {!belowSmall ? (
+          <DataText area={'txs'}>
+            {volumeMap.hasOwnProperty(exchange.id) ? formattedNum(volumeMap[exchange.id].txs) : '-'}
+          </DataText>
+        ) : (
+          ''
+        )}
+        <DataText area={'volume'}>
+          {volumeMap.hasOwnProperty(exchange.id) ? formattedNum(volumeMap[exchange.id].volume) + ' ETH' : '-'}
+        </DataText>
+      </DashGridClickable>
     )
   }
 
   return (
     <ListWrapper>
       <DashGrid center={true}>
-        <Flex p={24}>
+        <Flex p={24} alignItems="center">
           <Text color="text" area={'name'}>
             Exchanges
           </Text>
         </Flex>
-        <Flex p={24}>
-          <Text>Symbol</Text>
-        </Flex>
-        <DesktopOnly p={24}>
-          <ClickableText
-            area={'price'}
-            color="textDim"
-            onClick={e => {
-              setSortedColumn(SORT_FIELD.PRICE)
-              setSortDirection(!sortDirection)
-              sortTxs(SORT_FIELD.PRICE)
-            }}
-          >
-            Price {sortedColumn === SORT_FIELD.PRICE ? (sortDirection ? '↑' : '↓') : ''}
-          </ClickableText>
-        </DesktopOnly>
-        <DesktopOnly p={24}>
+        {!belowMedium ? (
+          <>
+            <Flex p={belowMedium ? 12 : 24} alignItems="center">
+              <Text>Symbol</Text>
+            </Flex>
+            <Flex p={belowMedium ? 12 : 24} alignItems="center">
+              <ClickableText
+                area={'price'}
+                color="textDim"
+                onClick={e => {
+                  setSortedColumn(SORT_FIELD.PRICE)
+                  setSortDirection(!sortDirection)
+                  sortTxs(SORT_FIELD.PRICE)
+                }}
+              >
+                Price {sortedColumn === SORT_FIELD.PRICE ? (sortDirection ? '↑' : '↓') : ''}
+              </ClickableText>
+            </Flex>
+          </>
+        ) : (
+          ''
+        )}
+        <Flex p={belowMedium ? 12 : 24} alignItems="center">
           <ClickableText
             area={'liquidity'}
             color="textDim"
@@ -271,21 +382,25 @@ function OverviewList({ tokenSymbol, exchangeAddress, price, priceUSD, setTxCoun
           >
             Liquidity {sortedColumn === SORT_FIELD.LIQUIDITY ? (sortDirection ? '↑' : '↓') : ''}
           </ClickableText>
-        </DesktopOnly>
-        <DesktopOnly p={24}>
-          <ClickableText
-            area={'liquidity'}
-            color="textDim"
-            onClick={e => {
-              setSortedColumn(SORT_FIELD.TRANSACTIIONS)
-              setSortDirection(!sortDirection)
-              sortTxs(SORT_FIELD.TRANSACTIIONS)
-            }}
-          >
-            Transactions {sortedColumn === SORT_FIELD.TRANSACTIIONS ? (sortDirection ? '↑' : '↓') : ''}
-          </ClickableText>
-        </DesktopOnly>
-        <DesktopOnly p={24}>
+        </Flex>
+        {!belowSmall ? (
+          <Flex p={belowMedium ? 12 : 0} alignItems="center">
+            <ClickableText
+              area={'liquidity'}
+              color="textDim"
+              onClick={e => {
+                setSortedColumn(SORT_FIELD.TRANSACTIIONS)
+                setSortDirection(!sortDirection)
+                sortTxs(SORT_FIELD.TRANSACTIIONS)
+              }}
+            >
+              Transactions (24hrs){sortedColumn === SORT_FIELD.TRANSACTIIONS ? (sortDirection ? '↑' : '↓') : ''}
+            </ClickableText>
+          </Flex>
+        ) : (
+          ''
+        )}
+        <Flex p={belowMedium ? 12 : 24} alignItems="center">
           <ClickableText
             area={'liquidity'}
             color="textDim"
@@ -295,13 +410,14 @@ function OverviewList({ tokenSymbol, exchangeAddress, price, priceUSD, setTxCoun
               sortTxs(SORT_FIELD.VOLUME)
             }}
           >
-            24hr Volume {sortedColumn === SORT_FIELD.VOLUME ? (sortDirection ? '↑' : '↓') : ''}
+            Volume (24hrs){sortedColumn === SORT_FIELD.VOLUME ? (!sortDirection ? '↑' : '↓') : ''}
           </ClickableText>
-        </DesktopOnly>
+        </Flex>
       </DashGrid>
+
       <Divider />
       <List p={0}>
-        {loading && txs ? (
+        {loading && txs.length === 0 ? (
           <Loader />
         ) : (
           filteredTxs.slice(TXS_PER_PAGE * (page - 1), page * TXS_PER_PAGE - 1).map((item, index) => {

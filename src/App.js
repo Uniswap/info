@@ -10,6 +10,8 @@ import { MainPage } from './pages/MainPage'
 import { OverviewPage } from './pages/OverviewPage'
 import TokenLogo from './components/TokenLogo'
 import { useChart } from './hooks/ChartData'
+import { useGlobalData } from './hooks/GlobalData'
+import { useUniswapHistory } from './hooks/UniswapHistory'
 
 const timeframeOptions = [
   { value: '1week', label: '1 week' },
@@ -24,7 +26,14 @@ function App(props) {
 
   const [currencyUnit, setCurrencyUnit] = useState('USD')
 
-  const chartData = useChart(props.directoryStore.state.activeExchange.exchangeAddress, historyDaysToQuery)
+  const chartData = useChart(
+    props.directoryStore.state.activeExchange ? props.directoryStore.state.activeExchange.exchangeAddress : '',
+    historyDaysToQuery
+  )
+
+  const uniswapHistory = useUniswapHistory(historyDaysToQuery)
+
+  const globalData = useGlobalData()
 
   // switch active exchane
   const switchActiveExchange = async address => {
@@ -63,6 +72,7 @@ function App(props) {
     tokenName,
     volumePercentChange,
     pricePercentChange,
+    pricePercentChangeETH,
     symbol,
     erc20Liquidity,
     price,
@@ -128,6 +138,7 @@ function App(props) {
                 symbol={symbol}
                 tradeVolume={tradeVolume}
                 pricePercentChange={pricePercentChange}
+                pricePercentChangeETH={pricePercentChangeETH}
                 volumePercentChange={volumePercentChange}
                 liquidityPercentChange={liquidityPercentChange}
                 erc20Liquidity={erc20Liquidity}
@@ -144,6 +155,8 @@ function App(props) {
               <OverviewPage
                 currencyUnit={currencyUnit}
                 tokenName={tokenName}
+                switchActiveExchange={switchActiveExchange}
+                globalData={globalData}
                 directory={directory}
                 exchangeAddress={exchangeAddress}
                 symbol={symbol}
@@ -152,11 +165,11 @@ function App(props) {
                 volumePercentChange={volumePercentChange}
                 liquidityPercentChange={liquidityPercentChange}
                 erc20Liquidity={erc20Liquidity}
-                ethLiquidity={ethLiquidity}
                 price={price}
                 invPrice={invPrice}
                 priceUSD={priceUSD}
                 chartData={chartData}
+                uniswapHistory={uniswapHistory}
                 tokenAddress={tokenAddress}
                 updateTimeframe={setHistoryDaysToQuery}
               />

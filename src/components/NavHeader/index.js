@@ -48,7 +48,7 @@ const LinkText = styled(Link)`
   font-weight: 500;
   color: white;
   margin-left: 2em;
-  opacity: ${props => (!props.selected ? 1 : 0.4)};
+  opacity: ${props => (props.selected ? 1 : 0.4)};
   text-decoration: none;
 
   @media screen and (max-width: 40em) {
@@ -93,7 +93,7 @@ export default function NavHeader({
     <Header px={24} py={3} bg={['transparent', 'transparent']} color={['white', 'black']}>
       <NavLeft>
         <Title />
-        <LinkText to="/" selected={window.location.pathname !== '/overview'}>
+        <LinkText to="/" selected={window.location.pathname !== '/tokens'}>
           Overview
         </LinkText>
       </NavLeft>
@@ -106,8 +106,8 @@ export default function NavHeader({
           onChange={select => {
             if (exchangeAddress !== select.value) {
               switchActiveExchange(select.value)
-              history.push('/tokens')
             }
+            history.push('/tokens')
           }}
         />
       </NavRight>

@@ -29,14 +29,14 @@ export class DirectoryContainer extends Container {
         let result = await client.query({
           query: DIRECTORY_QUERY,
           variables: {
-            first: 100,
+            first: 1000,
             skip: skip
           },
           fetchPolicy: 'network-only'
         })
         data = data.concat(result.data.exchanges)
-        skip = skip + 100
-        if (result.data.exchanges.length !== 100) {
+        skip = skip + 1000
+        if (result.data.exchanges.length !== 1000) {
           dataEnd = true
         }
       }
@@ -77,6 +77,9 @@ export class DirectoryContainer extends Container {
 
   // fetch exchange information via address
   async fetchOverviewData(address) {
+    /**
+     * get today's data
+     */
     try {
       const result = await client.query({
         query: TICKER_QUERY,
@@ -91,9 +94,13 @@ export class DirectoryContainer extends Container {
       }
       const { price, ethBalance, tokenBalance, tradeVolumeEth, priceUSD } = data
 
+      /**
+       * get yesterdays data
+       */
       let data24HoursAgo
       try {
-        const utcCurrentTime = dayjs()
+        // const utcCurrentTime = dayjs()
+        const utcCurrentTime = dayjs('2019-06-25')
         const utcOneDayBack = utcCurrentTime.subtract(1, 'day')
         const result24HoursAgo = await client.query({
           query: TICKER_24HOUR_QUERY,
@@ -120,10 +127,14 @@ export class DirectoryContainer extends Container {
       volumePercentChange += adjustedVolumeChangePercent
 
       let pricePercentChange = ''
-
       const adjustedPriceChangePercent = (((priceUSD - data24HoursAgo.tokenPriceUSD) / priceUSD) * 100).toFixed(2)
       adjustedPriceChangePercent > 0 ? (pricePercentChange = '+') : (pricePercentChange = '')
       pricePercentChange += adjustedPriceChangePercent
+
+      let pricePercentChangeETH = ''
+      const adjustedPriceChangePercentETH = (((price - data24HoursAgo.price) / price) * 100).toFixed(2)
+      adjustedPriceChangePercentETH > 0 ? (pricePercentChangeETH = '+') : (pricePercentChangeETH = '')
+      pricePercentChangeETH += adjustedPriceChangePercentETH
 
       let liquidityPercentChange = ''
       const adjustedPriceChangeLiquidity = (((ethBalance - data24HoursAgo.ethBalance) / ethBalance) * 100).toFixed(2)
@@ -142,6 +153,7 @@ export class DirectoryContainer extends Container {
             invPrice,
             priceUSD,
             pricePercentChange,
+            pricePercentChangeETH,
             volumePercentChange,
             liquidityPercentChange,
             tradeVolume: parseFloat(Big(oneDayVolume).toFixed(4)),

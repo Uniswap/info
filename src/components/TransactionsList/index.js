@@ -79,6 +79,14 @@ const DesktopOnly = styled(Flex)`
   }
 `
 
+const EmptyTxWrapper = styled.div`
+  width: 100%;
+  display: flex;
+  height: 80px;
+  align-items: center;
+  justify-content: center;
+`
+
 const SORT_FIELD = {
   TIME: 'timestamp',
   USD_VALUE: 'usdAmount',
@@ -188,7 +196,8 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, setTx
       setLoading(true)
 
       // current time
-      const utcEndTime = dayjs.utc()
+      // const utcCurrentTime = dayjs()
+      const utcEndTime = dayjs('2019-06-25')
       let utcStartTime
       utcStartTime = utcEndTime.subtract(1, 'day').startOf('day')
       let startTime = utcStartTime.unix() - 1 // -1 because we filter on greater than in the query
@@ -201,13 +210,14 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, setTx
         let result = await client.query({
           query: TRANSACTIONS_QUERY_SKIPPABLE,
           variables: {
+            timestamp: startTime,
             exchangeAddr: exchangeAddress,
             skip: skipCount
           },
           fetchPolicy: 'network-only'
         })
         if (result) {
-          skipCount = skipCount + 100
+          skipCount = skipCount + 1000
           if (result.data.transactions.length === 0) {
             fetchingData = false
             setLoading(false)
@@ -415,6 +425,7 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, setTx
       </DashGrid>
       <Divider />
       <List p={0}>
+        {!loading && txs && txs.length === 0 ? <EmptyTxWrapper>No transactions</EmptyTxWrapper> : ''}
         {loading && txs ? (
           <Loader />
         ) : (
