@@ -208,6 +208,7 @@ function OverviewList({
         }
       })
       SetFilteredTxs(newTxs)
+      setPage(1)
     } else {
       let newTxs = filteredTxs.slice().sort((a, b) => {
         return parseFloat(a[field]) > parseFloat(b[field])
@@ -215,6 +216,7 @@ function OverviewList({
           : (sortDirection ? -1 : 1) * 1
       })
       SetFilteredTxs(newTxs)
+      setPage(1)
     }
   }
 
