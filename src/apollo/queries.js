@@ -12,7 +12,7 @@ export const TRANSACTIONS_QUERY = gql`
         id
       }
       removeLiquidityEvents {
-        id
+        CH
       }
       tokenPurchaseEvents {
         id
@@ -80,10 +80,11 @@ export const TICKER_QUERY = gql`
   query exchange($id: String!) {
     exchange(id: $id) {
       price
+      priceUSD
       tokenBalance
       ethBalance
       tradeVolumeEth
-      priceUSD
+      tradeVolumeToken
     }
   }
 `
@@ -98,10 +99,11 @@ export const TICKER_24HOUR_QUERY = gql`
     ) {
       id
       exchangeAddress
-      price
       tradeVolumeEth
-      ethBalance
+      tradeVolumeToken
       tokenPriceUSD
+      price
+      ethBalance
       totalTxsCount
     }
   }
@@ -126,10 +128,12 @@ export const OVERVIEW_PAGE_QUERY = gql`
       id
       tokenAddress
       tradeVolumeEth
+      priceUSD
+      price
       ethBalance
       tokenSymbol
       tokenName
-      priceUSD
+      tokenBalance
       totalTxsCount
     }
   }
@@ -149,14 +153,14 @@ export const UNISWAP_GLOBALS_QUERY = gql`
 `
 
 export const UNISWAP_GLOBALS_24HOURS_AGO_QUERY = gql`
-  query uniswapDayDatas($date: Int!) {
-    uniswapDayDatas(where: { date_lt: $date }, first: 1, orderBy: date, orderDirection: desc) {
+  query uniswapHistoricalDatas($date: Int!) {
+    uniswapHistoricalDatas(where: { timestamp_lt: $date }, first: 1, orderBy: timestamp, orderDirection: desc) {
       totalVolumeInEth
       totalVolumeUSD
       totalLiquidityInEth
       totalLiquidityUSD
       txCount
-      date
+      timestamp
     }
   }
 `
@@ -166,13 +170,9 @@ export const UNISWAP_CHART_QUERY = gql`
     uniswapDayDatas(where: { date_gt: $date }, orderBy: date, orderDirection: asc) {
       date
       totalVolumeInEth
-      totalLiquidityInEth
       totalVolumeUSD
+      totalLiquidityInEth
       totalLiquidityUSD
-      totalTokenSells
-      totalTokenBuys
-      totalAddLiquidity
-      totalRemoveLiquidity
       txCount
     }
   }

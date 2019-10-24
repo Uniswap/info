@@ -80,6 +80,7 @@ const OverviewChart = ({ data, chartOption, currencyUnit }) => {
                 borderRadius: 10,
                 borderColor: 'var(--c-zircon)'
               }}
+              wrapperStyle={{ top: -70, left: -10 }}
             />
             <Area
               strokeWidth={2}
@@ -136,7 +137,7 @@ const OverviewChart = ({ data, chartOption, currencyUnit }) => {
             <Area
               type="monotone"
               name={'Volume' + (currencyUnit === 'USD' ? ' (USD)' : ' (ETH)')}
-              dataKey={currencyUnit === 'USD' ? 'usdVolume' : 'ethVolume'}
+              dataKey={currencyUnit === 'USD' ? 'dailyUSDVolume' : 'dailyEthVolume'}
               fill="#FE6DDE"
               opacity={'0.4'}
               stroke="#FE6DDE"

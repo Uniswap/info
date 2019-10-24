@@ -54,7 +54,7 @@ export default function TokenLogo({ address, header = false, size = '1rem', ...r
     <Inline>
       <Image
         {...rest}
-        alt={address}
+        alt={''}
         src={path}
         size={size}
         onError={event => {

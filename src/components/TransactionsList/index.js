@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useMedia } from 'react-use'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { client } from '../../apollo/client'
@@ -39,19 +40,45 @@ const List = styled(Box)`
 `
 
 const DashGrid = styled.div`
-  display: flex;
+  display: grid;
+  grid-gap: 1em;
+  grid-template-columns: 100px 1fr 1fr;
+  grid-template-areas: 'action value Time';
+  padding: 0 6px;
 
   > * {
     justify-content: flex-end;
+    width: 100%;
 
     &:first-child {
       justify-content: flex-start;
+      text-align: left;
+      width: 100px;
+    }
+  }
+
+  @media screen and (min-width: 40em) {
+    max-width: 1280px;
+    display: grid;
+    grid-gap: 1em;
+    grid-template-columns: 180px 1fr 1fr 1fr;
+    grid-template-areas: 'action value Account Time';
+
+    > * {
+      justify-content: flex-end;
+      width: 100%;
+
+      &:first-child {
+        justify-content: flex-start;
+        width: 180px;
+      }
     }
   }
 
   @media screen and (min-width: 64em) {
     max-width: 1280px;
     display: grid;
+    padding: 0 24px;
     grid-gap: 1em;
     grid-template-columns: 1.2fr 1fr 1fr 1fr 1fr 1fr;
     grid-template-areas: 'action value ethAmount tokenAmount Account Time';
@@ -70,13 +97,8 @@ const ClickableText = styled(Text)`
   &:hover {
     cursor: pointer;
     opacity: 0.6;
-  }
-`
-
-const DesktopOnly = styled(Flex)`
-  @media screen and (max-width: 44em) {
-    display: none;
-  }
+  
+  user-select: none;
 `
 
 const EmptyTxWrapper = styled.div`
@@ -85,6 +107,19 @@ const EmptyTxWrapper = styled.div`
   height: 80px;
   align-items: center;
   justify-content: center;
+`
+
+const DataText = styled(Flex)`
+  @media screen and (max-width: 40em) {
+    font-size: 14px;
+  }
+
+  align-items: center;
+  text-align: right;
+
+  & > * {
+    font-size: 1em;
+  }
 `
 
 const SORT_FIELD = {
@@ -197,7 +232,7 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, setTx
 
       // current time
       // const utcCurrentTime = dayjs()
-      const utcEndTime = dayjs('2019-06-25')
+      const utcEndTime = dayjs('2019-05-15')
       let utcStartTime
       utcStartTime = utcEndTime.subtract(1, 'day').startOf('day')
       let startTime = utcStartTime.unix() - 1 // -1 because we filter on greater than in the query
@@ -317,56 +352,52 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, setTx
     }
   }
 
+  const belowMedium = useMedia('(max-width: 64em)')
+
+  const belowSmall = useMedia('(max-width: 40em)')
+
   const TransactionItem = ({ transaction, tokenSymbol }) => {
     return (
-      <DashGrid>
-        <Flex p={24} alignItems={'center'}>
-          <Text color="text" area={'action'} fontWeight="500">
-            <CustomLink ml="3" color="button" external href={urls.showTransaction(transaction.tx)}>
-              {getTransactionType(transaction.event, tokenSymbol)}
-            </CustomLink>
-          </Text>
-        </Flex>
-        <Flex p={24}>
-          <Text area={'value'}>
-            {price && priceUSD ? formattedNumUsd(Big(transaction.ethAmount).toFixed(4) * price * priceUSD, 2) : ''}
-          </Text>
-        </Flex>
-        <DesktopOnly p={24}>
-          <Text area={'ethAmount'}>{formattedNum(Big(transaction.ethAmount), 4)}</Text>
-        </DesktopOnly>
-        <DesktopOnly p={24}>
-          <Text area={'tokenAmount'}>{formattedNum(Big(transaction.tokenAmount), 4)}</Text>
-        </DesktopOnly>
-        <DesktopOnly p={24}>
-          <Link
-            fontSize={[12, 16]}
-            ml="3"
-            color="button"
-            external
-            href={'https://etherscan.io/address/' + transaction.user}
-          >
-            <Text area={'Account'}>{transaction.user.slice(0, 6) + '...' + transaction.user.slice(38, 42)}</Text>
-          </Link>
-        </DesktopOnly>
-        <Flex p={24}>
-          <Text fontSize={[12, 16]} area={'Time'}>
-            {formatTime(transaction.timestamp)}
-          </Text>
-        </Flex>
+      <DashGrid style={{ height: '60px' }}>
+        <DataText area={'action'} color="text" fontWeight="500">
+          <CustomLink ml="3" color="button" external href={urls.showTransaction(transaction.tx)}>
+            {getTransactionType(transaction.event, tokenSymbol)}
+          </CustomLink>
+        </DataText>
+        <DataText area={'value'}>
+          {price && priceUSD ? formattedNumUsd(Big(transaction.ethAmount).toFixed(4) * price * priceUSD, 2) : ''}
+        </DataText>
+        {!belowMedium ? (
+          <>
+            <DataText area={'ethAmount'}>{formattedNum(Big(transaction.ethAmount), 4)}</DataText>
+            <DataText area={'tokenAmount'}>{formattedNum(Big(transaction.tokenAmount), 4)}</DataText>
+          </>
+        ) : (
+          ''
+        )}
+        {!belowSmall ? (
+          <DataText area={'Account'}>
+            <Link ml="3" color="button" external href={'https://etherscan.io/address/' + transaction.user}>
+              {transaction.user.slice(0, 6) + '...' + transaction.user.slice(38, 42)}
+            </Link>
+          </DataText>
+        ) : (
+          ''
+        )}
+        <DataText area={'Time'}>{formatTime(transaction.timestamp)}</DataText>
       </DashGrid>
     )
   }
 
   return (
     <ListWrapper>
-      <DashGrid center={true}>
-        <Flex p={24}>
+      <DashGrid center={true} style={{ height: '60px' }}>
+        <Flex alignItems="center">
           <Text color="text" area={'action'}>
             Transactions (24h)
           </Text>
         </Flex>
-        <Flex p={24}>
+        <Flex alignItems="center">
           <ClickableText
             area={'value'}
             color="textDim"
@@ -379,38 +410,48 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, setTx
             Value {sortedColumn === SORT_FIELD.USD_VALUE ? (sortDirection ? '↑' : '↓') : ''}
           </ClickableText>
         </Flex>
-        <DesktopOnly p={24}>
-          <ClickableText
-            area={'ethAmount'}
-            color="textDim"
-            onClick={e => {
-              setSortedColumn(SORT_FIELD.ETH_VALUE)
-              setSortDirection(!sortDirection)
-              sortTxs(SORT_FIELD.ETH_VALUE)
-            }}
-          >
-            ETH Amount {sortedColumn === SORT_FIELD.ETH_VALUE ? (sortDirection ? '↑' : '↓') : ''}
-          </ClickableText>
-        </DesktopOnly>
-        <DesktopOnly p={24}>
-          <ClickableText
-            area={'tokenAmount'}
-            color="textDim"
-            onClick={e => {
-              setSortedColumn(SORT_FIELD.TOKEN_VALUE)
-              setSortDirection(!sortDirection)
-              sortTxs(SORT_FIELD.TOKEN_VALUE)
-            }}
-          >
-            Token Amount {sortedColumn === SORT_FIELD.TOKEN_VALUE ? (sortDirection ? '↑' : '↓') : ''}
-          </ClickableText>
-        </DesktopOnly>
-        <DesktopOnly p={24}>
-          <Text area={'Account'} color="textDim">
-            Account
-          </Text>
-        </DesktopOnly>
-        <Flex p={24}>
+        {!belowMedium ? (
+          <>
+            <Flex alignItems="center">
+              <ClickableText
+                area={'ethAmount'}
+                color="textDim"
+                onClick={e => {
+                  setSortedColumn(SORT_FIELD.ETH_VALUE)
+                  setSortDirection(!sortDirection)
+                  sortTxs(SORT_FIELD.ETH_VALUE)
+                }}
+              >
+                ETH Amount {sortedColumn === SORT_FIELD.ETH_VALUE ? (sortDirection ? '↑' : '↓') : ''}
+              </ClickableText>
+            </Flex>
+            <Flex alignItems="center">
+              <ClickableText
+                area={'tokenAmount'}
+                color="textDim"
+                onClick={e => {
+                  setSortedColumn(SORT_FIELD.TOKEN_VALUE)
+                  setSortDirection(!sortDirection)
+                  sortTxs(SORT_FIELD.TOKEN_VALUE)
+                }}
+              >
+                Token Amount {sortedColumn === SORT_FIELD.TOKEN_VALUE ? (sortDirection ? '↑' : '↓') : ''}
+              </ClickableText>
+            </Flex>
+          </>
+        ) : (
+          ''
+        )}
+        {!belowSmall ? (
+          <Flex alignItems="center">
+            <Text area={'Account'} color="textDim">
+              Account
+            </Text>
+          </Flex>
+        ) : (
+          ''
+        )}
+        <Flex alignItems="center">
           <ClickableText
             area={'time'}
             onClick={e => {

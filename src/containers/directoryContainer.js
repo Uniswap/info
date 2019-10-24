@@ -16,7 +16,9 @@ export class DirectoryContainer extends Container {
   }
 
   setActiveExchange = address => {
-    this.setState({ activeExchange: this.state.exchanges[address] })
+    if (this.state.exchanges[address]) {
+      this.setState({ activeExchange: this.state.exchanges[address] })
+    }
   }
 
   // fetch all exchanges data
@@ -92,15 +94,16 @@ export class DirectoryContainer extends Container {
       if (result) {
         data = result.data.exchange
       }
-      const { price, ethBalance, tokenBalance, tradeVolumeEth, priceUSD } = data
+      const { price, ethBalance, tokenBalance, tradeVolumeEth, tradeVolumeToken, priceUSD } = data
 
       /**
        * get yesterdays data
        */
-      let data24HoursAgo
+      let data24HoursAgo = {}
+      let dataNowForTxs = {}
       try {
         // const utcCurrentTime = dayjs()
-        const utcCurrentTime = dayjs('2019-06-25')
+        const utcCurrentTime = dayjs('2019-05-15')
         const utcOneDayBack = utcCurrentTime.subtract(1, 'day')
         const result24HoursAgo = await client.query({
           query: TICKER_24HOUR_QUERY,
@@ -116,6 +119,23 @@ export class DirectoryContainer extends Container {
       } catch (err) {
         console.log('error: ', err)
       }
+      try {
+        // const utcCurrentTime = dayjs()
+        const utcCurrentTime = dayjs('2019-05-15')
+        const resultLatest = await client.query({
+          query: TICKER_24HOUR_QUERY,
+          variables: {
+            exchangeAddr: address,
+            timestamp: utcCurrentTime.unix()
+          },
+          fetchPolicy: 'network-only'
+        })
+        if (resultLatest) {
+          dataNowForTxs = resultLatest.data.exchangeHistoricalDatas[0]
+        }
+      } catch (err) {
+        console.log('error: ', err)
+      }
       const invPrice = 1 / price
 
       let volumePercentChange = ''
@@ -125,6 +145,14 @@ export class DirectoryContainer extends Container {
       ).toFixed(2)
       adjustedVolumeChangePercent > 0 ? (volumePercentChange = '+') : (volumePercentChange = '')
       volumePercentChange += adjustedVolumeChangePercent
+
+      let volumePercentChangeUSD = ''
+      const adjustedVolumeChangePercentUSD = (
+        ((tradeVolumeToken - data24HoursAgo.tradeVolumeToken) / tradeVolumeToken) *
+        100
+      ).toFixed(2)
+      adjustedVolumeChangePercentUSD > 0 ? (volumePercentChangeUSD = '+') : (volumePercentChangeUSD = '')
+      volumePercentChangeUSD += adjustedVolumeChangePercentUSD
 
       let pricePercentChange = ''
       const adjustedPriceChangePercent = (((priceUSD - data24HoursAgo.tokenPriceUSD) / priceUSD) * 100).toFixed(2)
@@ -141,7 +169,26 @@ export class DirectoryContainer extends Container {
       adjustedPriceChangeLiquidity > 0 ? (liquidityPercentChange = '+') : (liquidityPercentChange = '')
       liquidityPercentChange += adjustedPriceChangeLiquidity
 
+      let liquidityPercentChangeUSD = ''
+      const adjustedPriceChangeLiquidityUSD = (
+        ((ethBalance * price * priceUSD -
+          data24HoursAgo.ethBalance * data24HoursAgo.price * data24HoursAgo.tokenPriceUSD) /
+          (ethBalance * price * priceUSD)) *
+        100
+      ).toFixed(2)
+      adjustedPriceChangeLiquidityUSD > 0 ? (liquidityPercentChangeUSD = '+') : (liquidityPercentChangeUSD = '')
+      liquidityPercentChangeUSD += adjustedPriceChangeLiquidityUSD
+
+      let txsPercentChange = ''
+      const adjustedTxChangePercent = (
+        ((dataNowForTxs.totalTxsCount - data24HoursAgo.totalTxsCount) / dataNowForTxs.totalTxsCount) *
+        100
+      ).toFixed(2)
+      adjustedTxChangePercent > 0 ? (txsPercentChange = '+') : (txsPercentChange = '')
+      txsPercentChange += adjustedTxChangePercent
+
       let oneDayVolume = tradeVolumeEth - data24HoursAgo.tradeVolumeEth
+      let oneDayVolumeUSD = tradeVolumeToken * priceUSD - data24HoursAgo.tradeVolumeToken * priceUSD
 
       // update "exchanges" with new information
       await this.setState(prevState => ({
@@ -155,10 +202,14 @@ export class DirectoryContainer extends Container {
             pricePercentChange,
             pricePercentChangeETH,
             volumePercentChange,
+            volumePercentChangeUSD,
             liquidityPercentChange,
+            liquidityPercentChangeUSD,
             tradeVolume: parseFloat(Big(oneDayVolume).toFixed(4)),
+            tradeVolumeUSD: parseFloat(Big(oneDayVolumeUSD).toFixed(4)),
             ethLiquidity: Big(ethBalance).toFixed(4),
-            erc20Liquidity: Big(tokenBalance).toFixed(4)
+            usdLiquidity: Big(tokenBalance * priceUSD).toFixed(4),
+            txsPercentChange
           }
         }
       }))

@@ -10,11 +10,11 @@ export const client = new ApolloClient({
   link: new HttpLink({
     //pending 1 has updated tx coutn but no id fixes on historical
 
-    // the old pending version of 2 without the price fix
-    // uri: 'https://api.thegraph.com/subgraphs/id/QmPjQ4ZP5QpAvHgewv8ydXTs9CNybaGpTXAhdv1GBszx35'
-
     //current pending of 2 has the price fix
-    uri: 'https://api.thegraph.com/subgraphs/id/QmWHpyTDUmJ61xjtpz6ZSqR4qGRTJwQoT5WvMfcmB4QSfu'
+    // uri: 'https://api.thegraph.com/subgraphs/id/QmWHpyTDUmJ61xjtpz6ZSqR4qGRTJwQoT5WvMfcmB4QSfu'
+
+    // pending 1 has updated volume tracking, historical data
+    uri: 'https://api.thegraph.com/subgraphs/id/QmdwtSn8C8x5keGJ3xApqRMQqbLj3yNETL1JSNLhaUHFdc'
 
     // 3 is deployed without tx coutn and without price fix
     // uri: 'https://api.thegraph.com/subgraphs/name/ianlapham/unsiwap3'

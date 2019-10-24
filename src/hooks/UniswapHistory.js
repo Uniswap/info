@@ -13,7 +13,7 @@ export function useUniswapHistory(daysToQuery) {
       try {
         // current time
         // const utcEndTime = dayjs.utc()
-        const utcEndTime = dayjs('2019-06-25')
+        const utcEndTime = dayjs('2019-05-15')
         let utcStartTime
         // go back, go way way back
         switch (daysToQuery) {
@@ -47,7 +47,7 @@ export function useUniswapHistory(daysToQuery) {
             if (result.data.uniswapDayDatas.length !== 100) {
               dataEnd = true
             } else {
-              startTime = result.data.uniswapDayDatas[99].date - 1
+              startTime = result.data.uniswapDayDatas[result.data.uniswapDayDatas.length - 1].date - 1
             }
           }
         }
@@ -68,6 +68,12 @@ export function useUniswapHistory(daysToQuery) {
           data[i].dayString = dayString
           data[i].ethVolume = parseFloat(data[i].totalVolumeInEth)
           data[i].usdVolume = parseFloat(data[i].totalVolumeUSD)
+          if (i > 0) {
+            data[i].dailyEthVolume = parseFloat(data[i].totalVolumeInEth)
+            data[i].dailyUSDVolume = parseFloat(data[i].totalVolumeUSD)
+            // data[i].dailyEthVolume = 0
+            // data[i].dailyUSDVolume = 0
+          }
           data[i].ethLiquidity = parseFloat(data[i].totalLiquidityInEth)
           data[i].usdLiquidity = parseFloat(data[i].totalLiquidityUSD)
           data[i].txCount = parseFloat(data[i].txCount)

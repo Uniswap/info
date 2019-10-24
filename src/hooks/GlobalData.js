@@ -41,7 +41,7 @@ export function useGlobalData() {
             try {
               // current time
               // const utcCurrentTime = dayjs()
-              const utcCurrentTime = dayjs('2019-06-25')
+              const utcCurrentTime = dayjs('2019-05-15')
               const utcOneDayBack = utcCurrentTime.subtract(1, 'day')
               let dataEnd = false
 
@@ -55,11 +55,11 @@ export function useGlobalData() {
                   fetchPolicy: 'network-only'
                 })
                 if (result) {
-                  data24HoursAgo.totalVolumeInEth = result.data.uniswapDayDatas[0].totalVolumeInEth
-                  data24HoursAgo.totalVolumeUSD = result.data.uniswapDayDatas[0].totalVolumeUSD
-                  data24HoursAgo.liquidityEth = result.data.uniswapDayDatas[0].totalLiquidityInEth
-                  data24HoursAgo.liquidityUsd = result.data.uniswapDayDatas[0].totalLiquidityUSD
-                  data24HoursAgo.txCount = result.data.uniswapDayDatas[0].txCount
+                  data24HoursAgo.totalVolumeInEth = result.data.uniswapHistoricalDatas[0].totalVolumeInEth
+                  data24HoursAgo.totalVolumeUSD = result.data.uniswapHistoricalDatas[0].totalVolumeUSD
+                  data24HoursAgo.liquidityEth = result.data.uniswapHistoricalDatas[0].totalLiquidityInEth
+                  data24HoursAgo.liquidityUsd = result.data.uniswapHistoricalDatas[0].totalLiquidityUSD
+                  data24HoursAgo.txCount = result.data.uniswapHistoricalDatas[0].txCount
                   dataEnd = true
 
                   let txPercentChange = ''
@@ -76,6 +76,16 @@ export function useGlobalData() {
                   adjustedPriceChangeLiquidity > 0 ? (liquidityPercentChange = '+') : (liquidityPercentChange = '')
                   liquidityPercentChange += adjustedPriceChangeLiquidity
 
+                  let liquidityPercentChangeUSD = ''
+                  const adjustedPriceChangeLiquidityUSD = (
+                    ((data.liquidityUsd - data24HoursAgo.liquidityUsd) / data.liquidityUsd) *
+                    100
+                  ).toFixed(2)
+                  adjustedPriceChangeLiquidityUSD > 0
+                    ? (liquidityPercentChangeUSD = '+')
+                    : (liquidityPercentChangeUSD = '')
+                  liquidityPercentChangeUSD += adjustedPriceChangeLiquidityUSD
+
                   let volumePercentChange = ''
                   const adjustedVolumeChange = (
                     ((data.totalVolumeInEth - data24HoursAgo.totalVolumeInEth) / data.totalVolumeInEth) *
@@ -84,12 +94,22 @@ export function useGlobalData() {
                   adjustedVolumeChange > 0 ? (volumePercentChange = '+') : (volumePercentChange = '')
                   volumePercentChange += adjustedVolumeChange
 
+                  let volumePercentChangeUSD = ''
+                  const adjustedVolumeChangeUSD = (
+                    ((data.totalVolumeUSD - data24HoursAgo.totalVolumeUSD) / data.totalVolumeUSD) *
+                    100
+                  ).toFixed(2)
+                  adjustedVolumeChangeUSD > 0 ? (volumePercentChangeUSD = '+') : (volumePercentChangeUSD = '')
+                  volumePercentChangeUSD += adjustedVolumeChangeUSD
+
                   //set the global txCount
                   data.liquidityPercentChange = liquidityPercentChange
+                  data.liquidityPercentChangeUSD = liquidityPercentChangeUSD
+                  data.volumePercentChange = volumePercentChange
+                  data.volumePercentChangeUSD = volumePercentChangeUSD
                   data.txCount = data.txCount - data24HoursAgo.txCount
                   data.dailyVolumeETH = data.totalVolumeInEth - data24HoursAgo.totalVolumeInEth
                   data.dailyVolumeUSD = data.totalVolumeUSD - data24HoursAgo.totalVolumeUSD
-                  data.volumePercentChange = volumePercentChange
                 }
               }
               // setGlobalData(data)

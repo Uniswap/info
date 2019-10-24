@@ -1,5 +1,6 @@
 import theme from '../Theme/theme'
 import { visible } from 'ansi-colors'
+import { relative } from 'upath'
 const color = theme.colors
 
 export const customStyles = {
@@ -28,13 +29,16 @@ export const customStyles = {
   }),
   singleValue: styles => ({
     ...styles,
-    color: '#6C7284'
+    color: '#6C7284',
+    width: '100%',
+    paddingRight: '8px'
   }),
   indicatorSeparator: () => ({
     display: 'none'
   }),
   dropdownIndicator: styles => ({
     ...styles,
+    color: '#6C7284',
     paddingRight: 16
   }),
   valueContainer: styles => ({
@@ -119,7 +123,7 @@ export const customStylesMobile = {
   option: (styles, state) => ({
     ...styles,
     margin: '0px 0px',
-    padding: 'calc(16px - 1px) 16px',
+    padding: 'calc(16ppx - 1px) 16x',
     width: '',
     lineHeight: 1,
     color: state.isSelected ? '#000' : '',

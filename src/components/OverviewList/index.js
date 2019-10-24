@@ -43,6 +43,7 @@ const DashGrid = styled.div`
   grid-gap: 1em;
   grid-template-columns: 1fr 1fr 1fr;
   grid-template-areas: 'symbol liquidity volume';
+  padding: 0 6px;
 
   > * {
     justify-content: flex-end;
@@ -75,6 +76,7 @@ const DashGrid = styled.div`
   @media screen and (min-width: 64em) {
     max-width: 1280px;
     display: grid;
+    padding: 0 24px;
     grid-gap: 1em;
     grid-template-columns: 1fr 0.8fr 0.8fr 1fr 1fr 1fr;
     grid-template-areas: 'name symbol price txs liquidity volume';
@@ -89,6 +91,9 @@ const DashGridClickable = styled(DashGrid)`
 `
 
 const ListWrapper = styled.div`
+  @media screen and (max-width: 40em) {
+    padding: 0 0.4em;
+  }
   padding: 0 1em;
 `
 
@@ -99,6 +104,8 @@ const ClickableText = styled(Text)`
     cursor: pointer;
     opacity: 0.6;
   }
+
+  user-select: none;
 `
 
 const DataText = styled(Flex)`
@@ -106,11 +113,6 @@ const DataText = styled(Flex)`
     font-size: 14px;
   }
 
-  @media screen and (max-width: 64em) {
-    padding: 0px;
-  }
-
-  padding: 18px;
   align-items: center;
   text-align: right;
 
@@ -121,7 +123,6 @@ const DataText = styled(Flex)`
 
 const LogoBox = styled.div`
   width: 30px;
-  padding-left: 4px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -132,24 +133,12 @@ const LogoBox = styled.div`
   }
 `
 
-const LogoTextWrapper = styled(Flex)`
-  align-items: center;
-  padding: 18px;
-
-  @media screen and (max-width: 64em) {
-    padding: 12px;
-  }
-
-  @media screen and (max-width: 40em) {
-    padding: 12px 0px;
-  }
-`
-
 // @TODO rework into virtualized list
 function OverviewList({
   tokenSymbol,
   switchActiveExchange,
   exchangeAddress,
+  currencyUnit,
   price,
   priceUSD,
   setTxCount,
@@ -255,7 +244,7 @@ function OverviewList({
         try {
           ldata[item.id] = item
           // const utcCurrentTime = dayjs()
-          const utcCurrentTime = dayjs('2019-06-25')
+          const utcCurrentTime = dayjs('2019-05-15')
           const utcOneDayBack = utcCurrentTime.subtract(1, 'day')
           const result24HoursAgo = client.query({
             query: TICKER_24HOUR_QUERY,
@@ -266,28 +255,31 @@ function OverviewList({
             fetchPolicy: 'network-only'
           })
           promises.push(result24HoursAgo)
+          return true
         } catch (err) {
           console.log('error: ', err)
+          return false
         }
       })
 
       Promise.all(promises).then(resolved => {
         let newVolumeMap = {}
         resolved.map(oldItem => {
+          // get first result less than 24 hours ago
           let data24HoursAgo = oldItem.data.exchangeHistoricalDatas[0]
 
           if (data24HoursAgo) {
+            newVolumeMap[ldata[data24HoursAgo.exchangeAddress].id] = {}
+
             // get the volume difference
             let oneDayVolume = ldata[data24HoursAgo.exchangeAddress].tradeVolumeEth - data24HoursAgo.tradeVolumeEth
-
-            newVolumeMap[ldata[data24HoursAgo.exchangeAddress].id] = {}
             newVolumeMap[ldata[data24HoursAgo.exchangeAddress].id].volume = oneDayVolume
 
+            // get the tx difference
             let oneDayTxs = ldata[data24HoursAgo.exchangeAddress].totalTxsCount - data24HoursAgo.totalTxsCount
             newVolumeMap[ldata[data24HoursAgo.exchangeAddress].id].txs = oneDayTxs
           }
         })
-
         setVolumeMap(newVolumeMap)
       })
     }
@@ -306,8 +298,9 @@ function OverviewList({
           history.push('/tokens')
           window.scrollTo(0, 0)
         }}
+        style={{ height: '60px' }}
       >
-        <LogoTextWrapper>
+        <Flex alignItems="center">
           <LogoBox>
             <TokenLogo size={24} address={exchange.tokenAddress} style={{ height: '24px', width: '24px' }} />
           </LogoBox>
@@ -318,16 +311,28 @@ function OverviewList({
           ) : (
             <DataText area={'symbol'}>{exchange.tokenSymbol}</DataText>
           )}
-        </LogoTextWrapper>
+        </Flex>
         {!belowMedium ? (
           <>
             <DataText area={'symbol'}>{exchange.tokenSymbol}</DataText>
-            <DataText area={'price'}>${formattedNum(exchange.priceUSD, true)}</DataText>
+            <DataText area={'price'}>
+              {exchange.price && exchange.priceUSD
+                ? currencyUnit === 'USD'
+                  ? '$' + formattedNum(exchange.priceUSD, true)
+                  : formattedNum(1 / exchange.price) + ' ETH'
+                : ''}
+            </DataText>
           </>
         ) : (
           ''
         )}
-        <DataText area={'liquidity'}>{formattedNum(exchange.ethBalance)} ETH</DataText>
+        <DataText area={'liquidity'}>
+          {price && priceUSD
+            ? currencyUnit === 'USD'
+              ? '$' + formattedNum(exchange.ethBalance * 2 * price * priceUSD)
+              : formattedNum(exchange.ethBalance * 2) + ' ETH'
+            : ''}
+        </DataText>
         {!belowSmall ? (
           <DataText area={'txs'}>
             {volumeMap.hasOwnProperty(exchange.id) ? formattedNum(volumeMap[exchange.id].txs) : '-'}
@@ -336,7 +341,11 @@ function OverviewList({
           ''
         )}
         <DataText area={'volume'}>
-          {volumeMap.hasOwnProperty(exchange.id) ? formattedNum(volumeMap[exchange.id].volume) + ' ETH' : '-'}
+          {volumeMap.hasOwnProperty(exchange.id) && price && priceUSD
+            ? currencyUnit === 'USD'
+              ? '$' + formattedNum(volumeMap[exchange.id].volume * price * priceUSD)
+              : formattedNum(volumeMap[exchange.id].volume) + ' ETH'
+            : '-'}
         </DataText>
       </DashGridClickable>
     )
@@ -344,18 +353,18 @@ function OverviewList({
 
   return (
     <ListWrapper>
-      <DashGrid center={true}>
-        <Flex p={24} alignItems="center">
+      <DashGrid center={true} style={{ height: '60px' }}>
+        <Flex alignItems="center">
           <Text color="text" area={'name'}>
             Exchanges
           </Text>
         </Flex>
         {!belowMedium ? (
           <>
-            <Flex p={belowMedium ? 12 : 24} alignItems="center">
+            <Flex alignItems="center">
               <Text>Symbol</Text>
             </Flex>
-            <Flex p={belowMedium ? 12 : 24} alignItems="center">
+            <Flex alignItems="center">
               <ClickableText
                 area={'price'}
                 color="textDim"
@@ -372,7 +381,7 @@ function OverviewList({
         ) : (
           ''
         )}
-        <Flex p={belowMedium ? 12 : 24} alignItems="center">
+        <Flex alignItems="center">
           <ClickableText
             area={'liquidity'}
             color="textDim"
@@ -386,7 +395,7 @@ function OverviewList({
           </ClickableText>
         </Flex>
         {!belowSmall ? (
-          <Flex p={belowMedium ? 12 : 0} alignItems="center">
+          <Flex alignItems="center">
             <ClickableText
               area={'liquidity'}
               color="textDim"
@@ -396,13 +405,13 @@ function OverviewList({
                 sortTxs(SORT_FIELD.TRANSACTIIONS)
               }}
             >
-              Transactions (24hrs){sortedColumn === SORT_FIELD.TRANSACTIIONS ? (sortDirection ? '↑' : '↓') : ''}
+              Transactions (24hrs) {sortedColumn === SORT_FIELD.TRANSACTIIONS ? (sortDirection ? '↑' : '↓') : ''}
             </ClickableText>
           </Flex>
         ) : (
           ''
         )}
-        <Flex p={belowMedium ? 12 : 24} alignItems="center">
+        <Flex alignItems="center">
           <ClickableText
             area={'liquidity'}
             color="textDim"
@@ -412,7 +421,7 @@ function OverviewList({
               sortTxs(SORT_FIELD.VOLUME)
             }}
           >
-            Volume (24hrs){sortedColumn === SORT_FIELD.VOLUME ? (!sortDirection ? '↑' : '↓') : ''}
+            Volume (24hrs) {sortedColumn === SORT_FIELD.VOLUME ? (!sortDirection ? '↑' : '↓') : ''}
           </ClickableText>
         </Flex>
       </DashGrid>

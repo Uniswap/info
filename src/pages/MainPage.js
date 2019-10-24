@@ -286,10 +286,14 @@ export const MainPage = function({
   currencyUnit,
   symbol,
   tradeVolume,
+  tradeVolumeUSD,
   pricePercentChange,
   pricePercentChangeETH,
   volumePercentChange,
+  volumePercentChangeUSD,
   liquidityPercentChange,
+  liquidityPercentChangeUSD,
+  txsPercentChange,
   tokenName,
   ethLiquidity,
   price,
@@ -332,6 +336,14 @@ export const MainPage = function({
 
   const belowLarge = useMedia('(max-width: 64em)')
 
+  function getPercentSign(value) {
+    return (
+      <Text fontSize={14} lineHeight={1.4} color="white">
+        {value < 0 ? value + ' ↓' : value === 0 ? value : value + ' ↑'}
+      </Text>
+    )
+  }
+
   return (
     <div style={{ width: '100%' }}>
       <ThemedBackground bg="token" />
@@ -354,23 +366,7 @@ export const MainPage = function({
               </Text>
             }
             bottomRight={
-              currencyUnit === 'USD' ? (
-                <Text fontSize={14} lineHeight={1.8} color="white">
-                  {pricePercentChange > 0
-                    ? pricePercentChange + '% ↑'
-                    : pricePercentChange < 0
-                    ? pricePercentChange + '% ↓'
-                    : pricePercentChange + '%'}
-                </Text>
-              ) : (
-                <Text fontSize={14} lineHeight={1.8} color="white">
-                  {pricePercentChangeETH > 0
-                    ? pricePercentChangeETH + '% ↑'
-                    : pricePercentChangeETH < 0
-                    ? pricePercentChangeETH + '% ↓'
-                    : pricePercentChangeETH + '%'}
-                </Text>
-              )
+              currencyUnit === 'USD' ? getPercentSign(pricePercentChange) : getPercentSign(pricePercentChangeETH)
             }
           />
         </PricePanelMobile>
@@ -385,23 +381,7 @@ export const MainPage = function({
             </TokenPrice>
             {pricePercentChange && isFinite(pricePercentChange) ? (
               <TopPercent>
-                {currencyUnit === 'USD' ? (
-                  <Text fontSize={14} lineHeight={1.8} color="white">
-                    {pricePercentChange > 0
-                      ? pricePercentChange + '% ↑'
-                      : pricePercentChange < 0
-                      ? pricePercentChange + '% ↓'
-                      : pricePercentChange + '%'}
-                  </Text>
-                ) : (
-                  <Text fontSize={14} lineHeight={1.8} color="white">
-                    {pricePercentChangeETH > 0
-                      ? pricePercentChangeETH + '% ↑'
-                      : pricePercentChangeETH < 0
-                      ? pricePercentChangeETH + '% ↓'
-                      : pricePercentChangeETH + '%'}
-                  </Text>
-                )}
+                {currencyUnit === 'USD' ? getPercentSign(pricePercentChange) : getPercentSign(pricePercentChangeETH)}
               </TopPercent>
             ) : (
               ''
@@ -420,7 +400,7 @@ export const MainPage = function({
                 <Text fontSize={24} lineHeight={1.4} fontWeight={500}>
                   {invPrice && price && priceUSD
                     ? currencyUnit === 'USD'
-                      ? '$' + formattedNum(tradeVolume * price * priceUSD, true)
+                      ? '$' + formattedNum(tradeVolumeUSD, true)
                       : 'Ξ ' + formattedNum(tradeVolume)
                     : '-'}
                   {currencyUnit !== 'USD' ? <SmallText> ETH</SmallText> : ''}
@@ -429,13 +409,9 @@ export const MainPage = function({
               bottomRight={
                 volumePercentChange && isFinite(volumePercentChange) ? (
                   <div>
-                    <Text fontSize={14} lineHeight={1.4} color="white">
-                      {volumePercentChange > 0
-                        ? volumePercentChange + '% ↑'
-                        : volumePercentChange < 0
-                        ? volumePercentChange + '% ↓'
-                        : volumePercentChange + '%'}
-                    </Text>
+                    {currencyUnit === 'USD'
+                      ? getPercentSign(volumePercentChangeUSD)
+                      : getPercentSign(volumePercentChange)}
                   </div>
                 ) : (
                   ''
@@ -457,19 +433,11 @@ export const MainPage = function({
                 </Text>
               }
               bottomRight={
-                liquidityPercentChange && isFinite(liquidityPercentChange) ? (
-                  <div>
-                    <Text fontSize={14} lineHeight={1.4} color="white">
-                      {liquidityPercentChange > 0
-                        ? liquidityPercentChange + '% ↑'
-                        : liquidityPercentChange < 0
-                        ? liquidityPercentChange + '% ↓'
-                        : liquidityPercentChange + '%'}
-                    </Text>
-                  </div>
-                ) : (
-                  ''
-                )
+                liquidityPercentChange && isFinite(liquidityPercentChange)
+                  ? currencyUnit === 'USD'
+                    ? getPercentSign(liquidityPercentChangeUSD)
+                    : getPercentSign(liquidityPercentChange)
+                  : ''
               }
             />
           </TopPanel>
@@ -481,6 +449,7 @@ export const MainPage = function({
                   {txCount}
                 </Text>
               }
+              bottomRight={txsPercentChange ? getPercentSign(txsPercentChange) : ''}
             />
           </TopPanel>
           <ChartWrapper

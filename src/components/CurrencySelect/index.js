@@ -21,6 +21,9 @@ const MobileSelect = styled.div`
   @media screen and (min-width: 40em) {
     display: none;
   }
+  & > * {
+    pointer-events: none;
+  }
 `
 
 const Select = styled.div`
@@ -76,7 +79,7 @@ const CurrencySelect = ({ setCurrencyUnit, currencyUnit }) => {
   return (
     <>
       <MobileSelect onClick={() => update()}> {currencyUnit} </MobileSelect>
-      <Select onClick={() => update()}>
+      <Select>
         <SelectOption active={activeCurrency === 'USD'} onClick={() => update()}>
           USD
         </SelectOption>

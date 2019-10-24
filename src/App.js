@@ -26,6 +26,8 @@ function App(props) {
 
   const [currencyUnit, setCurrencyUnit] = useState('USD')
 
+  const [activeExchange, setActiveExchange] = useState('')
+
   const chartData = useChart(
     props.directoryStore.state.activeExchange ? props.directoryStore.state.activeExchange.exchangeAddress : '',
     historyDaysToQuery
@@ -69,18 +71,23 @@ function App(props) {
   const {
     exchangeAddress,
     tradeVolume,
+    tradeVolumeUSD,
     tokenName,
     volumePercentChange,
+    volumePercentChangeUSD,
     pricePercentChange,
     pricePercentChangeETH,
+    txsPercentChange,
     symbol,
     erc20Liquidity,
     price,
     invPrice,
     priceUSD,
     ethLiquidity,
+    usdLiquidity,
     tokenAddress,
-    liquidityPercentChange
+    liquidityPercentChange,
+    liquidityPercentChangeUSD
   } = props.directoryStore.state.activeExchange
 
   const defaultExchangeAddress = props.directoryStore.state.defaultExchangeAddress
@@ -137,12 +144,17 @@ function App(props) {
                 exchangeAddress={exchangeAddress}
                 symbol={symbol}
                 tradeVolume={tradeVolume}
+                tradeVolumeUSD={tradeVolumeUSD}
                 pricePercentChange={pricePercentChange}
                 pricePercentChangeETH={pricePercentChangeETH}
                 volumePercentChange={volumePercentChange}
+                volumePercentChangeUSD={volumePercentChangeUSD}
                 liquidityPercentChange={liquidityPercentChange}
+                liquidityPercentChangeUSD={liquidityPercentChangeUSD}
+                txsPercentChange={txsPercentChange}
                 erc20Liquidity={erc20Liquidity}
                 ethLiquidity={ethLiquidity}
+                usdLiquidity={usdLiquidity}
                 price={price}
                 invPrice={invPrice}
                 priceUSD={priceUSD}
