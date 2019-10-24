@@ -103,7 +103,7 @@ export class DirectoryContainer extends Container {
       let dataNowForTxs = {}
       try {
         // const utcCurrentTime = dayjs()
-        const utcCurrentTime = dayjs('2019-05-15')
+        const utcCurrentTime = dayjs('2019-05-17')
         const utcOneDayBack = utcCurrentTime.subtract(1, 'day')
         const result24HoursAgo = await client.query({
           query: TICKER_24HOUR_QUERY,
@@ -121,7 +121,7 @@ export class DirectoryContainer extends Container {
       }
       try {
         // const utcCurrentTime = dayjs()
-        const utcCurrentTime = dayjs('2019-05-15')
+        const utcCurrentTime = dayjs('2019-05-17')
         const resultLatest = await client.query({
           query: TICKER_24HOUR_QUERY,
           variables: {

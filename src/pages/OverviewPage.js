@@ -151,10 +151,6 @@ export const OverviewPage = function({
     return Number(parseFloat(num).toFixed(4)).toLocaleString()
   }
 
-  const getRandomInt = (min, max) => {
-    return Math.floor(Math.random() * (max - min + 1)) + min
-  }
-
   const belowMedium = useMedia('(max-width: 64em)')
 
   const belowSmall = useMedia('(max-width: 40em)')
@@ -163,8 +159,7 @@ export const OverviewPage = function({
     <div style={{ marginTop: '40px' }}>
       <ThemedBackground bg="black" />
       {globalData ? (
-        <Parallax y={belowMedium ? ['200px', '-400px'] : ['400px', '-400px']}>
-          >
+        <Parallax y={belowMedium ? [0, 0] : ['400px', '-400px']}>
           <DashboardWrapper>
             <OverviewDashboard mx="auto" px={[0, 3]}>
               <TopPanel rounded color="white" p={24} style={{ gridArea: 'volume' }}>

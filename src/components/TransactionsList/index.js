@@ -232,7 +232,7 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, setTx
 
       // current time
       // const utcCurrentTime = dayjs()
-      const utcEndTime = dayjs('2019-05-15')
+      const utcEndTime = dayjs('2019-05-17')
       let utcStartTime
       utcStartTime = utcEndTime.subtract(1, 'day').startOf('day')
       let startTime = utcStartTime.unix() - 1 // -1 because we filter on greater than in the query

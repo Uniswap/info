@@ -244,7 +244,7 @@ function OverviewList({
         try {
           ldata[item.id] = item
           // const utcCurrentTime = dayjs()
-          const utcCurrentTime = dayjs('2019-05-15')
+          const utcCurrentTime = dayjs('2019-05-17')
           const utcOneDayBack = utcCurrentTime.subtract(1, 'day')
           const result24HoursAgo = client.query({
             query: TICKER_24HOUR_QUERY,
