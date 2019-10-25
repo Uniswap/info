@@ -7,6 +7,7 @@ import { toK, toNiceDate, toNiceDateYear } from '../../helpers'
 
 const ChartWrapper = styled.div`
   padding-top: 1em;
+  margin-left: -1em;
 `
 
 const OverviewChart = ({ data, chartOption, currencyUnit }) => {
