@@ -3,16 +3,8 @@ import styled from 'styled-components'
 import { Text, Box } from 'rebass'
 
 import Link from './Link'
-import Panel from './Panel'
 
 import { urls } from '../helpers'
-
-const Header = styled(Panel)`
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr;
-  align-items: end;
-  justify-content: center;
-`
 
 const Divider = styled(Box)`
   height: 1px;
@@ -20,7 +12,7 @@ const Divider = styled(Box)`
 `
 
 const Hint = ({ children, ...rest }) => (
-  <Text fontSize={12} {...rest}>
+  <Text fontSize={12} paddingBottom={12} {...rest}>
     {children}
   </Text>
 )
@@ -37,4 +29,4 @@ const Address = ({ address, token, ...rest }) => (
   </Link>
 )
 
-export { Hint, Divider, Header, Address }
+export { Hint, Divider, Address }

@@ -3,49 +3,87 @@ import dayjs from 'dayjs'
 import { Big } from '../helpers'
 import { client } from '../apollo/client'
 import { DIRECTORY_QUERY, TICKER_QUERY, TICKER_24HOUR_QUERY } from '../apollo/queries'
+import { hardcodedExchanges } from '../constants/exchanges'
+import { hardcodeThemes } from '../constants/theme'
 
 export class DirectoryContainer extends Container {
   state = {
     directory: [],
     exchanges: [],
+    defaultIndex: 0,
     defaultExchangeAddress: '',
-    activeExchange: {}
+    activeExchange: { exchangeAddress: '' }
   }
 
-  setActiveExchange = address => this.setState({ activeExchange: this.state.exchanges[address] })
+  // used to switch between current exchange on token page
+  setActiveExchange = address => {
+    if (this.state.exchanges[address]) {
+      this.setState({ activeExchange: this.state.exchanges[address] })
+    }
+  }
 
+  // fetch all exchanges data
   async fetchDirectory() {
     try {
       let data = []
       let dataEnd = false
       let skip = 0
+
+      /**
+       * Get all the exchanges on Uniswap, and collect symbol, ticker, etc
+       * skip is max items the graph can return, should support 1000 now
+       */
       while (!dataEnd) {
         let result = await client.query({
           query: DIRECTORY_QUERY,
           variables: {
-            first: 100,
+            first: 1000,
             skip: skip
-          },
-          fetchPolicy: 'network-only'
+          }
         })
         data = data.concat(result.data.exchanges)
-        skip = skip + 100
-        if (result.data.exchanges.length !== 100) {
+
+        // loop if haven't found all yet
+        skip = skip + 1000
+        if (result.data.exchanges.length !== 1000) {
           dataEnd = true
         }
       }
-      console.log(`fetched ${data.length} exchanges for directory`)
+
       let directoryObjects = {}
+      let defaultExchange = null
+
+      /**
+       * Basical version of custom linking.
+       *
+       * @todo - replace this with address based routing at an app level
+       */
+      let query = window.location.search.match(new RegExp('[?&]token=([^&#?]*)'))
       data.forEach(exchange => {
-        directoryObjects[exchange.id] = buildDirectoryObject(exchange)
+        if (
+          (query && exchange.tokenAddress.toString().toUpperCase() === query[1].toString().toUpperCase()) ||
+          (query && exchange.tokenSymbol && query[1].toString().toUpperCase() === exchange.tokenSymbol.toUpperCase())
+        ) {
+          defaultExchange = exchange.id
+        }
+        return (directoryObjects[exchange.id] = buildDirectoryObject(exchange))
       })
 
+      // create a label for each used in dropdowns
       await this.setState({
         directory: data.map(exchange => buildDirectoryLabel(exchange)),
         exchanges: directoryObjects
       })
 
-      let defaultExchange = this.state.directory[0].value
+      /**
+       * Set default exchange if not one yet
+       *
+       * @todo - when moved to context allow for no selected exchange (when overview selected)
+       */
+
+      if (!defaultExchange) {
+        defaultExchange = this.state.directory[0].value
+      }
 
       // set default exchange address
       await this.setState({
@@ -57,7 +95,8 @@ export class DirectoryContainer extends Container {
   }
 
   // fetch exchange information via address
-  async fetchTicker(address) {
+  async fetchOverviewData(address) {
+    // get the current state of the exchange
     try {
       const result = await client.query({
         query: TICKER_QUERY,
@@ -70,9 +109,11 @@ export class DirectoryContainer extends Container {
       if (result) {
         data = result.data.exchange
       }
-      const { price, ethBalance, tokenBalance, tradeVolumeEth } = data
+      const { price, ethBalance, tradeVolumeEth, tradeVolumeToken, priceUSD, totalTxsCount } = data
 
-      let data24HoursAgo
+      let data24HoursAgo = {}
+
+      // get data from 24 hours ago
       try {
         const utcCurrentTime = dayjs()
         const utcOneDayBack = utcCurrentTime.subtract(1, 'day')
@@ -90,18 +131,72 @@ export class DirectoryContainer extends Container {
       } catch (err) {
         console.log('error: ', err)
       }
+
+      // set default values to 0 (for exchanges that are brand new and dont have 24 hour data yet)
       const invPrice = 1 / price
+      let pricePercentChange = 0
+      let pricePercentChangeETH = 0
+      let volumePercentChange = 0
+      let volumePercentChangeUSD = 0
+      let liquidityPercentChange = 0
+      let liquidityPercentChangeUSD = 0
+      let oneDayVolume = 0
+      let oneDayVolumeUSD = 0
+      let txsPercentChange = 0
 
-      let percentChange = ''
-      const adjustedPriceChangePercent = (((price - data24HoursAgo.price) / price) * 100).toFixed(2)
-      adjustedPriceChangePercent > 0 ? (percentChange = '+') : (percentChange = '')
+      if (data24HoursAgo) {
+        volumePercentChange = ''
+        const adjustedVolumeChangePercent = (
+          ((tradeVolumeEth - data24HoursAgo.tradeVolumeEth) / tradeVolumeEth) *
+          100
+        ).toFixed(2)
+        adjustedVolumeChangePercent > 0 ? (volumePercentChange = '+') : (volumePercentChange = '')
+        volumePercentChange += adjustedVolumeChangePercent
 
-      percentChange += adjustedPriceChangePercent
+        volumePercentChangeUSD = ''
+        const adjustedVolumeChangePercentUSD = (
+          ((tradeVolumeToken - data24HoursAgo.tradeVolumeToken) / tradeVolumeToken) *
+          100
+        ).toFixed(2)
+        adjustedVolumeChangePercentUSD > 0 ? (volumePercentChangeUSD = '+') : (volumePercentChangeUSD = '')
+        volumePercentChangeUSD += adjustedVolumeChangePercentUSD
 
-      let oneDayVolume = tradeVolumeEth - data24HoursAgo.tradeVolumeEth
+        pricePercentChange = ''
+        const adjustedPriceChangePercent = (((priceUSD - data24HoursAgo.tokenPriceUSD) / priceUSD) * 100).toFixed(2)
+        adjustedPriceChangePercent > 0 ? (pricePercentChange = '+') : (pricePercentChange = '')
+        pricePercentChange += adjustedPriceChangePercent
 
-      console.log(`fetched ticker for ${address}`)
+        pricePercentChangeETH = ''
+        const adjustedPriceChangePercentETH = (((price - data24HoursAgo.price) / price) * 100).toFixed(2)
+        adjustedPriceChangePercentETH > 0 ? (pricePercentChangeETH = '+') : (pricePercentChangeETH = '')
+        pricePercentChangeETH += adjustedPriceChangePercentETH
 
+        liquidityPercentChange = ''
+        const adjustedPriceChangeLiquidity = (((ethBalance - data24HoursAgo.ethBalance) / ethBalance) * 100).toFixed(2)
+        adjustedPriceChangeLiquidity > 0 ? (liquidityPercentChange = '+') : (liquidityPercentChange = '')
+        liquidityPercentChange += adjustedPriceChangeLiquidity
+
+        liquidityPercentChangeUSD = ''
+        const adjustedPriceChangeLiquidityUSD = (
+          ((ethBalance * price * priceUSD -
+            data24HoursAgo.ethBalance * data24HoursAgo.price * data24HoursAgo.tokenPriceUSD) /
+            (ethBalance * price * priceUSD)) *
+          100
+        ).toFixed(2)
+        adjustedPriceChangeLiquidityUSD > 0 ? (liquidityPercentChangeUSD = '+') : (liquidityPercentChangeUSD = '')
+        liquidityPercentChangeUSD += adjustedPriceChangeLiquidityUSD
+
+        txsPercentChange = ''
+        const adjustedTxChangePercent = (
+          ((totalTxsCount - data24HoursAgo.totalTxsCount) / totalTxsCount) *
+          100
+        ).toFixed(2)
+        adjustedTxChangePercent > 0 ? (txsPercentChange = '+') : (txsPercentChange = '')
+        txsPercentChange += adjustedTxChangePercent
+
+        oneDayVolume = tradeVolumeEth - data24HoursAgo.tradeVolumeEth
+        oneDayVolumeUSD = tradeVolumeToken * priceUSD - data24HoursAgo.tradeVolumeToken * priceUSD
+      }
       // update "exchanges" with new information
       await this.setState(prevState => ({
         exchanges: {
@@ -110,10 +205,17 @@ export class DirectoryContainer extends Container {
             ...prevState.exchanges[address],
             price,
             invPrice,
-            percentChange,
-            tradeVolume: Big(oneDayVolume).toFixed(4),
+            priceUSD,
+            pricePercentChange,
+            pricePercentChangeETH,
+            volumePercentChange,
+            volumePercentChangeUSD,
+            liquidityPercentChange,
+            liquidityPercentChangeUSD,
+            tradeVolume: parseFloat(Big(oneDayVolume).toFixed(4)),
+            tradeVolumeUSD: parseFloat(Big(oneDayVolumeUSD).toFixed(4)),
             ethLiquidity: Big(ethBalance).toFixed(4),
-            erc20Liquidity: Big(tokenBalance).toFixed(4)
+            txsPercentChange
           }
         }
       }))
@@ -126,28 +228,35 @@ export class DirectoryContainer extends Container {
   }
 }
 
+// build the label for dropdown
 const buildDirectoryLabel = exchange => {
-  let { tokenSymbol, id } = exchange
+  let { tokenSymbol, id, tokenAddress } = exchange
   const exchangeAddress = id
+
+  // custom handling for UI
   if (tokenSymbol === null) {
-    tokenSymbol = 'unknown'
+    if (hardcodedExchanges.hasOwnProperty(exchangeAddress.toUpperCase())) {
+      tokenSymbol = hardcodedExchanges[exchangeAddress.toUpperCase()].symbol
+    } else {
+      tokenSymbol = 'unknown'
+    }
   }
 
   return {
     label: tokenSymbol,
-    value: exchangeAddress
+    value: exchangeAddress,
+    tokenAddress: tokenAddress
   }
 }
 
+// build object for token page data
 const buildDirectoryObject = exchange => {
-  const { tokenName, tokenSymbol, id, tokenAddress, tokenDecimals } = exchange
+  let { tokenName, tokenSymbol, id, tokenAddress, tokenDecimals, ethBalance } = exchange
+  let symbol = tokenSymbol
 
   const exchangeAddress = id
-  const symbol = tokenSymbol
+
   let theme = hardcodeThemes[exchangeAddress]
-  if (theme === undefined) {
-    theme = ''
-  }
 
   return {
     tokenName,
@@ -155,6 +264,7 @@ const buildDirectoryObject = exchange => {
     exchangeAddress,
     tokenAddress,
     tokenDecimals,
+    ethBalance,
     tradeVolume: 0,
     percentChange: 0.0,
     theme,
@@ -163,13 +273,4 @@ const buildDirectoryObject = exchange => {
     ethLiquidity: 0,
     erc20Liquidity: 0
   }
-}
-
-// These are previously received from the loanscan api. Only 5 were found
-const hardcodeThemes = {
-  '0x2c4bd064b998838076fa341a83d007fc2fa50957': '#1abc9c',
-  '0xae76c84c9262cdb9abc0c2c8888e62db8e22a0bf': '#302c2c',
-  '0x09cabec1ead1c0ba254b09efb3ee13841712be14': '#fdc134',
-  '0x4e395304655f0796bc3bc63709db72173b9ddf98': '#00b4f4',
-  '0x2e642b8d59b45a1d8c5aef716a84ff44ea665914': '#ff5000'
 }

@@ -6,10 +6,7 @@ import { toK, toNiceDate, toNiceDateYear } from '../../helpers'
 
 const ChartWrapper = styled.div`
   padding-top: 1em;
-  margin-left: -1.5em;
-  @media (max-width: 40em) {
-    margin-left: -1em;
-  }
+  margin-left: -1em;
 `
 
 const Chart = ({ data, chartOption, currencyUnit }) => {
@@ -28,7 +25,7 @@ const Chart = ({ data, chartOption, currencyUnit }) => {
   if (chartOption !== 'volume' && chartData && data) {
     return (
       <ChartWrapper>
-        <ResponsiveContainer aspect={isNotMobile ? 60 / 22 : 60 / 12}>
+        <ResponsiveContainer aspect={60 / 12}>
           <AreaChart margin={{ top: 0, right: 0, bottom: 6, left: 10 }} barCategoryGap={1} data={chartData}>
             <CartesianGrid stroke="#f5f5f5" />
             <XAxis
@@ -74,7 +71,6 @@ const Chart = ({ data, chartOption, currencyUnit }) => {
                 borderRadius: 10,
                 borderColor: 'var(--c-zircon)'
               }}
-              wrapperStyle={{ top: -70, left: -10 }}
             />
             <Area
               strokeWidth={2}
@@ -144,7 +140,6 @@ const Chart = ({ data, chartOption, currencyUnit }) => {
                 borderRadius: 10,
                 borderColor: 'var(--c-zircon)'
               }}
-              wrapperStyle={{ top: -70, left: -10 }}
             />
             <Area
               type="monotone"

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import dayjs from 'dayjs'
 import { Area, XAxis, YAxis, ResponsiveContainer, CartesianGrid, Tooltip, AreaChart } from 'recharts'
 import styled from 'styled-components'
 import { useMedia } from 'react-use'
@@ -6,18 +7,24 @@ import { toK, toNiceDate, toNiceDateYear } from '../../helpers'
 
 const ChartWrapper = styled.div`
   padding-top: 1em;
-  margin-left: -1.5em;
-  @media (max-width: 40em) {
-    margin-left: -1em;
-  }
+  margin-left: -1em;
 `
 
-const Chart = ({ data, chartOption, currencyUnit }) => {
+const OverviewChart = ({ data, chartOption, currencyUnit }) => {
   const [chartData, setChartData] = useState([])
 
   useEffect(() => {
     setChartData([])
-    setChartData(data)
+
+    let filteredData = []
+    for (let x = 0; x < data.length - 1; x++) {
+      let dayStamp = dayjs.unix(data[x].date).date()
+      let dayStamp2 = dayjs.unix(data[x + 1].date).date()
+      if (dayStamp !== dayStamp2) {
+        filteredData.push(data[x])
+      }
+    }
+    setChartData(filteredData)
   }, [data])
 
   // useEffect(() => {
@@ -83,26 +90,9 @@ const Chart = ({ data, chartOption, currencyUnit }) => {
               name={'Total Liquidity' + (currencyUnit === 'USD' ? ' (USD)' : ' (ETH)')}
               dataKey={currencyUnit === 'USD' ? 'usdLiquidity' : 'ethLiquidity'}
               yAxisId={0}
-              fill="var(--c-token)"
+              fill="#FE6DDE"
               opacity={'0.4'}
-              stroke="var(--c-token)"
-            />
-            <Area
-              type="monotone"
-              name={'Eth Balance'}
-              dataKey={'ethBalance'}
-              fill="var(--c-token)"
-              opacity={'0'}
-              stroke="var(--c-token)"
-            />
-            <Area
-              type="monotone"
-              name={'Token Balance'}
-              dataKey={'tokenBalance'}
-              fill="var(--c-token)"
-              yAxisId={1}
-              opacity={'0'}
-              stroke="var(--c-token)"
+              stroke="#FE6DDE"
             />
           </AreaChart>
         </ResponsiveContainer>
@@ -149,10 +139,10 @@ const Chart = ({ data, chartOption, currencyUnit }) => {
             <Area
               type="monotone"
               name={'Volume' + (currencyUnit === 'USD' ? ' (USD)' : ' (ETH)')}
-              dataKey={currencyUnit === 'USD' ? 'usdVolume' : 'ethVolume'}
-              fill="var(--c-token)"
+              dataKey={currencyUnit === 'USD' ? 'dailyUSDVolume' : 'dailyEthVolume'}
+              fill="#FE6DDE"
               opacity={'0.4'}
-              stroke="var(--c-token)"
+              stroke="#FE6DDE"
             />
           </AreaChart>
         </ResponsiveContainer>
@@ -161,4 +151,4 @@ const Chart = ({ data, chartOption, currencyUnit }) => {
   }
 }
 
-export default Chart
+export default OverviewChart

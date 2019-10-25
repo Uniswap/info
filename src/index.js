@@ -1,30 +1,34 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
+import Web3Provider from 'web3-react'
 import { Subscribe, Provider } from 'unstated'
-
-import { PoolContainer } from './containers/poolContainer'
 import { DirectoryContainer } from './containers/directoryContainer'
-import { TransactionsContainer } from './containers/transactionsContainer'
-import { ChartContainer } from './containers/chartContainer'
-import { OverviewPageContainer } from './containers/overviewPageContainer'
 import App from './App'
+import { Connectors } from 'web3-react'
 
+const { InjectedConnector } = Connectors
+
+// right now only support mainet as our graph tracks that only
+const MetaMask = new InjectedConnector({ supportedNetworks: [1] })
+
+const connectors = { MetaMask }
+
+/**
+ * This is the last legacy data fetching strategy. In future updates we should move this into
+ * some data context.
+ *
+ */
 export default function AppWrapper() {
   return (
     <Provider>
-      <Subscribe to={[PoolContainer, TransactionsContainer, DirectoryContainer, ChartContainer, OverviewPageContainer]}>
-        {(poolStore, transactionsStore, directoryStore, chartStore, overviewPageStore) => (
-          <App
-            poolStore={poolStore}
-            transactionsStore={transactionsStore}
-            directoryStore={directoryStore}
-            chartStore={chartStore}
-            overviewPageStore={overviewPageStore}
-          />
-        )}
-      </Subscribe>
+      <Subscribe to={[DirectoryContainer]}>{directoryStore => <App directoryStore={directoryStore} />}</Subscribe>
     </Provider>
   )
 }
 
-ReactDOM.render(<AppWrapper />, document.getElementById('root'))
+ReactDOM.render(
+  <Web3Provider connectors={connectors} libraryName="ethers.js">
+    <AppWrapper />
+  </Web3Provider>,
+  document.getElementById('root')
+)
