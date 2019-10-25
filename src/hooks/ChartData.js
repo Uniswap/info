@@ -13,8 +13,7 @@ export function useChart(exchangeAddress, daysToQuery) {
   useEffect(() => {
     const fetchChartData = async function(exchangeAddress, daysToQuery) {
       try {
-        // const utcEndTime = dayjs.utc()
-        const utcEndTime = dayjs('2019-07-27')
+        const utcEndTime = dayjs.utc()
         let utcStartTime
         // go back, go way way back
         switch (daysToQuery) {

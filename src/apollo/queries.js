@@ -85,6 +85,7 @@ export const TICKER_QUERY = gql`
       ethBalance
       tradeVolumeEth
       tradeVolumeToken
+      totalTxsCount
     }
   }
 `

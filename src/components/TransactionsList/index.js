@@ -237,13 +237,12 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, setTx
    */
   useEffect(() => {
     setPage(1)
-    const ab = new AbortController()
+    let ab = new AbortController()
     async function getTxs() {
       setLoading(true)
 
       // current time
-      // const utcCurrentTime = dayjs()
-      const utcEndTime = dayjs('2019-07-22')
+      const utcEndTime = dayjs()
       let utcStartTime
       utcStartTime = utcEndTime.subtract(1, 'day').startOf('day')
       let startTime = utcStartTime.unix() - 1 // -1 because we filter on greater than in the query
@@ -253,6 +252,7 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, setTx
       let fetchingData = true
 
       while (fetchingData) {
+        ab = new AbortController()
         let result = await client.query({
           query: TRANSACTIONS_QUERY_SKIPPABLE,
           variables: {
@@ -345,13 +345,10 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, setTx
       SetRemoves(newRemoves)
       setTxCount(ts.length)
       setMaxPage(Math.floor(validDataLength / TXS_PER_PAGE) + 1)
-
-      return function cleanup() {
-        ab.abort()
-      }
     }
     getTxs()
 
+    // cleanup graphql call
     return function cleanup() {
       ab.abort()
     }
@@ -476,6 +473,7 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, setTx
         <Flex alignItems="center">
           <ClickableText
             area={'time'}
+            color="textDim"
             onClick={e => {
               setSortedColumn(SORT_FIELD.TIME)
               setSortDirection(!sortDirection)
@@ -489,7 +487,7 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, setTx
       <Divider />
       <List p={0}>
         {!loading && txs && txs.length === 0 ? <EmptyTxWrapper>No transactions</EmptyTxWrapper> : ''}
-        {loading && txs ? (
+        {loading ? (
           <Loader />
         ) : (
           filteredTxs.slice(TXS_PER_PAGE * (page - 1), page * TXS_PER_PAGE - 1).map((tx, index) => {
@@ -518,7 +516,6 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, setTx
         >
           <Arrow faded={page === maxPage ? true : false}>→</Arrow>
         </div>
-        <i data-feather="circle"></i>
       </PageButtons>
     </ListWrapper>
   )

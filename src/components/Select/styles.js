@@ -1,6 +1,4 @@
 import theme from '../Theme/theme'
-import { visible } from 'ansi-colors'
-import { relative } from 'upath'
 const color = theme.colors
 
 export const customStyles = {

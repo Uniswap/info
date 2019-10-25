@@ -14,6 +14,7 @@ import Loader from '../components/Loader'
 import TokenLogo from '../components/TokenLogo'
 import { Divider, Hint } from '../components'
 import { useMedia } from 'react-use'
+import { getTimeFrame } from '../constants'
 import Copy from '../components/Copy'
 
 const timeframeOptions = [
@@ -193,27 +194,6 @@ const TokenGroup = styled.div`
   align-items: center;
 `
 
-const FrameWrapper = styled.div`
-  min-width: 100vw;
-  height: 100vh;
-  left: 0;
-  top: 0;
-  z-index: 9999;
-  background-color: rgba(0, 0, 0, 0.7);
-  position: fixed;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  &:hover {
-    cursor: pointer;
-  }
-
-  @media screen and (max-width: 440px) {
-    padding-top: 20px;
-  }
-`
-
 const BuyButton = styled(Box)`
   &:hover {
     background-color: #2f80edab;
@@ -236,9 +216,30 @@ const ExchangeButtons = styled(Flex)`
   padding: 20px 20px;
 `
 
+const FrameWrapper = styled.div`
+  min-width: 100vw;
+  height: 100vh;
+  left: 0;
+  top: 0;
+  z-index: 9999;
+  background-color: rgba(0, 0, 0, 0.7);
+  position: fixed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  &:hover {
+    cursor: pointer;
+  }
+
+  @media screen and (max-width: 440px) {
+    padding-top: 20px;
+  }
+`
+
 const FrameBorder = styled.div`
   border-radius: 26px;
-  margin-bottom: 10px;
+  margin-bottom: 20px;
   overflow: hidden;
 `
 
@@ -302,6 +303,7 @@ export const MainPage = function({
   priceUSD,
   chartData,
   tokenAddress,
+  historyDaysToQuery,
   setHistoryDaysToQuery
 }) {
   const [chartOption, setChartOption] = useState('liquidity')
@@ -498,7 +500,7 @@ export const MainPage = function({
                   <Select
                     placeholder="Timeframe"
                     options={timeframeOptions}
-                    defaultValue={timeframeOptions[3]}
+                    defaultValue={getTimeFrame(historyDaysToQuery)}
                     onChange={select => {
                       setHistoryDaysToQuery(select.value)
                     }}
@@ -655,8 +657,8 @@ export const MainPage = function({
                   ? 'https://uniswap.exchange/swap?outputCurrency=' + tokenAddress.toString()
                   : 'https://uniswap.exchange/swap?inputCurrency=' + tokenAddress.toString()
               }
-              height="680px"
-              width={belowMedium ? '300px' : '400px'}
+              height={belowMedium ? '500px' : '660px'}
+              width={belowMedium ? '340px' : '400px'}
               id="myId"
               frameBorder="0"
               style={{ border: 'none', outline: 'none' }}

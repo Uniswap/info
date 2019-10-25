@@ -40,8 +40,7 @@ export function useGlobalData() {
              */
             try {
               // current time
-              // const utcCurrentTime = dayjs()
-              const utcCurrentTime = dayjs('2019-07-22')
+              const utcCurrentTime = dayjs()
               const utcOneDayBack = utcCurrentTime.subtract(1, 'day')
 
               // get the current data

@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import { useMedia } from 'react-use'
 import { Box, Flex, Text } from 'rebass'
 import styled from 'styled-components'
 import FourByFour from '../components/FourByFour'
@@ -10,8 +9,7 @@ import OverviewList from '../components/OverviewList'
 import OverviewChart from '../components/OverviewChart'
 import Loader from '../components/Loader'
 import { Divider, Hint } from '../components'
-
-import { Parallax } from 'react-scroll-parallax'
+import { getTimeFrame } from '../constants'
 
 const timeframeOptions = [
   { value: '1week', label: '1 week' },
@@ -152,15 +150,16 @@ function getPercentSign(value) {
 
 export const OverviewPage = function({
   exchangeAddress,
+  uniswapHistory,
   currencyUnit,
   globalData,
   symbol,
   price,
   invPrice,
-  switchActiveExchange,
   priceUSD,
-  uniswapHistory,
-  updateTimeframe
+  switchActiveExchange,
+  updateTimeframe,
+  historyDaysToQuery
 }) {
   const [chartOption, setChartOption] = useState('liquidity')
 
@@ -177,15 +176,10 @@ export const OverviewPage = function({
     return Number(parseFloat(num).toFixed(4)).toLocaleString()
   }
 
-  const belowMedium = useMedia('(max-width: 64em)')
-
-  const belowSmall = useMedia('(max-width: 40em)')
-
   return (
     <div style={{ marginTop: '0px' }}>
       <ThemedBackground bg="black" />
       {globalData ? (
-        // <Parallax y={belowMedium ? [0, 0] : ['400px', '-400px']}>
         <DashboardWrapper>
           <TokenHeader>
             <div>Uniswap Overview</div>
@@ -280,7 +274,7 @@ export const OverviewPage = function({
                     <Select
                       placeholder="Timeframe"
                       options={timeframeOptions}
-                      defaultValue={timeframeOptions[3]}
+                      defaultValue={getTimeFrame(historyDaysToQuery)}
                       onChange={select => {
                         updateTimeframe(select.value)
                       }}
@@ -317,7 +311,6 @@ export const OverviewPage = function({
           </OverviewDashboard>
         </DashboardWrapper>
       ) : (
-        // </Parallax>
         ''
       )}
       <Footer />
