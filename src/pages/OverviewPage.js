@@ -142,7 +142,6 @@ export const OverviewPage = function({
       return 0
     }
     if (num < 0.0001) {
-      console.log(num)
       return '< 0.0001'
     }
     if (usd && num >= 0.01) {
