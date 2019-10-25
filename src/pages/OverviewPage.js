@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import { useMedia } from 'react-use'
 import { Box, Flex, Text } from 'rebass'
 import styled from 'styled-components'
 import FourByFour from '../components/FourByFour'
@@ -10,8 +9,7 @@ import OverviewList from '../components/OverviewList'
 import OverviewChart from '../components/OverviewChart'
 import Loader from '../components/Loader'
 import { Divider, Hint } from '../components'
-
-import { Parallax } from 'react-scroll-parallax'
+import { getTimeFrame } from '../constants'
 
 const timeframeOptions = [
   { value: '1week', label: '1 week' },
@@ -32,7 +30,7 @@ const ThemedBackground = styled(Box)`
   width: 100vw;
 
   @media screen and (max-width: 64em) {
-    height: 489px;
+    height: 589px;
   }
 
   ${props => !props.last}
@@ -126,15 +124,16 @@ function getPercentSign(value) {
 
 export const OverviewPage = function({
   exchangeAddress,
+  uniswapHistory,
   currencyUnit,
   globalData,
   symbol,
   price,
   invPrice,
-  switchActiveExchange,
   priceUSD,
-  uniswapHistory,
-  updateTimeframe
+  switchActiveExchange,
+  updateTimeframe,
+  historyDaysToQuery
 }) {
   const [chartOption, setChartOption] = useState('liquidity')
 
@@ -143,6 +142,7 @@ export const OverviewPage = function({
       return 0
     }
     if (num < 0.0001) {
+      console.log(num)
       return '< 0.0001'
     }
     if (usd && num >= 0.01) {
@@ -151,15 +151,10 @@ export const OverviewPage = function({
     return Number(parseFloat(num).toFixed(4)).toLocaleString()
   }
 
-  const belowMedium = useMedia('(max-width: 64em)')
-
-  const belowSmall = useMedia('(max-width: 40em)')
-
   return (
     <div style={{ marginTop: '40px' }}>
       <ThemedBackground bg="black" />
       {globalData ? (
-        // <Parallax y={belowMedium ? [0, 0] : ['400px', '-400px']}>
         <DashboardWrapper>
           <OverviewDashboard mx="auto" px={[0, 3]}>
             <TopPanel rounded color="white" p={24} style={{ gridArea: 'volume' }}>
@@ -251,7 +246,7 @@ export const OverviewPage = function({
                     <Select
                       placeholder="Timeframe"
                       options={timeframeOptions}
-                      defaultValue={timeframeOptions[3]}
+                      defaultValue={getTimeFrame(historyDaysToQuery)}
                       onChange={select => {
                         updateTimeframe(select.value)
                       }}
@@ -288,7 +283,6 @@ export const OverviewPage = function({
           </OverviewDashboard>
         </DashboardWrapper>
       ) : (
-        // </Parallax>
         ''
       )}
       <Footer />

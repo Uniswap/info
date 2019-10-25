@@ -170,7 +170,8 @@ function OverviewList({ switchActiveExchange, currencyUnit, price, priceUSD }) {
     PRICE: 'priceUSD',
     LIQUIDITY: 'ethBalance',
     TRANSACTIIONS: 'txs',
-    VOLUME: 'volume'
+    VOLUME: 'volume',
+    SYMBOL: 'tokenSymbol'
   }
 
   const [sortedColumn, setSortedColumn] = useState(SORT_FIELD.LIQUIDITY)
@@ -197,11 +198,20 @@ function OverviewList({ switchActiveExchange, currencyUnit, price, priceUSD }) {
       SetFilteredTxs(newTxs)
       setPage(1)
     } else {
-      let newTxs = filteredTxs.slice().sort((a, b) => {
-        return parseFloat(a[field]) > parseFloat(b[field])
-          ? (sortDirection ? -1 : 1) * -1
-          : (sortDirection ? -1 : 1) * 1
-      })
+      let newTxs
+      if (field === SORT_FIELD.SYMBOL) {
+        newTxs = filteredTxs.slice().sort((a, b) => {
+          return a[field].toString().toLowerCase() > b[field].toString().toLowerCase()
+            ? (sortDirection ? -1 : 1) * -1
+            : (sortDirection ? -1 : 1) * 1
+        })
+      } else {
+        newTxs = filteredTxs.slice().sort((a, b) => {
+          return parseFloat(a[field]) > parseFloat(b[field])
+            ? (sortDirection ? -1 : 1) * -1
+            : (sortDirection ? -1 : 1) * 1
+        })
+      }
       SetFilteredTxs(newTxs)
       setPage(1)
     }
@@ -223,7 +233,6 @@ function OverviewList({ switchActiveExchange, currencyUnit, price, priceUSD }) {
           fetchPolicy: 'cache-first'
         })
         if (result) {
-          setLoading(false)
           fetchingData = false
           setMaxPage(Math.floor(result.data.exchanges.length / TXS_PER_PAGE))
           SetFilteredTxs(result.data.exchanges)
@@ -241,8 +250,7 @@ function OverviewList({ switchActiveExchange, currencyUnit, price, priceUSD }) {
       exchanges.map(item => {
         try {
           ldata[item.id] = item
-          // const utcCurrentTime = dayjs()
-          const utcCurrentTime = dayjs('2019-07-22')
+          const utcCurrentTime = dayjs()
           const utcOneDayBack = utcCurrentTime.subtract(1, 'day')
           let result24HoursAgo
           result24HoursAgo = client.query({
@@ -279,7 +287,9 @@ function OverviewList({ switchActiveExchange, currencyUnit, price, priceUSD }) {
             let oneDayTxs = ldata[data24HoursAgo.exchangeAddress].totalTxsCount - data24HoursAgo.totalTxsCount
             newVolumeMap[ldata[data24HoursAgo.exchangeAddress].id].txs = oneDayTxs
           }
+          return true
         })
+        setLoading(false)
         setExchangeData24Hour(newVolumeMap)
       })
     }
@@ -295,7 +305,7 @@ function OverviewList({ switchActiveExchange, currencyUnit, price, priceUSD }) {
       <DashGridClickable
         onClick={() => {
           switchActiveExchange(exchange.id)
-          history.push('/tokens')
+          history.push('/token')
           window.scrollTo(0, 0)
         }}
         style={{ height: '60px' }}
@@ -363,7 +373,17 @@ function OverviewList({ switchActiveExchange, currencyUnit, price, priceUSD }) {
         {!belowMedium ? (
           <>
             <Flex alignItems="center">
-              <Text>Symbol</Text>
+              <ClickableText
+                area={'liquidity'}
+                color="textDim"
+                onClick={e => {
+                  setSortedColumn(SORT_FIELD.SYMBOL)
+                  setSortDirection(!sortDirection)
+                  sortTxs(SORT_FIELD.SYMBOL)
+                }}
+              >
+                <Text>Symbol {sortedColumn === SORT_FIELD.SYMBOL ? (sortDirection ? '↑' : '↓') : ''}</Text>
+              </ClickableText>
             </Flex>
             <Flex alignItems="center">
               <ClickableText

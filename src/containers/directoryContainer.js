@@ -15,6 +15,7 @@ export class DirectoryContainer extends Container {
     activeExchange: { exchangeAddress: '' }
   }
 
+  // used to switch between current exchange on token page
   setActiveExchange = address => {
     if (this.state.exchanges[address]) {
       this.setState({ activeExchange: this.state.exchanges[address] })
@@ -27,6 +28,11 @@ export class DirectoryContainer extends Container {
       let data = []
       let dataEnd = false
       let skip = 0
+
+      /**
+       * Get all the exchanges on Uniswap, and collect symbol, ticker, etc
+       * skip is max items the graph can return, should support 1000 now
+       */
       while (!dataEnd) {
         let result = await client.query({
           query: DIRECTORY_QUERY,
@@ -36,18 +42,23 @@ export class DirectoryContainer extends Container {
           }
         })
         data = data.concat(result.data.exchanges)
+
+        // loop if haven't found all yet
         skip = skip + 1000
         if (result.data.exchanges.length !== 1000) {
           dataEnd = true
         }
       }
 
-      let query = window.location.search.match(new RegExp('[?&]token=([^&#?]*)'))
-
       let directoryObjects = {}
-
       let defaultExchange = null
 
+      /**
+       * Basical version of custom linking.
+       *
+       * @todo - replace this with address based routing at an app level
+       */
+      let query = window.location.search.match(new RegExp('[?&]token=([^&#?]*)'))
       data.forEach(exchange => {
         if (
           (query && exchange.tokenAddress.toString().toUpperCase() === query[1].toString().toUpperCase()) ||
@@ -58,10 +69,17 @@ export class DirectoryContainer extends Container {
         return (directoryObjects[exchange.id] = buildDirectoryObject(exchange))
       })
 
+      // create a label for each used in dropdowns
       await this.setState({
         directory: data.map(exchange => buildDirectoryLabel(exchange)),
         exchanges: directoryObjects
       })
+
+      /**
+       * Set default exchange if not one yet
+       *
+       * @todo - when moved to context allow for no selected exchange (when overview selected)
+       */
 
       if (!defaultExchange) {
         defaultExchange = this.state.directory[0].value
@@ -78,9 +96,7 @@ export class DirectoryContainer extends Container {
 
   // fetch exchange information via address
   async fetchOverviewData(address) {
-    /**
-     * get today's data
-     */
+    // get the current state of the exchange
     try {
       const result = await client.query({
         query: TICKER_QUERY,
@@ -93,16 +109,13 @@ export class DirectoryContainer extends Container {
       if (result) {
         data = result.data.exchange
       }
-      const { price, ethBalance, tokenBalance, tradeVolumeEth, tradeVolumeToken, priceUSD } = data
+      const { price, ethBalance, tradeVolumeEth, tradeVolumeToken, priceUSD, totalTxsCount } = data
 
-      /**
-       * get yesterdays data
-       */
       let data24HoursAgo = {}
-      let dataNowForTxs = {}
+
+      // get data from 24 hours ago
       try {
-        // const utcCurrentTime = dayjs()
-        const utcCurrentTime = dayjs('2019-07-22')
+        const utcCurrentTime = dayjs()
         const utcOneDayBack = utcCurrentTime.subtract(1, 'day')
         const result24HoursAgo = await client.query({
           query: TICKER_24HOUR_QUERY,
@@ -114,29 +127,12 @@ export class DirectoryContainer extends Container {
         })
         if (result24HoursAgo) {
           data24HoursAgo = result24HoursAgo.data.exchangeHistoricalDatas[0]
-
-          try {
-            // const utcCurrentTime = dayjs()
-            const utcCurrentTime = dayjs('2019-07-22')
-            const resultLatest = await client.query({
-              query: TICKER_24HOUR_QUERY,
-              variables: {
-                exchangeAddr: address,
-                timestamp: utcCurrentTime.unix()
-              },
-              fetchPolicy: 'network-only'
-            })
-            if (resultLatest) {
-              dataNowForTxs = resultLatest.data.exchangeHistoricalDatas[0]
-            }
-          } catch (err) {
-            console.log('error: ', err)
-          }
         }
       } catch (err) {
         console.log('error: ', err)
       }
 
+      // set default values to 0 (for exchanges that are brand new and dont have 24 hour data yet)
       const invPrice = 1 / price
       let pricePercentChange = 0
       let pricePercentChangeETH = 0
@@ -192,7 +188,7 @@ export class DirectoryContainer extends Container {
 
         txsPercentChange = ''
         const adjustedTxChangePercent = (
-          ((dataNowForTxs.totalTxsCount - data24HoursAgo.totalTxsCount) / dataNowForTxs.totalTxsCount) *
+          ((totalTxsCount - data24HoursAgo.totalTxsCount) / totalTxsCount) *
           100
         ).toFixed(2)
         adjustedTxChangePercent > 0 ? (txsPercentChange = '+') : (txsPercentChange = '')
@@ -219,7 +215,6 @@ export class DirectoryContainer extends Container {
             tradeVolume: parseFloat(Big(oneDayVolume).toFixed(4)),
             tradeVolumeUSD: parseFloat(Big(oneDayVolumeUSD).toFixed(4)),
             ethLiquidity: Big(ethBalance).toFixed(4),
-            usdLiquidity: Big(tokenBalance * priceUSD).toFixed(4),
             txsPercentChange
           }
         }
@@ -233,10 +228,12 @@ export class DirectoryContainer extends Container {
   }
 }
 
+// build the label for dropdown
 const buildDirectoryLabel = exchange => {
   let { tokenSymbol, id, tokenAddress } = exchange
   const exchangeAddress = id
 
+  // custom handling for UI
   if (tokenSymbol === null) {
     if (hardcodedExchanges.hasOwnProperty(exchangeAddress.toUpperCase())) {
       tokenSymbol = hardcodedExchanges[exchangeAddress.toUpperCase()].symbol
@@ -252,6 +249,7 @@ const buildDirectoryLabel = exchange => {
   }
 }
 
+// build object for token page data
 const buildDirectoryObject = exchange => {
   let { tokenName, tokenSymbol, id, tokenAddress, tokenDecimals, ethBalance } = exchange
   let symbol = tokenSymbol

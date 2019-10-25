@@ -11,16 +11,14 @@ import { useMedia } from 'react-use'
 
 const Header = styled(Panel)`
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 1rem;
   width: 100%;
+  grid-template-columns: 1fr 1fr;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px;
 
   @media (max-width: 40em) {
-    margin-bottom: 0;
-    padding-right: 18px;
-    padding-left: 18px;
+    padding: 18px;
   }
 `
 
@@ -37,7 +35,7 @@ const NavRight = styled.div`
   justify-items: end;
   align-items: center;
   grid-template-columns: auto 240px;
-  grid-column-gap: 13px;
+  grid-column-gap: 16px;
 
   @media screen and (max-width: 40em) {
     grid-template-columns: auto 160px;
@@ -68,11 +66,13 @@ export default function NavHeader({
   exchangeAddress,
   switchActiveExchange,
   setCurrencyUnit,
-  currencyUnit
+  currencyUnit,
+  setHistoryDaysToQuery
 }) {
   // for now exclude broken tokens
   const [filteredDirectory, setDirectory] = useState([])
 
+  // filter out exchange with low liquidity
   useEffect(() => {
     for (var i = 0; i < directory.length; i++) {
       if (parseFloat(exchanges[directory[i].value].ethBalance) > 0.1) {
@@ -86,15 +86,15 @@ export default function NavHeader({
     }
   }, [exchanges, directory, filteredDirectory])
 
-  const belowLarge = useMedia('(max-width: 640px)')
+  const belowLarge = useMedia('(max-width: 40em)')
   const history = useHistory()
 
   return (
-    <Header px={24} py={3} bg={['transparent', 'transparent']} color={['white', 'black']}>
+    <Header bg={['transparent', 'transparent']}>
       <NavLeft>
         <Title />
         <LinkText to="/" selected={window.location.pathname !== '/tokens'}>
-          Overview
+          Home
         </LinkText>
       </NavLeft>
       <NavRight>
@@ -107,7 +107,7 @@ export default function NavHeader({
             if (exchangeAddress !== select.value) {
               switchActiveExchange(select.value)
             }
-            history.push('/tokens')
+            history.push('/token')
           }}
         />
       </NavRight>

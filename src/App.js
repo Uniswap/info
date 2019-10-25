@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { ApolloProvider } from 'react-apollo'
 import { client } from './apollo/client'
 import { Route, Switch, BrowserRouter, withRouter } from 'react-router-dom'
@@ -12,44 +12,45 @@ import TokenLogo from './components/TokenLogo'
 import { useChart } from './hooks/ChartData'
 import { useGlobalData } from './hooks/GlobalData'
 import { useUniswapHistory } from './hooks/UniswapHistory'
-
-const timeframeOptions = [
-  { value: '1week', label: '1 week' },
-  { value: '1month', label: '1 month' },
-  { value: '3months', label: '3 months' },
-  { value: 'all', label: 'All time' }
-]
+import { timeframeOptions } from './constants'
 
 function App(props) {
-  //set default chart query time box
+  // set default time box to all time
   const [historyDaysToQuery, setHistoryDaysToQuery] = useState(timeframeOptions[3].value)
 
+  // currency across site can be USD or ETH
   const [currencyUnit, setCurrencyUnit] = useState('USD')
 
+  // data for individual exchange historical chart, start with default
   const chartData = useChart(
     props.directoryStore.state.activeExchange ? props.directoryStore.state.activeExchange.exchangeAddress : '',
     historyDaysToQuery
   )
 
+  // historical data for chart on overview page
   const uniswapHistory = useUniswapHistory(historyDaysToQuery)
 
+  // data for Uniswap totals on overview page, may be dependent on values in the future
   const globalData = useGlobalData()
 
   // switch active exchane
-  const switchActiveExchange = async address => {
-    try {
-      // set the active exchange
-      await props.directoryStore.setActiveExchange(address)
+  const switchActiveExchange = useCallback(
+    async address => {
+      try {
+        // reset active exchange address
+        await props.directoryStore.setActiveExchange(address)
 
-      // set the new theme color from active exchange
-      await setThemeColor(props.directoryStore.state.activeExchange.theme)
+        // set the new theme color from active exchange
+        await setThemeColor(props.directoryStore.state.activeExchange.theme)
 
-      // fetch the new ticker information
-      await props.directoryStore.fetchOverviewData(address)
-    } catch (err) {
-      console.log('error:', err)
-    }
-  }
+        // fetch the new information for the exhcnage token page
+        await props.directoryStore.fetchOverviewData(address)
+      } catch (err) {
+        console.log('error:', err)
+      }
+    },
+    [props.directoryStore]
+  )
 
   // fetch the initial data
   useEffect(() => {
@@ -64,7 +65,7 @@ function App(props) {
     } catch (err) {
       console.log('error:', err)
     }
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [props.directoryStore, switchActiveExchange])
 
   const {
     exchangeAddress,
@@ -77,18 +78,14 @@ function App(props) {
     pricePercentChangeETH,
     txsPercentChange,
     symbol,
-    erc20Liquidity,
     price,
     invPrice,
     priceUSD,
     ethLiquidity,
-    usdLiquidity,
     tokenAddress,
     liquidityPercentChange,
     liquidityPercentChangeUSD
   } = props.directoryStore.state.activeExchange
-
-  const defaultExchangeAddress = props.directoryStore.state.defaultExchangeAddress
 
   const {
     state: { exchanges }
@@ -119,12 +116,12 @@ function App(props) {
       default
       {...props}
       directory={directory}
+      exchanges={exchanges}
+      exchangeAddress={exchangeAddress}
+      switchActiveExchange={switchActiveExchange}
       currencyUnit={currencyUnit}
       setCurrencyUnit={setCurrencyUnit}
-      exchangeAddress={exchangeAddress}
-      defaultExchangeAddress={defaultExchangeAddress}
-      switchActiveExchange={switchActiveExchange}
-      exchanges={exchanges}
+      setHistoryDaysToQuery={setHistoryDaysToQuery}
     />
   ))
 
@@ -134,11 +131,10 @@ function App(props) {
         <BrowserRouter>
           <NavHeaderUpdated />
           <Switch>
-            <Route path="/tokens">
+            <Route path="/token">
               <MainPage
                 currencyUnit={currencyUnit}
                 tokenName={tokenName}
-                directory={directory}
                 exchangeAddress={exchangeAddress}
                 symbol={symbol}
                 tradeVolume={tradeVolume}
@@ -150,37 +146,27 @@ function App(props) {
                 liquidityPercentChange={liquidityPercentChange}
                 liquidityPercentChangeUSD={liquidityPercentChangeUSD}
                 txsPercentChange={txsPercentChange}
-                erc20Liquidity={erc20Liquidity}
                 ethLiquidity={ethLiquidity}
-                usdLiquidity={usdLiquidity}
                 price={price}
                 invPrice={invPrice}
                 priceUSD={priceUSD}
                 chartData={chartData}
                 tokenAddress={tokenAddress}
+                historyDaysToQuery={historyDaysToQuery}
                 setHistoryDaysToQuery={setHistoryDaysToQuery}
               />
             </Route>
             <Route path="/">
               <OverviewPage
                 currencyUnit={currencyUnit}
-                tokenName={tokenName}
                 switchActiveExchange={switchActiveExchange}
                 globalData={globalData}
-                directory={directory}
-                exchangeAddress={exchangeAddress}
                 symbol={symbol}
-                tradeVolume={tradeVolume}
-                pricePercentChange={pricePercentChange}
-                volumePercentChange={volumePercentChange}
-                liquidityPercentChange={liquidityPercentChange}
-                erc20Liquidity={erc20Liquidity}
                 price={price}
                 invPrice={invPrice}
                 priceUSD={priceUSD}
-                chartData={chartData}
                 uniswapHistory={uniswapHistory}
-                tokenAddress={tokenAddress}
+                historyDaysToQuery={historyDaysToQuery}
                 updateTimeframe={setHistoryDaysToQuery}
               />
             </Route>
