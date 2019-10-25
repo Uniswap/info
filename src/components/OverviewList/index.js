@@ -79,7 +79,7 @@ const DashGrid = styled.div`
     padding: 0 24px;
     grid-gap: 1em;
     grid-template-columns: 1fr 0.8fr 0.8fr 1fr 1fr 1fr;
-    grid-template-areas: 'name symbol price txs liquidity volume';
+    grid-template-areas: 'name symbol price volume liquidity txs';
   }
 `
 
@@ -134,22 +134,12 @@ const LogoBox = styled.div`
 `
 
 // @TODO rework into virtualized list
-function OverviewList({
-  tokenSymbol,
-  switchActiveExchange,
-  exchangeAddress,
-  currencyUnit,
-  price,
-  priceUSD,
-  setTxCount,
-  txFilter,
-  accountInput
-}) {
-  const [txs, setTxs] = useState([])
+function OverviewList({ switchActiveExchange, currencyUnit, price, priceUSD }) {
+  const [exchanges, setExchanges] = useState([])
 
   const [filteredTxs, SetFilteredTxs] = useState([])
 
-  const [volumeMap, setVolumeMap] = useState({})
+  const [exchangeData24Hour, setExchangeData24Hour] = useState({})
 
   const [page, setPage] = useState(1)
 
@@ -179,22 +169,30 @@ function OverviewList({
   const SORT_FIELD = {
     PRICE: 'priceUSD',
     LIQUIDITY: 'ethBalance',
-    TRANSACTIIONS: 'totalTxsCount',
+    TRANSACTIIONS: 'txs',
     VOLUME: 'volume'
   }
 
   const [sortedColumn, setSortedColumn] = useState(SORT_FIELD.LIQUIDITY)
 
   function sortTxs(field) {
-    if (field === SORT_FIELD.VOLUME) {
+    if (field === SORT_FIELD.VOLUME || field === SORT_FIELD.TRANSACTIIONS) {
       let newTxs = filteredTxs.slice().sort((a, b) => {
-        if (volumeMap.hasOwnProperty(a.id) && volumeMap.hasOwnProperty(b.id)) {
-          return parseFloat(volumeMap[a.id].volume) > parseFloat(volumeMap[b.id].volume)
-            ? (sortDirection ? -1 : 1) * 1
-            : (sortDirection ? -1 : 1) * -1
-        } else {
-          return 1
+        if (!exchangeData24Hour.hasOwnProperty(a.id)) {
+          exchangeData24Hour[a.id] = {}
+          exchangeData24Hour[a.id].volume = 0
+          exchangeData24Hour[a.id].txs = 0
+          setExchangeData24Hour(exchangeData24Hour)
         }
+        if (!exchangeData24Hour.hasOwnProperty(b.id)) {
+          exchangeData24Hour[b.id] = {}
+          exchangeData24Hour[b.id].volume = 0
+          exchangeData24Hour[a.id].txs = 0
+          setExchangeData24Hour(exchangeData24Hour)
+        }
+        return parseFloat(exchangeData24Hour[a.id][field]) > parseFloat(exchangeData24Hour[b.id][field])
+          ? (sortDirection ? -1 : 1) * 1
+          : (sortDirection ? -1 : 1) * -1
       })
       SetFilteredTxs(newTxs)
       setPage(1)
@@ -211,7 +209,7 @@ function OverviewList({
 
   useEffect(() => {
     setSortDirection(true)
-  }, [txs])
+  }, [exchanges])
 
   // get the data
   useEffect(() => {
@@ -222,14 +220,14 @@ function OverviewList({
       while (fetchingData) {
         let result = await client.query({
           query: OVERVIEW_PAGE_QUERY,
-          fetchPolicy: 'network-only'
+          fetchPolicy: 'cache-first'
         })
         if (result) {
           setLoading(false)
           fetchingData = false
           setMaxPage(Math.floor(result.data.exchanges.length / TXS_PER_PAGE))
           SetFilteredTxs(result.data.exchanges)
-          setTxs(result.data.exchanges)
+          setExchanges(result.data.exchanges)
         }
       }
     }
@@ -240,21 +238,23 @@ function OverviewList({
     function get24HrVol() {
       let promises = []
       let ldata = {}
-      txs.map(item => {
+      exchanges.map(item => {
         try {
           ldata[item.id] = item
           // const utcCurrentTime = dayjs()
-          const utcCurrentTime = dayjs('2019-05-17')
+          const utcCurrentTime = dayjs('2019-07-22')
           const utcOneDayBack = utcCurrentTime.subtract(1, 'day')
-          const result24HoursAgo = client.query({
+          let result24HoursAgo
+          result24HoursAgo = client.query({
             query: TICKER_24HOUR_QUERY,
             variables: {
               exchangeAddr: item.id,
               timestamp: utcOneDayBack.unix()
             },
-            fetchPolicy: 'network-only'
+            fetchPolicy: 'cache-first'
           })
           promises.push(result24HoursAgo)
+
           return true
         } catch (err) {
           console.log('error: ', err)
@@ -280,11 +280,11 @@ function OverviewList({
             newVolumeMap[ldata[data24HoursAgo.exchangeAddress].id].txs = oneDayTxs
           }
         })
-        setVolumeMap(newVolumeMap)
+        setExchangeData24Hour(newVolumeMap)
       })
     }
     get24HrVol()
-  }, [txs])
+  }, [exchanges])
 
   const belowMedium = useMedia('(max-width: 64em)')
 
@@ -333,20 +333,21 @@ function OverviewList({
               : formattedNum(exchange.ethBalance * 2) + ' ETH'
             : ''}
         </DataText>
+
+        <DataText area={'volume'}>
+          {exchangeData24Hour.hasOwnProperty(exchange.id) && price && priceUSD
+            ? currencyUnit === 'USD'
+              ? '$' + formattedNum(exchangeData24Hour[exchange.id].volume * price * priceUSD)
+              : formattedNum(exchangeData24Hour[exchange.id].volume) + ' ETH'
+            : '-'}
+        </DataText>
         {!belowSmall ? (
           <DataText area={'txs'}>
-            {volumeMap.hasOwnProperty(exchange.id) ? formattedNum(volumeMap[exchange.id].txs) : '-'}
+            {exchangeData24Hour.hasOwnProperty(exchange.id) ? formattedNum(exchangeData24Hour[exchange.id].txs) : '-'}
           </DataText>
         ) : (
           ''
         )}
-        <DataText area={'volume'}>
-          {volumeMap.hasOwnProperty(exchange.id) && price && priceUSD
-            ? currencyUnit === 'USD'
-              ? '$' + formattedNum(volumeMap[exchange.id].volume * price * priceUSD)
-              : formattedNum(volumeMap[exchange.id].volume) + ' ETH'
-            : '-'}
-        </DataText>
       </DashGridClickable>
     )
   }
@@ -394,23 +395,6 @@ function OverviewList({
             Liquidity {sortedColumn === SORT_FIELD.LIQUIDITY ? (sortDirection ? '↑' : '↓') : ''}
           </ClickableText>
         </Flex>
-        {!belowSmall ? (
-          <Flex alignItems="center">
-            <ClickableText
-              area={'liquidity'}
-              color="textDim"
-              onClick={e => {
-                setSortedColumn(SORT_FIELD.TRANSACTIIONS)
-                setSortDirection(!sortDirection)
-                sortTxs(SORT_FIELD.TRANSACTIIONS)
-              }}
-            >
-              Transactions (24hrs) {sortedColumn === SORT_FIELD.TRANSACTIIONS ? (sortDirection ? '↑' : '↓') : ''}
-            </ClickableText>
-          </Flex>
-        ) : (
-          ''
-        )}
         <Flex alignItems="center">
           <ClickableText
             area={'liquidity'}
@@ -424,11 +408,28 @@ function OverviewList({
             Volume (24hrs) {sortedColumn === SORT_FIELD.VOLUME ? (!sortDirection ? '↑' : '↓') : ''}
           </ClickableText>
         </Flex>
+        {!belowSmall ? (
+          <Flex alignItems="center">
+            <ClickableText
+              area={'liquidity'}
+              color="textDim"
+              onClick={e => {
+                setSortedColumn(SORT_FIELD.TRANSACTIIONS)
+                setSortDirection(!sortDirection)
+                sortTxs(SORT_FIELD.TRANSACTIIONS)
+              }}
+            >
+              Transactions (24hrs) {sortedColumn === SORT_FIELD.TRANSACTIIONS ? (!sortDirection ? '↑' : '↓') : ''}
+            </ClickableText>
+          </Flex>
+        ) : (
+          ''
+        )}
       </DashGrid>
 
       <Divider />
       <List p={0}>
-        {loading && txs.length === 0 ? (
+        {loading || exchanges.length === 0 || exchangeData24Hour.length === 0 ? (
           <Loader />
         ) : (
           filteredTxs.slice(TXS_PER_PAGE * (page - 1), page * TXS_PER_PAGE - 1).map((item, index) => {

@@ -224,15 +224,23 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, setTx
     }
   }, [txFilter, adds, removes, swaps, txs])
 
-  // get the data
+  /**
+   *  Fetch the overall and 24hour data for each exchange
+   *
+   * Update when exhcange changes
+   *
+   * Store results in categorized arrays for faster sorting
+   *
+   */
   useEffect(() => {
     setPage(1)
+    const ab = new AbortController()
     async function getTxs() {
       setLoading(true)
 
       // current time
       // const utcCurrentTime = dayjs()
-      const utcEndTime = dayjs('2019-05-17')
+      const utcEndTime = dayjs('2019-07-22')
       let utcStartTime
       utcStartTime = utcEndTime.subtract(1, 'day').startOf('day')
       let startTime = utcStartTime.unix() - 1 // -1 because we filter on greater than in the query
@@ -249,14 +257,17 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, setTx
             exchangeAddr: exchangeAddress,
             skip: skipCount
           },
-          fetchPolicy: 'network-only'
+          fetchOptions: {
+            signal: ab.signal
+          },
+          fetchPolicy: 'cache-first'
         })
         if (result) {
           skipCount = skipCount + 1000
-          if (result.data.transactions.length === 0) {
-            fetchingData = false
-            setLoading(false)
-          } else if (result.data.transactions[result.data.transactions.length - 1].timestamp < startTime) {
+          if (
+            result.data.transactions.length === 0 ||
+            result.data.transactions[result.data.transactions.length - 1].timestamp < startTime
+          ) {
             fetchingData = false
             setLoading(false)
           }
@@ -331,8 +342,16 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, setTx
       SetRemoves(newRemoves)
       setTxCount(ts.length)
       setMaxPage(Math.floor(validDataLength / TXS_PER_PAGE) + 1)
+
+      return function cleanup() {
+        ab.abort()
+      }
     }
     getTxs()
+
+    return function cleanup() {
+      ab.abort()
+    }
   }, [exchangeAddress, setTxCount])
 
   function getTransactionType(event, symbol) {

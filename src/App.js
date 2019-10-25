@@ -26,8 +26,6 @@ function App(props) {
 
   const [currencyUnit, setCurrencyUnit] = useState('USD')
 
-  const [activeExchange, setActiveExchange] = useState('')
-
   const chartData = useChart(
     props.directoryStore.state.activeExchange ? props.directoryStore.state.activeExchange.exchangeAddress : '',
     historyDaysToQuery

@@ -33,8 +33,7 @@ export class DirectoryContainer extends Container {
           variables: {
             first: 1000,
             skip: skip
-          },
-          fetchPolicy: 'network-only'
+          }
         })
         data = data.concat(result.data.exchanges)
         skip = skip + 1000
@@ -103,7 +102,7 @@ export class DirectoryContainer extends Container {
       let dataNowForTxs = {}
       try {
         // const utcCurrentTime = dayjs()
-        const utcCurrentTime = dayjs('2019-05-17')
+        const utcCurrentTime = dayjs('2019-07-22')
         const utcOneDayBack = utcCurrentTime.subtract(1, 'day')
         const result24HoursAgo = await client.query({
           query: TICKER_24HOUR_QUERY,
@@ -115,81 +114,93 @@ export class DirectoryContainer extends Container {
         })
         if (result24HoursAgo) {
           data24HoursAgo = result24HoursAgo.data.exchangeHistoricalDatas[0]
+
+          try {
+            // const utcCurrentTime = dayjs()
+            const utcCurrentTime = dayjs('2019-07-22')
+            const resultLatest = await client.query({
+              query: TICKER_24HOUR_QUERY,
+              variables: {
+                exchangeAddr: address,
+                timestamp: utcCurrentTime.unix()
+              },
+              fetchPolicy: 'network-only'
+            })
+            if (resultLatest) {
+              dataNowForTxs = resultLatest.data.exchangeHistoricalDatas[0]
+            }
+          } catch (err) {
+            console.log('error: ', err)
+          }
         }
       } catch (err) {
         console.log('error: ', err)
       }
-      try {
-        // const utcCurrentTime = dayjs()
-        const utcCurrentTime = dayjs('2019-05-17')
-        const resultLatest = await client.query({
-          query: TICKER_24HOUR_QUERY,
-          variables: {
-            exchangeAddr: address,
-            timestamp: utcCurrentTime.unix()
-          },
-          fetchPolicy: 'network-only'
-        })
-        if (resultLatest) {
-          dataNowForTxs = resultLatest.data.exchangeHistoricalDatas[0]
-        }
-      } catch (err) {
-        console.log('error: ', err)
-      }
+
       const invPrice = 1 / price
+      let pricePercentChange = 0
+      let pricePercentChangeETH = 0
+      let volumePercentChange = 0
+      let volumePercentChangeUSD = 0
+      let liquidityPercentChange = 0
+      let liquidityPercentChangeUSD = 0
+      let oneDayVolume = 0
+      let oneDayVolumeUSD = 0
+      let txsPercentChange = 0
 
-      let volumePercentChange = ''
-      const adjustedVolumeChangePercent = (
-        ((tradeVolumeEth - data24HoursAgo.tradeVolumeEth) / tradeVolumeEth) *
-        100
-      ).toFixed(2)
-      adjustedVolumeChangePercent > 0 ? (volumePercentChange = '+') : (volumePercentChange = '')
-      volumePercentChange += adjustedVolumeChangePercent
+      if (data24HoursAgo) {
+        volumePercentChange = ''
+        const adjustedVolumeChangePercent = (
+          ((tradeVolumeEth - data24HoursAgo.tradeVolumeEth) / tradeVolumeEth) *
+          100
+        ).toFixed(2)
+        adjustedVolumeChangePercent > 0 ? (volumePercentChange = '+') : (volumePercentChange = '')
+        volumePercentChange += adjustedVolumeChangePercent
 
-      let volumePercentChangeUSD = ''
-      const adjustedVolumeChangePercentUSD = (
-        ((tradeVolumeToken - data24HoursAgo.tradeVolumeToken) / tradeVolumeToken) *
-        100
-      ).toFixed(2)
-      adjustedVolumeChangePercentUSD > 0 ? (volumePercentChangeUSD = '+') : (volumePercentChangeUSD = '')
-      volumePercentChangeUSD += adjustedVolumeChangePercentUSD
+        volumePercentChangeUSD = ''
+        const adjustedVolumeChangePercentUSD = (
+          ((tradeVolumeToken - data24HoursAgo.tradeVolumeToken) / tradeVolumeToken) *
+          100
+        ).toFixed(2)
+        adjustedVolumeChangePercentUSD > 0 ? (volumePercentChangeUSD = '+') : (volumePercentChangeUSD = '')
+        volumePercentChangeUSD += adjustedVolumeChangePercentUSD
 
-      let pricePercentChange = ''
-      const adjustedPriceChangePercent = (((priceUSD - data24HoursAgo.tokenPriceUSD) / priceUSD) * 100).toFixed(2)
-      adjustedPriceChangePercent > 0 ? (pricePercentChange = '+') : (pricePercentChange = '')
-      pricePercentChange += adjustedPriceChangePercent
+        pricePercentChange = ''
+        const adjustedPriceChangePercent = (((priceUSD - data24HoursAgo.tokenPriceUSD) / priceUSD) * 100).toFixed(2)
+        adjustedPriceChangePercent > 0 ? (pricePercentChange = '+') : (pricePercentChange = '')
+        pricePercentChange += adjustedPriceChangePercent
 
-      let pricePercentChangeETH = ''
-      const adjustedPriceChangePercentETH = (((price - data24HoursAgo.price) / price) * 100).toFixed(2)
-      adjustedPriceChangePercentETH > 0 ? (pricePercentChangeETH = '+') : (pricePercentChangeETH = '')
-      pricePercentChangeETH += adjustedPriceChangePercentETH
+        pricePercentChangeETH = ''
+        const adjustedPriceChangePercentETH = (((price - data24HoursAgo.price) / price) * 100).toFixed(2)
+        adjustedPriceChangePercentETH > 0 ? (pricePercentChangeETH = '+') : (pricePercentChangeETH = '')
+        pricePercentChangeETH += adjustedPriceChangePercentETH
 
-      let liquidityPercentChange = ''
-      const adjustedPriceChangeLiquidity = (((ethBalance - data24HoursAgo.ethBalance) / ethBalance) * 100).toFixed(2)
-      adjustedPriceChangeLiquidity > 0 ? (liquidityPercentChange = '+') : (liquidityPercentChange = '')
-      liquidityPercentChange += adjustedPriceChangeLiquidity
+        liquidityPercentChange = ''
+        const adjustedPriceChangeLiquidity = (((ethBalance - data24HoursAgo.ethBalance) / ethBalance) * 100).toFixed(2)
+        adjustedPriceChangeLiquidity > 0 ? (liquidityPercentChange = '+') : (liquidityPercentChange = '')
+        liquidityPercentChange += adjustedPriceChangeLiquidity
 
-      let liquidityPercentChangeUSD = ''
-      const adjustedPriceChangeLiquidityUSD = (
-        ((ethBalance * price * priceUSD -
-          data24HoursAgo.ethBalance * data24HoursAgo.price * data24HoursAgo.tokenPriceUSD) /
-          (ethBalance * price * priceUSD)) *
-        100
-      ).toFixed(2)
-      adjustedPriceChangeLiquidityUSD > 0 ? (liquidityPercentChangeUSD = '+') : (liquidityPercentChangeUSD = '')
-      liquidityPercentChangeUSD += adjustedPriceChangeLiquidityUSD
+        liquidityPercentChangeUSD = ''
+        const adjustedPriceChangeLiquidityUSD = (
+          ((ethBalance * price * priceUSD -
+            data24HoursAgo.ethBalance * data24HoursAgo.price * data24HoursAgo.tokenPriceUSD) /
+            (ethBalance * price * priceUSD)) *
+          100
+        ).toFixed(2)
+        adjustedPriceChangeLiquidityUSD > 0 ? (liquidityPercentChangeUSD = '+') : (liquidityPercentChangeUSD = '')
+        liquidityPercentChangeUSD += adjustedPriceChangeLiquidityUSD
 
-      let txsPercentChange = ''
-      const adjustedTxChangePercent = (
-        ((dataNowForTxs.totalTxsCount - data24HoursAgo.totalTxsCount) / dataNowForTxs.totalTxsCount) *
-        100
-      ).toFixed(2)
-      adjustedTxChangePercent > 0 ? (txsPercentChange = '+') : (txsPercentChange = '')
-      txsPercentChange += adjustedTxChangePercent
+        txsPercentChange = ''
+        const adjustedTxChangePercent = (
+          ((dataNowForTxs.totalTxsCount - data24HoursAgo.totalTxsCount) / dataNowForTxs.totalTxsCount) *
+          100
+        ).toFixed(2)
+        adjustedTxChangePercent > 0 ? (txsPercentChange = '+') : (txsPercentChange = '')
+        txsPercentChange += adjustedTxChangePercent
 
-      let oneDayVolume = tradeVolumeEth - data24HoursAgo.tradeVolumeEth
-      let oneDayVolumeUSD = tradeVolumeToken * priceUSD - data24HoursAgo.tradeVolumeToken * priceUSD
-
+        oneDayVolume = tradeVolumeEth - data24HoursAgo.tradeVolumeEth
+        oneDayVolumeUSD = tradeVolumeToken * priceUSD - data24HoursAgo.tradeVolumeToken * priceUSD
+      }
       // update "exchanges" with new information
       await this.setState(prevState => ({
         exchanges: {

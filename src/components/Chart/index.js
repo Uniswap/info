@@ -70,6 +70,7 @@ const Chart = ({ data, chartOption, currencyUnit }) => {
                 borderRadius: 10,
                 borderColor: 'var(--c-zircon)'
               }}
+              wrapperStyle={{ top: -70, left: -10 }}
             />
             <Area
               strokeWidth={2}
@@ -139,6 +140,7 @@ const Chart = ({ data, chartOption, currencyUnit }) => {
                 borderRadius: 10,
                 borderColor: 'var(--c-zircon)'
               }}
+              wrapperStyle={{ top: -70, left: -10 }}
             />
             <Area
               type="monotone"

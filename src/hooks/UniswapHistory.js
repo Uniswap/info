@@ -13,7 +13,7 @@ export function useUniswapHistory(daysToQuery) {
       try {
         // current time
         // const utcEndTime = dayjs.utc()
-        const utcEndTime = dayjs('2019-05-17')
+        const utcEndTime = dayjs('2019-07-27')
         let utcStartTime
         // go back, go way way back
         switch (daysToQuery) {
@@ -21,17 +21,17 @@ export function useUniswapHistory(daysToQuery) {
             utcStartTime = utcEndTime.subtract(1, 'year').startOf('year')
             break
           case '3months':
-            utcStartTime = utcEndTime.subtract(3, 'month').startOf('month')
+            utcStartTime = utcEndTime.subtract(3, 'month')
             break
           case '1month':
-            utcStartTime = utcEndTime.subtract(1, 'month').startOf('month')
+            utcStartTime = utcEndTime.subtract(1, 'month')
             break
           case '1week':
           default:
             utcStartTime = utcEndTime.subtract(7, 'day').startOf('day')
             break
         }
-        let startTime = utcStartTime.unix() - 1 // -1 because we filter on greater than in the query
+        let startTime = utcStartTime.unix() //because we filter on greater than in the query
         let data = []
         let dataEnd = false
         while (!dataEnd) {
@@ -40,14 +40,14 @@ export function useUniswapHistory(daysToQuery) {
             variables: {
               date: startTime
             },
-            fetchPolicy: 'network-only'
+            fetchPolicy: 'cache-first'
           })
           if (result) {
             data = data.concat(result.data.uniswapDayDatas)
             if (result.data.uniswapDayDatas.length !== 100) {
               dataEnd = true
             } else {
-              startTime = result.data.uniswapDayDatas[result.data.uniswapDayDatas.length - 1].date - 1
+              startTime = result.data.uniswapDayDatas[result.data.uniswapDayDatas.length - 1].date
             }
           }
         }
@@ -69,10 +69,11 @@ export function useUniswapHistory(daysToQuery) {
           data[i].ethVolume = parseFloat(data[i].totalVolumeInEth)
           data[i].usdVolume = parseFloat(data[i].totalVolumeUSD)
           if (i > 0) {
-            data[i].dailyEthVolume = parseFloat(data[i].totalVolumeInEth)
-            data[i].dailyUSDVolume = parseFloat(data[i].totalVolumeUSD)
-            // data[i].dailyEthVolume = 0
-            // data[i].dailyUSDVolume = 0
+            data[i].dailyEthVolume = parseFloat(data[i].totalVolumeInEth) - parseFloat(data[i - 1].totalVolumeInEth)
+            data[i].dailyUSDVolume = parseFloat(data[i].totalVolumeUSD) - parseFloat(data[i - 1].totalVolumeUSD)
+          } else {
+            data[i].dailyEthVolume = 0
+            data[i].dailyUSDVolume = 0
           }
           data[i].ethLiquidity = parseFloat(data[i].totalLiquidityInEth)
           data[i].usdLiquidity = parseFloat(data[i].totalLiquidityUSD)

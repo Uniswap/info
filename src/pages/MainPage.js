@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import 'feather-icons'
 import { Box, Flex, Text } from 'rebass'
 import styled from 'styled-components'
 import Iframe from 'react-iframe'
@@ -13,6 +14,7 @@ import Loader from '../components/Loader'
 import TokenLogo from '../components/TokenLogo'
 import { Divider, Hint } from '../components'
 import { useMedia } from 'react-use'
+import Copy from '../components/Copy'
 
 const timeframeOptions = [
   { value: '1week', label: '1 week' },
@@ -350,7 +352,7 @@ export const MainPage = function({
       <TokenHeader>
         <TokenGroup>
           <StyledTokenLogo address={tokenAddress ? tokenAddress : ''} header={true} size={30} />
-          <TokenName>{tokenName ? tokenName + ' ' : '-'}</TokenName>
+          <TokenName>{tokenName ? tokenName + ' ' : '-'} </TokenName>
           <div>{'(' + symbol + ')'}</div>
         </TokenGroup>
         <PricePanelMobile rounded bg="token" color="white">
@@ -366,7 +368,11 @@ export const MainPage = function({
               </Text>
             }
             bottomRight={
-              currencyUnit === 'USD' ? getPercentSign(pricePercentChange) : getPercentSign(pricePercentChangeETH)
+              pricePercentChange && pricePercentChangeETH
+                ? currencyUnit === 'USD'
+                  ? getPercentSign(pricePercentChange)
+                  : getPercentSign(pricePercentChangeETH)
+                : ''
             }
           />
         </PricePanelMobile>
@@ -379,7 +385,7 @@ export const MainPage = function({
                   : 'Ξ ' + formattedNum(invPrice) + ' ETH'
                 : ''}
             </TokenPrice>
-            {pricePercentChange && isFinite(pricePercentChange) ? (
+            {pricePercentChange && pricePercentChangeETH && isFinite(pricePercentChange) ? (
               <TopPercent>
                 {currencyUnit === 'USD' ? getPercentSign(pricePercentChange) : getPercentSign(pricePercentChangeETH)}
               </TopPercent>
@@ -540,16 +546,18 @@ export const MainPage = function({
               </BuyButton>
             </ExchangeButtons>
             <Divider />
-            <Box p={24}>
+            <Flex p={24} justifyContent="space-between">
               <AddressLink href={'https://www.etherscan.io/token/' + tokenAddress + '/'} target="_blank">
                 Token Address ↗
               </AddressLink>
-            </Box>
-            <Box p={24}>
+              <Copy toCopy={tokenAddress} />
+            </Flex>
+            <Flex p={24} justifyContent="space-between">
               <AddressLink href={'https://www.etherscan.io/address/' + exchangeAddress + '/'} target="_blank">
                 Exchange Address ↗
               </AddressLink>
-            </Box>
+              <Copy toCopy={exchangeAddress} />
+            </Flex>
           </Panel>
           <ListOptions style={{ gridArea: 'listOptions' }}>
             <OptionsWrappper>

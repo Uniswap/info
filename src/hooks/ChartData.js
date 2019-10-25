@@ -7,12 +7,14 @@ import { CHART_QUERY } from '../apollo/queries'
 
 export function useChart(exchangeAddress, daysToQuery) {
   dayjs.extend(utc)
+
   const [chartData, setChartData] = useState([])
+
   useEffect(() => {
     const fetchChartData = async function(exchangeAddress, daysToQuery) {
       try {
-        // current time
-        const utcEndTime = dayjs.utc()
+        // const utcEndTime = dayjs.utc()
+        const utcEndTime = dayjs('2019-07-27')
         let utcStartTime
         // go back, go way way back
         switch (daysToQuery) {
@@ -20,10 +22,10 @@ export function useChart(exchangeAddress, daysToQuery) {
             utcStartTime = utcEndTime.subtract(1, 'year').startOf('year')
             break
           case '3months':
-            utcStartTime = utcEndTime.subtract(3, 'month').startOf('month')
+            utcStartTime = utcEndTime.subtract(3, 'month')
             break
           case '1month':
-            utcStartTime = utcEndTime.subtract(1, 'month').startOf('month')
+            utcStartTime = utcEndTime.subtract(1, 'month')
             break
           case '1week':
           default:
@@ -40,7 +42,7 @@ export function useChart(exchangeAddress, daysToQuery) {
               exchangeAddr: exchangeAddress,
               date: startTime
             },
-            fetchPolicy: 'network-only'
+            fetchPolicy: 'cache-first'
           })
           data = data.concat(result.data.exchangeDayDatas)
           if (result.data.exchangeDayDatas.length !== 100) {
