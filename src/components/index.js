@@ -12,7 +12,7 @@ const Divider = styled(Box)`
 `
 
 const Hint = ({ children, ...rest }) => (
-  <Text fontSize={12} {...rest}>
+  <Text fontSize={12} paddingBottom={12} {...rest}>
     {children}
   </Text>
 )

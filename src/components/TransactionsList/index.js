@@ -86,7 +86,10 @@ const DashGrid = styled.div`
 `
 
 const ListWrapper = styled.div`
-  padding: 0 1em;
+  @media screen and (max-width: 40em) {
+    padding-right: 1rem;
+    padding-left: 1rem;
+  }
 `
 
 const CustomLink = styled(Link)`

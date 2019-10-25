@@ -30,7 +30,7 @@ const SmallText = styled.span`
 
 const ThemedBackground = styled(Box)`
   position: absolute;
-  height: 378px;
+  height: 365px;
   z-index: -1;
   top: 0;
   width: 100vw;
@@ -52,7 +52,6 @@ const TopPanel = styled(Panel)`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 100px;
 
   @media screen and (max-width: 64em) {
     width: 100%;
@@ -117,7 +116,7 @@ const TextOption = styled(Text)`
 
 const ListOptions = styled(Flex)`
   flex-direction: row;
-  padding-left: 40px;
+  padding-left: 1.5rem;
   height: 40px
   justify-content: space-between;
   align-items; center;
@@ -342,7 +341,15 @@ export const MainPage = function({
 
   function getPercentSign(value) {
     return (
-      <Text fontSize={14} lineHeight={1.4} color="white">
+      <Text fontSize={14} lineHeight={1.2} color="white">
+        {value < 0 ? value + ' ↓' : value === 0 ? value : value + ' ↑'}
+      </Text>
+    )
+  }
+
+  function getPercentSignTall(value) {
+    return (
+      <Text fontSize={14} lineHeight={1.8} color="white">
         {value < 0 ? value + ' ↓' : value === 0 ? value : value + ' ↑'}
       </Text>
     )
@@ -389,7 +396,9 @@ export const MainPage = function({
             </TokenPrice>
             {pricePercentChange && pricePercentChangeETH && isFinite(pricePercentChange) ? (
               <TopPercent>
-                {currencyUnit === 'USD' ? getPercentSign(pricePercentChange) : getPercentSign(pricePercentChangeETH)}
+                {currencyUnit === 'USD'
+                  ? getPercentSignTall(pricePercentChange)
+                  : getPercentSignTall(pricePercentChangeETH)}
               </TopPercent>
             ) : (
               ''
@@ -405,7 +414,7 @@ export const MainPage = function({
             <FourByFour
               topLeft={<Hint color="textLight">Volume (24hrs)</Hint>}
               bottomLeft={
-                <Text fontSize={24} lineHeight={1.4} fontWeight={500}>
+                <Text fontSize={24} lineHeight={1} fontWeight={500}>
                   {invPrice && price && priceUSD
                     ? currencyUnit === 'USD'
                       ? '$' + formattedNum(tradeVolumeUSD, true)
@@ -431,7 +440,7 @@ export const MainPage = function({
             <FourByFour
               topLeft={<Hint color="textLight">Total Liquidity</Hint>}
               bottomLeft={
-                <Text fontSize={24} lineHeight={1.4} fontWeight={500}>
+                <Text fontSize={24} lineHeight={1} fontWeight={500}>
                   {ethLiquidity && priceUSD && price && !isNaN(ethLiquidity)
                     ? currencyUnit !== 'USD'
                       ? 'Ξ ' + formattedNum(ethLiquidity * 2)
@@ -453,7 +462,7 @@ export const MainPage = function({
             <FourByFour
               topLeft={<Hint color="textLight">Transactions (24hrs)</Hint>}
               bottomLeft={
-                <Text fontSize={24} lineHeight={1.4} fontWeight={500}>
+                <Text fontSize={24} lineHeight={1} fontWeight={500}>
                   {txCount}
                 </Text>
               }
@@ -464,10 +473,10 @@ export const MainPage = function({
             rounded
             bg="white"
             area="statistics"
-            style={{ boxShadow: '0px 4px 20px rgba(239, 162, 250, 0.15)' }}
+            style={{ boxShadow: '0px 4px 20px rgba(239, 162, 250, 0.15)', borderRadius: '10px' }}
           >
             <Box p={24}>
-              <Flex alignItems="center" justifyContent="space-between">
+              <Flex height={18} alignItems="center" justifyContent="space-between">
                 <Flex alignItems="center" justifyContent="space-between">
                   <TextOption
                     color={chartOption === 'liquidity' ? 'inherit' : 'grey'}
@@ -515,13 +524,18 @@ export const MainPage = function({
               )}
             </Box>
           </ChartWrapper>
-          <Panel rounded bg="white" area="exchange" style={{ boxShadow: '0px 4px 20px rgba(239, 162, 250, 0.15)' }}>
+          <Panel
+            rounded
+            bg="white"
+            area="exchange"
+            style={{ boxShadow: '0px 4px 20px rgba(239, 162, 250, 0.15)', marginBottom: 24 }}
+          >
             <Box p={24}>
-              <Flex alignItems="center" justifyContent="space-between">
+              <Flex height={18} alignItems="center" justifyContent="space-between">
                 <Flex alignItems="center" justifyContent="space-between" style={{ fontWeight: 500, height: '36px' }}>
                   <div>Exchange</div>
                 </Flex>
-                <AddressLink href={'https://www.etherscan.io/address/' + exchangeAddress + '/'} target="_blank">
+                <AddressLink href={'https://uniswap.exchange/swap/' + tokenAddress} target="_blank">
                   View Exchange ↗
                 </AddressLink>
               </Flex>
@@ -611,7 +625,7 @@ export const MainPage = function({
               </EmojiWrapper>
             </AccountSearchWrapper>
           </ListOptions>
-          <Panel rounded bg="white" area="transactions" style={{ marginTop: '20px' }}>
+          <Panel rounded bg="white" area="transactions">
             {exchangeAddress ? (
               <TransactionsList
                 currencyUnit={currencyUnit}

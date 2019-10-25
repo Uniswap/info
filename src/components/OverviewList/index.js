@@ -94,7 +94,6 @@ const ListWrapper = styled.div`
   @media screen and (max-width: 40em) {
     padding: 0 0.4em;
   }
-  padding: 0 1em;
 `
 
 const ClickableText = styled(Text)`

@@ -45,8 +45,8 @@ const NavRight = styled.div`
 const LinkText = styled(Link)`
   font-weight: 500;
   color: white;
-  margin-left: 2em;
-  opacity: ${props => (props.selected ? 1 : 0.4)};
+  margin-left: 1em;
+  opacity: ${props => (props.selected ? 0 : 0.6)};
   text-decoration: none;
 
   @media screen and (max-width: 40em) {
@@ -94,7 +94,7 @@ export default function NavHeader({
       <NavLeft>
         <Title />
         <LinkText to="/" selected={window.location.pathname !== '/tokens'}>
-          Home
+          Back to Overview
         </LinkText>
       </NavLeft>
       <NavRight>

@@ -6,6 +6,10 @@ import { toK, toNiceDate, toNiceDateYear } from '../../helpers'
 
 const ChartWrapper = styled.div`
   padding-top: 1em;
+  margin-left: -1.5em;
+  @media (max-width: 40em) {
+    margin-left: -1em;
+  }
 `
 
 const Chart = ({ data, chartOption, currencyUnit }) => {

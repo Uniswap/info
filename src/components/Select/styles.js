@@ -37,7 +37,7 @@ export const customStyles = {
   dropdownIndicator: styles => ({
     ...styles,
     color: '#6C7284',
-    paddingRight: 16
+    paddingRight: 0
   }),
   valueContainer: styles => ({
     ...styles,
@@ -109,7 +109,7 @@ export const customStylesMobile = {
   }),
   dropdownIndicator: styles => ({
     ...styles,
-    paddingRight: 16
+    paddingRight: 0
   }),
   valueContainer: styles => ({
     ...styles,
