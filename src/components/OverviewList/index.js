@@ -245,10 +245,10 @@ function OverviewList({ switchActiveExchange, currencyUnit, price, priceUSD }) {
   useEffect(() => {
     function get24HrVol() {
       let promises = []
-      let ldata = {}
+      let currentData = {}
       exchanges.map(item => {
         try {
-          ldata[item.id] = item
+          currentData[item.id] = item
           const utcCurrentTime = dayjs()
           const utcOneDayBack = utcCurrentTime.subtract(1, 'day')
           let result24HoursAgo
@@ -270,33 +270,34 @@ function OverviewList({ switchActiveExchange, currencyUnit, price, priceUSD }) {
       })
 
       Promise.all(promises).then(resolved => {
-        let newVolumeMap = {}
+        let new24HourData = {}
         resolved.map(oldItem => {
           // get first result less than 24 hours ago
           let data24HoursAgo = oldItem.data.exchangeHistoricalDatas[0]
 
+          const exchangeID = data24HoursAgo.exchangeAddress
+
           if (data24HoursAgo) {
-            newVolumeMap[ldata[data24HoursAgo.exchangeAddress].id] = {}
+            new24HourData[exchangeID] = {}
 
             // get the volume difference
-            let oneDayVolume = ldata[data24HoursAgo.exchangeAddress].tradeVolumeEth - data24HoursAgo.tradeVolumeEth
-            newVolumeMap[ldata[data24HoursAgo.exchangeAddress].id].volume = oneDayVolume
+            let oneDayVolume = currentData[exchangeID].tradeVolumeEth - data24HoursAgo.tradeVolumeEth
+            new24HourData[exchangeID].volume = oneDayVolume
 
             // get the tx difference
-            let oneDayTxs = ldata[data24HoursAgo.exchangeAddress].totalTxsCount - data24HoursAgo.totalTxsCount
-            newVolumeMap[ldata[data24HoursAgo.exchangeAddress].id].txs = oneDayTxs
+            let oneDayTxs = currentData[exchangeID].totalTxsCount - data24HoursAgo.totalTxsCount
+            new24HourData[exchangeID].txs = oneDayTxs
 
             const priceChangeRaw = (
-              ((ldata[data24HoursAgo.exchangeAddress].priceUSD - data24HoursAgo.tokenPriceUSD) /
-                ldata[data24HoursAgo.exchangeAddress].priceUSD) *
+              ((currentData[exchangeID].priceUSD - data24HoursAgo.tokenPriceUSD) / currentData[exchangeID].priceUSD) *
               100
             ).toFixed(2)
-            newVolumeMap[ldata[data24HoursAgo.exchangeAddress].id].priceChange = priceChangeRaw
+            new24HourData[exchangeID].priceChange = priceChangeRaw
           }
           return true
         })
         setLoading(false)
-        setExchangeData24Hour(newVolumeMap)
+        setExchangeData24Hour(new24HourData)
       })
     }
     get24HrVol()
@@ -317,7 +318,7 @@ function OverviewList({ switchActiveExchange, currencyUnit, price, priceUSD }) {
         style={{ height: '60px' }}
       >
         <Flex alignItems="center">
-          <div style={{ width: '30px' }}>{id}</div>
+          <div style={{ width: '30px' }}>{id + (page - 1) * 20}</div>
           <LogoBox>
             <TokenLogo size={24} address={exchange.tokenAddress} style={{ height: '24px', width: '24px' }} />
           </LogoBox>
@@ -461,7 +462,7 @@ function OverviewList({ switchActiveExchange, currencyUnit, price, priceUSD }) {
         {loading || exchanges.length === 0 || exchangeData24Hour.length === 0 ? (
           <Loader />
         ) : (
-          filteredTxs.slice(TXS_PER_PAGE * (page - 1), page * TXS_PER_PAGE - 1).map((item, index) => {
+          filteredTxs.slice(TXS_PER_PAGE * (page - 1), page * TXS_PER_PAGE).map((item, index) => {
             return (
               <div key={index}>
                 <TransactionItem key={index} exchange={item} id={index + 1} />
