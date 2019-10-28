@@ -617,7 +617,7 @@ export const MainPage = function({
               </EmojiWrapper>
             </AccountSearchWrapper>
           </ListOptions>
-          <Panel rounded bg="white" area="transactions">
+          <Panel rounded bg="white" area="transactions" style={{ marginTop: belowMedium ? '20px' : '' }}>
             {exchangeAddress ? (
               <TransactionsList
                 currencyUnit={currencyUnit}

@@ -18,17 +18,13 @@ const Chart = ({ data, chartOption, currencyUnit }) => {
   useEffect(() => {
     setChartData([])
     setChartData(data)
-  }, [data])
+  }, [data, chartOption, currencyUnit])
 
-  // useEffect(() => {
-  //   setChartData([])
-  // }, [exchangeAddress])
-
-  const isNotMobile = useMedia('(max-width: 40em)')
+  const isMobile = useMedia('(max-width: 40em)')
   if (chartOption === 'price' && chartData && data) {
     return (
       <ChartWrapper>
-        <ResponsiveContainer aspect={isNotMobile ? 60 / 22 : 60 / 12}>
+        <ResponsiveContainer aspect={isMobile ? 60 / 22 : 60 / 12}>
           <AreaChart margin={{ top: 0, right: 0, bottom: 6, left: 10 }} barCategoryGap={1} data={chartData}>
             <CartesianGrid stroke="#f5f5f5" />
             <XAxis
@@ -41,7 +37,7 @@ const Chart = ({ data, chartOption, currencyUnit }) => {
               dataKey="dayString"
             />
             <YAxis
-              hide={isNotMobile}
+              hide={isMobile}
               type="number"
               tickMargin={16}
               orientation="left"
@@ -50,19 +46,18 @@ const Chart = ({ data, chartOption, currencyUnit }) => {
               tickLine={false}
               interval="preserveEnd"
               minTickGap={80}
-              yAxisId={0}
+              yAxisId={2}
             />
-            <YAxis
-              hide={true}
-              type="number"
-              tickMargin={16}
-              orientation="right"
-              tickFormatter={tick => toK(tick)}
-              axisLine={false}
-              tickLine={false}
-              interval="preserveEnd"
-              minTickGap={80}
-              yAxisId={1}
+            <Area
+              strokeWidth={2}
+              dot={false}
+              type="monotone"
+              name={'Token Price' + (currencyUnit === 'USD' ? ' (USD)' : ' (ETH)')}
+              dataKey={currencyUnit === 'USD' ? 'tokenPriceUSD' : 'tokensPerEth'}
+              yAxisId={2}
+              fill="var(--c-token)"
+              opacity={'0.4'}
+              stroke="var(--c-token)"
             />
             <Tooltip
               cursor={true}
@@ -76,17 +71,6 @@ const Chart = ({ data, chartOption, currencyUnit }) => {
               }}
               wrapperStyle={{ top: -70, left: -10 }}
             />
-            <Area
-              strokeWidth={2}
-              dot={false}
-              type="monotone"
-              name={'Token Price' + (currencyUnit === 'USD' ? ' (USD)' : ' (ETH)')}
-              dataKey={currencyUnit === 'USD' ? 'tokenPriceUSD' : 'tokensPerEth'}
-              yAxisId={0}
-              fill="var(--c-token)"
-              opacity={'0.4'}
-              stroke="var(--c-token)"
-            />
           </AreaChart>
         </ResponsiveContainer>
       </ChartWrapper>
@@ -95,7 +79,7 @@ const Chart = ({ data, chartOption, currencyUnit }) => {
   if (chartOption !== 'volume' && chartData && data) {
     return (
       <ChartWrapper>
-        <ResponsiveContainer aspect={isNotMobile ? 60 / 22 : 60 / 12}>
+        <ResponsiveContainer aspect={isMobile ? 60 / 22 : 60 / 12}>
           <AreaChart margin={{ top: 0, right: 0, bottom: 6, left: 10 }} barCategoryGap={1} data={chartData}>
             <CartesianGrid stroke="#f5f5f5" />
             <XAxis
@@ -108,7 +92,7 @@ const Chart = ({ data, chartOption, currencyUnit }) => {
               dataKey="dayString"
             />
             <YAxis
-              hide={isNotMobile}
+              hide={isMobile}
               type="number"
               tickMargin={16}
               orientation="left"
@@ -178,7 +162,7 @@ const Chart = ({ data, chartOption, currencyUnit }) => {
   } else {
     return (
       <ChartWrapper>
-        <ResponsiveContainer aspect={isNotMobile ? 60 / 22 : 60 / 12}>
+        <ResponsiveContainer aspect={isMobile ? 60 / 22 : 60 / 12}>
           <AreaChart margin={{ top: 0, right: 0, bottom: 6, left: 10 }} barCategoryGap={1} data={chartData}>
             <CartesianGrid stroke="#f5f5f5" />
             <XAxis
@@ -191,7 +175,7 @@ const Chart = ({ data, chartOption, currencyUnit }) => {
               dataKey="dayString"
             />
             <YAxis
-              hide={isNotMobile}
+              hide={isMobile}
               type="number"
               axisLine={false}
               tickMargin={16}
@@ -219,6 +203,7 @@ const Chart = ({ data, chartOption, currencyUnit }) => {
               dataKey={currencyUnit === 'USD' ? 'usdVolume' : 'ethVolume'}
               fill="var(--c-token)"
               opacity={'0.4'}
+              yAxisId={0}
               stroke="var(--c-token)"
             />
           </AreaChart>
