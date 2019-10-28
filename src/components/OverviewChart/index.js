@@ -101,7 +101,7 @@ const OverviewChart = ({ data, chartOption, currencyUnit }) => {
   } else {
     return (
       <ChartWrapper>
-        <ResponsiveContainer aspect={60 / 12}>
+        <ResponsiveContainer aspect={isNotMobile ? 60 / 22 : 60 / 12}>
           <AreaChart margin={{ top: 0, right: 0, bottom: 6, left: 10 }} barCategoryGap={1} data={chartData}>
             <CartesianGrid stroke="#f5f5f5" />
             <XAxis

@@ -16,6 +16,7 @@ import { Divider, Hint } from '../components'
 import { useMedia } from 'react-use'
 import { getTimeFrame } from '../constants'
 import Copy from '../components/Copy'
+import { formattedNum } from '../helpers'
 
 const timeframeOptions = [
   { value: '1week', label: '1 week' },
@@ -322,19 +323,6 @@ export const MainPage = function({
     setTxCount('-')
   }, [exchangeAddress])
 
-  function formattedNum(num, usd = false) {
-    if (num === 0) {
-      return 0
-    }
-    if (num < 0.0001) {
-      return '< 0.0001'
-    }
-    if (usd && num >= 0.01) {
-      return Number(parseFloat(num).toFixed(2)).toLocaleString()
-    }
-    return Number(parseFloat(num).toFixed(4)).toLocaleString()
-  }
-
   const belowMedium = useMedia('(max-width: 440px)')
 
   const belowLarge = useMedia('(max-width: 64em)')
@@ -524,12 +512,7 @@ export const MainPage = function({
               )}
             </Box>
           </ChartWrapper>
-          <Panel
-            rounded
-            bg="white"
-            area="exchange"
-            style={{ boxShadow: '0px 4px 20px rgba(239, 162, 250, 0.15)', marginBottom: 24 }}
-          >
+          <Panel rounded bg="white" area="exchange" style={{ boxShadow: '0px 4px 20px rgba(239, 162, 250, 0.15)' }}>
             <Box p={24}>
               <Flex height={18} alignItems="center" justifyContent="space-between">
                 <Flex alignItems="center" justifyContent="space-between" style={{ fontWeight: 500, height: '36px' }}>

@@ -93,7 +93,7 @@ export default function NavHeader({
     <Header bg={['transparent', 'transparent']}>
       <NavLeft>
         <Title />
-        <LinkText to="/" selected={window.location.pathname !== '/tokens'}>
+        <LinkText to="/" selected={window.location.pathname !== '/token'}>
           Back to Overview
         </LinkText>
       </NavLeft>

@@ -12,7 +12,7 @@ import Link from '../Link'
 import { Divider } from '../../components'
 import Loader from '../../components/Loader'
 
-import { urls, formatTime, Big } from '../../helpers'
+import { urls, formatTime, Big, formattedNum } from '../../helpers'
 
 dayjs.extend(utc)
 
@@ -156,22 +156,6 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, setTx
 
   const [sortedColumn, setSortedColumn] = useState(SORT_FIELD.TIME)
 
-  function formattedNum(num, decimals) {
-    let number = Number(parseFloat(num).toFixed(decimals)).toLocaleString()
-    if (number < 0.0001) {
-      return '< 0.0001'
-    }
-    return number
-  }
-
-  function formattedNumUsd(num, decimals) {
-    let number = Number(parseFloat(num).toFixed(decimals)).toLocaleString()
-    if (number < 0.0001) {
-      return ' < $0.0001'
-    }
-    return '$' + number
-  }
-
   useEffect(() => {
     if (accountInput !== '') {
       let foundAccounts = []
@@ -203,6 +187,7 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, setTx
         parseFloat(a[field]) > parseFloat(b[field]) ? (sortDirection ? -1 : 1) * -1 : (sortDirection ? -1 : 1) * 1
       )
     SetFilteredTxs(newTxs)
+    setPage(1)
   }
 
   useEffect(() => {
@@ -211,18 +196,22 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, setTx
       case 'Add':
         SetFilteredTxs(adds)
         setMaxPage(Math.floor(adds.length / TXS_PER_PAGE) + 1)
+        setPage(1)
         break
       case 'Remove':
         SetFilteredTxs(removes)
         setMaxPage(Math.floor(removes.length / TXS_PER_PAGE) + 1)
+        setPage(1)
         break
       case 'Swaps':
         SetFilteredTxs(swaps)
         setMaxPage(Math.floor(swaps.length / TXS_PER_PAGE) + 1)
+        setPage(1)
         break
       default:
         SetFilteredTxs(txs)
         setMaxPage(Math.floor(txs.length / TXS_PER_PAGE) + 1)
+        setPage(1)
         break
     }
   }, [txFilter, adds, removes, swaps, txs])
@@ -384,12 +373,12 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, setTx
           </CustomLink>
         </DataText>
         <DataText area={'value'}>
-          {price && priceUSD ? formattedNumUsd(Big(transaction.ethAmount).toFixed(4) * price * priceUSD, 2) : ''}
+          {price && priceUSD ? '$' + formattedNum(Big(transaction.ethAmount) * price * priceUSD, true) : ''}
         </DataText>
         {!belowMedium ? (
           <>
-            <DataText area={'ethAmount'}>{formattedNum(Big(transaction.ethAmount), 4)}</DataText>
-            <DataText area={'tokenAmount'}>{formattedNum(Big(transaction.tokenAmount), 4)}</DataText>
+            <DataText area={'ethAmount'}>{formattedNum(Big(transaction.ethAmount))}</DataText>
+            <DataText area={'tokenAmount'}>{formattedNum(Big(transaction.tokenAmount))}</DataText>
           </>
         ) : (
           ''
@@ -486,7 +475,7 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, setTx
       </DashGrid>
       <Divider />
       <List p={0}>
-        {!loading && txs && txs.length === 0 ? <EmptyTxWrapper>No transactions</EmptyTxWrapper> : ''}
+        {!loading && txs && filteredTxs.length === 0 ? <EmptyTxWrapper>No transactions</EmptyTxWrapper> : ''}
         {loading ? (
           <Loader />
         ) : (

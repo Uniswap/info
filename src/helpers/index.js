@@ -129,3 +129,33 @@ export const getAllTransactions = async address => {
   const csvExporter = new ExportToCsv(options)
   csvExporter.generateCsv(data)
 }
+
+// using a currency library here in case we want to add more in future
+var priceFormatter = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD'
+})
+
+export const formattedNum = (number, usd = false) => {
+  let num = parseFloat(number)
+  if (num === 0) {
+    return 0
+  }
+  if (num < 0.0001) {
+    return '< 0.0001'
+  }
+
+  if (num > 1000) {
+    return Number(parseFloat(num).toFixed(0)).toLocaleString()
+  }
+
+  if (usd) {
+    if (num < 0.01) {
+      return Number(parseFloat(num).toFixed(4)).toLocaleString()
+    }
+    let usdString = priceFormatter.format(num)
+    return usdString.slice(1, usdString.length)
+  }
+
+  return Number(parseFloat(num).toFixed(4)).toLocaleString()
+}

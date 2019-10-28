@@ -6,7 +6,7 @@ import { isMobile } from 'react-device-detect'
 
 import Popout from './popout'
 
-import { customStyles, customStylesMobile } from './styles'
+import { customStyles, customStylesMobile, customStylesTime } from './styles'
 
 const MenuLabel = styled.div`
   display: flex;
@@ -72,7 +72,7 @@ const Select = ({ options, onChange, tokenSelect = false, placeholder, ...rest }
       isSearchable={true}
       onChange={onChange}
       options={options}
-      styles={customStyles}
+      styles={customStylesTime}
       {...rest}
     />
   )

@@ -9,7 +9,7 @@ import { Box, Flex, Text } from 'rebass'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import TokenLogo from '../TokenLogo'
-
+import { formattedNum } from '../../helpers'
 import { Divider } from '../../components'
 import Loader from '../../components/Loader'
 
@@ -125,7 +125,7 @@ const LogoBox = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-right: 20px;
+  margin-right: 4px;
 
   @media screen and (max-width: 40em) {
     margin-right: 6px;
@@ -152,42 +152,42 @@ function OverviewList({ switchActiveExchange, currencyUnit, price, priceUSD }) {
 
   const history = useHistory()
 
-  function formattedNum(num, usd = false) {
-    if (num === 0) {
-      return 0
-    }
-    if (num < 0.0001) {
-      return '< 0.0001'
-    }
-    if (usd && num >= 0.01) {
-      return Number(parseFloat(num).toFixed(2)).toLocaleString()
-    }
-    return Number(parseFloat(num).toFixed(4)).toLocaleString()
-  }
-
   const SORT_FIELD = {
     PRICE: 'priceUSD',
     LIQUIDITY: 'ethBalance',
     TRANSACTIIONS: 'txs',
     VOLUME: 'volume',
-    SYMBOL: 'tokenSymbol'
+    SYMBOL: 'tokenSymbol',
+    PRICE_CHANGE: 'priceChange'
   }
 
   const [sortedColumn, setSortedColumn] = useState(SORT_FIELD.LIQUIDITY)
 
+  function getPercentChangeColor(change) {
+    if (change === 0) {
+      return <span>{change + ' %'}</span>
+    }
+    if (change < 0) {
+      return <span style={{ color: 'red' }}>{change + ' %'}</span>
+    }
+    return <span style={{ color: 'green' }}>{change + ' %'}</span>
+  }
+
   function sortTxs(field) {
-    if (field === SORT_FIELD.VOLUME || field === SORT_FIELD.TRANSACTIIONS) {
+    if (field === SORT_FIELD.VOLUME || field === SORT_FIELD.TRANSACTIIONS || field === SORT_FIELD.PRICE_CHANGE) {
       let newTxs = filteredTxs.slice().sort((a, b) => {
         if (!exchangeData24Hour.hasOwnProperty(a.id)) {
           exchangeData24Hour[a.id] = {}
           exchangeData24Hour[a.id].volume = 0
           exchangeData24Hour[a.id].txs = 0
+          exchangeData24Hour[a.id].priceChange = 0
           setExchangeData24Hour(exchangeData24Hour)
         }
         if (!exchangeData24Hour.hasOwnProperty(b.id)) {
           exchangeData24Hour[b.id] = {}
           exchangeData24Hour[b.id].volume = 0
           exchangeData24Hour[a.id].txs = 0
+          exchangeData24Hour[b.id].priceChange = 0
           setExchangeData24Hour(exchangeData24Hour)
         }
         return parseFloat(exchangeData24Hour[a.id][field]) > parseFloat(exchangeData24Hour[b.id][field])
@@ -220,7 +220,7 @@ function OverviewList({ switchActiveExchange, currencyUnit, price, priceUSD }) {
     setSortDirection(true)
   }, [exchanges])
 
-  // get the data
+  // get top 100 exchanges by liquidity
   useEffect(() => {
     setPage(1)
     async function getTxs() {
@@ -285,6 +285,13 @@ function OverviewList({ switchActiveExchange, currencyUnit, price, priceUSD }) {
             // get the tx difference
             let oneDayTxs = ldata[data24HoursAgo.exchangeAddress].totalTxsCount - data24HoursAgo.totalTxsCount
             newVolumeMap[ldata[data24HoursAgo.exchangeAddress].id].txs = oneDayTxs
+
+            const priceChangeRaw = (
+              ((ldata[data24HoursAgo.exchangeAddress].priceUSD - data24HoursAgo.tokenPriceUSD) /
+                ldata[data24HoursAgo.exchangeAddress].priceUSD) *
+              100
+            ).toFixed(2)
+            newVolumeMap[ldata[data24HoursAgo.exchangeAddress].id].priceChange = priceChangeRaw
           }
           return true
         })
@@ -299,7 +306,7 @@ function OverviewList({ switchActiveExchange, currencyUnit, price, priceUSD }) {
 
   const belowSmall = useMedia('(max-width: 40em)')
 
-  const TransactionItem = ({ exchange }) => {
+  const TransactionItem = ({ exchange, id }) => {
     return (
       <DashGridClickable
         onClick={() => {
@@ -310,6 +317,7 @@ function OverviewList({ switchActiveExchange, currencyUnit, price, priceUSD }) {
         style={{ height: '60px' }}
       >
         <Flex alignItems="center">
+          <div style={{ width: '30px' }}>{id}</div>
           <LogoBox>
             <TokenLogo size={24} address={exchange.tokenAddress} style={{ height: '24px', width: '24px' }} />
           </LogoBox>
@@ -338,7 +346,7 @@ function OverviewList({ switchActiveExchange, currencyUnit, price, priceUSD }) {
         <DataText area={'liquidity'}>
           {price && priceUSD
             ? currencyUnit === 'USD'
-              ? '$' + formattedNum(exchange.ethBalance * 2 * price * priceUSD)
+              ? '$' + formattedNum(exchange.ethBalance * 2 * price * priceUSD, true)
               : formattedNum(exchange.ethBalance * 2) + ' ETH'
             : ''}
         </DataText>
@@ -346,13 +354,15 @@ function OverviewList({ switchActiveExchange, currencyUnit, price, priceUSD }) {
         <DataText area={'volume'}>
           {exchangeData24Hour.hasOwnProperty(exchange.id) && price && priceUSD
             ? currencyUnit === 'USD'
-              ? '$' + formattedNum(exchangeData24Hour[exchange.id].volume * price * priceUSD)
+              ? '$' + formattedNum(exchangeData24Hour[exchange.id].volume * price * priceUSD, true)
               : formattedNum(exchangeData24Hour[exchange.id].volume) + ' ETH'
             : '-'}
         </DataText>
         {!belowSmall ? (
           <DataText area={'txs'}>
-            {exchangeData24Hour.hasOwnProperty(exchange.id) ? formattedNum(exchangeData24Hour[exchange.id].txs) : '-'}
+            {exchangeData24Hour.hasOwnProperty(exchange.id)
+              ? getPercentChangeColor(exchangeData24Hour[exchange.id].priceChange)
+              : '-'}
           </DataText>
         ) : (
           ''
@@ -433,12 +443,12 @@ function OverviewList({ switchActiveExchange, currencyUnit, price, priceUSD }) {
               area={'liquidity'}
               color="textDim"
               onClick={e => {
-                setSortedColumn(SORT_FIELD.TRANSACTIIONS)
+                setSortedColumn(SORT_FIELD.PRICE_CHANGE)
                 setSortDirection(!sortDirection)
-                sortTxs(SORT_FIELD.TRANSACTIIONS)
+                sortTxs(SORT_FIELD.PRICE_CHANGE)
               }}
             >
-              Transactions (24hrs) {sortedColumn === SORT_FIELD.TRANSACTIIONS ? (!sortDirection ? '↑' : '↓') : ''}
+              Price Change (24hrs) {sortedColumn === SORT_FIELD.PRICE_CHANGE ? (!sortDirection ? '↑' : '↓') : ''}
             </ClickableText>
           </Flex>
         ) : (
@@ -454,7 +464,7 @@ function OverviewList({ switchActiveExchange, currencyUnit, price, priceUSD }) {
           filteredTxs.slice(TXS_PER_PAGE * (page - 1), page * TXS_PER_PAGE - 1).map((item, index) => {
             return (
               <div key={index}>
-                <TransactionItem key={index} exchange={item} />
+                <TransactionItem key={index} exchange={item} id={index + 1} />
                 <Divider />
               </div>
             )

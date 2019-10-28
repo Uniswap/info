@@ -8,6 +8,7 @@ import Footer from '../components/Footer'
 import OverviewList from '../components/OverviewList'
 import OverviewChart from '../components/OverviewChart'
 import Loader from '../components/Loader'
+import { formattedNum } from '../helpers'
 import { Divider, Hint } from '../components'
 import { getTimeFrame } from '../constants'
 
@@ -141,9 +142,10 @@ const DashboardWrapper = styled.div`
 `
 
 function getPercentSign(value) {
+  const parsedValue = parseFloat(value)
   return (
     <Text fontSize={14} lineHeight={1.2} color="white">
-      {value < 0 ? value + ' ↓' : value === 0 ? value : value + ' ↑'}
+      {parsedValue < 0 ? value + ' ↓' : parsedValue === 0 ? value : value + ' ↑'}
     </Text>
   )
 }
@@ -163,19 +165,6 @@ export const OverviewPage = function({
 }) {
   const [chartOption, setChartOption] = useState('liquidity')
 
-  function formattedNum(num, usd = false) {
-    if (num === 0) {
-      return 0
-    }
-    if (num < 0.0001) {
-      return '< 0.0001'
-    }
-    if (usd && num >= 0.01) {
-      return Number(parseFloat(num).toFixed(2)).toLocaleString()
-    }
-    return Number(parseFloat(num).toFixed(4)).toLocaleString()
-  }
-
   return (
     <div style={{ marginTop: '0px' }}>
       <ThemedBackground bg="black" />
@@ -192,8 +181,8 @@ export const OverviewPage = function({
                   <Text fontSize={24} lineHeight={1} fontWeight={500}>
                     {invPrice && price && priceUSD
                       ? currencyUnit === 'USD'
-                        ? '$' + formattedNum(parseFloat(globalData.dailyVolumeUSD).toFixed(0), true)
-                        : 'Ξ ' + formattedNum(parseFloat(globalData.dailyVolumeETH).toFixed(0))
+                        ? '$' + formattedNum(parseFloat(globalData.dailyVolumeUSD), true)
+                        : 'Ξ ' + formattedNum(parseFloat(globalData.dailyVolumeETH))
                       : '-'}
                     {currencyUnit !== 'USD' ? <SmallText> ETH</SmallText> : ''}
                   </Text>
@@ -218,8 +207,8 @@ export const OverviewPage = function({
                   <Text fontSize={24} lineHeight={1} fontWeight={500}>
                     {globalData.liquidityEth
                       ? currencyUnit !== 'USD'
-                        ? 'Ξ ' + formattedNum(parseFloat(globalData.liquidityEth).toFixed(0))
-                        : '$' + formattedNum(parseFloat(globalData.liquidityUsd).toFixed(0), true)
+                        ? 'Ξ ' + formattedNum(parseFloat(globalData.liquidityEth))
+                        : '$' + formattedNum(parseFloat(globalData.liquidityUsd), true)
                       : '-'}
                     {currencyUnit === 'USD' ? '' : <SmallText> ETH</SmallText>}
                   </Text>
