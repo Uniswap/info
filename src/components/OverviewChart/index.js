@@ -11,32 +11,12 @@ const ChartWrapper = styled.div`
 `
 
 const OverviewChart = ({ data, chartOption, currencyUnit }) => {
-  const [chartData, setChartData] = useState([])
-
-  useEffect(() => {
-    setChartData([])
-
-    let filteredData = []
-    for (let x = 0; x < data.length - 1; x++) {
-      let dayStamp = dayjs.unix(data[x].date).date()
-      let dayStamp2 = dayjs.unix(data[x + 1].date).date()
-      if (dayStamp !== dayStamp2) {
-        filteredData.push(data[x])
-      }
-    }
-    setChartData(filteredData)
-  }, [data])
-
-  // useEffect(() => {
-  //   setChartData([])
-  // }, [exchangeAddress])
-
   const isNotMobile = useMedia('(max-width: 40em)')
-  if (chartOption !== 'volume' && chartData && data) {
+  if (chartOption !== 'volume' && data) {
     return (
       <ChartWrapper>
         <ResponsiveContainer aspect={isNotMobile ? 60 / 22 : 60 / 12}>
-          <AreaChart margin={{ top: 0, right: 0, bottom: 6, left: 10 }} barCategoryGap={1} data={chartData}>
+          <AreaChart margin={{ top: 0, right: 0, bottom: 6, left: 10 }} barCategoryGap={1} data={data}>
             <CartesianGrid stroke="#f5f5f5" />
             <XAxis
               tickLine={false}
@@ -102,7 +82,7 @@ const OverviewChart = ({ data, chartOption, currencyUnit }) => {
     return (
       <ChartWrapper>
         <ResponsiveContainer aspect={isNotMobile ? 60 / 22 : 60 / 12}>
-          <AreaChart margin={{ top: 0, right: 0, bottom: 6, left: 10 }} barCategoryGap={1} data={chartData}>
+          <AreaChart margin={{ top: 0, right: 0, bottom: 6, left: 10 }} barCategoryGap={1} data={data}>
             <CartesianGrid stroke="#f5f5f5" />
             <XAxis
               tickLine={false}
