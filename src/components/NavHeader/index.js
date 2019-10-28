@@ -102,7 +102,7 @@ export default function NavHeader({
         <TokenSelect
           options={filteredDirectory}
           tokenSelect={true}
-          placeholder={belowLarge ? 'Tokens' : 'Find token or account'}
+          placeholder={belowLarge ? 'Tokens' : 'Find token'}
           onChange={select => {
             if (exchangeAddress !== select.value) {
               switchActiveExchange(select.value)
