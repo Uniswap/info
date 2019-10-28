@@ -37,7 +37,7 @@ const Chart = ({ data, chartOption, currencyUnit, symbol }) => {
               dataKey="dayString"
             />
             <YAxis
-              hide={isMobile || currencyUnit !== 'USD'}
+              hide={isMobile}
               type="number"
               tickMargin={16}
               orientation="left"
@@ -49,7 +49,7 @@ const Chart = ({ data, chartOption, currencyUnit, symbol }) => {
               yAxisId={2}
             />
             <YAxis
-              hide={isMobile || currencyUnit === 'USD'}
+              hide={true}
               type="number"
               tickMargin={16}
               orientation="left"
@@ -65,10 +65,10 @@ const Chart = ({ data, chartOption, currencyUnit, symbol }) => {
               dot={false}
               type="monotone"
               name={currencyUnit === 'ETH' ? 'Price (ETH/' + symbol + ')' : 'Price (USD/' + symbol + ')'}
-              dataKey={currencyUnit === 'USD' ? 'tokenPriceUSD' : 'ethPerToken'}
+              dataKey={currencyUnit === 'ETH' ? 'ethPerToken' : 'tokenPriceUSD'}
               yAxisId={2}
               fill="var(--c-token)"
-              opacity={currencyUnit === 'USD' ? '0.4' : '0'}
+              opacity={'0.4'}
               stroke="var(--c-token)"
             />
             <Area
@@ -76,10 +76,10 @@ const Chart = ({ data, chartOption, currencyUnit, symbol }) => {
               dot={false}
               type="monotone"
               name={currencyUnit === 'USD' ? 'Inverse (' + symbol + '/USD)' : 'Inverse (' + symbol + '/ETH)'}
-              dataKey={currencyUnit === 'USD' ? 'tokenPerUSD' : 'tokensPerEth'}
+              dataKey={currencyUnit === 'USD' ? 'tokensPerUSD' : 'tokensPerEth'}
               yAxisId={3}
               fill="var(--c-token)"
-              opacity={currencyUnit === 'USD' ? '0' : '0.4'}
+              opacity={'0'}
               stroke="var(--c-token)"
             />
             <Tooltip
