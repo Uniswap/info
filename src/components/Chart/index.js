@@ -12,7 +12,7 @@ const ChartWrapper = styled.div`
   }
 `
 
-const Chart = ({ data, chartOption, currencyUnit }) => {
+const Chart = ({ data, chartOption, currencyUnit, symbol }) => {
   const [chartData, setChartData] = useState([])
 
   useEffect(() => {
@@ -37,7 +37,7 @@ const Chart = ({ data, chartOption, currencyUnit }) => {
               dataKey="dayString"
             />
             <YAxis
-              hide={isMobile}
+              hide={isMobile || currencyUnit !== 'USD'}
               type="number"
               tickMargin={16}
               orientation="left"
@@ -48,15 +48,38 @@ const Chart = ({ data, chartOption, currencyUnit }) => {
               minTickGap={80}
               yAxisId={2}
             />
+            <YAxis
+              hide={isMobile || currencyUnit === 'USD'}
+              type="number"
+              tickMargin={16}
+              orientation="left"
+              tickFormatter={tick => toK(tick)}
+              axisLine={false}
+              tickLine={false}
+              interval="preserveEnd"
+              minTickGap={80}
+              yAxisId={3}
+            />
             <Area
               strokeWidth={2}
               dot={false}
               type="monotone"
-              name={'Token Price' + (currencyUnit === 'USD' ? ' (USD)' : ' (ETH)')}
-              dataKey={currencyUnit === 'USD' ? 'tokenPriceUSD' : 'tokensPerEth'}
+              name={'Price (USD/' + symbol + ')'}
+              dataKey={'tokenPriceUSD'}
               yAxisId={2}
               fill="var(--c-token)"
-              opacity={'0.4'}
+              opacity={currencyUnit === 'USD' ? '0.4' : '0'}
+              stroke="var(--c-token)"
+            />
+            <Area
+              strokeWidth={2}
+              dot={false}
+              type="monotone"
+              name={'Price (' + symbol + '/ETH)'}
+              dataKey={'tokensPerEth'}
+              yAxisId={3}
+              fill="var(--c-token)"
+              opacity={currencyUnit === 'USD' ? '0' : '0.4'}
               stroke="var(--c-token)"
             />
             <Tooltip
