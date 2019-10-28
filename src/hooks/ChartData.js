@@ -66,6 +66,7 @@ export function useChart(exchangeAddress, daysToQuery) {
           let ethPriceUsd = parseFloat(data[i].marginalEthRate) * parseFloat(data[i].tokenPriceUSD)
           data[i].ethVolume = parseFloat(x)
           data[i].usdVolume = parseFloat(x) * ethPriceUsd
+          data[i].tokensPerEth = 1 / parseFloat(data[i].marginalEthRate)
           let y = data[i].ethBalance
           data[i].ethBalance = parseFloat(y)
           data[i].tokenBalance = parseFloat(data[i].tokenBalance)

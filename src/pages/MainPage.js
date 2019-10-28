@@ -483,6 +483,15 @@ export const MainPage = function({
                   >
                     Volume
                   </TextOption>
+                  <TextOption
+                    style={{ marginLeft: !belowMedium ? '2em' : '0.6em' }}
+                    color={chartOption === 'price' ? 'inherit' : 'grey'}
+                    onClick={e => {
+                      setChartOption('price')
+                    }}
+                  >
+                    Price
+                  </TextOption>
                 </Flex>
                 <Box width={144}>
                   <Select
