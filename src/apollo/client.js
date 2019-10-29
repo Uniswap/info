@@ -9,10 +9,10 @@ export const client = new ApolloClient({
   // to a different host
   link: new HttpLink({
     // pending 1 has updated volume tracking, historical data
-    uri: 'https://api.thegraph.com/subgraphs/id/QmdwtSn8C8x5keGJ3xApqRMQqbLj3yNETL1JSNLhaUHFdc'
+    // uri: 'https://api.thegraph.com/subgraphs/id/QmdwtSn8C8x5keGJ3xApqRMQqbLj3yNETL1JSNLhaUHFdc'
 
     // 3 is deployed without tx coutn and without price fix
-    // uri: 'https://api.thegraph.com/subgraphs/name/ianlapham/Uniswap'
+    uri: 'https://api.thegraph.com/subgraphs/name/ianlapham/uniswap'
   }),
   cache: new InMemoryCache()
 })

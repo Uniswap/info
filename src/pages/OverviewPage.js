@@ -145,7 +145,7 @@ function getPercentSign(value) {
   const parsedValue = parseFloat(value)
   return (
     <Text fontSize={14} lineHeight={1.2} color="white">
-      {parsedValue < 0 ? value + ' ↓' : parsedValue === 0 ? value : value + ' ↑'}
+      {parsedValue < 0 ? value + '% ↓' : parsedValue === 0 ? value + '%' : value + '% ↑'}
     </Text>
   )
 }
