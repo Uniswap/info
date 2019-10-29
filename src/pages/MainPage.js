@@ -290,6 +290,7 @@ export const MainPage = function({
   symbol,
   tradeVolume,
   tradeVolumeUSD,
+  oneDayTxs,
   pricePercentChange,
   pricePercentChangeETH,
   volumePercentChange,
@@ -330,7 +331,7 @@ export const MainPage = function({
   function getPercentSign(value) {
     return (
       <Text fontSize={14} lineHeight={1.2} color="white">
-        {value < 0 ? value + ' ↓' : value === 0 ? value : value + ' ↑'}
+        {value < 0 ? value + '% ↓' : value === 0 ? value + '%' : value + '% ↑'}
       </Text>
     )
   }
@@ -338,7 +339,7 @@ export const MainPage = function({
   function getPercentSignTall(value) {
     return (
       <Text fontSize={14} lineHeight={1.8} color="white">
-        {value < 0 ? value + ' ↓' : value === 0 ? value : value + ' ↑'}
+        {value < 0 ? value + '% ↓' : value === 0 ? value + '%' : value + '% ↑'}
       </Text>
     )
   }

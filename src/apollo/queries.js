@@ -36,6 +36,7 @@ export const TRANSACTIONS_QUERY_SKIPPABLE = gql`
       user
       block
       fee
+      exchangeAddress
       timestamp
       addLiquidityEvents {
         id
@@ -99,6 +100,7 @@ export const TICKER_24HOUR_QUERY = gql`
       orderDirection: desc
     ) {
       id
+      timestamp
       exchangeAddress
       tradeVolumeEth
       tradeVolumeToken

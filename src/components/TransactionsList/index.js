@@ -233,11 +233,10 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, setTx
       // current time
       const utcEndTime = dayjs()
       let utcStartTime
-      utcStartTime = utcEndTime.subtract(1, 'day').startOf('day')
+      utcStartTime = utcEndTime.subtract(1, 'day')
       let startTime = utcStartTime.unix() - 1 // -1 because we filter on greater than in the query
       let data = []
       let skipCount = 0
-      let validDataLength = 0
       let fetchingData = true
 
       while (fetchingData) {
@@ -255,7 +254,7 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, setTx
           fetchPolicy: 'cache-first'
         })
         if (result) {
-          skipCount = skipCount + 1000
+          skipCount = skipCount + 100
           if (
             result.data.transactions.length === 0 ||
             result.data.transactions[result.data.transactions.length - 1].timestamp < startTime
@@ -287,8 +286,6 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, setTx
               newItem.tokenAmount = data[item].addLiquidityEvents[entry].tokenAmount
               newItem.event = 'AddLiquidity'
               newAdds.push(newItem)
-              ts.push(newItem)
-              validDataLength++
             }
           }
           if (data[item].removeLiquidityEvents.length > 0) {
@@ -298,19 +295,16 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, setTx
               newItem.tokenAmount = data[item].removeLiquidityEvents[entry].tokenAmount
               newItem.event = 'RemoveLiquidity'
               newRemoves.push(newItem)
-              ts.push(newItem)
-              validDataLength++
             }
           }
           if (data[item].tokenPurchaseEvents.length > 0) {
             let entry
+
             for (entry in data[item].tokenPurchaseEvents) {
               newItem.ethAmount = data[item].tokenPurchaseEvents[entry].eth
               newItem.tokenAmount = data[item].tokenPurchaseEvents[entry].token
               newItem.event = 'TokenPurchase'
               newSwaps.push(newItem)
-              ts.push(newItem)
-              validDataLength++
             }
           }
           if (data[item].ethPurchaseEvents.length > 0) {
@@ -318,12 +312,11 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, setTx
             for (entry in data[item].ethPurchaseEvents) {
               newItem.ethAmount = data[item].ethPurchaseEvents[entry].eth
               newItem.tokenAmount = data[item].ethPurchaseEvents[entry].token
-              newSwaps.push(newItem)
               newItem.event = 'EthPurchase'
-              ts.push(newItem)
-              validDataLength++
+              newSwaps.push(newItem)
             }
           }
+          ts.push(newItem)
         }
         return true
       })
@@ -333,7 +326,7 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, setTx
       SetAdds(newAdds)
       SetRemoves(newRemoves)
       setTxCount(ts.length)
-      setMaxPage(Math.floor(validDataLength / TXS_PER_PAGE) + 1)
+      setMaxPage(Math.floor(ts.length / TXS_PER_PAGE) + 1)
     }
     getTxs()
 
@@ -352,9 +345,10 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, setTx
       case 'Token Swap':
         return 'Swap ETH for ' + symbol
       case 'EthPurchase':
-        return 'Swap ETH for ' + symbol
-      case 'TokenPurchase':
         return 'Swap ' + symbol + ' for ETH'
+      case 'TokenPurchase':
+        return 'Swap ETH for ' + symbol
+
       default:
         return ''
     }
@@ -479,7 +473,7 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, setTx
         {loading ? (
           <Loader />
         ) : (
-          filteredTxs.slice(TXS_PER_PAGE * (page - 1), page * TXS_PER_PAGE - 1).map((tx, index) => {
+          filteredTxs.slice(TXS_PER_PAGE * (page - 1), page * TXS_PER_PAGE).map((tx, index) => {
             return (
               <div key={index}>
                 <TransactionItem key={index} transaction={tx} tokenSymbol={tokenSymbol} />

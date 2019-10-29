@@ -5,6 +5,7 @@ import { client } from '../apollo/client'
 import { DIRECTORY_QUERY, TICKER_QUERY, TICKER_24HOUR_QUERY } from '../apollo/queries'
 import { hardcodedExchanges } from '../constants/exchanges'
 import { hardcodeThemes } from '../constants/theme'
+import { getChangeValues } from '../helpers'
 
 export class DirectoryContainer extends Container {
   state = {
@@ -112,6 +113,7 @@ export class DirectoryContainer extends Container {
       const { price, ethBalance, tradeVolumeEth, tradeVolumeToken, priceUSD, totalTxsCount } = data
 
       let data24HoursAgo = {}
+      let data48HoursAgo = {}
 
       // get data from 24 hours ago
       try {
@@ -132,6 +134,25 @@ export class DirectoryContainer extends Container {
         console.log('error: ', err)
       }
 
+      // get data from 24 hours ago
+      try {
+        const utcCurrentTime = dayjs()
+        const utcTwoDaysBack = utcCurrentTime.subtract(2, 'day')
+        const result48HoursAgo = await client.query({
+          query: TICKER_24HOUR_QUERY,
+          variables: {
+            exchangeAddr: address,
+            timestamp: utcTwoDaysBack.unix()
+          },
+          fetchPolicy: 'network-only'
+        })
+        if (result48HoursAgo) {
+          data48HoursAgo = result48HoursAgo.data.exchangeHistoricalDatas[0]
+        }
+      } catch (err) {
+        console.log('error: ', err)
+      }
+
       // set default values to 0 (for exchanges that are brand new and dont have 24 hour data yet)
       const invPrice = 1 / price
       let pricePercentChange = 0
@@ -141,10 +162,11 @@ export class DirectoryContainer extends Container {
       let liquidityPercentChange = 0
       let liquidityPercentChangeUSD = 0
       let oneDayVolume = 0
+      let oneDayTxs = 0
       let oneDayVolumeUSD = 0
       let txsPercentChange = 0
 
-      if (data24HoursAgo) {
+      if (data24HoursAgo && data48HoursAgo) {
         volumePercentChange = ''
         const adjustedVolumeChangePercent = (
           ((tradeVolumeEth - data24HoursAgo.tradeVolumeEth) / tradeVolumeEth) *
@@ -186,16 +208,16 @@ export class DirectoryContainer extends Container {
         adjustedPriceChangeLiquidityUSD > 0 ? (liquidityPercentChangeUSD = '+') : (liquidityPercentChangeUSD = '')
         liquidityPercentChangeUSD += adjustedPriceChangeLiquidityUSD
 
-        txsPercentChange = ''
-        const adjustedTxChangePercent = (
-          ((totalTxsCount - data24HoursAgo.totalTxsCount) / totalTxsCount) *
-          100
-        ).toFixed(2)
-        adjustedTxChangePercent > 0 ? (txsPercentChange = '+') : (txsPercentChange = '')
-        txsPercentChange += adjustedTxChangePercent
-
         oneDayVolume = tradeVolumeEth - data24HoursAgo.tradeVolumeEth
         oneDayVolumeUSD = tradeVolumeToken * priceUSD - data24HoursAgo.tradeVolumeToken * priceUSD
+
+        let [, txsPercentChangeNew] = getChangeValues(
+          totalTxsCount,
+          data24HoursAgo.totalTxsCount,
+          data48HoursAgo.totalTxsCount
+        )
+
+        txsPercentChange = txsPercentChangeNew
       }
       // update "exchanges" with new information
       await this.setState(prevState => ({
@@ -214,6 +236,7 @@ export class DirectoryContainer extends Container {
             liquidityPercentChangeUSD,
             tradeVolume: parseFloat(Big(oneDayVolume).toFixed(4)),
             tradeVolumeUSD: parseFloat(Big(oneDayVolumeUSD).toFixed(4)),
+            oneDayTxs,
             ethLiquidity: Big(ethBalance).toFixed(4),
             txsPercentChange
           }

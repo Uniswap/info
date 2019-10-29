@@ -30,7 +30,7 @@ export function useUniswapHistory(daysToQuery) {
             utcStartTime = utcEndTime.subtract(7, 'day').startOf('day')
             break
         }
-        let startTime = utcStartTime.unix() //because we filter on greater than in the query
+        let startTime = utcStartTime.unix() - 1 //because we filter on greater than in the query
         let data = []
         let dataEnd = false
         while (!dataEnd) {

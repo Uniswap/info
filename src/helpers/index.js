@@ -159,3 +159,21 @@ export const formattedNum = (number, usd = false) => {
 
   return Number(parseFloat(num).toFixed(4)).toLocaleString()
 }
+
+export const getChangeValues = (valueNow, value24HoursAgo, value48HoursAgo) => {
+  // get volume info for both 24 hour periods
+  let firstDayValue = value24HoursAgo - value48HoursAgo
+  let secondDayValue = valueNow - value24HoursAgo
+  let amountChange = secondDayValue - firstDayValue
+
+  let percentChange = ''
+  const adjustedPercentChange = ((amountChange / firstDayValue) * 100).toFixed(2)
+  adjustedPercentChange > 0 ? (percentChange = '+') : (percentChange = '')
+  percentChange += adjustedPercentChange
+
+  if (isNaN(percentChange)) {
+    return [secondDayValue, 0]
+  }
+
+  return [secondDayValue, percentChange]
+}

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
-
+import { getChangeValues } from '../helpers'
 import { client } from '../apollo/client'
 import { UNISWAP_GLOBALS_QUERY, UNISWAP_GLOBALS_24HOURS_AGO_QUERY } from '../apollo/queries'
 
@@ -13,6 +13,7 @@ export function useGlobalData() {
     const fetchGlobalData = async function() {
       let data = {}
       let data24HoursAgo = {}
+      let data48HoursAgo = {}
 
       /**
        * 1. Get today's data
@@ -58,57 +59,81 @@ export function useGlobalData() {
                 data24HoursAgo.liquidityUsd = result.data.uniswapHistoricalDatas[0].totalLiquidityUSD
                 data24HoursAgo.txCount = result.data.uniswapHistoricalDatas[0].txCount
 
-                let txPercentChange = ''
-                const adjustedTxChange = (((data.txCount - data24HoursAgo.txCount) / data.txCount) * 100).toFixed(2)
-                adjustedTxChange > 0 ? (txPercentChange = '+') : (txPercentChange = '')
-                txPercentChange += adjustedTxChange
-                data.txPercentChange = txPercentChange
+                // get two day stats
 
-                let liquidityPercentChange = ''
-                const adjustedPriceChangeLiquidity = (
-                  ((data.liquidityEth - data24HoursAgo.liquidityEth) / data.liquidityEth) *
-                  100
-                ).toFixed(2)
-                adjustedPriceChangeLiquidity > 0 ? (liquidityPercentChange = '+') : (liquidityPercentChange = '')
-                liquidityPercentChange += adjustedPriceChangeLiquidity
+                const utcTwoDaysBack = utcCurrentTime.subtract(2, 'day')
 
-                let liquidityPercentChangeUSD = ''
-                const adjustedPriceChangeLiquidityUSD = (
-                  ((data.liquidityUsd - data24HoursAgo.liquidityUsd) / data.liquidityUsd) *
-                  100
-                ).toFixed(2)
-                adjustedPriceChangeLiquidityUSD > 0
-                  ? (liquidityPercentChangeUSD = '+')
-                  : (liquidityPercentChangeUSD = '')
-                liquidityPercentChangeUSD += adjustedPriceChangeLiquidityUSD
+                try {
+                  // get the current data
+                  let resultTwoDays = await client.query({
+                    query: UNISWAP_GLOBALS_24HOURS_AGO_QUERY,
+                    variables: {
+                      date: utcTwoDaysBack.unix()
+                    },
+                    fetchPolicy: 'cache-first'
+                  })
 
-                let volumePercentChange = ''
-                const adjustedVolumeChange = (
-                  ((data.totalVolumeInEth - data24HoursAgo.totalVolumeInEth) / data.totalVolumeInEth) *
-                  100
-                ).toFixed(2)
-                adjustedVolumeChange > 0 ? (volumePercentChange = '+') : (volumePercentChange = '')
-                volumePercentChange += adjustedVolumeChange
+                  if (resultTwoDays) {
+                    // set two day data
+                    data48HoursAgo.totalVolumeInEth = resultTwoDays.data.uniswapHistoricalDatas[0].totalVolumeInEth
+                    data48HoursAgo.totalVolumeUSD = resultTwoDays.data.uniswapHistoricalDatas[0].totalVolumeUSD
+                    data48HoursAgo.liquidityEth = resultTwoDays.data.uniswapHistoricalDatas[0].totalLiquidityInEth
+                    data48HoursAgo.liquidityUsd = resultTwoDays.data.uniswapHistoricalDatas[0].totalLiquidityUSD
+                    data48HoursAgo.txCount = resultTwoDays.data.uniswapHistoricalDatas[0].txCount
 
-                let volumePercentChangeUSD = ''
-                const adjustedVolumeChangeUSD = (
-                  ((data.totalVolumeUSD - data24HoursAgo.totalVolumeUSD) / data.totalVolumeUSD) *
-                  100
-                ).toFixed(2)
-                adjustedVolumeChangeUSD > 0 ? (volumePercentChangeUSD = '+') : (volumePercentChangeUSD = '')
-                volumePercentChangeUSD += adjustedVolumeChangeUSD
+                    // get volume info for both 24 hour periods
+                    let [volumeChangeUSD, volumePercentChangeUSD] = getChangeValues(
+                      data.totalVolumeUSD,
+                      data24HoursAgo.totalVolumeUSD,
+                      data48HoursAgo.totalVolumeUSD
+                    )
 
-                //set the global txCount
-                data.liquidityPercentChange = liquidityPercentChange
-                data.liquidityPercentChangeUSD = liquidityPercentChangeUSD
-                data.volumePercentChange = volumePercentChange
-                data.volumePercentChangeUSD = volumePercentChangeUSD
-                data.txCount = data.txCount - data24HoursAgo.txCount
-                data.dailyVolumeETH = data.totalVolumeInEth - data24HoursAgo.totalVolumeInEth
-                data.dailyVolumeUSD = data.totalVolumeUSD - data24HoursAgo.totalVolumeUSD
+                    let [volumeChangeETH, volumePercentChangeETH] = getChangeValues(
+                      data.totalVolumeInEth,
+                      data24HoursAgo.totalVolumeInEth,
+                      data48HoursAgo.totalVolumeInEth
+                    )
+
+                    let [txCountChange, txCountPercentChange] = getChangeValues(
+                      data.txCount,
+                      data24HoursAgo.txCount,
+                      data48HoursAgo.txCount
+                    )
+
+                    let liquidityPercentChangeETH = ''
+                    const adjustedPriceChangeLiquidity = (
+                      ((data.liquidityEth - data24HoursAgo.liquidityEth) / data.liquidityEth) *
+                      100
+                    ).toFixed(2)
+                    adjustedPriceChangeLiquidity > 0
+                      ? (liquidityPercentChangeETH = '+')
+                      : (liquidityPercentChangeETH = '')
+                    liquidityPercentChangeETH += adjustedPriceChangeLiquidity
+
+                    let liquidityPercentChangeUSD = ''
+                    const adjustedPriceChangeLiquidityUSD = (
+                      ((data.liquidityUsd - data24HoursAgo.liquidityUsd) / data.liquidityUsd) *
+                      100
+                    ).toFixed(2)
+                    adjustedPriceChangeLiquidityUSD > 0
+                      ? (liquidityPercentChangeUSD = '+')
+                      : (liquidityPercentChangeUSD = '')
+                    liquidityPercentChangeUSD += adjustedPriceChangeLiquidityUSD
+
+                    //set the global txCount
+                    data.liquidityPercentChange = liquidityPercentChangeETH
+                    data.liquidityPercentChangeUSD = liquidityPercentChangeUSD
+                    data.volumePercentChange = volumePercentChangeETH
+                    data.volumePercentChangeUSD = volumePercentChangeUSD
+                    data.txCount = txCountChange
+                    data.txCountPercentChange = txCountPercentChange
+                    data.dailyVolumeETH = volumeChangeETH
+                    data.dailyVolumeUSD = volumeChangeUSD
+                  }
+                } catch (err) {
+                  console.log('error: ', err)
+                }
               }
-
-              // setGlobalData(data)
             } catch (err) {
               console.log('error: ', err)
             }

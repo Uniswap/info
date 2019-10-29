@@ -234,7 +234,9 @@ export const OverviewPage = function({
                     {formattedNum(globalData.txCount)}
                   </Text>
                 }
-                bottomRight={globalData.txPercentChange ? <div>{getPercentSign(globalData.txPercentChange)}</div> : ''}
+                bottomRight={
+                  globalData.txCountPercentChange ? <div>{getPercentSign(globalData.txCountPercentChange)}</div> : ''
+                }
               />
             </TopPanel>
             <ChartWrapper rounded bg="white" area="statistics">

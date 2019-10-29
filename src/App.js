@@ -71,6 +71,7 @@ function App(props) {
     exchangeAddress,
     tradeVolume,
     tradeVolumeUSD,
+    oneDayTxs,
     tokenName,
     volumePercentChange,
     volumePercentChangeUSD,
@@ -139,6 +140,7 @@ function App(props) {
                 symbol={symbol}
                 tradeVolume={tradeVolume}
                 tradeVolumeUSD={tradeVolumeUSD}
+                oneDayTxs={oneDayTxs}
                 pricePercentChange={pricePercentChange}
                 pricePercentChangeETH={pricePercentChangeETH}
                 volumePercentChange={volumePercentChange}
