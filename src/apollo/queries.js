@@ -80,12 +80,16 @@ export const CHART_QUERY = gql`
 export const TICKER_QUERY = gql`
   query exchange($id: String!) {
     exchange(id: $id) {
+      tokenAddress
+      tokenName
+      tokenSymbol
       price
       priceUSD
       tokenBalance
       ethBalance
       tradeVolumeEth
       tradeVolumeToken
+      tradeVolumeUSD
       totalTxsCount
     }
   }
@@ -104,6 +108,7 @@ export const TICKER_24HOUR_QUERY = gql`
       exchangeAddress
       tradeVolumeEth
       tradeVolumeToken
+      tradeVolumeUSD
       tokenPriceUSD
       price
       ethBalance

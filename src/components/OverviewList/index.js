@@ -133,7 +133,7 @@ const LogoBox = styled.div`
 `
 
 // @TODO rework into virtualized list
-function OverviewList({ switchActiveExchange, currencyUnit, price, priceUSD }) {
+function OverviewList({ currencyUnit }) {
   const [exchanges, setExchanges] = useState([])
 
   const [filteredTxs, SetFilteredTxs] = useState([])
@@ -249,7 +249,7 @@ function OverviewList({ switchActiveExchange, currencyUnit, price, priceUSD }) {
       exchanges.map(item => {
         try {
           currentData[item.id] = item
-          const utcCurrentTime = dayjs()
+          const utcCurrentTime = dayjs('06-10-2019')
           const utcOneDayBack = utcCurrentTime.subtract(1, 'day')
           let result24HoursAgo
           result24HoursAgo = client.query({
@@ -275,10 +275,14 @@ function OverviewList({ switchActiveExchange, currencyUnit, price, priceUSD }) {
           // get first result less than 24 hours ago
           let data24HoursAgo = oldItem.data.exchangeHistoricalDatas[0]
 
-          const exchangeID = data24HoursAgo.exchangeAddress
-
           if (data24HoursAgo) {
+            const exchangeID = data24HoursAgo.exchangeAddress
+
             new24HourData[exchangeID] = {}
+
+            //set the price data
+            new24HourData[exchangeID].price = currentData[exchangeID].price
+            new24HourData[exchangeID].priceUSD = currentData[exchangeID].priceUSD
 
             // get the volume difference
             let oneDayVolume = currentData[exchangeID].tradeVolumeEth - data24HoursAgo.tradeVolumeEth
@@ -311,8 +315,7 @@ function OverviewList({ switchActiveExchange, currencyUnit, price, priceUSD }) {
     return (
       <DashGridClickable
         onClick={() => {
-          switchActiveExchange(exchange.id)
-          history.push('/token')
+          history.push('/token/' + exchange.id)
           window.scrollTo(0, 0)
         }}
         style={{ height: '60px' }}
@@ -345,17 +348,30 @@ function OverviewList({ switchActiveExchange, currencyUnit, price, priceUSD }) {
           ''
         )}
         <DataText area={'liquidity'}>
-          {price && priceUSD
+          {exchangeData24Hour.hasOwnProperty(exchange.id)
             ? currencyUnit === 'USD'
-              ? '$' + formattedNum(exchange.ethBalance * 2 * price * priceUSD, true)
+              ? '$' +
+                formattedNum(
+                  exchange.ethBalance *
+                    2 *
+                    exchangeData24Hour[exchange.id].price *
+                    exchangeData24Hour[exchange.id].priceUSD,
+                  true
+                )
               : formattedNum(exchange.ethBalance * 2) + ' ETH'
-            : ''}
+            : '-'}
         </DataText>
 
         <DataText area={'volume'}>
-          {exchangeData24Hour.hasOwnProperty(exchange.id) && price && priceUSD
+          {exchangeData24Hour.hasOwnProperty(exchange.id)
             ? currencyUnit === 'USD'
-              ? '$' + formattedNum(exchangeData24Hour[exchange.id].volume * price * priceUSD, true)
+              ? '$' +
+                formattedNum(
+                  exchangeData24Hour[exchange.id].volume *
+                    exchangeData24Hour[exchange.id].price *
+                    exchangeData24Hour[exchange.id].priceUSD,
+                  true
+                )
               : formattedNum(exchangeData24Hour[exchange.id].volume) + ' ETH'
             : '-'}
         </DataText>

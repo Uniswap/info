@@ -69,19 +69,6 @@ const TopPanel = styled(Panel)`
   }
 `
 
-const StyledTokenLogo = styled(TokenLogo)`
-  margin-left: 0;
-  margin-right: 1rem;
-  height: 34px;
-  width: 34px;
-  border-radius: 50%;
-  border: 2px solid white;
-  background-color: white;
-  display: flex;
-  align-itmes: center;
-  justify-content: center;
-`
-
 const TokenHeader = styled(Box)`
   color: white;
   font-weight: 600;
@@ -193,6 +180,7 @@ const TokenGroup = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
+  min-height: 38px;
 `
 
 const BuyButton = styled(Box)`
@@ -291,6 +279,7 @@ export const MainPage = function({
   tradeVolume,
   tradeVolumeUSD,
   oneDayTxs,
+  logo,
   pricePercentChange,
   pricePercentChangeETH,
   volumePercentChange,
@@ -310,8 +299,6 @@ export const MainPage = function({
 }) {
   const [chartOption, setChartOption] = useState('liquidity')
 
-  const [txCount, setTxCount] = useState('-')
-
   const [txFilter, setTxFilter] = useState('All')
 
   const [showModal, ToggleModal] = useState(false)
@@ -319,10 +306,6 @@ export const MainPage = function({
   const [accountInput, setAccountInput] = useState('')
 
   const [buyToggle, setBuyToggle] = useState(true)
-
-  useEffect(() => {
-    setTxCount('-')
-  }, [exchangeAddress])
 
   const belowMedium = useMedia('(max-width: 440px)')
 
@@ -349,9 +332,9 @@ export const MainPage = function({
       <ThemedBackground bg="token" />
       <TokenHeader>
         <TokenGroup>
-          <StyledTokenLogo address={tokenAddress ? tokenAddress : ''} header={true} size={30} />
-          <TokenName>{tokenName ? tokenName + ' ' : '-'} </TokenName>
-          <div>{'(' + symbol + ')'}</div>
+          {logo}
+          <TokenName>{tokenName ? tokenName + ' ' : ''} </TokenName>
+          <div>{symbol ? '(' + symbol + ')' : ''}</div>
         </TokenGroup>
         <PricePanelMobile rounded bg="token" color="white">
           <FourByFour
@@ -452,7 +435,7 @@ export const MainPage = function({
               topLeft={<Hint color="textLight">Transactions (24hrs)</Hint>}
               bottomLeft={
                 <Text fontSize={24} lineHeight={1} fontWeight={500}>
-                  {txCount}
+                  {oneDayTxs}
                 </Text>
               }
               bottomRight={txsPercentChange ? getPercentSign(txsPercentChange) : ''}
@@ -626,7 +609,6 @@ export const MainPage = function({
                 accountInput={accountInput}
                 priceUSD={priceUSD}
                 tokenSymbol={symbol}
-                setTxCount={setTxCount}
                 exchangeAddress={exchangeAddress}
                 txFilter={txFilter}
               />
@@ -663,7 +645,7 @@ export const MainPage = function({
       ) : (
         ''
       )}
-      <Footer />
+      <Footer />)
     </div>
   )
 }
