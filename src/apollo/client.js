@@ -8,11 +8,12 @@ export const client = new ApolloClient({
   // Pass the configuration option { uri: YOUR_GRAPHQL_API_URL } to the `HttpLink` to connect
   // to a different host
   link: new HttpLink({
-    // pending 1 has updated volume tracking, historical data
-    // uri: 'https://api.thegraph.com/subgraphs/id/QmdwtSn8C8x5keGJ3xApqRMQqbLj3yNETL1JSNLhaUHFdc'
+    // pending uniswap2 with broken trade volume
+    // uri: 'https://api.thegraph.com/subgraphs/id/QmaaL3LyWjSDint7ZcykbgtGifVhS4ND3Ey4VJhd6gD7vj'
 
-    // 3 is deployed without tx coutn and without price fix
-    uri: 'https://api.thegraph.com/subgraphs/name/ianlapham/uniswap'
+    // pending uniswap with 'fixed' trade volumne
+    uri: 'https://api.thegraph.com/subgraphs/id/QmdcNsBW9x12BPgPtCrvid2hvUgJgiUvYERPNBo6ZXKPhN'
+    // uri: 'https://api.thegraph.com/subgraphs/name/ianlapham/uniswap'
   }),
   cache: new InMemoryCache()
 })

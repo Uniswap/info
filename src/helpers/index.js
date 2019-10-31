@@ -7,7 +7,7 @@ import { TRANSACTIONS_QUERY_SKIPPABLE } from '../apollo/queries'
 
 BigNumber.set({ EXPONENTIAL_AT: 50 })
 
-export const BASE_URL = 'https://uniswap-api-staging.loanscan.io/'
+export const BASE_URL = 'https://uniswap-api.loanscan.io/'
 
 export const toNiceDate = date => dayjs(date).format('MMM DD')
 
@@ -160,7 +160,7 @@ export const formattedNum = (number, usd = false) => {
   return Number(parseFloat(num).toFixed(4)).toLocaleString()
 }
 
-export const getChangeValues = (valueNow, value24HoursAgo, value48HoursAgo) => {
+export const get2DayPercentFormatted = (valueNow, value24HoursAgo, value48HoursAgo) => {
   // get volume info for both 24 hour periods
   let firstDayValue = value24HoursAgo - value48HoursAgo
   let secondDayValue = valueNow - value24HoursAgo
@@ -171,9 +171,22 @@ export const getChangeValues = (valueNow, value24HoursAgo, value48HoursAgo) => {
   adjustedPercentChange > 0 ? (percentChange = '+') : (percentChange = '')
   percentChange += adjustedPercentChange
 
-  if (isNaN(percentChange)) {
+  if (isNaN(percentChange) || !isFinite(percentChange)) {
     return [secondDayValue, 0]
   }
 
   return [secondDayValue, percentChange]
+}
+
+export const getPercentFormatted = (valueNow, value24HoursAgo) => {
+  let percentChange = ''
+  const adjustedPercentChange = (((valueNow - value24HoursAgo) / value24HoursAgo) * 100).toFixed(2)
+  adjustedPercentChange > 0 ? (percentChange = '+') : (percentChange = '')
+  percentChange += adjustedPercentChange
+
+  if (isNaN(percentChange)) {
+    return 0
+  }
+
+  return percentChange
 }

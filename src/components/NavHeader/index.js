@@ -8,6 +8,8 @@ import CurrencySelect from '../CurrencySelect'
 import Panel from '../Panel'
 import { isMobile } from 'react-device-detect'
 import { useMedia } from 'react-use'
+import { hardcodeThemes } from '../../constants/theme'
+import { setThemeColor } from '../../helpers'
 
 const Header = styled(Panel)`
   display: grid;
@@ -60,31 +62,28 @@ const NavLeft = styled.div`
   align-items: center;
 `
 
-export default function NavHeader({
-  directory,
-  exchanges,
-  exchangeAddress,
-  switchActiveExchange,
-  setCurrencyUnit,
-  currencyUnit,
-  setHistoryDaysToQuery
-}) {
+export default function NavHeader({ exchanges, setActiveExchange, setCurrencyUnit, currencyUnit }) {
   // for now exclude broken tokens
   const [filteredDirectory, setDirectory] = useState([])
 
   // filter out exchange with low liquidity
   useEffect(() => {
-    for (var i = 0; i < directory.length; i++) {
-      if (parseFloat(exchanges[directory[i].value].ethBalance) > 0.1) {
-        let newd = filteredDirectory
-        if (isMobile && directory[i].label.length > 5) {
-          directory[i].label = directory[i].label.slice(0, 5) + '...'
+    if (exchanges) {
+      Object.keys(exchanges).map(key => {
+        let item = exchanges[key]
+        if (parseFloat(item.ethBalance) > 0.1) {
+          let newd = filteredDirectory
+          if (isMobile && item.label.label.length > 5) {
+            item.label.label = item.label.label.slice(0, 5) + '...'
+          }
+          item.label.logo = item.logo
+          newd.push(item.label)
+          setDirectory(newd)
         }
-        newd.push(directory[i])
-        setDirectory(newd)
-      }
+        return true
+      })
     }
-  }, [exchanges, directory, filteredDirectory])
+  }, [exchanges, filteredDirectory])
 
   const belowLarge = useMedia('(max-width: 40em)')
   const history = useHistory()
@@ -104,10 +103,8 @@ export default function NavHeader({
           tokenSelect={true}
           placeholder={belowLarge ? 'Tokens' : 'Find token'}
           onChange={select => {
-            if (exchangeAddress !== select.value) {
-              switchActiveExchange(select.value)
-            }
-            history.push('/token')
+            setThemeColor(hardcodeThemes[select.value])
+            history.push('/token/' + select.value)
           }}
         />
       </NavRight>

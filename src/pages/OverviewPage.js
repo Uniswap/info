@@ -155,11 +155,6 @@ export const OverviewPage = function({
   uniswapHistory,
   currencyUnit,
   globalData,
-  symbol,
-  price,
-  invPrice,
-  priceUSD,
-  switchActiveExchange,
   updateTimeframe,
   historyDaysToQuery
 }) {
@@ -179,11 +174,9 @@ export const OverviewPage = function({
                 topLeft={<Hint color="textLight">Volume (24hrs)</Hint>}
                 bottomLeft={
                   <Text fontSize={24} lineHeight={1} fontWeight={500}>
-                    {invPrice && price && priceUSD
-                      ? currencyUnit === 'USD'
-                        ? '$' + formattedNum(parseFloat(globalData.dailyVolumeUSD), true)
-                        : 'Ξ ' + formattedNum(parseFloat(globalData.dailyVolumeETH))
-                      : '-'}
+                    {currencyUnit === 'USD'
+                      ? '$' + formattedNum(parseFloat(globalData.dailyVolumeUSD), true)
+                      : 'Ξ ' + formattedNum(parseFloat(globalData.dailyVolumeETH))}
                     {currencyUnit !== 'USD' ? <SmallText> ETH</SmallText> : ''}
                   </Text>
                 }
@@ -278,7 +271,6 @@ export const OverviewPage = function({
               <Box p={24} style={{ boxShadow: '0px 4px 20px rgba(239, 162, 250, 0.15)', borderRadius: '10px' }}>
                 {uniswapHistory && uniswapHistory.length > 0 ? (
                   <OverviewChart
-                    symbol={symbol}
                     exchangeAddress={exchangeAddress}
                     data={uniswapHistory}
                     currencyUnit={currencyUnit}
@@ -290,14 +282,7 @@ export const OverviewPage = function({
               </Box>
             </ChartWrapper>
             <Panel rounded bg="white" area="transactions">
-              <OverviewList
-                currencyUnit={currencyUnit}
-                price={price}
-                switchActiveExchange={switchActiveExchange}
-                priceUSD={priceUSD}
-                tokenSymbol={symbol}
-                exchangeAddress={exchangeAddress}
-              />
+              <OverviewList currencyUnit={currencyUnit} exchangeAddress={exchangeAddress} />
             </Panel>
           </OverviewDashboard>
         </DashboardWrapper>

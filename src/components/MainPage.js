@@ -1,21 +1,20 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import 'feather-icons'
 import { Box, Flex, Text } from 'rebass'
 import styled from 'styled-components'
 import Iframe from 'react-iframe'
-import FourByFour from '../components/FourByFour'
-import Panel from '../components/Panel'
-import Dashboard from '../components/Dashboard'
-import Select from '../components/Select'
-import Footer from '../components/Footer'
-import TransactionsList from '../components/TransactionsList'
-import Chart from '../components/Chart'
-import Loader from '../components/Loader'
-import TokenLogo from '../components/TokenLogo'
-import { Divider, Hint } from '../components'
+import FourByFour from './FourByFour'
+import Panel from './Panel'
+import Dashboard from './Dashboard'
+import Select from './Select'
+import Footer from './Footer'
+import TransactionsList from './TransactionsList'
+import Chart from './Chart'
+import Loader from './Loader'
+import { Divider, Hint } from '.'
 import { useMedia } from 'react-use'
 import { getTimeFrame } from '../constants'
-import Copy from '../components/Copy'
+import Copy from './Copy'
 import { formattedNum } from '../helpers'
 
 const timeframeOptions = [
@@ -67,19 +66,6 @@ const TopPanel = styled(Panel)`
       border-radius: 1em 1em 0 0;
     }
   }
-`
-
-const StyledTokenLogo = styled(TokenLogo)`
-  margin-left: 0;
-  margin-right: 1rem;
-  height: 34px;
-  width: 34px;
-  border-radius: 50%;
-  border: 2px solid white;
-  background-color: white;
-  display: flex;
-  align-itmes: center;
-  justify-content: center;
 `
 
 const TokenHeader = styled(Box)`
@@ -193,6 +179,7 @@ const TokenGroup = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
+  min-height: 38px;
 `
 
 const BuyButton = styled(Box)`
@@ -291,6 +278,7 @@ export const MainPage = function({
   tradeVolume,
   tradeVolumeUSD,
   oneDayTxs,
+  logo,
   pricePercentChange,
   pricePercentChangeETH,
   volumePercentChange,
@@ -310,8 +298,6 @@ export const MainPage = function({
 }) {
   const [chartOption, setChartOption] = useState('liquidity')
 
-  const [txCount, setTxCount] = useState('-')
-
   const [txFilter, setTxFilter] = useState('All')
 
   const [showModal, ToggleModal] = useState(false)
@@ -319,10 +305,6 @@ export const MainPage = function({
   const [accountInput, setAccountInput] = useState('')
 
   const [buyToggle, setBuyToggle] = useState(true)
-
-  useEffect(() => {
-    setTxCount('-')
-  }, [exchangeAddress])
 
   const belowMedium = useMedia('(max-width: 440px)')
 
@@ -349,9 +331,9 @@ export const MainPage = function({
       <ThemedBackground bg="token" />
       <TokenHeader>
         <TokenGroup>
-          <StyledTokenLogo address={tokenAddress ? tokenAddress : ''} header={true} size={30} />
-          <TokenName>{tokenName ? tokenName + ' ' : '-'} </TokenName>
-          <div>{'(' + symbol + ')'}</div>
+          {logo}
+          <TokenName>{tokenName ? tokenName + ' ' : ''} </TokenName>
+          <div>{symbol ? '(' + symbol + ')' : ''}</div>
         </TokenGroup>
         <PricePanelMobile rounded bg="token" color="white">
           <FourByFour
@@ -452,7 +434,7 @@ export const MainPage = function({
               topLeft={<Hint color="textLight">Transactions (24hrs)</Hint>}
               bottomLeft={
                 <Text fontSize={24} lineHeight={1} fontWeight={500}>
-                  {txCount}
+                  {oneDayTxs}
                 </Text>
               }
               bottomRight={txsPercentChange ? getPercentSign(txsPercentChange) : ''}
@@ -626,7 +608,6 @@ export const MainPage = function({
                 accountInput={accountInput}
                 priceUSD={priceUSD}
                 tokenSymbol={symbol}
-                setTxCount={setTxCount}
                 exchangeAddress={exchangeAddress}
                 txFilter={txFilter}
               />
@@ -663,7 +644,7 @@ export const MainPage = function({
       ) : (
         ''
       )}
-      <Footer />
+      <Footer />)
     </div>
   )
 }

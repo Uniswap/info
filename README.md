@@ -1,6 +1,6 @@
 # Uniswap History
 
-[![Build Status](https://travis-ci.org/Uniswap/uniswap-info.svg?branch=the-graph)](https://travis-ci.org/Uniswap/uniswap-info)
+[![Build Status](https://travis-ci.org/Uniswap/uniswap-info.svg?branch=master)](https://travis-ci.org/Uniswap/uniswap-info)
 [![Netlify Status](https://api.netlify.com/api/v1/badges/fe433ca1-042b-40c1-890f-a92fd74ecc00/deploy-status)](https://app.netlify.com/sites/uniswap-info/deploys)
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 
