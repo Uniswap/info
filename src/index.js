@@ -1,7 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { Subscribe, Provider } from 'unstated'
-import { DirectoryContainer } from './containers/directoryContainer'
+import { Provider } from 'unstated'
 import App from './App'
 
 /**
@@ -12,7 +11,7 @@ import App from './App'
 export default function AppWrapper() {
   return (
     <Provider>
-      <Subscribe to={[DirectoryContainer]}>{directoryStore => <App directoryStore={directoryStore} />}</Subscribe>
+      <App />}
     </Provider>
   )
 }
