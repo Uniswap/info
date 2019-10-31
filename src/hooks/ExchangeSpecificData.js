@@ -18,19 +18,16 @@ export function useExchangeSpecificData(exchangeAddress) {
       let data = {}
       let newExchangeData = {}
       // get the current state of the exchange
-      try {
-        const result = await client.query({
-          query: TICKER_QUERY,
-          variables: {
-            id: address
-          },
-          fetchPolicy: 'cache-first'
-        })
-        if (result) {
-          data = result.data.exchange
-        }
-      } catch (err) {
-        console.log('error: ', err)
+      const result = await client.query({
+        query: TICKER_QUERY,
+        variables: {
+          id: address
+        },
+        fetchPolicy: 'network-only'
+      })
+
+      if (result) {
+        data = result.data.exchange
       }
 
       const {

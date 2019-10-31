@@ -81,18 +81,11 @@ export const DIRECTORY_QUERY = gql`
   query exchanges($first: Int!, $skip: Int!) {
     exchanges(first: $first, skip: $skip, orderBy: combinedBalanceInUSD, orderDirection: desc) {
       id
-      tokenAddress
-      tokenName
       tokenSymbol
+      tokenName
       tokenDecimals
-      price
-      priceUSD
+      tokenAddress
       ethBalance
-      tradeVolumeEth
-      tradeVolumeToken
-      tradeVolumeUSD
-      tokenBalance
-      totalTxsCount
     }
   }
 `

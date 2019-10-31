@@ -1,8 +1,8 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { ApolloProvider } from 'react-apollo'
 import { client } from './apollo/client'
 import { Route, Switch, BrowserRouter, withRouter, Redirect } from 'react-router-dom'
-import Loader from './components/Loader'
+import LocalLoader from './components/LocalLoader'
 import Wrapper from './components/Theme'
 import NavHeader from './components/NavHeader'
 import { ExchangePage } from './pages/ExchangePage'
@@ -28,6 +28,15 @@ function App(props) {
   // essential data for each exchange above liqudiity threshold
   const exchanges = useAllExchanges()
 
+  //used for route loading
+  const [length, setLength] = useState(0)
+
+  useEffect(() => {
+    if (exchanges) {
+      setLength(Object.keys(exchanges).length)
+    }
+  }, [exchanges])
+
   const NavHeaderUpdated = withRouter(props => (
     <NavHeader
       default
@@ -42,7 +51,7 @@ function App(props) {
   return (
     <ApolloProvider client={client}>
       <Wrapper>
-        {globalData && exchanges && uniswapHistory ? (
+        {globalData && uniswapHistory && length > 0 ? (
           <BrowserRouter>
             <NavHeaderUpdated />
             <Switch>
@@ -51,7 +60,7 @@ function App(props) {
                 strict
                 path="/token/:exchangeAddressURL?"
                 render={({ match }) => {
-                  if (exchanges.hasOwnProperty(match.params.exchangeAddressURL)) {
+                  if (exchanges && exchanges.hasOwnProperty(match.params.exchangeAddressURL)) {
                     return (
                       <ExchangePage
                         currencyUnit={currencyUnit}
@@ -79,7 +88,7 @@ function App(props) {
             </Switch>
           </BrowserRouter>
         ) : (
-          <Loader fill="true" />
+          <>{LocalLoader()}</>
         )}
       </Wrapper>
     </ApolloProvider>

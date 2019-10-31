@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react'
-import dayjs from 'dayjs'
+import React from 'react'
 import { Area, XAxis, YAxis, ResponsiveContainer, CartesianGrid, Tooltip, AreaChart } from 'recharts'
 import styled from 'styled-components'
 import { useMedia } from 'react-use'
