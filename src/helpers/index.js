@@ -171,7 +171,7 @@ export const get2DayPercentFormatted = (valueNow, value24HoursAgo, value48HoursA
   adjustedPercentChange > 0 ? (percentChange = '+') : (percentChange = '')
   percentChange += adjustedPercentChange
 
-  if (isNaN(percentChange)) {
+  if (isNaN(percentChange) || !isFinite(percentChange)) {
     return [secondDayValue, 0]
   }
 

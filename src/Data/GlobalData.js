@@ -14,7 +14,7 @@ export function useGlobalData() {
       let data = {}
       let data24HoursAgo = {}
       let data48HoursAgo = {}
-      const utcCurrentTime = dayjs('06-10-2019')
+      const utcCurrentTime = dayjs('09-17-2019')
       try {
         // get the current data
         let result = await client.query({

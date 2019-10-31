@@ -77,9 +77,50 @@ export const CHART_QUERY = gql`
   }
 `
 
+export const DIRECTORY_QUERY = gql`
+  query exchanges($first: Int!, $skip: Int!) {
+    exchanges(first: $first, skip: $skip, orderBy: combinedBalanceInUSD, orderDirection: desc) {
+      id
+      tokenAddress
+      tokenName
+      tokenSymbol
+      tokenDecimals
+      price
+      priceUSD
+      ethBalance
+      tradeVolumeEth
+      tradeVolumeToken
+      tradeVolumeUSD
+      tokenBalance
+      totalTxsCount
+    }
+  }
+`
+
+export const OVERVIEW_PAGE_QUERY = gql`
+  query exchanges {
+    exchanges(orderBy: ethBalance, orderDirection: desc) {
+      id
+      tokenAddress
+      tokenName
+      tokenSymbol
+      tokenDecimals
+      price
+      priceUSD
+      ethBalance
+      tradeVolumeEth
+      tradeVolumeToken
+      tradeVolumeUSD
+      tokenBalance
+      totalTxsCount
+    }
+  }
+`
+
 export const TICKER_QUERY = gql`
   query exchange($id: String!) {
     exchange(id: $id) {
+      id
       tokenAddress
       tokenName
       tokenSymbol
@@ -90,6 +131,7 @@ export const TICKER_QUERY = gql`
       tradeVolumeEth
       tradeVolumeToken
       tradeVolumeUSD
+      tokenBalance
       totalTxsCount
     }
   }
@@ -112,36 +154,6 @@ export const TICKER_24HOUR_QUERY = gql`
       tokenPriceUSD
       price
       ethBalance
-      totalTxsCount
-    }
-  }
-`
-
-export const DIRECTORY_QUERY = gql`
-  query exchanges($first: Int!, $skip: Int!) {
-    exchanges(first: $first, skip: $skip, orderBy: combinedBalanceInUSD, orderDirection: desc) {
-      id
-      tokenSymbol
-      tokenName
-      tokenDecimals
-      tokenAddress
-      ethBalance
-    }
-  }
-`
-
-export const OVERVIEW_PAGE_QUERY = gql`
-  query exchanges {
-    exchanges(orderBy: ethBalance, orderDirection: desc) {
-      id
-      tokenAddress
-      tradeVolumeEth
-      priceUSD
-      price
-      ethBalance
-      tokenSymbol
-      tokenName
-      tokenBalance
       totalTxsCount
     }
   }

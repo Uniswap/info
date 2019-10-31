@@ -12,7 +12,7 @@ export function useExchangeSpecificData(exchangeAddress) {
 
   useEffect(() => {
     const fetchExchangeData = async function(address) {
-      const utcCurrentTime = dayjs('06-10-2019')
+      const utcCurrentTime = dayjs('09-17-2019')
       let data24HoursAgo = {}
       let data48HoursAgo = {}
       let data = {}

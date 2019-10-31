@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { ApolloProvider } from 'react-apollo'
 import { client } from './apollo/client'
 import { Route, Switch, BrowserRouter, withRouter, Redirect } from 'react-router-dom'
@@ -7,10 +7,10 @@ import Wrapper from './components/Theme'
 import NavHeader from './components/NavHeader'
 import { ExchangePage } from './pages/ExchangePage'
 import { OverviewPage } from './pages/OverviewPage'
-import { useGlobalData } from './hooks/GlobalData'
-import { useUniswapHistory } from './hooks/UniswapHistory'
+import { useGlobalData } from './Data/GlobalData'
+import { useUniswapHistory } from './Data/UniswapHistory'
 import { timeframeOptions } from './constants'
-import { useAllExchanges } from './hooks/GetAllExchanges'
+import { useAllExchanges } from './Data/GetAllExchanges'
 
 function App(props) {
   // set default time box to all time
@@ -70,7 +70,6 @@ function App(props) {
                 <OverviewPage
                   currencyUnit={currencyUnit}
                   globalData={globalData}
-                  exchanges={exchanges}
                   uniswapHistory={uniswapHistory}
                   historyDaysToQuery={historyDaysToQuery}
                   updateTimeframe={setHistoryDaysToQuery}

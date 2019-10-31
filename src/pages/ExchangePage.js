@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { MainPage } from '../pages/MainPage'
-import { useExchangeSpecificData } from '../hooks/ExchangeSpecificData'
-import { useChart } from '../hooks/ChartData'
+import { useExchangeSpecificData } from '../Hooks/ExchangeSpecificData'
+import { useChart } from '../Hooks/ChartData'
 import { hardcodeThemes } from '../constants/theme'
 import { setThemeColor } from '../helpers/'
 

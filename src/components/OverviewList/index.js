@@ -223,20 +223,17 @@ function OverviewList({ currencyUnit }) {
   // get top 100 exchanges by liquidity
   useEffect(() => {
     setPage(1)
+
     async function getTxs() {
       setLoading(true)
-      let fetchingData = true
-      while (fetchingData) {
-        let result = await client.query({
-          query: OVERVIEW_PAGE_QUERY,
-          fetchPolicy: 'cache-first'
-        })
-        if (result) {
-          fetchingData = false
-          setMaxPage(Math.floor(result.data.exchanges.length / TXS_PER_PAGE))
-          SetFilteredTxs(result.data.exchanges)
-          setExchanges(result.data.exchanges)
-        }
+      let result = await client.query({
+        query: OVERVIEW_PAGE_QUERY,
+        fetchPolicy: 'cache-first'
+      })
+      if (result) {
+        setMaxPage(Math.floor(result.data.exchanges.length / TXS_PER_PAGE))
+        SetFilteredTxs(result.data.exchanges)
+        setExchanges(result.data.exchanges)
       }
     }
     getTxs()
@@ -249,7 +246,7 @@ function OverviewList({ currencyUnit }) {
       exchanges.map(item => {
         try {
           currentData[item.id] = item
-          const utcCurrentTime = dayjs('06-10-2019')
+          const utcCurrentTime = dayjs('09-17-2019')
           const utcOneDayBack = utcCurrentTime.subtract(1, 'day')
           let result24HoursAgo
           result24HoursAgo = client.query({

@@ -173,6 +173,7 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, txFil
   }, [exchangeAddress])
 
   useEffect(() => {
+    let extraPages = 1
     if (accountInput !== '') {
       let foundAccounts = []
       for (let x = 0; x < txs.length; x++) {
@@ -186,10 +187,16 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, txFil
         }
       }
       SetFilteredTxs(foundAccounts)
-      setMaxPage(Math.floor(foundAccounts.length / TXS_PER_PAGE) + 1)
+      if (foundAccounts.length % TXS_PER_PAGE === 0) {
+        extraPages = 0
+      }
+      setMaxPage(Math.floor(foundAccounts.length / TXS_PER_PAGE) + extraPages)
     } else {
       SetFilteredTxs(txs)
-      setMaxPage(Math.floor(txs.length / TXS_PER_PAGE) + 1)
+      if (txs.length % TXS_PER_PAGE === 0) {
+        extraPages = 0
+      }
+      setMaxPage(Math.floor(txs.length / TXS_PER_PAGE) + extraPages)
     }
   }, [accountInput, txs])
 
@@ -246,7 +253,7 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, txFil
     setLoading(true)
     async function getTxs() {
       // current time
-      const utcEndTime = dayjs('06-10-2019')
+      const utcEndTime = dayjs('09-17-2019')
       let utcStartTime
       utcStartTime = utcEndTime.subtract(1, 'day')
       let startTime = utcStartTime.unix() - 1 // -1 because we filter on greater than in the query
@@ -285,7 +292,7 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, txFil
       let newAdds = []
       let newRemoves = []
       Object.keys(data).map((item, i) => {
-        if (data[item].timestamp !== startTime) {
+        if (data[item].timestamp > startTime) {
           if (data[item].addLiquidityEvents.length > 0) {
             let entry
             let newItem = {
