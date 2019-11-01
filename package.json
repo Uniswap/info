@@ -2,7 +2,7 @@
   "name": "uniswap-info",
   "version": "0.1.0",
   "private": true,
-  "homepage": "“https://uniswap.info",
+  "homepage": "https://uniswap.info",
   "dependencies": {
     "@reach/router": "^1.2.1",
     "apollo-cache-inmemory": "^1.6.3",
