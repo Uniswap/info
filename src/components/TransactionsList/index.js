@@ -10,11 +10,22 @@ import styled from 'styled-components'
 
 import Link from '../Link'
 import { Divider } from '../../components'
-import Loader from '../../components/Loader'
+import gif from './loading.gif'
 
 import { urls, formatTime, Big, formattedNum } from '../../helpers'
 
 dayjs.extend(utc)
+
+const LoadWrapper = styled.div`
+  pointer-events: none;
+  display: grid;
+  place-items: center;
+  padding-top: 20px;
+
+  & > * {
+    width: 72px;
+  }
+`
 
 const PageButtons = styled.div`
   width: 100%;
@@ -133,7 +144,7 @@ const SORT_FIELD = {
 }
 
 // @TODO rework into virtualized list
-function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, setTxCount, txFilter, accountInput }) {
+function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, txFilter, accountInput }) {
   const [txs, setTxs] = useState([])
 
   const [swaps, SetSwaps] = useState([])
@@ -157,6 +168,12 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, setTx
   const [sortedColumn, setSortedColumn] = useState(SORT_FIELD.TIME)
 
   useEffect(() => {
+    setMaxPage(1)
+    setPage(1)
+  }, [exchangeAddress])
+
+  useEffect(() => {
+    let extraPages = 1
     if (accountInput !== '') {
       let foundAccounts = []
       for (let x = 0; x < txs.length; x++) {
@@ -170,10 +187,16 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, setTx
         }
       }
       SetFilteredTxs(foundAccounts)
-      setMaxPage(Math.floor(foundAccounts.length / TXS_PER_PAGE) + 1)
+      if (foundAccounts.length % TXS_PER_PAGE === 0) {
+        extraPages = 0
+      }
+      setMaxPage(Math.floor(foundAccounts.length / TXS_PER_PAGE) + extraPages)
     } else {
       SetFilteredTxs(txs)
-      setMaxPage(Math.floor(txs.length / TXS_PER_PAGE) + 1)
+      if (txs.length % TXS_PER_PAGE === 0) {
+        extraPages = 0
+      }
+      setMaxPage(Math.floor(txs.length / TXS_PER_PAGE) + extraPages)
     }
   }, [accountInput, txs])
 
@@ -227,9 +250,8 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, setTx
   useEffect(() => {
     setPage(1)
     let ab = new AbortController()
+    setLoading(true)
     async function getTxs() {
-      setLoading(true)
-
       // current time
       const utcEndTime = dayjs()
       let utcStartTime
@@ -251,7 +273,7 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, setTx
           fetchOptions: {
             signal: ab.signal
           },
-          fetchPolicy: 'cache-first'
+          fetchPolicy: 'network-only'
         })
         if (result) {
           skipCount = skipCount + 100
@@ -260,7 +282,6 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, setTx
             result.data.transactions[result.data.transactions.length - 1].timestamp < startTime
           ) {
             fetchingData = false
-            setLoading(false)
           }
           data = data.concat(result.data.transactions)
         }
@@ -271,52 +292,75 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, setTx
       let newAdds = []
       let newRemoves = []
       Object.keys(data).map((item, i) => {
-        if (data[item].timestamp !== startTime) {
-          let newItem = {
-            tx: data[item].id,
-            ethAmount: '',
-            tokenAmount: '',
-            user: data[item].user,
-            timestamp: data[item].timestamp
-          }
+        if (data[item].timestamp > startTime) {
           if (data[item].addLiquidityEvents.length > 0) {
             let entry
+            let newItem = {
+              tx: data[item].id,
+              ethAmount: '',
+              tokenAmount: '',
+              user: data[item].user,
+              timestamp: data[item].timestamp
+            }
             for (entry in data[item].addLiquidityEvents) {
               newItem.ethAmount = data[item].addLiquidityEvents[entry].ethAmount
               newItem.tokenAmount = data[item].addLiquidityEvents[entry].tokenAmount
               newItem.event = 'AddLiquidity'
               newAdds.push(newItem)
+              ts.push(newItem)
             }
           }
           if (data[item].removeLiquidityEvents.length > 0) {
             let entry
+            let newItem = {
+              tx: data[item].id,
+              ethAmount: '',
+              tokenAmount: '',
+              user: data[item].user,
+              timestamp: data[item].timestamp
+            }
             for (entry in data[item].removeLiquidityEvents) {
               newItem.ethAmount = data[item].removeLiquidityEvents[entry].ethAmount
               newItem.tokenAmount = data[item].removeLiquidityEvents[entry].tokenAmount
               newItem.event = 'RemoveLiquidity'
               newRemoves.push(newItem)
+              ts.push(newItem)
             }
           }
           if (data[item].tokenPurchaseEvents.length > 0) {
             let entry
-
+            let newItem = {
+              tx: data[item].id,
+              ethAmount: '',
+              tokenAmount: '',
+              user: data[item].user,
+              timestamp: data[item].timestamp
+            }
             for (entry in data[item].tokenPurchaseEvents) {
               newItem.ethAmount = data[item].tokenPurchaseEvents[entry].eth
               newItem.tokenAmount = data[item].tokenPurchaseEvents[entry].token
               newItem.event = 'TokenPurchase'
               newSwaps.push(newItem)
+              ts.push(newItem)
             }
           }
           if (data[item].ethPurchaseEvents.length > 0) {
             let entry
+            let newItem = {
+              tx: data[item].id,
+              ethAmount: '',
+              tokenAmount: '',
+              user: data[item].user,
+              timestamp: data[item].timestamp
+            }
             for (entry in data[item].ethPurchaseEvents) {
               newItem.ethAmount = data[item].ethPurchaseEvents[entry].eth
               newItem.tokenAmount = data[item].ethPurchaseEvents[entry].token
               newItem.event = 'EthPurchase'
               newSwaps.push(newItem)
+              ts.push(newItem)
             }
           }
-          ts.push(newItem)
         }
         return true
       })
@@ -325,7 +369,8 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, setTx
       SetSwaps(newSwaps)
       SetAdds(newAdds)
       SetRemoves(newRemoves)
-      setTxCount(ts.length)
+      setLoading(false)
+      // setTxCount(ts.length)
       setMaxPage(Math.floor(ts.length / TXS_PER_PAGE) + 1)
     }
     getTxs()
@@ -334,7 +379,7 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, setTx
     return function cleanup() {
       ab.abort()
     }
-  }, [exchangeAddress, setTxCount])
+  }, [exchangeAddress])
 
   function getTransactionType(event, symbol) {
     switch (event) {
@@ -343,7 +388,7 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, setTx
       case 'RemoveLiquidity':
         return 'Remove ETH and ' + symbol
       case 'Token Swap':
-        return 'Swap ETH for ' + symbol
+        return 'Swap ' + symbol + ' for ETH'
       case 'EthPurchase':
         return 'Swap ' + symbol + ' for ETH'
       case 'TokenPurchase':
@@ -471,7 +516,9 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, setTx
       <List p={0}>
         {!loading && txs && filteredTxs.length === 0 ? <EmptyTxWrapper>No transactions</EmptyTxWrapper> : ''}
         {loading ? (
-          <Loader />
+          <LoadWrapper>
+            <img src={gif} alt="loading-icon" />
+          </LoadWrapper>
         ) : (
           filteredTxs.slice(TXS_PER_PAGE * (page - 1), page * TXS_PER_PAGE).map((tx, index) => {
             return (

@@ -1,6 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
-import { useCopyClipboard } from '../../hooks/Copy'
+import { useCopyClipboard } from '../../Data/Copy'
 
 import { CheckCircle, Copy } from 'react-feather'
 

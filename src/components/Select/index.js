@@ -16,12 +16,15 @@ const MenuLabel = styled.div`
   flex-direction: row;
 `
 
+const LabelBox = styled.div`
+  margin-right: 8px;
+`
+
 const LogoBox = styled.div`
   width: 30px;
   display: flex;
   justify-content: center;
-  align-items: center;
-  margin-left: 2px;
+  align-items: flex-start;
 `
 
 function customFilter(option, searchText) {
@@ -52,8 +55,8 @@ const Select = ({ options, onChange, tokenSelect = false, placeholder, ...rest }
       filterOption={customFilter}
       getOptionLabel={option => (
         <MenuLabel>
-          {option.label}
           <LogoBox>{option.logo}</LogoBox>
+          <LabelBox>{option.label}</LabelBox>
         </MenuLabel>
       )}
       styles={isMobile ? customStylesMobile : customStyles}
