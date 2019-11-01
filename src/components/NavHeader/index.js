@@ -62,7 +62,7 @@ const NavLeft = styled.div`
   align-items: center;
 `
 
-export default function NavHeader({ exchanges, setActiveExchange, setCurrencyUnit, currencyUnit }) {
+export default function NavHeader({ exchanges, setCurrencyUnit, currencyUnit }) {
   // for now exclude broken tokens
   const [filteredDirectory, setDirectory] = useState([])
 
@@ -92,8 +92,8 @@ export default function NavHeader({ exchanges, setActiveExchange, setCurrencyUni
     <Header bg={['transparent', 'transparent']}>
       <NavLeft>
         <Title />
-        <LinkText to="/" selected={window.location.pathname !== '/token'}>
-          Back to Overview
+        <LinkText to="/" selected={window.location.pathname === '/home'}>
+          Back to Home
         </LinkText>
       </NavLeft>
       <NavRight>
