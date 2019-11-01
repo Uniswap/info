@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { MainPage } from '../pages/MainPage'
+import LocalLoader from '../components/LocalLoader'
 import { useExchangeSpecificData } from '../Data/ExchangeSpecificData'
 import { useChart } from '../Data/ChartData'
 import { hardcodeThemes } from '../constants/theme'
@@ -56,6 +57,6 @@ export const ExchangePage = function({ address, exchanges, currencyUnit, history
       tokenAddress={exchangeData.tokenAddress}
     />
   ) : (
-    ''
+    <LocalLoader />
   )
 }
