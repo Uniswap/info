@@ -1,17 +1,26 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { Provider } from 'unstated'
+import { Subscribe, Provider } from 'unstated'
+
+import { PoolContainer } from './containers/poolContainer'
+import { DirectoryContainer } from './containers/directoryContainer'
+import { TransactionsContainer } from './containers/transactionsContainer'
+import { ChartContainer } from './containers/chartContainer'
 import App from './App'
 
-/**
- * This is the last legacy data fetching strategy. In future updates we should move this into
- * some data context.
- *
- */
 export default function AppWrapper() {
   return (
     <Provider>
-      <App />}
+      <Subscribe to={[PoolContainer, TransactionsContainer, DirectoryContainer, ChartContainer]}>
+        {(poolStore, transactionsStore, directoryStore, chartStore) => (
+          <App
+            poolStore={poolStore}
+            transactionsStore={transactionsStore}
+            directoryStore={directoryStore}
+            chartStore={chartStore}
+          />
+        )}
+      </Subscribe>
     </Provider>
   )
 }
