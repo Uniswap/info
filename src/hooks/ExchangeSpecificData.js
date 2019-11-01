@@ -12,7 +12,7 @@ export function useExchangeSpecificData(exchangeAddress) {
 
   useEffect(() => {
     const fetchExchangeData = async function(address) {
-      const utcCurrentTime = dayjs('09-17-2019')
+      const utcCurrentTime = dayjs()
       let data24HoursAgo = {}
       let data48HoursAgo = {}
       let data = {}
@@ -51,7 +51,7 @@ export function useExchangeSpecificData(exchangeAddress) {
             exchangeAddr: address,
             timestamp: utcOneDayBack.unix()
           },
-          fetchPolicy: 'cache-first'
+          fetchPolicy: 'network-only'
         })
         if (result24HoursAgo) {
           data24HoursAgo = result24HoursAgo.data.exchangeHistoricalDatas[0]
@@ -69,7 +69,7 @@ export function useExchangeSpecificData(exchangeAddress) {
             exchangeAddr: address,
             timestamp: utcTwoDaysBack.unix()
           },
-          fetchPolicy: 'cache-first'
+          fetchPolicy: 'network-only'
         })
         if (result48HoursAgo) {
           data48HoursAgo = result48HoursAgo.data.exchangeHistoricalDatas[0]
@@ -99,7 +99,7 @@ export function useExchangeSpecificData(exchangeAddress) {
           data48HoursAgo.tradeVolumeEth
         )
 
-        // volume in USD
+        // until updated graph with correct USD accumulation
         ;[oneDayVolumeUSD, volumePercentChangeUSD] = get2DayPercentFormatted(
           tradeVolumeUSD,
           data24HoursAgo.tradeVolumeUSD,
@@ -136,7 +136,9 @@ export function useExchangeSpecificData(exchangeAddress) {
       newExchangeData.liquidityPercentChangeETH = liquidityPercentChangeETH
       newExchangeData.liquidityPercentChangeUSD = liquidityPercentChangeUSD
       newExchangeData.tradeVolume = parseFloat(Big(oneDayVolume).toFixed(4))
-      newExchangeData.tradeVolumeUSD = parseFloat(Big(oneDayVolumeUSD).toFixed(4))
+      // keep this until updated graph with correct accumulation pricing
+      newExchangeData.volumeUSD = oneDayVolumeUSD
+      newExchangeData.tradeVolumeUSD = parseFloat(Big(oneDayVolume * price * priceUSD).toFixed(4))
       newExchangeData.oneDayTxs = oneDayTxs
       newExchangeData.ethLiquidity = Big(ethBalance).toFixed(4)
       newExchangeData.txsPercentChange = txsPercentChange

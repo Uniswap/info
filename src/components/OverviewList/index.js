@@ -246,7 +246,7 @@ function OverviewList({ currencyUnit }) {
       exchanges.map(item => {
         try {
           currentData[item.id] = item
-          const utcCurrentTime = dayjs('09-17-2019')
+          const utcCurrentTime = dayjs()
           const utcOneDayBack = utcCurrentTime.subtract(1, 'day')
           let result24HoursAgo
           result24HoursAgo = client.query({
