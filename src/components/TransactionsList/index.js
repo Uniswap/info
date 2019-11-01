@@ -16,17 +16,6 @@ import { urls, formatTime, Big, formattedNum } from '../../helpers'
 
 dayjs.extend(utc)
 
-const LoadWrapper = styled.div`
-  pointer-events: none;
-  display: grid;
-  place-items: center;
-  padding-top: 20px;
-
-  & > * {
-    width: 72px;
-  }
-`
-
 const PageButtons = styled.div`
   width: 100%;
   display: flex;
