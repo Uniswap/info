@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react'
-import { MainPage } from '../components/MainPage'
+import { MainPage } from '../pages/MainPage'
 import { useExchangeSpecificData } from '../Data/ExchangeSpecificData'
 import { useChart } from '../Data/ChartData'
 import { hardcodeThemes } from '../constants/theme'
-import { setThemeColor } from '../helpers'
-import Loader from '../components/Loader'
+import { setThemeColor } from '../helpers/'
 
 export const ExchangePage = function({ address, exchanges, currencyUnit, historyDaysToQuery, setHistoryDaysToQuery }) {
   const exchangeData = useExchangeSpecificData(address)
@@ -29,7 +28,7 @@ export const ExchangePage = function({ address, exchanges, currencyUnit, history
     }
   }, [exchanges, address])
 
-  return exchangeData && exchanges ? (
+  return exchangeData ? (
     <MainPage
       currencyUnit={currencyUnit}
       exchangeAddress={address}
@@ -57,6 +56,6 @@ export const ExchangePage = function({ address, exchanges, currencyUnit, history
       tokenAddress={exchangeData.tokenAddress}
     />
   ) : (
-    <Loader fill="true" />
+    ''
   )
 }

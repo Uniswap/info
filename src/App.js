@@ -5,7 +5,7 @@ import { Route, Switch, BrowserRouter, withRouter, Redirect } from 'react-router
 import LocalLoader from './components/LocalLoader'
 import Wrapper from './components/Theme'
 import NavHeader from './components/NavHeader'
-import { ExchangePage } from './pages/ExchangePage'
+import { ExchangePage } from './Data/ExchangePage'
 import { OverviewPage } from './pages/OverviewPage'
 import { useGlobalData } from './Data/GlobalData'
 import { useUniswapHistory } from './Data/UniswapHistory'
