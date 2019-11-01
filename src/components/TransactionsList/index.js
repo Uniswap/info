@@ -22,11 +22,6 @@ const LoadWrapper = styled.div`
   place-items: center;
   padding-top: 20px;
 
-  background-image: url('./loading.gif');
-  background-size: 72px;
-  background-repeat: no-repeat;
-  background-position: center;
-
   & > * {
     width: 72px;
   }
