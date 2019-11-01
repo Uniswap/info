@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useMedia } from 'react-use'
 import dayjs from 'dayjs'
+import LocalLoader from '../LocalLoader'
 import utc from 'dayjs/plugin/utc'
 import { client } from '../../apollo/client'
 import { TRANSACTIONS_QUERY_SKIPPABLE } from '../../apollo/queries'
@@ -10,22 +11,10 @@ import styled from 'styled-components'
 
 import Link from '../Link'
 import { Divider } from '../../components'
-import gif from './loading.gif'
 
 import { urls, formatTime, Big, formattedNum } from '../../helpers'
 
 dayjs.extend(utc)
-
-const LoadWrapper = styled.div`
-  pointer-events: none;
-  display: grid;
-  place-items: center;
-  padding-top: 20px;
-
-  & > * {
-    width: 72px;
-  }
-`
 
 const PageButtons = styled.div`
   width: 100%;
@@ -516,9 +505,7 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, txFil
       <List p={0}>
         {!loading && txs && filteredTxs.length === 0 ? <EmptyTxWrapper>No transactions</EmptyTxWrapper> : ''}
         {loading ? (
-          <LoadWrapper>
-            <img src={gif} alt="loading-icon" />
-          </LoadWrapper>
+          <LocalLoader />
         ) : (
           filteredTxs.slice(TXS_PER_PAGE * (page - 1), page * TXS_PER_PAGE).map((tx, index) => {
             return (

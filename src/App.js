@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react'
 import { ApolloProvider } from 'react-apollo'
 import { client } from './apollo/client'
 import { Route, Switch, BrowserRouter, withRouter, Redirect } from 'react-router-dom'
-import LocalLoader from './components/LocalLoader'
 import Wrapper from './components/Theme'
 import NavHeader from './components/NavHeader'
 import { ExchangePage } from './Data/ExchangePage'
@@ -11,6 +10,7 @@ import { useGlobalData } from './Data/GlobalData'
 import { useUniswapHistory } from './Data/UniswapHistory'
 import { timeframeOptions } from './constants'
 import { useAllExchanges } from './Data/GetAllExchanges'
+import LocalLoader from './components/LocalLoader'
 
 function App(props) {
   // set default time box to all time
@@ -88,7 +88,7 @@ function App(props) {
             </Switch>
           </BrowserRouter>
         ) : (
-          <>{LocalLoader()}</>
+          <LocalLoader fill="true" />
         )}
       </Wrapper>
     </ApolloProvider>
