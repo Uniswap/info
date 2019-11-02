@@ -4,7 +4,7 @@ import { client } from './apollo/client'
 import { Route, Switch, BrowserRouter, withRouter, Redirect } from 'react-router-dom'
 import Wrapper from './components/Theme'
 import NavHeader from './components/NavHeader'
-import { ExchangePage } from './Data/ExchangePage'
+import { ExchangeWrapper } from './pages/ExchangeWrapper'
 import { OverviewPage } from './pages/OverviewPage'
 import { useGlobalData } from './Data/GlobalData'
 import { useUniswapHistory } from './Data/UniswapHistory'
@@ -62,7 +62,7 @@ function App(props) {
                 render={({ match }) => {
                   if (exchanges && exchanges.hasOwnProperty(match.params.exchangeAddressURL)) {
                     return (
-                      <ExchangePage
+                      <ExchangeWrapper
                         currencyUnit={currencyUnit}
                         address={match.params.exchangeAddressURL}
                         exchanges={exchanges}

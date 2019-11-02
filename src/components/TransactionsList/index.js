@@ -396,7 +396,7 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, txFil
     return (
       <DashGrid style={{ height: '60px' }}>
         <DataText area={'action'} color="text" fontWeight="500">
-          <CustomLink ml="3" color="button" external href={urls.showTransaction(transaction.tx)}>
+          <CustomLink ml="3" color="button" external href={urls.showTransaction(transaction.tx.split('-')[0])}>
             {getTransactionType(transaction.event, tokenSymbol)}
           </CustomLink>
         </DataText>
