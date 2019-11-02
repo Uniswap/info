@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import 'feather-icons'
 import { Box, Flex, Text } from 'rebass'
 import styled from 'styled-components'
@@ -382,7 +382,6 @@ export const ExchangePage = function({
       <DashboardWrapper>
         <Dashboard mx="auto" px={[0, 0]}>
           <TopPanel rounded bg="token" color="white" p={24} style={{ gridArea: 'volume' }}>
-            {console.log(tradeVolumeUSD == 0)}
             <FourByFour
               topLeft={<Hint color="textLight">Volume (24hrs)</Hint>}
               bottomLeft={
