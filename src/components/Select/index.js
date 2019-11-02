@@ -12,19 +12,18 @@ const MenuLabel = styled.div`
   display: flex;
   align-items: center;
   width: 100%;
-  justify-content: space-between;
+  justify-content: flex-start;
   flex-direction: row;
 `
 
-const LabelBox = styled.div`
-  margin-right: 8px;
-`
+const LabelBox = styled.div``
 
 const LogoBox = styled.div`
   width: 30px;
   display: flex;
   justify-content: center;
   align-items: flex-start;
+  margin-right: 8px;
 `
 
 function customFilter(option, searchText) {

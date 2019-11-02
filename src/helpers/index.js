@@ -137,6 +137,9 @@ var priceFormatter = new Intl.NumberFormat('en-US', {
 })
 
 export const formattedNum = (number, usd = false) => {
+  if (isNaN(number) || number === '') {
+    return ''
+  }
   let num = parseFloat(number)
   if (num === 0) {
     return 0

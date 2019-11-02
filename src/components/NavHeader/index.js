@@ -25,7 +25,7 @@ const Header = styled(Panel)`
 `
 
 const TokenSelect = styled(Select)`
-  width: 240px;
+  width: 180px;
 
   @media screen and (max-width: 40em) {
     width: 160px;
@@ -36,7 +36,7 @@ const NavRight = styled.div`
   display: grid;
   justify-items: end;
   align-items: center;
-  grid-template-columns: auto 240px;
+  grid-template-columns: auto 180px;
   grid-column-gap: 16px;
 
   @media screen and (max-width: 40em) {
