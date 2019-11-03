@@ -11,7 +11,7 @@ import App from './App'
 export default function AppWrapper() {
   return (
     <Provider>
-      <App />}
+      <App />
     </Provider>
   )
 }

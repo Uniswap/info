@@ -30,6 +30,7 @@ export const ExchangeWrapper = function({
     updateData.price = exchangeData.price
     updateData.invPrice = exchangeData.invPrice
     updateData.priceUSD = exchangeData.priceUSD
+    updateData.tokenAddress = exchangeData.tokenAddres
     updateData.pricePercentChange = exchangeData.pricePercentChange
     updateData.pricePercentChangeETH = exchangeData.pricePercentChangeETH
     updateData.volumePercentChange = exchangeData.volumePercentChangeETH
@@ -67,21 +68,21 @@ export const ExchangeWrapper = function({
       setHistoryDaysToQuery={setHistoryDaysToQuery}
       tokenName={tokenName}
       symbol={tokenSymbol}
-      tokenAddres={exchangeData.tokenAddress}
-      tradeVolume={currentData.tradeVolume || currentData.tradeVolume === 0 ? currentData.tradeVolume : ''}
-      tradeVolumeUSD={currentData.tradeVolumeUSD || currentData.tradeVolumeUSD === 0 ? currentData.tradeVolumeUSD : ''}
-      oneDayTxs={currentData.oneDayTxs || currentData.oneDayTxs === 0 ? currentData.oneDayTxs : ''}
-      pricePercentChange={currentData.pricePercentChange ? currentData.pricePercentChange : ''}
-      pricePercentChangeETH={currentData.pricePercentChangeETH ? currentData.pricePercentChangeETH : ''}
-      volumePercentChange={currentData.volumePercentChange ? currentData.volumePercentChange : ''}
-      volumePercentChangeUSD={currentData.volumePercentChangeUSD ? currentData.volumePercentChangeUSD : ''}
-      liquidityPercentChange={currentData.liquidityPercentChange ? currentData.liquidityPercentChange : ''}
-      liquidityPercentChangeUSD={currentData.liquidityPercentChangeUSD ? currentData.liquidityPercentChangeUSD : ''}
-      txsPercentChange={currentData.txsPercentChange ? currentData.txsPercentChange : ''}
-      ethLiquidity={currentData.ethLiquidity ? currentData.ethLiquidity : ''}
-      price={currentData.price || currentData.price === 0 ? currentData.price : ''}
-      invPrice={currentData.invPrice || currentData.invPrice === 0 ? currentData.invPrice : ''}
-      priceUSD={currentData.priceUSD || currentData.priceUSD === 0 ? currentData.priceUSD : ''}
+      tokenAddress={exchangeData.tokenAddress}
+      tradeVolume={currentData.tradeVolume}
+      tradeVolumeUSD={currentData.tradeVolumeUSD}
+      oneDayTxs={currentData.oneDayTxs}
+      ethLiquidity={currentData.ethLiquidity}
+      price={currentData.price}
+      invPrice={currentData.invPrice}
+      priceUSD={currentData.priceUSD}
+      pricePercentChange={currentData.pricePercentChange}
+      pricePercentChangeETH={currentData.pricePercentChangeETH}
+      volumePercentChange={currentData.volumePercentChange}
+      volumePercentChangeUSD={currentData.volumePercentChangeUSD}
+      liquidityPercentChange={currentData.liquidityPercentChange}
+      liquidityPercentChangeUSD={currentData.liquidityPercentChangeUSD}
+      txsPercentChange={currentData.txsPercentChange}
     />
   ) : (
     <LocalLoader />

@@ -340,7 +340,7 @@ export const ExchangePage = function({
             topLeft={<Hint color="textLight">Price</Hint>}
             bottomLeft={
               <Text fontSize={24} lineHeight={1.4} fontWeight={500}>
-                {invPrice && priceUSD
+                {!isNaN(price) && !isNaN(invPrice)
                   ? currencyUnit === 'USD'
                     ? '$' + formattedNum(priceUSD, true)
                     : 'Ξ ' + formattedNum(invPrice) + ' ETH'
@@ -348,7 +348,7 @@ export const ExchangePage = function({
               </Text>
             }
             bottomRight={
-              pricePercentChange && pricePercentChangeETH
+              !isNaN(pricePercentChange) && !isNaN(pricePercentChangeETH)
                 ? currencyUnit === 'USD'
                   ? getPercentSign(pricePercentChange)
                   : getPercentSign(pricePercentChangeETH)
@@ -359,13 +359,13 @@ export const ExchangePage = function({
         {!belowLarge ? (
           <TokenGroup>
             <TokenPrice>
-              {invPrice && priceUSD
+              {!isNaN(price) && !isNaN(invPrice)
                 ? currencyUnit === 'USD'
                   ? '$' + formattedNum(priceUSD, true)
                   : 'Ξ ' + formattedNum(invPrice) + ' ETH'
                 : ''}
             </TokenPrice>
-            {pricePercentChange && pricePercentChangeETH && isFinite(pricePercentChange) ? (
+            {!isNaN(pricePercentChange) && !isNaN(pricePercentChangeETH) ? (
               <TopPercent>
                 {currencyUnit === 'USD'
                   ? getPercentSignTall(pricePercentChange)
@@ -386,7 +386,7 @@ export const ExchangePage = function({
               topLeft={<Hint color="textLight">Volume (24hrs)</Hint>}
               bottomLeft={
                 <Text fontSize={24} lineHeight={1} fontWeight={500}>
-                  {tradeVolumeUSD === 0 || tradeVolumeUSD !== ''
+                  {!isNaN(tradeVolumeUSD) && !isNaN(tradeVolume)
                     ? currencyUnit === 'USD'
                       ? '$' + formattedNum(tradeVolumeUSD, true)
                       : 'Ξ ' + formattedNum(tradeVolume)
@@ -395,7 +395,7 @@ export const ExchangePage = function({
                 </Text>
               }
               bottomRight={
-                volumePercentChange && isFinite(volumePercentChange) ? (
+                !isNaN(volumePercentChangeUSD) && !isNaN(volumePercentChange) ? (
                   <div>
                     {currencyUnit === 'USD'
                       ? getPercentSign(volumePercentChangeUSD)
@@ -412,7 +412,7 @@ export const ExchangePage = function({
               topLeft={<Hint color="textLight">Total Liquidity</Hint>}
               bottomLeft={
                 <Text fontSize={24} lineHeight={1} fontWeight={500}>
-                  {ethLiquidity && priceUSD && price && !isNaN(ethLiquidity)
+                  {!isNaN(ethLiquidity) && !isNaN(price) && !isNaN(priceUSD)
                     ? currencyUnit !== 'USD'
                       ? 'Ξ ' + formattedNum(ethLiquidity * 2)
                       : '$' + formattedNum(parseFloat(ethLiquidity) * price * priceUSD * 2, true)
@@ -421,7 +421,7 @@ export const ExchangePage = function({
                 </Text>
               }
               bottomRight={
-                liquidityPercentChange && isFinite(liquidityPercentChange)
+                !isNaN(liquidityPercentChangeUSD) && !isNaN(price) && !isNaN(liquidityPercentChange)
                   ? currencyUnit === 'USD'
                     ? getPercentSign(liquidityPercentChangeUSD)
                     : getPercentSign(liquidityPercentChange)
@@ -435,10 +435,10 @@ export const ExchangePage = function({
               topLeft={<Hint color="textLight">Transactions (24hrs)</Hint>}
               bottomLeft={
                 <Text fontSize={24} lineHeight={1} fontWeight={500}>
-                  {oneDayTxs || oneDayTxs === 0 ? oneDayTxs : '-'}
+                  {!isNaN(oneDayTxs) ? oneDayTxs : '-'}
                 </Text>
               }
-              bottomRight={txsPercentChange ? getPercentSign(txsPercentChange) : ''}
+              bottomRight={!isNaN(txsPercentChange) ? getPercentSign(txsPercentChange) : ''}
             />
           </TopPanel>
           <ChartWrapper
@@ -519,7 +519,6 @@ export const ExchangePage = function({
             <Divider />
             <ExchangeButtons alignItems="center" justifyContent="space-between">
               <BuyButton
-                // bg="token"
                 onClick={() => {
                   setBuyToggle(true)
                   ToggleModal(true)
