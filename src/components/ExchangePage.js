@@ -644,7 +644,7 @@ export const ExchangePage = function({
       ) : (
         ''
       )}
-      <Footer />)
+      <Footer />
     </div>
   )
 }
