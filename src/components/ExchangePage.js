@@ -520,7 +520,6 @@ export const ExchangePage = function({
             <ExchangeButtons alignItems="center" justifyContent="space-between">
               <BuyButton
                 onClick={() => {
-                  console.log('clciked')
                   setBuyToggle(true)
                   ToggleModal(true)
                 }}
