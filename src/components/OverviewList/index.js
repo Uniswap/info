@@ -144,7 +144,7 @@ function OverviewList({ currencyUnit }) {
 
   const [maxPage, setMaxPage] = useState(1)
 
-  const TXS_PER_PAGE = 20
+  const TXS_PER_PAGE = 10
 
   const [loading, setLoading] = useState(true)
 
