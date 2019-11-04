@@ -78,7 +78,7 @@ export function useUniswapHistory(daysToQuery) {
           data[i].usdLiquidity = parseFloat(data[i].totalLiquidityUSD)
           data[i].txCount = parseFloat(data[i].txCount)
         })
-        setUniswapData(data)
+        setUniswapData(data.slice(1, data.length)) // remove first value
       } catch (err) {
         console.log('error: ', err)
       }
