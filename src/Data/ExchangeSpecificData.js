@@ -55,6 +55,8 @@ export function useExchangeSpecificData(exchangeAddress) {
         })
         if (result24HoursAgo) {
           data24HoursAgo = result24HoursAgo.data.exchangeHistoricalDatas[0]
+            ? result24HoursAgo.data.exchangeHistoricalDatas[0]
+            : data24HoursAgo
         }
       } catch (err) {
         console.log('error: ', err)
@@ -73,6 +75,8 @@ export function useExchangeSpecificData(exchangeAddress) {
         })
         if (result48HoursAgo) {
           data48HoursAgo = result48HoursAgo.data.exchangeHistoricalDatas[0]
+            ? result48HoursAgo.data.exchangeHistoricalDatas[0]
+            : data48HoursAgo
         }
       } catch (err) {
         console.log('error: ', err)
@@ -91,26 +95,26 @@ export function useExchangeSpecificData(exchangeAddress) {
       let oneDayVolume = 0
       let oneDayVolumeUSD = 0
 
-      if (data && data24HoursAgo && data48HoursAgo) {
+      if (data) {
         // volume in ETH
         ;[oneDayVolume, volumePercentChangeETH] = get2DayPercentFormatted(
           tradeVolumeEth,
-          data24HoursAgo.tradeVolumeEth,
-          data48HoursAgo.tradeVolumeEth
+          data24HoursAgo.tradeVolumeEth ? data24HoursAgo.tradeVolumeEth : 0,
+          data48HoursAgo.tradeVolumeEth ? data48HoursAgo.tradeVolumeEth : 0
         )
 
         // until updated graph with correct USD accumulation
         ;[oneDayVolumeUSD, volumePercentChangeUSD] = get2DayPercentFormatted(
           tradeVolumeUSD,
-          data24HoursAgo.tradeVolumeUSD,
-          data48HoursAgo.tradeVolumeUSD
+          data24HoursAgo.tradeVolumeUSD ? data24HoursAgo.tradeVolumeUSD : 0,
+          data48HoursAgo.tradeVolumeUSD ? data48HoursAgo.tradeVolumeUSD : 0
         )
 
         // get tx values
         ;[oneDayTxs, txsPercentChange] = get2DayPercentFormatted(
           totalTxsCount,
-          data24HoursAgo.totalTxsCount,
-          data48HoursAgo.totalTxsCount
+          data24HoursAgo.totalTxsCount ? data24HoursAgo.totalTxsCount : 1, //account for initial add tx
+          data48HoursAgo.totalTxsCount ? data48HoursAgo.totalTxsCount : 1
         )
 
         // regular percentage changes
@@ -122,6 +126,7 @@ export function useExchangeSpecificData(exchangeAddress) {
           data24HoursAgo.ethBalance * data24HoursAgo.price * data24HoursAgo.tokenPriceUSD
         )
       }
+
       // update "exchanges" with new information
       newExchangeData.tokenName = tokenName
       newExchangeData.tokenSymbol = tokenSymbol

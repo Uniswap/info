@@ -90,7 +90,6 @@ export const getAllTransactions = async address => {
   let fetchingData = true
 
   while (fetchingData) {
-    console.log(skipCount)
     let result = await client.query({
       query: TRANSACTIONS_QUERY_SKIPPABLE,
       variables: {

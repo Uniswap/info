@@ -430,7 +430,6 @@ export const ExchangePage = function({
             />
           </TopPanel>
           <TopPanel rounded bg="token" color="white" style={{ gridArea: 'shares' }} p={24}>
-            {console.log()}
             <FourByFour
               topLeft={<Hint color="textLight">Transactions (24hrs)</Hint>}
               bottomLeft={
