@@ -318,7 +318,7 @@ function OverviewList({ currencyUnit }) {
         style={{ height: '60px' }}
       >
         <Flex alignItems="center" justifyContent="flex-start">
-          <div style={{ minWidth: '30px' }}>{id + (page - 1) * 20}</div>
+          <div style={{ minWidth: '30px' }}>{id + (page - 1) * TXS_PER_PAGE}</div>
           <LogoBox>
             <TokenLogo size={24} address={exchange.tokenAddress} style={{ height: '24px', width: '24px' }} />
           </LogoBox>
