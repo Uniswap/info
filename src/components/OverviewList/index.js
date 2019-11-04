@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useHistory, Link } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { useMedia } from 'react-use'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
@@ -134,6 +134,10 @@ const LogoBox = styled.div`
 
 const CustomLink = styled(Link)`
   text-decoration: none;
+
+  &:visited {
+    color: blue;
+  }
 `
 
 // @TODO rework into virtualized list
@@ -153,8 +157,6 @@ function OverviewList({ currencyUnit }) {
   const [loading, setLoading] = useState(true)
 
   const [sortDirection, setSortDirection] = useState(true)
-
-  const history = useHistory()
 
   const SORT_FIELD = {
     PRICE: 'priceUSD',
@@ -332,7 +334,14 @@ function OverviewList({ currencyUnit }) {
               </Text>
             </CustomLink>
           ) : (
-            <DataText area={'symbol'}>{exchange.tokenSymbol}</DataText>
+            <CustomLink
+              to={'/token/' + exchange.id}
+              onClick={() => {
+                window.scrollTo(0, 0)
+              }}
+            >
+              <DataText area={'symbol'}>{exchange.tokenSymbol}</DataText>
+            </CustomLink>
           )}
         </Flex>
         {!belowMedium ? (
