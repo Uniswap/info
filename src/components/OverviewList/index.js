@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useHistory } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { useMedia } from 'react-use'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
@@ -85,8 +85,8 @@ const DashGrid = styled.div`
 
 const DashGridClickable = styled(DashGrid)`
   :hover {
-    background-color: #f8f8f8;
-    cursor: pointer;
+    // background-color: #f8f8f8;
+    // cursor: pointer;
   }
 `
 
@@ -132,6 +132,14 @@ const LogoBox = styled.div`
   }
 `
 
+const CustomLink = styled(Link)`
+  text-decoration: none;
+
+  &:visited {
+    color: blue;
+  }
+`
+
 // @TODO rework into virtualized list
 function OverviewList({ currencyUnit }) {
   const [exchanges, setExchanges] = useState([])
@@ -149,8 +157,6 @@ function OverviewList({ currencyUnit }) {
   const [loading, setLoading] = useState(true)
 
   const [sortDirection, setSortDirection] = useState(true)
-
-  const history = useHistory()
 
   const SORT_FIELD = {
     PRICE: 'priceUSD',
@@ -310,24 +316,32 @@ function OverviewList({ currencyUnit }) {
 
   const TransactionItem = ({ exchange, id }) => {
     return (
-      <DashGridClickable
-        onClick={() => {
-          history.push('/token/' + exchange.id)
-          window.scrollTo(0, 0)
-        }}
-        style={{ height: '60px' }}
-      >
+      <DashGridClickable style={{ height: '60px' }}>
         <Flex alignItems="center" justifyContent="flex-start">
           <div style={{ minWidth: '30px' }}>{id + (page - 1) * TXS_PER_PAGE}</div>
           <LogoBox>
             <TokenLogo size={24} address={exchange.tokenAddress} style={{ height: '24px', width: '24px' }} />
           </LogoBox>
           {!belowSmall ? (
-            <Text color="text" area={'name'} fontWeight="500">
-              {exchange.tokenName}
-            </Text>
+            <CustomLink
+              to={'/token/' + exchange.id}
+              onClick={() => {
+                window.scrollTo(0, 0)
+              }}
+            >
+              <Text color="button" area={'name'} fontWeight="500">
+                {exchange.tokenName}
+              </Text>
+            </CustomLink>
           ) : (
-            <DataText area={'symbol'}>{exchange.tokenSymbol}</DataText>
+            <CustomLink
+              to={'/token/' + exchange.id}
+              onClick={() => {
+                window.scrollTo(0, 0)
+              }}
+            >
+              <DataText area={'symbol'}>{exchange.tokenSymbol}</DataText>
+            </CustomLink>
           )}
         </Flex>
         {!belowMedium ? (
