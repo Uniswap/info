@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useHistory } from 'react-router-dom'
+import { useHistory, Link } from 'react-router-dom'
 import { useMedia } from 'react-use'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
@@ -85,8 +85,8 @@ const DashGrid = styled.div`
 
 const DashGridClickable = styled(DashGrid)`
   :hover {
-    background-color: #f8f8f8;
-    cursor: pointer;
+    // background-color: #f8f8f8;
+    // cursor: pointer;
   }
 `
 
@@ -130,6 +130,10 @@ const LogoBox = styled.div`
   @media screen and (max-width: 40em) {
     margin-right: 6px;
   }
+`
+
+const CustomLink = styled(Link)`
+  text-decoration: none;
 `
 
 // @TODO rework into virtualized list
@@ -310,22 +314,23 @@ function OverviewList({ currencyUnit }) {
 
   const TransactionItem = ({ exchange, id }) => {
     return (
-      <DashGridClickable
-        onClick={() => {
-          history.push('/token/' + exchange.id)
-          window.scrollTo(0, 0)
-        }}
-        style={{ height: '60px' }}
-      >
+      <DashGridClickable style={{ height: '60px' }}>
         <Flex alignItems="center" justifyContent="flex-start">
           <div style={{ minWidth: '30px' }}>{id + (page - 1) * TXS_PER_PAGE}</div>
           <LogoBox>
             <TokenLogo size={24} address={exchange.tokenAddress} style={{ height: '24px', width: '24px' }} />
           </LogoBox>
           {!belowSmall ? (
-            <Text color="text" area={'name'} fontWeight="500">
-              {exchange.tokenName}
-            </Text>
+            <CustomLink
+              to={'/token/' + exchange.id}
+              onClick={() => {
+                window.scrollTo(0, 0)
+              }}
+            >
+              <Text color="button" area={'name'} fontWeight="500">
+                {exchange.tokenName}
+              </Text>
+            </CustomLink>
           ) : (
             <DataText area={'symbol'}>{exchange.tokenSymbol}</DataText>
           )}
