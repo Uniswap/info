@@ -71,8 +71,8 @@ export function useUniswapHistory(daysToQuery) {
             data[i].dailyEthVolume = parseFloat(data[i].totalVolumeInEth) - parseFloat(data[i - 1].totalVolumeInEth)
             data[i].dailyUSDVolume = parseFloat(data[i].totalVolumeUSD) - parseFloat(data[i - 1].totalVolumeUSD)
           } else {
-            data[i].dailyEthVolume = 0
-            data[i].dailyUSDVolume = 0
+            data[i].dailyEthVolume = data[i].totalVolumeInEth
+            data[i].dailyUSDVolume = data[i].totalVolumeUSD
           }
           data[i].ethLiquidity = parseFloat(data[i].totalLiquidityInEth)
           data[i].usdLiquidity = parseFloat(data[i].totalLiquidityUSD)
