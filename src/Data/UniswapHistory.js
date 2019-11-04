@@ -71,14 +71,14 @@ export function useUniswapHistory(daysToQuery) {
             data[i].dailyEthVolume = parseFloat(data[i].totalVolumeInEth) - parseFloat(data[i - 1].totalVolumeInEth)
             data[i].dailyUSDVolume = parseFloat(data[i].totalVolumeUSD) - parseFloat(data[i - 1].totalVolumeUSD)
           } else {
-            data[i].dailyEthVolume = data[i].totalVolumeInEth
-            data[i].dailyUSDVolume = data[i].totalVolumeUSD
+            data[i].dailyEthVolume = 0
+            data[i].dailyUSDVolume = 0
           }
           data[i].ethLiquidity = parseFloat(data[i].totalLiquidityInEth)
           data[i].usdLiquidity = parseFloat(data[i].totalLiquidityUSD)
           data[i].txCount = parseFloat(data[i].txCount)
         })
-        setUniswapData(data)
+        setUniswapData(data.slice(1, data.length)) // remove first value
       } catch (err) {
         console.log('error: ', err)
       }
