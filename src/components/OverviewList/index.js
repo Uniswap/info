@@ -327,7 +327,7 @@ function OverviewList({ currencyUnit }) {
           </LogoBox>
           {!belowSmall ? (
             <CustomLink
-              to={'/token/' + exchange.id}
+              to={'/token/' + exchange.tokenAddress}
               onClick={() => {
                 window.scrollTo(0, 0)
               }}
@@ -338,7 +338,7 @@ function OverviewList({ currencyUnit }) {
             </CustomLink>
           ) : (
             <CustomLink
-              to={'/token/' + exchange.id}
+              to={'/token/' + exchange.tokenAddress}
               onClick={() => {
                 window.scrollTo(0, 0)
               }}

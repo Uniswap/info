@@ -32,7 +32,7 @@ function customFilter(option, searchText) {
       .toString()
       .toLowerCase()
       .includes(searchText.toString().toLowerCase()) ||
-    option.data.value
+    option.data.tokenAddress
       .toString()
       .toLowerCase()
       .includes(searchText.toString().toLowerCase())

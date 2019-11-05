@@ -31,10 +31,18 @@ function App(props) {
   //used for route loading
   const [length, setLength] = useState(0)
 
+  const [tokenToExchangeMap, setTokenToExchangeMap] = useState()
+
   useEffect(() => {
     if (exchanges) {
       setLength(Object.keys(exchanges).length)
     }
+    let newSet = {}
+    Object.keys(exchanges).map(key => {
+      newSet[exchanges[key].tokenAddress.toLowerCase()] = key
+      return true
+    })
+    setTokenToExchangeMap(newSet)
   }, [exchanges])
 
   const NavHeaderUpdated = withRouter(props => (
@@ -58,13 +66,13 @@ function App(props) {
               <Route
                 exact
                 strict
-                path="/token/:exchangeAddressURL?"
+                path="/token/:tokenAddressURL?"
                 render={({ match }) => {
-                  if (exchanges && exchanges.hasOwnProperty(match.params.exchangeAddressURL)) {
+                  if (exchanges && tokenToExchangeMap.hasOwnProperty(match.params.tokenAddressURL.toLowerCase())) {
                     return (
                       <ExchangeWrapper
                         currencyUnit={currencyUnit}
-                        address={match.params.exchangeAddressURL}
+                        address={tokenToExchangeMap[match.params.tokenAddressURL.toLowerCase()]}
                         exchanges={exchanges}
                         historyDaysToQuery={historyDaysToQuery}
                         setHistoryDaysToQuery={setHistoryDaysToQuery}
