@@ -136,7 +136,7 @@ const CustomLink = styled(Link)`
   text-decoration: none;
 
   &:visited {
-    color: blue;
+    color: #2f80ed;
   }
 `
 
