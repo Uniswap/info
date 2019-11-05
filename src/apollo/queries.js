@@ -187,6 +187,8 @@ export const UNISWAP_CHART_QUERY = gql`
       totalLiquidityInEth
       totalLiquidityUSD
       txCount
+      dailyVolumeInETH
+      dailyVolumeInUSD
     }
   }
 `

@@ -14,6 +14,7 @@ export function useChart(exchangeAddress, daysToQuery) {
     const fetchChartData = async function(exchangeAddress, daysToQuery) {
       try {
         const utcEndTime = dayjs.utc()
+        console.log(utcEndTime)
         let utcStartTime
         // go back, go way way back
         switch (daysToQuery) {
@@ -78,7 +79,7 @@ export function useChart(exchangeAddress, daysToQuery) {
             parseFloat(data[i].ethBalance) * ethPriceUsd
           data[i].ethLiquidity = parseFloat(data[i].ethBalance) * 2
         })
-        setChartData(data)
+        setChartData(data.slice(0, data.length - 1))
       } catch (err) {
         console.log('error: ', err)
       }

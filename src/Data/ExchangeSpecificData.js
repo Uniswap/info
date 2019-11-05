@@ -140,12 +140,10 @@ export function useExchangeSpecificData(exchangeAddress) {
       newExchangeData.volumePercentChangeUSD = volumePercentChangeUSD
       newExchangeData.liquidityPercentChangeETH = liquidityPercentChangeETH
       newExchangeData.liquidityPercentChangeUSD = liquidityPercentChangeUSD
-      newExchangeData.tradeVolume = parseFloat(Big(oneDayVolume).toFixed(4))
-      // keep this until updated graph with correct accumulation pricing
-      newExchangeData.volumeUSD = oneDayVolumeUSD
-      newExchangeData.tradeVolumeUSD = parseFloat(Big(oneDayVolume * price * priceUSD).toFixed(4))
+      newExchangeData.tradeVolume = oneDayVolume
+      newExchangeData.tradeVolumeUSD = oneDayVolumeUSD
       newExchangeData.oneDayTxs = oneDayTxs
-      newExchangeData.ethLiquidity = Big(ethBalance).toFixed(4)
+      newExchangeData.ethLiquidity = ethBalance
       newExchangeData.txsPercentChange = txsPercentChange
 
       setExchangeData(newExchangeData)
