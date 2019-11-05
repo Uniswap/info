@@ -136,7 +136,7 @@ const CustomLink = styled(Link)`
   text-decoration: none;
 
   &:visited {
-    color: blue;
+    color: rgb(47, 128, 237);
   }
 `
 
@@ -343,7 +343,9 @@ function OverviewList({ currencyUnit }) {
                 window.scrollTo(0, 0)
               }}
             >
-              <DataText area={'symbol'}>{exchange.tokenSymbol}</DataText>
+              <DataText area={'symbol'} color="button">
+                {exchange.tokenSymbol}
+              </DataText>
             </CustomLink>
           )}
         </Flex>

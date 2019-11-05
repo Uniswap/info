@@ -78,7 +78,7 @@ export function useChart(exchangeAddress, daysToQuery) {
             parseFloat(data[i].ethBalance) * ethPriceUsd
           data[i].ethLiquidity = parseFloat(data[i].ethBalance) * 2
         })
-        setChartData(data.slice(0, data.length - 1))
+        setChartData(data)
       } catch (err) {
         console.log('error: ', err)
       }
