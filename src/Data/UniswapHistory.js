@@ -13,6 +13,7 @@ export function useUniswapHistory(daysToQuery) {
       try {
         // current time
         const utcEndTime = dayjs.utc()
+        console.log(utcEndTime)
         let utcStartTime
         // go back, go way way back
         switch (daysToQuery) {
@@ -31,6 +32,7 @@ export function useUniswapHistory(daysToQuery) {
             break
         }
         let startTime = utcStartTime.unix() - 1 //because we filter on greater than in the query
+
         let data = []
         let dataEnd = false
         while (!dataEnd) {
@@ -67,18 +69,13 @@ export function useUniswapHistory(daysToQuery) {
           data[i].dayString = dayString
           data[i].ethVolume = parseFloat(data[i].totalVolumeInEth)
           data[i].usdVolume = parseFloat(data[i].totalVolumeUSD)
-          if (i > 0) {
-            data[i].dailyEthVolume = parseFloat(data[i].totalVolumeInEth) - parseFloat(data[i - 1].totalVolumeInEth)
-            data[i].dailyUSDVolume = parseFloat(data[i].totalVolumeUSD) - parseFloat(data[i - 1].totalVolumeUSD)
-          } else {
-            data[i].dailyEthVolume = 0
-            data[i].dailyUSDVolume = 0
-          }
+          data[i].dailyEthVolume = parseFloat(data[i].dailyVolumeInETH)
+          data[i].dailyUSDVolume = parseFloat(data[i].dailyVolumeInUSD)
           data[i].ethLiquidity = parseFloat(data[i].totalLiquidityInEth)
           data[i].usdLiquidity = parseFloat(data[i].totalLiquidityUSD)
           data[i].txCount = parseFloat(data[i].txCount)
         })
-        setUniswapData(data.slice(1, data.length)) // remove first value
+        setUniswapData(data) // remove first value
       } catch (err) {
         console.log('error: ', err)
       }

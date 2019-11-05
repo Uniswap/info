@@ -3,7 +3,7 @@ import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { client } from '../apollo/client'
 import { TICKER_QUERY, TICKER_24HOUR_QUERY } from '../apollo/queries'
-import { get2DayPercentFormatted, getPercentFormatted, Big } from '../helpers'
+import { get2DayPercentFormatted, getPercentFormatted } from '../helpers'
 
 export function useExchangeSpecificData(exchangeAddress) {
   dayjs.extend(utc)
@@ -140,12 +140,10 @@ export function useExchangeSpecificData(exchangeAddress) {
       newExchangeData.volumePercentChangeUSD = volumePercentChangeUSD
       newExchangeData.liquidityPercentChangeETH = liquidityPercentChangeETH
       newExchangeData.liquidityPercentChangeUSD = liquidityPercentChangeUSD
-      newExchangeData.tradeVolume = parseFloat(Big(oneDayVolume).toFixed(4))
-      // keep this until updated graph with correct accumulation pricing
-      newExchangeData.volumeUSD = oneDayVolumeUSD
-      newExchangeData.tradeVolumeUSD = parseFloat(Big(oneDayVolume * price * priceUSD).toFixed(4))
+      newExchangeData.tradeVolume = oneDayVolume
+      newExchangeData.tradeVolumeUSD = oneDayVolumeUSD
       newExchangeData.oneDayTxs = oneDayTxs
-      newExchangeData.ethLiquidity = Big(ethBalance).toFixed(4)
+      newExchangeData.ethLiquidity = ethBalance
       newExchangeData.txsPercentChange = txsPercentChange
 
       setExchangeData(newExchangeData)
