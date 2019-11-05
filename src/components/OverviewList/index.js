@@ -232,15 +232,29 @@ function OverviewList({ currencyUnit }) {
 
     async function getTxs() {
       setLoading(true)
-      let result = await client.query({
-        query: OVERVIEW_PAGE_QUERY,
-        fetchPolicy: 'cache-first'
-      })
-      if (result) {
-        setMaxPage(Math.floor(result.data.exchanges.length / TXS_PER_PAGE))
-        SetFilteredTxs(result.data.exchanges)
-        setExchanges(result.data.exchanges)
+      let gettingExchanges = true
+      let newExchanges = []
+      let skip = 0
+      while (gettingExchanges) {
+        let result = await client.query({
+          query: OVERVIEW_PAGE_QUERY,
+          variables: {
+            first: 100,
+            skip: skip
+          },
+          fetchPolicy: 'cache-first'
+        })
+        if (result) {
+          newExchanges = newExchanges.concat(result.data.exchanges)
+          skip = skip + 100
+          if (skip === 200) {
+            gettingExchanges = false
+          }
+        }
       }
+      setMaxPage(Math.floor(newExchanges.length / TXS_PER_PAGE))
+      SetFilteredTxs(newExchanges)
+      setExchanges(newExchanges)
     }
     getTxs()
   }, [])
@@ -327,7 +341,7 @@ function OverviewList({ currencyUnit }) {
           </LogoBox>
           {!belowSmall ? (
             <CustomLink
-              to={'/token/' + exchange.id}
+              to={'/token/' + exchange.tokenAddress}
               onClick={() => {
                 window.scrollTo(0, 0)
               }}
@@ -338,7 +352,7 @@ function OverviewList({ currencyUnit }) {
             </CustomLink>
           ) : (
             <CustomLink
-              to={'/token/' + exchange.id}
+              to={'/token/' + exchange.tokenAddress}
               onClick={() => {
                 window.scrollTo(0, 0)
               }}

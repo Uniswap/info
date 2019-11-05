@@ -14,16 +14,19 @@ export const customStyles = {
     boxShadow: 'none',
     ':hover': {
       borderColor: color.zircon,
-      cursor: 'pointer'
+      cursor: 'pointer',
+      overflow: 'scroll'
     }
   }),
   placeholder: styles => ({
     ...styles,
-    color: '#6C7284'
+    color: '#6C7284',
+    overflow: 'scroll'
   }),
   input: styles => ({
     ...styles,
-    color: '#6C7284'
+    color: '#6C7284',
+    overflow: 'scroll'
   }),
   singleValue: styles => ({
     ...styles,
@@ -42,8 +45,8 @@ export const customStyles = {
   valueContainer: styles => ({
     ...styles,
     paddingLeft: 16,
-    overflow: 'visible',
-    textAlign: 'right'
+    textAlign: 'right',
+    overflow: 'scroll'
   }),
   menuPlacer: styles => ({
     ...styles

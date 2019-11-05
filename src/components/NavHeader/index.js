@@ -104,7 +104,7 @@ export default function NavHeader({ exchanges, setCurrencyUnit, currencyUnit }) 
           placeholder={belowLarge ? 'Tokens' : 'Find token'}
           onChange={select => {
             setThemeColor(hardcodeThemes[select.value])
-            history.push('/token/' + select.value)
+            history.push('/token/' + select.tokenAddress)
           }}
         />
       </NavRight>

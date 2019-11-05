@@ -91,8 +91,8 @@ export const DIRECTORY_QUERY = gql`
 `
 
 export const OVERVIEW_PAGE_QUERY = gql`
-  query exchanges {
-    exchanges(orderBy: ethBalance, orderDirection: desc) {
+  query exchanges($first: Int!, $skip: Int!) {
+    exchanges(first: $first, skip: $skip, orderBy: ethBalance, orderDirection: desc) {
       id
       tokenAddress
       tokenName
