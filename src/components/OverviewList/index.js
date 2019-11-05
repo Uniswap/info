@@ -291,6 +291,9 @@ function OverviewList({ currencyUnit }) {
             let oneDayVolume = currentData[exchangeID].tradeVolumeEth - data24HoursAgo.tradeVolumeEth
             new24HourData[exchangeID].volume = oneDayVolume
 
+            let oneDayVolumeUSD = currentData[exchangeID].tradeVolumeUSD - data24HoursAgo.tradeVolumeUSD
+            new24HourData[exchangeID].volumeUSD = oneDayVolumeUSD
+
             // get the tx difference
             let oneDayTxs = currentData[exchangeID].totalTxsCount - data24HoursAgo.totalTxsCount
             new24HourData[exchangeID].txs = oneDayTxs
@@ -376,13 +379,7 @@ function OverviewList({ currencyUnit }) {
         <DataText area={'volume'}>
           {exchangeData24Hour.hasOwnProperty(exchange.id)
             ? currencyUnit === 'USD'
-              ? '$' +
-                formattedNum(
-                  exchangeData24Hour[exchange.id].volume *
-                    exchangeData24Hour[exchange.id].price *
-                    exchangeData24Hour[exchange.id].priceUSD,
-                  true
-                )
+              ? '$' + formattedNum(exchangeData24Hour[exchange.id].volumeUSD, true)
               : formattedNum(exchangeData24Hour[exchange.id].volume) + ' ETH'
             : '-'}
         </DataText>

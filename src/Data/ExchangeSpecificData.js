@@ -3,7 +3,7 @@ import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { client } from '../apollo/client'
 import { TICKER_QUERY, TICKER_24HOUR_QUERY } from '../apollo/queries'
-import { get2DayPercentFormatted, getPercentFormatted, Big } from '../helpers'
+import { get2DayPercentFormatted, getPercentFormatted } from '../helpers'
 
 export function useExchangeSpecificData(exchangeAddress) {
   dayjs.extend(utc)

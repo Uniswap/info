@@ -13,6 +13,7 @@ export function useUniswapHistory(daysToQuery) {
       try {
         // current time
         const utcEndTime = dayjs.utc()
+        console.log(utcEndTime)
         let utcStartTime
         // go back, go way way back
         switch (daysToQuery) {
@@ -31,6 +32,7 @@ export function useUniswapHistory(daysToQuery) {
             break
         }
         let startTime = utcStartTime.unix() - 1 //because we filter on greater than in the query
+
         let data = []
         let dataEnd = false
         while (!dataEnd) {
@@ -63,8 +65,7 @@ export function useUniswapHistory(daysToQuery) {
             .concat('-')
             .concat((dayTimestamp.month() + 1).toString())
             .concat('-')
-            .concat(dayTimestamp.date().toString())
-
+            .concat((dayTimestamp.date() + 1).toString())
           data[i].dayString = dayString
           data[i].ethVolume = parseFloat(data[i].totalVolumeInEth)
           data[i].usdVolume = parseFloat(data[i].totalVolumeUSD)

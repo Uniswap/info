@@ -14,7 +14,6 @@ export function useChart(exchangeAddress, daysToQuery) {
     const fetchChartData = async function(exchangeAddress, daysToQuery) {
       try {
         const utcEndTime = dayjs.utc()
-        console.log(utcEndTime)
         let utcStartTime
         // go back, go way way back
         switch (daysToQuery) {
