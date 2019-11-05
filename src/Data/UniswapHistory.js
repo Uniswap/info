@@ -13,7 +13,6 @@ export function useUniswapHistory(daysToQuery) {
       try {
         // current time
         const utcEndTime = dayjs.utc()
-        console.log(utcEndTime)
         let utcStartTime
         // go back, go way way back
         switch (daysToQuery) {
