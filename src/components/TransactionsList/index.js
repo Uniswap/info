@@ -100,7 +100,7 @@ const ClickableText = styled(Text)`
   &:hover {
     cursor: pointer;
     opacity: 0.6;
-  
+
   user-select: none;
 `
 
@@ -503,7 +503,10 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, txFil
       </DashGrid>
       <Divider />
       <List p={0}>
-        {!loading && txs && filteredTxs.length === 0 ? <EmptyTxWrapper>No transactions</EmptyTxWrapper> : ''}
+        {(!loading && txs && filteredTxs.length === 0)
+          ? <EmptyTxWrapper>No transactions in last 24 hours</EmptyTxWrapper>
+          : ''
+        }
         {loading ? (
           <LocalLoader />
         ) : (
