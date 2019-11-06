@@ -443,7 +443,7 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, txFil
               sortTxs(SORT_FIELD.USD_VALUE)
             }}
           >
-            Value {sortedColumn === SORT_FIELD.USD_VALUE ? (sortDirection ? '↑' : '↓') : ''}
+            Value {sortedColumn === SORT_FIELD.USD_VALUE ? (!sortDirection ? '↑' : '↓') : ''}
           </ClickableText>
         </Flex>
         {!belowMedium ? (
@@ -458,7 +458,7 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, txFil
                   sortTxs(SORT_FIELD.ETH_VALUE)
                 }}
               >
-                ETH Amount {sortedColumn === SORT_FIELD.ETH_VALUE ? (sortDirection ? '↑' : '↓') : ''}
+                ETH Amount {sortedColumn === SORT_FIELD.ETH_VALUE ? (!sortDirection ? '↑' : '↓') : ''}
               </ClickableText>
             </Flex>
             <Flex alignItems="center">
@@ -471,7 +471,7 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, txFil
                   sortTxs(SORT_FIELD.TOKEN_VALUE)
                 }}
               >
-                Token Amount {sortedColumn === SORT_FIELD.TOKEN_VALUE ? (sortDirection ? '↑' : '↓') : ''}
+                Token Amount {sortedColumn === SORT_FIELD.TOKEN_VALUE ? (!sortDirection ? '↑' : '↓') : ''}
               </ClickableText>
             </Flex>
           </>
@@ -497,7 +497,7 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, txFil
               sortTxs(SORT_FIELD.TIME)
             }}
           >
-            Time {sortedColumn === SORT_FIELD.TIME ? (sortDirection ? '↑' : '↓') : ''}
+            Time {sortedColumn === SORT_FIELD.TIME ? (!sortDirection ? '↑' : '↓') : ''}
           </ClickableText>
         </Flex>
       </DashGrid>

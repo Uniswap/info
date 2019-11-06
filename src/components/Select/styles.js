@@ -14,19 +14,17 @@ export const customStyles = {
     boxShadow: 'none',
     ':hover': {
       borderColor: color.zircon,
-      cursor: 'pointer',
-      overflow: 'scroll'
+      cursor: 'pointer'
     }
   }),
   placeholder: styles => ({
     ...styles,
-    color: '#6C7284',
-    overflow: 'scroll'
+    color: '#6C7284'
   }),
   input: styles => ({
     ...styles,
     color: '#6C7284',
-    overflow: 'scroll'
+    overflow: 'hidden'
   }),
   singleValue: styles => ({
     ...styles,
@@ -101,7 +99,8 @@ export const customStylesMobile = {
   }),
   input: styles => ({
     ...styles,
-    color: '6C7284'
+    color: '6C7284',
+    overflow: 'hidden'
   }),
   singleValue: styles => ({
     ...styles,
