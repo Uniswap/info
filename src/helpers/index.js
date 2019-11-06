@@ -153,13 +153,12 @@ export const formattedNum = (number, usd = false) => {
 
   if (usd) {
     if (num < 0.01) {
-      return Number(parseFloat(num).toFixed(4)).toLocaleString()
+      return Number(parseFloat(num).toFixed(4))
     }
     let usdString = priceFormatter.format(num)
     return usdString.slice(1, usdString.length)
   }
-
-  return Number(parseFloat(num).toFixed(4)).toLocaleString()
+  return Number(parseFloat(num).toFixed(4))
 }
 
 export const get2DayPercentFormatted = (valueNow, value24HoursAgo, value48HoursAgo) => {

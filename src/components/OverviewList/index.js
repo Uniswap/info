@@ -317,6 +317,12 @@ function OverviewList({ currencyUnit }) {
               100
             ).toFixed(2)
             new24HourData[exchangeID].priceChange = priceChangeRaw
+
+            const priceChangeETH = (
+              ((currentData[exchangeID].price - data24HoursAgo.price) / currentData[exchangeID].price) *
+              100
+            ).toFixed(2)
+            new24HourData[exchangeID].priceChangeETH = priceChangeETH
           }
           return true
         })
@@ -402,7 +408,9 @@ function OverviewList({ currencyUnit }) {
         {!belowSmall ? (
           <DataText area={'txs'}>
             {exchangeData24Hour.hasOwnProperty(exchange.id)
-              ? getPercentChangeColor(exchangeData24Hour[exchange.id].priceChange)
+              ? currencyUnit === 'USD'
+                ? getPercentChangeColor(exchangeData24Hour[exchange.id].priceChange)
+                : getPercentChangeColor(exchangeData24Hour[exchange.id].priceChangeETH)
               : '-'}
           </DataText>
         ) : (
@@ -432,7 +440,7 @@ function OverviewList({ currencyUnit }) {
                   sortTxs(SORT_FIELD.SYMBOL)
                 }}
               >
-                <Text>Symbol {sortedColumn === SORT_FIELD.SYMBOL ? (sortDirection ? '↑' : '↓') : ''}</Text>
+                <Text>Symbol {sortedColumn === SORT_FIELD.SYMBOL ? (!sortDirection ? '↑' : '↓') : ''}</Text>
               </ClickableText>
             </Flex>
             <Flex alignItems="center">
@@ -445,7 +453,7 @@ function OverviewList({ currencyUnit }) {
                   sortTxs(SORT_FIELD.PRICE)
                 }}
               >
-                Price {sortedColumn === SORT_FIELD.PRICE ? (sortDirection ? '↑' : '↓') : ''}
+                Price {sortedColumn === SORT_FIELD.PRICE ? (!sortDirection ? '↑' : '↓') : ''}
               </ClickableText>
             </Flex>
           </>
@@ -462,7 +470,7 @@ function OverviewList({ currencyUnit }) {
               sortTxs(SORT_FIELD.LIQUIDITY)
             }}
           >
-            Liquidity {sortedColumn === SORT_FIELD.LIQUIDITY ? (sortDirection ? '↑' : '↓') : ''}
+            Liquidity {sortedColumn === SORT_FIELD.LIQUIDITY ? (!sortDirection ? '↑' : '↓') : ''}
           </ClickableText>
         </Flex>
         <Flex alignItems="center">
@@ -475,7 +483,7 @@ function OverviewList({ currencyUnit }) {
               sortTxs(SORT_FIELD.VOLUME)
             }}
           >
-            Volume (24hrs) {sortedColumn === SORT_FIELD.VOLUME ? (!sortDirection ? '↑' : '↓') : ''}
+            Volume (24hrs) {sortedColumn === SORT_FIELD.VOLUME ? (sortDirection ? '↑' : '↓') : ''}
           </ClickableText>
         </Flex>
         {!belowSmall ? (
@@ -489,7 +497,7 @@ function OverviewList({ currencyUnit }) {
                 sortTxs(SORT_FIELD.PRICE_CHANGE)
               }}
             >
-              Price Change (24hrs) {sortedColumn === SORT_FIELD.PRICE_CHANGE ? (!sortDirection ? '↑' : '↓') : ''}
+              Price Change (24hrs) {sortedColumn === SORT_FIELD.PRICE_CHANGE ? (sortDirection ? '↑' : '↓') : ''}
             </ClickableText>
           </Flex>
         ) : (

@@ -361,7 +361,7 @@ export const ExchangePage = function({
             <TokenPrice>
               {!isNaN(price) && !isNaN(invPrice)
                 ? currencyUnit === 'USD'
-                  ? '$' + formattedNum(priceUSD, true)
+                  ? '$' + formattedNum(priceUSD, true, true)
                   : 'Ξ ' + formattedNum(invPrice) + ' ETH'
                 : ''}
             </TokenPrice>
