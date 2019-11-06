@@ -503,10 +503,11 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, txFil
       </DashGrid>
       <Divider />
       <List p={0}>
-        {(!loading && txs && filteredTxs.length === 0)
-          ? <EmptyTxWrapper>No transactions in last 24 hours</EmptyTxWrapper>
-          : ''
-        }
+        {!loading && txs && filteredTxs.length === 0 ? (
+          <EmptyTxWrapper>No transactions in last 24 hours</EmptyTxWrapper>
+        ) : (
+          ''
+        )}
         {loading ? (
           <LocalLoader />
         ) : (
