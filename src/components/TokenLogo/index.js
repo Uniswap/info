@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
 
-const TOKEN_ICON_API = 'https://raw.githubusercontent.com/TrustWallet/tokens/master/tokens'
+const TOKEN_ICON_API = 'https://raw.githubusercontent.com/TrustWallet/assets/master/blockchains/ethereum/assets/'
 const BAD_IMAGES = {}
 
 const Inline = styled.div`
@@ -52,7 +52,7 @@ export default function TokenLogo({ address, header = false, size = '1rem', ...r
     address = '0xc011a72400e58ecd99ee497cf89e3775d4bd732f'
   }
 
-  const path = `${TOKEN_ICON_API}/${address.toLowerCase()}.png`
+  const path = `${TOKEN_ICON_API}/${address.toLowerCase()}/logo.png`
 
   return (
     <Inline>
