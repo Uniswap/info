@@ -14,7 +14,7 @@ export const customStyles = {
     boxShadow: 'none',
     ':hover': {
       borderColor: color.zircon,
-      cursor: 'pointer'
+      cursor: 'pointer',
     }
   }),
   placeholder: styles => ({
