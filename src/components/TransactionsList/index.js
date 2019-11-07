@@ -326,8 +326,8 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, txFil
               timestamp: data[item].timestamp
             }
             for (entry in data[item].tokenPurchaseEvents) {
-              newItem.ethAmount = data[item].tokenPurchaseEvents[entry].eth
-              newItem.tokenAmount = data[item].tokenPurchaseEvents[entry].token
+              newItem.ethAmount = data[item].tokenPurchaseEvents[entry].ethAmount
+              newItem.tokenAmount = data[item].tokenPurchaseEvents[entry].tokenAmount
               newItem.event = 'TokenPurchase'
               newSwaps.push(newItem)
               ts.push(newItem)
@@ -343,8 +343,8 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, txFil
               timestamp: data[item].timestamp
             }
             for (entry in data[item].ethPurchaseEvents) {
-              newItem.ethAmount = data[item].ethPurchaseEvents[entry].eth
-              newItem.tokenAmount = data[item].ethPurchaseEvents[entry].token
+              newItem.ethAmount = data[item].ethPurchaseEvents[entry].ethAmount
+              newItem.tokenAmount = data[item].ethPurchaseEvents[entry].tokenAmount
               newItem.event = 'EthPurchase'
               newSwaps.push(newItem)
               ts.push(newItem)
