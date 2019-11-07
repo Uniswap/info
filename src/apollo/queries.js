@@ -50,13 +50,13 @@ export const TRANSACTIONS_QUERY_SKIPPABLE = gql`
       }
       tokenPurchaseEvents {
         id
-        eth
-        token
+        ethAmount
+        tokenAmount
       }
       ethPurchaseEvents {
         id
-        eth
-        token
+        ethAmount
+        tokenAmount
       }
     }
   }
@@ -70,7 +70,6 @@ export const CHART_QUERY = gql`
       tokenBalance
       marginalEthRate
       ethVolume
-      ROI
       tokenPriceUSD
       totalEvents
     }
