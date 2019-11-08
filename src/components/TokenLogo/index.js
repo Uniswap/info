@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
 
-const TOKEN_ICON_API = 'https://raw.githubusercontent.com/TrustWallet/assets/master/blockchains/ethereum/assets/'
+const TOKEN_ICON_API = 'https://raw.githubusercontent.com/trustWallet/assets/old/blockchains/ethereum/assets/'
 const BAD_IMAGES = {}
 
 const Inline = styled.div`
