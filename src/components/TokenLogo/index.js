@@ -52,7 +52,7 @@ export default function TokenLogo({ address, header = false, size = '1rem', ...r
     address = '0xc011a72400e58ecd99ee497cf89e3775d4bd732f'
   }
 
-  const path = `${TOKEN_ICON_API}/${address.toLowerCase()}/logo.png`
+  const path = `${TOKEN_ICON_API}/${address}/logo.png`
 
   return (
     <Inline>
