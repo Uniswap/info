@@ -2,16 +2,23 @@ import { BigNumber } from 'bignumber.js'
 import dayjs from 'dayjs'
 import { client } from '../apollo/client'
 import { ExportToCsv } from 'export-to-csv'
+import { ethers } from 'ethers'
 
 import { TRANSACTIONS_QUERY_SKIPPABLE } from '../apollo/queries'
 
 BigNumber.set({ EXPONENTIAL_AT: 50 })
 
-export const BASE_URL = 'https://uniswap-api.loanscan.io/'
-
 export const toNiceDate = date => dayjs(date).format('MMM DD')
 
 export const toNiceDateYear = date => dayjs(date).format('MMMM DD, YYYY')
+
+export const isAddress = value => {
+  try {
+    return ethers.utils.getAddress(value.toLowerCase())
+  } catch {
+    return false
+  }
+}
 
 export const isWeb3Available = async () => {
   /* eslint-disable */
