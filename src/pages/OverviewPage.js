@@ -281,12 +281,7 @@ export const OverviewPage = function({
               <Divider />
               <Box p={24} style={{ boxShadow: '0px 4px 20px rgba(239, 162, 250, 0.15)', borderRadius: '10px' }}>
                 {uniswapHistory && uniswapHistory.length > 0 ? (
-                  <OverviewChart
-                    exchangeAddress={exchangeAddress}
-                    data={uniswapHistory}
-                    currencyUnit={currencyUnit}
-                    chartOption={chartOption}
-                  />
+                  <OverviewChart data={uniswapHistory} currencyUnit={currencyUnit} chartOption={chartOption} />
                 ) : (
                   <Loader />
                 )}

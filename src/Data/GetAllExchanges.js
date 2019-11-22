@@ -46,6 +46,9 @@ export function useAllExchanges() {
         console.log('error: ', err)
       }
       data.forEach(exchange => {
+        if (exchange.tokenAddress === '0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359') {
+          exchange.tokenSymbol = 'SAI'
+        }
         exchange.label = buildDirectoryLabel(exchange)
         const logo = <TokenLogo address={exchange.tokenAddress} style={{ height: '20px', width: '20px' }} />
         const logoStyled = <StyledTokenLogo address={exchange.tokenAddress} header={true} size={30} />
