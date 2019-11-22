@@ -4,6 +4,7 @@ export const hardcodeThemes = {
   '0x2c4bd064b998838076fa341a83d007fc2fa50957': '#1abc9c',
   '0xae76c84c9262cdb9abc0c2c8888e62db8e22a0bf': '#302c2c',
   '0x09cabec1ead1c0ba254b09efb3ee13841712be14': '#fdc134',
+  '0x2a1530c4c41db0b0b2bb646cb5eb1a67b7158667': '#fdc134',
   '0x2e642b8d59b45a1d8c5aef716a84ff44ea665914': '#ff5000',
   '0x0d8775f648430679a709e98d2b0cb6250d2887ef': '#676370',
   '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48': '#2875ca',

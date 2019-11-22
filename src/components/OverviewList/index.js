@@ -338,6 +338,9 @@ function OverviewList({ currencyUnit }) {
   const belowSmall = useMedia('(max-width: 40em)')
 
   const TransactionItem = ({ exchange, id }) => {
+    if (exchange.tokenAddress === '0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359') {
+      exchange.tokenSymbol = 'SAI'
+    }
     return (
       <DashGridClickable style={{ height: '60px' }}>
         <Flex alignItems="center" justifyContent="flex-start">

@@ -30,7 +30,7 @@ export function useExchangeSpecificData(exchangeAddress) {
         data = result.data.exchange
       }
 
-      const {
+      let {
         tokenName,
         tokenSymbol,
         tokenAddress,
@@ -125,6 +125,10 @@ export function useExchangeSpecificData(exchangeAddress) {
           ethBalance * price * priceUSD,
           data24HoursAgo.ethBalance * data24HoursAgo.price * data24HoursAgo.tokenPriceUSD
         )
+      }
+
+      if (tokenAddress === '0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359') {
+        tokenSymbol = 'SAI'
       }
 
       // update "exchanges" with new information
