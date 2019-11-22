@@ -150,6 +150,17 @@ function getPercentSign(value) {
   )
 }
 
+const FloatRight = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  margin-top: 1rem;
+  font-size: 10px;
+  color: #333333;
+  font-weight: 500;
+`
+
 export const OverviewPage = function({
   exchangeAddress,
   uniswapHistory,
@@ -279,6 +290,7 @@ export const OverviewPage = function({
                 ) : (
                   <Loader />
                 )}
+                <FloatRight>UTC±00:00</FloatRight>
               </Box>
             </ChartWrapper>
             <Panel rounded bg="white" area="transactions">
