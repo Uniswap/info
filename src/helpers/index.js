@@ -3,14 +3,21 @@ import dayjs from 'dayjs'
 import { client } from '../apollo/client'
 import { ExportToCsv } from 'export-to-csv'
 import { ethers } from 'ethers'
+import utc from 'dayjs/plugin/utc'
 
 import { TRANSACTIONS_QUERY_SKIPPABLE } from '../apollo/queries'
 
 BigNumber.set({ EXPONENTIAL_AT: 50 })
 
-export const toNiceDate = date => dayjs(date).format('MMM DD')
+dayjs.extend(utc)
 
-export const toNiceDateYear = date => dayjs(date).format('MMMM DD, YYYY')
+export const toNiceDate = date => {
+  // let df = new Date(date * 1000).toUTCString('MMMM DD')
+  let x = dayjs.utc(dayjs.unix(date)).format('MMM DD')
+  return x
+}
+
+export const toNiceDateYear = date => dayjs.utc(dayjs.unix(date)).format('MMMM DD, YYYY')
 
 export const isAddress = value => {
   try {

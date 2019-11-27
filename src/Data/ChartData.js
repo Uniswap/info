@@ -52,16 +52,7 @@ export function useChart(exchangeAddress, daysToQuery) {
         }
 
         data.forEach((dayData, i) => {
-          let dayTimestamp = dayjs.unix(data[i].date)
-          // note, the dayjs api says date starts at 1, but it appears it doesnt, as I had to add 1
-          let dayString = dayTimestamp
-            .year()
-            .toString()
-            .concat('-')
-            .concat((dayTimestamp.month() + 1).toString())
-            .concat('-')
-            .concat((dayTimestamp.date() + 1).toString())
-          data[i].dayString = dayString
+          data[i].dayString = data[i].date
           let x = data[i].ethVolume
           let ethPriceUsd = parseFloat(data[i].marginalEthRate) * parseFloat(data[i].tokenPriceUSD)
           data[i].ethVolume = parseFloat(x)

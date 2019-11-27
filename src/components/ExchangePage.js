@@ -68,6 +68,17 @@ const TopPanel = styled(Panel)`
   }
 `
 
+const FloatRight = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  margin-top: 1rem;
+  font-size: 10px;
+  color: #333333;
+  font-weight: 500;
+`
+
 const TokenHeader = styled(Box)`
   color: white;
   font-weight: 600;
@@ -502,6 +513,7 @@ export const ExchangePage = function({
               ) : (
                 <Loader />
               )}
+              <FloatRight>UTC±00:00</FloatRight>
             </Box>
           </ChartWrapper>
           <Panel rounded bg="white" area="exchange" style={{ boxShadow: '0px 4px 20px rgba(239, 162, 250, 0.15)' }}>
