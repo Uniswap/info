@@ -341,6 +341,10 @@ function OverviewList({ currencyUnit }) {
     if (exchange.tokenAddress === '0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359') {
       exchange.tokenSymbol = 'SAI'
     }
+    if (exchange.tokenAddress === '0xf5dce57282a584d2746faf1593d3121fcac444dc') {
+      exchange.tokenSymbol = 'cSAI'
+      exchange.tokenName = 'Compound SAI'
+    }
     return (
       <DashGridClickable style={{ height: '60px' }}>
         <Flex alignItems="center" justifyContent="flex-start">
