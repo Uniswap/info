@@ -127,8 +127,14 @@ export function useExchangeSpecificData(exchangeAddress) {
         )
       }
 
+      // manual overrides
       if (tokenAddress === '0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359') {
         tokenSymbol = 'SAI'
+      }
+
+      if (tokenAddress === '0xf5dce57282a584d2746faf1593d3121fcac444dc') {
+        tokenSymbol = 'cSAI'
+        tokenName = 'Compound Sai'
       }
 
       // update "exchanges" with new information
