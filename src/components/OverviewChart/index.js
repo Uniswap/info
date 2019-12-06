@@ -1,5 +1,5 @@
 import React from 'react'
-import { Area, XAxis, YAxis, ResponsiveContainer, CartesianGrid, Tooltip, AreaChart } from 'recharts'
+import { Area, XAxis, YAxis, ResponsiveContainer, BarChart, Bar, CartesianGrid, Tooltip, AreaChart } from 'recharts'
 import styled from 'styled-components'
 import { useMedia } from 'react-use'
 import { toK, toNiceDate, toNiceDateYear } from '../../helpers'
@@ -78,10 +78,11 @@ const OverviewChart = ({ data, chartOption, currencyUnit }) => {
       </ChartWrapper>
     )
   } else {
+    // volume
     return (
       <ChartWrapper>
         <ResponsiveContainer aspect={isNotMobile ? 60 / 22 : 60 / 12}>
-          <AreaChart margin={{ top: 0, right: 0, bottom: 6, left: 10 }} barCategoryGap={1} data={data}>
+          <BarChart margin={{ top: 0, right: 0, bottom: 6, left: 10 }} barCategoryGap={1} data={data}>
             <CartesianGrid stroke="#f5f5f5" />
             <XAxis
               tickLine={false}
@@ -115,7 +116,7 @@ const OverviewChart = ({ data, chartOption, currencyUnit }) => {
               }}
               wrapperStyle={{ top: -70, left: -10 }}
             />
-            <Area
+            <Bar
               type="monotone"
               name={'Volume' + (currencyUnit === 'USD' ? ' (USD)' : ' (ETH)')}
               dataKey={currencyUnit === 'USD' ? 'dailyUSDVolume' : 'dailyEthVolume'}
@@ -123,7 +124,7 @@ const OverviewChart = ({ data, chartOption, currencyUnit }) => {
               opacity={'0.4'}
               stroke="#FE6DDE"
             />
-          </AreaChart>
+          </BarChart>
         </ResponsiveContainer>
       </ChartWrapper>
     )

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Area, XAxis, YAxis, ResponsiveContainer, CartesianGrid, Tooltip, AreaChart } from 'recharts'
+import { Area, XAxis, YAxis, ResponsiveContainer, Bar, BarChart, CartesianGrid, Tooltip, AreaChart } from 'recharts'
 import styled from 'styled-components'
 import { useMedia } from 'react-use'
 import { toK, toNiceDate, toNiceDateYear } from '../../helpers'
@@ -183,10 +183,11 @@ const Chart = ({ data, chartOption, currencyUnit, symbol }) => {
       </ChartWrapper>
     )
   } else {
+    // volume
     return (
       <ChartWrapper>
         <ResponsiveContainer aspect={isMobile ? 60 / 22 : 60 / 12}>
-          <AreaChart margin={{ top: 0, right: 0, bottom: 6, left: 10 }} barCategoryGap={1} data={chartData}>
+          <BarChart margin={{ top: 0, right: 0, bottom: 6, left: 10 }} barCategoryGap={1} data={chartData}>
             <CartesianGrid stroke="#f5f5f5" />
             <XAxis
               tickLine={false}
@@ -220,7 +221,7 @@ const Chart = ({ data, chartOption, currencyUnit, symbol }) => {
               }}
               wrapperStyle={{ top: -70, left: -10 }}
             />
-            <Area
+            <Bar
               type="monotone"
               name={'Volume' + (currencyUnit === 'USD' ? ' (USD)' : ' (ETH)')}
               dataKey={currencyUnit === 'USD' ? 'usdVolume' : 'ethVolume'}
@@ -229,7 +230,7 @@ const Chart = ({ data, chartOption, currencyUnit, symbol }) => {
               yAxisId={0}
               stroke="var(--c-token)"
             />
-          </AreaChart>
+          </BarChart>
         </ResponsiveContainer>
       </ChartWrapper>
     )
