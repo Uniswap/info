@@ -4,7 +4,8 @@ import LocalLoader from '../components/LocalLoader'
 import { useExchangeSpecificData } from '../Data/ExchangeSpecificData'
 import { useChart } from '../Data/ChartData'
 import { hardcodeThemes } from '../constants/theme'
-import { setThemeColor } from '../helpers'
+import { setThemeColor, isAddress } from '../helpers'
+import Vibrant from 'node-vibrant'
 
 export const ExchangeWrapper = function({
   address,
@@ -47,8 +48,26 @@ export const ExchangeWrapper = function({
 
   useEffect(() => {
     setCurrentData({}) // reset data for UI
-    setThemeColor(hardcodeThemes[address])
-  }, [address])
+    if (hardcodeThemes.hasOwnProperty(address)) {
+      setThemeColor(hardcodeThemes[address])
+    } else {
+      if (exchanges.hasOwnProperty(address)) {
+        let tokenAddress = exchanges[address].tokenAddress
+        const path = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${isAddress(
+          tokenAddress
+        )}/logo.png`
+        Vibrant.from(path).getPalette((err, palette) => {
+          if (palette && palette.Vibrant) {
+            let r = palette.Vibrant._rgb
+            let code = 'rgba(' + r[0] + ',' + r[1] + ',' + r[2] + ')'
+            setThemeColor(code)
+          }
+        })
+      } else {
+        setThemeColor('#333333')
+      }
+    }
+  }, [address, exchanges])
 
   useEffect(() => {
     if (exchanges.hasOwnProperty(address)) {

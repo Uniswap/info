@@ -18,6 +18,7 @@
     "graphql": "^14.5.6",
     "graphql-tag": "^2.10.1",
     "jazzicon": "^1.5.0",
+    "node-vibrant": "^3.1.5",
     "react": "^16.9.0",
     "react-apollo": "^3.1.1",
     "react-device-detect": "^1.9.10",

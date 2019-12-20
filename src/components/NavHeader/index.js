@@ -71,13 +71,14 @@ export default function NavHeader({ exchanges, setCurrencyUnit, currencyUnit }) 
     if (exchanges) {
       Object.keys(exchanges).map(key => {
         let item = exchanges[key]
-        if (parseFloat(item.ethBalance) > 0.1) {
+        if (parseFloat(item.ethBalance) > 0) {
           let newd = filteredDirectory
           if (isMobile && item.label.label.length > 5) {
             item.label.label = item.label.label.slice(0, 5) + '...'
           }
           item.label.logo = item.logo
           newd.push(item.label)
+          // newd = newd.slice(0, 199)
           setDirectory(newd)
         }
         return true
@@ -103,7 +104,9 @@ export default function NavHeader({ exchanges, setCurrencyUnit, currencyUnit }) 
           tokenSelect={true}
           placeholder={belowLarge ? 'Tokens' : 'Find token'}
           onChange={select => {
-            setThemeColor(hardcodeThemes[select.value])
+            if (hardcodeThemes.hasOwnProperty(select.value)) {
+              setThemeColor(hardcodeThemes[select.value])
+            }
             history.push('/token/' + select.tokenAddress)
           }}
         />
