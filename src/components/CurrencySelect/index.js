@@ -5,7 +5,7 @@ const MobileSelect = styled.div`
   width: 65px;
   height: 38px;
   background-color: rgba(255, 255, 255, 0.3);
-  border-radius: 32px;
+  border-radius: 20px;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -30,7 +30,7 @@ const Select = styled.div`
   width: 130px;
   height: 38px;
   background-color: rgba(255, 255, 255, 0.1);
-  border-radius: 32px;
+  border-radius: 20px;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -52,7 +52,7 @@ const SelectOption = styled.div`
   width: 65px;
   height: 38px;
   background-color: ${props => (props.active ? 'rgba(255, 255, 255, 0.3)' : 'rgba(255, 255, 255, 0)')};
-  border-radius: 32px;
+  border-radius: 20px;
   display: flex;
   flex-direction: row;
   align-items: center;

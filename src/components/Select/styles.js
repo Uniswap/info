@@ -4,7 +4,7 @@ const color = theme.colors
 export const customStyles = {
   control: (styles, state) => ({
     ...styles,
-    borderRadius: 38,
+    borderRadius: 20,
     backgroundColor: 'white',
     color: '#6C7284',
     maxHeight: '32px',
@@ -53,7 +53,7 @@ export const customStyles = {
   option: (styles, state) => ({
     ...styles,
     margin: '0px 0px',
-    padding: 'calc(12px - 1px) calc(24px - 1px)',
+    padding: 'calc(12px - 1px) calc(12px - 1px)',
     width: '',
     lineHeight: 1,
     color: state.isSelected ? '#000' : '',
@@ -82,7 +82,7 @@ export const customStyles = {
 export const customStylesMobile = {
   control: (styles, state) => ({
     ...styles,
-    borderRadius: 38,
+    borderRadius: 12,
     backgroundColor: 'white',
     color: '#6C7284',
     maxHeight: '32px',
@@ -138,7 +138,7 @@ export const customStylesMobile = {
   }),
   menu: styles => ({
     ...styles,
-    borderRadius: 16,
+    borderRadius: 20,
     boxShadow: '0 4px 8px 0 rgba(47, 128, 237, 0.1), 0 0 0 0.5px var(--c-zircon)',
     overflow: 'hidden',
     paddingBottom: '12px'
@@ -153,7 +153,7 @@ export const customStylesMobile = {
 export const customStylesTime = {
   control: (styles, state) => ({
     ...styles,
-    borderRadius: 38,
+    borderRadius: 20,
     backgroundColor: 'white',
     color: '#6C7284',
     maxHeight: '32px',

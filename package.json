@@ -9,6 +9,7 @@
     "apollo-client": "^2.6.4",
     "apollo-link-http": "^1.5.16",
     "bignumber.js": "^9.0.0",
+    "color-contrast-checker": "^1.5.0",
     "copy-to-clipboard": "^3.2.0",
     "dayjs": "^1.8.16",
     "es-abstract": "^1.14.2",
@@ -19,6 +20,7 @@
     "graphql-tag": "^2.10.1",
     "jazzicon": "^1.5.0",
     "node-vibrant": "^3.1.5",
+    "polished": "^3.4.2",
     "react": "^16.9.0",
     "react-apollo": "^3.1.1",
     "react-device-detect": "^1.9.10",
@@ -38,6 +40,7 @@
     "styled-components": "^4.3.2",
     "typeface-inter": "^3.10.0",
     "unstated": "^2.1.1",
+    "wcag-contrast": "^3.0.0",
     "web3-react": "^5.0.4"
   },
   "scripts": {
