@@ -3,7 +3,7 @@ import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 
 import { client } from '../apollo/client'
-import { CHART_QUERY } from '../apollo/queries'
+import { CHART_QUERY, TICKER_QUERY } from '../apollo/queries'
 
 export function useChart(exchangeAddress, daysToQuery) {
   dayjs.extend(utc)
@@ -15,7 +15,6 @@ export function useChart(exchangeAddress, daysToQuery) {
       try {
         const utcEndTime = dayjs.utc()
         let utcStartTime
-        // go back, go way way back
         switch (daysToQuery) {
           case 'all':
             utcStartTime = utcEndTime.subtract(1, 'year').startOf('year')
@@ -47,18 +46,41 @@ export function useChart(exchangeAddress, daysToQuery) {
           if (result.data.exchangeDayDatas.length !== 100) {
             dataEnd = true
           } else {
-            startTime = result.data.exchangeDayDatas[99].date - 1
+            startTime = result.data.exchangeDayDatas[result.data.exchangeDayDatas.length - 1].date
           }
         }
 
+        // if no txs in the current timestamp ut must be most current
+        if (!data[0]) {
+          const result = await client.query({
+            query: TICKER_QUERY,
+            variables: {
+              id: exchangeAddress
+            },
+            fetchPolicy: 'network-only'
+          })
+          if (result) {
+            data[0] = result.data.exchange
+            data[0].date = startTime
+            data[0].marginalEthRate = data[0].price
+            data[0].tokenPriceUSD = data[0].priceUSD
+          }
+        }
+        // use to keep track of which days had volume
+        let dayIndexSet = new Set()
+        let dayIndexArray = []
+        const oneDay = 24 * 60 * 60
         data.forEach((dayData, i) => {
+          // add the day index to the set of days
+          dayIndexSet.add((data[i].date / oneDay).toFixed(0))
+          dayIndexArray.push(data[i])
           data[i].dayString = data[i].date
-          let x = data[i].ethVolume
+          let ethVolume = data[i].ethVolume
           let ethPriceUsd = parseFloat(data[i].marginalEthRate) * parseFloat(data[i].tokenPriceUSD)
-          data[i].ethVolume = parseFloat(x)
+          data[i].ethVolume = parseFloat(ethVolume)
           data[i].tokenPriceUSD = parseFloat(data[i].tokenPriceUSD)
           data[i].tokensPerUSD = 1 / parseFloat(data[i].tokenPriceUSD)
-          data[i].usdVolume = parseFloat(x) * ethPriceUsd
+          data[i].usdVolume = parseFloat(ethVolume) * ethPriceUsd
           data[i].ethPerToken = 1 / parseFloat(data[i].marginalEthRate)
           data[i].tokensPerEth = parseFloat(data[i].marginalEthRate)
           let y = data[i].ethBalance
@@ -69,6 +91,49 @@ export function useChart(exchangeAddress, daysToQuery) {
             parseFloat(data[i].ethBalance) * ethPriceUsd
           data[i].ethLiquidity = parseFloat(data[i].ethBalance) * 2
         })
+        // fill in empty days
+        let timestamp = data[0].date ? data[0].date : startTime
+        let latestLiquidityUSD = data[0].usdLiquidity
+        let latestLiquidityETH = data[0].ethLiquidity
+        let latestEthBalance = data[0].ethBalance
+        let latestTokenBalance = data[0].tokenBalance
+        let latestEthPerToken = data[0].ethPerToken
+        let latestTokenPriceUSD = data[0].tokenPriceUSD
+        let latestTokensPerUSD = data[0].tokensPerUSD
+        let latestTokensPerETH = data[0].tokensPerEth
+        let index = 1
+        while (timestamp < utcEndTime.unix() - oneDay) {
+          const nextDay = timestamp + oneDay
+          let currentDayIndex = (nextDay / oneDay).toFixed(0)
+          if (!dayIndexSet.has(currentDayIndex)) {
+            data.push({
+              date: nextDay,
+              dayString: nextDay,
+              ethVolume: 0,
+              usdVolume: 0,
+              usdLiquidity: latestLiquidityUSD,
+              ethLiquidity: latestLiquidityETH,
+              ethBalance: latestEthBalance,
+              tokenBalance: latestTokenBalance,
+              tokenPriceUSD: latestTokenPriceUSD,
+              ethPerToken: latestEthPerToken,
+              tokensPerUSD: latestTokensPerUSD,
+              tokensPerEth: latestTokensPerETH
+            })
+          } else {
+            latestLiquidityUSD = dayIndexArray[index].usdLiquidity
+            latestLiquidityETH = dayIndexArray[index].ethLiquidity
+            latestEthBalance = dayIndexArray[index].ethBalance
+            latestTokenBalance = dayIndexArray[index].tokenBalance
+            latestEthPerToken = dayIndexArray[index].ethPerToken
+            latestTokenPriceUSD = dayIndexArray[index].tokenPriceUSD
+            latestTokensPerUSD = dayIndexArray[index].tokensPerUSD
+            latestTokensPerETH = dayIndexArray[index].tokensPerEth
+            index = index + 1
+          }
+          timestamp = nextDay
+        }
+        data = data.sort((a, b) => (parseInt(a.date) > parseInt(b.date) ? 1 : -1))
         setChartData(data)
       } catch (err) {
         console.log('error: ', err)

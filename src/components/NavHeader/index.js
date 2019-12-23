@@ -8,8 +8,6 @@ import CurrencySelect from '../CurrencySelect'
 import Panel from '../Panel'
 import { isMobile } from 'react-device-detect'
 import { useMedia } from 'react-use'
-import { hardcodeThemes } from '../../constants/theme'
-import { setThemeColor } from '../../helpers'
 
 const Header = styled(Panel)`
   display: grid;
@@ -66,24 +64,28 @@ export default function NavHeader({ exchanges, setCurrencyUnit, currencyUnit }) 
   // for now exclude broken tokens
   const [filteredDirectory, setDirectory] = useState([])
 
+  const [capEth, setCapEth] = useState(true)
+
   // filter out exchange with low liquidity
   useEffect(() => {
+    setDirectory([])
     if (exchanges) {
+      let fd = []
       Object.keys(exchanges).map(key => {
         let item = exchanges[key]
-        if (parseFloat(item.ethBalance) > 0.1) {
-          let newd = filteredDirectory
+        if (parseFloat(item.ethBalance) > (capEth ? 0.5 : 0)) {
           if (isMobile && item.label.label.length > 5) {
             item.label.label = item.label.label.slice(0, 5) + '...'
           }
           item.label.logo = item.logo
-          newd.push(item.label)
-          setDirectory(newd)
+          item.label.ethBalance = item.ethBalance
+          fd.push(item.label)
         }
         return true
       })
+      setDirectory(fd)
     }
-  }, [exchanges, filteredDirectory])
+  }, [exchanges, capEth])
 
   const belowLarge = useMedia('(max-width: 40em)')
   const history = useHistory()
@@ -100,10 +102,11 @@ export default function NavHeader({ exchanges, setCurrencyUnit, currencyUnit }) 
         <CurrencySelect setCurrencyUnit={setCurrencyUnit} currencyUnit={currencyUnit} />
         <TokenSelect
           options={filteredDirectory}
+          setCapEth={setCapEth}
+          capEth={capEth}
           tokenSelect={true}
           placeholder={belowLarge ? 'Tokens' : 'Find token'}
           onChange={select => {
-            setThemeColor(hardcodeThemes[select.value])
             history.push('/token/' + select.tokenAddress)
           }}
         />

@@ -26,24 +26,50 @@ const LogoBox = styled.div`
   margin-right: 8px;
 `
 
+const CustomMenu = styled.div`
+  background-color: white;
+  position: absolute;
+  border-radius: 16px;
+  box-shadow: 0 4px 8px 0 rgba(47, 128, 237, 0.1), 0 0 0 0.5px var(--c-zircon);
+  overflow: hidden;
+  padding: 0;
+  width: 180px;
+  z-index: 5;
+  margin-top: 10px;
+  padding-top: 36px;
+`
+
+const FixedToggle = styled.div`
+  position: absolute;
+  height: 24px;
+  z-index: 10;
+  background-color: white;
+  width: 100%;
+  top: 8px;
+  display: flex;
+  align-items: center;
+  padding-left: 12px;
+  & > input {
+    margin-right: 8px;
+  }
+`
+
+let addressStart = new RegExp('^0x')
 function customFilter(option, searchText) {
-  if (
-    option.data.label
-      .toString()
-      .toLowerCase()
-      .includes(searchText.toString().toLowerCase()) ||
-    option.data.tokenAddress
+  const isAddress = addressStart.test(searchText)
+  if (isAddress) {
+    return option.data.tokenAddress
       .toString()
       .toLowerCase()
       .includes(searchText.toString().toLowerCase())
-  ) {
-    return true
-  } else {
-    return false
   }
+  return option.data.label
+    .toString()
+    .toLowerCase()
+    .includes(searchText.toString().toLowerCase())
 }
 
-const Select = ({ options, onChange, tokenSelect = false, placeholder, ...rest }) => {
+const Select = ({ options, onChange, setCapEth, capEth, tokenSelect = false, placeholder, ...rest }) => {
   return tokenSelect ? (
     <ReactSelect
       placeholder={placeholder}
@@ -65,7 +91,25 @@ const Select = ({ options, onChange, tokenSelect = false, placeholder, ...rest }
           <span role="img" aria-label={'viewer'} style={{ marginRight: '8px' }}>
             🔎
           </span>
-        )
+        ),
+        Menu: ({ children, innerRef, innerProps }) => {
+          return (
+            <CustomMenu ref={innerRef} {...innerProps}>
+              <FixedToggle>
+                <input
+                  name="isGoing"
+                  type="checkbox"
+                  checked={capEth}
+                  onChange={() => {
+                    setCapEth(!capEth)
+                  }}
+                />
+                Hide Low Liquidity
+              </FixedToggle>
+              {children}
+            </CustomMenu>
+          )
+        }
       }}
     />
   ) : (
