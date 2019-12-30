@@ -338,7 +338,7 @@ export const ExchangePage = function({
   }
 
   return (
-    <div style={{ width: '100%' }}>
+    <div style={{ marginTop: '0px' }}>
       <ThemedBackground bg="token" />
       <TokenHeader>
         <TokenGroup>
