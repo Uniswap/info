@@ -72,7 +72,6 @@ const TokenHeader = styled(Box)`
   padding: 20px;
   padding-top: 24px;
   padding-bottom: 20px;
-  /* padding-left: 0px; */
   display: flex;
   margin: auto;
   max-width: 1240px;

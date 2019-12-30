@@ -58,8 +58,8 @@ export const ExchangeWrapper = function({
         if (palette && palette.Vibrant) {
           let detectedHex = palette.Vibrant.hex
           let AAscore = hex(detectedHex, '#FFF')
-          while (AAscore < 4) {
-            detectedHex = darken(0.05, detectedHex)
+          while (AAscore < 3) {
+            detectedHex = darken(0.01, detectedHex)
             AAscore = hex(detectedHex, '#FFF')
           }
           setThemeColor(detectedHex)

@@ -17,10 +17,6 @@ const Chart = ({ data, chartOption, currencyUnit }) => {
     setChartData(data)
   }, [data])
 
-  // useEffect(() => {
-  //   setChartData([])
-  // }, [exchangeAddress])
-
   const isNotMobile = useMedia('(max-width: 40em)')
   if (chartOption !== 'volume' && chartData && data) {
     return (
