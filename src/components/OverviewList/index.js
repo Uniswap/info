@@ -164,7 +164,8 @@ function OverviewList({ currencyUnit }) {
     TRANSACTIIONS: 'txs',
     VOLUME: 'volume',
     SYMBOL: 'tokenSymbol',
-    PRICE_CHANGE: 'priceChange'
+    PRICE_CHANGE: 'priceChange',
+    PRICE_CHANGE_ETH: 'priceChangeETH'
   }
 
   const [sortedColumn, setSortedColumn] = useState(SORT_FIELD.LIQUIDITY)
@@ -180,13 +181,19 @@ function OverviewList({ currencyUnit }) {
   }
 
   function sortTxs(field) {
-    if (field === SORT_FIELD.VOLUME || field === SORT_FIELD.TRANSACTIIONS || field === SORT_FIELD.PRICE_CHANGE) {
+    if (
+      field === SORT_FIELD.VOLUME ||
+      field === SORT_FIELD.TRANSACTIIONS ||
+      field === SORT_FIELD.PRICE_CHANGE ||
+      field === SORT_FIELD.PRICE_CHANGE_ETH
+    ) {
       let newTxs = filteredTxs.slice().sort((a, b) => {
         if (!exchangeData24Hour.hasOwnProperty(a.id)) {
           exchangeData24Hour[a.id] = {}
           exchangeData24Hour[a.id].volume = 0
           exchangeData24Hour[a.id].txs = 0
           exchangeData24Hour[a.id].priceChange = 0
+          exchangeData24Hour[a.id].priceChangeETH = 0
           setExchangeData24Hour(exchangeData24Hour)
         }
         if (!exchangeData24Hour.hasOwnProperty(b.id)) {
@@ -194,6 +201,7 @@ function OverviewList({ currencyUnit }) {
           exchangeData24Hour[b.id].volume = 0
           exchangeData24Hour[a.id].txs = 0
           exchangeData24Hour[b.id].priceChange = 0
+          exchangeData24Hour[a.id].priceChangeETH = 0
           setExchangeData24Hour(exchangeData24Hour)
         }
         return parseFloat(exchangeData24Hour[a.id][field]) > parseFloat(exchangeData24Hour[b.id][field])
@@ -319,7 +327,7 @@ function OverviewList({ currencyUnit }) {
             new24HourData[exchangeID].priceChange = priceChangeRaw
 
             const priceChangeETH = (
-              ((currentData[exchangeID].price - data24HoursAgo.price) / currentData[exchangeID].price) *
+              ((1 / currentData[exchangeID].price - 1 / data24HoursAgo.price) / (1 / currentData[exchangeID].price)) *
               100
             ).toFixed(2)
             new24HourData[exchangeID].priceChangeETH = priceChangeETH
@@ -501,7 +509,7 @@ function OverviewList({ currencyUnit }) {
               onClick={e => {
                 setSortedColumn(SORT_FIELD.PRICE_CHANGE)
                 setSortDirection(!sortDirection)
-                sortTxs(SORT_FIELD.PRICE_CHANGE)
+                sortTxs(currencyUnit === 'USD' ? SORT_FIELD.PRICE_CHANGE : SORT_FIELD.PRICE_CHANGE_ETH)
               }}
             >
               Price Change (24hrs) {sortedColumn === SORT_FIELD.PRICE_CHANGE ? (sortDirection ? '↑' : '↓') : ''}
