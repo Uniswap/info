@@ -289,7 +289,7 @@ export const OverviewPage = function({
               </Box>
             </ChartWrapper>
             <Panel rounded bg="white" area="transactions">
-              <OverviewList currencyUnit={currencyUnit} exchangeAddress={exchangeAddress} />
+              <OverviewList currencyUnit={currencyUnit} />
             </Panel>
           </OverviewDashboard>
         </DashboardWrapper>
