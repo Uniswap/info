@@ -119,7 +119,7 @@ export function useExchangeSpecificData(exchangeAddress) {
 
         // regular percentage changes
         pricePercentChangeUSD = getPercentFormatted(priceUSD, data24HoursAgo.tokenPriceUSD)
-        pricePercentChangeETH = getPercentFormatted(price, data24HoursAgo.price)
+        pricePercentChangeETH = getPercentFormatted(1 / price, 1 / data24HoursAgo.price)
         liquidityPercentChangeETH = getPercentFormatted(ethBalance, data24HoursAgo.ethBalance)
         liquidityPercentChangeUSD = getPercentFormatted(
           ethBalance * price * priceUSD,
