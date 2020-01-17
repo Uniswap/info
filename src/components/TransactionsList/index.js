@@ -100,7 +100,7 @@ const ClickableText = styled(Text)`
   &:hover {
     cursor: pointer;
     opacity: 0.6;
-
+  }
   user-select: none;
 `
 
@@ -401,7 +401,7 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, txFil
           </CustomLink>
         </DataText>
         <DataText area={'value'}>
-          {price && priceUSD ? '$' + formattedNum(Big(transaction.ethAmount) * price * priceUSD, true) : ''}
+          {price && priceUSD ? '$' + formattedNum(Big(transaction.ethAmount) * price * priceUSD * 2, true) : ''}
         </DataText>
         {!belowMedium ? (
           <>
