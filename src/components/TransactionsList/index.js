@@ -393,6 +393,7 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, txFil
   const belowSmall = useMedia('(max-width: 40em)')
 
   const TransactionItem = ({ transaction, tokenSymbol }) => {
+    console.log(transaction)
     return (
       <DashGrid style={{ height: '60px' }}>
         <DataText area={'action'} color="text" fontWeight="500">
@@ -401,7 +402,16 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, txFil
           </CustomLink>
         </DataText>
         <DataText area={'value'}>
-          {price && priceUSD ? '$' + formattedNum(Big(transaction.ethAmount) * price * priceUSD * 2, true) : ''}
+          {price && priceUSD
+            ? '$' +
+              formattedNum(
+                Big(transaction.ethAmount) *
+                  price *
+                  priceUSD *
+                  (transaction.event === 'AddLiquidity' || transaction.event === 'RemoveLiquidity' ? 2 : 1),
+                true
+              )
+            : ''}
         </DataText>
         {!belowMedium ? (
           <>
