@@ -1,0 +1,72 @@
+import React from "react"
+import { useHistory } from "react-router-dom"
+import styled from "styled-components"
+
+import { Text, Flex } from "rebass"
+import Logo from "../../assets/logo2.svg"
+
+import { useTokenData } from "../../contexts/TokenData"
+import { usePairData } from "../../contexts/PairData"
+
+const TitleWrapper = styled.div`
+  text-decoration: none;
+
+  &:hover {
+    cursor: pointer;
+  }
+`
+
+const LogoWrapper = styled.img`
+  height: 30px;
+  width: 30px;
+`
+
+export default function Title({ token, pair }) {
+  const history = useHistory()
+
+  const { name, symbol } = useTokenData(token)
+  const { token0, token1 } = usePairData(pair)
+  const symbol0 = token0 && token0.symbol
+  const symbol1 = token1 && token1.symbol
+
+  function getName() {
+    if (symbol0 && symbol1) {
+      return (
+        <div>
+          Uniswap Info /{" "}
+          <span style={{ fontWeight: 400 }}>{symbol0 + "-" + symbol1}</span>
+        </div>
+      )
+    }
+    if (name && symbol) {
+      return (
+        <div>
+          Uniswap Info /{" "}
+          <span style={{ fontWeight: 400 }}>{name + "(" + symbol + ")"}</span>
+        </div>
+      )
+    } else {
+      return "Uniswap Info"
+    }
+  }
+
+  return (
+    <TitleWrapper onClick={() => history.push("/")}>
+      <Flex alignItems="center">
+        <Text fontSize="1rem" lineHeight="1">
+          <LogoWrapper src={Logo} alt="" />
+        </Text>
+
+        <Text
+          fontWeight={600}
+          mx="1rem"
+          color="black"
+          lineHeight="1.5rem"
+          style={{ textDecorationColor: "blue" }}
+        >
+          {getName()}
+        </Text>
+      </Flex>
+    </TitleWrapper>
+  )
+}

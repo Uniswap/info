@@ -1,0 +1,372 @@
+import React, {
+  createContext,
+  useContext,
+  useReducer,
+  useMemo,
+  useCallback,
+  useEffect,
+  useState
+} from "react"
+
+import { client } from "../apollo/client"
+import {
+  TOKEN_DATA,
+  All_TOKENS,
+  TOKEN_TXNS,
+  TOKEN_HISTORICAL_DATA,
+  TOKEN_CHART
+} from "../apollo/queries"
+
+import { useEthPrice } from "./GlobalData"
+
+import dayjs from "dayjs"
+import utc from "dayjs/plugin/utc"
+
+import { get2DayPercentFormatted, getPercentFormatted } from "../helpers"
+
+const UPDATE = "UPDATE"
+const UPDATE_TOKEN_TXNS = "UPDATE_TOKEN_TXNS"
+const UPDATE_CHART_DATA = "UPDATE_CHART_DATA"
+
+dayjs.extend(utc)
+
+export function safeAccess(object, path) {
+  return object
+    ? path.reduce(
+        (accumulator, currentValue) =>
+          accumulator && accumulator[currentValue]
+            ? accumulator[currentValue]
+            : null,
+        object
+      )
+    : null
+}
+
+const TokenDataContext = createContext()
+
+function useTokenDataContext() {
+  return useContext(TokenDataContext)
+}
+
+function reducer(state, { type, payload }) {
+  switch (type) {
+    case UPDATE: {
+      const { data } = payload
+      const store = {}
+      Object.keys(data).map(item => {
+        return (store[item] = data[item])
+      })
+      return {
+        ...state,
+        [data.id]: {
+          ...(safeAccess(state, [data.id]) || {}),
+          ...store
+        }
+      }
+    }
+    case UPDATE_TOKEN_TXNS: {
+      const { address, mints, burns, swaps } = payload
+      return {
+        ...state,
+        [address]: {
+          ...(safeAccess(state, [address]) || {}),
+          txns: {
+            mints,
+            burns,
+            swaps
+          }
+        }
+      }
+    }
+    case UPDATE_CHART_DATA: {
+      const { address, chartData } = payload
+      return {
+        ...state,
+        [address]: {
+          ...(safeAccess(state, [address]) || {}),
+          chartData
+        }
+      }
+    }
+    default: {
+      throw Error(`Unexpected action type in DataContext reducer: '${type}'.`)
+    }
+  }
+}
+
+export default function Provider({ children }) {
+  const [state, dispatch] = useReducer(reducer, {})
+  const update = useCallback(data => {
+    dispatch({
+      type: UPDATE,
+      payload: {
+        data
+      }
+    })
+  }, [])
+
+  const updateTokenTxns = useCallback((address, mints, burns, swaps) => {
+    dispatch({
+      type: UPDATE_TOKEN_TXNS,
+      payload: { address, mints, burns, swaps }
+    })
+  }, [])
+
+  const updateChartData = useCallback((address, chartData) => {
+    dispatch({
+      type: UPDATE_CHART_DATA,
+      payload: { address, chartData }
+    })
+  }, [])
+
+  return (
+    <TokenDataContext.Provider
+      value={useMemo(
+        () => [state, { update, updateTokenTxns, updateChartData }],
+        [state, update, updateTokenTxns, updateChartData]
+      )}
+    >
+      {children}
+    </TokenDataContext.Provider>
+  )
+}
+
+const getAllTokens = async () => {
+  let data = []
+  let result = await client.query({
+    query: All_TOKENS,
+    fetchPolicy: "cache-first"
+  })
+  data = data.concat(result.data.tokens)
+  return data
+}
+
+const getTokenData = async (address, ethPrice) => {
+  let data = []
+  let result = await client.query({
+    query: TOKEN_DATA,
+    variables: {
+      tokenAddr: address
+    },
+    fetchPolicy: "cache-first"
+  })
+  data = result.data && result.data.tokens && result.data.tokens[0]
+  let oneDayData = []
+  let twoDayData = []
+  const utcCurrentTime = dayjs()
+  const utcOneDayBack = utcCurrentTime.subtract(1, "day")
+  const utcTwoDaysBack = utcCurrentTime.subtract(2, "day")
+  let oneDayResult = await client.query({
+    query: TOKEN_HISTORICAL_DATA,
+    variables: {
+      tokenAddr: address,
+      timestamp: utcOneDayBack.unix()
+    },
+    fetchPolicy: "cache-first"
+  })
+  oneDayData = oneDayResult.data.tokenHistoricalDatas[0]
+  let twoDayResult = await client.query({
+    query: TOKEN_HISTORICAL_DATA,
+    variables: {
+      tokenAddr: address,
+      timestamp: utcTwoDaysBack.unix()
+    },
+    fetchPolicy: "cache-first"
+  })
+  twoDayData = twoDayResult.data.tokenHistoricalDatas[0]
+  if (data && oneDayData && twoDayData) {
+    const [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentFormatted(
+      data.tradeVolumeUSD,
+      oneDayData.tradeVolumeUSD ? oneDayData.tradeVolumeUSD : 0,
+      twoDayData.tradeVolumeUSD ? twoDayData.tradeVolumeUSD : 0
+    )
+    const [oneDayVolumeETH, volumeChangeETH] = get2DayPercentFormatted(
+      data.tradeVolumeETH,
+      oneDayData.tradeVolumeETH ? oneDayData.tradeVolumeETH : 0,
+      twoDayData.tradeVolumeETH ? twoDayData.tradeVolumeETH : 0
+    )
+    const priceChangeUSD = getPercentFormatted(
+      data.derivedETH * ethPrice,
+      oneDayData.priceUSD
+    )
+    const priceChangeETH = getPercentFormatted(
+      data.derivedETH,
+      oneDayData.priceETH
+    )
+    const liquidityChangeUSD = getPercentFormatted(
+      data.totalLiquidityUSD,
+      oneDayData.totalLiquidityUSD
+    )
+    const liquidityChangeETH = getPercentFormatted(
+      data.totalLiquidityETH,
+      oneDayData.totalLiquidityETH
+    )
+    data.priceUSD = data.derivedETH * ethPrice
+    data.totalLiquidityUSD = data.totalLiquidityETH * ethPrice
+    data.oneDayVolumeUSD = oneDayVolumeUSD
+    data.oneDayVolumeETH = oneDayVolumeETH
+    data.volumeChangeUSD = volumeChangeUSD
+    data.volumeChangeETH = volumeChangeETH
+    data.priceChangeUSD = priceChangeUSD
+    data.priceChangeETH = priceChangeETH
+    data.liquidityChangeUSD = liquidityChangeUSD
+    data.liquidityChangeETH = liquidityChangeETH
+  } else {
+    // new tokens
+    data.priceUSD = 0
+    data.totalLiquidityUSD = 0
+    data.oneDayVolumeUSD = 0
+    data.oneDayVolumeETH = 0
+    data.volumeChangeUSD = 0
+    data.volumeChangeETH = 0
+    data.priceChangeUSD = 0
+    data.priceChangeETH = 0
+    data.liquidityChangeUSD = 0
+    data.liquidityChangeETH = 0
+  }
+  return data
+}
+
+const getTokenTransactions = async tokenAddress => {
+  let mints = []
+  let burns = []
+  let swaps = []
+  let result = await client.query({
+    query: TOKEN_TXNS,
+    variables: {
+      tokenAddr: tokenAddress
+    },
+    fetchPolicy: "cache-first"
+  })
+  mints = mints.concat(result.data.asToken0Mint)
+  mints = mints.concat(result.data.asToken1Mint)
+  burns = burns.concat(result.data.asToken0Burn)
+  burns = burns.concat(result.data.asToken1Burn)
+  swaps = swaps.concat(result.data.asTokenBoughtSwap)
+  swaps = swaps.concat(result.data.asTokenSoldSwap)
+  return [mints, burns, swaps]
+}
+
+const getTokenChartData = async tokenAddress => {
+  let data = []
+  const utcEndTime = dayjs.utc()
+  let utcStartTime = utcEndTime.subtract(1, "year")
+  let startTime = utcStartTime.unix() - 1
+  let result = await client.query({
+    query: TOKEN_CHART,
+    variables: {
+      tokenAddr: tokenAddress
+    },
+    fetchPolicy: "cache-first"
+  })
+  data = data.concat(result.data.tokenDayDatas)
+  let dayIndexSet = new Set()
+  let dayIndexArray = []
+  const oneDay = 24 * 60 * 60
+  data.forEach((dayData, i) => {
+    // add the day index to the set of days
+    dayIndexSet.add((data[i].date / oneDay).toFixed(0))
+    dayIndexArray.push(data[i])
+  })
+  // fill in empty days
+  let timestamp = data[0] && data[0].date ? data[0].date : startTime
+  let latestLiquidityUSD = data[0] && data[0].totalLiquidityUSD
+  let latestPairDatas = data[0] && data[0].mostLiquidPairs
+  let index = 1
+  while (timestamp < utcEndTime.unix() - oneDay) {
+    const nextDay = timestamp + oneDay
+    let currentDayIndex = (nextDay / oneDay).toFixed(0)
+    if (!dayIndexSet.has(currentDayIndex)) {
+      data.push({
+        date: nextDay,
+        dayString: nextDay,
+        totalLiquidityUSD: latestLiquidityUSD,
+        mostLiquidPairs: latestPairDatas
+      })
+    } else {
+      latestLiquidityUSD = dayIndexArray[index].totalLiquidityUSD
+      latestPairDatas = dayIndexArray[index].mostLiquidPairs
+      index = index + 1
+    }
+    timestamp = nextDay
+  }
+  data = data.sort((a, b) => (parseInt(a.date) > parseInt(b.date) ? 1 : -1))
+  return data
+}
+
+export function Updater() {
+  const [, { update, updateChartData }] = useTokenDataContext()
+  const ethPrice = useEthPrice()
+  useEffect(() => {
+    ethPrice &&
+      getAllTokens().then(allTokens => {
+        allTokens.map(async token => {
+          let data = await getTokenData(token.id, ethPrice)
+          update(data)
+        })
+      })
+  }, [update, updateChartData, ethPrice])
+  return null
+}
+
+export function useTokenData(tokenAddress) {
+  const [state, { update }] = useTokenDataContext()
+  const ethPrice = useEthPrice()
+  const tokenData = safeAccess(state, [tokenAddress])
+  if (!tokenAddress) {
+    return {}
+  }
+  if (!tokenData && ethPrice) {
+    getTokenData(tokenAddress, ethPrice).then(data => {
+      update(data)
+    })
+  }
+  return tokenData || {}
+}
+
+export function useTokenTransactions(tokenAddress) {
+  const [state, { updateTokenTxns }] = useTokenDataContext()
+  const tokenTxns = safeAccess(state, [tokenAddress, "txns"])
+  useEffect(() => {
+    async function checkForTxns() {
+      if (!tokenTxns) {
+        let [mints, burns, swap] = await getTokenTransactions(tokenAddress)
+        updateTokenTxns(tokenAddress, mints, burns, swap)
+      }
+    }
+    checkForTxns()
+  }, [tokenTxns, tokenAddress, updateTokenTxns])
+  return tokenTxns
+}
+
+export function useTokenChartData(tokenAddress) {
+  const [state, { updateChartData }] = useTokenDataContext()
+  const chartData = safeAccess(state, [tokenAddress, "chartData"])
+  useEffect(() => {
+    async function checkForChartData() {
+      if (!chartData) {
+        let data = await getTokenChartData(tokenAddress)
+        updateChartData(tokenAddress, data)
+      }
+    }
+    checkForChartData()
+  }, [chartData, tokenAddress, updateChartData])
+  return chartData
+}
+
+export function useAllTokens() {
+  const [allTokens, setAllTokens] = useState()
+  useEffect(() => {
+    async function getTokens() {
+      const tokens = await getAllTokens()
+      setAllTokens(tokens)
+    }
+    getTokens()
+  }, [])
+  return allTokens
+}
+
+export function useAllTokenData() {
+  const [state] = useTokenDataContext()
+  return state
+}
