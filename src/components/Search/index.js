@@ -17,15 +17,11 @@ const Wrapper = styled.div`
   align-items: center;
   justify-content: flex-end;
   padding: ${({ large }) => (large ? "12px" : "8px 16px")};
-  border: 1px solid rgba(255, 255, 255);
+  border: 1px solid rgba(255, 255, 255, 0.4);
   border-radius: 12px;
-  background: rgba(255, 255, 255);
+  background: rgba(255, 255, 255, 0.4);
   border-bottom-right-radius: ${({ open }) => (open ? "0px" : "12px")};
   border-bottom-left-radius: ${({ open }) => (open ? "0px" : "12px")};
-  box-shadow: ${({ shadow }) =>
-    shadow
-      ? "0px 0px 1px rgba(0, 0, 0, 0.04), 0px 4px 8px rgba(0, 0, 0, 0.04),0px 16px 24px rgba(0, 0, 0, 0.04), 0px 24px 32px rgba(0, 0, 0, 0.04);"
-      : ""};
 `
 const Input = styled.input`
   position: relative;
@@ -241,7 +237,6 @@ export const GlobalSearch = () => {
             setValue(e.target.value)
           }}
         />
-        <ArrowIconStyled />
       </Wrapper>
       {showMenu && (
         <Menu>

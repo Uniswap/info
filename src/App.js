@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import React from "react"
 import styled from "styled-components"
 import { ApolloProvider } from "react-apollo"
 import { client } from "./apollo/client"
@@ -9,6 +9,12 @@ import {
   withRouter,
   Redirect
 } from "react-router-dom"
+
+import ThemeProvider, { GlobalStyle } from "./Theme"
+
+import LocalStorageContextProvider, {
+  Updater as LocalStorageContextUpdater
+} from "./contexts/LocalStorage"
 
 import TokenDataContextProvider, {
   Updater as TokenDataContextUpdater,
@@ -48,19 +54,22 @@ function App() {
 
   function ContextProviders({ children }) {
     return (
-      <ApplicationContextProvider>
-        <TokenDataContextProvider>
-          <GlobalDataContextProvider>
-            <PairDataContextProvider>{children}</PairDataContextProvider>
-          </GlobalDataContextProvider>
-        </TokenDataContextProvider>
-      </ApplicationContextProvider>
+      <LocalStorageContextProvider>
+        <ApplicationContextProvider>
+          <TokenDataContextProvider>
+            <GlobalDataContextProvider>
+              <PairDataContextProvider>{children}</PairDataContextProvider>
+            </GlobalDataContextProvider>
+          </TokenDataContextProvider>
+        </ApplicationContextProvider>
+      </LocalStorageContextProvider>
     )
   }
 
   function Updaters() {
     return (
       <>
+        <LocalStorageContextUpdater />
         <PairDataContextUpdater />
         <TokenDataContextUpdater />
         <GlobalDataContextUpdater />
@@ -72,7 +81,9 @@ function App() {
     <ApolloProvider client={client}>
       <ContextProviders>
         <Updaters />
-        <ThemeWrapper>
+        <ThemeProvider>
+          {/* <ThemeWrapper> */}
+          <GlobalStyle />
           <AppWrapper>
             {allTokens ? (
               <BrowserRouter>
@@ -138,7 +149,8 @@ function App() {
               <LocalLoader fill="true" />
             )}
           </AppWrapper>
-        </ThemeWrapper>
+          {/* </ThemeWrapper> */}
+        </ThemeProvider>
       </ContextProviders>
     </ApolloProvider>
   )

@@ -15,7 +15,6 @@ import Row from "../Row"
 import DropdownSelect from "../../components/DropdownSelect"
 
 import { useAllTokens } from "../../contexts/TokenData"
-
 import { toK, toNiceDate, toNiceDateYear } from "../../helpers"
 
 const ChartWrapper = styled.div`
@@ -54,8 +53,6 @@ const GlobalChart = ({ chartData }) => {
       formattedItem["other"] = total - sum
       return formattedItem
     })
-
-  // console.log(chartData)
 
   const colors = [
     {
@@ -129,7 +126,7 @@ const GlobalChart = ({ chartData }) => {
         />
       </OptionsWrapper>
       {chartFilter === "liq" && (
-        <ResponsiveContainer aspect={60 / 18}>
+        <ResponsiveContainer aspect={60 / 28}>
           <AreaChart
             margin={{ top: 10, right: 0, bottom: 6, left: 0 }}
             barCategoryGap={1}

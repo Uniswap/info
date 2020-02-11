@@ -7,6 +7,7 @@ import React, {
 } from "react"
 
 const UPDATE = "UPDATE"
+const UPDATE_COLOR = "UPDATE_COLOR"
 
 export function safeAccess(object, path) {
   return object
@@ -35,6 +36,13 @@ function reducer(state, { type, payload }) {
         currency
       }
     }
+    case UPDATE_COLOR: {
+      const { color } = payload
+      return {
+        ...state,
+        color
+      }
+    }
     default: {
       throw Error(`Unexpected action type in DataContext reducer: '${type}'.`)
     }
@@ -52,9 +60,22 @@ export default function Provider({ children }) {
     })
   }, [])
 
+  const updateColor = useCallback(color => {
+    dispatch({
+      type: UPDATE_COLOR,
+      payload: {
+        color
+      }
+    })
+  }, [])
+
   return (
     <ApplicationContext.Provider
-      value={useMemo(() => [state, { update }], [state, update])}
+      value={useMemo(() => [state, { update, updateColor }], [
+        state,
+        update,
+        updateColor
+      ])}
     >
       {children}
     </ApplicationContext.Provider>
@@ -71,4 +92,9 @@ export function useCurrentCurrency() {
     }
   }, [state, update])
   return [state.currency, toggleCurrency]
+}
+
+export function useColor() {
+  const [state, { updateColor }] = useApplicationContext()
+  return [state.color, updateColor]
 }

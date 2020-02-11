@@ -21,7 +21,13 @@ const LogoWrapper = styled.img`
   width: 30px;
 `
 
-export default function Title({ token, pair }) {
+const Header = styled.span`
+  font-size: 24px;
+  font-weight: 900;
+  color: ${({ theme, color }) => (theme[color] ? theme[color] : color)};
+`
+
+export default function Title({ token, pair, color }) {
   const history = useHistory()
 
   const { name, symbol } = useTokenData(token)
@@ -33,7 +39,7 @@ export default function Title({ token, pair }) {
     if (symbol0 && symbol1) {
       return (
         <div>
-          Uniswap Info /{" "}
+          <Header color={color}>Uniswap Info </Header> /{" "}
           <span style={{ fontWeight: 400 }}>{symbol0 + "-" + symbol1}</span>
         </div>
       )
@@ -41,12 +47,12 @@ export default function Title({ token, pair }) {
     if (name && symbol) {
       return (
         <div>
-          Uniswap Info /{" "}
+          <Header color={color}>Uniswap Info </Header> /{" "}
           <span style={{ fontWeight: 400 }}>{name + "(" + symbol + ")"}</span>
         </div>
       )
     } else {
-      return "Uniswap Info"
+      return <Header color={color}>Uniswap Info </Header>
     }
   }
 
@@ -56,14 +62,7 @@ export default function Title({ token, pair }) {
         <Text fontSize="1rem" lineHeight="1">
           <LogoWrapper src={Logo} alt="" />
         </Text>
-
-        <Text
-          fontWeight={600}
-          mx="1rem"
-          color="black"
-          lineHeight="1.5rem"
-          style={{ textDecorationColor: "blue" }}
-        >
+        <Text fontWeight={600} mx="1rem" lineHeight="1.5rem">
           {getName()}
         </Text>
       </Flex>

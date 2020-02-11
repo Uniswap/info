@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import "feather-icons"
 import { Text, Flex } from "rebass"
 import styled from "styled-components"
@@ -14,7 +14,8 @@ import TxnList from "../components/TxnList"
 import GlobalChart from "../components/GlobalChart"
 
 import { formattedNum } from "../helpers"
-import { useGlobalData } from "../contexts/GlobalData"
+import { useColor } from "../contexts/Application"
+import { useGlobalData, useEthPrice } from "../contexts/GlobalData"
 import { useAllTokenData } from "../contexts/TokenData"
 import { useCurrentCurrency } from "../contexts/Application"
 import { useAllPairs } from "../contexts/PairData"
@@ -40,14 +41,10 @@ const ThemedBackground = styled.div`
   top: 0;
   left: 0;
   right: 0;
-  height: 600px;
+  height: 500px;
   max-width: 100vw;
   z-index: -1;
-  background: linear-gradient(
-    180deg,
-    rgba(254, 109, 222, 0.6) 0%,
-    rgba(254, 109, 222, 0) 100%
-  );
+  background: ${({ theme }) => theme.background};
 `
 
 const ListOptions = styled(Flex)`
@@ -76,12 +73,31 @@ const OptionsWrappper = styled(Flex)`
   }
 `
 
-const PanelWrapper = styled.div`
+const GridRow = styled.div`
+  display: inline-grid;
+  grid-template-columns: 30% 70%;
+  column-gap: 6px;
+  align-items: start;
+  height: 500px;
+`
+
+const LeftGroup = styled.div`
+  display: grid;
+  grid-template-rows: min-content auto;
+  row-gap: 6px;
+  height: 100%;
+`
+
+const DashboardPanel = styled.div`
+  border-radius: 20px;
+  background-color: rgba(255, 255, 255, 0.4);
+`
+
+const PanelWrapper = styled(DashboardPanel)`
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   justify-content: flex-start;
-  width: 100%;
-  margin: 40px 0;
+  padding: 24px;
 `
 
 const TopPanel = styled(Panel)`
@@ -105,8 +121,15 @@ const TopPanel = styled(Panel)`
   }
 `
 
+const SpacedColumn = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+`
+
 const ChartWrapper = styled.div`
-  /* min-width: 100vw; */
+  height: 100%;
 `
 
 function GlobalPage() {
@@ -130,6 +153,11 @@ function GlobalPage() {
   const pairs = useAllPairs()
   const [currency] = useCurrentCurrency()
 
+  const ethPrice = useEthPrice()
+  const formattedEthPrice = formattedNum(ethPrice, true)
+
+  const [, setColor] = useColor()
+
   const liquidity =
     currency === "ETH"
       ? formattedNum(totalLiquidityETH)
@@ -150,41 +178,81 @@ function GlobalPage() {
       ? formattedNum(volumeChangeETH) + "%"
       : formattedNum(volumeChangeUSD) + "%"
 
+  useEffect(() => {
+    setColor("uniswapPink")
+  }, [setColor])
+
   return (
     <PageWrapper>
       <ThemedBackground />
       <GlobalSearch />
-      <PanelWrapper>
-        <TopPanel rounded color="black" p={24}>
-          <Column>
-            <RowFlat>
-              <Text fontSize={36} lineHeight={1} fontWeight={600}>
-                {liquidity}
-              </Text>
-              <Text marginLeft="10px">{liquidityChange}</Text>
-            </RowFlat>
-            <RowFlat style={{ marginTop: "10px" }}>
-              <Hint>Total Liquidity</Hint>
-            </RowFlat>
-          </Column>
-        </TopPanel>
-        <TopPanel rounded color="black" p={24}>
-          <Column>
-            <RowFlat>
-              <Text fontSize={36} lineHeight={1} fontWeight={600}>
-                {volume}
-              </Text>
-              <Text marginLeft="10px">{volumeChange}</Text>
-            </RowFlat>
-            <RowFlat style={{ marginTop: "10px" }}>
-              <Hint>Volume (24hrs)</Hint>
-            </RowFlat>
-          </Column>
-        </TopPanel>
-      </PanelWrapper>
-      <ChartWrapper area="fill" rounded>
-        <GlobalChart chartData={chartData} />
-      </ChartWrapper>
+      <GridRow style={{ marginTop: "40px" }}>
+        <LeftGroup>
+          <PanelWrapper>
+            <TopPanel rounded color="black">
+              <Column>
+                <RowFlat>
+                  <Text fontSize={36} lineHeight={1} fontWeight={600}>
+                    {formattedEthPrice}
+                  </Text>
+                  <Text marginLeft="10px">{liquidityChange}</Text>
+                </RowFlat>
+                <RowFlat style={{ marginTop: "10px" }}>
+                  <Hint>ETH Uniprice</Hint>
+                </RowFlat>
+              </Column>
+            </TopPanel>
+          </PanelWrapper>
+          <PanelWrapper>
+            <SpacedColumn>
+              <TopPanel rounded color="black">
+                <Column>
+                  <RowFlat>
+                    <Text fontSize={36} lineHeight={1} fontWeight={600}>
+                      {liquidity}
+                    </Text>
+                    <Text marginLeft="10px">{liquidityChange}</Text>
+                  </RowFlat>
+                  <RowFlat style={{ marginTop: "10px" }}>
+                    <Hint>Total Liquidity</Hint>
+                  </RowFlat>
+                </Column>
+              </TopPanel>
+              <TopPanel rounded color="black">
+                <Column>
+                  <RowFlat>
+                    <Text fontSize={36} lineHeight={1} fontWeight={600}>
+                      {volume}
+                    </Text>
+                    <Text marginLeft="10px">{volumeChange}</Text>
+                  </RowFlat>
+                  <RowFlat style={{ marginTop: "10px" }}>
+                    <Hint>Volume (24hrs)</Hint>
+                  </RowFlat>
+                </Column>
+              </TopPanel>
+              <TopPanel rounded color="black">
+                <Column>
+                  <RowFlat>
+                    <Text fontSize={36} lineHeight={1} fontWeight={600}>
+                      {0}
+                    </Text>
+                    <Text marginLeft="10px">{volumeChange}</Text>
+                  </RowFlat>
+                  <RowFlat style={{ marginTop: "10px" }}>
+                    <Hint>Transactions (24hrs)</Hint>
+                  </RowFlat>
+                </Column>
+              </TopPanel>
+            </SpacedColumn>
+          </PanelWrapper>
+        </LeftGroup>
+        <PanelWrapper>
+          <ChartWrapper area="fill" rounded>
+            <GlobalChart chartData={chartData} />
+          </ChartWrapper>
+        </PanelWrapper>
+      </GridRow>
       <ListOptions>
         <OptionsWrappper>
           <Text
