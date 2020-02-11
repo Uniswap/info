@@ -121,7 +121,6 @@ const SORT_FIELD = {
   VOL: "oneDayVolumeUSD"
 }
 
-// @TODO rework into virtualized list
 function PairList({ pairs }) {
   const ethPrice = useEthPrice()
 
@@ -186,7 +185,7 @@ function PairList({ pairs }) {
         <DataText area="number" fontWeight="500">
           {index}
         </DataText>
-        <DataText area="name" color="text" fontWeight="500">
+        <DataText area="name" fontWeight="500">
           <TokenLogo address={item.id} />
           <CustomLink
             style={{ marginLeft: "10px" }}
@@ -204,7 +203,7 @@ function PairList({ pairs }) {
           <DataText area="apy">12.3%</DataText>
         </>
         <DataText area="supply">
-          <Link ml="3" color="button" external href={""}>
+          <Link ml="3" external href={""}>
             Add Liquidity
           </Link>
         </DataText>
@@ -216,12 +215,12 @@ function PairList({ pairs }) {
     <ListWrapper>
       <DashGrid center={true} style={{ height: "60px" }}>
         <Flex alignItems="center">
-          <Text color="text" area="number" fontWeight="500">
+          <Text area="number" fontWeight="500">
             #
           </Text>
         </Flex>
         <Flex alignItems="center" justifyContent="flexStart">
-          <Text color="text" area="name" fontWeight="500">
+          <Text area="name" fontWeight="500">
             Name
           </Text>
         </Flex>

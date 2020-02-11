@@ -8,6 +8,7 @@ const Link = ({ external, children, ...rest }) => (
   <RebassLink
     target={external ? "_blank" : null}
     rel={external ? "noopener noreferrer" : null}
+    color="#2f80ed"
     {...rest}
   >
     {children}

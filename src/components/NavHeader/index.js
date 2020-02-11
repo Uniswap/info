@@ -5,7 +5,6 @@ import { darken, transparentize } from "polished"
 import Toggle from "react-switch"
 
 import { useDarkModeManager } from "../../contexts/LocalStorage"
-import { useColor } from "../../contexts/Application"
 
 import Title from "../Title"
 import Panel from "../Panel"
@@ -32,10 +31,10 @@ const NavLeft = styled.div`
 
 const NavRight = styled.div`
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: min-content min-content min-content;
   column-gap: 20px;
   align-items: center;
-  justify-items: end;
+  justify-content: end;
 `
 
 const StyledToggle = styled(Toggle)`
@@ -66,12 +65,11 @@ const EmojiToggle = styled.span`
 export default function NavHeader({ token, pair }) {
   const isHome = !token && !pair
   const [isDark, toggleDarkMode] = useDarkModeManager()
-  const [color] = useColor()
 
   return (
     <Header>
       <NavLeft>
-        <Title token={token} pair={pair} color={color} />
+        <Title token={token} pair={pair} />
       </NavLeft>
       <NavRight>
         <StyledToggle

@@ -10,30 +10,11 @@ import {
   Redirect
 } from "react-router-dom"
 
-import ThemeProvider, { GlobalStyle } from "./Theme"
-
-import LocalStorageContextProvider, {
-  Updater as LocalStorageContextUpdater
-} from "./contexts/LocalStorage"
-
-import TokenDataContextProvider, {
-  Updater as TokenDataContextUpdater,
-  useAllTokens
-} from "./contexts/TokenData"
-
-import GlobalDataContextProvider, {
-  Updater as GlobalDataContextUpdater
-} from "./contexts/GlobalData"
-
-import PairDataContextProvider, {
-  Updater as PairDataContextUpdater
-} from "./contexts/PairData"
-import ApplicationContextProvider from "./contexts/Application"
+import { useAllTokens } from "./contexts/TokenData"
 
 import GlobalPage from "./pages/GlobalPage"
 import TokenPage from "./pages/TokenPage"
 import PairPage from "./pages/PairPage"
-import { Wrapper as ThemeWrapper } from "./components/Theme"
 import NavHeader from "./components/NavHeader"
 import LocalLoader from "./components/LocalLoader"
 
@@ -52,106 +33,73 @@ function App() {
 
   const allTokens = useAllTokens()
 
-  function ContextProviders({ children }) {
-    return (
-      <LocalStorageContextProvider>
-        <ApplicationContextProvider>
-          <TokenDataContextProvider>
-            <GlobalDataContextProvider>
-              <PairDataContextProvider>{children}</PairDataContextProvider>
-            </GlobalDataContextProvider>
-          </TokenDataContextProvider>
-        </ApplicationContextProvider>
-      </LocalStorageContextProvider>
-    )
-  }
-
-  function Updaters() {
-    return (
-      <>
-        <LocalStorageContextUpdater />
-        <PairDataContextUpdater />
-        <TokenDataContextUpdater />
-        <GlobalDataContextUpdater />
-      </>
-    )
-  }
-
   return (
     <ApolloProvider client={client}>
-      <ContextProviders>
-        <Updaters />
-        <ThemeProvider>
-          {/* <ThemeWrapper> */}
-          <GlobalStyle />
-          <AppWrapper>
-            {allTokens ? (
-              <BrowserRouter>
-                <Switch>
-                  <Route
-                    exacts
-                    strict
-                    path="/token/:tokenAddress"
-                    render={({ match }) => {
-                      const searched =
-                        allTokens &&
-                        allTokens.filter(token => {
-                          return (
-                            token.id.toLowerCase() ===
-                            match.params.tokenAddress.toLowerCase()
-                          )
-                        })
-                      if (allTokens && searched.length > 0) {
-                        return (
-                          <>
-                            <NavHeaderUpdated
-                              token={match.params.tokenAddress.toLowerCase()}
-                            />
-                            <TokenPage
-                              address={match.params.tokenAddress.toLowerCase()}
-                            />
-                          </>
-                        )
-                      } else {
-                        return <Redirect to="/home" />
-                      }
-                    }}
-                  />
-                  <Route
-                    exacts
-                    strict
-                    path="/pair/:pairAddress"
-                    render={({ match }) => {
-                      if (true) {
-                        return (
-                          <>
-                            <NavHeaderUpdated
-                              pair={match.params.pairAddress.toLowerCase()}
-                            />
-                            <PairPage
-                              address={match.params.pairAddress.toLowerCase()}
-                            />
-                          </>
-                        )
-                      } else {
-                        return <Redirect to="/home" />
-                      }
-                    }}
-                  />
-                  <Route path="/home">
-                    <NavHeaderUpdated />
-                    <GlobalPage />
-                  </Route>
-                  <Redirect to="/home" />
-                </Switch>
-              </BrowserRouter>
-            ) : (
-              <LocalLoader fill="true" />
-            )}
-          </AppWrapper>
-          {/* </ThemeWrapper> */}
-        </ThemeProvider>
-      </ContextProviders>
+      <AppWrapper>
+        {allTokens ? (
+          <BrowserRouter>
+            <Switch>
+              <Route
+                exacts
+                strict
+                path="/token/:tokenAddress"
+                render={({ match }) => {
+                  const searched =
+                    allTokens &&
+                    allTokens.filter(token => {
+                      return (
+                        token.id.toLowerCase() ===
+                        match.params.tokenAddress.toLowerCase()
+                      )
+                    })
+                  if (allTokens && searched.length > 0) {
+                    return (
+                      <>
+                        <NavHeaderUpdated
+                          token={match.params.tokenAddress.toLowerCase()}
+                        />
+                        <TokenPage
+                          address={match.params.tokenAddress.toLowerCase()}
+                        />
+                      </>
+                    )
+                  } else {
+                    return <Redirect to="/home" />
+                  }
+                }}
+              />
+              <Route
+                exacts
+                strict
+                path="/pair/:pairAddress"
+                render={({ match }) => {
+                  if (true) {
+                    return (
+                      <>
+                        <NavHeaderUpdated
+                          pair={match.params.pairAddress.toLowerCase()}
+                        />
+                        <PairPage
+                          address={match.params.pairAddress.toLowerCase()}
+                        />
+                      </>
+                    )
+                  } else {
+                    return <Redirect to="/home" />
+                  }
+                }}
+              />
+              <Route path="/home">
+                <NavHeaderUpdated />
+                <GlobalPage />
+              </Route>
+              <Redirect to="/home" />
+            </Switch>
+          </BrowserRouter>
+        ) : (
+          <LocalLoader fill="true" />
+        )}
+      </AppWrapper>
     </ApolloProvider>
   )
 }

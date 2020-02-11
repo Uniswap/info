@@ -3,7 +3,6 @@ import "feather-icons"
 import { Text, Flex } from "rebass"
 import styled from "styled-components"
 
-import Panel from "../components/Panel"
 import { GlobalSearch } from "../components/Search"
 import { RowFlat } from "../components/Row"
 import Column from "../components/Column"
@@ -50,11 +49,9 @@ const ThemedBackground = styled.div`
 const ListOptions = styled(Flex)`
   flex-direction: row;
   height: 40px
-  justify-content: space-between;
+  justify-content: space-betwearen;
   align-items; center;
   width: 100%;
-  margin: 2rem 0;
-  margin-top: 80px;
   font-size: 24px;
   font-weight: 600;
 
@@ -75,10 +72,11 @@ const OptionsWrappper = styled(Flex)`
 
 const GridRow = styled.div`
   display: inline-grid;
+  width: 100%;
+  min-height: 500px;
   grid-template-columns: 30% 70%;
   column-gap: 6px;
   align-items: start;
-  height: 500px;
 `
 
 const LeftGroup = styled.div`
@@ -88,48 +86,29 @@ const LeftGroup = styled.div`
   height: 100%;
 `
 
-const DashboardPanel = styled.div`
-  border-radius: 20px;
-  background-color: rgba(255, 255, 255, 0.4);
-`
-
-const PanelWrapper = styled(DashboardPanel)`
+const Panel = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  padding: 24px;
-`
-
-const TopPanel = styled(Panel)`
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  width: fit-content;
-
-  @media screen and (max-width: 64em) {
-    width: 100%;
-    border-radius: 0
-
-    &:nth-of-type(3) {
-      margin-bottom: 20px;
-      border-radius: 0 0 1em 1em;
-    }
-
-    &:first-of-type {
-      border-radius: 1em 1em 0 0;
-    }
-  }
+  border-radius: 20px;
+  background-color: ${({ theme }) => theme.panelColor};
 `
 
 const SpacedColumn = styled.div`
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: space-around;
   height: 100%;
+  padding: 24px;
 `
 
 const ChartWrapper = styled.div`
   height: 100%;
+  padding: 24px;
+`
+
+const PaddedGroup = styled.div`
+  padding: 24px;
 `
 
 function GlobalPage() {
@@ -179,7 +158,7 @@ function GlobalPage() {
       : formattedNum(volumeChangeUSD) + "%"
 
   useEffect(() => {
-    setColor("uniswapPink")
+    setColor("#FE6DDE")
   }, [setColor])
 
   return (
@@ -188,8 +167,8 @@ function GlobalPage() {
       <GlobalSearch />
       <GridRow style={{ marginTop: "40px" }}>
         <LeftGroup>
-          <PanelWrapper>
-            <TopPanel rounded color="black">
+          <Panel>
+            <PaddedGroup>
               <Column>
                 <RowFlat>
                   <Text fontSize={36} lineHeight={1} fontWeight={600}>
@@ -201,131 +180,119 @@ function GlobalPage() {
                   <Hint>ETH Uniprice</Hint>
                 </RowFlat>
               </Column>
-            </TopPanel>
-          </PanelWrapper>
-          <PanelWrapper>
+            </PaddedGroup>
+          </Panel>
+          <Panel>
             <SpacedColumn>
-              <TopPanel rounded color="black">
-                <Column>
-                  <RowFlat>
-                    <Text fontSize={36} lineHeight={1} fontWeight={600}>
-                      {liquidity}
-                    </Text>
-                    <Text marginLeft="10px">{liquidityChange}</Text>
-                  </RowFlat>
-                  <RowFlat style={{ marginTop: "10px" }}>
-                    <Hint>Total Liquidity</Hint>
-                  </RowFlat>
-                </Column>
-              </TopPanel>
-              <TopPanel rounded color="black">
-                <Column>
-                  <RowFlat>
-                    <Text fontSize={36} lineHeight={1} fontWeight={600}>
-                      {volume}
-                    </Text>
-                    <Text marginLeft="10px">{volumeChange}</Text>
-                  </RowFlat>
-                  <RowFlat style={{ marginTop: "10px" }}>
-                    <Hint>Volume (24hrs)</Hint>
-                  </RowFlat>
-                </Column>
-              </TopPanel>
-              <TopPanel rounded color="black">
-                <Column>
-                  <RowFlat>
-                    <Text fontSize={36} lineHeight={1} fontWeight={600}>
-                      {0}
-                    </Text>
-                    <Text marginLeft="10px">{volumeChange}</Text>
-                  </RowFlat>
-                  <RowFlat style={{ marginTop: "10px" }}>
-                    <Hint>Transactions (24hrs)</Hint>
-                  </RowFlat>
-                </Column>
-              </TopPanel>
+              <Column>
+                <RowFlat>
+                  <Text fontSize={36} lineHeight={1} fontWeight={600}>
+                    {liquidity}
+                  </Text>
+                  <Text marginLeft="10px">{liquidityChange}</Text>
+                </RowFlat>
+                <RowFlat style={{ marginTop: "10px" }}>
+                  <Hint>Total Liquidity</Hint>
+                </RowFlat>
+              </Column>
+              <Column>
+                <RowFlat>
+                  <Text fontSize={36} lineHeight={1} fontWeight={600}>
+                    {volume}
+                  </Text>
+                  <Text marginLeft="10px">{volumeChange}</Text>
+                </RowFlat>
+                <RowFlat style={{ marginTop: "10px" }}>
+                  <Hint>Volume (24hrs)</Hint>
+                </RowFlat>
+              </Column>
+              <Column>
+                <RowFlat>
+                  <Text fontSize={36} lineHeight={1} fontWeight={600}>
+                    {0}
+                  </Text>
+                  <Text marginLeft="10px">{volumeChange}</Text>
+                </RowFlat>
+                <RowFlat style={{ marginTop: "10px" }}>
+                  <Hint>Transactions (24hrs)</Hint>
+                </RowFlat>
+              </Column>
             </SpacedColumn>
-          </PanelWrapper>
+          </Panel>
         </LeftGroup>
-        <PanelWrapper>
+        <Panel>
           <ChartWrapper area="fill" rounded>
             <GlobalChart chartData={chartData} />
           </ChartWrapper>
-        </PanelWrapper>
+        </Panel>
       </GridRow>
-      <ListOptions>
-        <OptionsWrappper>
-          <Text
-            onClick={() => {
-              setTokenFilter("TOKENS")
-            }}
-            color={tokenFilter === "TOKENS" ? "black" : "textDim"}
-          >
-            Top Tokens
-          </Text>
-          <Text
-            onClick={() => {
-              setTokenFilter("PAIRS")
-            }}
-            color={tokenFilter === "PAIRS" ? "black" : "textDim"}
-          >
-            Top Pairs
-          </Text>
-        </OptionsWrappper>
-      </ListOptions>
-      <Panel
-        rounded
-        style={{
-          border: "1px solid rgba(43, 43, 43, 0.05)"
-        }}
-      >
+      <Panel style={{ marginTop: "6px" }}>
+        <PaddedGroup>
+          <ListOptions>
+            <OptionsWrappper>
+              <Text
+                onClick={() => {
+                  setTokenFilter("TOKENS")
+                }}
+                color={tokenFilter === "TOKENS" ? "black" : "#aeaeae"}
+              >
+                Top Tokens
+              </Text>
+              <Text
+                onClick={() => {
+                  setTokenFilter("PAIRS")
+                }}
+                color={tokenFilter === "PAIRS" ? "black" : "#aeaeae"}
+              >
+                Top Pairs
+              </Text>
+            </OptionsWrappper>
+          </ListOptions>
+        </PaddedGroup>
         {allTokenData && tokenFilter === "TOKENS" && (
           <TopTokenList tokens={allTokenData} />
         )}
         {allTokenData && tokenFilter === "PAIRS" && <PairList pairs={pairs} />}
       </Panel>
-      <ListOptions>
-        <OptionsWrappper>
-          <Text
-            onClick={() => {
-              setTxFilter("ALL")
-            }}
-            color={txFilter !== "ALL" ? "textDim" : "black"}
-          >
-            All
-          </Text>
-          <Text
-            onClick={() => {
-              setTxFilter("SWAP")
-            }}
-            color={txFilter !== "SWAP" ? "textDim" : "black"}
-          >
-            Swaps
-          </Text>
-          <Text
-            onClick={() => {
-              setTxFilter("ADD")
-            }}
-            color={txFilter !== "ADD" ? "textDim" : "black"}
-          >
-            Add
-          </Text>
-          <Text
-            onClick={() => {
-              setTxFilter("REMOVE")
-            }}
-            color={txFilter !== "REMOVE" ? "textDim" : "black"}
-          >
-            Remove
-          </Text>
-        </OptionsWrappper>
-      </ListOptions>
-      <Panel
-        rounded
-        style={{
-          border: "1px solid rgba(43, 43, 43, 0.05)"
-        }}
-      >
+      <Panel style={{ marginTop: "6px" }}>
+        <PaddedGroup>
+          <ListOptions>
+            <OptionsWrappper>
+              <Text
+                onClick={() => {
+                  setTxFilter("ALL")
+                }}
+                color={txFilter !== "ALL" ? "#aeaeae" : "black"}
+              >
+                All
+              </Text>
+              <Text
+                onClick={() => {
+                  setTxFilter("SWAP")
+                }}
+                color={txFilter !== "SWAP" ? "#aeaeae" : "black"}
+              >
+                Swaps
+              </Text>
+              <Text
+                onClick={() => {
+                  setTxFilter("ADD")
+                }}
+                color={txFilter !== "ADD" ? "#aeaeae" : "black"}
+              >
+                Add
+              </Text>
+              <Text
+                onClick={() => {
+                  setTxFilter("REMOVE")
+                }}
+                color={txFilter !== "REMOVE" ? "#aeaeae" : "black"}
+              >
+                Remove
+              </Text>
+            </OptionsWrappper>
+          </ListOptions>
+        </PaddedGroup>
         <TxnList txns={txns} txFilter={txFilter} />
       </Panel>
     </PageWrapper>

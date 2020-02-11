@@ -24,10 +24,10 @@ const LogoWrapper = styled.img`
 const Header = styled.span`
   font-size: 24px;
   font-weight: 900;
-  color: ${({ theme, color }) => (theme[color] ? theme[color] : color)};
+  color: ${({ theme }) => theme.textColor};
 `
 
-export default function Title({ token, pair, color }) {
+export default function Title({ token, pair }) {
   const history = useHistory()
 
   const { name, symbol } = useTokenData(token)
@@ -39,7 +39,7 @@ export default function Title({ token, pair, color }) {
     if (symbol0 && symbol1) {
       return (
         <div>
-          <Header color={color}>Uniswap Info </Header> /{" "}
+          <Header>Uniswap Info </Header> /{" "}
           <span style={{ fontWeight: 400 }}>{symbol0 + "-" + symbol1}</span>
         </div>
       )
@@ -47,12 +47,12 @@ export default function Title({ token, pair, color }) {
     if (name && symbol) {
       return (
         <div>
-          <Header color={color}>Uniswap Info </Header> /{" "}
+          <Header>Uniswap Info </Header> /{" "}
           <span style={{ fontWeight: 400 }}>{name + "(" + symbol + ")"}</span>
         </div>
       )
     } else {
-      return <Header color={color}>Uniswap Info </Header>
+      return <Header>Uniswap Info </Header>
     }
   }
 

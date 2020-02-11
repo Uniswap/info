@@ -18,7 +18,7 @@ const Select = styled.div`
   border-radius: 20px;
   font-weight: 500;
   font-size: 16px;
-  color: black;
+  color: ${({ theme }) => theme.textColor};
 
   :hover {
     cursor: pointer;

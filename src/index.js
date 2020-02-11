@@ -1,14 +1,61 @@
 import React from "react"
 import ReactDOM from "react-dom"
-import { Provider } from "unstated"
+
+import ThemeProvider, { GlobalStyle } from "./Theme"
+
+import LocalStorageContextProvider, {
+  Updater as LocalStorageContextUpdater
+} from "./contexts/LocalStorage"
+
+import TokenDataContextProvider, {
+  Updater as TokenDataContextUpdater
+} from "./contexts/TokenData"
+
+import GlobalDataContextProvider, {
+  Updater as GlobalDataContextUpdater
+} from "./contexts/GlobalData"
+
+import PairDataContextProvider, {
+  Updater as PairDataContextUpdater
+} from "./contexts/PairData"
+import ApplicationContextProvider from "./contexts/Application"
+
 import App from "./App"
 
-export default function AppWrapper() {
+function ContextProviders({ children }) {
   return (
-    <Provider>
-      <App />
-    </Provider>
+    <LocalStorageContextProvider>
+      <ApplicationContextProvider>
+        <TokenDataContextProvider>
+          <GlobalDataContextProvider>
+            <PairDataContextProvider>{children}</PairDataContextProvider>
+          </GlobalDataContextProvider>
+        </TokenDataContextProvider>
+      </ApplicationContextProvider>
+    </LocalStorageContextProvider>
   )
 }
 
-ReactDOM.render(<AppWrapper />, document.getElementById("root"))
+function Updaters() {
+  return (
+    <>
+      <LocalStorageContextUpdater />
+      <PairDataContextUpdater />
+      <TokenDataContextUpdater />
+      <GlobalDataContextUpdater />
+    </>
+  )
+}
+
+ReactDOM.render(
+  <ContextProviders>
+    <Updaters />
+    <ThemeProvider>
+      <>
+        <GlobalStyle />
+        <App />
+      </>
+    </ThemeProvider>
+  </ContextProviders>,
+  document.getElementById("root")
+)

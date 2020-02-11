@@ -4,7 +4,6 @@ import styled from "styled-components"
 import Row from "../Row"
 import TokenLogo from "../TokenLogo"
 import { Search as SearchIcon } from "react-feather"
-import { ChevronDown as ArrowDown } from "react-feather"
 import { BasicLink } from "../Link"
 
 import { useAllTokenData } from "../../contexts/TokenData"
@@ -17,9 +16,9 @@ const Wrapper = styled.div`
   align-items: center;
   justify-content: flex-end;
   padding: ${({ large }) => (large ? "12px" : "8px 16px")};
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  border: 1px solid ${({ theme }) => theme.inputBackground};
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.4);
+  background: ${({ theme }) => theme.inputBackground};
   border-bottom-right-radius: ${({ open }) => (open ? "0px" : "12px")};
   border-bottom-left-radius: ${({ open }) => (open ? "0px" : "12px")};
 `
@@ -31,13 +30,12 @@ const Input = styled.input`
   white-space: nowrap;
   background: none;
   border: none;
-
   outline: none;
-  color: black;
+  color: ${({ theme }) => theme.textColor};
   font-size: ${({ large }) => (large ? "20px" : "16px")};
 
   ::placeholder {
-    color: black;
+    color: ${({ theme }) => theme.textColor};
   }
 `
 
@@ -51,13 +49,7 @@ const SearchIconLarge = styled(SearchIcon)`
   height: 20px;
   width: 20px;
   margin-right: 16px;
-`
-
-const ArrowIconStyled = styled(ArrowDown)`
-  position: absolute;
-  right: 16px;
-  height: 24px;
-  width: 24px;
+  color: ${({ theme }) => theme.textColor};
 `
 
 const Menu = styled.div`
@@ -225,7 +217,14 @@ export const GlobalSearch = () => {
   }, [filteredPairList])
 
   return (
-    <div style={{ height: "60px", zIndex: "30", position: "relative" }}>
+    <div
+      style={{
+        height: "60px",
+        zIndex: "30",
+        position: "relative",
+        width: "100%"
+      }}
+    >
       <Wrapper open={showMenu} shadow={true} large={true}>
         <SearchIconLarge />
         <Input

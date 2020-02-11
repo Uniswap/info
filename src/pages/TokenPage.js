@@ -12,7 +12,6 @@ import Column from "../components/Column"
 import { ButtonPlusDull, ButtonCustom } from "../components/ButtonStyled"
 import TxnList from "../components/TxnList"
 import StackedAreaChart from "../components/StackedAreaChart"
-import GlobalChart from "../components/GlobalChart"
 import Link from "../components/Link"
 
 import { formattedNum } from "../helpers"
@@ -398,11 +397,7 @@ function TokenPage({ address }) {
                 {address.slice(0, 6) + "..." + address.slice(38, 42)}
               </Text>
             </Column>
-            <Link
-              color="button"
-              external
-              href={"https://etherscan.io/address/" + address}
-            >
+            <Link external href={"https://etherscan.io/address/" + address}>
               View on Etherscan
             </Link>
           </TokenDetailsLayout>

@@ -237,11 +237,7 @@ function TxnList({ txns, txFilter }) {
     return (
       <DashGrid style={{ height: "60px" }}>
         <DataText area="txn" fontWeight="500">
-          <Link
-            color="button"
-            external
-            href={"https://etherscan.io/address/" + item.account}
-          >
+          <Link external href={"https://etherscan.io/address/" + item.account}>
             {getTransactionType(
               item.type,
               item.token0Symbol,
@@ -261,11 +257,7 @@ function TxnList({ txns, txFilter }) {
           {formattedNum(item.token1Amount)}
         </DataText>
         <DataText area="account">
-          <Link
-            color="button"
-            external
-            href={"https://etherscan.io/address/" + item.account}
-          >
+          <Link external href={"https://etherscan.io/address/" + item.account}>
             {item.account &&
               item.account.slice(0, 6) + "..." + item.account.slice(38, 42)}
           </Link>

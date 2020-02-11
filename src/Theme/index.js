@@ -1,40 +1,23 @@
-import React, { useEffect } from "react"
+import React from "react"
 import {
   ThemeProvider as StyledComponentsThemeProvider,
-  createGlobalStyle,
-  css
+  createGlobalStyle
 } from "styled-components"
+import { useColor } from "../contexts/Application"
 import { useDarkModeManager } from "../contexts/LocalStorage"
-
-const MEDIA_WIDTHS = {
-  upToSmall: 600,
-  upToMedium: 960,
-  upToLarge: 1280
-}
-
-const mediaWidthTemplates = Object.keys(MEDIA_WIDTHS).reduce(
-  (accumulator, size) => {
-    accumulator[size] = (...args) => css`
-      @media (max-width: ${MEDIA_WIDTHS[size]}px) {
-        ${css(...args)}
-      }
-    `
-    return accumulator
-  },
-  {}
-)
 
 export default function ThemeProvider({ children }) {
   const [darkMode] = useDarkModeManager()
+  const [color] = useColor()
 
   return (
-    <StyledComponentsThemeProvider theme={theme(darkMode)}>
+    <StyledComponentsThemeProvider theme={theme(darkMode, color)}>
       {children}
     </StyledComponentsThemeProvider>
   )
 }
 
-const theme = darkMode => ({
+const theme = (darkMode, color) => ({
   background: darkMode
     ? "black"
     : `linear-gradient(
@@ -43,12 +26,16 @@ const theme = darkMode => ({
       rgba(254, 109, 222, 0) 100%
     );`,
 
+  customColor: color,
+  textColor: darkMode ? color : "black",
+
+  panelColor: darkMode ? color : "rgba(255, 255, 255, 0.4)",
   backgroundColor: darkMode ? "black" : "white",
 
   uniswapPink: darkMode ? "#FE6DDE" : "black",
 
   concreteGray: darkMode ? "#292C2F" : "#FAFAFA",
-  inputBackground: darkMode ? "#202124" : "white",
+  inputBackground: darkMode ? "#1F1F1F" : "rgba(255, 255, 255, 0.4)",
   shadowColor: darkMode ? "#000" : "#2F80ED",
   mercuryGray: darkMode ? "#333333" : "#E1E1E1"
 })
@@ -73,12 +60,20 @@ export const GlobalStyle = createGlobalStyle`
     height: 100%;
     overflow: auto;
     -webkit-overflow-scrolling: touch;
-}
+  } 
+
+  a {
+    text-decoration: none;
+
+    :hover {
+      text-decoration: none
+    }
+  }
 
   html {
     font-size: 16px;
     font-variant: none;
-    color: ${({ theme }) => theme.textColor};
+    color: 'black';
     background-color: ${({ theme }) => theme.backgroundColor};
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;

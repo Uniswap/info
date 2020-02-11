@@ -125,6 +125,63 @@ const StackedAreaChart = ({ chartData, token }) => {
           setActive={setTimeline}
         />
       </OptionsWrapper>
+      {chartFilter === "liqRaw" && chartData && (
+        <ResponsiveContainer aspect={60 / 12}>
+          <AreaChart
+            margin={{ top: 10, right: 0, bottom: 6, left: 0 }}
+            barCategoryGap={1}
+            data={chartData}
+          >
+            <XAxis
+              tickLine={false}
+              axisLine={false}
+              interval="preserveEnd"
+              tickMargin={16}
+              minTickGap={120}
+              tickFormatter={tick => toNiceDate(tick)}
+              dataKey="date"
+              tick={{ fill: "black" }}
+            />
+            <YAxis
+              type="number"
+              // tickMargin={46}
+              orientation="left"
+              tickFormatter={tick => toK(tick)}
+              axisLine={false}
+              tickLine={false}
+              interval="preserveEnd"
+              minTickGap={80}
+              // mirror={true}
+              yAxisId={0}
+              tick={{ fill: "black" }}
+            />
+            <Tooltip
+              cursor={true}
+              formatter={val => toK(val, true)}
+              labelFormatter={label => toNiceDateYear(label)}
+              labelStyle={{ paddingTop: 4 }}
+              contentStyle={{
+                padding: "10px 14px",
+                borderRadius: 10,
+                borderColor: "var(--c-zircon)"
+              }}
+              wrapperStyle={{ top: -70, left: -10 }}
+            />
+            <Area
+              key={"other"}
+              dataKey={"totalLiquidityUSD"}
+              stackId="2"
+              strokeWidth={2}
+              dot={false}
+              type="monotone"
+              name={"Liquidity"}
+              yAxisId={0}
+              fill={"none"}
+              stroke={"black"}
+            />
+          </AreaChart>
+        </ResponsiveContainer>
+      )}
       {chartFilter === "liq" && newData && (
         <ResponsiveContainer aspect={60 / 12}>
           <AreaChart

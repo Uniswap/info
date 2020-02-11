@@ -1,7 +1,6 @@
 import React from "react"
 import { Button as RebassButton } from "rebass"
 import styled from "styled-components"
-import { ChevronDown } from "react-feather"
 import { Plus } from "react-feather"
 
 const Base = styled(RebassButton)`
@@ -22,17 +21,6 @@ const BaseCustom = styled(RebassButton)`
   border-radius: 8px;
   cursor: pointer;
   outline: none;
-  border: 1px solid;
-`
-
-const Secondary = styled(Base)`
-  background-color: transparent;
-
-  &:disabled {
-    opacity: 0.5,
-    background-color: transparent,
-    cursor: 'auto'
-  }
 `
 
 const Dull = styled(Base)`
@@ -59,49 +47,12 @@ export default function ButtonStyled({ children, ...rest }) {
   return <Base {...rest}>{children}</Base>
 }
 
-export function ButtonStyledSecondary({ children, ...rest }) {
-  return <Secondary {...rest}>{children}</Secondary>
-}
-
 const ContentWrapper = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
 `
-
-export function ButtonDropwdown({ disabled, children, ...rest }) {
-  return (
-    <Base {...rest}>
-      <ContentWrapper>
-        <div style={{ display: "flex", alignItems: "center" }}>{children}</div>
-        <ChevronDown size={24} />
-      </ContentWrapper>
-    </Base>
-  )
-}
-
-export function ButtonDropwdownSecondary({ disabled, children, ...rest }) {
-  return (
-    <Secondary {...rest}>
-      <ContentWrapper>
-        <div style={{ display: "flex", alignItems: "center" }}>{children}</div>
-        <ChevronDown size={24} />
-      </ContentWrapper>
-    </Secondary>
-  )
-}
-
-export function ButtonPlusSecondary({ disabled, children, ...rest }) {
-  return (
-    <Secondary {...rest}>
-      <ContentWrapper>
-        <Plus size={20} />
-        <div style={{ display: "flex", alignItems: "center" }}>{children}</div>
-      </ContentWrapper>
-    </Secondary>
-  )
-}
 
 export function ButtonPlusDull({ disabled, children, ...rest }) {
   return (
@@ -116,7 +67,7 @@ export function ButtonPlusDull({ disabled, children, ...rest }) {
 
 export function ButtonCustom({ children, bgColor, color, ...rest }) {
   return (
-    <BaseCustom {...rest} bgColor={bgColor} color={color}>
+    <BaseCustom bg={bgColor} color={color} {...rest}>
       {children}
     </BaseCustom>
   )
