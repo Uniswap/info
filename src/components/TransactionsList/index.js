@@ -393,7 +393,6 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, txFil
   const belowSmall = useMedia('(max-width: 40em)')
 
   const TransactionItem = ({ transaction, tokenSymbol }) => {
-    console.log(transaction)
     return (
       <DashGrid style={{ height: '60px' }}>
         <DataText area={'action'} color="text" fontWeight="500">
