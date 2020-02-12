@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-// import styled from 'styled-components'
+import styled from 'styled-components'
 import { ApolloProvider } from 'react-apollo'
 import { client } from './apollo/client'
 import { Route, Switch, BrowserRouter, withRouter, Redirect } from 'react-router-dom'
@@ -77,7 +77,7 @@ function App(props) {
       <Wrapper>
         <WarningWrapper>
           <WarningBanner>
-            Warning: The data on this site has not been updated since 01/04/20, 4:01am UTC±00:00. Please check back
+            Warning: The data on this site has not been updated since 02/12/20, 4:01am UTC±00:00. Please check back
             soon.
           </WarningBanner>
         </WarningWrapper>
