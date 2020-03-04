@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Box, Flex, Text } from 'rebass'
 import styled from 'styled-components'
+import intl from 'react-intl-universal';
 import FourByFour from '../components/FourByFour'
 import Panel from '../components/Panel'
 import Select from '../components/Select'
@@ -12,12 +13,12 @@ import { formattedNum } from '../helpers'
 import { Divider, Hint } from '../components'
 import { getTimeFrame } from '../constants'
 
-const timeframeOptions = [
-  { value: '1week', label: '1 week' },
-  { value: '1month', label: '1 month' },
-  { value: '3months', label: '3 months' },
-  { value: 'all', label: 'All time' }
-]
+//const timeframeOptions = [
+//  { value: '1week', label: '1 week' },
+//  { value: '1month', label: '1 month' },
+//  { value: '3months', label: '3 months' },
+//  { value: 'all', label: 'All time' }
+//]
 
 const SmallText = styled.span`
   font-size: 0.6em;
@@ -168,6 +169,12 @@ export const OverviewPage = function({
   updateTimeframe,
   historyDaysToQuery
 }) {
+  const timeframeOptions = [
+  { value: '1week', label: intl.get('oneweek') },
+  { value: '1month', label: intl.get('onemonth') },
+  { value: '3months', label: intl.get('threemonths') },
+  { value: 'all', label: intl.get('alltime') }
+  ]		
   const [chartOption, setChartOption] = useState('liquidity')
 
   return (
@@ -181,7 +188,7 @@ export const OverviewPage = function({
           <OverviewDashboard mx="auto" px={[0, 3]}>
             <TopPanel rounded color="white" p={24} style={{ gridArea: 'volume' }}>
               <FourByFour
-                topLeft={<Hint color="textLight">Volume (24hrs)</Hint>}
+                topLeft={<Hint color="textLight">{intl.get('Volume_24hrs')}</Hint>}
                 bottomLeft={
                   <Text fontSize={24} lineHeight={1} fontWeight={500}>
                     {currencyUnit === 'USD'
@@ -205,7 +212,7 @@ export const OverviewPage = function({
             </TopPanel>
             <TopPanel rounded color="white" p={24} style={{ gridArea: 'liquidity' }}>
               <FourByFour
-                topLeft={<Hint color="textLight">Total Liquidity</Hint>}
+                topLeft={<Hint color="textLight">{intl.get('Total_Liquidity')}</Hint>}
                 bottomLeft={
                   <Text fontSize={24} lineHeight={1} fontWeight={500}>
                     {globalData.liquidityEth
@@ -231,7 +238,7 @@ export const OverviewPage = function({
             </TopPanel>
             <TopPanel rounded bg="white" color="white" style={{ gridArea: 'shares' }} p={24}>
               <FourByFour
-                topLeft={<Hint color="textLight">Transactions (24hrs)</Hint>}
+                topLeft={<Hint color="textLight">{intl.get('Transactions_24hrs')}</Hint>}
                 bottomLeft={
                   <Text fontSize={24} lineHeight={1} fontWeight={500}>
                     {formattedNum(globalData.txCount)}
@@ -252,7 +259,7 @@ export const OverviewPage = function({
                         setChartOption('liquidity')
                       }}
                     >
-                      Liquidity
+					  {intl.get('Liquidity')}
                     </TextOption>
                     <TextOption
                       style={{ marginLeft: '2em' }}
@@ -261,7 +268,7 @@ export const OverviewPage = function({
                         setChartOption('volume')
                       }}
                     >
-                      Volume
+                      {intl.get('Volume')}
                     </TextOption>
                   </Flex>
                   <Box width={144}>

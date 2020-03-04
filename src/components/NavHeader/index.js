@@ -8,6 +8,7 @@ import CurrencySelect from '../CurrencySelect'
 import Panel from '../Panel'
 import { isMobile } from 'react-device-detect'
 import { useMedia } from 'react-use'
+import intl from 'react-intl-universal'
 
 const Header = styled(Panel)`
   display: grid;
@@ -105,7 +106,7 @@ export default function NavHeader({ exchanges, setCurrencyUnit, currencyUnit }) 
           setCapEth={setCapEth}
           capEth={capEth}
           tokenSelect={true}
-          placeholder={belowLarge ? 'Tokens' : 'Find token'}
+          placeholder={belowLarge ? intl.get('Tokens') : intl.get('Find_token')}
           onChange={select => {
             history.push('/token/' + select.tokenAddress)
           }}

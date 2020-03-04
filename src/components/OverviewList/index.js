@@ -12,6 +12,7 @@ import TokenLogo from '../TokenLogo'
 import { formattedNum } from '../../helpers'
 import { Divider } from '../../components'
 import Loader from '../../components/Loader'
+import intl from 'react-intl-universal'
 
 dayjs.extend(utc)
 
@@ -440,7 +441,7 @@ function OverviewList({ currencyUnit }) {
       <DashGrid center={true} style={{ height: '60px' }}>
         <Flex alignItems="center">
           <Text color="text" area={'name'}>
-            Exchanges
+			  {intl.get('Exchanges')}
           </Text>
         </Flex>
         {!belowMedium ? (
@@ -455,7 +456,7 @@ function OverviewList({ currencyUnit }) {
                   sortTxs(SORT_FIELD.SYMBOL)
                 }}
               >
-                <Text>Symbol {sortedColumn === SORT_FIELD.SYMBOL ? (!sortDirection ? '↑' : '↓') : ''}</Text>
+                <Text>{intl.get('Symbol')} {sortedColumn === SORT_FIELD.SYMBOL ? (!sortDirection ? '↑' : '↓') : ''}</Text>
               </ClickableText>
             </Flex>
             <Flex alignItems="center">
@@ -468,7 +469,7 @@ function OverviewList({ currencyUnit }) {
                   sortTxs(SORT_FIELD.PRICE)
                 }}
               >
-                Price {sortedColumn === SORT_FIELD.PRICE ? (!sortDirection ? '↑' : '↓') : ''}
+			  {intl.get('Price')} {sortedColumn === SORT_FIELD.PRICE ? (!sortDirection ? '↑' : '↓') : ''}
               </ClickableText>
             </Flex>
           </>
@@ -485,7 +486,7 @@ function OverviewList({ currencyUnit }) {
               sortTxs(SORT_FIELD.LIQUIDITY)
             }}
           >
-            Liquidity {sortedColumn === SORT_FIELD.LIQUIDITY ? (!sortDirection ? '↑' : '↓') : ''}
+		  {intl.get('Liquidity')} {sortedColumn === SORT_FIELD.LIQUIDITY ? (!sortDirection ? '↑' : '↓') : ''}
           </ClickableText>
         </Flex>
         <Flex alignItems="center">
@@ -498,7 +499,7 @@ function OverviewList({ currencyUnit }) {
               sortTxs(SORT_FIELD.VOLUME)
             }}
           >
-            Volume (24hrs) {sortedColumn === SORT_FIELD.VOLUME ? (sortDirection ? '↑' : '↓') : ''}
+		  {intl.get('Volume_24hrs')} {sortedColumn === SORT_FIELD.VOLUME ? (sortDirection ? '↑' : '↓') : ''}
           </ClickableText>
         </Flex>
         {!belowSmall ? (
@@ -512,7 +513,7 @@ function OverviewList({ currencyUnit }) {
                 sortTxs(currencyUnit === 'USD' ? SORT_FIELD.PRICE_CHANGE : SORT_FIELD.PRICE_CHANGE_ETH)
               }}
             >
-              Price Change (24hrs) {sortedColumn === SORT_FIELD.PRICE_CHANGE ? (sortDirection ? '↑' : '↓') : ''}
+			{intl.get('Price_Change_24hrs')} {sortedColumn === SORT_FIELD.PRICE_CHANGE ? (sortDirection ? '↑' : '↓') : ''}
             </ClickableText>
           </Flex>
         ) : (
@@ -543,7 +544,7 @@ function OverviewList({ currencyUnit }) {
         >
           <Arrow faded={page === 1 ? true : false}>←</Arrow>
         </div>
-        {'Page ' + page + ' of ' + maxPage}
+        {intl.get('Page') + page + intl.get('Page_of') + maxPage}
         <div
           onClick={e => {
             setPage(page === maxPage ? page : page + 1)

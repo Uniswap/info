@@ -3,6 +3,7 @@ import styled from 'styled-components'
 import PropTypes from 'prop-types'
 import { default as ReactSelect } from 'react-select'
 import { isMobile } from 'react-device-detect'
+import intl from 'react-intl-universal'
 
 import Popout from './popout'
 
@@ -104,7 +105,7 @@ const Select = ({ options, onChange, setCapEth, capEth, tokenSelect = false, pla
                     setCapEth(!capEth)
                   }}
                 />
-                Hide Low Liquidity
+                {intl.get('Hide_Low_Liquidity')}
               </FixedToggle>
               {children}
             </CustomMenu>

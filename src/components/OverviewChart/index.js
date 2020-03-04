@@ -3,6 +3,7 @@ import { Area, XAxis, YAxis, ResponsiveContainer, BarChart, Bar, CartesianGrid, 
 import styled from 'styled-components'
 import { useMedia } from 'react-use'
 import { toK, toNiceDate, toNiceDateYear } from '../../helpers'
+import intl from 'react-intl-universal'
 
 const ChartWrapper = styled.div`
   padding-top: 1em;
@@ -66,7 +67,7 @@ const OverviewChart = ({ data, chartOption, currencyUnit }) => {
               strokeWidth={2}
               dot={false}
               type="monotone"
-              name={'Total Liquidity' + (currencyUnit === 'USD' ? ' (USD)' : ' (ETH)')}
+              name={intl.get('Total_Liquidity') + (currencyUnit === 'USD' ? ' (USD)' : ' (ETH)')}
               dataKey={currencyUnit === 'USD' ? 'usdLiquidity' : 'ethLiquidity'}
               yAxisId={0}
               fill="#FE6DDE"
@@ -118,7 +119,7 @@ const OverviewChart = ({ data, chartOption, currencyUnit }) => {
             />
             <Bar
               type="monotone"
-              name={'Volume' + (currencyUnit === 'USD' ? ' (USD)' : ' (ETH)')}
+              name={intl.get('Volume') + (currencyUnit === 'USD' ? ' (USD)' : ' (ETH)')}
               dataKey={currencyUnit === 'USD' ? 'dailyUSDVolume' : 'dailyEthVolume'}
               fill="#FE6DDE"
               opacity={'0.4'}

@@ -13,6 +13,7 @@ import Link from '../Link'
 import { Divider } from '../../components'
 
 import { urls, formatTime, Big, formattedNum } from '../../helpers'
+import intl from 'react-intl-universal'
 
 dayjs.extend(utc)
 
@@ -373,15 +374,15 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, txFil
   function getTransactionType(event, symbol) {
     switch (event) {
       case 'AddLiquidity':
-        return 'Add ETH and ' + symbol
+        return intl.get('Add_ETH_and') + symbol
       case 'RemoveLiquidity':
-        return 'Remove ETH and ' + symbol
+        return intl.get('Remove_ETH_and') + symbol
       case 'Token Swap':
-        return 'Swap ' + symbol + ' for ETH'
+        return intl.get('Swap') + symbol +  intl.get('for_ETH')
       case 'EthPurchase':
-        return 'Swap ' + symbol + ' for ETH'
+        return intl.get('Swap') + symbol +  intl.get('for_ETH')
       case 'TokenPurchase':
-        return 'Swap ETH for ' + symbol
+        return intl.get('Swap_ETH_for') + symbol
 
       default:
         return ''
@@ -424,6 +425,9 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, txFil
           <DataText area={'Account'}>
             <Link ml="3" color="button" external href={'https://etherscan.io/address/' + transaction.user}>
               {transaction.user.slice(0, 6) + '...' + transaction.user.slice(38, 42)}
+            </Link>
+			<Link ml="3" color="button" external href={'https://cn.etherscan.com/address/' + transaction.user}>
+              （中文）
             </Link>
           </DataText>
         ) : (

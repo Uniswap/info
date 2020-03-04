@@ -3,6 +3,7 @@ import { Area, XAxis, YAxis, ResponsiveContainer, CartesianGrid, Tooltip, AreaCh
 import styled from 'styled-components'
 import { useMedia } from 'react-use'
 import { toK, toNiceDate, toNiceDateYear } from '../../helpers'
+import intl from 'react-intl-universal'
 
 const ChartWrapper = styled.div`
   padding-top: 1em;
@@ -72,7 +73,7 @@ const Chart = ({ data, chartOption, currencyUnit }) => {
               strokeWidth={2}
               dot={false}
               type="monotone"
-              name={'Total Liquidity' + (currencyUnit === 'USD' ? ' (USD)' : ' (ETH)')}
+              name={intl.get('Total_Liquidity') + (currencyUnit === 'USD' ? ' (USD)' : ' (ETH)')}
               dataKey={currencyUnit === 'USD' ? 'usdLiquidity' : 'ethLiquidity'}
               yAxisId={0}
               fill="var(--c-token)"
@@ -81,7 +82,7 @@ const Chart = ({ data, chartOption, currencyUnit }) => {
             />
             <Area
               type="monotone"
-              name={'Eth Balance'}
+              name={intl.get('Eth_Balance')}
               dataKey={'ethBalance'}
               fill="var(--c-token)"
               opacity={'0'}
@@ -89,7 +90,7 @@ const Chart = ({ data, chartOption, currencyUnit }) => {
             />
             <Area
               type="monotone"
-              name={'Token Balance'}
+              name={intl.get('Token_Balance')}
               dataKey={'tokenBalance'}
               fill="var(--c-token)"
               yAxisId={1}
@@ -139,7 +140,7 @@ const Chart = ({ data, chartOption, currencyUnit }) => {
             />
             <Area
               type="monotone"
-              name={'Volume' + (currencyUnit === 'USD' ? ' (USD)' : ' (ETH)')}
+              name={intl.get('Volume') + (currencyUnit === 'USD' ? ' (USD)' : ' (ETH)')}
               dataKey={currencyUnit === 'USD' ? 'usdVolume' : 'ethVolume'}
               fill="var(--c-token)"
               opacity={'0.4'}

@@ -16,13 +16,15 @@ import { useMedia } from 'react-use'
 import { getTimeFrame } from '../constants'
 import Copy from './Copy'
 import { formattedNum } from '../helpers'
+import intl from 'react-intl-universal'
 
-const timeframeOptions = [
-  { value: '1week', label: '1 week' },
-  { value: '1month', label: '1 month' },
-  { value: '3months', label: '3 months' },
-  { value: 'all', label: 'All time' }
-]
+
+//const timeframeOptions = [
+//  { value: '1week', label: intl.get('oneweek') },
+//  { value: '1month', label: '1 month' },
+//  { value: '3months', label: '3 months' },
+//  { value: 'all', label: 'All time' }
+//]
 
 const SmallText = styled.span`
   font-size: 0.6em;
@@ -307,6 +309,13 @@ export const ExchangePage = function({
   historyDaysToQuery,
   setHistoryDaysToQuery
 }) {
+  const timeframeOptions = [
+  { value: '1week', label: intl.get('oneweek') },
+  { value: '1month', label: intl.get('onemonth') },
+  { value: '3months', label: intl.get('threemonths') },
+  { value: 'all', label: intl.get('alltime') }
+  ]	
+	
   const [chartOption, setChartOption] = useState('liquidity')
 
   const [txFilter, setTxFilter] = useState('All')
@@ -394,7 +403,7 @@ export const ExchangePage = function({
         <Dashboard mx="auto" px={[0, 0]}>
           <TopPanel rounded bg="token" color="white" p={24} style={{ gridArea: 'volume' }}>
             <FourByFour
-              topLeft={<Hint color="textLight">Volume (24hrs)</Hint>}
+              topLeft={<Hint color="textLight">{intl.get('Volume_24hrs')}</Hint>}
               bottomLeft={
                 <Text fontSize={24} lineHeight={1} fontWeight={500}>
                   {!isNaN(tradeVolumeUSD) && !isNaN(tradeVolume)
@@ -420,7 +429,7 @@ export const ExchangePage = function({
           </TopPanel>
           <TopPanel rounded bg="token" color="white" p={24} style={{ gridArea: 'liquidity' }}>
             <FourByFour
-              topLeft={<Hint color="textLight">Total Liquidity</Hint>}
+              topLeft={<Hint color="textLight">{intl.get('Total_Liquidity')}</Hint>}
               bottomLeft={
                 <Text fontSize={24} lineHeight={1} fontWeight={500}>
                   {!isNaN(ethLiquidity) && !isNaN(price) && !isNaN(priceUSD)
@@ -442,7 +451,7 @@ export const ExchangePage = function({
           </TopPanel>
           <TopPanel rounded bg="token" color="white" style={{ gridArea: 'shares' }} p={24}>
             <FourByFour
-              topLeft={<Hint color="textLight">Transactions (24hrs)</Hint>}
+              topLeft={<Hint color="textLight">{intl.get('Transactions_24hrs')}</Hint>}
               bottomLeft={
                 <Text fontSize={24} lineHeight={1} fontWeight={500}>
                   {!isNaN(oneDayTxs) ? oneDayTxs : '-'}
@@ -466,7 +475,7 @@ export const ExchangePage = function({
                       setChartOption('liquidity')
                     }}
                   >
-                    Liquidity
+                    {intl.get('Liquidity')}
                   </TextOption>
                   <TextOption
                     style={{ marginLeft: !belowMedium ? '2em' : '0.6em' }}
@@ -475,7 +484,7 @@ export const ExchangePage = function({
                       setChartOption('volume')
                     }}
                   >
-                    Volume
+                    {intl.get('Volume')}
                   </TextOption>
                   <TextOption
                     style={{ marginLeft: !belowMedium ? '2em' : '0.6em' }}
@@ -484,7 +493,7 @@ export const ExchangePage = function({
                       setChartOption('price')
                     }}
                   >
-                    Price
+                    {intl.get('Price')}
                   </TextOption>
                 </Flex>
                 <Box width={144}>
@@ -520,10 +529,10 @@ export const ExchangePage = function({
             <Box p={24}>
               <Flex height={18} alignItems="center" justifyContent="space-between">
                 <Flex alignItems="center" justifyContent="space-between" style={{ fontWeight: 500, height: '36px' }}>
-                  <div>Exchange</div>
+                  <div>{intl.get('Exchange')}</div>
                 </Flex>
                 <AddressLink href={'https://uniswap.exchange/swap/' + tokenAddress} target="_blank">
-                  View Exchange ↗
+                  {intl.get('View_Exchange')} ↗
                 </AddressLink>
               </Flex>
             </Box>
@@ -535,7 +544,7 @@ export const ExchangePage = function({
                   ToggleModal(true)
                 }}
               >
-                {'Buy'}
+                {intl.get('Buy')}
               </BuyButton>
               <BuyButton
                 bg="token"
@@ -544,19 +553,25 @@ export const ExchangePage = function({
                   ToggleModal(true)
                 }}
               >
-                {'Sell'}
+                {intl.get('Sell')}
               </BuyButton>
             </ExchangeButtons>
             <Divider />
             <Flex p={24} justifyContent="space-between">
               <AddressLink href={'https://www.etherscan.io/token/' + tokenAddress + '/'} target="_blank">
-                Token Address ↗
+                {intl.get('Token_Address')} ↗
+              </AddressLink>
+			  <AddressLink href={'https://cn.etherscan.com/token/' + tokenAddress + '/'} target="_blank">
+                （中文）
               </AddressLink>
               <Copy toCopy={tokenAddress} />
             </Flex>
-            <Flex p={24} justifyContent="space-between">
-              <AddressLink href={'https://www.etherscan.io/address/' + exchangeAddress + '/'} target="_blank">
-                Exchange Address ↗
+            <Flex p={24} justifyContent="space-between">              
+			  <AddressLink href={'https://www.etherscan.io/address/' + exchangeAddress + '/'} target="_blank">
+                {intl.get('Exchange_Address')} ↗
+              </AddressLink>
+			  <AddressLink href={'https://cn.etherscan.com/address/' + exchangeAddress + '/'} target="_blank">
+                （中文）
               </AddressLink>
               <Copy toCopy={exchangeAddress} />
             </Flex>
@@ -569,7 +584,7 @@ export const ExchangePage = function({
                 }}
                 color={txFilter !== 'All' ? 'textDim' : 'black'}
               >
-                All
+                {intl.get('All')}
               </Text>
               <Text
                 onClick={e => {
@@ -577,7 +592,7 @@ export const ExchangePage = function({
                 }}
                 color={txFilter !== 'Swaps' ? 'textDim' : 'black'}
               >
-                Swaps
+                {intl.get('Swaps')}
               </Text>
               <Text
                 onClick={e => {
@@ -585,7 +600,7 @@ export const ExchangePage = function({
                 }}
                 color={txFilter !== 'Add' ? 'textDim' : 'black'}
               >
-                Add
+                {intl.get('Add')}
               </Text>
               <Text
                 onClick={e => {
@@ -593,13 +608,13 @@ export const ExchangePage = function({
                 }}
                 color={txFilter !== 'Remove' ? 'textDim' : 'black'}
               >
-                Remove
+                {intl.get('Remove')}
               </Text>
             </OptionsWrappper>
             <AccountSearchWrapper>
               <AccountSearch
                 value={accountInput}
-                placeholder={'Filter by account'}
+                placeholder={intl.get('Filter_by_account')}
                 onChange={e => {
                   setAccountInput(e.target.value)
                 }}
