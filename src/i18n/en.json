@@ -48,5 +48,7 @@
   "alltime":"All time",
   "About":"About",
   "Docs":"Docs",
-  "Code":"Code"
+  "Code":"Code",
+  "IMG_SRC":"https://raw.githubusercontent.com/trustwallet/assets",
+  "ETHERSCAN":"www.etherscan.io"
 }

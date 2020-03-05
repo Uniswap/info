@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import { isAddress } from '../../helpers/index.js'
+import { isZh } from '../../helpers/index.js'
 
 const BAD_IMAGES = {}
 
@@ -52,7 +53,7 @@ export default function TokenLogo({ address, header = false, size = '1rem', ...r
     address = '0xc011a72400e58ecd99ee497cf89e3775d4bd732f'
   }
 
-  const path = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${isAddress(
+  const path = `${isZh()}/master/blockchains/ethereum/assets/${isAddress(
     address
   )}/logo.png`
 

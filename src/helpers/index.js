@@ -4,6 +4,7 @@ import { client } from '../apollo/client'
 import { ExportToCsv } from 'export-to-csv'
 import { ethers } from 'ethers'
 import utc from 'dayjs/plugin/utc'
+import intl from 'react-intl-universal';
 
 import { TRANSACTIONS_QUERY_SKIPPABLE } from '../apollo/queries'
 
@@ -18,6 +19,13 @@ export const toNiceDate = date => {
 }
 
 export const toNiceDateYear = date => dayjs.utc(dayjs.unix(date)).format('MMMM DD, YYYY')
+
+export const isZh = () => {
+	return intl.get('IMG_SRC')
+}
+export const isEtherscan = () => {
+	return intl.get('ETHERSCAN')
+}
 
 export const isAddress = value => {
   try {
@@ -63,10 +71,10 @@ export const setThemeColor = theme => document.documentElement.style.setProperty
 export const Big = number => new BigNumber(number)
 
 export const urls = {
-  showTransaction: tx => `https://etherscan.io/tx/${tx}/`,
-  showAddress: address => `https://www.etherscan.io/address/${address}/`,
-  showToken: address => `https://www.etherscan.io/token/${address}/`,
-  showBlock: block => `https://etherscan.io/block/${block}/`
+  showTransaction: tx => `https://${isEtherscan()}/tx/${tx}/`,
+  showAddress: address => `https://${isEtherscan()}/address/${address}/`,
+  showToken: address => `https://${isEtherscan()}/token/${address}/`,
+  showBlock: block => `https://${isEtherscan()}/block/${block}/`
 }
 
 export const formatTime = unix => {

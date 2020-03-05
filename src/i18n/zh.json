@@ -48,5 +48,7 @@
   "alltime":"所有时间",
   "About":"关于",
   "Docs":"文档",
-  "Code":"代码"
+  "Code":"代码",
+  "IMG_SRC":"https://gitee.com/clj/assets/raw",
+  "ETHERSCAN":"cn.etherscan.com"
 }

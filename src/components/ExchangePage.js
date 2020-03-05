@@ -15,7 +15,7 @@ import { Divider, Hint } from '.'
 import { useMedia } from 'react-use'
 import { getTimeFrame } from '../constants'
 import Copy from './Copy'
-import { formattedNum } from '../helpers'
+import { formattedNum, isEtherscan } from '../helpers'
 import intl from 'react-intl-universal'
 
 
@@ -357,7 +357,7 @@ export const ExchangePage = function({
         </TokenGroup>
         <PricePanelMobile rounded bg="token" color="white">
           <FourByFour
-            topLeft={<Hint color="textLight">Price</Hint>}
+            topLeft={<Hint color="textLight">{intl.get('Price')}</Hint>}
             bottomLeft={
               <Text fontSize={24} lineHeight={1.4} fontWeight={500}>
                 {!isNaN(price) && !isNaN(invPrice)
@@ -558,20 +558,14 @@ export const ExchangePage = function({
             </ExchangeButtons>
             <Divider />
             <Flex p={24} justifyContent="space-between">
-              <AddressLink href={'https://www.etherscan.io/token/' + tokenAddress + '/'} target="_blank">
+              <AddressLink href={'https://'+`${isEtherscan()}`+'/token/' + tokenAddress + '/'} target="_blank">
                 {intl.get('Token_Address')} ↗
-              </AddressLink>
-			  <AddressLink href={'https://cn.etherscan.com/token/' + tokenAddress + '/'} target="_blank">
-                （中文）
               </AddressLink>
               <Copy toCopy={tokenAddress} />
             </Flex>
             <Flex p={24} justifyContent="space-between">              
-			  <AddressLink href={'https://www.etherscan.io/address/' + exchangeAddress + '/'} target="_blank">
+			  <AddressLink href={'https://'+`${isEtherscan()}`+'/address/' + exchangeAddress + '/'} target="_blank">
                 {intl.get('Exchange_Address')} ↗
-              </AddressLink>
-			  <AddressLink href={'https://cn.etherscan.com/address/' + exchangeAddress + '/'} target="_blank">
-                （中文）
               </AddressLink>
               <Copy toCopy={exchangeAddress} />
             </Flex>

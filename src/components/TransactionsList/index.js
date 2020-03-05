@@ -12,7 +12,7 @@ import styled from 'styled-components'
 import Link from '../Link'
 import { Divider } from '../../components'
 
-import { urls, formatTime, Big, formattedNum } from '../../helpers'
+import { urls, formatTime, Big, formattedNum, isEtherscan } from '../../helpers'
 import intl from 'react-intl-universal'
 
 dayjs.extend(utc)
@@ -400,9 +400,6 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, txFil
           <CustomLink ml="3" color="button" external href={urls.showTransaction(transaction.tx.split('-')[0])}>
             {getTransactionType(transaction.event, tokenSymbol)}
           </CustomLink>
-		  <Link ml="0" color="button" external href={'https://cn.etherscan.com/tx/' + transaction.tx.split('-')[0]}>
-              （中文）
-            </Link>
         </DataText>
         <DataText area={'value'}>
           {price && priceUSD
@@ -426,11 +423,8 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, txFil
         )}
         {!belowSmall ? (
           <DataText area={'Account'}>
-            <Link ml="3" color="button" external href={'https://etherscan.io/address/' + transaction.user}>
+            <Link ml="3" color="button" external href={'https://'+`${isEtherscan()}`+'/address/' + transaction.user}>
               {transaction.user.slice(0, 6) + '...' + transaction.user.slice(38, 42)}
-            </Link>
-			<Link ml="0" color="button" external href={'https://cn.etherscan.com/address/' + transaction.user}>
-              （中文）
             </Link>
           </DataText>
         ) : (
@@ -487,7 +481,7 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, txFil
                   sortTxs(SORT_FIELD.TOKEN_VALUE)
                 }}
               >
-                {intl.get('Token Amount')} {sortedColumn === SORT_FIELD.TOKEN_VALUE ? (!sortDirection ? '↑' : '↓') : ''}
+                {intl.get('Token_Amount')} {sortedColumn === SORT_FIELD.TOKEN_VALUE ? (!sortDirection ? '↑' : '↓') : ''}
               </ClickableText>
             </Flex>
           </>

@@ -3,7 +3,7 @@ import { ExchangePage } from '../components/ExchangePage'
 import LocalLoader from '../components/LocalLoader'
 import { useExchangeSpecificData } from '../Data/ExchangeSpecificData'
 import { useChart } from '../Data/ChartData'
-import { setThemeColor, isAddress } from '../helpers'
+import { setThemeColor, isAddress, isZh } from '../helpers'
 import { darken } from 'polished'
 import Vibrant from 'node-vibrant'
 import { hex } from 'wcag-contrast'
@@ -51,7 +51,7 @@ export const ExchangeWrapper = function({
     setCurrentData({}) // reset data for UI
     if (exchanges.hasOwnProperty(address)) {
       let tokenAddress = exchanges[address].tokenAddress
-      const path = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${isAddress(
+      const path = `${isZh()}/master/blockchains/ethereum/assets/${isAddress(
         tokenAddress
       )}/logo.png`
       Vibrant.from(path).getPalette((err, palette) => {
