@@ -423,7 +423,7 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, txFil
         )}
         {!belowSmall ? (
           <DataText area={'Account'}>
-            <Link ml="3" color="button" external href={'https://'+`${isEtherscan()}`+'/address/' + transaction.user}>
+            <Link ml="3" color="button" external href={'https://'+isEtherscan()+'/address/' + transaction.user}>
               {transaction.user.slice(0, 6) + '...' + transaction.user.slice(38, 42)}
             </Link>
           </DataText>

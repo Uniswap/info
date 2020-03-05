@@ -558,13 +558,13 @@ export const ExchangePage = function({
             </ExchangeButtons>
             <Divider />
             <Flex p={24} justifyContent="space-between">
-              <AddressLink href={'https://'+`${isEtherscan()}`+'/token/' + tokenAddress + '/'} target="_blank">
+              <AddressLink href={'https://'+ isEtherscan() +'/token/' + tokenAddress + '/'} target="_blank">
                 {intl.get('Token_Address')} ↗
               </AddressLink>
               <Copy toCopy={tokenAddress} />
             </Flex>
             <Flex p={24} justifyContent="space-between">              
-			  <AddressLink href={'https://'+`${isEtherscan()}`+'/address/' + exchangeAddress + '/'} target="_blank">
+			  <AddressLink href={'https://'+ isEtherscan() +'/address/' + exchangeAddress + '/'} target="_blank">
                 {intl.get('Exchange_Address')} ↗
               </AddressLink>
               <Copy toCopy={exchangeAddress} />
