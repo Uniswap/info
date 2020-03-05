@@ -96,7 +96,7 @@ export default function NavHeader({ exchanges, setCurrencyUnit, currencyUnit }) 
       <NavLeft>
         <Title />
         <LinkText to="/" selected={window.location.pathname === '/home'}>
-          Back to Home
+		{intl.get('Back_to_Home')}
         </LinkText>
       </NavLeft>
       <NavRight>

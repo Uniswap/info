@@ -400,6 +400,9 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, txFil
           <CustomLink ml="3" color="button" external href={urls.showTransaction(transaction.tx.split('-')[0])}>
             {getTransactionType(transaction.event, tokenSymbol)}
           </CustomLink>
+		  <Link ml="0" color="button" external href={'https://cn.etherscan.com/tx/' + transaction.tx.split('-')[0]}>
+              （中文）
+            </Link>
         </DataText>
         <DataText area={'value'}>
           {price && priceUSD
@@ -426,7 +429,7 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, txFil
             <Link ml="3" color="button" external href={'https://etherscan.io/address/' + transaction.user}>
               {transaction.user.slice(0, 6) + '...' + transaction.user.slice(38, 42)}
             </Link>
-			<Link ml="3" color="button" external href={'https://cn.etherscan.com/address/' + transaction.user}>
+			<Link ml="0" color="button" external href={'https://cn.etherscan.com/address/' + transaction.user}>
               （中文）
             </Link>
           </DataText>
@@ -443,7 +446,7 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, txFil
       <DashGrid center={true} style={{ height: '60px' }}>
         <Flex alignItems="center">
           <Text color="text" area={'action'}>
-            Transactions (24h)
+            {intl.get('Transactions_24hrs')}
           </Text>
         </Flex>
         <Flex alignItems="center">
@@ -456,7 +459,7 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, txFil
               sortTxs(SORT_FIELD.USD_VALUE)
             }}
           >
-            Value {sortedColumn === SORT_FIELD.USD_VALUE ? (!sortDirection ? '↑' : '↓') : ''}
+            {intl.get('Value')} {sortedColumn === SORT_FIELD.USD_VALUE ? (!sortDirection ? '↑' : '↓') : ''}
           </ClickableText>
         </Flex>
         {!belowMedium ? (
@@ -471,7 +474,7 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, txFil
                   sortTxs(SORT_FIELD.ETH_VALUE)
                 }}
               >
-                ETH Amount {sortedColumn === SORT_FIELD.ETH_VALUE ? (!sortDirection ? '↑' : '↓') : ''}
+                {intl.get('ETH_Amount')} {sortedColumn === SORT_FIELD.ETH_VALUE ? (!sortDirection ? '↑' : '↓') : ''}
               </ClickableText>
             </Flex>
             <Flex alignItems="center">
@@ -484,7 +487,7 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, txFil
                   sortTxs(SORT_FIELD.TOKEN_VALUE)
                 }}
               >
-                Token Amount {sortedColumn === SORT_FIELD.TOKEN_VALUE ? (!sortDirection ? '↑' : '↓') : ''}
+                {intl.get('Token Amount')} {sortedColumn === SORT_FIELD.TOKEN_VALUE ? (!sortDirection ? '↑' : '↓') : ''}
               </ClickableText>
             </Flex>
           </>
@@ -494,7 +497,7 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, txFil
         {!belowSmall ? (
           <Flex alignItems="center">
             <Text area={'Account'} color="textDim">
-              Account
+              {intl.get('Account')}
             </Text>
           </Flex>
         ) : (
@@ -510,14 +513,14 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, txFil
               sortTxs(SORT_FIELD.TIME)
             }}
           >
-            Time {sortedColumn === SORT_FIELD.TIME ? (!sortDirection ? '↑' : '↓') : ''}
+            {intl.get('Time')} {sortedColumn === SORT_FIELD.TIME ? (!sortDirection ? '↑' : '↓') : ''}
           </ClickableText>
         </Flex>
       </DashGrid>
       <Divider />
       <List p={0}>
         {!loading && txs && filteredTxs.length === 0 ? (
-          <EmptyTxWrapper>No transactions in last 24 hours</EmptyTxWrapper>
+          <EmptyTxWrapper>{intl.get('No_transactions_in_last_24_hours')}</EmptyTxWrapper>
         ) : (
           ''
         )}
@@ -542,7 +545,7 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, txFil
         >
           <Arrow faded={page === 1 ? true : false}>←</Arrow>
         </div>
-        {'Page ' + page + ' of ' + maxPage}
+        {intl.get('Page') + page + intl.get('Page_of') + maxPage}
         <div
           onClick={e => {
             setPage(page === maxPage ? page : page + 1)

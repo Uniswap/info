@@ -183,7 +183,7 @@ export const OverviewPage = function({
       {globalData ? (
         <DashboardWrapper>
           <TokenHeader>
-            <div>Uniswap Overview</div>
+            <div>{intl.get('Uniswap_Overview')}</div>
           </TokenHeader>
           <OverviewDashboard mx="auto" px={[0, 3]}>
             <TopPanel rounded color="white" p={24} style={{ gridArea: 'volume' }}>

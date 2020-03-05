@@ -3,6 +3,7 @@ import { Text, Flex } from 'rebass'
 import { useHistory } from 'react-router-dom'
 import Emoji from '../Emoji'
 import styled from 'styled-components'
+import intl from 'react-intl-universal'
 
 const TitleWrapper = styled.div`
   text-decoration: none;
@@ -23,7 +24,7 @@ export default function Title() {
         </Text>
 
         <Text fontWeight={500} mx="0.5rem" color="white" lineHeight="1.5rem" style={{ textDecorationColor: 'blue' }}>
-          Info
+			{intl.get('Info')}
         </Text>
       </Flex>
     </TitleWrapper>

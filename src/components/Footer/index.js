@@ -2,6 +2,7 @@ import React from 'react'
 import { Flex } from 'rebass'
 
 import Link from '../Link'
+import intl from 'react-intl-universal'
 
 const links = [
   { url: 'https://uniswap.io', text: 'About' },
@@ -19,7 +20,7 @@ const Footer = () => (
   <Flex as="footer" p={24}>
     {links.map((link, index) => (
       <FooterLink key={index} href={link.url}>
-        {link.text}
+        {intl.get(link.text)}
       </FooterLink>
     ))}
   </Flex>
