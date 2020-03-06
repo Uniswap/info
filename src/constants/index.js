@@ -9,10 +9,10 @@ export const timeframeOptions = [
 
 export const getTimeFrame = current => {
   const timeframeOptions = [
-  { value: '1week', label: intl.get('oneweek') },
-  { value: '1month', label: intl.get('onemonth') },
-  { value: '3months', label: intl.get('threemonths') },
-  { value: 'all', label: intl.get('alltime') }
+    { value: '1week', label: intl.get('oneweek') },
+    { value: '1month', label: intl.get('onemonth') },
+    { value: '3months', label: intl.get('threemonths') },
+    { value: 'all', label: intl.get('alltime') }
   ]
   switch (current) {
     case 'all':

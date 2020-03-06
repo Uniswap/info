@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { Provider } from 'unstated'
-import intl from 'react-intl-universal';
+import intl from 'react-intl-universal'
 import App from './App'
 import zh from './i18n/zh.json'
 import en from './i18n/en.json'

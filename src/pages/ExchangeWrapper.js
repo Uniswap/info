@@ -51,9 +51,7 @@ export const ExchangeWrapper = function({
     setCurrentData({}) // reset data for UI
     if (exchanges.hasOwnProperty(address)) {
       let tokenAddress = exchanges[address].tokenAddress
-      const path = `${isZh()}/master/blockchains/ethereum/assets/${isAddress(
-        tokenAddress
-      )}/logo.png`
+      const path = `${isZh()}/master/blockchains/ethereum/assets/${isAddress(tokenAddress)}/logo.png`
       Vibrant.from(path).getPalette((err, palette) => {
         if (palette && palette.Vibrant) {
           let detectedHex = palette.Vibrant.hex

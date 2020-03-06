@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Box, Flex, Text } from 'rebass'
 import styled from 'styled-components'
-import intl from 'react-intl-universal';
+import intl from 'react-intl-universal'
 import FourByFour from '../components/FourByFour'
 import Panel from '../components/Panel'
 import Select from '../components/Select'
@@ -170,11 +170,11 @@ export const OverviewPage = function({
   historyDaysToQuery
 }) {
   const timeframeOptions = [
-  { value: '1week', label: intl.get('oneweek') },
-  { value: '1month', label: intl.get('onemonth') },
-  { value: '3months', label: intl.get('threemonths') },
-  { value: 'all', label: intl.get('alltime') }
-  ]		
+    { value: '1week', label: intl.get('oneweek') },
+    { value: '1month', label: intl.get('onemonth') },
+    { value: '3months', label: intl.get('threemonths') },
+    { value: 'all', label: intl.get('alltime') }
+  ]
   const [chartOption, setChartOption] = useState('liquidity')
 
   return (
@@ -259,7 +259,7 @@ export const OverviewPage = function({
                         setChartOption('liquidity')
                       }}
                     >
-					  {intl.get('Liquidity')}
+                      {intl.get('Liquidity')}
                     </TextOption>
                     <TextOption
                       style={{ marginLeft: '2em' }}

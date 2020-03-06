@@ -53,9 +53,7 @@ export default function TokenLogo({ address, header = false, size = '1rem', ...r
     address = '0xc011a72400e58ecd99ee497cf89e3775d4bd732f'
   }
 
-  const path = `${isZh()}/master/blockchains/ethereum/assets/${isAddress(
-    address
-  )}/logo.png`
+  const path = `${isZh()}/master/blockchains/ethereum/assets/${isAddress(address)}/logo.png`
 
   return (
     <Inline>

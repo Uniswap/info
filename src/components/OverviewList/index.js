@@ -441,7 +441,7 @@ function OverviewList({ currencyUnit }) {
       <DashGrid center={true} style={{ height: '60px' }}>
         <Flex alignItems="center">
           <Text color="text" area={'name'}>
-			  {intl.get('Exchanges')}
+            {intl.get('Exchanges')}
           </Text>
         </Flex>
         {!belowMedium ? (
@@ -456,7 +456,9 @@ function OverviewList({ currencyUnit }) {
                   sortTxs(SORT_FIELD.SYMBOL)
                 }}
               >
-                <Text>{intl.get('Symbol')} {sortedColumn === SORT_FIELD.SYMBOL ? (!sortDirection ? '↑' : '↓') : ''}</Text>
+                <Text>
+                  {intl.get('Symbol')} {sortedColumn === SORT_FIELD.SYMBOL ? (!sortDirection ? '↑' : '↓') : ''}
+                </Text>
               </ClickableText>
             </Flex>
             <Flex alignItems="center">
@@ -469,7 +471,7 @@ function OverviewList({ currencyUnit }) {
                   sortTxs(SORT_FIELD.PRICE)
                 }}
               >
-			  {intl.get('Price')} {sortedColumn === SORT_FIELD.PRICE ? (!sortDirection ? '↑' : '↓') : ''}
+                {intl.get('Price')} {sortedColumn === SORT_FIELD.PRICE ? (!sortDirection ? '↑' : '↓') : ''}
               </ClickableText>
             </Flex>
           </>
@@ -486,7 +488,7 @@ function OverviewList({ currencyUnit }) {
               sortTxs(SORT_FIELD.LIQUIDITY)
             }}
           >
-		  {intl.get('Liquidity')} {sortedColumn === SORT_FIELD.LIQUIDITY ? (!sortDirection ? '↑' : '↓') : ''}
+            {intl.get('Liquidity')} {sortedColumn === SORT_FIELD.LIQUIDITY ? (!sortDirection ? '↑' : '↓') : ''}
           </ClickableText>
         </Flex>
         <Flex alignItems="center">
@@ -499,7 +501,7 @@ function OverviewList({ currencyUnit }) {
               sortTxs(SORT_FIELD.VOLUME)
             }}
           >
-		  {intl.get('Volume_24hrs')} {sortedColumn === SORT_FIELD.VOLUME ? (sortDirection ? '↑' : '↓') : ''}
+            {intl.get('Volume_24hrs')} {sortedColumn === SORT_FIELD.VOLUME ? (sortDirection ? '↑' : '↓') : ''}
           </ClickableText>
         </Flex>
         {!belowSmall ? (
@@ -513,7 +515,8 @@ function OverviewList({ currencyUnit }) {
                 sortTxs(currencyUnit === 'USD' ? SORT_FIELD.PRICE_CHANGE : SORT_FIELD.PRICE_CHANGE_ETH)
               }}
             >
-			{intl.get('Price_Change_24hrs')} {sortedColumn === SORT_FIELD.PRICE_CHANGE ? (sortDirection ? '↑' : '↓') : ''}
+              {intl.get('Price_Change_24hrs')}{' '}
+              {sortedColumn === SORT_FIELD.PRICE_CHANGE ? (sortDirection ? '↑' : '↓') : ''}
             </ClickableText>
           </Flex>
         ) : (

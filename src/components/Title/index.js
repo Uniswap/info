@@ -24,7 +24,7 @@ export default function Title() {
         </Text>
 
         <Text fontWeight={500} mx="0.5rem" color="white" lineHeight="1.5rem" style={{ textDecorationColor: 'blue' }}>
-			{intl.get('Info')}
+          {intl.get('Info')}
         </Text>
       </Flex>
     </TitleWrapper>

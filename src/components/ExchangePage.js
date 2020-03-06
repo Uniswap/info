@@ -18,7 +18,6 @@ import Copy from './Copy'
 import { formattedNum, isEtherscan } from '../helpers'
 import intl from 'react-intl-universal'
 
-
 //const timeframeOptions = [
 //  { value: '1week', label: intl.get('oneweek') },
 //  { value: '1month', label: '1 month' },
@@ -310,12 +309,12 @@ export const ExchangePage = function({
   setHistoryDaysToQuery
 }) {
   const timeframeOptions = [
-  { value: '1week', label: intl.get('oneweek') },
-  { value: '1month', label: intl.get('onemonth') },
-  { value: '3months', label: intl.get('threemonths') },
-  { value: 'all', label: intl.get('alltime') }
-  ]	
-	
+    { value: '1week', label: intl.get('oneweek') },
+    { value: '1month', label: intl.get('onemonth') },
+    { value: '3months', label: intl.get('threemonths') },
+    { value: 'all', label: intl.get('alltime') }
+  ]
+
   const [chartOption, setChartOption] = useState('liquidity')
 
   const [txFilter, setTxFilter] = useState('All')
@@ -558,13 +557,13 @@ export const ExchangePage = function({
             </ExchangeButtons>
             <Divider />
             <Flex p={24} justifyContent="space-between">
-              <AddressLink href={'https://'+ isEtherscan() +'/token/' + tokenAddress + '/'} target="_blank">
+              <AddressLink href={'https://' + isEtherscan() + '/token/' + tokenAddress + '/'} target="_blank">
                 {intl.get('Token_Address')} ↗
               </AddressLink>
               <Copy toCopy={tokenAddress} />
             </Flex>
-            <Flex p={24} justifyContent="space-between">              
-			  <AddressLink href={'https://'+ isEtherscan() +'/address/' + exchangeAddress + '/'} target="_blank">
+            <Flex p={24} justifyContent="space-between">
+              <AddressLink href={'https://' + isEtherscan() + '/address/' + exchangeAddress + '/'} target="_blank">
                 {intl.get('Exchange_Address')} ↗
               </AddressLink>
               <Copy toCopy={exchangeAddress} />

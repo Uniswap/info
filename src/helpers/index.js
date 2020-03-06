@@ -4,7 +4,7 @@ import { client } from '../apollo/client'
 import { ExportToCsv } from 'export-to-csv'
 import { ethers } from 'ethers'
 import utc from 'dayjs/plugin/utc'
-import intl from 'react-intl-universal';
+import intl from 'react-intl-universal'
 
 import { TRANSACTIONS_QUERY_SKIPPABLE } from '../apollo/queries'
 
@@ -21,10 +21,10 @@ export const toNiceDate = date => {
 export const toNiceDateYear = date => dayjs.utc(dayjs.unix(date)).format('MMMM DD, YYYY')
 
 export const isZh = () => {
-	return intl.get('IMG_SRC')
+  return intl.get('IMG_SRC')
 }
 export const isEtherscan = () => {
-	return intl.get('ETHERSCAN')
+  return intl.get('ETHERSCAN')
 }
 
 export const isAddress = value => {

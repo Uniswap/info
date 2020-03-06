@@ -64,7 +64,11 @@ const Chart = ({ data, chartOption, currencyUnit, symbol }) => {
               strokeWidth={2}
               dot={false}
               type="monotone"
-              name={currencyUnit === 'ETH' ? intl.get('Price')+' (ETH/' + symbol + ')' : intl.get('Price')+' (USD/' + symbol + ')'}
+              name={
+                currencyUnit === 'ETH'
+                  ? intl.get('Price') + ' (ETH/' + symbol + ')'
+                  : intl.get('Price') + ' (USD/' + symbol + ')'
+              }
               dataKey={currencyUnit === 'ETH' ? 'ethPerToken' : 'tokenPriceUSD'}
               yAxisId={2}
               fill="var(--c-token)"
@@ -75,7 +79,11 @@ const Chart = ({ data, chartOption, currencyUnit, symbol }) => {
               strokeWidth={2}
               dot={false}
               type="monotone"
-              name={currencyUnit === 'USD' ? intl.get('Inverse')+' (' + symbol + '/USD)' : intl.get('Inverse')+' (' + symbol + '/ETH)'}
+              name={
+                currencyUnit === 'USD'
+                  ? intl.get('Inverse') + ' (' + symbol + '/USD)'
+                  : intl.get('Inverse') + ' (' + symbol + '/ETH)'
+              }
               dataKey={currencyUnit === 'USD' ? 'tokensPerUSD' : 'tokensPerEth'}
               yAxisId={3}
               fill="var(--c-token)"

@@ -378,9 +378,9 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, txFil
       case 'RemoveLiquidity':
         return intl.get('Remove_ETH_and') + symbol
       case 'Token Swap':
-        return intl.get('Swap') + symbol +  intl.get('for_ETH')
+        return intl.get('Swap') + symbol + intl.get('for_ETH')
       case 'EthPurchase':
-        return intl.get('Swap') + symbol +  intl.get('for_ETH')
+        return intl.get('Swap') + symbol + intl.get('for_ETH')
       case 'TokenPurchase':
         return intl.get('Swap_ETH_for') + symbol
 
@@ -423,7 +423,7 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, txFil
         )}
         {!belowSmall ? (
           <DataText area={'Account'}>
-            <Link ml="3" color="button" external href={'https://'+isEtherscan()+'/address/' + transaction.user}>
+            <Link ml="3" color="button" external href={'https://' + isEtherscan() + '/address/' + transaction.user}>
               {transaction.user.slice(0, 6) + '...' + transaction.user.slice(38, 42)}
             </Link>
           </DataText>
