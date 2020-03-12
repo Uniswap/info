@@ -97,7 +97,7 @@ export const getAllTransactions = async address => {
   // current time
   const utcEndTime = dayjs.utc()
   let utcStartTime
-  utcStartTime = utcEndTime.subtract(1, 'year').startOf('day')
+  utcStartTime = utcEndTime.subtract(2, 'year').startOf('day')
   let startTime = utcStartTime.unix() - 1 // -1 because we filter on greater than in the query
   let data = []
   let skipCount = 0

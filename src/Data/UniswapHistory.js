@@ -18,7 +18,7 @@ export function useUniswapHistory(daysToQuery) {
         // go back, go way way back
         switch (daysToQuery) {
           case 'all':
-            utcStartTime = utcEndTime.subtract(1, 'year').startOf('year')
+            utcStartTime = utcEndTime.subtract(2, 'year').startOf('year')
             break
           case '3months':
             utcStartTime = utcEndTime.subtract(3, 'month')
