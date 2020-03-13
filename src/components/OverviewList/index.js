@@ -321,7 +321,7 @@ function OverviewList({ currencyUnit }) {
             new24HourData[exchangeID].txs = oneDayTxs
 
             const priceChangeRaw = (
-              ((currentData[exchangeID].priceUSD - data24HoursAgo.tokenPriceUSD) / currentData[exchangeID].priceUSD) *
+              ((currentData[exchangeID].priceUSD - data24HoursAgo.tokenPriceUSD) / data24HoursAgo.tokenPriceUSD) *
               100
             ).toFixed(2)
             new24HourData[exchangeID].priceChange = priceChangeRaw
