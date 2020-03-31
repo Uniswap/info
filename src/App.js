@@ -79,6 +79,8 @@ function App() {
                           address={tokenToExchangeMap[match.params.tokenAddressURL.toLowerCase()]}
                           exchanges={exchanges}
                           historyDaysToQuery={historyDaysToQuery}
+                          timeWindow={timeWindow}
+                          setTimeWindow={setTimeWindow}
                           setHistoryDaysToQuery={setHistoryDaysToQuery}
                         />
                       )
