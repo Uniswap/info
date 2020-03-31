@@ -26,6 +26,9 @@ export function useUniswapHistory(daysToQuery) {
           case 'all':
             utcStartTime = utcEndTime.subtract(2, 'year').startOf('year')
             break
+          case '1year':
+            utcStartTime = utcEndTime.subtract(1, 'year')
+            break
           case '3months':
             utcStartTime = utcEndTime.subtract(3, 'month')
             break
@@ -85,7 +88,7 @@ export function useUniswapHistory(daysToQuery) {
               currentMonth = month
               startIndex++
             }
-            monthlyData[startIndex] = {}
+            monthlyData[startIndex] = monthlyData[startIndex] || {}
             monthlyData[startIndex].dayString = data[i].date
             monthlyData[startIndex].monthlyVolumeETH = monthlyData[startIndex].monthlyVolumeETH
               ? monthlyData[startIndex].monthlyVolumeETH + data[i].dailyEthVolume
@@ -108,7 +111,7 @@ export function useUniswapHistory(daysToQuery) {
               currentWeek = week
               startIndexWeekly++
             }
-            weeklyData[startIndexWeekly] = {}
+            weeklyData[startIndexWeekly] = weeklyData[startIndexWeekly] || {}
             weeklyData[startIndexWeekly].dayString = data[i].date
             weeklyData[startIndexWeekly].weeklyVolumeETH = weeklyData[startIndexWeekly].weeklyVolumeETH
               ? weeklyData[startIndexWeekly].weeklyVolumeETH + data[i].dailyEthVolume

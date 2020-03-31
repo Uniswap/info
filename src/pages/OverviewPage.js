@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useMedia } from 'react-use'
 import { Box, Flex, Text } from 'rebass'
 import styled from 'styled-components'
 import FourByFour from '../components/FourByFour'
@@ -167,6 +168,8 @@ export const OverviewPage = function({
 }) {
   const [chartOption, setChartOption] = useState('liquidity')
 
+  const belowSmall = useMedia('(max-width: 40em)')
+
   return (
     <div style={{ marginTop: '0px' }}>
       <ThemedBackground bg="black" />
@@ -262,7 +265,7 @@ export const OverviewPage = function({
                     </TextOption>
                   </Flex>
                   <Flex>
-                    {chartOption === 'volume' && (
+                    {chartOption === 'volume' && !belowSmall && (
                       <Box width={144}>
                         <Select
                           placeholder="Window"

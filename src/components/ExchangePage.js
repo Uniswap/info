@@ -13,16 +13,9 @@ import Chart from './Chart'
 import Loader from './Loader'
 import { Divider, Hint } from '.'
 import { useMedia } from 'react-use'
-import { getTimeFrame } from '../constants'
+import { getTimeFrame, timeframeOptions } from '../constants'
 import Copy from './Copy'
 import { formattedNum } from '../helpers'
-
-const timeframeOptions = [
-  { value: '1week', label: '1 week' },
-  { value: '1month', label: '1 month' },
-  { value: '3months', label: '3 months' },
-  { value: 'all', label: 'All time' }
-]
 
 const SmallText = styled.span`
   font-size: 0.6em;

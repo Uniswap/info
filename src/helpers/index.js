@@ -42,7 +42,7 @@ export const toWeeklyYear = date => {
   var wkStart = new Date(new Date(date).setDate(date.getDate() - lessDays))
   var wkEnd = new Date(new Date(wkStart).setDate(wkStart.getDate() + 6))
 
-  return dayjs.utc(wkStart).format('MMM DD YY') + ' - ' + dayjs.utc(wkEnd).format('MMM DD YY')
+  return dayjs.utc(wkStart).format('MMM DD YYYY') + ' - ' + dayjs.utc(wkEnd).format('MMM DD YYYY')
 }
 
 export const isAddress = value => {

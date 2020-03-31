@@ -19,6 +19,9 @@ export function useChart(exchangeAddress, daysToQuery) {
           case 'all':
             utcStartTime = utcEndTime.subtract(2, 'year').startOf('year')
             break
+          case '1year':
+            utcStartTime = utcEndTime.subtract(1, 'year').startOf('year')
+            break
           case '3months':
             utcStartTime = utcEndTime.subtract(3, 'month')
             break
