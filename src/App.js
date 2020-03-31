@@ -14,7 +14,7 @@ import LocalLoader from './components/LocalLoader'
 
 function App() {
   // set default time box to all time
-  const [historyDaysToQuery, setHistoryDaysToQuery] = useState(timeframeOptions[3].value)
+  const [historyDaysToQuery, setHistoryDaysToQuery] = useState(timeframeOptions[4].value)
 
   // the window to aggregate accross
   const [timeWindow, setTimeWindow] = useState('weekly')
