@@ -16,11 +16,14 @@ function App() {
   // set default time box to all time
   const [historyDaysToQuery, setHistoryDaysToQuery] = useState(timeframeOptions[3].value)
 
+  // the window to aggregate accross
+  const [timeWindow, setTimeWindow] = useState('weekly')
+
   // currency across site can be USD or ETH
   const [currencyUnit, setCurrencyUnit] = useState('USD')
 
   // historical data for chart on overview page
-  const uniswapHistory = useUniswapHistory(historyDaysToQuery)
+  const [uniswapHistory, monthlyHistory, weeklyHistory] = useUniswapHistory(historyDaysToQuery)
 
   // data for Uniswap totals on overview page, may be dependent on values in the future
   const globalData = useGlobalData()
@@ -89,6 +92,10 @@ function App() {
                     currencyUnit={currencyUnit}
                     globalData={globalData}
                     uniswapHistory={uniswapHistory}
+                    monthlyHistory={monthlyHistory}
+                    weeklyHistory={weeklyHistory}
+                    timeWindow={timeWindow}
+                    setTimeWindow={setTimeWindow}
                     historyDaysToQuery={historyDaysToQuery}
                     updateTimeframe={setHistoryDaysToQuery}
                   />

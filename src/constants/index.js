@@ -19,3 +19,22 @@ export const getTimeFrame = current => {
       return timeframeOptions[3]
   }
 }
+
+export const windowOptions = [
+  { value: 'daily', label: 'Daily' },
+  { value: 'weekly', label: 'Weekly' },
+  { value: 'monthly', label: 'Monthly' }
+]
+
+export const getTimeWindow = current => {
+  switch (current) {
+    case 'daily':
+      return windowOptions[0]
+    case 'weekly':
+      return windowOptions[1]
+    case 'monthly':
+      return windowOptions[2]
+    default:
+      return windowOptions[0]
+  }
+}
