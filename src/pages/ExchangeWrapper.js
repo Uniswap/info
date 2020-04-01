@@ -13,11 +13,13 @@ export const ExchangeWrapper = function({
   exchanges,
   currencyUnit,
   historyDaysToQuery,
-  setHistoryDaysToQuery
+  setHistoryDaysToQuery,
+  timeWindow,
+  setTimeWindow
 }) {
   const exchangeData = useExchangeSpecificData(address)
 
-  const chartData = useChart(address, historyDaysToQuery)
+  const [chartData, monthlyData, weeklyData] = useChart(address, historyDaysToQuery)
 
   const [tokenName, setTokenName] = useState('')
 
@@ -103,6 +105,10 @@ export const ExchangeWrapper = function({
       liquidityPercentChange={currentData.liquidityPercentChange}
       liquidityPercentChangeUSD={currentData.liquidityPercentChangeUSD}
       txsPercentChange={currentData.txsPercentChange}
+      monthlyData={monthlyData}
+      weeklyData={weeklyData}
+      timeWindow={timeWindow}
+      setTimeWindow={setTimeWindow}
     />
   ) : (
     <LocalLoader />

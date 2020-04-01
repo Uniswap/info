@@ -10,6 +10,9 @@ export function useChart(exchangeAddress, daysToQuery) {
 
   const [chartData, setChartData] = useState([])
 
+  const [monthlyData, setMonthlyData] = useState([])
+  const [weeklyData, setWeeklyData] = useState([])
+
   useEffect(() => {
     const fetchChartData = async function(exchangeAddress, daysToQuery) {
       try {
@@ -18,6 +21,9 @@ export function useChart(exchangeAddress, daysToQuery) {
         switch (daysToQuery) {
           case 'all':
             utcStartTime = utcEndTime.subtract(2, 'year').startOf('year')
+            break
+          case '1year':
+            utcStartTime = utcEndTime.subtract(1, 'year').startOf('year')
             break
           case '3months':
             utcStartTime = utcEndTime.subtract(3, 'month')
@@ -134,6 +140,54 @@ export function useChart(exchangeAddress, daysToQuery) {
           timestamp = nextDay
         }
         data = data.sort((a, b) => (parseInt(a.date) > parseInt(b.date) ? 1 : -1))
+        // mothly fetching
+        const fetchMonthly = true
+        const monthlyData = []
+        let startIndex = -1
+        let currentMonth = -1
+        if (fetchMonthly) {
+          data.forEach((dayData, i) => {
+            const month = dayjs.utc(dayjs.unix(data[i].date)).month()
+            if (month !== currentMonth) {
+              currentMonth = month
+              startIndex++
+            }
+            monthlyData[startIndex] = monthlyData[startIndex] || {}
+            monthlyData[startIndex].dayString = data[i].date
+            monthlyData[startIndex].monthlyVolumeETH = monthlyData[startIndex].monthlyVolumeETH
+              ? monthlyData[startIndex].monthlyVolumeETH + data[i].ethVolume
+              : data[i].ethVolume
+            monthlyData[startIndex].monthlyVolumeUSD = monthlyData[startIndex].monthlyVolumeUSD
+              ? monthlyData[startIndex].monthlyVolumeUSD + data[i].usdVolume
+              : data[i].usdVolume
+          })
+        }
+
+        // mothly fetching
+        const fetchWeekly = true
+        const weeklyData = []
+        let startIndexWeekly = -1
+        let currentWeek = -1
+        if (fetchWeekly) {
+          data.forEach((dayData, i) => {
+            const week = dayjs.utc(dayjs.unix(data[i].date)).week()
+            if (week !== currentWeek) {
+              currentWeek = week
+              startIndexWeekly++
+            }
+            weeklyData[startIndexWeekly] = weeklyData[startIndexWeekly] || {}
+            weeklyData[startIndexWeekly].dayString = data[i].date
+            weeklyData[startIndexWeekly].weeklyVolumeETH = weeklyData[startIndexWeekly].weeklyVolumeETH
+              ? weeklyData[startIndexWeekly].weeklyVolumeETH + data[i].ethVolume
+              : data[i].ethVolume
+            weeklyData[startIndexWeekly].weeklyVolumeUSD = weeklyData[startIndexWeekly].weeklyVolumeUSD
+              ? weeklyData[startIndexWeekly].weeklyVolumeUSD + data[i].usdVolume
+              : data[i].usdVolume
+          })
+        }
+
+        setWeeklyData(weeklyData)
+        setMonthlyData(monthlyData)
         setChartData(data)
       } catch (err) {
         console.log('error: ', err)
@@ -142,5 +196,5 @@ export function useChart(exchangeAddress, daysToQuery) {
     fetchChartData(exchangeAddress, daysToQuery)
   }, [exchangeAddress, daysToQuery])
 
-  return chartData
+  return [chartData, monthlyData, weeklyData]
 }

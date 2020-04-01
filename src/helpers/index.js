@@ -12,12 +12,38 @@ BigNumber.set({ EXPONENTIAL_AT: 50 })
 dayjs.extend(utc)
 
 export const toNiceDate = date => {
-  // let df = new Date(date * 1000).toUTCString('MMMM DD')
-  let x = dayjs.utc(dayjs.unix(date)).format('MMM DD')
-  return x
+  return dayjs.utc(dayjs.unix(date)).format('MMM DD')
+}
+
+export const toMonthlyDate = date => {
+  return dayjs.utc(dayjs.unix(date)).format('MMM')
+}
+
+export const toWeeklyDate = date => {
+  const formatted = dayjs.utc(dayjs.unix(date))
+  date = new Date(formatted)
+  const day = new Date(formatted).getDay()
+  var lessDays = day === 0 ? 6 : day - 1
+  var wkStart = new Date(new Date(date).setDate(date.getDate() - lessDays))
+  var wkEnd = new Date(new Date(wkStart).setDate(wkStart.getDate() + 6))
+
+  return dayjs.utc(wkStart).format('MMM DD') + ' - ' + dayjs.utc(wkEnd).format('MMM DD')
 }
 
 export const toNiceDateYear = date => dayjs.utc(dayjs.unix(date)).format('MMMM DD, YYYY')
+
+export const toMonthlyYear = date => dayjs.utc(dayjs.unix(date)).format('MMMM YYYY')
+
+export const toWeeklyYear = date => {
+  const formatted = dayjs.utc(dayjs.unix(date))
+  date = new Date(formatted)
+  const day = new Date(formatted).getDay()
+  var lessDays = day === 0 ? 6 : day - 1
+  var wkStart = new Date(new Date(date).setDate(date.getDate() - lessDays))
+  var wkEnd = new Date(new Date(wkStart).setDate(wkStart.getDate() + 6))
+
+  return dayjs.utc(wkStart).format('MMM DD YYYY') + ' - ' + dayjs.utc(wkEnd).format('MMM DD YYYY')
+}
 
 export const isAddress = value => {
   try {

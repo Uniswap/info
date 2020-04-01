@@ -13,16 +13,9 @@ import Chart from './Chart'
 import Loader from './Loader'
 import { Divider, Hint } from '.'
 import { useMedia } from 'react-use'
-import { getTimeFrame } from '../constants'
+import { getTimeFrame, timeframeOptions, windowOptions, getTimeWindow } from '../constants'
 import Copy from './Copy'
 import { formattedNum } from '../helpers'
-
-const timeframeOptions = [
-  { value: '1week', label: '1 week' },
-  { value: '1month', label: '1 month' },
-  { value: '3months', label: '3 months' },
-  { value: 'all', label: 'All time' }
-]
 
 const SmallText = styled.span`
   font-size: 0.6em;
@@ -305,7 +298,11 @@ export const ExchangePage = function({
   chartData,
   tokenAddress,
   historyDaysToQuery,
-  setHistoryDaysToQuery
+  setHistoryDaysToQuery,
+  monthlyData,
+  weeklyData,
+  timeWindow,
+  setTimeWindow
 }) {
   const [chartOption, setChartOption] = useState('liquidity')
 
@@ -320,6 +317,8 @@ export const ExchangePage = function({
   const belowMedium = useMedia('(max-width: 440px)')
 
   const belowLarge = useMedia('(max-width: 64em)')
+
+  const belowSmall = useMedia('(max-width: 44rem)')
 
   function getPercentSign(value) {
     return (
@@ -487,17 +486,32 @@ export const ExchangePage = function({
                     Price
                   </TextOption>
                 </Flex>
-                <Box width={144}>
-                  <Select
-                    placeholder="Timeframe"
-                    options={timeframeOptions}
-                    defaultValue={getTimeFrame(historyDaysToQuery)}
-                    onChange={select => {
-                      setHistoryDaysToQuery(select.value)
-                    }}
-                    customStyles={{ backgroundColor: 'white' }}
-                  />
-                </Box>
+                <Flex>
+                  {chartOption === 'volume' && !belowSmall && (
+                    <Box width={144}>
+                      <Select
+                        placeholder="Window"
+                        options={windowOptions}
+                        defaultValue={getTimeWindow(timeWindow)}
+                        onChange={select => {
+                          setTimeWindow(select.value)
+                        }}
+                        customStyles={{ backgroundColor: 'white' }}
+                      />
+                    </Box>
+                  )}
+                  <Box width={144}>
+                    <Select
+                      placeholder="Timeframe"
+                      options={timeframeOptions}
+                      defaultValue={getTimeFrame(historyDaysToQuery)}
+                      onChange={select => {
+                        setHistoryDaysToQuery(select.value)
+                      }}
+                      customStyles={{ backgroundColor: 'white' }}
+                    />
+                  </Box>
+                </Flex>
               </Flex>
             </Box>
             <Divider />
@@ -507,8 +521,11 @@ export const ExchangePage = function({
                   symbol={symbol}
                   exchangeAddress={exchangeAddress}
                   data={chartData}
+                  weeklyData={weeklyData}
+                  monthlyData={monthlyData}
                   currencyUnit={currencyUnit}
                   chartOption={chartOption}
+                  timeWindow={timeWindow}
                 />
               ) : (
                 <Loader />

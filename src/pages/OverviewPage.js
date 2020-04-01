@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useMedia } from 'react-use'
 import { Box, Flex, Text } from 'rebass'
 import styled from 'styled-components'
 import FourByFour from '../components/FourByFour'
@@ -10,14 +11,7 @@ import OverviewChart from '../components/OverviewChart'
 import Loader from '../components/Loader'
 import { formattedNum } from '../helpers'
 import { Divider, Hint } from '../components'
-import { getTimeFrame } from '../constants'
-
-const timeframeOptions = [
-  { value: '1week', label: '1 week' },
-  { value: '1month', label: '1 month' },
-  { value: '3months', label: '3 months' },
-  { value: 'all', label: 'All time' }
-]
+import { getTimeFrame, timeframeOptions, windowOptions, getTimeWindow } from '../constants'
 
 const SmallText = styled.span`
   font-size: 0.6em;
@@ -166,9 +160,15 @@ export const OverviewPage = function({
   currencyUnit,
   globalData,
   updateTimeframe,
-  historyDaysToQuery
+  historyDaysToQuery,
+  monthlyHistory,
+  weeklyHistory,
+  timeWindow,
+  setTimeWindow
 }) {
   const [chartOption, setChartOption] = useState('liquidity')
+
+  const belowSmall = useMedia('(max-width: 40em)')
 
   return (
     <div style={{ marginTop: '0px' }}>
@@ -264,23 +264,45 @@ export const OverviewPage = function({
                       Volume
                     </TextOption>
                   </Flex>
-                  <Box width={144}>
-                    <Select
-                      placeholder="Timeframe"
-                      options={timeframeOptions}
-                      defaultValue={getTimeFrame(historyDaysToQuery)}
-                      onChange={select => {
-                        updateTimeframe(select.value)
-                      }}
-                      customStyles={{ backgroundColor: 'white' }}
-                    />
-                  </Box>
+                  <Flex>
+                    {chartOption === 'volume' && !belowSmall && (
+                      <Box width={144}>
+                        <Select
+                          placeholder="Window"
+                          options={windowOptions}
+                          defaultValue={getTimeWindow(timeWindow)}
+                          onChange={select => {
+                            setTimeWindow(select.value)
+                          }}
+                          customStyles={{ backgroundColor: 'white' }}
+                        />
+                      </Box>
+                    )}
+                    <Box width={144}>
+                      <Select
+                        placeholder="Timeframe"
+                        options={timeframeOptions}
+                        defaultValue={getTimeFrame(historyDaysToQuery)}
+                        onChange={select => {
+                          updateTimeframe(select.value)
+                        }}
+                        customStyles={{ backgroundColor: 'white' }}
+                      />
+                    </Box>
+                  </Flex>
                 </Flex>
               </Box>
               <Divider />
               <Box p={24} style={{ boxShadow: '0px 4px 20px rgba(239, 162, 250, 0.15)', borderRadius: '10px' }}>
                 {uniswapHistory && uniswapHistory.length > 0 ? (
-                  <OverviewChart data={uniswapHistory} currencyUnit={currencyUnit} chartOption={chartOption} />
+                  <OverviewChart
+                    data={uniswapHistory}
+                    currencyUnit={currencyUnit}
+                    chartOption={chartOption}
+                    monthlyHistory={monthlyHistory}
+                    weeklyHistory={weeklyHistory}
+                    timeWindow={timeWindow}
+                  />
                 ) : (
                   <Loader />
                 )}
