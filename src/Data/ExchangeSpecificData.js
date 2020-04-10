@@ -110,6 +110,9 @@ export function useExchangeSpecificData(exchangeAddress) {
           data48HoursAgo.tradeVolumeUSD ? data48HoursAgo.tradeVolumeUSD : 0
         )
 
+        console.log(tradeVolumeUSD)
+        console.log(data24HoursAgo.tradeVolumeUSD)
+
         // get tx values
         ;[oneDayTxs, txsPercentChange] = get2DayPercentFormatted(
           totalTxsCount,
