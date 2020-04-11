@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import styled from 'styled-components'
+// import styled from 'styled-components'
 import { ApolloProvider } from 'react-apollo'
 import { client } from './apollo/client'
 import { Route, Switch, BrowserRouter, withRouter, Redirect } from 'react-router-dom'
@@ -13,20 +13,20 @@ import { timeframeOptions } from './constants'
 import { useAllExchanges } from './Data/GetAllExchanges'
 import LocalLoader from './components/LocalLoader'
 
-const WarningWrapper = styled.div`
-  width: 100%;
-  display: flex;
-  justify-content: center;
-`
+// const WarningWrapper = styled.div`
+//   width: 100%;
+//   display: flex;
+//   justify-content: center;
+// `
 
-const WarningBanner = styled.div`
-  background-color: #ff6871;
-  padding: 1.5rem;
-  color: white;
-  width: 100%;
-  text-align: center;
-  font-weight: 500;
-`
+// const WarningBanner = styled.div`
+//   background-color: #ff6871;
+//   padding: 1.5rem;
+//   color: white;
+//   width: 100%;
+//   text-align: center;
+//   font-weight: 500;
+// `
 
 function App() {
   // set default time box to all time
@@ -78,9 +78,9 @@ function App() {
   return (
     <ApolloProvider client={client}>
       <Wrapper>
-        <WarningWrapper>
+        {/* <WarningWrapper>
           <WarningBanner>Warning: Some data on this site has not been updated since 04/09/20.</WarningBanner>
-        </WarningWrapper>
+        </WarningWrapper> */}
         <div style={{ position: 'relative' }}>
           {globalData && uniswapHistory && length > 0 ? (
             <BrowserRouter>
