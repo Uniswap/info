@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from "react"
-import styled from "styled-components"
-import dayjs from "dayjs"
-import utc from "dayjs/plugin/utc"
+import React, { useState, useEffect } from 'react'
+import styled from 'styled-components'
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
 
-import { formatTime, formattedNum } from "../../helpers"
-import { useMedia } from "react-use"
-import { useCurrentCurrency } from "../../contexts/Application"
+import { formatTime, formattedNum } from '../../helpers'
+import { useMedia } from 'react-use'
+import { useCurrentCurrency } from '../../contexts/Application'
 
-import LocalLoader from "../LocalLoader"
-import { Box, Flex, Text } from "rebass"
-import Link from "../Link"
-import { Divider } from ".."
+import LocalLoader from '../LocalLoader'
+import { Box, Flex, Text } from 'rebass'
+import Link from '../Link'
+import { Divider } from '..'
 
 dayjs.extend(utc)
 
@@ -40,7 +40,7 @@ const DashGrid = styled.div`
   display: grid;
   grid-gap: 1em;
   grid-template-columns: 100px 1fr 1fr;
-  grid-template-areas: "action value Time";
+  grid-template-areas: 'action value Time';
   padding: 0 6px;
 
   > * {
@@ -59,7 +59,7 @@ const DashGrid = styled.div`
     display: grid;
     grid-gap: 1em;
     grid-template-columns: 180px 1fr 1fr;
-    grid-template-areas: "action value Time";
+    grid-template-areas: 'action value Time';
 
     > * {
       justify-content: flex-end;
@@ -78,7 +78,7 @@ const DashGrid = styled.div`
     padding: 0 24px;
     grid-gap: 1em;
     grid-template-columns: 1.2fr 1fr 1fr 1fr 1fr 1fr;
-    grid-template-areas: "txn value amountToken amountOther account time";
+    grid-template-areas: 'txn value amountToken amountOther account time';
   }
 `
 
@@ -111,14 +111,14 @@ const DataText = styled(Flex)`
 `
 
 const SORT_FIELD = {
-  VALUE: "valueUSD",
-  AMOUNT0: "token0Amount",
-  AMOUNT1: "token1Amount",
-  TIMESTAMP: "timestamp"
+  VALUE: 'valueUSD',
+  AMOUNT0: 'token0Amount',
+  AMOUNT1: 'token1Amount',
+  TIMESTAMP: 'timestamp'
 }
 
 // @TODO rework into virtualized list
-function TxnList({ txns, txFilter }) {
+function TxnList({ transactions, txFilter }) {
   // page state
   const [page, setPage] = useState(1)
   const [maxPage, setMaxPage] = useState(1)
@@ -134,59 +134,64 @@ function TxnList({ txns, txFilter }) {
   useEffect(() => {
     setMaxPage(1) // edit this to do modular
     setPage(1)
-  }, [txns])
+  }, [transactions])
 
   const TXN_TYPE = {
-    SWAP: "SWAP",
-    ADD: "ADD",
-    REMOVE: "REMOVE"
+    SWAP: 'SWAP',
+    ADD: 'ADD',
+    REMOVE: 'REMOVE'
   }
 
   // parse the txns and format for UI
   useEffect(() => {
-    if (txns) {
+    if (transactions) {
       let newTxns = []
-      txns.mints.map(mint => {
-        let newTxn = {}
-        newTxn.timestamp = mint.timestamp
-        newTxn.type = TXN_TYPE.ADD
-        newTxn.token0Amount = mint.amount0
-        newTxn.token1Amount = mint.amount1
-        newTxn.account = mint.to
-        newTxn.token0Symbol = mint.token0.symbol
-        newTxn.token1Symbol = mint.token1.symbol
-        newTxn.valueUSD = mint.valueUSD
-        newTxn.valueETH = mint.valueETH
-        return newTxns.push(newTxn)
+      transactions.map(transaction => {
+        if (transaction.mints.length > 0) {
+          transaction.mints.map(mint => {
+            let newTxn = {}
+            newTxn.timestamp = transaction.timestamp
+            newTxn.type = TXN_TYPE.ADD
+            newTxn.token0Amount = mint.amount0
+            newTxn.token1Amount = mint.amount1
+            newTxn.account = mint.to
+            newTxn.token0Symbol = mint.pair.token0.symbol
+            newTxn.token1Symbol = mint.pair.token1.symbol
+            newTxn.valueUSD = mint.amountUSD
+            return newTxns.push(newTxn)
+          })
+        }
+        if (transaction.burns.length > 0) {
+          transaction.burns.map(burn => {
+            let newTxn = {}
+            newTxn.timestamp = transaction.timestamp
+            newTxn.type = TXN_TYPE.REMOVE
+            newTxn.token0Amount = burn.amount0
+            newTxn.token1Amount = burn.amount1
+            newTxn.account = burn.from
+            newTxn.token0Symbol = burn.pair.token0.symbol
+            newTxn.token1Symbol = burn.pair.token1.symbol
+            newTxn.valueUSD = burn.amountUSD
+            return newTxns.push(newTxn)
+          })
+        }
+        if (transaction.swaps.length > 0) {
+          transaction.swaps.map(swap => {
+            let newTxn = {}
+            newTxn.timestamp = transaction.timestamp
+            newTxn.type = TXN_TYPE.SWAP
+            newTxn.token0Amount = swap.amountSold
+            newTxn.token1Amount = swap.amountBought
+            newTxn.token0Symbol = swap.pair.token0.symbol
+            newTxn.token1Symbol = swap.pair.token1.symbol
+            newTxn.account = swap.to
+            return newTxns.push(newTxn)
+          })
+        }
       })
-      txns.burns.map(burn => {
-        let newTxn = {}
-        newTxn.timestamp = burn.timestamp
-        newTxn.type = TXN_TYPE.REMOVE
-        newTxn.token0Amount = burn.amount0
-        newTxn.token1Amount = burn.amount1
-        newTxn.account = burn.from
-        newTxn.token0Symbol = burn.token0.symbol
-        newTxn.token1Symbol = burn.token1.symbol
-        newTxn.valueUSD = burn.valueUSD
-        newTxn.valueETH = burn.valueETH
-        return newTxns.push(newTxn)
-      })
-      txns.swaps.map(swap => {
-        let newTxn = {}
-        newTxn.timestamp = swap.timestamp
-        newTxn.type = TXN_TYPE.SWAP
-        newTxn.token0Amount = swap.amountSold
-        newTxn.token1Amount = swap.amountBought
-        newTxn.token0Symbol = swap.tokenSold.symbol
-        newTxn.token1Symbol = swap.tokenBought.symbol
-        newTxn.valueUSD = swap.valueUSD
-        newTxn.valueETH = swap.valueETH
-        newTxn.account = swap.to
-        return newTxns.push(newTxn)
-      })
+
       const filtered = newTxns.filter(item => {
-        if (txFilter !== "ALL") {
+        if (txFilter !== 'ALL') {
           return item.type === txFilter
         }
         return true
@@ -202,7 +207,7 @@ function TxnList({ txns, txFilter }) {
         setMaxPage(Math.floor(filtered.length / ITEMS_PER_PAGE) + extraPages)
       }
     }
-  }, [txns, TXN_TYPE.ADD, TXN_TYPE.REMOVE, TXN_TYPE.SWAP, txFilter])
+  }, [transactions, TXN_TYPE.ADD, TXN_TYPE.REMOVE, TXN_TYPE.SWAP, txFilter])
 
   useEffect(() => {
     setPage(1)
@@ -211,13 +216,13 @@ function TxnList({ txns, txFilter }) {
   function getTransactionType(event, symbol0, symbol1) {
     switch (event) {
       case TXN_TYPE.ADD:
-        return "Add " + symbol0 + " and " + symbol1
+        return 'Add ' + symbol0 + ' and ' + symbol1
       case TXN_TYPE.REMOVE:
-        return "Remove " + symbol0 + " and " + symbol1
+        return 'Remove ' + symbol0 + ' and ' + symbol1
       case TXN_TYPE.SWAP:
-        return "Swap " + symbol0 + " for " + symbol1
+        return 'Swap ' + symbol0 + ' for ' + symbol1
       default:
-        return ""
+        return ''
     }
   }
 
@@ -231,35 +236,24 @@ function TxnList({ txns, txFilter }) {
       })
       .slice(ITEMS_PER_PAGE * (page - 1), page * ITEMS_PER_PAGE)
 
-  const belowMedium = useMedia("(max-width: 64em)")
+  const belowMedium = useMedia('(max-width: 64em)')
 
   const ListItem = ({ item }) => {
     return (
-      <DashGrid style={{ height: "60px" }}>
+      <DashGrid style={{ height: '60px' }}>
         <DataText area="txn" fontWeight="500">
-          <Link external href={"https://etherscan.io/address/" + item.account}>
-            {getTransactionType(
-              item.type,
-              item.token0Symbol,
-              item.token1Symbol
-            )}
+          <Link external href={'https://etherscan.io/address/' + item.account}>
+            {getTransactionType(item.type, item.token0Symbol, item.token1Symbol)}
           </Link>
         </DataText>
         <DataText area="value" color="text" fontWeight="500">
-          {currency === "ETH"
-            ? "Ξ " + formattedNum(item.valueETH)
-            : formattedNum(item.valueUSD, true)}
+          {currency === 'ETH' ? 'Ξ ' + formattedNum(item.valueETH) : formattedNum(item.valueUSD, true)}
         </DataText>
-        <DataText area="amountToken">
-          {formattedNum(item.token0Amount)}
-        </DataText>
-        <DataText area="amountOther">
-          {formattedNum(item.token1Amount)}
-        </DataText>
+        <DataText area="amountToken">{formattedNum(item.token0Amount)}</DataText>
+        <DataText area="amountOther">{formattedNum(item.token1Amount)}</DataText>
         <DataText area="account">
-          <Link external href={"https://etherscan.io/address/" + item.account}>
-            {item.account &&
-              item.account.slice(0, 6) + "..." + item.account.slice(38, 42)}
+          <Link external href={'https://etherscan.io/address/' + item.account}>
+            {item.account && item.account.slice(0, 6) + '...' + item.account.slice(38, 42)}
           </Link>
         </DataText>
         <DataText area="time">{formatTime(item.timestamp)}</DataText>
@@ -269,7 +263,7 @@ function TxnList({ txns, txFilter }) {
 
   return (
     <ListWrapper>
-      <DashGrid center={true} style={{ height: "60px" }}>
+      <DashGrid center={true} style={{ height: '60px' }}>
         <Flex alignItems="center">
           <Text color="text" area="txn" fontWeight="500">
             Transactions
@@ -284,12 +278,7 @@ function TxnList({ txns, txFilter }) {
               setSortDirection(!sortDirection)
             }}
           >
-            Value{" "}
-            {sortedColumn === SORT_FIELD.VALUE
-              ? !sortDirection
-                ? "↑"
-                : "↓"
-              : ""}
+            Value {sortedColumn === SORT_FIELD.VALUE ? (!sortDirection ? '↑' : '↓') : ''}
           </ClickableText>
         </Flex>
         <Flex alignItems="center">
@@ -301,12 +290,7 @@ function TxnList({ txns, txFilter }) {
               setSortDirection(!sortDirection)
             }}
           >
-            Token Amount{" "}
-            {sortedColumn === SORT_FIELD.AMOUNT0
-              ? !sortDirection
-                ? "↑"
-                : "↓"
-              : ""}
+            Token Amount {sortedColumn === SORT_FIELD.AMOUNT0 ? (!sortDirection ? '↑' : '↓') : ''}
           </ClickableText>
         </Flex>
         {!belowMedium ? (
@@ -320,12 +304,7 @@ function TxnList({ txns, txFilter }) {
                   setSortDirection(!sortDirection)
                 }}
               >
-                Other Amount{" "}
-                {sortedColumn === SORT_FIELD.AMOUNT1
-                  ? !sortDirection
-                    ? "↑"
-                    : "↓"
-                  : ""}
+                Other Amount {sortedColumn === SORT_FIELD.AMOUNT1 ? (!sortDirection ? '↑' : '↓') : ''}
               </ClickableText>
             </Flex>
             <Flex alignItems="center">
@@ -342,17 +321,12 @@ function TxnList({ txns, txFilter }) {
                   setSortDirection(!sortDirection)
                 }}
               >
-                Time{" "}
-                {sortedColumn === SORT_FIELD.TIMESTAMP
-                  ? !sortDirection
-                    ? "↑"
-                    : "↓"
-                  : ""}
+                Time {sortedColumn === SORT_FIELD.TIMESTAMP ? (!sortDirection ? '↑' : '↓') : ''}
               </ClickableText>
             </Flex>
           </>
         ) : (
-          ""
+          ''
         )}
       </DashGrid>
       <Divider />
@@ -378,7 +352,7 @@ function TxnList({ txns, txFilter }) {
         >
           <Arrow faded={page === 1 ? true : false}>←</Arrow>
         </div>
-        {"Page " + page + " of " + maxPage}
+        {'Page ' + page + ' of ' + maxPage}
         <div
           onClick={e => {
             setPage(page === maxPage ? page : page + 1)

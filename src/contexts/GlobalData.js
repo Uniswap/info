@@ -1,40 +1,24 @@
-import React, {
-  createContext,
-  useContext,
-  useReducer,
-  useMemo,
-  useCallback,
-  useEffect
-} from "react"
+import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect } from 'react'
 
-import { client } from "../apollo/client"
-import {
-  GLOBAL_DATA,
-  GLOBAL_TXNS,
-  GLOBAL_HISTORICAL_DATA,
-  GLOBAL_CHART,
-  ETH_PRICE
-} from "../apollo/queries"
+import { client } from '../apollo/client'
+import { GLOBAL_DATA, GLOBAL_TXNS, GLOBAL_CHART, ETH_PRICE } from '../apollo/queries'
 
-import dayjs from "dayjs"
-import utc from "dayjs/plugin/utc"
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
 
-import { get2DayPercentFormatted, getPercentFormatted } from "../helpers"
+import { get2DayPercentFormatted, getPercentFormatted } from '../helpers'
 
-const UPDATE = "UPDATE"
-const UPDATE_TXNS = "UPDATE_TXNS"
-const UPDATE_CHART = "UPDATE_CHART"
-const UPDATE_ETH_PRICE = "UPDATE_ETH_PRICE"
+const UPDATE = 'UPDATE'
+const UPDATE_TXNS = 'UPDATE_TXNS'
+const UPDATE_CHART = 'UPDATE_CHART'
+const UPDATE_ETH_PRICE = 'UPDATE_ETH_PRICE'
 
 dayjs.extend(utc)
 
 export function safeAccess(object, path) {
   return object
     ? path.reduce(
-        (accumulator, currentValue) =>
-          accumulator && accumulator[currentValue]
-            ? accumulator[currentValue]
-            : null,
+        (accumulator, currentValue) => (accumulator && accumulator[currentValue] ? accumulator[currentValue] : null),
         object
       )
     : null
@@ -61,18 +45,16 @@ function reducer(state, { type, payload }) {
         volumeChangeUSD: data.volumeChangeUSD,
         volumeChangeETH: data.volumeChangeETH,
         liquidityChangeUSD: data.liquidityChangeUSD,
-        liquidityChangeETH: data.liquidityChangeETH
+        liquidityChangeETH: data.liquidityChangeETH,
+        oneDayTxns: data.oneDayTxns,
+        txnChange: data.txnChange
       }
     }
     case UPDATE_TXNS: {
-      const { mints, burns, swaps } = payload
+      const { transactions } = payload
       return {
         ...state,
-        txns: {
-          mints,
-          burns,
-          swaps
-        }
+        transactions
       }
     }
     case UPDATE_CHART: {
@@ -105,13 +87,11 @@ export default function Provider({ children }) {
     })
   }, [])
 
-  const updateTransactions = useCallback((mints, burns, swaps) => {
+  const updateTransactions = useCallback(transactions => {
     dispatch({
       type: UPDATE_TXNS,
       payload: {
-        mints,
-        burns,
-        swaps
+        transactions
       }
     })
   }, [])
@@ -136,13 +116,13 @@ export default function Provider({ children }) {
 
   return (
     <GlobalDataContext.Provider
-      value={useMemo(
-        () => [
-          state,
-          { update, updateTransactions, updateChart, updateEthPrice }
-        ],
-        [state, update, updateTransactions, updateChart, updateEthPrice]
-      )}
+      value={useMemo(() => [state, { update, updateTransactions, updateChart, updateEthPrice }], [
+        state,
+        update,
+        updateTransactions,
+        updateChart,
+        updateEthPrice
+      ])}
     >
       {children}
     </GlobalDataContext.Provider>
@@ -150,30 +130,29 @@ export default function Provider({ children }) {
 }
 
 async function getGlobalData() {
+  // const utcCurrentTime = dayjs()
+  // const utcOneDayBack = utcCurrentTime.subtract(1, 'day')
+  // const utcTwoDaysBack = utcCurrentTime.subtract(2, 'day')
+  let currentBlock = 6432338
+  let oneDayBlock = 6426343
+  let twoDayBlock = 6420546
+
   let result = await client.query({
-    query: GLOBAL_DATA,
-    fetchPolicy: "cache-first"
+    query: GLOBAL_DATA(currentBlock),
+    fetchPolicy: 'cache-first'
   })
-  let data = result.data.uniswaps[0]
-  const utcCurrentTime = dayjs()
-  const utcOneDayBack = utcCurrentTime.subtract(1, "day")
-  const utcTwoDaysBack = utcCurrentTime.subtract(2, "day")
+  let data = result.data.uniswapFactories[0]
   let oneDayResult = await client.query({
-    query: GLOBAL_HISTORICAL_DATA,
-    fetchPolicy: "cache-first",
-    variables: {
-      timestamp: utcOneDayBack.unix()
-    }
+    query: GLOBAL_DATA(oneDayBlock),
+    fetchPolicy: 'cache-first'
   })
-  let oneDayData = oneDayResult.data.uniswapHistoricalDatas[0]
+  let oneDayData = oneDayResult.data.uniswapFactories[0]
+
   let twoDayResult = await client.query({
-    query: GLOBAL_HISTORICAL_DATA,
-    variables: {
-      timestamp: utcTwoDaysBack.unix()
-    },
-    fetchPolicy: "cache-first"
+    query: GLOBAL_DATA(twoDayBlock),
+    fetchPolicy: 'cache-first'
   })
-  let twoDayData = twoDayResult.data.uniswapHistoricalDatas[0]
+  let twoDayData = twoDayResult.data.uniswapFactories[0]
   if (data && oneDayData && twoDayData) {
     const [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentFormatted(
       data.totalVolumeUSD,
@@ -187,31 +166,34 @@ async function getGlobalData() {
       twoDayData.totalVolumeETH ? twoDayData.totalVolumeETH : 0
     )
 
-    const liquidityChangeUSD = getPercentFormatted(
-      data.totalLiquidityUSD,
-      oneDayData.totalLiquidityUSD
+    const [oneDayTxns, txnChange] = get2DayPercentFormatted(
+      data.txCount,
+      oneDayData.txCount ? oneDayData.txCount : 0,
+      twoDayData.txCount ? twoDayData.txCount : 0
     )
-    const liquidityChangeETH = getPercentFormatted(
-      data.totalLiquidityETH,
-      oneDayData.totalLiquidityETH
-    )
+
+    const liquidityChangeUSD = getPercentFormatted(data.totalLiquidityUSD, oneDayData.totalLiquidityUSD)
+    const liquidityChangeETH = getPercentFormatted(data.totalLiquidityETH, oneDayData.totalLiquidityETH)
     data.oneDayVolumeUSD = oneDayVolumeUSD
     data.volumeChangeUSD = volumeChangeUSD
     data.oneDayVolumeETH = oneDayVolumeETH
     data.volumeChangeETH = volumeChangeETH
     data.liquidityChangeUSD = liquidityChangeUSD
     data.liquidityChangeETH = liquidityChangeETH
+    data.oneDayTxns = oneDayTxns
+    data.txnChange = txnChange
   }
+
   return data
 }
 
 const getChartData = async () => {
   const utcEndTime = dayjs.utc()
-  let utcStartTime = utcEndTime.subtract(1, "year")
+  let utcStartTime = utcEndTime.subtract(1, 'year')
   let startTime = utcStartTime.unix() - 1
   let result = await client.query({
     query: GLOBAL_CHART,
-    fetchPolicy: "network-only"
+    fetchPolicy: 'network-only'
   })
   let data = result.data.uniswapDayDatas
   let dayIndexSet = new Set()
@@ -222,6 +204,7 @@ const getChartData = async () => {
     dayIndexSet.add((data[i].date / oneDay).toFixed(0))
     dayIndexArray.push(data[i])
   })
+
   // fill in empty days
   let timestamp = data[0].date ? data[0].date : startTime
   let latestLiquidityUSD = data[0].totalLiquidityUSD
@@ -253,21 +236,17 @@ const getChartData = async () => {
 const getGlobalTransactions = async () => {
   let result = await client.query({
     query: GLOBAL_TXNS,
-    fetchPolicy: "cache-first"
+    fetchPolicy: 'cache-first'
   })
-  return [result.data.mints, result.data.burns, result.data.swaps]
+  return result.data.transactions
 }
 
 const getEthPrice = async () => {
   let result = await client.query({
     query: ETH_PRICE,
-    fetchPolicy: "cache-first"
+    fetchPolicy: 'cache-first'
   })
-  return result &&
-    result.data &&
-    result.data.bundles &&
-    result.data.bundles[0] &&
-    result.data.bundles[0].ethPrice
+  return result && result.data && result.data.bundles && result.data.bundles[0] && result.data.bundles[0].ethPrice
     ? result.data.bundles[0].ethPrice
     : 0
 }
@@ -278,8 +257,8 @@ export function Updater() {
     async function fetchData() {
       let globalData = await getGlobalData()
       update(globalData)
-      let [mints, burns, swaps] = await getGlobalTransactions()
-      updateTransactions(mints, burns, swaps)
+      let txns = await getGlobalTransactions()
+      updateTransactions(txns)
       let chartData = await getChartData()
       updateChart(chartData)
     }
@@ -305,7 +284,7 @@ export function useGlobalData() {
 
 export function useEthPrice() {
   const [state, { updateEthPrice }] = useGlobalDataContext()
-  const ethPrice = safeAccess(state, ["ethPrice"])
+  const ethPrice = safeAccess(state, ['ethPrice'])
   useEffect(() => {
     async function checkForEthPrice() {
       if (!ethPrice) {

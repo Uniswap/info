@@ -1,41 +1,25 @@
-import React, {
-  createContext,
-  useContext,
-  useReducer,
-  useMemo,
-  useCallback,
-  useEffect
-} from "react"
+import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect } from 'react'
 
-import { client } from "../apollo/client"
-import {
-  PAIR_DATA,
-  PAIR_HISTORICAL_DATA,
-  PAIR_CHART,
-  PAIR_TXNS,
-  All_PAIRS
-} from "../apollo/queries"
+import { client } from '../apollo/client'
+import { PAIR_DATA, PAIR_CHART, PAIR_TXNS, All_PAIRS } from '../apollo/queries'
 
-import { useEthPrice } from "./GlobalData"
+import { useEthPrice } from './GlobalData'
 
-import dayjs from "dayjs"
-import utc from "dayjs/plugin/utc"
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
 
-import { get2DayPercentFormatted, getPercentFormatted } from "../helpers"
+import { get2DayPercentFormatted, getPercentFormatted } from '../helpers'
 
-const UPDATE = "UPDATE"
-const UPDATE_PAIR_TXNS = "UPDATE_PAIR_TXNS"
-const UPDATE_CHART_DATA = "UPDATE_CHART_DATA"
+const UPDATE = 'UPDATE'
+const UPDATE_PAIR_TXNS = 'UPDATE_PAIR_TXNS'
+const UPDATE_CHART_DATA = 'UPDATE_CHART_DATA'
 
 dayjs.extend(utc)
 
 export function safeAccess(object, path) {
   return object
     ? path.reduce(
-        (accumulator, currentValue) =>
-          accumulator && accumulator[currentValue]
-            ? accumulator[currentValue]
-            : null,
+        (accumulator, currentValue) => (accumulator && accumulator[currentValue] ? accumulator[currentValue] : null),
         object
       )
     : null
@@ -120,10 +104,12 @@ export default function Provider({ children }) {
 
   return (
     <PairDataContext.Provider
-      value={useMemo(
-        () => [state, { update, updatePairTxns, updateChartData }],
-        [state, update, updatePairTxns, updateChartData]
-      )}
+      value={useMemo(() => [state, { update, updatePairTxns, updateChartData }], [
+        state,
+        update,
+        updatePairTxns,
+        updateChartData
+      ])}
     >
       {children}
     </PairDataContext.Provider>
@@ -134,45 +120,39 @@ const getAllPairs = async () => {
   let data = []
   let result = await client.query({
     query: All_PAIRS,
-    fetchPolicy: "cache-first"
+    fetchPolicy: 'cache-first'
   })
-  data = data.concat(result.data.exchanges)
+  data = data.concat(result.data.pairs)
   return data
 }
 
 const getPairData = async (address, ethPrice) => {
+  let currentBlock = 6432338
+  let oneDayBlock = 6426343
+  let twoDayBlock = 6420546
+  // const utcCurrentTime = dayjs()
+  // const utcOneDayBack = utcCurrentTime.subtract(1, 'day')
+  // const utcTwoDaysBack = utcCurrentTime.subtract(2, 'day')
+
   let data = []
   let result = await client.query({
-    query: PAIR_DATA,
-    variables: {
-      exchangeAddress: address
-    },
-    fetchPolicy: "no-cache"
+    query: PAIR_DATA(address, currentBlock),
+    fetchPolicy: 'no-cache'
   })
-  data = result.data && result.data.exchanges && result.data.exchanges[0]
+  data = result.data && result.data.pairs && result.data.pairs[0]
   let oneDayData = []
   let twoDayData = []
-  const utcCurrentTime = dayjs()
-  const utcOneDayBack = utcCurrentTime.subtract(1, "day")
-  const utcTwoDaysBack = utcCurrentTime.subtract(2, "day")
+
   let oneDayResult = await client.query({
-    query: PAIR_HISTORICAL_DATA,
-    variables: {
-      pairAddress: address,
-      timestamp: utcOneDayBack.unix()
-    },
-    fetchPolicy: "no-cache"
+    query: PAIR_DATA(address, oneDayBlock),
+    fetchPolicy: 'no-cache'
   })
-  oneDayData = oneDayResult.data.exchangeHistoricalDatas[0]
+  oneDayData = oneDayResult.data.pairs[0]
   let twoDayResult = await client.query({
-    query: PAIR_HISTORICAL_DATA,
-    variables: {
-      pairAddress: address,
-      timestamp: utcTwoDaysBack.unix()
-    },
-    fetchPolicy: "no-cache"
+    query: PAIR_DATA(address, twoDayBlock),
+    fetchPolicy: 'no-cache'
   })
-  twoDayData = twoDayResult.data.exchangeHistoricalDatas[0]
+  twoDayData = twoDayResult.data.pairs[0]
   if (data && oneDayData && twoDayData) {
     const [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentFormatted(
       data.tradeVolumeUSD,
@@ -185,14 +165,8 @@ const getPairData = async (address, ethPrice) => {
       twoDayData.tradeVolumeETH ? twoDayData.tradeVolumeETH : 0
     )
 
-    const liquidityChangeUSD = getPercentFormatted(
-      data.combinedBalanceETH * ethPrice,
-      oneDayData.combinedBalanceUSD
-    )
-    const liquidityChangeETH = getPercentFormatted(
-      data.combinedBalanceETH,
-      oneDayData.combinedBalanceETH
-    )
+    const liquidityChangeUSD = getPercentFormatted(data.combinedBalanceETH * ethPrice, oneDayData.combinedBalanceUSD)
+    const liquidityChangeETH = getPercentFormatted(data.combinedBalanceETH, oneDayData.combinedBalanceETH)
     data.combinedBalanceUSD = data.combinedBalanceETH * ethPrice
     data.oneDayVolumeUSD = oneDayVolumeUSD
     data.oneDayVolumeETH = oneDayVolumeETH
@@ -219,8 +193,9 @@ const getPairTransactions = async pairAddress => {
     variables: {
       pairAddress: pairAddress
     },
-    fetchPolicy: "no-cache"
+    fetchPolicy: 'no-cache'
   })
+
   let mints = result.data.mints
   let burns = result.data.burns
   let swaps = result.data.swaps
@@ -230,18 +205,16 @@ const getPairTransactions = async pairAddress => {
 const getPairChartData = async pairAddress => {
   let data = []
   const utcEndTime = dayjs.utc()
-  let utcStartTime = utcEndTime.subtract(1, "month")
+  let utcStartTime = utcEndTime.subtract(1, 'month')
   let startTime = utcStartTime.unix() - 1
   let result = await client.query({
     query: PAIR_CHART,
     variables: {
-      exchangeAddress: pairAddress
+      pairAddress: pairAddress
     },
-    fetchPolicy: "cache-first"
+    fetchPolicy: 'cache-first'
   })
-  data = data.concat(
-    result.data.exchangeDayDatas && result.data.exchangeDayDatas[0]
-  )
+  data = data.concat(result.data.pairDayDatas && result.data.pairDayDatas[0])
   let dayIndexSet = new Set()
   let dayIndexArray = []
   const oneDay = 24 * 60 * 60
@@ -311,7 +284,7 @@ export function usePairData(pairAddress) {
 
 export function usePairTransactions(pairAddress) {
   const [state, { updatePairTxns }] = usePairDataContext()
-  const pairTxns = safeAccess(state, [pairAddress, "txns"])
+  const pairTxns = safeAccess(state, [pairAddress, 'txns'])
   useEffect(() => {
     async function checkForTxns() {
       if (!pairTxns) {
@@ -326,7 +299,7 @@ export function usePairTransactions(pairAddress) {
 
 export function usePairChartData(pairAddress) {
   const [state, { updateChartData }] = usePairDataContext()
-  const chartData = safeAccess(state, [pairAddress, "chartData"])
+  const chartData = safeAccess(state, [pairAddress, 'chartData'])
   useEffect(() => {
     async function checkForChartData() {
       if (!chartData) {

@@ -1,23 +1,23 @@
-import React, { useState, useEffect } from "react"
-import "feather-icons"
-import { Text, Flex } from "rebass"
-import styled from "styled-components"
+import React, { useState, useEffect } from 'react'
+import 'feather-icons'
+import { Text, Flex } from 'rebass'
+import styled from 'styled-components'
 
-import { GlobalSearch } from "../components/Search"
-import { RowFlat } from "../components/Row"
-import Column from "../components/Column"
-import { Hint } from "../components"
-import PairList from "../components/PairList"
-import TopTokenList from "../components/TopTokenList"
-import TxnList from "../components/TxnList"
-import GlobalChart from "../components/GlobalChart"
+import { GlobalSearch } from '../components/Search'
+import { RowFlat } from '../components/Row'
+import Column from '../components/Column'
+import { Hint } from '../components'
+import PairList from '../components/PairList'
+import TopTokenList from '../components/TopTokenList'
+import TxnList from '../components/TxnList'
+import GlobalChart from '../components/GlobalChart'
 
-import { formattedNum } from "../helpers"
-import { useColor } from "../contexts/Application"
-import { useGlobalData, useEthPrice } from "../contexts/GlobalData"
-import { useAllTokenData } from "../contexts/TokenData"
-import { useCurrentCurrency } from "../contexts/Application"
-import { useAllPairs } from "../contexts/PairData"
+import { formattedNum } from '../helpers'
+import { useColor } from '../contexts/Application'
+import { useGlobalData, useEthPrice } from '../contexts/GlobalData'
+import { useAllTokenData } from '../contexts/TokenData'
+import { useCurrentCurrency } from '../contexts/Application'
+import { useAllPairs } from '../contexts/PairData'
 
 const PageWrapper = styled.div`
   width: 100%;
@@ -112,8 +112,8 @@ const PaddedGroup = styled.div`
 `
 
 function GlobalPage() {
-  const [txFilter, setTxFilter] = useState("ALL")
-  const [tokenFilter, setTokenFilter] = useState("TOKENS")
+  const [txFilter, setTxFilter] = useState('ALL')
+  const [tokenFilter, setTokenFilter] = useState('TOKENS')
 
   const {
     totalLiquidityUSD,
@@ -124,7 +124,7 @@ function GlobalPage() {
     volumeChangeETH,
     liquidityChangeUSD,
     liquidityChangeETH,
-    txns,
+    transactions,
     chartData
   } = useGlobalData()
 
@@ -137,35 +137,24 @@ function GlobalPage() {
 
   const [, setColor] = useColor()
 
-  const liquidity =
-    currency === "ETH"
-      ? formattedNum(totalLiquidityETH)
-      : formattedNum(totalLiquidityUSD, true)
+  const liquidity = currency === 'ETH' ? formattedNum(totalLiquidityETH) : formattedNum(totalLiquidityUSD, true)
 
   const liquidityChange =
-    currency === "ETH"
-      ? formattedNum(liquidityChangeETH) + "%"
-      : formattedNum(liquidityChangeUSD) + "%"
+    currency === 'ETH' ? formattedNum(liquidityChangeETH) + '%' : formattedNum(liquidityChangeUSD) + '%'
 
-  const volume =
-    currency === "ETH"
-      ? formattedNum(oneDayVolumeETH, true)
-      : formattedNum(oneDayVolumeUSD, true)
+  const volume = currency === 'ETH' ? formattedNum(oneDayVolumeETH, true) : formattedNum(oneDayVolumeUSD, true)
 
-  const volumeChange =
-    currency === "ETH"
-      ? formattedNum(volumeChangeETH) + "%"
-      : formattedNum(volumeChangeUSD) + "%"
+  const volumeChange = currency === 'ETH' ? formattedNum(volumeChangeETH) + '%' : formattedNum(volumeChangeUSD) + '%'
 
   useEffect(() => {
-    setColor("#FE6DDE")
+    setColor('#FE6DDE')
   }, [setColor])
 
   return (
     <PageWrapper>
       <ThemedBackground />
       <GlobalSearch />
-      <GridRow style={{ marginTop: "40px" }}>
+      <GridRow style={{ marginTop: '40px' }}>
         <LeftGroup>
           <Panel>
             <PaddedGroup>
@@ -176,7 +165,7 @@ function GlobalPage() {
                   </Text>
                   <Text marginLeft="10px">{liquidityChange}</Text>
                 </RowFlat>
-                <RowFlat style={{ marginTop: "10px" }}>
+                <RowFlat style={{ marginTop: '10px' }}>
                   <Hint>ETH Uniprice</Hint>
                 </RowFlat>
               </Column>
@@ -191,7 +180,7 @@ function GlobalPage() {
                   </Text>
                   <Text marginLeft="10px">{liquidityChange}</Text>
                 </RowFlat>
-                <RowFlat style={{ marginTop: "10px" }}>
+                <RowFlat style={{ marginTop: '10px' }}>
                   <Hint>Total Liquidity</Hint>
                 </RowFlat>
               </Column>
@@ -202,7 +191,7 @@ function GlobalPage() {
                   </Text>
                   <Text marginLeft="10px">{volumeChange}</Text>
                 </RowFlat>
-                <RowFlat style={{ marginTop: "10px" }}>
+                <RowFlat style={{ marginTop: '10px' }}>
                   <Hint>Volume (24hrs)</Hint>
                 </RowFlat>
               </Column>
@@ -213,7 +202,7 @@ function GlobalPage() {
                   </Text>
                   <Text marginLeft="10px">{volumeChange}</Text>
                 </RowFlat>
-                <RowFlat style={{ marginTop: "10px" }}>
+                <RowFlat style={{ marginTop: '10px' }}>
                   <Hint>Transactions (24hrs)</Hint>
                 </RowFlat>
               </Column>
@@ -226,74 +215,72 @@ function GlobalPage() {
           </ChartWrapper>
         </Panel>
       </GridRow>
-      <Panel style={{ marginTop: "6px" }}>
+      <Panel style={{ marginTop: '6px' }}>
         <PaddedGroup>
           <ListOptions>
             <OptionsWrappper>
               <Text
                 onClick={() => {
-                  setTokenFilter("TOKENS")
+                  setTokenFilter('TOKENS')
                 }}
-                color={tokenFilter === "TOKENS" ? "black" : "#aeaeae"}
+                color={tokenFilter === 'TOKENS' ? 'black' : '#aeaeae'}
               >
                 Top Tokens
               </Text>
               <Text
                 onClick={() => {
-                  setTokenFilter("PAIRS")
+                  setTokenFilter('PAIRS')
                 }}
-                color={tokenFilter === "PAIRS" ? "black" : "#aeaeae"}
+                color={tokenFilter === 'PAIRS' ? 'black' : '#aeaeae'}
               >
                 Top Pairs
               </Text>
             </OptionsWrappper>
           </ListOptions>
         </PaddedGroup>
-        {allTokenData && tokenFilter === "TOKENS" && (
-          <TopTokenList tokens={allTokenData} />
-        )}
-        {allTokenData && tokenFilter === "PAIRS" && <PairList pairs={pairs} />}
+        {allTokenData && tokenFilter === 'TOKENS' && <TopTokenList tokens={allTokenData} />}
+        {allTokenData && tokenFilter === 'PAIRS' && <PairList pairs={pairs} />}
       </Panel>
-      <Panel style={{ marginTop: "6px" }}>
+      <Panel style={{ marginTop: '6px' }}>
         <PaddedGroup>
           <ListOptions>
             <OptionsWrappper>
               <Text
                 onClick={() => {
-                  setTxFilter("ALL")
+                  setTxFilter('ALL')
                 }}
-                color={txFilter !== "ALL" ? "#aeaeae" : "black"}
+                color={txFilter !== 'ALL' ? '#aeaeae' : 'black'}
               >
                 All
               </Text>
               <Text
                 onClick={() => {
-                  setTxFilter("SWAP")
+                  setTxFilter('SWAP')
                 }}
-                color={txFilter !== "SWAP" ? "#aeaeae" : "black"}
+                color={txFilter !== 'SWAP' ? '#aeaeae' : 'black'}
               >
                 Swaps
               </Text>
               <Text
                 onClick={() => {
-                  setTxFilter("ADD")
+                  setTxFilter('ADD')
                 }}
-                color={txFilter !== "ADD" ? "#aeaeae" : "black"}
+                color={txFilter !== 'ADD' ? '#aeaeae' : 'black'}
               >
                 Add
               </Text>
               <Text
                 onClick={() => {
-                  setTxFilter("REMOVE")
+                  setTxFilter('REMOVE')
                 }}
-                color={txFilter !== "REMOVE" ? "#aeaeae" : "black"}
+                color={txFilter !== 'REMOVE' ? '#aeaeae' : 'black'}
               >
                 Remove
               </Text>
             </OptionsWrappper>
           </ListOptions>
         </PaddedGroup>
-        <TxnList txns={txns} txFilter={txFilter} />
+        <TxnList transactions={transactions} txFilter={txFilter} />
       </Panel>
     </PageWrapper>
   )

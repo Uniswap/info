@@ -1,42 +1,25 @@
-import React, {
-  createContext,
-  useContext,
-  useReducer,
-  useMemo,
-  useCallback,
-  useEffect,
-  useState
-} from "react"
+import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect, useState } from 'react'
 
-import { client } from "../apollo/client"
-import {
-  TOKEN_DATA,
-  All_TOKENS,
-  TOKEN_TXNS,
-  TOKEN_HISTORICAL_DATA,
-  TOKEN_CHART
-} from "../apollo/queries"
+import { client } from '../apollo/client'
+import { TOKEN_DATA, All_TOKENS, TOKEN_TXNS, TOKEN_CHART } from '../apollo/queries'
 
-import { useEthPrice } from "./GlobalData"
+import { useEthPrice } from './GlobalData'
 
-import dayjs from "dayjs"
-import utc from "dayjs/plugin/utc"
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
 
-import { get2DayPercentFormatted, getPercentFormatted } from "../helpers"
+import { get2DayPercentFormatted, getPercentFormatted } from '../helpers'
 
-const UPDATE = "UPDATE"
-const UPDATE_TOKEN_TXNS = "UPDATE_TOKEN_TXNS"
-const UPDATE_CHART_DATA = "UPDATE_CHART_DATA"
+const UPDATE = 'UPDATE'
+const UPDATE_TOKEN_TXNS = 'UPDATE_TOKEN_TXNS'
+const UPDATE_CHART_DATA = 'UPDATE_CHART_DATA'
 
 dayjs.extend(utc)
 
 export function safeAccess(object, path) {
   return object
     ? path.reduce(
-        (accumulator, currentValue) =>
-          accumulator && accumulator[currentValue]
-            ? accumulator[currentValue]
-            : null,
+        (accumulator, currentValue) => (accumulator && accumulator[currentValue] ? accumulator[currentValue] : null),
         object
       )
     : null
@@ -121,10 +104,12 @@ export default function Provider({ children }) {
 
   return (
     <TokenDataContext.Provider
-      value={useMemo(
-        () => [state, { update, updateTokenTxns, updateChartData }],
-        [state, update, updateTokenTxns, updateChartData]
-      )}
+      value={useMemo(() => [state, { update, updateTokenTxns, updateChartData }], [
+        state,
+        update,
+        updateTokenTxns,
+        updateChartData
+      ])}
     >
       {children}
     </TokenDataContext.Provider>
@@ -135,45 +120,43 @@ const getAllTokens = async () => {
   let data = []
   let result = await client.query({
     query: All_TOKENS,
-    fetchPolicy: "cache-first"
+    fetchPolicy: 'cache-first'
   })
   data = data.concat(result.data.tokens)
   return data
 }
 
 const getTokenData = async (address, ethPrice) => {
+  let currentBlock = 6432338
+  let oneDayBlock = 6426343
+  let twoDayBlock = 6420546
+  // const utcCurrentTime = dayjs()
+  // const utcOneDayBack = utcCurrentTime.subtract(1, 'day')
+  // const utcTwoDaysBack = utcCurrentTime.subtract(2, 'day')
+
+  // initialize data arrays
   let data = []
-  let result = await client.query({
-    query: TOKEN_DATA,
-    variables: {
-      tokenAddr: address
-    },
-    fetchPolicy: "cache-first"
-  })
-  data = result.data && result.data.tokens && result.data.tokens[0]
   let oneDayData = []
   let twoDayData = []
-  const utcCurrentTime = dayjs()
-  const utcOneDayBack = utcCurrentTime.subtract(1, "day")
-  const utcTwoDaysBack = utcCurrentTime.subtract(2, "day")
+
+  // fetch all current and historical data
+  let result = await client.query({
+    query: TOKEN_DATA(address, currentBlock),
+    fetchPolicy: 'cache-first'
+  })
+  data = result.data && result.data.tokens && result.data.tokens[0]
   let oneDayResult = await client.query({
-    query: TOKEN_HISTORICAL_DATA,
-    variables: {
-      tokenAddr: address,
-      timestamp: utcOneDayBack.unix()
-    },
-    fetchPolicy: "cache-first"
+    query: TOKEN_DATA(address, oneDayBlock),
+    fetchPolicy: 'cache-first'
   })
-  oneDayData = oneDayResult.data.tokenHistoricalDatas[0]
+  oneDayData = oneDayResult.data.tokens[0]
   let twoDayResult = await client.query({
-    query: TOKEN_HISTORICAL_DATA,
-    variables: {
-      tokenAddr: address,
-      timestamp: utcTwoDaysBack.unix()
-    },
-    fetchPolicy: "cache-first"
+    query: TOKEN_DATA(address, twoDayBlock),
+    fetchPolicy: 'cache-first'
   })
-  twoDayData = twoDayResult.data.tokenHistoricalDatas[0]
+  twoDayData = twoDayResult.data.tokens[0]
+
+  // calculate percentage changes and daily changes
   if (data && oneDayData && twoDayData) {
     const [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentFormatted(
       data.tradeVolumeUSD,
@@ -185,22 +168,12 @@ const getTokenData = async (address, ethPrice) => {
       oneDayData.tradeVolumeETH ? oneDayData.tradeVolumeETH : 0,
       twoDayData.tradeVolumeETH ? twoDayData.tradeVolumeETH : 0
     )
-    const priceChangeUSD = getPercentFormatted(
-      data.derivedETH * ethPrice,
-      oneDayData.priceUSD
-    )
-    const priceChangeETH = getPercentFormatted(
-      data.derivedETH,
-      oneDayData.priceETH
-    )
-    const liquidityChangeUSD = getPercentFormatted(
-      data.totalLiquidityUSD,
-      oneDayData.totalLiquidityUSD
-    )
-    const liquidityChangeETH = getPercentFormatted(
-      data.totalLiquidityETH,
-      oneDayData.totalLiquidityETH
-    )
+    const priceChangeUSD = getPercentFormatted(data.derivedETH * ethPrice, oneDayData.priceUSD)
+    const priceChangeETH = getPercentFormatted(data.derivedETH, oneDayData.priceETH)
+    const liquidityChangeUSD = getPercentFormatted(data.totalLiquidityUSD, oneDayData.totalLiquidityUSD)
+    const liquidityChangeETH = getPercentFormatted(data.totalLiquidityETH, oneDayData.totalLiquidityETH)
+
+    // set data
     data.priceUSD = data.derivedETH * ethPrice
     data.totalLiquidityUSD = data.totalLiquidityETH * ethPrice
     data.oneDayVolumeUSD = oneDayVolumeUSD
@@ -236,7 +209,7 @@ const getTokenTransactions = async tokenAddress => {
     variables: {
       tokenAddr: tokenAddress
     },
-    fetchPolicy: "cache-first"
+    fetchPolicy: 'cache-first'
   })
   mints = mints.concat(result.data.asToken0Mint)
   mints = mints.concat(result.data.asToken1Mint)
@@ -250,14 +223,14 @@ const getTokenTransactions = async tokenAddress => {
 const getTokenChartData = async tokenAddress => {
   let data = []
   const utcEndTime = dayjs.utc()
-  let utcStartTime = utcEndTime.subtract(1, "year")
+  let utcStartTime = utcEndTime.subtract(1, 'year')
   let startTime = utcStartTime.unix() - 1
   let result = await client.query({
     query: TOKEN_CHART,
     variables: {
       tokenAddr: tokenAddress
     },
-    fetchPolicy: "cache-first"
+    fetchPolicy: 'cache-first'
   })
   data = data.concat(result.data.tokenDayDatas)
   let dayIndexSet = new Set()
@@ -326,7 +299,7 @@ export function useTokenData(tokenAddress) {
 
 export function useTokenTransactions(tokenAddress) {
   const [state, { updateTokenTxns }] = useTokenDataContext()
-  const tokenTxns = safeAccess(state, [tokenAddress, "txns"])
+  const tokenTxns = safeAccess(state, [tokenAddress, 'txns'])
   useEffect(() => {
     async function checkForTxns() {
       if (!tokenTxns) {
@@ -341,7 +314,7 @@ export function useTokenTransactions(tokenAddress) {
 
 export function useTokenChartData(tokenAddress) {
   const [state, { updateChartData }] = useTokenDataContext()
-  const chartData = safeAccess(state, [tokenAddress, "chartData"])
+  const chartData = safeAccess(state, [tokenAddress, 'chartData'])
   useEffect(() => {
     async function checkForChartData() {
       if (!chartData) {

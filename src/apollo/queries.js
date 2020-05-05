@@ -1,4 +1,4 @@
-import gql from "graphql-tag"
+import gql from 'graphql-tag'
 
 export const ETH_PRICE = gql`
   query bundles {
@@ -10,145 +10,87 @@ export const ETH_PRICE = gql`
 `
 
 export const PAIR_CHART = gql`
-  query exchangeDayDatas($exchangeAddress: Bytes!) {
-    exchangeDayDatas(
-      orderBy: date
-      orderDirection: asc
-      where: { exchangeAddress: $exchangeAddress }
-    ) {
+  query pairDayDatas($pairAddress: Bytes!) {
+    pairDayDatas(orderBy: date, orderDirection: asc, where: { pairAddress: $pairAddress }) {
       id
       date
+      dailyVolumeToken0
+      dailyVolumeToken1
       dailyVolumeUSD
-      combinedBalanceUSD
+      reserve0
+      reserve1
+      reserveUSD
     }
   }
 `
 
 export const PAIR_TXNS = gql`
   query transactions($pairAddress: Bytes!) {
-    mints(
-      where: { exchange: $pairAddress }
-      orderBy: timestamp
-      orderDirection: desc
-    ) {
-      timestamp
-      token0 {
-        symbol
+    mints(orderBy: timestamp, orderDirection: desc, where: { pair: $pairAddress }) {
+      pair {
+        token0
+        token1
       }
-      token1 {
-        symbol
-      }
+      to
+      liquidity
       amount0
       amount1
-      to
-      valueETH
-      valueUSD
+      amountUSD
     }
-    burns(
-      where: { exchange: $pairAddress }
-      orderBy: timestamp
-      orderDirection: desc
-    ) {
-      timestamp
-      token0 {
-        symbol
+    burns(orderBy: timestamp, orderDirection: desc, where: { pair: $pairAddress }) {
+      pair {
+        token0
+        token1
       }
-      token1 {
-        symbol
-      }
+      to
+      liquidity
       amount0
       amount1
-      from
-      valueETH
-      valueUSD
+      amountUSD
     }
-    swaps(
-      where: { exchange: $pairAddress }
-      orderBy: timestamp
-      orderDirection: desc
-    ) {
-      timestamp
-      tokenBought {
-        symbol
+    swaps(orderBy: timestamp, orderDirection: desc, where: { pair: $pairAddress }) {
+      pair {
+        token0
+        token1
       }
-      tokenSold {
-        symbol
-      }
-      amountBought
-      amountSold
+      liquidity
+      amount0In
+      amount0Out
+      amount1In
+      amount1Out
       to
-      valueETH
-      valueUSD
     }
   }
 `
 
-export const PAIR_HISTORICAL_DATA = gql`
-  query exchangeHistoricalDatas($timestamp: Int!, $pairAddress: Bytes!) {
-    exchangeHistoricalDatas(
-      first: 1
-      where: { exchangeAddress: $pairAddress, timestamp_lt: $timestamp }
-      orderBy: timestamp
-      orderDirection: desc
-    ) {
-      id
-      exchangeAddress
-      token0Balance
-      token1Balance
-      combinedBalanceETH
-      combinedBalanceUSD
-      totalUniToken
-      tradeVolumeETH
-      tradeVolumeUSD
-      token0Price
-      token1Price
-    }
-  }
-`
-
-export const PAIR_DATA = gql`
-  query exchanges($exchangeAddress: String!) {
-    exchanges(where: { id: $exchangeAddress }) {
-      id
-      token0 {
+export const PAIR_DATA = (pairAddress, block) => {
+  const queryString =
+    `
+    query pairs {
+      pairs(block: {number: ` +
+    block +
+    `} where: { id: "` +
+    pairAddress +
+    `"}) {
         id
-        symbol
-        name
+        token0 {
+          id
+          symbol
+          name
+        }
+        token1 {
+          id
+          symbol
+          name
+        }
+        reserve0
+        reserve1
+        reserveUSD
       }
-      token1 {
-        id
-        symbol
-        name
-      }
-      token0Balance
-      token1Balance
-      combinedBalanceETH
-      totalUniToken
-      tradeVolumeETH
-      tradeVolumeUSD
-      token0Price
-      token1Price
-    }
-  }
-`
+    }`
 
-export const GLOBAL_HISTORICAL_DATA = gql`
-  query uniswapHistoricalDatas($timestamp: Int!) {
-    uniswapHistoricalDatas(
-      first: 1
-      where: { timestamp_lt: $timestamp }
-      orderBy: timestamp
-      orderDirection: desc
-    ) {
-      id
-      timestamp
-      totalVolumeUSD
-      totalVolumeETH
-      totalLiquidityUSD
-      totalLiquidityETH
-    }
-  }
-`
+  return gql(queryString)
+}
 
 export const GLOBAL_CHART = gql`
   query uniswapDayDatas {
@@ -173,68 +115,88 @@ export const GLOBAL_CHART = gql`
   }
 `
 
-export const GLOBAL_DATA = gql`
-  query uniswaps {
-    uniswaps(where: { id: "1" }) {
+export const GLOBAL_DATA = block => {
+  const queryString =
+    `
+  query uniswapFactories {
+    uniswapFactories(block: {number: ` +
+    block +
+    `} where: { id: "0xe2f197885abe8ec7c866cFf76605FD06d4576218" }) {
       id
       totalVolumeUSD
       totalVolumeETH
       totalLiquidityUSD
       totalLiquidityETH
+      txCount
     }
   }
 `
+  return gql(queryString)
+}
 
 export const GLOBAL_TXNS = gql`
   query transactions {
-    mints(first: 200, orderBy: timestamp, orderDirection: desc) {
+    transactions(first: 200, orderBy: timestamp, orderDirection: desc) {
+      id
       timestamp
-      token0 {
-        symbol
+      mints {
+        pair {
+          token0 {
+            id
+            symbol
+          }
+          token1 {
+            id
+            symbol
+          }
+        }
+        to
+        liquidity
+        amount0
+        amount1
+        amountUSD
       }
-      token1 {
-        symbol
+      burns {
+        pair {
+          token0 {
+            id
+            symbol
+          }
+          token1 {
+            id
+            symbol
+          }
+        }
+        to
+        liquidity
+        amount0
+        amount1
+        amountUSD
       }
-      amount0
-      amount1
-      to
-      valueETH
-      valueUSD
-    }
-    burns(first: 200, orderBy: timestamp, orderDirection: desc) {
-      timestamp
-      token0 {
-        symbol
+      swaps {
+        pair {
+          token0 {
+            id
+            symbol
+          }
+          token1 {
+            id
+            symbol
+          }
+        }
+        amount0In
+        amount0Out
+        amount1In
+        amount1Out
+        to
       }
-      token1 {
-        symbol
-      }
-      amount0
-      amount1
-      from
-      valueETH
-      valueUSD
-    }
-    swaps(first: 200, orderBy: timestamp, orderDirection: desc) {
-      timestamp
-      tokenBought {
-        symbol
-      }
-      tokenSold {
-        symbol
-      }
-      amountBought
-      amountSold
-      to
-      valueETH
-      valueUSD
     }
   }
 `
 
 export const All_PAIRS = gql`
-  query exchanges {
-    exchanges {
+  query pairs {
+    pairs {
       id
     }
   }
@@ -251,11 +213,7 @@ export const All_TOKENS = gql`
 
 export const TOKEN_CHART = gql`
   query tokenDayDatas($tokenAddr: String!) {
-    tokenDayDatas(
-      orderBy: date
-      orderDirection: desc
-      where: { token: $tokenAddr }
-    ) {
+    tokenDayDatas(orderBy: date, orderDirection: desc, where: { token: $tokenAddr }) {
       id
       date
       totalLiquidityUSD
@@ -277,43 +235,27 @@ export const TOKEN_CHART = gql`
   }
 `
 
-export const TOKEN_HISTORICAL_DATA = gql`
-  query tokenHistoricalDatas($tokenAddr: String!, $timestamp: Int!) {
-    tokenHistoricalDatas(
-      first: 1
-      orderBy: timestamp
-      orderDirection: desc
-      where: { token: $tokenAddr, timestamp_lt: $timestamp }
-    ) {
-      id
-      timestamp
-      priceETH
-      priceUSD
-      tradeVolumeUSD
-      tradeVolumeETH
-      totalLiquidityUSD
-      totalLiquidityETH
-    }
-  }
-`
-
-export const TOKEN_DATA = gql`
-  query tokens($tokenAddr: String!) {
-    tokens(where: { id: $tokenAddr }) {
+export const TOKEN_DATA = (tokenAddress, block) => {
+  const queryString =
+    `
+  query tokens {
+    tokens(block: {number:` +
+    block +
+    `} where: {id:"` +
+    tokenAddress +
+    `"}) {
       id
       name
       symbol
       decimals
       derivedETH
+      tradeVolume
       tradeVolumeUSD
-      tradeVolumeETH
-      totalLiquidityToken
-      totalLiquidityETH
-      allPairs(orderBy: combinedBalanceETH, orderDirection: desc) {
+      totalLiquidity
+      allPairs(orderBy: reserveUSD, orderDirection: desc) {
         id
-        combinedBalanceETH
-        tradeVolumeUSD
-        tradeVolumeETH
+        reserveUSD
+        volumeUSD
         token0 {
           name
           symbol
@@ -328,6 +270,8 @@ export const TOKEN_DATA = gql`
     }
   }
 `
+  return gql(queryString)
+}
 
 export const TOKEN_TXNS = gql`
   fragment comparisonFieldsMint on Mint {
@@ -378,46 +322,22 @@ export const TOKEN_TXNS = gql`
     valueUSD
   }
   query($tokenAddr: String!) {
-    asToken0Mint: mints(
-      where: { token0: $tokenAddr }
-      orderBy: timestamp
-      orderDirection: desc
-    ) {
+    asToken0Mint: mints(where: { token0: $tokenAddr }, orderBy: timestamp, orderDirection: desc) {
       ...comparisonFieldsMint
     }
-    asToken1Mint: mints(
-      where: { token1: $tokenAddr }
-      orderBy: timestamp
-      orderDirection: desc
-    ) {
+    asToken1Mint: mints(where: { token1: $tokenAddr }, orderBy: timestamp, orderDirection: desc) {
       ...comparisonFieldsMint
     }
-    asToken0Burn: burns(
-      where: { token0: $tokenAddr }
-      orderBy: timestamp
-      orderDirection: desc
-    ) {
+    asToken0Burn: burns(where: { token0: $tokenAddr }, orderBy: timestamp, orderDirection: desc) {
       ...comparisonFieldsBurn
     }
-    asToken1Burn: burns(
-      where: { token1: $tokenAddr }
-      orderBy: timestamp
-      orderDirection: desc
-    ) {
+    asToken1Burn: burns(where: { token1: $tokenAddr }, orderBy: timestamp, orderDirection: desc) {
       ...comparisonFieldsBurn
     }
-    asTokenBoughtSwap: swaps(
-      where: { tokenBought: $tokenAddr }
-      orderBy: timestamp
-      orderDirection: desc
-    ) {
+    asTokenBoughtSwap: swaps(where: { tokenBought: $tokenAddr }, orderBy: timestamp, orderDirection: desc) {
       ...comparisonFieldsSwap
     }
-    asTokenSoldSwap: swaps(
-      where: { tokenSold: $tokenAddr }
-      orderBy: timestamp
-      orderDirection: desc
-    ) {
+    asTokenSoldSwap: swaps(where: { tokenSold: $tokenAddr }, orderBy: timestamp, orderDirection: desc) {
       ...comparisonFieldsSwap
     }
   }
