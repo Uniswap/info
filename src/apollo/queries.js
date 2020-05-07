@@ -17,8 +17,6 @@ export const PAIR_CHART = gql`
       dailyVolumeToken0
       dailyVolumeToken1
       dailyVolumeUSD
-      reserve0
-      reserve1
       reserveUSD
     }
   }
@@ -28,8 +26,14 @@ export const PAIR_TXNS = gql`
   query transactions($pairAddress: Bytes!) {
     mints(orderBy: timestamp, orderDirection: desc, where: { pair: $pairAddress }) {
       pair {
-        token0
-        token1
+        token0 {
+          id
+          symbol
+        }
+        token1 {
+          id
+          symbol
+        }
       }
       to
       liquidity
@@ -39,8 +43,12 @@ export const PAIR_TXNS = gql`
     }
     burns(orderBy: timestamp, orderDirection: desc, where: { pair: $pairAddress }) {
       pair {
-        token0
-        token1
+        token0 {
+          symbol
+        }
+        token1 {
+          symbol
+        }
       }
       to
       liquidity
@@ -50,28 +58,32 @@ export const PAIR_TXNS = gql`
     }
     swaps(orderBy: timestamp, orderDirection: desc, where: { pair: $pairAddress }) {
       pair {
-        token0
-        token1
+        token0 {
+          symbol
+        }
+        token1 {
+          symbol
+        }
       }
-      liquidity
       amount0In
       amount0Out
       amount1In
       amount1Out
+      amountUSD
       to
     }
   }
 `
 
 export const PAIR_DATA = (pairAddress, block) => {
-  const queryString =
-    `
+  const queryString = block
+    ? `
     query pairs {
       pairs(block: {number: ` +
-    block +
-    `} where: { id: "` +
-    pairAddress +
-    `"}) {
+      block +
+      `} where: { id: "` +
+      pairAddress +
+      `"}) {
         id
         token0 {
           id
@@ -86,6 +98,28 @@ export const PAIR_DATA = (pairAddress, block) => {
         reserve0
         reserve1
         reserveUSD
+        volumeUSD
+      }
+    }`
+    : ` query pairs {
+      pairs( where: { id: "` +
+      pairAddress +
+      `"}) {
+        id
+        token0 {
+          id
+          symbol
+          name
+        }
+        token1 {
+          id
+          symbol
+          name
+        }
+        reserve0
+        reserve1
+        reserveUSD
+        volumeUSD
       }
     }`
 
@@ -116,30 +150,44 @@ export const GLOBAL_CHART = gql`
 `
 
 export const GLOBAL_DATA = block => {
-  const queryString =
-    `
-  query uniswapFactories {
-    uniswapFactories(block: {number: ` +
-    block +
-    `} where: { id: "0xe2f197885abe8ec7c866cFf76605FD06d4576218" }) {
-      id
-      totalVolumeUSD
-      totalVolumeETH
-      totalLiquidityUSD
-      totalLiquidityETH
-      txCount
-    }
-  }
-`
+  const queryString = block
+    ? ` query uniswapFactories {
+      uniswapFactories(block:   
+       {number: ` +
+      block +
+      `}` +
+      ` where: { id: "0xe2f197885abe8ec7c866cFf76605FD06d4576218" }) {
+        id
+        totalVolumeUSD
+        totalVolumeETH
+        totalLiquidityUSD
+        totalLiquidityETH
+        txCount
+      }
+    }`
+    : `query uniswapFactories {
+      uniswapFactories(
+        where: { id: "0xe2f197885abe8ec7c866cFf76605FD06d4576218" }) {
+        id
+        totalVolumeUSD
+        totalVolumeETH
+        totalLiquidityUSD
+        totalLiquidityETH
+        txCount
+      }
+    }`
+
   return gql(queryString)
 }
 
 export const GLOBAL_TXNS = gql`
   query transactions {
     transactions(first: 200, orderBy: timestamp, orderDirection: desc) {
-      id
-      timestamp
       mints {
+        transaction {
+          id
+          timestamp
+        }
         pair {
           token0 {
             id
@@ -157,6 +205,10 @@ export const GLOBAL_TXNS = gql`
         amountUSD
       }
       burns {
+        transaction {
+          id
+          timestamp
+        }
         pair {
           token0 {
             id
@@ -174,6 +226,10 @@ export const GLOBAL_TXNS = gql`
         amountUSD
       }
       swaps {
+        transaction {
+          id
+          timestamp
+        }
         pair {
           token0 {
             id
@@ -188,6 +244,7 @@ export const GLOBAL_TXNS = gql`
         amount0Out
         amount1In
         amount1Out
+        amountUSD
         to
       }
     }
@@ -216,7 +273,11 @@ export const TOKEN_CHART = gql`
     tokenDayDatas(orderBy: date, orderDirection: desc, where: { token: $tokenAddr }) {
       id
       date
+      totalLiquidityToken
       totalLiquidityUSD
+      totalLiquidityETH
+      dailyVolumeETH
+      dailyVolumeToken
       dailyVolumeUSD
       mostLiquidPairs {
         id
@@ -228,22 +289,20 @@ export const TOKEN_CHART = gql`
           id
           derivedETH
         }
-        token0Balance
-        token1Balance
       }
     }
   }
 `
 
 export const TOKEN_DATA = (tokenAddress, block) => {
-  const queryString =
-    `
+  const queryString = block
+    ? `
   query tokens {
     tokens(block: {number:` +
-    block +
-    `} where: {id:"` +
-    tokenAddress +
-    `"}) {
+      block +
+      `} where: {id:"` +
+      tokenAddress +
+      `"}) {
       id
       name
       symbol
@@ -270,75 +329,104 @@ export const TOKEN_DATA = (tokenAddress, block) => {
     }
   }
 `
+    : ` query tokens {
+  tokens( where: {id:"` +
+      tokenAddress +
+      `"}) {
+    id
+    name
+    symbol
+    decimals
+    derivedETH
+    tradeVolume
+    tradeVolumeUSD
+    totalLiquidity
+    allPairs(orderBy: reserveUSD, orderDirection: desc) {
+      id
+      reserveUSD
+      volumeUSD
+      token0 {
+        name
+        symbol
+        derivedETH
+      }
+      token1 {
+        name
+        symbol
+        derivedETH
+      }
+    }
+  }
+}`
   return gql(queryString)
 }
 
 export const TOKEN_TXNS = gql`
-  fragment comparisonFieldsMint on Mint {
-    token0 {
+  query($allPairs: [Bytes]!) {
+    mints(where: { pair_in: $allPairs }, orderBy: timestamp, orderDirection: desc) {
+      transaction {
+        id
+        timestamp
+      }
+      pair {
+        token0 {
+          id
+          symbol
+        }
+        token1 {
+          id
+          symbol
+        }
+      }
+      to
+      liquidity
+      amount0
+      amount1
+      amountUSD
+    }
+    burns(where: { pair_in: $allPairs }, orderBy: timestamp, orderDirection: desc) {
+      transaction {
+        id
+        timestamp
+      }
+      pair {
+        token0 {
+          id
+          symbol
+        }
+        token1 {
+          id
+          symbol
+        }
+      }
+      to
+      liquidity
+      amount0
+      amount1
+      amountUSD
+    }
+    swaps(where: { pair_in: $allPairs }, orderBy: timestamp, orderDirection: desc) {
+      transaction {
+        id
+        timestamp
+      }
       id
-      symbol
-    }
-    token1 {
-      symbol
-    }
-    timestamp
-    amount0
-    amount1
-    to
-    valueETH
-    valueUSD
-  }
-  fragment comparisonFieldsBurn on Burn {
-    token0 {
-      id
-      symbol
-    }
-    token1 {
-      id
-      symbol
-    }
-    timestamp
-    amount0
-    amount1
-    from
-    valueETH
-    valueUSD
-  }
-  fragment comparisonFieldsSwap on Swap {
-    tokenBought {
-      id
-      symbol
-    }
-    tokenSold {
-      id
-      symbol
-    }
-    timestamp
-    amountBought
-    amountSold
-    to
-    valueETH
-    valueUSD
-  }
-  query($tokenAddr: String!) {
-    asToken0Mint: mints(where: { token0: $tokenAddr }, orderBy: timestamp, orderDirection: desc) {
-      ...comparisonFieldsMint
-    }
-    asToken1Mint: mints(where: { token1: $tokenAddr }, orderBy: timestamp, orderDirection: desc) {
-      ...comparisonFieldsMint
-    }
-    asToken0Burn: burns(where: { token0: $tokenAddr }, orderBy: timestamp, orderDirection: desc) {
-      ...comparisonFieldsBurn
-    }
-    asToken1Burn: burns(where: { token1: $tokenAddr }, orderBy: timestamp, orderDirection: desc) {
-      ...comparisonFieldsBurn
-    }
-    asTokenBoughtSwap: swaps(where: { tokenBought: $tokenAddr }, orderBy: timestamp, orderDirection: desc) {
-      ...comparisonFieldsSwap
-    }
-    asTokenSoldSwap: swaps(where: { tokenSold: $tokenAddr }, orderBy: timestamp, orderDirection: desc) {
-      ...comparisonFieldsSwap
+      pair {
+        token0 {
+          id
+          symbol
+        }
+        token1 {
+          id
+          symbol
+        }
+      }
+      amount0In
+      amount0Out
+      amount1In
+      amount1Out
+      amountUSD
+      to
     }
   }
 `

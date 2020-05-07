@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect } from 'react'
 
 import { client } from '../apollo/client'
-import { PAIR_DATA, PAIR_CHART, PAIR_TXNS, All_PAIRS } from '../apollo/queries'
+import { PAIR_DATA, PAIR_CHART, PAIR_TXNS, All_PAIRS, TOKEN_TXNS } from '../apollo/queries'
 
 import { useEthPrice } from './GlobalData'
 
@@ -48,16 +48,12 @@ function reducer(state, { type, payload }) {
       }
     }
     case UPDATE_PAIR_TXNS: {
-      const { address, mints, burns, swaps } = payload
+      const { address, transactions } = payload
       return {
         ...state,
         [address]: {
           ...(safeAccess(state, [address]) || {}),
-          txns: {
-            mints,
-            burns,
-            swaps
-          }
+          txns: transactions
         }
       }
     }
@@ -88,10 +84,10 @@ export default function Provider({ children }) {
     })
   }, [])
 
-  const updatePairTxns = useCallback((address, mints, burns, swaps) => {
+  const updatePairTxns = useCallback((address, transactions) => {
     dispatch({
       type: UPDATE_PAIR_TXNS,
-      payload: { address, mints, burns, swaps }
+      payload: { address, transactions }
     })
   }, [])
 
@@ -127,7 +123,6 @@ const getAllPairs = async () => {
 }
 
 const getPairData = async (address, ethPrice) => {
-  let currentBlock = 6432338
   let oneDayBlock = 6426343
   let twoDayBlock = 6420546
   // const utcCurrentTime = dayjs()
@@ -136,7 +131,7 @@ const getPairData = async (address, ethPrice) => {
 
   let data = []
   let result = await client.query({
-    query: PAIR_DATA(address, currentBlock),
+    query: PAIR_DATA(address),
     fetchPolicy: 'no-cache'
   })
   data = result.data && result.data.pairs && result.data.pairs[0]
@@ -155,9 +150,9 @@ const getPairData = async (address, ethPrice) => {
   twoDayData = twoDayResult.data.pairs[0]
   if (data && oneDayData && twoDayData) {
     const [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentFormatted(
-      data.tradeVolumeUSD,
-      oneDayData.tradeVolumeUSD ? oneDayData.tradeVolumeUSD : 0,
-      twoDayData.tradeVolumeUSD ? twoDayData.tradeVolumeUSD : 0
+      data.volumeUSD,
+      oneDayData.volumeUSD ? oneDayData.volumeUSD : 0,
+      twoDayData.volumeUSD ? twoDayData.volumeUSD : 0
     )
     const [oneDayVolumeETH, volumeChangeETH] = get2DayPercentFormatted(
       data.tradeVolumeETH,
@@ -165,18 +160,24 @@ const getPairData = async (address, ethPrice) => {
       twoDayData.tradeVolumeETH ? twoDayData.tradeVolumeETH : 0
     )
 
-    const liquidityChangeUSD = getPercentFormatted(data.combinedBalanceETH * ethPrice, oneDayData.combinedBalanceUSD)
-    const liquidityChangeETH = getPercentFormatted(data.combinedBalanceETH, oneDayData.combinedBalanceETH)
-    data.combinedBalanceUSD = data.combinedBalanceETH * ethPrice
+    const liquidityChangeUSD = getPercentFormatted(data.reserveUSD * ethPrice, oneDayData.reserveUSD)
+    const liquidityChangeETH = getPercentFormatted(data.reserveUSD, oneDayData.reserveUSD)
+
     data.oneDayVolumeUSD = oneDayVolumeUSD
     data.oneDayVolumeETH = oneDayVolumeETH
     data.volumeChangeUSD = volumeChangeUSD
     data.volumeChangeETH = volumeChangeETH
     data.liquidityChangeUSD = liquidityChangeUSD
     data.liquidityChangeETH = liquidityChangeETH
-  } else {
+  } else if (data && !oneDayData) {
     // no historical values yet
-    data.combinedBalanceUSD = data.combinedBalanceETH * ethPrice
+    data.oneDayVolumeUSD = data.volumeUSD
+    data.oneDayVolumeETH = 0
+    data.volumeChangeUSD = 100
+    data.volumeChangeETH = 100
+    data.liquidityChangeUSD = 100
+    data.liquidityChangeETH = 100
+  } else {
     data.oneDayVolumeUSD = 0
     data.oneDayVolumeETH = 0
     data.volumeChangeUSD = 0
@@ -189,17 +190,18 @@ const getPairData = async (address, ethPrice) => {
 
 const getPairTransactions = async pairAddress => {
   let result = await client.query({
-    query: PAIR_TXNS,
+    query: TOKEN_TXNS,
     variables: {
-      pairAddress: pairAddress
+      allPairs: [pairAddress]
     },
     fetchPolicy: 'no-cache'
   })
 
-  let mints = result.data.mints
-  let burns = result.data.burns
-  let swaps = result.data.swaps
-  return [mints, burns, swaps]
+  const transactions = {}
+  transactions.mints = result.data.mints
+  transactions.burns = result.data.burns
+  transactions.swaps = result.data.swaps
+  return transactions
 }
 
 const getPairChartData = async pairAddress => {
@@ -214,7 +216,7 @@ const getPairChartData = async pairAddress => {
     },
     fetchPolicy: 'cache-first'
   })
-  data = data.concat(result.data.pairDayDatas && result.data.pairDayDatas[0])
+  data = result.data.pairDayDatas
   let dayIndexSet = new Set()
   let dayIndexArray = []
   const oneDay = 24 * 60 * 60
@@ -223,24 +225,27 @@ const getPairChartData = async pairAddress => {
     dayIndexSet.add((data[i].date / oneDay).toFixed(0))
     dayIndexArray.push(data[i])
   })
-  // fill in empty days
-  let timestamp = data[0].date ? data[0].date : startTime
-  let latestLiquidityUSD = data[0].combinedBalanceUSD
-  let index = 1
-  while (timestamp < utcEndTime.unix() - oneDay) {
-    const nextDay = timestamp + oneDay
-    let currentDayIndex = (nextDay / oneDay).toFixed(0)
-    if (!dayIndexSet.has(currentDayIndex)) {
-      data.push({
-        date: nextDay,
-        dayString: nextDay,
-        combinedBalanceUSD: latestLiquidityUSD
-      })
-    } else {
-      latestLiquidityUSD = dayIndexArray[index].combinedBalanceUSD
-      index = index + 1
+
+  if (data[0]) {
+    // fill in empty days
+    let timestamp = data[0].date ? data[0].date : startTime
+    let latestLiquidityUSD = data[0].reserveUSD
+    let index = 1
+    while (timestamp < utcEndTime.unix() - oneDay) {
+      const nextDay = timestamp + oneDay
+      let currentDayIndex = (nextDay / oneDay).toFixed(0)
+      if (!dayIndexSet.has(currentDayIndex)) {
+        data.push({
+          date: nextDay,
+          dayString: nextDay,
+          reserveUSD: latestLiquidityUSD
+        })
+      } else {
+        latestLiquidityUSD = dayIndexArray[index].reserveUSD
+        index = index + 1
+      }
+      timestamp = nextDay
     }
-    timestamp = nextDay
   }
   data = data.sort((a, b) => (parseInt(a.date) > parseInt(b.date) ? 1 : -1))
   return data
@@ -255,7 +260,7 @@ export function Updater() {
         getAllPairs().then(allPairs => {
           allPairs.map(async pair => {
             return getPairData(pair.id, ethPrice).then(data => {
-              update(data)
+              data && update(data)
             })
           })
         })
@@ -288,8 +293,8 @@ export function usePairTransactions(pairAddress) {
   useEffect(() => {
     async function checkForTxns() {
       if (!pairTxns) {
-        let [mints, burns, swaps] = await getPairTransactions(pairAddress)
-        updatePairTxns(pairAddress, mints, burns, swaps)
+        let transactions = await getPairTransactions(pairAddress)
+        updatePairTxns(pairAddress, transactions)
       }
     }
     checkForTxns()

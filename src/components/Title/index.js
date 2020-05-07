@@ -1,12 +1,14 @@
-import React from "react"
-import { useHistory } from "react-router-dom"
-import styled from "styled-components"
+import React from 'react'
+import { useHistory } from 'react-router-dom'
+import styled from 'styled-components'
 
-import { Text, Flex } from "rebass"
-import Logo from "../../assets/logo2.svg"
-
-import { useTokenData } from "../../contexts/TokenData"
-import { usePairData } from "../../contexts/PairData"
+import { Text, Flex } from 'rebass'
+import { useTokenData } from '../../contexts/TokenData'
+import { usePairData } from '../../contexts/PairData'
+import Link from '../Link'
+import Row, { RowFixed } from '../Row'
+import Unicorn from '../../assets/unicorn.svg'
+import Wordmark from '../../assets/wordmark.svg'
 
 const TitleWrapper = styled.div`
   text-decoration: none;
@@ -16,15 +18,28 @@ const TitleWrapper = styled.div`
   }
 `
 
-const LogoWrapper = styled.img`
-  height: 30px;
-  width: 30px;
+const UniIcon = styled(Link)`
+  transition: transform 0.3s ease;
+  :hover {
+    transform: rotate(-5deg);
+  }
 `
 
-const Header = styled.span`
-  font-size: 24px;
-  font-weight: 900;
-  color: ${({ theme }) => theme.textColor};
+const TitleText = styled(Row)`
+  width: fit-content;
+  white-space: nowrap;
+`
+
+const Alpha = styled.div`
+  width: fit-content;
+  margin-left: 10px;
+  border-radius: 12px;
+  padding: 3px 7px;
+  background-color: ${({ theme }) => theme.blue1};
+  color: ${({ theme }) => theme.white};
+  font-size: 12px;
+  font-weight: 600;
+  color: white;
 `
 
 export default function Title({ token, pair }) {
@@ -39,29 +54,33 @@ export default function Title({ token, pair }) {
     if (symbol0 && symbol1) {
       return (
         <div>
-          <Header>Uniswap Info </Header> /{" "}
-          <span style={{ fontWeight: 400 }}>{symbol0 + "-" + symbol1}</span>
+          / <span style={{ fontWeight: 400 }}>{symbol0 + '-' + symbol1}</span>
         </div>
       )
     }
     if (name && symbol) {
       return (
         <div>
-          <Header>Uniswap Info </Header> /{" "}
-          <span style={{ fontWeight: 400 }}>{name + "(" + symbol + ")"}</span>
+          / <span style={{ fontWeight: 400 }}>{name + '(' + symbol + ')'}</span>
         </div>
       )
     } else {
-      return <Header>Uniswap Info </Header>
+      return ''
     }
   }
 
   return (
-    <TitleWrapper onClick={() => history.push("/")}>
+    <TitleWrapper onClick={() => history.push('/')}>
       <Flex alignItems="center">
-        <Text fontSize="1rem" lineHeight="1">
-          <LogoWrapper src={Logo} alt="" />
-        </Text>
+        <RowFixed>
+          <UniIcon id="link" onClick={() => history.push('/')}>
+            <img src={Unicorn} alt="logo" />
+          </UniIcon>
+          <TitleText>
+            <img style={{ marginLeft: '4px', marginTop: '4px' }} src={Wordmark} alt="logo" />
+            <Alpha>V2</Alpha>
+          </TitleText>
+        </RowFixed>
         <Text fontWeight={600} mx="1rem" lineHeight="1.5rem">
           {getName()}
         </Text>

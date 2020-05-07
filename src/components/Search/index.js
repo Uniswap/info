@@ -1,13 +1,13 @@
-import React, { useState, useEffect, useMemo } from "react"
-import styled from "styled-components"
+import React, { useState, useEffect, useMemo } from 'react'
+import styled from 'styled-components'
 
-import Row from "../Row"
-import TokenLogo from "../TokenLogo"
-import { Search as SearchIcon } from "react-feather"
-import { BasicLink } from "../Link"
+import Row from '../Row'
+import TokenLogo from '../TokenLogo'
+import { Search as SearchIcon } from 'react-feather'
+import { BasicLink } from '../Link'
 
-import { useAllTokenData } from "../../contexts/TokenData"
-import { useAllPairs } from "../../contexts/PairData"
+import { useAllTokenData } from '../../contexts/TokenData'
+import { useAllPairs } from '../../contexts/PairData'
 
 const Wrapper = styled.div`
   display: flex;
@@ -15,12 +15,12 @@ const Wrapper = styled.div`
   flex-direction: row;
   align-items: center;
   justify-content: flex-end;
-  padding: ${({ large }) => (large ? "12px" : "8px 16px")};
+  padding: ${({ large }) => (large ? '12px' : '8px 16px')};
   border: 1px solid ${({ theme }) => theme.inputBackground};
   border-radius: 12px;
   background: ${({ theme }) => theme.inputBackground};
-  border-bottom-right-radius: ${({ open }) => (open ? "0px" : "12px")};
-  border-bottom-left-radius: ${({ open }) => (open ? "0px" : "12px")};
+  border-bottom-right-radius: ${({ open }) => (open ? '0px' : '12px')};
+  border-bottom-left-radius: ${({ open }) => (open ? '0px' : '12px')};
 `
 const Input = styled.input`
   position: relative;
@@ -32,23 +32,24 @@ const Input = styled.input`
   border: none;
   outline: none;
   color: ${({ theme }) => theme.textColor};
-  font-size: ${({ large }) => (large ? "20px" : "16px")};
+  font-size: ${({ large }) => (large ? '20px' : '16px')};
 
   ::placeholder {
     color: ${({ theme }) => theme.textColor};
+    font-size: ${({ large }) => (large ? '20px' : '16px')};
   }
 `
 
-const SearchIconSmall = styled(SearchIcon)`
-  height: 16px;
-  width: 16px;
-  margin-left: 16px;
-`
+// const SearchIconSmall = styled(SearchIcon)`
+//   height: 16px;
+//   width: 16px;
+//   margin-left: 16px;
+// `
 
 const SearchIconLarge = styled(SearchIcon)`
   height: 20px;
   width: 20px;
-  margin-right: 16px;
+  margin-right: 10px;
   color: ${({ theme }) => theme.textColor};
 `
 
@@ -80,9 +81,9 @@ const MenuItem = styled(Row)`
   }
 `
 
-const WrapperSmall = styled(Wrapper)`
-  width: 240px;
-`
+// const WrapperSmall = styled(Wrapper)`
+//   width: 240px;
+// `
 
 const Heading = styled(Row)`
   padding: 1rem;
@@ -106,25 +107,25 @@ const Blue = styled.span`
 
 const Tokens = styled.div``
 
-export default function Search() {
-  return (
-    <WrapperSmall>
-      <Input placeholder={"Search pools and accounts..."}></Input>
-      <SearchIconSmall />
-    </WrapperSmall>
-  )
-}
+// export default function Search() {
+//   return (
+//     <WrapperSmall>
+//       <Input placeholder={'Search pools and accounts...'}></Input>
+//       <SearchIconSmall />
+//     </WrapperSmall>
+//   )
+// }
 
-export const GlobalSearch = () => {
+export const Search = ({ small = false }) => {
   const allTokens = useAllTokenData()
   const allPairs = useAllPairs()
   const [showMenu, toggleMenu] = useState(false)
-  const [value, setValue] = useState("")
+  const [value, setValue] = useState('')
   const [showShadow, toggleShadow] = useState(false)
   const [showBottomShadow, toggleBottomShadow] = useState(false)
 
   useEffect(() => {
-    if (value !== "") {
+    if (value !== '') {
       toggleMenu(true)
     } else {
       toggleMenu(false)
@@ -135,22 +136,16 @@ export const GlobalSearch = () => {
 
   const filteredTokenList = useMemo(() => {
     return Object.keys(allTokens).filter(address => {
-      const regexMatches = Object.keys(allTokens[address]).map(
-        tokenEntryKey => {
-          const isAddress = value.slice(0, 2) === "0x"
-          if (tokenEntryKey === "id" && isAddress) {
-            return allTokens[address][tokenEntryKey].match(
-              new RegExp(escapeStringRegexp(value), "i")
-            )
-          }
-          if (tokenEntryKey === "symbol" && !isAddress) {
-            return allTokens[address][tokenEntryKey].match(
-              new RegExp(escapeStringRegexp(value), "i")
-            )
-          }
-          return false
+      const regexMatches = Object.keys(allTokens[address]).map(tokenEntryKey => {
+        const isAddress = value.slice(0, 2) === '0x'
+        if (tokenEntryKey === 'id' && isAddress) {
+          return allTokens[address][tokenEntryKey].match(new RegExp(escapeStringRegexp(value), 'i'))
         }
-      )
+        if (tokenEntryKey === 'symbol' && !isAddress) {
+          return allTokens[address][tokenEntryKey].match(new RegExp(escapeStringRegexp(value), 'i'))
+        }
+        return false
+      })
       return regexMatches.some(m => m)
     })
   }, [allTokens, value])
@@ -158,35 +153,21 @@ export const GlobalSearch = () => {
   const filteredPairList = useMemo(() => {
     return Object.keys(allPairs).filter(pair => {
       const regexMatches = Object.keys(allPairs[pair]).map(field => {
-        const isAddress = value.slice(0, 2) === "0x"
-        if (field === "id" && isAddress) {
-          return allPairs[pair][field].match(
-            new RegExp(escapeStringRegexp(value), "i")
-          )
+        const isAddress = value.slice(0, 2) === '0x'
+        if (field === 'id' && isAddress) {
+          return allPairs[pair][field].match(new RegExp(escapeStringRegexp(value), 'i'))
         }
-        if (field === "token0") {
-          return allPairs[pair][field].symbol.match(
-            new RegExp(escapeStringRegexp(value), "i")
-          )
+        if (field === 'token0') {
+          return allPairs[pair][field].symbol.match(new RegExp(escapeStringRegexp(value), 'i'))
         }
-        if (field === "token1") {
-          return allPairs[pair][field].symbol.match(
-            new RegExp(escapeStringRegexp(value), "i")
-          )
+        if (field === 'token1') {
+          return allPairs[pair][field].symbol.match(new RegExp(escapeStringRegexp(value), 'i'))
         }
         return false
       })
       return regexMatches.some(m => m)
     })
   }, [allPairs, value])
-
-  const trendingByVolume = useMemo(() => {
-    return Object.keys(allTokens)
-      .sort((a, b) => {
-        return a.oneDayVolumeETH > b.oneDayVolumeETH
-      })
-      .slice(0, 5)
-  }, [allTokens])
 
   useEffect(() => {
     if (Object.keys(filteredTokenList).length > 2) {
@@ -219,18 +200,18 @@ export const GlobalSearch = () => {
   return (
     <div
       style={{
-        height: "60px",
-        zIndex: "30",
-        position: "relative",
-        width: "100%"
+        height: '40px',
+        zIndex: '30',
+        position: 'relative',
+        width: '100%'
       }}
     >
-      <Wrapper open={showMenu} shadow={true} large={true}>
+      <Wrapper open={showMenu} shadow={true} large={!small}>
         <SearchIconLarge />
         <Input
-          large={true}
-          type={"text"}
-          placeholder={"Search all Uniswap pools and accounts..."}
+          large={!small}
+          type={'text'}
+          placeholder={'Search all Uniswap pools and tokens...'}
           value={value}
           onChange={e => {
             setValue(e.target.value)
@@ -246,12 +227,10 @@ export const GlobalSearch = () => {
             <Gray>Tokens</Gray>
           </Heading>
           <Tokens shadow={showShadow}>
-            {Object.keys(filteredTokenList).length === 0 && (
-              <MenuItem>No results</MenuItem>
-            )}
+            {Object.keys(filteredTokenList).length === 0 && <MenuItem>No results</MenuItem>}
             {filteredTokenList.slice(0, tokensShown).map(key => {
               return (
-                <BasicLink to={"/token/" + key} key={key}>
+                <BasicLink to={'/token/' + key} key={key}>
                   <MenuItem>
                     <TokenLogo address={allTokens[key].id}></TokenLogo>
                     <span>{allTokens[key].name}</span>
@@ -260,56 +239,49 @@ export const GlobalSearch = () => {
                 </BasicLink>
               )
             })}
-            {Object.keys(filteredTokenList).length > 3 &&
-              Object.keys(filteredTokenList).length >= tokensShown && (
-                <Heading>
-                  <Blue
-                    onClick={() => {
-                      setTokensShown(tokensShown + 5)
-                    }}
-                  >
-                    See more...
-                  </Blue>
-                </Heading>
-              )}
+            {Object.keys(filteredTokenList).length > 3 && Object.keys(filteredTokenList).length >= tokensShown && (
+              <Heading>
+                <Blue
+                  onClick={() => {
+                    setTokensShown(tokensShown + 5)
+                  }}
+                >
+                  See more...
+                </Blue>
+              </Heading>
+            )}
           </Tokens>
           <Heading>
             <Gray>Pools</Gray>
           </Heading>
           <Tokens shadow={showBottomShadow}>
-            {Object.keys(filteredPairList).length === 0 && (
-              <MenuItem>No results</MenuItem>
-            )}
+            {Object.keys(filteredPairList).length === 0 && <MenuItem>No results</MenuItem>}
             {filteredPairList.slice(0, pairsShown).map(key => {
               return (
-                <BasicLink to={"/pair/" + key} key={key}>
+                <BasicLink to={'/pair/' + key} key={key}>
                   <MenuItem>
                     <TokenLogo address={allPairs[key].id}></TokenLogo>
-                    <span>
-                      {allPairs[key].token0.symbol +
-                        "-" +
-                        allPairs[key].token1.symbol}{" "}
-                      Pool
-                    </span>
+                    <span>{allPairs[key].token0.symbol + '-' + allPairs[key].token1.symbol} Pool</span>
                   </MenuItem>
                 </BasicLink>
               )
             })}
-            {Object.keys(filteredPairList).length > 3 &&
-              Object.keys(filteredPairList).length >= pairsShown && (
-                <Heading>
-                  <Blue
-                    onClick={() => {
-                      setPairsShown(pairsShown + 5)
-                    }}
-                  >
-                    See more...
-                  </Blue>
-                </Heading>
-              )}
+            {Object.keys(filteredPairList).length > 3 && Object.keys(filteredPairList).length >= pairsShown && (
+              <Heading>
+                <Blue
+                  onClick={() => {
+                    setPairsShown(pairsShown + 5)
+                  }}
+                >
+                  See more...
+                </Blue>
+              </Heading>
+            )}
           </Tokens>
         </Menu>
       )}
     </div>
   )
 }
+
+export default Search

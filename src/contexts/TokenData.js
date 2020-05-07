@@ -48,16 +48,12 @@ function reducer(state, { type, payload }) {
       }
     }
     case UPDATE_TOKEN_TXNS: {
-      const { address, mints, burns, swaps } = payload
+      const { address, transactions } = payload
       return {
         ...state,
         [address]: {
           ...(safeAccess(state, [address]) || {}),
-          txns: {
-            mints,
-            burns,
-            swaps
-          }
+          txns: transactions
         }
       }
     }
@@ -88,10 +84,10 @@ export default function Provider({ children }) {
     })
   }, [])
 
-  const updateTokenTxns = useCallback((address, mints, burns, swaps) => {
+  const updateTokenTxns = useCallback((address, transactions) => {
     dispatch({
       type: UPDATE_TOKEN_TXNS,
-      payload: { address, mints, burns, swaps }
+      payload: { address, transactions }
     })
   }, [])
 
@@ -127,7 +123,6 @@ const getAllTokens = async () => {
 }
 
 const getTokenData = async (address, ethPrice) => {
-  let currentBlock = 6432338
   let oneDayBlock = 6426343
   let twoDayBlock = 6420546
   // const utcCurrentTime = dayjs()
@@ -141,10 +136,11 @@ const getTokenData = async (address, ethPrice) => {
 
   // fetch all current and historical data
   let result = await client.query({
-    query: TOKEN_DATA(address, currentBlock),
+    query: TOKEN_DATA(address),
     fetchPolicy: 'cache-first'
   })
   data = result.data && result.data.tokens && result.data.tokens[0]
+
   let oneDayResult = await client.query({
     query: TOKEN_DATA(address, oneDayBlock),
     fetchPolicy: 'cache-first'
@@ -163,19 +159,21 @@ const getTokenData = async (address, ethPrice) => {
       oneDayData.tradeVolumeUSD ? oneDayData.tradeVolumeUSD : 0,
       twoDayData.tradeVolumeUSD ? twoDayData.tradeVolumeUSD : 0
     )
+
     const [oneDayVolumeETH, volumeChangeETH] = get2DayPercentFormatted(
       data.tradeVolumeETH,
       oneDayData.tradeVolumeETH ? oneDayData.tradeVolumeETH : 0,
       twoDayData.tradeVolumeETH ? twoDayData.tradeVolumeETH : 0
     )
-    const priceChangeUSD = getPercentFormatted(data.derivedETH * ethPrice, oneDayData.priceUSD)
+
+    const priceChangeUSD = getPercentFormatted(data.derivedETH * ethPrice, oneDayData.derivedETH * ethPrice)
     const priceChangeETH = getPercentFormatted(data.derivedETH, oneDayData.priceETH)
     const liquidityChangeUSD = getPercentFormatted(data.totalLiquidityUSD, oneDayData.totalLiquidityUSD)
     const liquidityChangeETH = getPercentFormatted(data.totalLiquidityETH, oneDayData.totalLiquidityETH)
 
     // set data
     data.priceUSD = data.derivedETH * ethPrice
-    data.totalLiquidityUSD = data.totalLiquidityETH * ethPrice
+    data.totalLiquidityUSD = data.totalLiquidity * ethPrice * data.derivedETH
     data.oneDayVolumeUSD = oneDayVolumeUSD
     data.oneDayVolumeETH = oneDayVolumeETH
     data.volumeChangeUSD = volumeChangeUSD
@@ -184,11 +182,22 @@ const getTokenData = async (address, ethPrice) => {
     data.priceChangeETH = priceChangeETH
     data.liquidityChangeUSD = liquidityChangeUSD
     data.liquidityChangeETH = liquidityChangeETH
+  } else if (data && !oneDayData) {
+    // new tokens
+    data.priceUSD = data.derivedETH * ethPrice
+    data.totalLiquidityUSD = data.totalLiquidity * ethPrice * data.derivedETH
+    data.oneDayVolumeUSD = data.tradeVolumeUSD
+    data.oneDayVolumeETH = data.tradeVolume * data.derivedETH
+    data.volumeChangeUSD = 100
+    data.volumeChangeETH = 100
+    data.priceChangeUSD = 100
+    data.priceChangeETH = 100
+    data.liquidityChangeUSD = 100
+    data.liquidityChangeETH = 100
   } else {
     // new tokens
     data.priceUSD = 0
     data.totalLiquidityUSD = 0
-    data.oneDayVolumeUSD = 0
     data.oneDayVolumeETH = 0
     data.volumeChangeUSD = 0
     data.volumeChangeETH = 0
@@ -200,24 +209,20 @@ const getTokenData = async (address, ethPrice) => {
   return data
 }
 
-const getTokenTransactions = async tokenAddress => {
-  let mints = []
-  let burns = []
-  let swaps = []
+const getTokenTransactions = async (tokenAddress, allPairsFormatted) => {
   let result = await client.query({
     query: TOKEN_TXNS,
     variables: {
-      tokenAddr: tokenAddress
+      tokenAddr: tokenAddress,
+      allPairs: allPairsFormatted
     },
     fetchPolicy: 'cache-first'
   })
-  mints = mints.concat(result.data.asToken0Mint)
-  mints = mints.concat(result.data.asToken1Mint)
-  burns = burns.concat(result.data.asToken0Burn)
-  burns = burns.concat(result.data.asToken1Burn)
-  swaps = swaps.concat(result.data.asTokenBoughtSwap)
-  swaps = swaps.concat(result.data.asTokenSoldSwap)
-  return [mints, burns, swaps]
+  const transactions = {}
+  transactions.mints = result.data.mints
+  transactions.burns = result.data.burns
+  transactions.swaps = result.data.swaps
+  return transactions
 }
 
 const getTokenChartData = async tokenAddress => {
@@ -275,7 +280,7 @@ export function Updater() {
       getAllTokens().then(allTokens => {
         allTokens.map(async token => {
           let data = await getTokenData(token.id, ethPrice)
-          update(data)
+          data && update(data)
         })
       })
   }, [update, updateChartData, ethPrice])
@@ -300,16 +305,27 @@ export function useTokenData(tokenAddress) {
 export function useTokenTransactions(tokenAddress) {
   const [state, { updateTokenTxns }] = useTokenDataContext()
   const tokenTxns = safeAccess(state, [tokenAddress, 'txns'])
+
+  const allPairsFormatted =
+    state[tokenAddress] &&
+    state[tokenAddress].allPairs &&
+    state[tokenAddress].allPairs.map(pair => {
+      return pair.id
+    })
+
   useEffect(() => {
     async function checkForTxns() {
-      if (!tokenTxns) {
-        let [mints, burns, swap] = await getTokenTransactions(tokenAddress)
-        updateTokenTxns(tokenAddress, mints, burns, swap)
+      if (!tokenTxns && allPairsFormatted) {
+        let transactions = await getTokenTransactions(tokenAddress, allPairsFormatted)
+        updateTokenTxns(tokenAddress, transactions)
       }
     }
     checkForTxns()
-  }, [tokenTxns, tokenAddress, updateTokenTxns])
-  return tokenTxns
+  }, [tokenTxns, tokenAddress, updateTokenTxns, allPairsFormatted])
+
+  return useMemo(() => {
+    return tokenTxns
+  }, [tokenTxns])
 }
 
 export function useTokenChartData(tokenAddress) {

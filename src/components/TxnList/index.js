@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 
-import { formatTime, formattedNum } from '../../helpers'
+import { formatTime, formattedNum, urls } from '../../helpers'
 import { useMedia } from 'react-use'
 import { useCurrentCurrency } from '../../contexts/Application'
 
@@ -111,7 +111,7 @@ const DataText = styled(Flex)`
 `
 
 const SORT_FIELD = {
-  VALUE: 'valueUSD',
+  VALUE: 'amountUSD',
   AMOUNT0: 'token0Amount',
   AMOUNT1: 'token1Amount',
   TIMESTAMP: 'timestamp'
@@ -141,54 +141,55 @@ function TxnList({ transactions, txFilter }) {
     ADD: 'ADD',
     REMOVE: 'REMOVE'
   }
-
   // parse the txns and format for UI
   useEffect(() => {
     if (transactions) {
       let newTxns = []
-      transactions.map(transaction => {
-        if (transaction.mints.length > 0) {
-          transaction.mints.map(mint => {
-            let newTxn = {}
-            newTxn.timestamp = transaction.timestamp
-            newTxn.type = TXN_TYPE.ADD
-            newTxn.token0Amount = mint.amount0
-            newTxn.token1Amount = mint.amount1
-            newTxn.account = mint.to
-            newTxn.token0Symbol = mint.pair.token0.symbol
-            newTxn.token1Symbol = mint.pair.token1.symbol
-            newTxn.valueUSD = mint.amountUSD
-            return newTxns.push(newTxn)
-          })
-        }
-        if (transaction.burns.length > 0) {
-          transaction.burns.map(burn => {
-            let newTxn = {}
-            newTxn.timestamp = transaction.timestamp
-            newTxn.type = TXN_TYPE.REMOVE
-            newTxn.token0Amount = burn.amount0
-            newTxn.token1Amount = burn.amount1
-            newTxn.account = burn.from
-            newTxn.token0Symbol = burn.pair.token0.symbol
-            newTxn.token1Symbol = burn.pair.token1.symbol
-            newTxn.valueUSD = burn.amountUSD
-            return newTxns.push(newTxn)
-          })
-        }
-        if (transaction.swaps.length > 0) {
-          transaction.swaps.map(swap => {
-            let newTxn = {}
-            newTxn.timestamp = transaction.timestamp
-            newTxn.type = TXN_TYPE.SWAP
-            newTxn.token0Amount = swap.amountSold
-            newTxn.token1Amount = swap.amountBought
-            newTxn.token0Symbol = swap.pair.token0.symbol
-            newTxn.token1Symbol = swap.pair.token1.symbol
-            newTxn.account = swap.to
-            return newTxns.push(newTxn)
-          })
-        }
-      })
+      if (transactions.mints.length > 0) {
+        transactions.mints.map(mint => {
+          let newTxn = {}
+          newTxn.hash = mint.transaction.id
+          newTxn.timestamp = mint.transaction.timestamp
+          newTxn.type = TXN_TYPE.ADD
+          newTxn.token0Amount = mint.amount0
+          newTxn.token1Amount = mint.amount1
+          newTxn.account = mint.to
+          newTxn.token0Symbol = mint.pair.token0.symbol
+          newTxn.token1Symbol = mint.pair.token1.symbol
+          newTxn.amountUSD = mint.amountUSD
+          return newTxns.push(newTxn)
+        })
+      }
+      if (transactions.burns.length > 0) {
+        transactions.burns.map(burn => {
+          let newTxn = {}
+          newTxn.hash = burn.transaction.id
+          newTxn.timestamp = burn.transaction.timestamp
+          newTxn.type = TXN_TYPE.REMOVE
+          newTxn.token0Amount = burn.amount0
+          newTxn.token1Amount = burn.amount1
+          newTxn.account = burn.to
+          newTxn.token0Symbol = burn.pair.token0.symbol
+          newTxn.token1Symbol = burn.pair.token1.symbol
+          newTxn.amountUSD = burn.amountUSD
+          return newTxns.push(newTxn)
+        })
+      }
+      if (transactions.swaps.length > 0) {
+        transactions.swaps.map(swap => {
+          let newTxn = {}
+          newTxn.hash = swap.transaction.id
+          newTxn.timestamp = swap.transaction.timestamp
+          newTxn.type = TXN_TYPE.SWAP
+          newTxn.token0Amount = swap.amount0In + swap.amount0Out
+          newTxn.token1Amount = swap.amount1In + swap.amount1Out
+          newTxn.token0Symbol = swap.pair.token0.symbol
+          newTxn.token1Symbol = swap.pair.token1.symbol
+          newTxn.amountUSD = swap.amountUSD
+          newTxn.account = swap.to
+          return newTxns.push(newTxn)
+        })
+      }
 
       const filtered = newTxns.filter(item => {
         if (txFilter !== 'ALL') {
@@ -242,15 +243,15 @@ function TxnList({ transactions, txFilter }) {
     return (
       <DashGrid style={{ height: '60px' }}>
         <DataText area="txn" fontWeight="500">
-          <Link external href={'https://etherscan.io/address/' + item.account}>
+          <Link external href={urls.showTransaction(item.hash)}>
             {getTransactionType(item.type, item.token0Symbol, item.token1Symbol)}
           </Link>
         </DataText>
         <DataText area="value" color="text" fontWeight="500">
-          {currency === 'ETH' ? 'Ξ ' + formattedNum(item.valueETH) : formattedNum(item.valueUSD, true)}
+          {currency === 'ETH' ? 'Ξ ' + formattedNum(item.valueETH) : formattedNum(item.amountUSD, true)}
         </DataText>
-        <DataText area="amountToken">{formattedNum(item.token0Amount)}</DataText>
-        <DataText area="amountOther">{formattedNum(item.token1Amount)}</DataText>
+        <DataText area="amountToken">{formattedNum(item.token0Amount) + ' ' + item.token0Symbol}</DataText>
+        <DataText area="amountOther">{formattedNum(item.token1Amount) + ' ' + item.token1Symbol}</DataText>
         <DataText area="account">
           <Link external href={'https://etherscan.io/address/' + item.account}>
             {item.account && item.account.slice(0, 6) + '...' + item.account.slice(38, 42)}
@@ -278,7 +279,7 @@ function TxnList({ transactions, txFilter }) {
               setSortDirection(!sortDirection)
             }}
           >
-            Value {sortedColumn === SORT_FIELD.VALUE ? (!sortDirection ? '↑' : '↓') : ''}
+            Total Value {sortedColumn === SORT_FIELD.VALUE ? (!sortDirection ? '↑' : '↓') : ''}
           </ClickableText>
         </Flex>
         <Flex alignItems="center">
@@ -290,7 +291,7 @@ function TxnList({ transactions, txFilter }) {
               setSortDirection(!sortDirection)
             }}
           >
-            Token Amount {sortedColumn === SORT_FIELD.AMOUNT0 ? (!sortDirection ? '↑' : '↓') : ''}
+            Token 0 Amount {sortedColumn === SORT_FIELD.AMOUNT0 ? (!sortDirection ? '↑' : '↓') : ''}
           </ClickableText>
         </Flex>
         {!belowMedium ? (
@@ -304,7 +305,7 @@ function TxnList({ transactions, txFilter }) {
                   setSortDirection(!sortDirection)
                 }}
               >
-                Other Amount {sortedColumn === SORT_FIELD.AMOUNT1 ? (!sortDirection ? '↑' : '↓') : ''}
+                Token 1 Amount {sortedColumn === SORT_FIELD.AMOUNT1 ? (!sortDirection ? '↑' : '↓') : ''}
               </ClickableText>
             </Flex>
             <Flex alignItems="center">

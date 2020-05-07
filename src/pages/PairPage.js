@@ -1,27 +1,23 @@
-import React, { useState } from "react"
-import "feather-icons"
-import styled from "styled-components"
+import React, { useState } from 'react'
+import 'feather-icons'
+import styled from 'styled-components'
 
-import { Box, Text, Flex } from "rebass"
-import Panel from "../components/Panel"
-import TokenLogo from "../components/TokenLogo"
-import { RowFlat } from "../components/Row"
-import Column from "../components/Column"
-import { ButtonPlusDull, ButtonCustom } from "../components/ButtonStyled"
-import PairChart from "../components/PairChart"
-import Link from "../components/Link"
-import { Hint } from "../components"
-import TxnList from "../components/TxnList"
-import Loader from "../components/Loader"
+import { Box, Text, Flex } from 'rebass'
+import Panel from '../components/Panel'
+import TokenLogo from '../components/TokenLogo'
+import { RowFlat } from '../components/Row'
+import Column from '../components/Column'
+import { ButtonPlusDull, ButtonCustom } from '../components/ButtonStyled'
+import PairChart from '../components/PairChart'
+import Link from '../components/Link'
+import { Hint } from '../components'
+import TxnList from '../components/TxnList'
+import Loader from '../components/Loader'
 
-import { formattedNum } from "../helpers"
+import { formattedNum } from '../helpers'
 
-import {
-  usePairData,
-  usePairTransactions,
-  usePairChartData
-} from "../contexts/PairData"
-import { useCurrentCurrency } from "../contexts/Application"
+import { usePairData, usePairTransactions, usePairChartData } from '../contexts/PairData'
+import { useCurrentCurrency } from '../contexts/Application'
 
 const PageWrapper = styled.div`
   width: 100%;
@@ -126,8 +122,8 @@ const TopPanel = styled(Panel)`
 `
 
 const ButtonShadow = styled(ButtonCustom)`
-  box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.04), 0px 4px 8px rgba(0, 0, 0, 0.04),
-    0px 16px 24px rgba(0, 0, 0, 0.04), 0px 24px 32px rgba(0, 0, 0, 0.04);
+  box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.04), 0px 4px 8px rgba(0, 0, 0, 0.04), 0px 16px 24px rgba(0, 0, 0, 0.04),
+    0px 24px 32px rgba(0, 0, 0, 0.04);
 `
 
 const TokenDetailsLayout = styled.div`
@@ -152,23 +148,19 @@ const ThemedBackground = styled.div`
   height: 1000px;
   max-width: 100vw;
   z-index: -1;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 173, 0, 0.8) 0%,
-    rgba(255, 173, 0, 0) 100%
-  );
+  background: linear-gradient(180deg, rgba(255, 173, 0, 0.8) 0%, rgba(255, 173, 0, 0) 100%);
 `
 
 function PairPage({ address }) {
-  const [txFilter, setTxFilter] = useState("ALL")
+  const [txFilter, setTxFilter] = useState('ALL')
   const [currency] = useCurrentCurrency()
   const {
     token0,
     token1,
-    token0Balance,
-    token1Balance,
+    reserve0,
+    reserve1,
     combinedBalanceETH,
-    combinedBalanceUSD,
+    reserveUSD,
     oneDayVolumeETH,
     oneDayVolumeUSD,
     volumeChangeUSD,
@@ -177,46 +169,36 @@ function PairPage({ address }) {
     liquidityChangeETH
   } = usePairData(address)
   const chartData = usePairChartData(address)
-  const txns = usePairTransactions(address)
+  const transactions = usePairTransactions(address)
 
-  const liquidity =
-    currency === "ETH"
-      ? "Ξ " + formattedNum(combinedBalanceETH)
-      : "$" + formattedNum(combinedBalanceUSD)
+  const liquidity = currency === 'ETH' ? 'Ξ ' + formattedNum(combinedBalanceETH) : '$' + formattedNum(reserveUSD)
 
   const liquidityChange =
-    currency === "ETH"
-      ? formattedNum(liquidityChangeETH) + "%"
-      : formattedNum(liquidityChangeUSD) + "%"
+    currency === 'ETH' ? formattedNum(liquidityChangeETH) + '%' : formattedNum(liquidityChangeUSD) + '%'
 
-  const volume =
-    currency === "ETH"
-      ? "Ξ " + formattedNum(oneDayVolumeETH)
-      : "$" + formattedNum(oneDayVolumeUSD)
+  const volume = currency === 'ETH' ? 'Ξ ' + formattedNum(oneDayVolumeETH) : '$' + formattedNum(oneDayVolumeUSD)
 
-  const volumeChange =
-    currency === "ETH"
-      ? formattedNum(volumeChangeETH) + "%"
-      : formattedNum(volumeChangeUSD) + "%"
+  const volumeChange = currency === 'ETH' ? formattedNum(volumeChangeETH) + '%' : formattedNum(volumeChangeUSD) + '%'
 
   return (
     <PageWrapper>
       <ThemedBackground />
       <TokenHeader>
         <Row>
-          <TokenLogo
-            address={"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"}
-            size="32px"
-          />
-          <Text mx={"18px"}>
-            {token0 && token1
-              ? token0.symbol + "-" + token1.symbol + " Pool"
-              : ""}
-          </Text>
+          <TokenLogo address={'0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'} size="32px" />
+          <Text mx={'18px'}>{token0 && token1 ? token0.symbol + '-' + token1.symbol + ' Pool' : ''}</Text>
         </Row>
         <Row>
-          <ButtonPlusDull mx="1rem">Add Liquidity</ButtonPlusDull>
-          <ButtonShadow bgColor="#f5ba3f">Trade</ButtonShadow>
+          <ButtonPlusDull mx="1rem">
+            <Text fontSize={20} fontWeight={700}>
+              Join Pool
+            </Text>
+          </ButtonPlusDull>
+          <ButtonShadow bgColor="#f5ba3f">
+            <Text fontSize={20} fontWeight={700}>
+              Trade
+            </Text>
+          </ButtonShadow>
         </Row>
       </TokenHeader>
       <DashboardWrapper>
@@ -232,7 +214,7 @@ function PairPage({ address }) {
                 </Text>
                 <Text marginLeft={10}>{volumeChange}</Text>
               </RowFlat>
-              <RowFlat style={{ marginTop: "10px" }}>
+              <RowFlat style={{ marginTop: '10px' }}>
                 <Hint>Volume (24hrs)</Hint>
               </RowFlat>
             </Column>
@@ -245,7 +227,7 @@ function PairPage({ address }) {
                 </Text>
                 <Text marginLeft={10}>{liquidityChange}</Text>
               </RowFlat>
-              <RowFlat style={{ marginTop: "10px" }}>
+              <RowFlat style={{ marginTop: '10px' }}>
                 <Hint>Total Liquidity</Hint>
               </RowFlat>
             </Column>
@@ -254,11 +236,11 @@ function PairPage({ address }) {
             <Column>
               <RowFlat>
                 <Text fontSize={24} lineHeight={1} fontWeight={600}>
-                  {token0Balance ? formattedNum(token0Balance) : ""}
+                  {reserve0 ? formattedNum(reserve0) : ''}
                 </Text>
               </RowFlat>
-              <RowFlat style={{ marginTop: "10px" }}>
-                <Hint>{token0 ? token0.symbol + " balance" : ""}</Hint>
+              <RowFlat style={{ marginTop: '10px' }}>
+                <Hint>{token0 ? token0.symbol + ' balance' : ''}</Hint>
               </RowFlat>
             </Column>
           </TopPanel>
@@ -266,11 +248,11 @@ function PairPage({ address }) {
             <Column>
               <RowFlat>
                 <Text fontSize={24} lineHeight={1} fontWeight={600}>
-                  {token1Balance ? formattedNum(token1Balance) : ""}
+                  {reserve1 ? formattedNum(reserve1) : ''}
                 </Text>
               </RowFlat>
-              <RowFlat style={{ marginTop: "10px" }}>
-                <Hint>{token1 ? token1.symbol + " balance" : ""}</Hint>
+              <RowFlat style={{ marginTop: '10px' }}>
+                <Hint>{token1 ? token1.symbol + ' balance' : ''}</Hint>
               </RowFlat>
             </Column>
           </TopPanel>
@@ -279,65 +261,37 @@ function PairPage({ address }) {
         <Panel
           rounded
           style={{
-            border: "1px solid rgba(43, 43, 43, 0.05)",
-            marginBottom: "60px"
+            border: '1px solid rgba(43, 43, 43, 0.05)',
+            marginBottom: '60px'
           }}
           p={20}
         >
           <TokenDetailsLayout>
             <Column>
               <Text color="#888D9B">Pool Name</Text>
-              <Text
-                style={{ marginTop: "1rem" }}
-                fontSize={24}
-                fontWeight="500"
-              >
-                {token0 && token1
-                  ? token0.symbol + "-" + token1.symbol + " Pool"
-                  : ""}
+              <Text style={{ marginTop: '1rem' }} fontSize={24} fontWeight="500">
+                {token0 && token1 ? token0.symbol + '-' + token1.symbol + ' Pool' : ''}
               </Text>
             </Column>
             <Column>
               <Text color="#888D9B">Address</Text>
-              <Text
-                style={{ marginTop: "1rem" }}
-                fontSize={24}
-                fontWeight="500"
-              >
-                {address.slice(0, 6) + "..." + address.slice(38, 42)}
+              <Text style={{ marginTop: '1rem' }} fontSize={24} fontWeight="500">
+                {address.slice(0, 6) + '...' + address.slice(38, 42)}
               </Text>
             </Column>
             <Column>
-              <Text color="#888D9B">
-                {token0 && token0.symbol + " address"}
-              </Text>
-              <Text
-                style={{ marginTop: "1rem" }}
-                fontSize={24}
-                fontWeight="500"
-              >
-                {token0 &&
-                  token0.id.slice(0, 6) + "..." + token0.id.slice(38, 42)}
+              <Text color="#888D9B">{token0 && token0.symbol + ' address'}</Text>
+              <Text style={{ marginTop: '1rem' }} fontSize={24} fontWeight="500">
+                {token0 && token0.id.slice(0, 6) + '...' + token0.id.slice(38, 42)}
               </Text>
             </Column>
             <Column>
-              <Text color="#888D9B">
-                {token1 && token1.symbol + " address"}
-              </Text>
-              <Text
-                style={{ marginTop: "1rem" }}
-                fontSize={24}
-                fontWeight="500"
-              >
-                {token1 &&
-                  token1.id.slice(0, 6) + "..." + token1.id.slice(38, 42)}
+              <Text color="#888D9B">{token1 && token1.symbol + ' address'}</Text>
+              <Text style={{ marginTop: '1rem' }} fontSize={24} fontWeight="500">
+                {token1 && token1.id.slice(0, 6) + '...' + token1.id.slice(38, 42)}
               </Text>
             </Column>
-            <Link
-              color="button"
-              external
-              href={"https://etherscan.io/address/" + address}
-            >
+            <Link color="button" external href={'https://etherscan.io/address/' + address}>
               View on Etherscan
             </Link>
           </TokenDetailsLayout>
@@ -346,33 +300,33 @@ function PairPage({ address }) {
           <OptionsWrappper>
             <Text
               onClick={() => {
-                setTxFilter("ALL")
+                setTxFilter('ALL')
               }}
-              color={txFilter !== "ALL" ? "textDim" : "black"}
+              color={txFilter !== 'ALL' ? 'textDim' : 'black'}
             >
               All
             </Text>
             <Text
               onClick={() => {
-                setTxFilter("SWAP")
+                setTxFilter('SWAP')
               }}
-              color={txFilter !== "SWAP" ? "textDim" : "black"}
+              color={txFilter !== 'SWAP' ? 'textDim' : 'black'}
             >
               Swaps
             </Text>
             <Text
               onClick={() => {
-                setTxFilter("ADD")
+                setTxFilter('ADD')
               }}
-              color={txFilter !== "ADD" ? "textDim" : "black"}
+              color={txFilter !== 'ADD' ? 'textDim' : 'black'}
             >
               Add
             </Text>
             <Text
               onClick={() => {
-                setTxFilter("REMOVE")
+                setTxFilter('REMOVE')
               }}
-              color={txFilter !== "REMOVE" ? "textDim" : "black"}
+              color={txFilter !== 'REMOVE' ? 'textDim' : 'black'}
             >
               Remove
             </Text>
@@ -381,10 +335,10 @@ function PairPage({ address }) {
         <Panel
           rounded
           style={{
-            border: "1px solid rgba(43, 43, 43, 0.05)"
+            border: '1px solid rgba(43, 43, 43, 0.05)'
           }}
         >
-          {txns ? <TxnList txns={txns} txFilter={txFilter} /> : <Loader />}
+          {transactions ? <TxnList transactions={transactions} txFilter={txFilter} /> : <Loader />}
         </Panel>
       </DashboardWrapper>
     </PageWrapper>

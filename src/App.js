@@ -1,22 +1,20 @@
-import React from "react"
-import styled from "styled-components"
-import { ApolloProvider } from "react-apollo"
-import { client } from "./apollo/client"
-import {
-  Route,
-  Switch,
-  BrowserRouter,
-  withRouter,
-  Redirect
-} from "react-router-dom"
+import React from 'react'
+import styled from 'styled-components'
+import { ApolloProvider } from 'react-apollo'
+import { client } from './apollo/client'
+import { Route, Switch, BrowserRouter, withRouter, Redirect } from 'react-router-dom'
+import ScrolToTop from './components/ScrollToTop'
 
-import { useAllTokens } from "./contexts/TokenData"
+import { useAllTokens } from './contexts/TokenData'
 
-import GlobalPage from "./pages/GlobalPage"
-import TokenPage from "./pages/TokenPage"
-import PairPage from "./pages/PairPage"
-import NavHeader from "./components/NavHeader"
-import LocalLoader from "./components/LocalLoader"
+import GlobalPage from './pages/GlobalPage'
+import TokenPage from './pages/TokenPage'
+import PairPage from './pages/PairPage'
+import NavHeader from './components/NavHeader'
+import LocalLoader from './components/LocalLoader'
+import { AutoColumn } from './components/Column'
+import Link from './components/Link'
+import { lighten } from 'polished'
 
 const AppWrapper = styled.div`
   position: relative;
@@ -28,6 +26,20 @@ const AppWrapper = styled.div`
   justify-content: flex-start;
 `
 
+const MigrateBanner = styled(AutoColumn)`
+  width: 100%;
+  padding: 12px 0;
+  display: flex;
+  justify-content: center;
+  background-color: ${lighten(0.4, '#ff007a')};
+  color: ${({ theme }) => theme.pink2};
+  font-weight: 500;
+  text-align: center;
+  a {
+    color: ${({ theme }) => theme.pink2};
+  }
+`
+
 function App() {
   const NavHeaderUpdated = withRouter(props => <NavHeader default {...props} />)
 
@@ -36,8 +48,15 @@ function App() {
   return (
     <ApolloProvider client={client}>
       <AppWrapper>
+        <MigrateBanner>
+          <b>This site displays analystics for Uniswap V2 only.</b>&nbsp;To see Uniswap V1 analytics&nbsp;
+          <Link href="https://uniswap.info/" target="_blank">
+            <b>click here ↗</b>
+          </Link>
+        </MigrateBanner>
         {allTokens ? (
           <BrowserRouter>
+            <ScrolToTop />
             <Switch>
               <Route
                 exacts
@@ -47,20 +66,13 @@ function App() {
                   const searched =
                     allTokens &&
                     allTokens.filter(token => {
-                      return (
-                        token.id.toLowerCase() ===
-                        match.params.tokenAddress.toLowerCase()
-                      )
+                      return token.id.toLowerCase() === match.params.tokenAddress.toLowerCase()
                     })
                   if (allTokens && searched.length > 0) {
                     return (
                       <>
-                        <NavHeaderUpdated
-                          token={match.params.tokenAddress.toLowerCase()}
-                        />
-                        <TokenPage
-                          address={match.params.tokenAddress.toLowerCase()}
-                        />
+                        <NavHeaderUpdated token={match.params.tokenAddress.toLowerCase()} />
+                        <TokenPage address={match.params.tokenAddress.toLowerCase()} />
                       </>
                     )
                   } else {
@@ -76,12 +88,8 @@ function App() {
                   if (true) {
                     return (
                       <>
-                        <NavHeaderUpdated
-                          pair={match.params.pairAddress.toLowerCase()}
-                        />
-                        <PairPage
-                          address={match.params.pairAddress.toLowerCase()}
-                        />
+                        <NavHeaderUpdated pair={match.params.pairAddress.toLowerCase()} />
+                        <PairPage address={match.params.pairAddress.toLowerCase()} />
                       </>
                     )
                   } else {

@@ -133,12 +133,11 @@ async function getGlobalData() {
   // const utcCurrentTime = dayjs()
   // const utcOneDayBack = utcCurrentTime.subtract(1, 'day')
   // const utcTwoDaysBack = utcCurrentTime.subtract(2, 'day')
-  let currentBlock = 6432338
   let oneDayBlock = 6426343
   let twoDayBlock = 6420546
 
   let result = await client.query({
-    query: GLOBAL_DATA(currentBlock),
+    query: GLOBAL_DATA(),
     fetchPolicy: 'cache-first'
   })
   let data = result.data.uniswapFactories[0]
@@ -203,12 +202,13 @@ const getChartData = async () => {
     // add the day index to the set of days
     dayIndexSet.add((data[i].date / oneDay).toFixed(0))
     dayIndexArray.push(data[i])
+    dayData.dailyVolumeUSD = parseFloat(dayData.dailyVolumeUSD)
   })
 
   // fill in empty days
   let timestamp = data[0].date ? data[0].date : startTime
   let latestLiquidityUSD = data[0].totalLiquidityUSD
-  let latestVolumeUSD = data[0].totalVolumeUSD
+  let latestVolumeUSD = parseFloat(data[0].totalVolumeUSD)
   let latestDayDats = data[0].mostLiquidTokens
   let index = 1
   while (timestamp < utcEndTime.unix() - oneDay) {
@@ -223,12 +223,13 @@ const getChartData = async () => {
       })
     } else {
       latestLiquidityUSD = dayIndexArray[index].totalLiquidityUSD
-      latestVolumeUSD = dayIndexArray[index].totalVolumeUSD
+      latestVolumeUSD = parseFloat(dayIndexArray[index].totalVolumeUSD)
       latestDayDats = dayIndexArray[index].mostLiquidTokens
       index = index + 1
     }
     timestamp = nextDay
   }
+
   data = data.sort((a, b) => (parseInt(a.date) > parseInt(b.date) ? 1 : -1))
   return data
 }
@@ -238,7 +239,28 @@ const getGlobalTransactions = async () => {
     query: GLOBAL_TXNS,
     fetchPolicy: 'cache-first'
   })
-  return result.data.transactions
+  const transactions = {}
+  transactions.mints = []
+  transactions.burns = []
+  transactions.swaps = []
+  result.data.transactions.map(transaction => {
+    if (transaction.mints.length > 0) {
+      transaction.mints.map(mint => {
+        return transactions.mints.push(mint)
+      })
+    }
+    if (transaction.burns.length > 0) {
+      transaction.burns.map(burn => {
+        return transactions.burns.push(burn)
+      })
+    }
+    if (transaction.swaps.length > 0) {
+      transaction.swaps.map(swap => {
+        return transactions.swaps.push(swap)
+      })
+    }
+  })
+  return transactions
 }
 
 const getEthPrice = async () => {
@@ -246,6 +268,7 @@ const getEthPrice = async () => {
     query: ETH_PRICE,
     fetchPolicy: 'cache-first'
   })
+
   return result && result.data && result.data.bundles && result.data.bundles[0] && result.data.bundles[0].ethPrice
     ? result.data.bundles[0].ethPrice
     : 0

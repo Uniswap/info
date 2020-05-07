@@ -1,29 +1,36 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
 import { Area, XAxis, YAxis, ResponsiveContainer, Tooltip, AreaChart, BarChart, Bar } from 'recharts'
-import Row, { RowBetween } from '../Row'
-// import DropdownSelect from '../../components/DropdownSelect'
-// import { useAllTokens } from '../../contexts/TokenData'
+import Row, { AutoRow, RowBetween } from '../Row'
+import DropdownSelect from '../../components/DropdownSelect'
+
 import { toK, toNiceDate, toNiceDateYear } from '../../helpers'
 import { OptionButton } from '../ButtonStyled'
 
 const ChartWrapper = styled.div`
   /* margin-left: -1em; */
+  margin-top: 40px;
 `
 
-const GlobalChart = ({ chartData }) => {
+const StackedAreaChart = ({ chartData, token }) => {
   // const tokens = useAllTokens()
-
   // const newData =
   //   chartData &&
   //   chartData.map(dayItem => {
   //     let formattedItem = {}
-  //     const total = dayItem.totalLiquidityUSD
+  //     const total = parseFloat(dayItem.totalLiquidityUSD)
   //     let sum = 0
   //     formattedItem.date = dayItem.date
-  //     dayItem.mostLiquidTokens.map(tokenDayData => {
-  //       sum += parseFloat(tokenDayData.totalLiquidityUSD)
-  //       return (formattedItem[tokenDayData.token.id] = tokenDayData.totalLiquidityUSD)
+  //     dayItem.mostLiquidPairs.map(exchangeDayData => {
+  //       if (exchangeDayData.token0.id === token) {
+  //         const usdAmount = exchangeDayData.token0Balance * exchangeDayData.token0.derivedETH * 100
+  //         sum += usdAmount
+  //         return (formattedItem[exchangeDayData.token1.id] = usdAmount)
+  //       } else {
+  //         const usdAmount = exchangeDayData.token1Balance * exchangeDayData.token1.derivedETH * 100
+  //         sum += usdAmount
+  //         return (formattedItem[exchangeDayData.token0.id] = usdAmount)
+  //       }
   //     })
   //     formattedItem['other'] = total - sum
   //     return formattedItem
@@ -32,23 +39,18 @@ const GlobalChart = ({ chartData }) => {
   // const colors = [
   //   {
   //     key: 'key1',
-  //     color: 'rgba(239, 131, 78, 1)',
-  //     border: 'rgba(239, 131, 78, 1)'
+  //     color: 'rgba(255, 173, 0, 0.8)',
+  //     border: 'rgba(255, 173, 0, 1)'
   //   },
   //   {
   //     key: 'key2',
-  //     color: 'rgba(69, 142, 250 , 1)',
-  //     border: 'rgba(69, 142, 250 , 1)'
+  //     color: 'rgba(69, 142, 250 , 0.2)',
+  //     border: 'rgba(69, 142, 250 , 0.8)'
   //   },
   //   {
   //     key: 'key3',
-  //     color: 'rgba(250, 69, 69, 1)',
-  //     border: 'rgba(250, 69, 69, 1)'
-  //   },
-  //   {
-  //     key: 'key4',
-  //     color: 'rgba(131, 78, 239, 1)',
-  //     border: 'rgba(131, 78, 239, 1)'
+  //     color: 'rgba(250, 69, 69, 0.2)',
+  //     border: 'rgba(250, 69, 69, 0.4)'
   //   }
   // ]
 
@@ -61,92 +63,67 @@ const GlobalChart = ({ chartData }) => {
   //   }
   // }
 
-  const [chartFilter, setChartFilter] = useState('liqRaw')
+  const [chartFilter, setChartFilter] = useState('liq')
   const [timeWindow, setTimeWindow] = useState('week')
 
-  return chartData ? (
+  return (
     <ChartWrapper>
-      <RowBetween marginBottom={'10px'}>
-        <Row>
-          <OptionButton
-            style={{ marginRight: '10px' }}
-            active={chartFilter === 'liqRaw'}
-            onClick={() => setChartFilter('liqRaw')}
-          >
+      <RowBetween mb={40}>
+        <AutoRow gap="10px">
+          <OptionButton active={chartFilter === 'liq'} onClick={() => setChartFilter('liq')}>
             Liquidity
           </OptionButton>
-          <OptionButton
-            style={{ marginRight: '10px' }}
-            active={chartFilter === 'vol'}
-            onClick={() => setChartFilter('vol')}
-          >
+          <OptionButton active={chartFilter === 'vol'} onClick={() => setChartFilter('vol')}>
             Volume
           </OptionButton>
-        </Row>
-        <Row justify="flex-end">
-          <OptionButton
-            style={{ marginRight: '10px' }}
-            active={timeWindow === 'week'}
-            onClick={() => setTimeWindow('week')}
-          >
+        </AutoRow>
+        <AutoRow justify="flex-end" gap="10px">
+          <OptionButton active={timeWindow === 'week'} onClick={() => setTimeWindow('week')}>
             1 Week
           </OptionButton>
-          <OptionButton
-            style={{ marginRight: '10px' }}
-            active={timeWindow === 'month'}
-            onClick={() => setTimeWindow('month')}
-          >
+          <OptionButton active={timeWindow === 'month'} onClick={() => setTimeWindow('month')}>
             1 Month
           </OptionButton>
           <OptionButton active={timeWindow === 'all'} onClick={() => setTimeWindow('all')}>
             All Time
           </OptionButton>
-        </Row>
-        {/* <DropdownSelect options={options} active={timeline} setActive={setTimeline} /> */}
+        </AutoRow>
       </RowBetween>
-      {chartFilter === 'liqRaw' && chartData && (
-        <ResponsiveContainer aspect={60 / 28}>
-          <AreaChart margin={{ top: 20, right: 0, bottom: 6, left: 10 }} barCategoryGap={1} data={chartData}>
-            <defs>
-              <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#ff007a" stopOpacity={0.2} />
-                <stop offset="95%" stopColor="#ff007a" stopOpacity={0} />
-              </linearGradient>
-            </defs>
+      {chartFilter === 'liq' && chartData && (
+        <ResponsiveContainer aspect={60 / 12}>
+          <AreaChart margin={{ top: 10, right: 0, bottom: 6, left: 0 }} barCategoryGap={1} data={chartData}>
             <XAxis
               tickLine={false}
               axisLine={false}
               interval="preserveEnd"
               tickMargin={16}
-              minTickGap={20}
+              minTickGap={120}
               tickFormatter={tick => toNiceDate(tick)}
               dataKey="date"
               tick={{ fill: 'black' }}
             />
             <YAxis
               type="number"
+              // tickMargin={46}
               orientation="left"
-              tickFormatter={tick => '$' + toK(tick)}
+              tickFormatter={tick => toK(tick)}
               axisLine={false}
               tickLine={false}
-              interval={0}
-              minTickGap={50}
+              interval="preserveEnd"
+              minTickGap={80}
               // mirror={true}
               yAxisId={0}
-              padding={{ top: 20, bottom: 20 }}
               tick={{ fill: 'black' }}
             />
             <Tooltip
-              cursor={{ stroke: 'white', strokeWidth: 1 }}
+              cursor={true}
               formatter={val => toK(val, true)}
               labelFormatter={label => toNiceDateYear(label)}
               labelStyle={{ paddingTop: 4 }}
               contentStyle={{
                 padding: '10px 14px',
-                borderRadius: 5,
-                borderColor: '#ff007a',
-                background: 'white',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24) '
+                borderRadius: 10,
+                borderColor: 'var(--c-zircon)'
               }}
               wrapperStyle={{ top: -70, left: -10 }}
             />
@@ -155,34 +132,29 @@ const GlobalChart = ({ chartData }) => {
               dataKey={'totalLiquidityUSD'}
               stackId="2"
               strokeWidth={2}
-              stroke="rgb(255, 0, 122, 1)"
               dot={false}
               type="monotone"
               name={'Liquidity'}
               yAxisId={0}
-              fill="url(#colorUv)"
+              fill={'none'}
+              stroke={'black'}
             />
           </AreaChart>
         </ResponsiveContainer>
       )}
-      {/* {chartFilter === 'breakdown' && (
-        <ResponsiveContainer aspect={60 / 28}>
+      {/* {chartFilter === 'liq' && newData && (
+        <ResponsiveContainer aspect={60 / 12}>
           <AreaChart margin={{ top: 10, right: 0, bottom: 6, left: 0 }} barCategoryGap={1} data={newData}>
             <defs>
               {colors.map((color, i) => {
                 return (
                   <linearGradient key={i} id={color.key} x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor={color.color} stopOpacity={0.8} />
-                    <stop offset="95%" stopColor={color.color} stopOpacity={0.2} />
+                    <stop offset="95%" stopColor={color.color} stopOpacity={0} />
                   </linearGradient>
                 )
               })}
             </defs>
-            <Legend
-              margin={{ top: 40, left: 0, right: 0, bottom: 0 }}
-              iconType="circle"
-              wrapperStyle={{ paddingTop: '40px' }}
-            />
             <XAxis
               tickLine={false}
               axisLine={false}
@@ -252,8 +224,8 @@ const GlobalChart = ({ chartData }) => {
         </ResponsiveContainer>
       )} */}
       {chartFilter === 'vol' && (
-        <ResponsiveContainer aspect={60 / 28}>
-          <BarChart margin={{ top: 20, right: 0, bottom: 6, left: 10 }} barCategoryGap={1} data={chartData}>
+        <ResponsiveContainer aspect={60 / 12}>
+          <BarChart margin={{ top: 0, right: 0, bottom: 6, left: 10 }} barCategoryGap={1} data={chartData}>
             <XAxis
               tickLine={false}
               axisLine={false}
@@ -262,30 +234,26 @@ const GlobalChart = ({ chartData }) => {
               tickMargin={14}
               tickFormatter={tick => toNiceDate(tick)}
               dataKey="date"
-              tick={{ fill: 'black' }}
             />
             <YAxis
               type="number"
               axisLine={false}
               tickMargin={16}
-              tickFormatter={tick => '$' + toK(tick, true, true)}
+              tickFormatter={tick => toK(tick)}
               tickLine={false}
               interval="preserveEnd"
               minTickGap={80}
               yAxisId={0}
-              tick={{ fill: 'black' }}
-              domain={[0, 'dataMax']}
             />
             <Tooltip
-              cursor={{ fill: '#ff007a', opacity: 0.1 }}
+              cursor={true}
               formatter={val => toK(val, true)}
               labelFormatter={label => toNiceDateYear(label)}
               labelStyle={{ paddingTop: 4 }}
               contentStyle={{
                 padding: '10px 14px',
                 borderRadius: 10,
-                borderColor: 'red',
-                color: 'black'
+                borderColor: 'var(--c-zircon)'
               }}
               wrapperStyle={{ top: -70, left: -10 }}
             />
@@ -293,7 +261,7 @@ const GlobalChart = ({ chartData }) => {
               type="monotone"
               name={'Volume'}
               dataKey={'dailyVolumeUSD'}
-              fill="#ff007a"
+              fill="rgba(254, 109, 222, 0.6)"
               opacity={'0.4'}
               yAxisId={0}
               stroke="rgba(254, 109, 222, 0.8)"
@@ -302,9 +270,7 @@ const GlobalChart = ({ chartData }) => {
         </ResponsiveContainer>
       )}
     </ChartWrapper>
-  ) : (
-    ''
   )
 }
 
-export default GlobalChart
+export default StackedAreaChart

@@ -1,11 +1,11 @@
-import React from "react"
-import { Button as RebassButton } from "rebass"
-import styled from "styled-components"
-import { Plus } from "react-feather"
+import React from 'react'
+import { Button as RebassButton } from 'rebass'
+import styled from 'styled-components'
+import { Plus } from 'react-feather'
 
 const Base = styled(RebassButton)`
   padding: 8px 12px;
-  font-size: 1rem;
+  font-size: 16px;
   font-weight: 600;
   border-radius: 8px;
   color: white;
@@ -59,7 +59,7 @@ export function ButtonPlusDull({ disabled, children, ...rest }) {
     <Dull {...rest}>
       <ContentWrapper>
         <Plus size={16} />
-        <div style={{ display: "flex", alignItems: "center" }}>{children}</div>
+        <div style={{ display: 'flex', alignItems: 'center' }}>{children}</div>
       </ContentWrapper>
     </Dull>
   )
@@ -72,3 +72,19 @@ export function ButtonCustom({ children, bgColor, color, ...rest }) {
     </BaseCustom>
   )
 }
+
+export const OptionButton = styled.div`
+  font-weight: 500;
+  width: fit-content;
+  white-space: nowrap;
+  &:hover {
+    cursor: pointer;
+  }
+  background-color: ${({ active }) => (active ? 'rgba(0, 0, 0, 0.06);' : 'rgba(0, 0, 0, 0.02);')};
+  padding: 6px;
+  border-radius: 6px;
+
+  :hover {
+    background-color: rgba(0, 0, 0, 0.06);
+  }
+`

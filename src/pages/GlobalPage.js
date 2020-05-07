@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import 'feather-icons'
-import { Text, Flex } from 'rebass'
+import { Text } from 'rebass'
 import styled from 'styled-components'
 
-import { GlobalSearch } from '../components/Search'
-import { RowFlat } from '../components/Row'
+import { RowFlat, AutoRow } from '../components/Row'
 import Column from '../components/Column'
 import { Hint } from '../components'
 import PairList from '../components/PairList'
@@ -12,12 +11,16 @@ import TopTokenList from '../components/TopTokenList'
 import TxnList from '../components/TxnList'
 import GlobalChart from '../components/GlobalChart'
 
+import { Hover } from '../Theme'
+
 import { formattedNum } from '../helpers'
 import { useColor } from '../contexts/Application'
 import { useGlobalData, useEthPrice } from '../contexts/GlobalData'
 import { useAllTokenData } from '../contexts/TokenData'
 import { useCurrentCurrency } from '../contexts/Application'
 import { useAllPairs } from '../contexts/PairData'
+import { Search } from '../components/Search'
+import EthLogo from '../assets/eth.png'
 
 const PageWrapper = styled.div`
   width: 100%;
@@ -40,33 +43,20 @@ const ThemedBackground = styled.div`
   top: 0;
   left: 0;
   right: 0;
-  height: 500px;
+  height: 900px;
   max-width: 100vw;
   z-index: -1;
   background: ${({ theme }) => theme.background};
 `
 
-const ListOptions = styled(Flex)`
-  flex-direction: row;
+const ListOptions = styled(AutoRow)`
   height: 40px
-  justify-content: space-betwearen;
-  align-items; center;
   width: 100%;
   font-size: 24px;
   font-weight: 600;
 
   @media screen and (max-width: 64em) {
     display: none;
-  }
-`
-
-const OptionsWrappper = styled(Flex)`
-  align-items: center;
-  & > * {
-    margin-right: 1em;
-    &:hover {
-      cursor: pointer;
-    }
   }
 `
 
@@ -91,6 +81,7 @@ const Panel = styled.div`
   flex-direction: column;
   justify-content: flex-start;
   border-radius: 20px;
+  height: 100%;
   background-color: ${({ theme }) => theme.panelColor};
 `
 
@@ -111,6 +102,14 @@ const PaddedGroup = styled.div`
   padding: 24px;
 `
 
+const EthIcon = styled.img`
+  height: 26px;
+  width: 26px;
+  position: absolute;
+  top: 24px;
+  right: 20px;
+`
+
 function GlobalPage() {
   const [txFilter, setTxFilter] = useState('ALL')
   const [tokenFilter, setTokenFilter] = useState('TOKENS')
@@ -124,6 +123,8 @@ function GlobalPage() {
     volumeChangeETH,
     liquidityChangeUSD,
     liquidityChangeETH,
+    oneDayTxns,
+    txnChange,
     transactions,
     chartData
   } = useGlobalData()
@@ -153,17 +154,18 @@ function GlobalPage() {
   return (
     <PageWrapper>
       <ThemedBackground />
-      <GlobalSearch />
+      <Search />
       <GridRow style={{ marginTop: '40px' }}>
         <LeftGroup>
-          <Panel>
+          <Panel style={{ position: 'relative' }}>
+            <EthIcon src={EthLogo} />
             <PaddedGroup>
               <Column>
                 <RowFlat>
                   <Text fontSize={36} lineHeight={1} fontWeight={600}>
                     {formattedEthPrice}
                   </Text>
-                  <Text marginLeft="10px">{liquidityChange}</Text>
+                  {/* <Text marginLeft="10px">{liquidityChange}</Text> */}
                 </RowFlat>
                 <RowFlat style={{ marginTop: '10px' }}>
                   <Hint>ETH Uniprice</Hint>
@@ -198,9 +200,9 @@ function GlobalPage() {
               <Column>
                 <RowFlat>
                   <Text fontSize={36} lineHeight={1} fontWeight={600}>
-                    {0}
+                    {oneDayTxns}
                   </Text>
-                  <Text marginLeft="10px">{volumeChange}</Text>
+                  <Text marginLeft="10px">{txnChange}%</Text>
                 </RowFlat>
                 <RowFlat style={{ marginTop: '10px' }}>
                   <Hint>Transactions (24hrs)</Hint>
@@ -217,8 +219,8 @@ function GlobalPage() {
       </GridRow>
       <Panel style={{ marginTop: '6px' }}>
         <PaddedGroup>
-          <ListOptions>
-            <OptionsWrappper>
+          <ListOptions gap="10px">
+            <Hover>
               <Text
                 onClick={() => {
                   setTokenFilter('TOKENS')
@@ -227,6 +229,8 @@ function GlobalPage() {
               >
                 Top Tokens
               </Text>
+            </Hover>
+            <Hover>
               <Text
                 onClick={() => {
                   setTokenFilter('PAIRS')
@@ -235,16 +239,18 @@ function GlobalPage() {
               >
                 Top Pairs
               </Text>
-            </OptionsWrappper>
+            </Hover>
           </ListOptions>
         </PaddedGroup>
         {allTokenData && tokenFilter === 'TOKENS' && <TopTokenList tokens={allTokenData} />}
-        {allTokenData && tokenFilter === 'PAIRS' && <PairList pairs={pairs} />}
+        {allTokenData && tokenFilter === 'PAIRS' && (
+          <PairList pairs={pairs && Object.keys(pairs).map(key => pairs[key])} />
+        )}
       </Panel>
       <Panel style={{ marginTop: '6px' }}>
         <PaddedGroup>
-          <ListOptions>
-            <OptionsWrappper>
+          <ListOptions gap="10px">
+            <Hover>
               <Text
                 onClick={() => {
                   setTxFilter('ALL')
@@ -253,6 +259,8 @@ function GlobalPage() {
               >
                 All
               </Text>
+            </Hover>
+            <Hover>
               <Text
                 onClick={() => {
                   setTxFilter('SWAP')
@@ -261,6 +269,8 @@ function GlobalPage() {
               >
                 Swaps
               </Text>
+            </Hover>
+            <Hover>
               <Text
                 onClick={() => {
                   setTxFilter('ADD')
@@ -269,6 +279,8 @@ function GlobalPage() {
               >
                 Add
               </Text>
+            </Hover>
+            <Hover>
               <Text
                 onClick={() => {
                   setTxFilter('REMOVE')
@@ -277,7 +289,7 @@ function GlobalPage() {
               >
                 Remove
               </Text>
-            </OptionsWrappper>
+            </Hover>
           </ListOptions>
         </PaddedGroup>
         <TxnList transactions={transactions} txFilter={txFilter} />

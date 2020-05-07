@@ -1,28 +1,25 @@
-import React, { useState } from "react"
-import "feather-icons"
-import { Box, Text, Flex } from "rebass"
-import styled from "styled-components"
+import React, { useState } from 'react'
+import 'feather-icons'
+import { Box, Text } from 'rebass'
+import styled from 'styled-components'
 
-import Panel from "../components/Panel"
-import TokenLogo from "../components/TokenLogo"
-import PairList from "../components/PairList"
-import Loader from "../components/Loader"
-import { RowFlat } from "../components/Row"
-import Column from "../components/Column"
-import { ButtonPlusDull, ButtonCustom } from "../components/ButtonStyled"
-import TxnList from "../components/TxnList"
-import StackedAreaChart from "../components/StackedAreaChart"
-import Link from "../components/Link"
+import Panel from '../components/Panel'
+import TokenLogo from '../components/TokenLogo'
+import PairList from '../components/PairList'
+import Loader from '../components/Loader'
+import { RowFlat, AutoRow, RowBetween } from '../components/Row'
+import Column from '../components/Column'
+import { ButtonPlusDull, ButtonCustom } from '../components/ButtonStyled'
+import TxnList from '../components/TxnList'
+import StackedAreaChart from '../components/StackedAreaChart'
+import Link from '../components/Link'
 
-import { formattedNum } from "../helpers"
-import { Hint } from "../components/."
+import { formattedNum } from '../helpers'
+import { Hint } from '../components/.'
 
-import {
-  useTokenData,
-  useTokenTransactions,
-  useTokenChartData
-} from "../contexts/TokenData"
-import { useCurrentCurrency } from "../contexts/Application"
+import { useTokenData, useTokenTransactions, useTokenChartData } from '../contexts/TokenData'
+import { useCurrentCurrency } from '../contexts/Application'
+import { Hover } from '../Theme'
 
 const TopPercent = styled.div`
   align-self: flex-end;
@@ -91,32 +88,6 @@ const ListHeader = styled.div`
   margin: 5rem 0 2rem 0;
 `
 
-const ListOptions = styled(Flex)`
-  flex-direction: row;
-  height: 40px
-  justify-content: space-between;
-  align-items; center;
-  width: 100%;
-  margin: 2rem 0;
-  font-size: 20px;
-  font-weight: 600;
-
-  @media screen and (max-width: 64em) {
-    display: none;
-  }
-  
-`
-
-const OptionsWrappper = styled(Flex)`
-  align-items: center;
-  & > * {
-    margin-right: 1em;
-    &:hover {
-      cursor: pointer;
-    }
-  }
-`
-
 const AccountSearch = styled.input`
   font-size: 14px;
   border: none;
@@ -179,8 +150,8 @@ const EmojiWrapper = styled.span`
 `
 
 const ButtonShadow = styled(ButtonCustom)`
-  box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.04), 0px 4px 8px rgba(0, 0, 0, 0.04),
-    0px 16px 24px rgba(0, 0, 0, 0.04), 0px 24px 32px rgba(0, 0, 0, 0.04);
+  box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.04), 0px 4px 8px rgba(0, 0, 0, 0.04), 0px 16px 24px rgba(0, 0, 0, 0.04),
+    0px 24px 32px rgba(0, 0, 0, 0.04);
 `
 
 const TokenDetailsLayout = styled.div`
@@ -210,30 +181,21 @@ const ThemedBackground = styled.div`
   height: 1000px;
   max-width: 100vw;
   z-index: -1;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 173, 0, 0.8) 0%,
-    rgba(255, 173, 0, 0) 100%
-  );
+  background: linear-gradient(180deg, rgba(255, 173, 0, 0.8) 0%, rgba(255, 173, 0, 0) 100%);
 `
 
 function getPercentSign(value) {
   return (
     <Text fontSize={14} lineHeight={1.2}>
-      {value !== undefined &&
-        (value < 0
-          ? value + "% ↓"
-          : parseInt(value) === 0
-          ? value + "%"
-          : value + "% ↑")}
+      {value !== undefined && (value < 0 ? value + '% ↓' : parseInt(value) === 0 ? value + '%' : value + '% ↑')}
     </Text>
   )
 }
 
 function TokenPage({ address }) {
-  const [txFilter, setTxFilter] = useState("ALL")
+  const [txFilter, setTxFilter] = useState('ALL')
 
-  const [accountInput, setAccountInput] = useState("")
+  const [accountInput, setAccountInput] = useState('')
 
   const {
     name,
@@ -245,7 +207,7 @@ function TokenPage({ address }) {
     oneDayVolumeETH,
     totalLiquidityUSD,
     totalLiquidityETH,
-    totalLiquidityToken,
+    totalLiquidity,
     volumeChangeUSD,
     volumeChangeETH,
     priceChangeUSD,
@@ -257,38 +219,30 @@ function TokenPage({ address }) {
   const chartData = useTokenChartData(address)
 
   // all transactions with this token
-  const txns = useTokenTransactions(address)
+  const transactions = useTokenTransactions(address)
 
   const [currency] = useCurrentCurrency()
 
-  const price =
-    currency === "ETH"
-      ? "Ξ " + formattedNum(derivedETH)
-      : formattedNum(priceUSD, true)
+  const price = currency === 'ETH' ? 'Ξ ' + formattedNum(derivedETH) : formattedNum(priceUSD, true)
 
-  const priceChange =
-    currency === "ETH"
-      ? getPercentSign(priceChangeETH)
-      : getPercentSign(priceChangeUSD)
+  const priceChange = currency === 'ETH' ? getPercentSign(priceChangeETH) : getPercentSign(priceChangeUSD)
 
-  const volume =
-    currency === "ETH"
-      ? "Ξ " + formattedNum(oneDayVolumeETH)
-      : formattedNum(oneDayVolumeUSD, true)
-  const volumeChange =
-    currency === "ETH"
-      ? getPercentSign(volumeChangeETH)
-      : getPercentSign(volumeChangeUSD)
+  const volume = currency === 'ETH' ? 'Ξ ' + formattedNum(oneDayVolumeETH) : formattedNum(oneDayVolumeUSD, true)
+  const volumeChange = currency === 'ETH' ? getPercentSign(volumeChangeETH) : getPercentSign(volumeChangeUSD)
 
-  const liquidity =
-    currency === "ETH"
-      ? "Ξ " + formattedNum(totalLiquidityETH)
-      : formattedNum(totalLiquidityUSD, true)
+  const liquidity = currency === 'ETH' ? 'Ξ ' + formattedNum(totalLiquidityETH) : formattedNum(totalLiquidityUSD, true)
 
-  const liquidityChange =
-    currency === "ETH"
-      ? getPercentSign(liquidityChangeETH)
-      : getPercentSign(liquidityChangeUSD)
+  const liquidityChange = currency === 'ETH' ? getPercentSign(liquidityChangeETH) : getPercentSign(liquidityChangeUSD)
+
+  const Option = ({ onClick, active, children }) => {
+    return (
+      <Hover>
+        <Text onClick={onClick} color={!active ? '#aeaeae' : 'black'} fontWeight={600} fontSize={24}>
+          {children}
+        </Text>
+      </Hover>
+    )
+  }
 
   return (
     <PageWrapper>
@@ -296,12 +250,9 @@ function TokenPage({ address }) {
       <TokenHeader>
         <Row>
           <TokenGroup>
-            <TokenLogo
-              address={"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"}
-              size="32px"
-            />
-            <TokenName>{name ? name + " " : ""} </TokenName>
-            <div>{symbol ? "(" + symbol + ")" : ""}</div>
+            <TokenLogo address={'0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'} size="32px" />
+            <TokenName>{name ? name + ' ' : ''} </TokenName>
+            <div>{symbol ? '(' + symbol + ')' : ''}</div>
           </TokenGroup>
           <TokenGroup>
             <TokenPrice>{price}</TokenPrice>
@@ -309,12 +260,20 @@ function TokenPage({ address }) {
           </TokenGroup>
         </Row>
         <Row>
-          <ButtonPlusDull mx="1rem">Add Liquidity</ButtonPlusDull>
-          <ButtonShadow bgColor="#f5ba3f">Trade</ButtonShadow>
+          <ButtonPlusDull mx="1rem">
+            <Text fontSize={16} fontWeight={600}>
+              Join Pool
+            </Text>
+          </ButtonPlusDull>
+          <ButtonShadow bgColor="#f5ba3f">
+            <Text fontSize={16} fontWeight={600}>
+              Trade
+            </Text>
+          </ButtonShadow>
         </Row>
       </TokenHeader>
       <DashboardWrapper>
-        <ChartWrapper area="fill" rounded style={{ height: "300px" }}>
+        <ChartWrapper area="fill" rounded style={{ height: '300px' }}>
           <StackedAreaChart chartData={chartData} token={address} />
         </ChartWrapper>
         <PanelWrapper>
@@ -324,9 +283,9 @@ function TokenPage({ address }) {
                 <Text fontSize={24} lineHeight={1} fontWeight={600}>
                   {volume}
                 </Text>
-                <div style={{ marginLeft: "10px" }}>{volumeChange}</div>
+                <div style={{ marginLeft: '10px' }}>{volumeChange}</div>
               </RowFlat>
-              <RowFlat style={{ marginTop: "10px" }}>
+              <RowFlat style={{ marginTop: '10px' }}>
                 <Hint>Volume (24hrs)</Hint>
               </RowFlat>
             </Column>
@@ -337,9 +296,9 @@ function TokenPage({ address }) {
                 <Text fontSize={24} lineHeight={1} fontWeight={600}>
                   {liquidity}
                 </Text>
-                <Text marginLeft={"10px"}>{liquidityChange}</Text>
+                <Text marginLeft={'10px'}>{liquidityChange}</Text>
               </RowFlat>
-              <RowFlat style={{ marginTop: "10px" }}>
+              <RowFlat style={{ marginTop: '10px' }}>
                 <Hint>Total Liquidity</Hint>
               </RowFlat>
             </Column>
@@ -348,11 +307,10 @@ function TokenPage({ address }) {
             <Column>
               <RowFlat>
                 <Text fontSize={24} lineHeight={1} fontWeight={600}>
-                  {totalLiquidityToken !== undefined &&
-                    formattedNum(totalLiquidityToken)}
+                  {totalLiquidity && formattedNum(totalLiquidity)}
                 </Text>
               </RowFlat>
-              <RowFlat style={{ marginTop: "10px" }}>
+              <RowFlat style={{ marginTop: '10px' }}>
                 <Hint>Total Liquidity Token</Hint>
               </RowFlat>
             </Column>
@@ -362,42 +320,30 @@ function TokenPage({ address }) {
         <Panel
           rounded
           style={{
-            border: "1px solid rgba(43, 43, 43, 0.05)"
+            border: '1px solid rgba(43, 43, 43, 0.05)'
           }}
           p={20}
         >
           <TokenDetailsLayout>
             <Column>
               <Text color="#888D9B">Symbol</Text>
-              <Text
-                style={{ marginTop: "1rem" }}
-                fontSize={24}
-                fontWeight="500"
-              >
+              <Text style={{ marginTop: '1rem' }} fontSize={24} fontWeight="500">
                 {symbol}
               </Text>
             </Column>
             <Column>
               <Text color="#888D9B">Name</Text>
-              <Text
-                style={{ marginTop: "1rem" }}
-                fontSize={24}
-                fontWeight="500"
-              >
+              <Text style={{ marginTop: '1rem' }} fontSize={24} fontWeight="500">
                 {name}
               </Text>
             </Column>
             <Column>
               <Text color="#888D9B">Address</Text>
-              <Text
-                style={{ marginTop: "1rem" }}
-                fontSize={24}
-                fontWeight="500"
-              >
-                {address.slice(0, 6) + "..." + address.slice(38, 42)}
+              <Text style={{ marginTop: '1rem' }} fontSize={24} fontWeight="500">
+                {address.slice(0, 6) + '...' + address.slice(38, 42)}
               </Text>
             </Column>
-            <Link external href={"https://etherscan.io/address/" + address}>
+            <Link external href={'https://etherscan.io/address/' + address}>
               View on Etherscan
             </Link>
           </TokenDetailsLayout>
@@ -406,54 +352,50 @@ function TokenPage({ address }) {
         <Panel
           rounded
           style={{
-            border: "1px solid rgba(43, 43, 43, 0.05)"
+            border: '1px solid rgba(43, 43, 43, 0.05)'
           }}
         >
-          {address ? (
-            <PairList address={address} pairs={allPairs} />
-          ) : (
-            <Loader />
-          )}
+          {address ? <PairList address={address} pairs={allPairs} /> : <Loader />}
         </Panel>
-        <ListOptions>
-          <OptionsWrappper>
-            <Text
+        <RowBetween mt={40} mb={40}>
+          <AutoRow gap="10px" pl={4}>
+            <Option
               onClick={() => {
-                setTxFilter("ALL")
+                setTxFilter('ALL')
               }}
-              color={txFilter !== "ALL" ? "textDim" : "black"}
+              active={txFilter === 'ALL'}
             >
               All
-            </Text>
-            <Text
+            </Option>
+            <Option
               onClick={() => {
-                setTxFilter("SWAP")
+                setTxFilter('SWAP')
               }}
-              color={txFilter !== "SWAP" ? "textDim" : "black"}
+              active={txFilter === 'SWAP'}
             >
               Swaps
-            </Text>
-            <Text
+            </Option>
+            <Option
               onClick={() => {
-                setTxFilter("ADD")
+                setTxFilter('ADD')
               }}
-              color={txFilter !== "ADD" ? "textDim" : "black"}
+              active={txFilter === 'ADD'}
             >
-              Add
-            </Text>
-            <Text
+              Adds
+            </Option>
+            <Option
               onClick={() => {
-                setTxFilter("REMOVE")
+                setTxFilter('REMOVE')
               }}
-              color={txFilter !== "REMOVE" ? "textDim" : "black"}
+              active={txFilter === 'REMOVE'}
             >
-              Remove
-            </Text>
-          </OptionsWrappper>
+              Removes
+            </Option>
+          </AutoRow>
           <AccountSearchWrapper>
             <AccountSearch
               value={accountInput}
-              placeholder={"Filter by account"}
+              placeholder={'Filter by account'}
               onChange={e => {
                 setAccountInput(e.target.value)
               }}
@@ -464,14 +406,14 @@ function TokenPage({ address }) {
               </span>
             </EmojiWrapper>
           </AccountSearchWrapper>
-        </ListOptions>
+        </RowBetween>
         <Panel
           rounded
           style={{
-            border: "1px solid rgba(43, 43, 43, 0.05)"
+            border: '1px solid rgba(43, 43, 43, 0.05)'
           }}
         >
-          {txns ? <TxnList txns={txns} txFilter={txFilter} /> : <Loader />}
+          {transactions ? <TxnList transactions={transactions} txFilter={txFilter} /> : <Loader />}
         </Panel>
       </DashboardWrapper>
     </PageWrapper>
