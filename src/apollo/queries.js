@@ -79,11 +79,8 @@ export const PAIR_DATA = (pairAddress, block) => {
   const queryString = block
     ? `
     query pairs {
-      pairs(block: {number: ` +
-      block +
-      `} where: { id: "` +
-      pairAddress +
-      `"}) {
+      pairs(block: {number: ${block} 
+      } where: { id: "${pairAddress}"}) {
         id
         token0 {
           id

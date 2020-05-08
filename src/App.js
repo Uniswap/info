@@ -31,12 +31,12 @@ const MigrateBanner = styled(AutoColumn)`
   padding: 12px 0;
   display: flex;
   justify-content: center;
-  background-color: ${lighten(0.4, '#ff007a')};
-  color: ${({ theme }) => theme.pink2};
+  background-color: rgba(255, 255, 255, 0.3);
+  color: ${({ theme }) => theme.text1};
   font-weight: 500;
   text-align: center;
   a {
-    color: ${({ theme }) => theme.pink2};
+    color: ${({ theme }) => theme.text1};
   }
 `
 

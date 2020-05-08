@@ -15,10 +15,10 @@ const Base = styled(RebassButton)`
 `
 
 const BaseCustom = styled(RebassButton)`
-  padding: 8px 12px;
+  padding: 16px 12px;
   font-size: 1rem;
   font-weight: 400;
-  border-radius: 8px;
+  border-radius: 12px;
   cursor: pointer;
   outline: none;
 `
@@ -52,6 +52,16 @@ const ContentWrapper = styled.div`
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
+`
+
+export const ButtonLight = styled(Base)`
+  background-color: rgba(255, 255, 255, 0.8);
+  color: (0, 0, 0, 0.5);
+`
+
+export const ButtonFaded = styled(Base)`
+  background-color: rgba(0, 0, 0, 0.02);
+  color: (255, 255, 255, 0.5);
 `
 
 export function ButtonPlusDull({ disabled, children, ...rest }) {

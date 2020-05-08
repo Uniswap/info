@@ -1,21 +1,12 @@
-import React, {
-  createContext,
-  useContext,
-  useReducer,
-  useMemo,
-  useCallback
-} from "react"
+import React, { createContext, useContext, useReducer, useMemo, useCallback } from 'react'
 
-const UPDATE = "UPDATE"
-const UPDATE_COLOR = "UPDATE_COLOR"
+const UPDATE = 'UPDATE'
+const UPDATE_COLOR = 'UPDATE_COLOR'
 
 export function safeAccess(object, path) {
   return object
     ? path.reduce(
-        (accumulator, currentValue) =>
-          accumulator && accumulator[currentValue]
-            ? accumulator[currentValue]
-            : null,
+        (accumulator, currentValue) => (accumulator && accumulator[currentValue] ? accumulator[currentValue] : null),
         object
       )
     : null
@@ -50,7 +41,7 @@ function reducer(state, { type, payload }) {
 }
 
 export default function Provider({ children }) {
-  const [state, dispatch] = useReducer(reducer, { currency: "USD" })
+  const [state, dispatch] = useReducer(reducer, { currency: 'USD' })
   const update = useCallback(currency => {
     dispatch({
       type: UPDATE,
@@ -70,13 +61,7 @@ export default function Provider({ children }) {
   }, [])
 
   return (
-    <ApplicationContext.Provider
-      value={useMemo(() => [state, { update, updateColor }], [
-        state,
-        update,
-        updateColor
-      ])}
-    >
+    <ApplicationContext.Provider value={useMemo(() => [state, { update, updateColor }], [state, update, updateColor])}>
       {children}
     </ApplicationContext.Provider>
   )
@@ -85,10 +70,10 @@ export default function Provider({ children }) {
 export function useCurrentCurrency() {
   const [state, { update }] = useApplicationContext()
   const toggleCurrency = useCallback(() => {
-    if (state.currency === "ETH") {
-      update("USD")
+    if (state.currency === 'ETH') {
+      update('USD')
     } else {
-      update("ETH")
+      update('ETH')
     }
   }, [state, update])
   return [state.currency, toggleCurrency]

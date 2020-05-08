@@ -4,7 +4,6 @@ import dayjs from 'dayjs'
 import LocalLoader from '../LocalLoader'
 import utc from 'dayjs/plugin/utc'
 import { Box, Flex, Text } from 'rebass'
-import TokenLogo from '../TokenLogo'
 import styled from 'styled-components'
 
 import Link, { CustomLink } from '../Link'
@@ -13,6 +12,8 @@ import { Divider } from '../../components'
 import { formattedNum } from '../../helpers'
 import { useCurrentCurrency } from '../../contexts/Application'
 import { usePairData, useAllPairs } from '../../contexts/PairData'
+import DoubleTokenLogo from '../DoubleLogo'
+import { ButtonFaded } from '../ButtonStyled'
 
 dayjs.extend(utc)
 
@@ -72,7 +73,7 @@ const DashGrid = styled.div`
       }
 
       &:nth-child(2) {
-        justify-content: flex-start;
+        justify-content: flex-end;
       }
     }
   }
@@ -82,8 +83,8 @@ const DashGrid = styled.div`
     display: grid;
     padding: 0 24px;
     grid-gap: 1em;
-    grid-template-columns: 20px 2.2fr 1fr 1fr 1fr;
-    grid-template-areas: 'number name liq vol supply';
+    grid-template-columns: 2.2fr 1fr 1fr 1fr;
+    grid-template-areas: 'name liq vol supply';
   }
 `
 
@@ -108,7 +109,7 @@ const DataText = styled(Flex)`
   }
 
   align-items: center;
-  text-align: right;
+  text-align: center;
 
   & > * {
     font-size: 1em;
@@ -172,13 +173,10 @@ function PairList({ pairs }) {
 
     return (
       <DashGrid style={{ height: '60px' }}>
-        <DataText area="number" fontWeight="500">
-          {index}
-        </DataText>
         <DataText area="name" fontWeight="500">
-          <TokenLogo address={item.id} />
+          <DoubleTokenLogo a0={item.token0.id || ''} a1={item.token1.id || ''} />
           <CustomLink
-            style={{ marginLeft: '10px' }}
+            style={{ marginLeft: '20px', whiteSpace: 'nowrap' }}
             to={'/pair/' + item.id}
             onClick={() => {
               window.scrollTo(0, 0)
@@ -192,9 +190,11 @@ function PairList({ pairs }) {
           <DataText area="vol">{volume}</DataText>
         </>
         <DataText area="supply">
-          <Link ml="3" external href={''}>
-            Add Liquidity
-          </Link>
+          <ButtonFaded>
+            <Link external href={''}>
+              + Join Pool
+            </Link>
+          </ButtonFaded>
         </DataText>
       </DashGrid>
     )
@@ -203,17 +203,12 @@ function PairList({ pairs }) {
   return (
     <ListWrapper>
       <DashGrid center={true} style={{ height: '60px' }}>
-        <Flex alignItems="center">
-          <Text area="number" fontWeight="500">
-            #
-          </Text>
-        </Flex>
         <Flex alignItems="center" justifyContent="flexStart">
           <Text area="name" fontWeight="500">
             Name
           </Text>
         </Flex>
-        <Flex alignItems="center">
+        <Flex alignItems="center" justifyContent="flexEnd">
           <ClickableText
             area="liq"
             onClick={e => {

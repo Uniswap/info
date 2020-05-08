@@ -9,17 +9,18 @@ import PairList from '../components/PairList'
 import Loader from '../components/Loader'
 import { RowFlat, AutoRow, RowBetween } from '../components/Row'
 import Column from '../components/Column'
-import { ButtonPlusDull, ButtonCustom } from '../components/ButtonStyled'
+import { ButtonCustom, ButtonLight } from '../components/ButtonStyled'
 import TxnList from '../components/TxnList'
-import StackedAreaChart from '../components/StackedAreaChart'
+import TokenChart from '../components/TokenChart'
 import Link from '../components/Link'
-
 import { formattedNum } from '../helpers'
 import { Hint } from '../components/.'
 
 import { useTokenData, useTokenTransactions, useTokenChartData } from '../contexts/TokenData'
 import { useCurrentCurrency } from '../contexts/Application'
 import { Hover } from '../Theme'
+import { useColor } from '../hooks'
+import CopyHelper from '../components/Copy'
 
 const TopPercent = styled.div`
   align-self: flex-end;
@@ -167,12 +168,6 @@ const TokenDetailsLayout = styled.div`
   }
 `
 
-const ChartWrapper = styled.div`
-  /* position: absolute; */
-  /* left: 0;
-  min-width: 100vw; */
-`
-
 const ThemedBackground = styled.div`
   position: absolute;
   top: 0;
@@ -181,7 +176,8 @@ const ThemedBackground = styled.div`
   height: 1000px;
   max-width: 100vw;
   z-index: -1;
-  background: linear-gradient(180deg, rgba(255, 173, 0, 0.8) 0%, rgba(255, 173, 0, 0) 100%);
+  background: ${({ backgroundColor }) =>
+    `linear-gradient(180deg, ${backgroundColor} 0%, rgba(255, 255, 255, 0) 100%);`};
 `
 
 function getPercentSign(value) {
@@ -198,6 +194,7 @@ function TokenPage({ address }) {
   const [accountInput, setAccountInput] = useState('')
 
   const {
+    id,
     name,
     symbol,
     priceUSD,
@@ -216,22 +213,28 @@ function TokenPage({ address }) {
     liquidityChangeETH
   } = useTokenData(address)
 
+  // global values
+  const [currency] = useCurrentCurrency()
+
+  // detect color from token
+  const backgroundColor = useColor(id)
+
+  // daily data
   const chartData = useTokenChartData(address)
 
   // all transactions with this token
   const transactions = useTokenTransactions(address)
 
-  const [currency] = useCurrentCurrency()
-
+  // price
   const price = currency === 'ETH' ? 'Ξ ' + formattedNum(derivedETH) : formattedNum(priceUSD, true)
-
   const priceChange = currency === 'ETH' ? getPercentSign(priceChangeETH) : getPercentSign(priceChangeUSD)
 
+  // volume
   const volume = currency === 'ETH' ? 'Ξ ' + formattedNum(oneDayVolumeETH) : formattedNum(oneDayVolumeUSD, true)
   const volumeChange = currency === 'ETH' ? getPercentSign(volumeChangeETH) : getPercentSign(volumeChangeUSD)
 
+  // liquidity
   const liquidity = currency === 'ETH' ? 'Ξ ' + formattedNum(totalLiquidityETH) : formattedNum(totalLiquidityUSD, true)
-
   const liquidityChange = currency === 'ETH' ? getPercentSign(liquidityChangeETH) : getPercentSign(liquidityChangeUSD)
 
   const Option = ({ onClick, active, children }) => {
@@ -246,7 +249,7 @@ function TokenPage({ address }) {
 
   return (
     <PageWrapper>
-      <ThemedBackground />
+      <ThemedBackground backgroundColor={backgroundColor} />
       <TokenHeader>
         <Row>
           <TokenGroup>
@@ -259,23 +262,11 @@ function TokenPage({ address }) {
             <TopPercent>{priceChange}</TopPercent>
           </TokenGroup>
         </Row>
-        <Row>
-          <ButtonPlusDull mx="1rem">
-            <Text fontSize={16} fontWeight={600}>
-              Join Pool
-            </Text>
-          </ButtonPlusDull>
-          <ButtonShadow bgColor="#f5ba3f">
-            <Text fontSize={16} fontWeight={600}>
-              Trade
-            </Text>
-          </ButtonShadow>
-        </Row>
       </TokenHeader>
       <DashboardWrapper>
-        <ChartWrapper area="fill" rounded style={{ height: '300px' }}>
-          <StackedAreaChart chartData={chartData} token={address} />
-        </ChartWrapper>
+        <div area="fill" rounded="true" style={{ height: '300px' }}>
+          <TokenChart chartData={chartData} token={address} color={backgroundColor} />
+        </div>
         <PanelWrapper>
           <TopPanel rounded color="black" p={24}>
             <Column>
@@ -339,13 +330,25 @@ function TokenPage({ address }) {
             </Column>
             <Column>
               <Text color="#888D9B">Address</Text>
-              <Text style={{ marginTop: '1rem' }} fontSize={24} fontWeight="500">
-                {address.slice(0, 6) + '...' + address.slice(38, 42)}
-              </Text>
+              <AutoRow align="flex-end">
+                <Text style={{ marginTop: '1rem' }} fontSize={24} fontWeight="500">
+                  {address.slice(0, 8) + '...' + address.slice(36, 42)}
+                </Text>
+                <CopyHelper toCopy={address} />
+              </AutoRow>
             </Column>
-            <Link external href={'https://etherscan.io/address/' + address}>
-              View on Etherscan
-            </Link>
+            <AutoRow gap="20px" justify="flex-end">
+              <ButtonLight color={backgroundColor}>
+                <Link external href={'https://etherscan.io/address/' + address}>
+                  Trade Token ↗
+                </Link>
+              </ButtonLight>
+              <ButtonLight color={backgroundColor}>
+                <Link external href={'https://etherscan.io/address/' + address}>
+                  View on Etherscan ↗
+                </Link>
+              </ButtonLight>
+            </AutoRow>
           </TokenDetailsLayout>
         </Panel>
         <ListHeader>Top Pairs</ListHeader>

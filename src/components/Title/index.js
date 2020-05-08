@@ -28,19 +28,21 @@ const UniIcon = styled(Link)`
 const TitleText = styled(Row)`
   width: fit-content;
   white-space: nowrap;
+  font-size: 26px;
+  font-weight: 800;
 `
 
-const Alpha = styled.div`
-  width: fit-content;
-  margin-left: 10px;
-  border-radius: 12px;
-  padding: 3px 7px;
-  background-color: ${({ theme }) => theme.blue1};
-  color: ${({ theme }) => theme.white};
-  font-size: 12px;
-  font-weight: 600;
-  color: white;
-`
+// const Alpha = styled.div`
+//   width: fit-content;
+//   margin-left: 10px;
+//   border-radius: 12px;
+//   padding: 3px 7px;
+//   background-color: ${({ theme }) => theme.blue1};
+//   color: ${({ theme }) => theme.white};
+//   font-size: 12px;
+//   font-weight: 600;
+//   color: white;
+// `
 
 export default function Title({ token, pair }) {
   const history = useHistory()
@@ -77,11 +79,12 @@ export default function Title({ token, pair }) {
             <img src={Unicorn} alt="logo" />
           </UniIcon>
           <TitleText>
-            <img style={{ marginLeft: '4px', marginTop: '4px' }} src={Wordmark} alt="logo" />
-            <Alpha>V2</Alpha>
+            {/* <img style={{ marginLeft: '4px', marginTop: '4px' }} src={Wordmark} alt="logo" /> */}
+            {/* <Alpha>V2</Alpha> */}
+            Uniswap Info
           </TitleText>
         </RowFixed>
-        <Text fontWeight={600} mx="1rem" lineHeight="1.5rem">
+        <Text fontWeight={600} mx="10px" lineHeight="1.5rem">
           {getName()}
         </Text>
       </Flex>
