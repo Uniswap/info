@@ -440,7 +440,7 @@ function OverviewList({ currencyUnit }) {
       <DashGrid center={true} style={{ height: '60px' }}>
         <Flex alignItems="center">
           <Text color="text" area={'name'}>
-            Exchanges
+            Tokens
           </Text>
         </Flex>
         {!belowMedium ? (
