@@ -4,7 +4,9 @@ import { Area, XAxis, YAxis, ResponsiveContainer, Tooltip, AreaChart, BarChart, 
 import Row, { RowBetween } from '../Row'
 import { toK, toNiceDate, toNiceDateYear } from '../../helpers'
 import { OptionButton } from '../ButtonStyled'
-import { lighten, darken } from 'polished'
+import { lighten } from 'polished'
+import { useMedia } from 'react-use'
+import DropdownSelect from '../DropdownSelect'
 
 const ChartWrapper = styled.div`
   /* margin-left: -1em; */
@@ -12,50 +14,66 @@ const ChartWrapper = styled.div`
 
 const GlobalChart = ({ chartData }) => {
   const [chartFilter, setChartFilter] = useState('liqRaw')
-  const [timeWindow, setTimeWindow] = useState('week')
+  const [timeWindow, setTimeWindow] = useState('1week')
+
+  const below1080 = useMedia('(max-width: 1080px)')
+  const below600 = useMedia('(max-width: 600px)')
+
+  const options = [
+    { value: '1week', text: '1 week' },
+    { value: '1month', text: '1 month' },
+    { value: '3months', text: '3 months' },
+    { value: '1year', text: '1 Year' }
+  ]
 
   return chartData ? (
     <ChartWrapper>
-      <RowBetween marginBottom={'10px'}>
-        <Row>
-          <OptionButton
-            style={{ marginRight: '10px' }}
-            active={chartFilter === 'liqRaw'}
-            onClick={() => setChartFilter('liqRaw')}
-          >
-            Liquidity
-          </OptionButton>
-          <OptionButton
-            style={{ marginRight: '10px' }}
-            active={chartFilter === 'vol'}
-            onClick={() => setChartFilter('vol')}
-          >
-            Volume
-          </OptionButton>
-        </Row>
-        <Row justify="flex-end">
-          <OptionButton
-            style={{ marginRight: '10px' }}
-            active={timeWindow === 'week'}
-            onClick={() => setTimeWindow('week')}
-          >
-            1 Week
-          </OptionButton>
-          <OptionButton
-            style={{ marginRight: '10px' }}
-            active={timeWindow === 'month'}
-            onClick={() => setTimeWindow('month')}
-          >
-            1 Month
-          </OptionButton>
-          <OptionButton active={timeWindow === 'all'} onClick={() => setTimeWindow('all')}>
-            All Time
-          </OptionButton>
-        </Row>
-        {/* <DropdownSelect options={options} active={timeline} setActive={setTimeline} /> */}
-      </RowBetween>
+      {below600 ? (
+        <RowBetween mb={20}>
+          <DropdownSelect options={options} active={timeWindow} setActive={setTimeWindow} />
+          <DropdownSelect options={options} active={timeWindow} setActive={setTimeWindow} />
+        </RowBetween>
+      ) : (
+        <RowBetween marginBottom={'10px'}>
+          <Row>
+            <OptionButton
+              style={{ marginRight: '10px' }}
+              active={chartFilter === 'liqRaw'}
+              onClick={() => setChartFilter('liqRaw')}
+            >
+              Liquidity
+            </OptionButton>
+            <OptionButton
+              style={{ marginRight: '10px' }}
+              active={chartFilter === 'vol'}
+              onClick={() => setChartFilter('vol')}
+            >
+              Volume
+            </OptionButton>
+          </Row>
+          <Row justify="flex-end">
+            <OptionButton
+              style={{ marginRight: '10px' }}
+              active={timeWindow === '1week'}
+              onClick={() => setTimeWindow('1week')}
+            >
+              1 Week
+            </OptionButton>
+            <OptionButton
+              style={{ marginRight: '10px' }}
+              active={timeWindow === '1month'}
+              onClick={() => setTimeWindow('1month')}
+            >
+              1 Month
+            </OptionButton>
+            <OptionButton active={timeWindow === 'all'} onClick={() => setTimeWindow('all')}>
+              All Time
+            </OptionButton>
+          </Row>
+        </RowBetween>
+      )}
       {chartFilter === 'liqRaw' && chartData && (
-        <ResponsiveContainer aspect={60 / 28}>
+        <ResponsiveContainer aspect={below1080 ? 60 / 28 : 60 / 28}>
           <AreaChart margin={{ top: 20, right: 0, bottom: 6, left: 10 }} barCategoryGap={1} data={chartData}>
             <defs>
               <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
@@ -84,6 +102,7 @@ const GlobalChart = ({ chartData }) => {
               yAxisId={0}
               padding={{ top: 20, bottom: 20 }}
               tick={{ fill: 'black' }}
+              hide={below600}
             />
             <Tooltip
               cursor={{ stroke: 'white', strokeWidth: 1 }}
@@ -93,9 +112,8 @@ const GlobalChart = ({ chartData }) => {
               contentStyle={{
                 padding: '10px 14px',
                 borderRadius: 10,
-                borderColor: 'transparent',
-                backgroundColor: lighten(0.34, '#ff007a'),
-                color: lighten(0.4, '#ff007a')
+                borderColor: 'rgba(254, 109, 222, 0.8)',
+                color: 'black'
               }}
               wrapperStyle={{ top: -70, left: -10 }}
             />
@@ -114,7 +132,6 @@ const GlobalChart = ({ chartData }) => {
           </AreaChart>
         </ResponsiveContainer>
       )}
-
       {chartFilter === 'vol' && (
         <ResponsiveContainer aspect={60 / 28}>
           <BarChart margin={{ top: 20, right: 0, bottom: 6, left: 10 }} barCategoryGap={1} data={chartData}>
@@ -148,7 +165,7 @@ const GlobalChart = ({ chartData }) => {
               contentStyle={{
                 padding: '10px 14px',
                 borderRadius: 10,
-                borderColor: 'red',
+                borderColor: 'rgba(254, 109, 222, 0.8)',
                 color: 'black'
               }}
               wrapperStyle={{ top: -70, left: -10 }}

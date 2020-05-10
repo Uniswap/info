@@ -1,85 +1,65 @@
 import React, { useState } from 'react'
 import 'feather-icons'
-import { Box, Text } from 'rebass'
+import { Text } from 'rebass'
 import styled from 'styled-components'
 
 import Panel from '../components/Panel'
 import TokenLogo from '../components/TokenLogo'
 import PairList from '../components/PairList'
 import Loader from '../components/Loader'
-import { RowFlat, AutoRow, RowBetween } from '../components/Row'
-import Column from '../components/Column'
-import { ButtonCustom, ButtonLight } from '../components/ButtonStyled'
+import { RowFlat, AutoRow, RowBetween, RowFixed } from '../components/Row'
+import Column, { AutoColumn } from '../components/Column'
+import { ButtonLight, ButtonDark } from '../components/ButtonStyled'
 import TxnList from '../components/TxnList'
 import TokenChart from '../components/TokenChart'
-import Link from '../components/Link'
 import { formattedNum } from '../helpers'
 import { Hint } from '../components/.'
 
 import { useTokenData, useTokenTransactions, useTokenChartData } from '../contexts/TokenData'
 import { useCurrentCurrency } from '../contexts/Application'
-import { Hover } from '../Theme'
+import { Hover, ThemedBackground } from '../Theme'
 import { useColor } from '../hooks'
 import CopyHelper from '../components/Copy'
 
-const TopPercent = styled.div`
-  align-self: flex-end;
-  margin-left: 20px;
-`
 const PageWrapper = styled.div`
-  width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
   padding-bottom: 100px;
+  width: calc(100% - 80px);
+  padding: 0 40px;
+  overflow: scroll;
 
-  @media screen and (min-width: 64em) {
+  @media screen and (max-width: 640px) {
+    width: calc(100% - 40px);
+    padding: 0 20px;
+  }
+
+  & > * {
+    width: 100%;
     max-width: 1240px;
   }
+`
+
+const TopPercent = styled.div`
+  align-self: flex-end;
+  margin-left: 10px;
 `
 
 const DashboardWrapper = styled.div`
   width: 100%;
 `
 
-const TokenHeader = styled(Box)`
-  color: black;
-  font-weight: 600;
-  font-size: 20px;
-  width: 100%;
-  padding: 2rem 0;
-
-  @media screen and (min-width: 64em) {
-    display: flex;
-    flex-direction: row;
-    font-size: 32px;
-    align-items: center;
-    justify-content: space-between;
-    max-width: 1320px;
-  }
-`
-
-const Row = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-`
-
 const TokenName = styled.div`
-  margin-right: 10px;
-  margin-left: 10px;
-`
+  font-size: 36px;
+  font-weight: 600;
+  line-height: 32px;
 
-const TokenPrice = styled.div`
-  margin-left: 1em;
-`
-
-const TokenGroup = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  min-height: 38px;
+  @media screen and (max-width: 1080px) {
+    font-size: 24px;
+    line-height: normal;
+  }
 `
 
 const ListHeader = styled.div`
@@ -150,11 +130,6 @@ const EmojiWrapper = styled.span`
   }
 `
 
-const ButtonShadow = styled(ButtonCustom)`
-  box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.04), 0px 4px 8px rgba(0, 0, 0, 0.04), 0px 16px 24px rgba(0, 0, 0, 0.04),
-    0px 24px 32px rgba(0, 0, 0, 0.04);
-`
-
 const TokenDetailsLayout = styled.div`
   display: inline-grid;
   width: 100%;
@@ -168,16 +143,30 @@ const TokenDetailsLayout = styled.div`
   }
 `
 
-const ThemedBackground = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1000px;
-  max-width: 100vw;
-  z-index: -1;
-  background: ${({ backgroundColor }) =>
-    `linear-gradient(180deg, ${backgroundColor} 0%, rgba(255, 255, 255, 0) 100%);`};
+const ShadedBox = styled.div`
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 20px;
+  padding: 20px;
+`
+
+const Break = styled.div`
+  width: 50px;
+  height: 2px;
+  background: black;
+`
+
+const GroupedOverflow = styled.div`
+  display: flex;
+  align-items: flex-end;
+
+  min-width: 0;
+  max-width: 240px;
+  div {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 `
 
 function getPercentSign(value) {
@@ -250,107 +239,86 @@ function TokenPage({ address }) {
   return (
     <PageWrapper>
       <ThemedBackground backgroundColor={backgroundColor} />
-      <TokenHeader>
-        <Row>
-          <TokenGroup>
-            <TokenLogo address={'0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'} size="32px" />
-            <TokenName>{name ? name + ' ' : ''} </TokenName>
-            <div>{symbol ? '(' + symbol + ')' : ''}</div>
-          </TokenGroup>
-          <TokenGroup>
-            <TokenPrice>{price}</TokenPrice>
-            <TopPercent>{priceChange}</TopPercent>
-          </TokenGroup>
-        </Row>
-      </TokenHeader>
-      <DashboardWrapper>
-        <div area="fill" rounded="true" style={{ height: '300px' }}>
-          <TokenChart chartData={chartData} token={address} color={backgroundColor} />
-        </div>
-        <PanelWrapper>
-          <TopPanel rounded color="black" p={24}>
-            <Column>
-              <RowFlat>
-                <Text fontSize={24} lineHeight={1} fontWeight={600}>
+      <RowBetween align="flex-start">
+        <ShadedBox style={{ width: '40%' }}>
+          <AutoColumn gap="40px">
+            <RowBetween>
+              <TokenLogo address={'0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'} size="32px" />
+              <RowFixed justify="flex-end">
+                <ButtonLight color={backgroundColor}>+ Add Liquidity</ButtonLight>
+                <ButtonDark ml={10} color={backgroundColor}>
+                  Trade
+                </ButtonDark>
+              </RowFixed>
+            </RowBetween>
+            <TokenName>{name ? name + ' ' : ''}</TokenName>
+            <AutoColumn gap="10px">
+              <RowFlat style={{ lineHeight: '22px' }}>
+                <Text fontSize={36} fontWeight={600}>
+                  {price}
+                </Text>
+                <TopPercent>{priceChange}</TopPercent>
+              </RowFlat>
+              <Hint>Price</Hint>
+            </AutoColumn>
+            <AutoColumn gap="10px">
+              <RowFlat style={{ lineHeight: '22px' }}>
+                <Text fontSize={24} fontWeight={600}>
                   {volume}
                 </Text>
-                <div style={{ marginLeft: '10px' }}>{volumeChange}</div>
+                <TopPercent>{volumeChange}</TopPercent>
               </RowFlat>
-              <RowFlat style={{ marginTop: '10px' }}>
-                <Hint>Volume (24hrs)</Hint>
-              </RowFlat>
-            </Column>
-          </TopPanel>
-          <TopPanel rounded color="black" p={24}>
-            <Column>
-              <RowFlat>
-                <Text fontSize={24} lineHeight={1} fontWeight={600}>
+              <Hint>24hr Volume</Hint>
+            </AutoColumn>
+            <AutoColumn gap="10px">
+              <RowFlat style={{ lineHeight: '22px' }}>
+                <Text fontSize={24} fontWeight={600}>
                   {liquidity}
                 </Text>
-                <Text marginLeft={'10px'}>{liquidityChange}</Text>
+                <TopPercent>{liquidityChange}</TopPercent>
               </RowFlat>
-              <RowFlat style={{ marginTop: '10px' }}>
-                <Hint>Total Liquidity</Hint>
-              </RowFlat>
-            </Column>
-          </TopPanel>
-          <TopPanel rounded color="black" p={24}>
-            <Column>
-              <RowFlat>
-                <Text fontSize={24} lineHeight={1} fontWeight={600}>
+              <Hint>Total Liquidity</Hint>
+            </AutoColumn>
+            <AutoColumn gap="10px">
+              <RowFlat style={{ lineHeight: '22px' }}>
+                <Text fontSize={24} fontWeight={600}>
                   {totalLiquidity && formattedNum(totalLiquidity)}
                 </Text>
+                <TopPercent>{liquidityChange}</TopPercent>
               </RowFlat>
-              <RowFlat style={{ marginTop: '10px' }}>
-                <Hint>Total Liquidity Token</Hint>
-              </RowFlat>
-            </Column>
-          </TopPanel>
-        </PanelWrapper>
-        <ListHeader>Token Details</ListHeader>
-        <Panel
-          rounded
-          style={{
-            border: '1px solid rgba(43, 43, 43, 0.05)'
-          }}
-          p={20}
-        >
-          <TokenDetailsLayout>
-            <Column>
-              <Text color="#888D9B">Symbol</Text>
-              <Text style={{ marginTop: '1rem' }} fontSize={24} fontWeight="500">
-                {symbol}
-              </Text>
-            </Column>
-            <Column>
-              <Text color="#888D9B">Name</Text>
-              <Text style={{ marginTop: '1rem' }} fontSize={24} fontWeight="500">
-                {name}
-              </Text>
-            </Column>
-            <Column>
-              <Text color="#888D9B">Address</Text>
-              <AutoRow align="flex-end">
-                <Text style={{ marginTop: '1rem' }} fontSize={24} fontWeight="500">
-                  {address.slice(0, 8) + '...' + address.slice(36, 42)}
+              <Hint>Total Liquidity Token</Hint>
+            </AutoColumn>
+            <Break />
+            <AutoRow gap="10px">
+              <AutoColumn gap="20px">
+                <Text fontSize={16} fontWeight="500">
+                  {symbol}
                 </Text>
-                <CopyHelper toCopy={address} />
-              </AutoRow>
-            </Column>
-            <AutoRow gap="20px" justify="flex-end">
-              <ButtonLight color={backgroundColor}>
-                <Link external href={'https://etherscan.io/address/' + address}>
-                  Trade Token ↗
-                </Link>
-              </ButtonLight>
-              <ButtonLight color={backgroundColor}>
-                <Link external href={'https://etherscan.io/address/' + address}>
-                  View on Etherscan ↗
-                </Link>
-              </ButtonLight>
+                <Text>Symbol</Text>
+              </AutoColumn>
+              <AutoColumn gap="20px">
+                <Text fontSize={16} fontWeight="500">
+                  {name}
+                </Text>
+                <Text>Name</Text>
+              </AutoColumn>
+              <AutoColumn gap="20px">
+                <GroupedOverflow>
+                  <Text fontSize={16} fontWeight="500">
+                    {address.slice(0, 6) + '...' + address.slice(38, 42)}
+                  </Text>
+                  <CopyHelper toCopy={address} />
+                </GroupedOverflow>
+                <Text>Address</Text>
+              </AutoColumn>
             </AutoRow>
-          </TokenDetailsLayout>
-        </Panel>
+          </AutoColumn>
+        </ShadedBox>
+        <ShadedBox style={{ width: '60%' }}>
+          <TokenChart chartData={chartData} token={address} color={backgroundColor} />
+        </ShadedBox>
+      </RowBetween>
+      <DashboardWrapper>
         <ListHeader>Top Pairs</ListHeader>
         <Panel
           rounded

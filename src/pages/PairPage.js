@@ -2,12 +2,12 @@ import React, { useState } from 'react'
 import 'feather-icons'
 import styled from 'styled-components'
 
-import { Box, Text, Flex } from 'rebass'
+import { Text, Flex } from 'rebass'
 import Panel from '../components/Panel'
 import TokenLogo from '../components/TokenLogo'
-import { RowFlat } from '../components/Row'
+import { RowFlat, AutoRow, RowBetween, RowFixed } from '../components/Row'
 import Column from '../components/Column'
-import { ButtonPlusDull, ButtonCustom } from '../components/ButtonStyled'
+import { ButtonLight, ButtonDark } from '../components/ButtonStyled'
 import PairChart from '../components/PairChart'
 import Link from '../components/Link'
 import { Hint } from '../components'
@@ -15,9 +15,11 @@ import TxnList from '../components/TxnList'
 import Loader from '../components/Loader'
 
 import { formattedNum } from '../helpers'
-
+import { useColor } from '../hooks'
 import { usePairData, usePairTransactions, usePairChartData } from '../contexts/PairData'
 import { useCurrentCurrency } from '../contexts/Application'
+import { ThemedBackground, Hover } from '../Theme'
+import CopyHelper from '../components/Copy'
 
 const PageWrapper = styled.div`
   width: 100%;
@@ -34,29 +36,6 @@ const PageWrapper = styled.div`
 
 const DashboardWrapper = styled.div`
   width: 100%;
-`
-
-const TokenHeader = styled(Box)`
-  color: black;
-  font-weight: 600;
-  font-size: 20px;
-  width: 100%;
-  padding: 2rem 0;
-
-  @media screen and (min-width: 64em) {
-    display: flex;
-    flex-direction: row;
-    font-size: 32px;
-    align-items: center;
-    justify-content: space-between;
-    max-width: 1320px;
-  }
-`
-
-const Row = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
 `
 
 const ListHeader = styled.div`
@@ -78,17 +57,6 @@ const ListOptions = styled(Flex)`
 
   @media screen and (max-width: 64em) {
     display: none;
-  }
-`
-
-const OptionsWrappper = styled(Flex)`
-  align-items: center;
-  & > * {
-    margin-right: 1em;
-    &:hover {
-      cursor: pointer;
-      color: black;
-    }
   }
 `
 
@@ -121,9 +89,15 @@ const TopPanel = styled(Panel)`
   }
 `
 
-const ButtonShadow = styled(ButtonCustom)`
-  box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.04), 0px 4px 8px rgba(0, 0, 0, 0.04), 0px 16px 24px rgba(0, 0, 0, 0.04),
-    0px 24px 32px rgba(0, 0, 0, 0.04);
+const TokenName = styled.div`
+  font-size: 36px;
+  font-weight: 600;
+  line-height: 32px;
+
+  @media screen and (max-width: 1080px) {
+    font-size: 24px;
+    line-height: normal;
+  }
 `
 
 const TokenDetailsLayout = styled.div`
@@ -136,22 +110,35 @@ const TokenDetailsLayout = styled.div`
   }
 `
 
+const GroupedOverflow = styled.div`
+  display: flex;
+  align-items: flex-end;
+
+  min-width: 0;
+  max-width: 240px;
+  div {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+`
+
 const ChartWrapper = styled.div`
   margin-bottom: 40px;
 `
 
-const ThemedBackground = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1000px;
-  max-width: 100vw;
-  z-index: -1;
-  background: linear-gradient(180deg, rgba(255, 173, 0, 0.8) 0%, rgba(255, 173, 0, 0) 100%);
-`
+const Option = ({ onClick, active, children }) => {
+  return (
+    <Hover>
+      <Text onClick={onClick} color={!active ? '#aeaeae' : 'black'} fontWeight={600} fontSize={24}>
+        {children}
+      </Text>
+    </Hover>
+  )
+}
 
-function PairPage({ address }) {
+function PairPage({ pairAddress }) {
   const [txFilter, setTxFilter] = useState('ALL')
   const [currency] = useCurrentCurrency()
   const {
@@ -167,9 +154,11 @@ function PairPage({ address }) {
     volumeChangeETH,
     liquidityChangeUSD,
     liquidityChangeETH
-  } = usePairData(address)
-  const chartData = usePairChartData(address)
-  const transactions = usePairTransactions(address)
+  } = usePairData(pairAddress)
+  const chartData = usePairChartData(pairAddress)
+  const transactions = usePairTransactions(pairAddress)
+
+  const backgroundColor = useColor(pairAddress)
 
   const liquidity = currency === 'ETH' ? 'Ξ ' + formattedNum(combinedBalanceETH) : '$' + formattedNum(reserveUSD)
 
@@ -182,28 +171,24 @@ function PairPage({ address }) {
 
   return (
     <PageWrapper>
-      <ThemedBackground />
-      <TokenHeader>
-        <Row>
+      <ThemedBackground backgroundColor={backgroundColor} />
+      <RowBetween mb={20} mt={20}>
+        <RowFixed>
           <TokenLogo address={'0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'} size="32px" />
-          <Text mx={'18px'}>{token0 && token1 ? token0.symbol + '-' + token1.symbol + ' Pool' : ''}</Text>
-        </Row>
-        <Row>
-          <ButtonPlusDull mx="1rem">
-            <Text fontSize={20} fontWeight={700}>
-              Join Pool
-            </Text>
-          </ButtonPlusDull>
-          <ButtonShadow bgColor="#f5ba3f">
-            <Text fontSize={20} fontWeight={700}>
-              Trade
-            </Text>
-          </ButtonShadow>
-        </Row>
-      </TokenHeader>
+          <RowFlat style={{ marginLeft: '10px' }}>
+            <TokenName>{token0 && token1 ? token0.symbol + '-' + token1.symbol + ' Pool' : ''}</TokenName>
+          </RowFlat>
+        </RowFixed>
+        <RowFixed justify="flex-end">
+          <ButtonLight color={backgroundColor}>+ Add Liquidity</ButtonLight>
+          <ButtonDark ml={10} color={backgroundColor}>
+            Trade
+          </ButtonDark>
+        </RowFixed>
+      </RowBetween>
       <DashboardWrapper>
         <ChartWrapper>
-          <PairChart chartData={chartData} />
+          <PairChart chartData={chartData} color={backgroundColor} />
         </ChartWrapper>
         <PanelWrapper>
           <TopPanel rounded color="black" p={24}>
@@ -269,68 +254,81 @@ function PairPage({ address }) {
           <TokenDetailsLayout>
             <Column>
               <Text color="#888D9B">Pool Name</Text>
-              <Text style={{ marginTop: '1rem' }} fontSize={24} fontWeight="500">
-                {token0 && token1 ? token0.symbol + '-' + token1.symbol + ' Pool' : ''}
-              </Text>
+              <GroupedOverflow>
+                <Text style={{ marginTop: '1rem' }} fontSize={18} fontWeight="500">
+                  {token0 && token1 ? token0.symbol + '-' + token1.symbol + ' Pool' : ''}
+                </Text>
+              </GroupedOverflow>
             </Column>
             <Column>
               <Text color="#888D9B">Address</Text>
-              <Text style={{ marginTop: '1rem' }} fontSize={24} fontWeight="500">
-                {address.slice(0, 6) + '...' + address.slice(38, 42)}
-              </Text>
+              <GroupedOverflow>
+                <Text style={{ marginTop: '1rem' }} fontSize={18} fontWeight="500">
+                  {pairAddress.slice(0, 6) + '...' + pairAddress.slice(38, 42)}
+                </Text>
+                <CopyHelper toCopy={pairAddress} />
+              </GroupedOverflow>
             </Column>
             <Column>
               <Text color="#888D9B">{token0 && token0.symbol + ' address'}</Text>
-              <Text style={{ marginTop: '1rem' }} fontSize={24} fontWeight="500">
-                {token0 && token0.id.slice(0, 6) + '...' + token0.id.slice(38, 42)}
-              </Text>
+              <GroupedOverflow>
+                <Text style={{ marginTop: '1rem' }} fontSize={18} fontWeight="500">
+                  {token0 && token0.id.slice(0, 6) + '...' + token0.id.slice(38, 42)}
+                </Text>
+                <CopyHelper toCopy={token0?.address} />
+              </GroupedOverflow>
             </Column>
             <Column>
               <Text color="#888D9B">{token1 && token1.symbol + ' address'}</Text>
-              <Text style={{ marginTop: '1rem' }} fontSize={24} fontWeight="500">
-                {token1 && token1.id.slice(0, 6) + '...' + token1.id.slice(38, 42)}
-              </Text>
+              <GroupedOverflow>
+                <Text style={{ marginTop: '1rem' }} fontSize={18} fontWeight="500">
+                  {token1 && token1.id.slice(0, 6) + '...' + token1.id.slice(38, 42)}
+                </Text>
+                <CopyHelper toCopy={token1?.id} />
+              </GroupedOverflow>
             </Column>
-            <Link color="button" external href={'https://etherscan.io/address/' + address}>
-              View on Etherscan
-            </Link>
+            <ButtonLight color={backgroundColor}>
+              <Link external href={'https://etherscan.io/address/' + pairAddress}>
+                View on Etherscan ↗
+              </Link>
+            </ButtonLight>
           </TokenDetailsLayout>
         </Panel>
         <ListOptions>
-          <OptionsWrappper>
-            <Text
+          <AutoRow gap="10px" pl={4}>
+            <Option
               onClick={() => {
                 setTxFilter('ALL')
               }}
-              color={txFilter !== 'ALL' ? 'textDim' : 'black'}
+              active={txFilter === 'ALL'}
             >
               All
-            </Text>
-            <Text
+            </Option>
+            <Option
               onClick={() => {
-                setTxFilter('SWAP')
+                setTxFilter('SWAPS')
               }}
-              color={txFilter !== 'SWAP' ? 'textDim' : 'black'}
+              active={txFilter === 'SWAPS'}
             >
               Swaps
-            </Text>
-            <Text
+            </Option>
+            <Option
               onClick={() => {
-                setTxFilter('ADD')
+                setTxFilter('ADDS')
               }}
-              color={txFilter !== 'ADD' ? 'textDim' : 'black'}
+              active={txFilter === 'ADDS'}
             >
-              Add
-            </Text>
-            <Text
+              Adds
+            </Option>
+            <Option
               onClick={() => {
-                setTxFilter('REMOVE')
+                setTxFilter('REMOVES')
               }}
-              color={txFilter !== 'REMOVE' ? 'textDim' : 'black'}
+              active={txFilter === 'REMOVES'}
             >
-              Remove
-            </Text>
-          </OptionsWrappper>
+              Removes
+            </Option>
+          </AutoRow>
         </ListOptions>
         <Panel
           rounded

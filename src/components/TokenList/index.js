@@ -12,6 +12,7 @@ import { Divider } from '..'
 
 import { useCurrentCurrency } from '../../contexts/Application'
 import { formattedNum } from '../../helpers'
+import { useMedia } from 'react-use'
 
 dayjs.extend(utc)
 
@@ -41,9 +42,8 @@ const DashGrid = styled.div`
   display: grid;
   grid-gap: 1em;
   grid-template-columns: 100px 1fr 1fr;
-  grid-template-areas: 'action value Time';
-  padding: 0 6px;
-
+  grid-template-areas: 'name liq vol';
+  width: 100%;
   > * {
     justify-content: flex-end;
     width: 100%;
@@ -55,12 +55,11 @@ const DashGrid = styled.div`
     }
   }
 
-  @media screen and (min-width: 40em) {
-    max-width: 1280px;
+  @media screen and (min-width: 680px) {
     display: grid;
     grid-gap: 1em;
-    grid-template-columns: 180px 1fr 1fr;
-    grid-template-areas: 'action value Time';
+    grid-template-columns: 180px 1fr 1fr 1fr;
+    grid-template-areas: 'name symbol liq vol ';
 
     > * {
       justify-content: flex-end;
@@ -72,10 +71,8 @@ const DashGrid = styled.div`
     }
   }
 
-  @media screen and (min-width: 64em) {
-    max-width: 1320px;
+  @media screen and (min-width: 1080px) {
     display: grid;
-    padding: 0 24px;
     grid-gap: 1em;
     grid-template-columns: 1.5fr 0.6fr 1fr 1fr 1fr 1fr;
     grid-template-areas: 'name symbol price liq vol change';
@@ -83,18 +80,24 @@ const DashGrid = styled.div`
 `
 
 const ListWrapper = styled.div`
-  @media screen and (max-width: 40em) {
-    padding-right: 1rem;
-    padding-left: 1rem;
+  padding: 0 40px;
+
+  @media screen and (max-width: 640px) {
+    padding: 0 20px;
   }
 `
 
 const ClickableText = styled(Text)`
+  text-align: end;
   &:hover {
     cursor: pointer;
     opacity: 0.6;
   }
   user-select: none;
+
+  @media screen and (max-width: 640px) {
+    font-size: 14px;
+  }
 `
 
 const DataText = styled(Flex)`
@@ -132,6 +135,10 @@ function TopTokenList({ tokens }) {
   const [filteredItems, setFilteredItems] = useState()
 
   const [currency] = useCurrentCurrency()
+
+  const below1300 = useMedia('(max-width: 1300px)')
+  const below1080 = useMedia('(max-width: 1080px)')
+  const below680 = useMedia('(max-width: 680px)')
 
   useEffect(() => {
     setMaxPage(1) // edit this to do modular
@@ -180,31 +187,35 @@ function TopTokenList({ tokens }) {
                 window.scrollTo(0, 0)
               }}
             >
-              {item.name}
+              {below680 ? item.symbol : item.name}
             </CustomLink>
           </Row>
         </DataText>
-        <DataText area="symbol" color="text" fontWeight="500">
-          {item.symbol}
-        </DataText>
-        <DataText area="price" color="text" fontWeight="500">
-          {currency === 'ETH' ? 'Ξ ' + formattedNum(item.derivedETH) : formattedNum(item.priceUSD, true)}
-        </DataText>
+        {!below680 && (
+          <DataText area="symbol" color="text" fontWeight="500">
+            {item.symbol}
+          </DataText>
+        )}
+        {!below1080 && (
+          <DataText area="price" color="text" fontWeight="500">
+            {currency === 'ETH' ? 'Ξ ' + formattedNum(item.derivedETH) : formattedNum(item.priceUSD, true)}
+          </DataText>
+        )}
         <DataText area="liq">
           {currency === 'ETH'
             ? 'Ξ ' + formattedNum(item.totalLiquidityETH)
             : formattedNum(item.totalLiquidityUSD, true)}
         </DataText>
-        <>
-          <DataText area="vol">
-            {currency === 'ETH'
-              ? 'Ξ ' + formattedNum(item.oneDayVolumeETH, true)
-              : formattedNum(item.oneDayVolumeUSD, true)}
-          </DataText>
+        <DataText area="vol">
+          {currency === 'ETH'
+            ? 'Ξ ' + formattedNum(item.oneDayVolumeETH, true)
+            : formattedNum(item.oneDayVolumeUSD, true)}
+        </DataText>
+        {!below1080 && (
           <DataText area="change">
             {currency === 'ETH' ? formattedNum(item.priceChangeETH) : formattedNum(item.priceChangeUSD)}%
           </DataText>
-        </>
+        )}
       </DashGrid>
     )
   }
@@ -225,28 +236,32 @@ function TopTokenList({ tokens }) {
             Name {sortedColumn === SORT_FIELD.NAME ? (!sortDirection ? '↑' : '↓') : ''}
           </ClickableText>
         </Flex>
-        <Flex alignItems="center">
-          <ClickableText
-            area="symbol"
-            onClick={e => {
-              setSortedColumn(SORT_FIELD.SYMBOL)
-              setSortDirection(!sortDirection)
-            }}
-          >
-            Symbol {sortedColumn === SORT_FIELD.SYMBOL ? (!sortDirection ? '↑' : '↓') : ''}
-          </ClickableText>
-        </Flex>
-        <Flex alignItems="center">
-          <ClickableText
-            area="price"
-            onClick={e => {
-              setSortedColumn(SORT_FIELD.PRICE)
-              setSortDirection(!sortDirection)
-            }}
-          >
-            Price {sortedColumn === SORT_FIELD.PRICE ? (!sortDirection ? '↑' : '↓') : ''}
-          </ClickableText>
-        </Flex>
+        {!below680 && (
+          <Flex alignItems="center">
+            <ClickableText
+              area="symbol"
+              onClick={e => {
+                setSortedColumn(SORT_FIELD.SYMBOL)
+                setSortDirection(!sortDirection)
+              }}
+            >
+              Symbol {sortedColumn === SORT_FIELD.SYMBOL ? (!sortDirection ? '↑' : '↓') : ''}
+            </ClickableText>
+          </Flex>
+        )}
+        {!below1080 && (
+          <Flex alignItems="center">
+            <ClickableText
+              area="price"
+              onClick={e => {
+                setSortedColumn(SORT_FIELD.PRICE)
+                setSortDirection(!sortDirection)
+              }}
+            >
+              Price {sortedColumn === SORT_FIELD.PRICE ? (!sortDirection ? '↑' : '↓') : ''}
+            </ClickableText>
+          </Flex>
+        )}
         <Flex alignItems="center">
           <ClickableText
             area="liq"
@@ -266,20 +281,24 @@ function TopTokenList({ tokens }) {
               setSortDirection(!sortDirection)
             }}
           >
-            Volume (24 Hour) {sortedColumn === SORT_FIELD.VOL ? (!sortDirection ? '↑' : '↓') : ''}
+            Volume {below1300 ? '(24hrs)' : '(24 Hours)'}{' '}
+            {sortedColumn === SORT_FIELD.VOL ? (!sortDirection ? '↑' : '↓') : ''}
           </ClickableText>
         </Flex>
-        <Flex alignItems="center">
-          <ClickableText
-            area="change"
-            onClick={e => {
-              setSortedColumn(SORT_FIELD.CHANGE)
-              setSortDirection(!sortDirection)
-            }}
-          >
-            Price Change (24 Hour) {sortedColumn === SORT_FIELD.CHANGE ? (!sortDirection ? '↑' : '↓') : ''}
-          </ClickableText>
-        </Flex>
+        {!below1080 && (
+          <Flex alignItems="center">
+            <ClickableText
+              area="change"
+              onClick={e => {
+                setSortedColumn(SORT_FIELD.CHANGE)
+                setSortDirection(!sortDirection)
+              }}
+            >
+              Price Change {below1300 ? '(24hrs)' : '(24 Hours)'}{' '}
+              {sortedColumn === SORT_FIELD.CHANGE ? (!sortDirection ? '↑' : '↓') : ''}
+            </ClickableText>
+          </Flex>
+        )}
       </DashGrid>
       <Divider />
       <List p={0}>

@@ -40,8 +40,7 @@ const DashGrid = styled.div`
   display: grid;
   grid-gap: 1em;
   grid-template-columns: 100px 1fr 1fr;
-  grid-template-areas: 'action value Time';
-  padding: 0 6px;
+  grid-template-areas: 'txn value time';
 
   > * {
     justify-content: flex-end;
@@ -54,38 +53,38 @@ const DashGrid = styled.div`
     }
   }
 
-  @media screen and (min-width: 40em) {
-    max-width: 1280px;
-    display: grid;
-    grid-gap: 1em;
-    grid-template-columns: 180px 1fr 1fr;
-    grid-template-areas: 'action value Time';
-
+  @media screen and (min-width: 500px) {
     > * {
-      justify-content: flex-end;
-      width: 100%;
-
       &:first-child {
-        justify-content: flex-start;
         width: 180px;
       }
     }
   }
 
-  @media screen and (min-width: 64em) {
+  @media screen and (min-width: 780px) {
     max-width: 1320px;
-    display: grid;
-    padding: 0 24px;
-    grid-gap: 1em;
+    grid-template-columns: 1.2fr 1fr 1fr 1fr 1fr;
+    grid-template-areas: 'txn value amountToken amountOther time';
+
+    > * {
+      &:first-child {
+        width: 180px;
+      }
+    }
+  }
+
+  @media screen and (min-width: 1080px) {
+    max-width: 1320px;
     grid-template-columns: 1.2fr 1fr 1fr 1fr 1fr 1fr;
     grid-template-areas: 'txn value amountToken amountOther account time';
   }
 `
 
 const ListWrapper = styled.div`
-  @media screen and (max-width: 40em) {
-    padding-right: 1rem;
-    padding-left: 1rem;
+  padding: 0 40px;
+
+  @media screen and (max-width: 640px) {
+    padding: 0 20px;
   }
 `
 
@@ -95,6 +94,11 @@ const ClickableText = styled(Text)`
     opacity: 0.6;
   }
   user-select: none;
+  text-align: end;
+
+  @media screen and (max-width: 640px) {
+    font-size: 14px;
+  }
 `
 
 const DataText = styled(Flex)`
@@ -237,7 +241,8 @@ function TxnList({ transactions, txFilter }) {
       })
       .slice(ITEMS_PER_PAGE * (page - 1), page * ITEMS_PER_PAGE)
 
-  const belowMedium = useMedia('(max-width: 64em)')
+  const below1080 = useMedia('(max-width: 1080px)')
+  const below780 = useMedia('(max-width: 780px)')
 
   const ListItem = ({ item }) => {
     return (
@@ -247,16 +252,22 @@ function TxnList({ transactions, txFilter }) {
             {getTransactionType(item.type, item.token0Symbol, item.token1Symbol)}
           </Link>
         </DataText>
-        <DataText area="value" color="text" fontWeight="500">
+        <DataText area="value">
           {currency === 'ETH' ? 'Ξ ' + formattedNum(item.valueETH) : formattedNum(item.amountUSD, true)}
         </DataText>
-        <DataText area="amountToken">{formattedNum(item.token0Amount) + ' ' + item.token0Symbol}</DataText>
-        <DataText area="amountOther">{formattedNum(item.token1Amount) + ' ' + item.token1Symbol}</DataText>
-        <DataText area="account">
-          <Link external href={'https://etherscan.io/address/' + item.account}>
-            {item.account && item.account.slice(0, 6) + '...' + item.account.slice(38, 42)}
-          </Link>
-        </DataText>
+        {!below780 && (
+          <>
+            <DataText area="amountToken">{formattedNum(item.token0Amount) + ' ' + item.token0Symbol}</DataText>
+            <DataText area="amountOther">{formattedNum(item.token1Amount) + ' ' + item.token1Symbol}</DataText>
+          </>
+        )}
+        {!below1080 && (
+          <DataText area="account">
+            <Link external href={'https://etherscan.io/address/' + item.account}>
+              {item.account && item.account.slice(0, 6) + '...' + item.account.slice(38, 42)}
+            </Link>
+          </DataText>
+        )}
         <DataText area="time">{formatTime(item.timestamp)}</DataText>
       </DashGrid>
     )
@@ -267,7 +278,7 @@ function TxnList({ transactions, txFilter }) {
       <DashGrid center={true} style={{ height: '60px' }}>
         <Flex alignItems="center">
           <Text color="text" area="txn" fontWeight="500">
-            Transactions
+            Transaction
           </Text>
         </Flex>
         <Flex alignItems="center" justifyContent="flexStart">
@@ -282,20 +293,22 @@ function TxnList({ transactions, txFilter }) {
             Total Value {sortedColumn === SORT_FIELD.VALUE ? (!sortDirection ? '↑' : '↓') : ''}
           </ClickableText>
         </Flex>
-        <Flex alignItems="center">
-          <ClickableText
-            area="amountToken"
-            color="textDim"
-            onClick={() => {
-              setSortedColumn(SORT_FIELD.AMOUNT0)
-              setSortDirection(!sortDirection)
-            }}
-          >
-            Token 0 Amount {sortedColumn === SORT_FIELD.AMOUNT0 ? (!sortDirection ? '↑' : '↓') : ''}
-          </ClickableText>
-        </Flex>
-        {!belowMedium ? (
-          <>
+        {!below780 && (
+          <Flex alignItems="center">
+            <ClickableText
+              area="amountToken"
+              color="textDim"
+              onClick={() => {
+                setSortedColumn(SORT_FIELD.AMOUNT0)
+                setSortDirection(!sortDirection)
+              }}
+            >
+              Token 0 Amount {sortedColumn === SORT_FIELD.AMOUNT0 ? (!sortDirection ? '↑' : '↓') : ''}
+            </ClickableText>
+          </Flex>
+        )}
+        <>
+          {!below780 && (
             <Flex alignItems="center">
               <ClickableText
                 area="amountOther"
@@ -308,27 +321,27 @@ function TxnList({ transactions, txFilter }) {
                 Token 1 Amount {sortedColumn === SORT_FIELD.AMOUNT1 ? (!sortDirection ? '↑' : '↓') : ''}
               </ClickableText>
             </Flex>
+          )}
+          {!below1080 && (
             <Flex alignItems="center">
               <Text area="account" color="textDim">
                 Account
               </Text>
             </Flex>
-            <Flex alignItems="center">
-              <ClickableText
-                area="time"
-                color="textDim"
-                onClick={() => {
-                  setSortedColumn(SORT_FIELD.TIMESTAMP)
-                  setSortDirection(!sortDirection)
-                }}
-              >
-                Time {sortedColumn === SORT_FIELD.TIMESTAMP ? (!sortDirection ? '↑' : '↓') : ''}
-              </ClickableText>
-            </Flex>
-          </>
-        ) : (
-          ''
-        )}
+          )}
+          <Flex alignItems="center">
+            <ClickableText
+              area="time"
+              color="textDim"
+              onClick={() => {
+                setSortedColumn(SORT_FIELD.TIMESTAMP)
+                setSortDirection(!sortDirection)
+              }}
+            >
+              Time {sortedColumn === SORT_FIELD.TIMESTAMP ? (!sortDirection ? '↑' : '↓') : ''}
+            </ClickableText>
+          </Flex>
+        </>
       </DashGrid>
       <Divider />
       <List p={0}>

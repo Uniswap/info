@@ -43,8 +43,7 @@ const DashGrid = styled.div`
   display: grid;
   grid-gap: 1em;
   grid-template-columns: 100px 1fr 1fr;
-  grid-template-areas: 'action value Time';
-  padding: 0 6px;
+  grid-template-areas: 'name liq vol';
 
   > * {
     justify-content: flex-end;
@@ -57,41 +56,17 @@ const DashGrid = styled.div`
     }
   }
 
-  @media screen and (min-width: 40em) {
-    max-width: 1280px;
-    display: grid;
-    grid-gap: 1em;
-    grid-template-columns: 180px 1fr 1fr;
-    grid-template-areas: 'action value Time';
-
-    > * {
-      justify-content: flex-end;
-      width: 100%;
-
-      &:first-child {
-        justify-content: flex-start;
-      }
-
-      &:nth-child(2) {
-        justify-content: flex-end;
-      }
-    }
-  }
-
-  @media screen and (min-width: 64em) {
-    max-width: 1320px;
-    display: grid;
-    padding: 0 24px;
-    grid-gap: 1em;
-    grid-template-columns: 2.2fr 1fr 1fr 1fr;
+  @media screen and (min-width: 740px) {
+    grid-template-columns: 100px 1fr 200px 200px;
     grid-template-areas: 'name liq vol supply';
   }
 `
 
 const ListWrapper = styled.div`
-  @media screen and (max-width: 40em) {
-    padding-right: 1rem;
-    padding-left: 1rem;
+  padding: 0 40px;
+
+  @media screen and (max-width: 640px) {
+    padding: 0 20px;
   }
 `
 
@@ -100,6 +75,7 @@ const ClickableText = styled(Text)`
     cursor: pointer;
     opacity: 0.6;
   }
+  text-align: end;
   user-select: none;
 `
 
@@ -125,7 +101,8 @@ function PairList({ pairs }) {
   const [currency] = useCurrentCurrency()
   const allPairData = useAllPairs()
 
-  const belowMedium = useMedia('(max-width: 64em)')
+  const below740 = useMedia('(max-width: 740px)')
+  const below600 = useMedia('(max-width: 600px)')
 
   // pagination
   const [page, setPage] = useState(1)
@@ -189,13 +166,15 @@ function PairList({ pairs }) {
         <>
           <DataText area="vol">{volume}</DataText>
         </>
-        <DataText area="supply">
-          <ButtonFaded>
-            <Link external href={''}>
-              + Join Pool
-            </Link>
-          </ButtonFaded>
-        </DataText>
+        {!below740 && (
+          <DataText area="supply">
+            <ButtonFaded>
+              <Link external href={''}>
+                + Join Pool
+              </Link>
+            </ButtonFaded>
+          </DataText>
+        )}
       </DashGrid>
     )
   }
@@ -219,26 +198,25 @@ function PairList({ pairs }) {
             Liquidity {sortedColumn === SORT_FIELD.LIQ ? (!sortDirection ? '↑' : '↓') : ''}
           </ClickableText>
         </Flex>
-        {!belowMedium ? (
-          <>
-            <Flex alignItems="center">
-              <ClickableText
-                area="vol"
-                onClick={e => {
-                  setSortedColumn(SORT_FIELD.VOL)
-                  setSortDirection(!sortDirection)
-                }}
-              >
-                Volume (24 Hours) {sortedColumn === SORT_FIELD.VOL ? (!sortDirection ? '↑' : '↓') : ''}
-              </ClickableText>
-            </Flex>
-          </>
-        ) : (
-          ''
+        <>
+          <Flex alignItems="center">
+            <ClickableText
+              area="vol"
+              onClick={e => {
+                setSortedColumn(SORT_FIELD.VOL)
+                setSortDirection(!sortDirection)
+              }}
+            >
+              Volume {below600 ? '(24hrs)' : '(24 Hours)'}{' '}
+              {sortedColumn === SORT_FIELD.VOL ? (!sortDirection ? '↑' : '↓') : ''}
+            </ClickableText>
+          </Flex>
+        </>
+        {!below740 && (
+          <Flex alignItems="center">
+            <Text area="supply">Supply</Text>
+          </Flex>
         )}
-        <Flex alignItems="center">
-          <Text area="supply">Supply</Text>
-        </Flex>
       </DashGrid>
       <Divider />
       <List p={0}>

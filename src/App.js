@@ -14,11 +14,12 @@ import NavHeader from './components/NavHeader'
 import LocalLoader from './components/LocalLoader'
 import { AutoColumn } from './components/Column'
 import Link from './components/Link'
-import { lighten } from 'polished'
+import { useMedia } from 'react-use'
 
 const AppWrapper = styled.div`
   position: relative;
   width: 100%;
+  max-width: 100vw;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -45,14 +46,35 @@ function App() {
 
   const allTokens = useAllTokens()
 
+  const below750 = useMedia('(max-width: 750px)')
+  const below490 = useMedia('(max-width: 490px)')
+
   return (
     <ApolloProvider client={client}>
       <AppWrapper>
         <MigrateBanner>
-          <b>This site displays analystics for Uniswap V2 only.</b>&nbsp;To see Uniswap V1 analytics&nbsp;
-          <Link href="https://uniswap.info/" target="_blank">
-            <b>click here ↗</b>
-          </Link>
+          {below490 ? (
+            <>
+              For V1 analytics&nbsp;
+              <Link href="https://uniswap.info/" target="_blank">
+                <b>click here ↗</b>
+              </Link>
+            </>
+          ) : below750 ? (
+            <>
+              <b>This site is for Uniswap V2 only.</b>&nbsp;For V1 analytics&nbsp;
+              <Link href="https://uniswap.info/" target="_blank">
+                <b>click here ↗</b>
+              </Link>
+            </>
+          ) : (
+            <>
+              <b>This site displays analystics for Uniswap V2 only.</b> To see Uniswap V1 analytics&nbsp;
+              <Link href="https://uniswap.info/" target="_blank">
+                <b>click here ↗</b>
+              </Link>
+            </>
+          )}
         </MigrateBanner>
         {allTokens ? (
           <BrowserRouter>
@@ -89,7 +111,7 @@ function App() {
                     return (
                       <>
                         <NavHeaderUpdated pair={match.params.pairAddress.toLowerCase()} />
-                        <PairPage address={match.params.pairAddress.toLowerCase()} />
+                        <PairPage pairAddress={match.params.pairAddress.toLowerCase()} />
                       </>
                     )
                   } else {

@@ -7,11 +7,13 @@ import Search from '../Search'
 import { RowFixed, RowBetween } from '../Row'
 
 const Header = styled.div`
-  width: 100%;
-  padding: 32px 0;
+  width: calc(100% - 80px);
+  padding: 32px 40px;
+  max-width: 1240px;
 
-  @media screen and (min-width: 64em) {
-    max-width: 1240px;
+  @media screen and (max-width: 640px) {
+    width: calc(100% - 40px);
+    padding: 32px 20px;
   }
 `
 

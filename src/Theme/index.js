@@ -93,6 +93,19 @@ export const Link = styled.a.attrs({
   }
 `
 
+export const ThemedBackground = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1000px;
+  max-width: 100vw !important;
+  width: 100v !important;
+  z-index: -1;
+  background: ${({ backgroundColor }) =>
+    `linear-gradient(180deg, ${backgroundColor} 0%, rgba(255, 255, 255, 0) 100%);`};
+`
+
 export const GlobalStyle = createGlobalStyle`
   @import url('https://rsms.me/inter/inter.css');
   html { font-family: 'Inter', sans-serif; }
@@ -111,7 +124,7 @@ export const GlobalStyle = createGlobalStyle`
 
   body > div {
     height: 100%;
-    overflow: auto;
+    overflow-y: auto;
     -webkit-overflow-scrolling: touch;
   } 
 

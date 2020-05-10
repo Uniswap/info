@@ -32,7 +32,7 @@ export default function CopyHelper({ toCopy }) {
       {isCopied ? (
         <TransactionStatusText>
           <CheckCircle size={'16'} stroke="black" />
-          <TransactionStatusText>Copied</TransactionStatusText>
+          {/* <TransactionStatusText>Copied</TransactionStatusText> */}
         </TransactionStatusText>
       ) : (
         <TransactionStatusText>

@@ -59,14 +59,12 @@ const StackedAreaChart = ({ chartData, color }) => {
             />
             <YAxis
               type="number"
-              // tickMargin={46}
               orientation="left"
               tickFormatter={tick => toK(tick)}
               axisLine={false}
               tickLine={false}
               interval="preserveEnd"
               minTickGap={80}
-              // mirror={true}
               yAxisId={0}
               tick={{ fill: 'black' }}
             />
@@ -78,9 +76,8 @@ const StackedAreaChart = ({ chartData, color }) => {
               contentStyle={{
                 padding: '10px 14px',
                 borderRadius: 10,
-                borderColor: 'transparent',
-                backgroundColor: lighten(0.1, color),
-                color: lighten(0.4, color)
+                borderColor: color,
+                color: 'black'
               }}
               wrapperStyle={{ top: -70, left: -10 }}
             />
@@ -129,7 +126,8 @@ const StackedAreaChart = ({ chartData, color }) => {
               contentStyle={{
                 padding: '10px 14px',
                 borderRadius: 10,
-                borderColor: 'var(--c-zircon)'
+                borderColor: color,
+                color: 'black'
               }}
               wrapperStyle={{ top: -70, left: -10 }}
             />

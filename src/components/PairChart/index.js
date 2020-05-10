@@ -5,12 +5,13 @@ import { RowBetween, AutoRow } from '../Row'
 
 import { toK, toNiceDate, toNiceDateYear } from '../../helpers'
 import { OptionButton } from '../ButtonStyled'
+import { lighten, darken } from 'polished'
 
 const ChartWrapper = styled.div`
   padding-top: 40px;
 `
 
-const GlobalChart = ({ chartData }) => {
+const GlobalChart = ({ chartData, color }) => {
   const options = [{ text: 'All Time' }, { text: '3 Months' }, { text: '1 week' }]
   const [chartFilter, setChartFilter] = useState('liq')
   const [timeWindow, setTimeWindow] = useState(options[0])
@@ -41,6 +42,12 @@ const GlobalChart = ({ chartData }) => {
       {chartFilter === 'liq' && (
         <ResponsiveContainer aspect={60 / 12}>
           <AreaChart margin={{ top: 0, right: 0, bottom: 6, left: 10 }} barCategoryGap={1} data={chartData}>
+            <defs>
+              <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor={color} stopOpacity={0.35} />
+                <stop offset="95%" stopColor={color} stopOpacity={0} />
+              </linearGradient>
+            </defs>
             <XAxis
               tickLine={false}
               axisLine={false}
@@ -69,7 +76,9 @@ const GlobalChart = ({ chartData }) => {
               contentStyle={{
                 padding: '10px 14px',
                 borderRadius: 10,
-                borderColor: 'var(--c-zircon)'
+                borderColor: 'transparent',
+                backgroundColor: lighten(0.1, color),
+                color: lighten(0.4, color)
               }}
               wrapperStyle={{ top: -70, left: -10 }}
             />
@@ -80,8 +89,8 @@ const GlobalChart = ({ chartData }) => {
               name={' (USD)'}
               dataKey={'reserveUSD'}
               yAxisId={0}
-              fill="rgba(235, 243, 255, 0.3)"
-              stroke="rgba(254, 109, 222, 0.6)"
+              stroke={darken(0.12, color)}
+              fill="url(#colorUv)"
             />
           </AreaChart>
         </ResponsiveContainer>
@@ -109,14 +118,16 @@ const GlobalChart = ({ chartData }) => {
               yAxisId={0}
             />
             <Tooltip
-              cursor={true}
+              cursor={{ fill: color, opacity: 0.1 }}
               formatter={val => toK(val, true)}
               labelFormatter={label => toNiceDateYear(label)}
               labelStyle={{ paddingTop: 4 }}
               contentStyle={{
                 padding: '10px 14px',
                 borderRadius: 10,
-                borderColor: 'var(--c-zircon)'
+                borderColor: 'transparent',
+                backgroundColor: lighten(0.1, color),
+                color: lighten(0.4, color)
               }}
               wrapperStyle={{ top: -70, left: -10 }}
             />
@@ -124,10 +135,10 @@ const GlobalChart = ({ chartData }) => {
               type="monotone"
               name={'Volume'}
               dataKey={'dailyVolumeUSD'}
-              fill="rgba(254, 109, 222, 0.6)"
+              fill={color}
               opacity={'0.4'}
               yAxisId={0}
-              stroke="rgba(254, 109, 222, 0.8)"
+              stroke={color}
             />
           </BarChart>
         </ResponsiveContainer>

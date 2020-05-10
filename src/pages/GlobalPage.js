@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import 'feather-icons'
-import { Text } from 'rebass'
+import { Text, Box } from 'rebass'
 import styled from 'styled-components'
 
-import { RowFlat, AutoRow } from '../components/Row'
-import Column from '../components/Column'
+import { RowFlat, AutoRow, RowBetween } from '../components/Row'
+import Column, { AutoColumn } from '../components/Column'
 import { Hint } from '../components'
 import PairList from '../components/PairList'
-import TopTokenList from '../components/TopTokenList'
+import TopTokenList from '../components/TokenList'
 import TxnList from '../components/TxnList'
 import GlobalChart from '../components/GlobalChart'
 
@@ -21,20 +21,25 @@ import { useCurrentCurrency } from '../contexts/Application'
 import { useAllPairs } from '../contexts/PairData'
 import { Search } from '../components/Search'
 import EthLogo from '../assets/eth.png'
+import { useMedia } from 'react-use'
 
 const PageWrapper = styled.div`
-  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding-bottom: 100px;
+  width: calc(100% - 80px);
+  padding: 0 40px;
+  overflow: scroll;
+  & > * {
+    width: 100%;
+    max-width: 1240px;
+  }
 
-  @media screen and (min-width: 64em) {
-    & > * {
-      width: 100%;
-      max-width: 1240px;
-    }
+  @media screen and (max-width: 640px) {
+    width: calc(100% - 40px);
+    padding: 0 20px;
   }
 `
 
@@ -55,8 +60,8 @@ const ListOptions = styled(AutoRow)`
   font-size: 24px;
   font-weight: 600;
 
-  @media screen and (max-width: 64em) {
-    display: none;
+  @media screen and (max-width: 640px) {
+    font-size: 16px
   }
 `
 
@@ -77,11 +82,11 @@ const LeftGroup = styled.div`
 `
 
 const Panel = styled.div`
+  width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   border-radius: 20px;
-  height: 100%;
   background-color: ${({ theme }) => theme.panelColor};
 `
 
@@ -100,6 +105,9 @@ const ChartWrapper = styled.div`
 
 const PaddedGroup = styled.div`
   padding: 24px;
+  @media screen and (max-width: 640px) {
+    padding: 20px;
+  }
 `
 
 const EthIcon = styled.img`
@@ -151,72 +159,131 @@ function GlobalPage() {
     setColor('#FE6DDE')
   }, [setColor])
 
+  const below1080 = useMedia('(max-width: 1080px)')
+
   return (
     <PageWrapper>
       <ThemedBackground />
       <Search />
-      <GridRow style={{ marginTop: '40px' }}>
-        <LeftGroup>
-          <Panel style={{ position: 'relative' }}>
-            <EthIcon src={EthLogo} />
-            <PaddedGroup>
-              <Column>
-                <RowFlat>
-                  <Text fontSize={36} lineHeight={1} fontWeight={600}>
-                    {formattedEthPrice}
-                  </Text>
-                  {/* <Text marginLeft="10px">{liquidityChange}</Text> */}
-                </RowFlat>
-                <RowFlat style={{ marginTop: '10px' }}>
-                  <Hint>ETH Uniprice</Hint>
-                </RowFlat>
-              </Column>
-            </PaddedGroup>
+      {below1080 && (
+        <Box mb={20}>
+          <Box mb={20} mt={30}>
+            <Panel>
+              <Box padding="20px">
+                <AutoColumn gap="40px">
+                  <AutoColumn gap="20px">
+                    <RowBetween>
+                      <Text>Volume (24hrs)</Text>
+                      <div />
+                    </RowBetween>
+                    <RowBetween align="flex-end">
+                      <Text fontSize={36} lineHeight={1} fontWeight={600}>
+                        {volume}
+                      </Text>
+                      <Text>{volumeChange}</Text>
+                    </RowBetween>
+                  </AutoColumn>
+                  <AutoColumn gap="20px">
+                    <RowBetween>
+                      <Text>Total Liquidity</Text>
+                      <div />
+                    </RowBetween>
+                    <RowBetween align="flex-end">
+                      <Text fontSize={36} lineHeight={1} fontWeight={600}>
+                        {liquidity}
+                      </Text>
+                      <Text>{liquidityChange}</Text>
+                    </RowBetween>
+                  </AutoColumn>
+                  <AutoColumn gap="20px">
+                    <RowBetween>
+                      <Text>Transactions (24hrs)</Text>
+                      <div />
+                    </RowBetween>
+                    <RowBetween align="flex-end">
+                      <Text fontSize={36} lineHeight={1} fontWeight={600}>
+                        {oneDayTxns}
+                      </Text>
+                      <Text>{txnChange}</Text>
+                    </RowBetween>
+                  </AutoColumn>
+                </AutoColumn>
+              </Box>
+            </Panel>
+          </Box>
+          <Box>
+            <Panel>
+              <ChartWrapper area="fill" rounded>
+                <GlobalChart chartData={chartData} />
+              </ChartWrapper>
+            </Panel>
+          </Box>
+        </Box>
+      )}
+      {!below1080 && (
+        <GridRow style={{ marginTop: '40px' }}>
+          <LeftGroup>
+            <Panel style={{ position: 'relative' }}>
+              <EthIcon src={EthLogo} />
+              <PaddedGroup>
+                <Column>
+                  <RowFlat>
+                    <Text fontSize={36} lineHeight={1} fontWeight={600}>
+                      {formattedEthPrice}
+                    </Text>
+                    {/* <Text marginLeft="10px">{liquidityChange}</Text> */}
+                  </RowFlat>
+                  <RowFlat style={{ marginTop: '10px' }}>
+                    <Hint>ETH Uniprice</Hint>
+                  </RowFlat>
+                </Column>
+              </PaddedGroup>
+            </Panel>
+            <Panel>
+              <SpacedColumn>
+                <Column>
+                  <RowFlat>
+                    <Text fontSize={36} lineHeight={1} fontWeight={600}>
+                      {liquidity}
+                    </Text>
+                    <Text marginLeft="10px">{liquidityChange}</Text>
+                  </RowFlat>
+                  <RowFlat style={{ marginTop: '10px' }}>
+                    <Hint>Total Liquidity</Hint>
+                  </RowFlat>
+                </Column>
+                <Column>
+                  <RowFlat>
+                    <Text fontSize={36} lineHeight={1} fontWeight={600}>
+                      {volume}
+                    </Text>
+                    <Text marginLeft="10px">{volumeChange}</Text>
+                  </RowFlat>
+                  <RowFlat style={{ marginTop: '10px' }}>
+                    <Hint>Volume (24hrs)</Hint>
+                  </RowFlat>
+                </Column>
+                <Column>
+                  <RowFlat>
+                    <Text fontSize={36} lineHeight={1} fontWeight={600}>
+                      {oneDayTxns}
+                    </Text>
+                    <Text marginLeft="10px">{txnChange}%</Text>
+                  </RowFlat>
+                  <RowFlat style={{ marginTop: '10px' }}>
+                    <Hint>Transactions (24hrs)</Hint>
+                  </RowFlat>
+                </Column>
+              </SpacedColumn>
+            </Panel>
+          </LeftGroup>
+          <Panel style={{ height: '100%' }}>
+            <ChartWrapper area="fill" rounded>
+              <GlobalChart chartData={chartData} />
+            </ChartWrapper>
           </Panel>
-          <Panel>
-            <SpacedColumn>
-              <Column>
-                <RowFlat>
-                  <Text fontSize={36} lineHeight={1} fontWeight={600}>
-                    {liquidity}
-                  </Text>
-                  <Text marginLeft="10px">{liquidityChange}</Text>
-                </RowFlat>
-                <RowFlat style={{ marginTop: '10px' }}>
-                  <Hint>Total Liquidity</Hint>
-                </RowFlat>
-              </Column>
-              <Column>
-                <RowFlat>
-                  <Text fontSize={36} lineHeight={1} fontWeight={600}>
-                    {volume}
-                  </Text>
-                  <Text marginLeft="10px">{volumeChange}</Text>
-                </RowFlat>
-                <RowFlat style={{ marginTop: '10px' }}>
-                  <Hint>Volume (24hrs)</Hint>
-                </RowFlat>
-              </Column>
-              <Column>
-                <RowFlat>
-                  <Text fontSize={36} lineHeight={1} fontWeight={600}>
-                    {oneDayTxns}
-                  </Text>
-                  <Text marginLeft="10px">{txnChange}%</Text>
-                </RowFlat>
-                <RowFlat style={{ marginTop: '10px' }}>
-                  <Hint>Transactions (24hrs)</Hint>
-                </RowFlat>
-              </Column>
-            </SpacedColumn>
-          </Panel>
-        </LeftGroup>
-        <Panel>
-          <ChartWrapper area="fill" rounded>
-            <GlobalChart chartData={chartData} />
-          </ChartWrapper>
-        </Panel>
-      </GridRow>
+        </GridRow>
+      )}
       <Panel style={{ marginTop: '6px' }}>
         <PaddedGroup>
           <ListOptions gap="10px">
@@ -277,7 +344,7 @@ function GlobalPage() {
                 }}
                 color={txFilter !== 'ADD' ? '#aeaeae' : 'black'}
               >
-                Add
+                Adds
               </Text>
             </Hover>
             <Hover>
@@ -287,7 +354,7 @@ function GlobalPage() {
                 }}
                 color={txFilter !== 'REMOVE' ? '#aeaeae' : 'black'}
               >
-                Remove
+                Removes
               </Text>
             </Hover>
           </ListOptions>

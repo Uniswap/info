@@ -38,18 +38,18 @@ const Input = styled.input`
     color: ${({ theme }) => theme.textColor};
     font-size: ${({ large }) => (large ? '20px' : '16px')};
   }
-`
 
-// const SearchIconSmall = styled(SearchIcon)`
-//   height: 16px;
-//   width: 16px;
-//   margin-left: 16px;
-// `
+  @media screen and (max-width: 640px) {
+    ::placeholder {
+      font-size: 16px;
+    }
+  }
+`
 
 const SearchIconLarge = styled(SearchIcon)`
   height: 20px;
   width: 20px;
-  margin-right: 10px;
+  margin-right: 4px;
   color: ${({ theme }) => theme.textColor};
 `
 
@@ -81,10 +81,6 @@ const MenuItem = styled(Row)`
   }
 `
 
-// const WrapperSmall = styled(Wrapper)`
-//   width: 240px;
-// `
-
 const Heading = styled(Row)`
   padding: 1rem;
 `
@@ -105,24 +101,13 @@ const Blue = styled.span`
   }
 `
 
-const Tokens = styled.div``
-
-// export default function Search() {
-//   return (
-//     <WrapperSmall>
-//       <Input placeholder={'Search pools and accounts...'}></Input>
-//       <SearchIconSmall />
-//     </WrapperSmall>
-//   )
-// }
-
 export const Search = ({ small = false }) => {
   const allTokens = useAllTokenData()
   const allPairs = useAllPairs()
   const [showMenu, toggleMenu] = useState(false)
   const [value, setValue] = useState('')
-  const [showShadow, toggleShadow] = useState(false)
-  const [showBottomShadow, toggleBottomShadow] = useState(false)
+  const [, toggleShadow] = useState(false)
+  const [, toggleBottomShadow] = useState(false)
 
   useEffect(() => {
     if (value !== '') {
@@ -197,6 +182,11 @@ export const Search = ({ small = false }) => {
     setPairsShown(Math.min(Object.keys(filteredPairList).length, 3))
   }, [filteredPairList])
 
+  function onDismiss() {
+    toggleMenu(false)
+    setValue('')
+  }
+
   return (
     <div
       style={{
@@ -226,11 +216,11 @@ export const Search = ({ small = false }) => {
           <Heading>
             <Gray>Tokens</Gray>
           </Heading>
-          <Tokens shadow={showShadow}>
+          <div>
             {Object.keys(filteredTokenList).length === 0 && <MenuItem>No results</MenuItem>}
             {filteredTokenList.slice(0, tokensShown).map(key => {
               return (
-                <BasicLink to={'/token/' + key} key={key}>
+                <BasicLink to={'/token/' + key} key={key} onClick={onDismiss}>
                   <MenuItem>
                     <TokenLogo address={allTokens[key].id}></TokenLogo>
                     <span>{allTokens[key].name}</span>
@@ -250,15 +240,15 @@ export const Search = ({ small = false }) => {
                 </Blue>
               </Heading>
             )}
-          </Tokens>
+          </div>
           <Heading>
             <Gray>Pools</Gray>
           </Heading>
-          <Tokens shadow={showBottomShadow}>
+          <div>
             {Object.keys(filteredPairList).length === 0 && <MenuItem>No results</MenuItem>}
             {filteredPairList.slice(0, pairsShown).map(key => {
               return (
-                <BasicLink to={'/pair/' + key} key={key}>
+                <BasicLink to={'/pair/' + key} key={key} onClick={onDismiss}>
                   <MenuItem>
                     <TokenLogo address={allPairs[key].id}></TokenLogo>
                     <span>{allPairs[key].token0.symbol + '-' + allPairs[key].token1.symbol} Pool</span>
@@ -277,7 +267,7 @@ export const Search = ({ small = false }) => {
                 </Blue>
               </Heading>
             )}
-          </Tokens>
+          </div>
         </Menu>
       )}
     </div>
