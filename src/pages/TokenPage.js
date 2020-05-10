@@ -66,7 +66,7 @@ const ListHeader = styled.div`
   font-size: 24px;
   font-weight: 600;
   width: 100%;
-  margin: 5rem 0 2rem 0;
+  margin: 40px 0;
 `
 
 const AccountSearch = styled.input`
@@ -147,6 +147,7 @@ const ShadedBox = styled.div`
   background: rgba(255, 255, 255, 0.4);
   border-radius: 20px;
   padding: 20px;
+  height: 100%;
 `
 
 const Break = styled.div`
@@ -240,7 +241,7 @@ function TokenPage({ address }) {
     <PageWrapper>
       <ThemedBackground backgroundColor={backgroundColor} />
       <RowBetween align="flex-start">
-        <ShadedBox style={{ width: '40%' }}>
+        <ShadedBox style={{ width: '36%', minHeight: '620px' }}>
           <AutoColumn gap="40px">
             <RowBetween>
               <TokenLogo address={'0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'} size="32px" />
@@ -314,7 +315,7 @@ function TokenPage({ address }) {
             </AutoRow>
           </AutoColumn>
         </ShadedBox>
-        <ShadedBox style={{ width: '60%' }}>
+        <ShadedBox style={{ width: '64%', minHeight: '620px' }}>
           <TokenChart chartData={chartData} token={address} color={backgroundColor} />
         </ShadedBox>
       </RowBetween>
