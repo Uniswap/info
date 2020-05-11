@@ -8,7 +8,7 @@ import { useEthPrice } from './GlobalData'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 
-import { get2DayPercentFormatted, getPercentFormatted } from '../helpers'
+import { get2DayPercentFormatted, getPercentFormatted, getBlockFromTimestamp } from '../helpers'
 
 const UPDATE = 'UPDATE'
 const UPDATE_TOKEN_TXNS = 'UPDATE_TOKEN_TXNS'
@@ -123,11 +123,11 @@ const getAllTokens = async () => {
 }
 
 const getTokenData = async (address, ethPrice) => {
-  let oneDayBlock = 6426343
-  let twoDayBlock = 6420546
-  // const utcCurrentTime = dayjs()
-  // const utcOneDayBack = utcCurrentTime.subtract(1, 'day')
-  // const utcTwoDaysBack = utcCurrentTime.subtract(2, 'day')
+  const utcCurrentTime = dayjs()
+  const utcOneDayBack = utcCurrentTime.subtract(1, 'day').unix()
+  const utcTwoDaysBack = utcCurrentTime.subtract(2, 'day').unix()
+  let oneDayBlock = await getBlockFromTimestamp(utcOneDayBack)
+  let twoDayBlock = await getBlockFromTimestamp(utcTwoDaysBack)
 
   // initialize data arrays
   let data = []
@@ -245,6 +245,7 @@ const getTokenChartData = async tokenAddress => {
     // add the day index to the set of days
     dayIndexSet.add((data[i].date / oneDay).toFixed(0))
     dayIndexArray.push(data[i])
+    dayData.dailyVolumeUSD = parseFloat(dayData.dailyVolumeUSD)
   })
   // fill in empty days
   let timestamp = data[0] && data[0].date ? data[0].date : startTime
@@ -258,6 +259,7 @@ const getTokenChartData = async tokenAddress => {
       data.push({
         date: nextDay,
         dayString: nextDay,
+        dailyVolumeUSD: 0,
         totalLiquidityUSD: latestLiquidityUSD,
         mostLiquidPairs: latestPairDatas
       })

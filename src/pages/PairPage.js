@@ -2,11 +2,10 @@ import React, { useState } from 'react'
 import 'feather-icons'
 import styled from 'styled-components'
 
-import { Text, Flex } from 'rebass'
+import { Text, Box } from 'rebass'
 import Panel from '../components/Panel'
-import TokenLogo from '../components/TokenLogo'
 import { RowFlat, AutoRow, RowBetween, RowFixed } from '../components/Row'
-import Column from '../components/Column'
+import Column, { AutoColumn } from '../components/Column'
 import { ButtonLight, ButtonDark } from '../components/ButtonStyled'
 import PairChart from '../components/PairChart'
 import Link from '../components/Link'
@@ -20,16 +19,26 @@ import { usePairData, usePairTransactions, usePairChartData } from '../contexts/
 import { useCurrentCurrency } from '../contexts/Application'
 import { ThemedBackground, Hover } from '../Theme'
 import CopyHelper from '../components/Copy'
+import { useMedia } from 'react-use'
+import DoubleTokenLogo from '../components/DoubleLogo'
 
 const PageWrapper = styled.div`
-  width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
   padding-bottom: 100px;
+  width: calc(100% - 80px);
+  padding: 0 40px;
+  overflow: scroll;
 
-  @media screen and (min-width: 64em) {
+  @media screen and (max-width: 640px) {
+    width: calc(100% - 40px);
+    padding: 0 20px;
+  }
+
+  & > * {
+    width: 100%;
     max-width: 1240px;
   }
 `
@@ -43,21 +52,6 @@ const ListHeader = styled.div`
   font-weight: 600;
   width: 100%;
   margin: 5rem 0 2rem 0;
-`
-
-const ListOptions = styled(Flex)`
-  flex-direction: row;
-  height: 40px
-  justify-content: space-between;
-  align-items; center;
-  width: 100%;
-  margin: 2rem 0;
-  font-size: 20px;
-  font-weight: 600;
-
-  @media screen and (max-width: 64em) {
-    display: none;
-  }
 `
 
 const PanelWrapper = styled.div`
@@ -127,6 +121,22 @@ const GroupedOverflow = styled.div`
 const ChartWrapper = styled.div`
   margin-bottom: 40px;
 `
+const ShadedBox = styled.div`
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 20px;
+  padding: 20px;
+`
+
+const TopPercent = styled.div`
+  align-self: flex-end;
+  margin-left: 10px;
+`
+
+const Break = styled.div`
+  width: 50px;
+  height: 2px;
+  background: black;
+`
 
 const Option = ({ onClick, active, children }) => {
   return (
@@ -169,132 +179,221 @@ function PairPage({ pairAddress }) {
 
   const volumeChange = currency === 'ETH' ? formattedNum(volumeChangeETH) + '%' : formattedNum(volumeChangeUSD) + '%'
 
+  const below1080 = useMedia('(max-width: 1080px)')
+
   return (
     <PageWrapper>
       <ThemedBackground backgroundColor={backgroundColor} />
-      <RowBetween mb={20} mt={20}>
-        <RowFixed>
-          <TokenLogo address={'0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'} size="32px" />
-          <RowFlat style={{ marginLeft: '10px' }}>
+      {below1080 && (
+        <ShadedBox style={{ width: '100%' }}>
+          <AutoColumn gap="40px">
+            <RowBetween>
+              {token0 && token1 && (
+                <DoubleTokenLogo a0={token0?.id || ''} a1={token1?.id || ''} size={32} margin={true} />
+              )}
+              <RowFixed justify="flex-end">
+                <ButtonLight color={backgroundColor}>+ Add Liquidity</ButtonLight>
+              </RowFixed>
+            </RowBetween>
             <TokenName>{token0 && token1 ? token0.symbol + '-' + token1.symbol + ' Pool' : ''}</TokenName>
-          </RowFlat>
-        </RowFixed>
-        <RowFixed justify="flex-end">
-          <ButtonLight color={backgroundColor}>+ Add Liquidity</ButtonLight>
-          <ButtonDark ml={10} color={backgroundColor}>
-            Trade
-          </ButtonDark>
-        </RowFixed>
-      </RowBetween>
+            <AutoColumn gap="10px">
+              <RowFlat style={{ lineHeight: '22px' }}>
+                <Text fontSize={24} fontWeight={600}>
+                  {volume}
+                </Text>
+                <TopPercent>{volumeChange}</TopPercent>
+              </RowFlat>
+              <Hint>24hr Volume</Hint>
+            </AutoColumn>
+            <AutoColumn gap="10px">
+              <RowFlat style={{ lineHeight: '22px' }}>
+                <Text fontSize={24} fontWeight={600}>
+                  {liquidity}
+                </Text>
+                <TopPercent>{liquidityChange}</TopPercent>
+              </RowFlat>
+              <Hint>Total Liquidity</Hint>
+            </AutoColumn>
+            <AutoColumn gap="10px">
+              <RowFlat style={{ lineHeight: '22px' }}>
+                <Text fontSize={24} fontWeight={600}>
+                  {reserve0 ? formattedNum(reserve0) : ''}
+                </Text>
+              </RowFlat>
+              <Hint>{token0 ? token0.symbol + ' balance' : ''}</Hint>
+            </AutoColumn>
+            <AutoColumn gap="10px">
+              <RowFlat style={{ lineHeight: '22px' }}>
+                <Text fontSize={24} fontWeight={600}>
+                  {reserve1 ? formattedNum(reserve1) : ''}
+                </Text>
+              </RowFlat>
+              <Hint>{token1 ? token1.symbol + ' balance' : ''}</Hint>
+            </AutoColumn>
+            <Break />
+            <AutoRow gap="10px">
+              <AutoColumn gap="20px">
+                <RowFixed>
+                  <Text fontSize={16} fontWeight="500">
+                    {pairAddress.slice(0, 6) + '...' + pairAddress.slice(38, 42)}
+                  </Text>
+                  <CopyHelper toCopy={pairAddress} />
+                </RowFixed>
+                <Text>Pool Address</Text>
+              </AutoColumn>
+              <AutoColumn gap="20px">
+                <RowFixed>
+                  <Text fontSize={16} fontWeight="500">
+                    {token0 && token0?.id.slice(0, 6) + '...' + token0?.id.slice(38, 42)}
+                  </Text>
+                  <CopyHelper toCopy={token0?.id} />
+                </RowFixed>
+                <Text>{token0 && token0.symbol + ' address'}</Text>
+              </AutoColumn>
+              <AutoColumn gap="20px">
+                <RowFixed>
+                  <Text fontSize={16} fontWeight="500">
+                    {token1 && token1?.id.slice(0, 6) + '...' + token1?.id.slice(38, 42)}
+                  </Text>
+                  <CopyHelper toCopy={token1?.id} />
+                </RowFixed>
+                <Text>{token1 && token1.symbol + ' address'}</Text>
+              </AutoColumn>
+            </AutoRow>
+          </AutoColumn>
+        </ShadedBox>
+      )}
+      {!below1080 && (
+        <RowBetween mb={20} mt={20}>
+          <RowFixed>
+            <DoubleTokenLogo a0={token0?.id || ''} a1={token1?.id || ''} size={32} margin={true} />
+            <RowFlat style={{ marginLeft: '10px' }}>
+              <TokenName>{token0 && token1 ? token0.symbol + '-' + token1.symbol + ' Pool' : ''}</TokenName>
+            </RowFlat>
+          </RowFixed>
+          <RowFixed justify="flex-end">
+            <ButtonLight color={backgroundColor}>+ Add Liquidity</ButtonLight>
+            <ButtonDark ml={10} color={backgroundColor}>
+              Trade
+            </ButtonDark>
+          </RowFixed>
+        </RowBetween>
+      )}
       <DashboardWrapper>
         <ChartWrapper>
           <PairChart chartData={chartData} color={backgroundColor} />
         </ChartWrapper>
-        <PanelWrapper>
-          <TopPanel rounded color="black" p={24}>
-            <Column>
-              <RowFlat>
-                <Text fontSize={24} lineHeight={1} fontWeight={600}>
-                  {volume}
-                </Text>
-                <Text marginLeft={10}>{volumeChange}</Text>
-              </RowFlat>
-              <RowFlat style={{ marginTop: '10px' }}>
-                <Hint>Volume (24hrs)</Hint>
-              </RowFlat>
-            </Column>
-          </TopPanel>
-          <TopPanel rounded color="black" p={24}>
-            <Column>
-              <RowFlat>
-                <Text fontSize={24} lineHeight={1} fontWeight={600}>
-                  {liquidity}
-                </Text>
-                <Text marginLeft={10}>{liquidityChange}</Text>
-              </RowFlat>
-              <RowFlat style={{ marginTop: '10px' }}>
-                <Hint>Total Liquidity</Hint>
-              </RowFlat>
-            </Column>
-          </TopPanel>
-          <TopPanel rounded color="black" p={24}>
-            <Column>
-              <RowFlat>
-                <Text fontSize={24} lineHeight={1} fontWeight={600}>
-                  {reserve0 ? formattedNum(reserve0) : ''}
-                </Text>
-              </RowFlat>
-              <RowFlat style={{ marginTop: '10px' }}>
-                <Hint>{token0 ? token0.symbol + ' balance' : ''}</Hint>
-              </RowFlat>
-            </Column>
-          </TopPanel>
-          <TopPanel rounded color="black" p={24}>
-            <Column>
-              <RowFlat>
-                <Text fontSize={24} lineHeight={1} fontWeight={600}>
-                  {reserve1 ? formattedNum(reserve1) : ''}
-                </Text>
-              </RowFlat>
-              <RowFlat style={{ marginTop: '10px' }}>
-                <Hint>{token1 ? token1.symbol + ' balance' : ''}</Hint>
-              </RowFlat>
-            </Column>
-          </TopPanel>
-        </PanelWrapper>
-        <ListHeader>Pool Details</ListHeader>
-        <Panel
-          rounded
-          style={{
-            border: '1px solid rgba(43, 43, 43, 0.05)',
-            marginBottom: '60px'
-          }}
-          p={20}
-        >
-          <TokenDetailsLayout>
-            <Column>
-              <Text color="#888D9B">Pool Name</Text>
-              <GroupedOverflow>
-                <Text style={{ marginTop: '1rem' }} fontSize={18} fontWeight="500">
-                  {token0 && token1 ? token0.symbol + '-' + token1.symbol + ' Pool' : ''}
-                </Text>
-              </GroupedOverflow>
-            </Column>
-            <Column>
-              <Text color="#888D9B">Address</Text>
-              <GroupedOverflow>
-                <Text style={{ marginTop: '1rem' }} fontSize={18} fontWeight="500">
-                  {pairAddress.slice(0, 6) + '...' + pairAddress.slice(38, 42)}
-                </Text>
-                <CopyHelper toCopy={pairAddress} />
-              </GroupedOverflow>
-            </Column>
-            <Column>
-              <Text color="#888D9B">{token0 && token0.symbol + ' address'}</Text>
-              <GroupedOverflow>
-                <Text style={{ marginTop: '1rem' }} fontSize={18} fontWeight="500">
-                  {token0 && token0.id.slice(0, 6) + '...' + token0.id.slice(38, 42)}
-                </Text>
-                <CopyHelper toCopy={token0?.address} />
-              </GroupedOverflow>
-            </Column>
-            <Column>
-              <Text color="#888D9B">{token1 && token1.symbol + ' address'}</Text>
-              <GroupedOverflow>
-                <Text style={{ marginTop: '1rem' }} fontSize={18} fontWeight="500">
-                  {token1 && token1.id.slice(0, 6) + '...' + token1.id.slice(38, 42)}
-                </Text>
-                <CopyHelper toCopy={token1?.id} />
-              </GroupedOverflow>
-            </Column>
-            <ButtonLight color={backgroundColor}>
-              <Link external href={'https://etherscan.io/address/' + pairAddress}>
-                View on Etherscan ↗
-              </Link>
-            </ButtonLight>
-          </TokenDetailsLayout>
-        </Panel>
-        <ListOptions>
+        {!below1080 && (
+          <PanelWrapper>
+            <TopPanel rounded color="black" p={24}>
+              <Column>
+                <RowFlat>
+                  <Text fontSize={24} lineHeight={1} fontWeight={600}>
+                    {volume}
+                  </Text>
+                  <Text marginLeft={10}>{volumeChange}</Text>
+                </RowFlat>
+                <RowFlat style={{ marginTop: '10px' }}>
+                  <Hint>Volume (24hrs)</Hint>
+                </RowFlat>
+              </Column>
+            </TopPanel>
+            <TopPanel rounded color="black" p={24}>
+              <Column>
+                <RowFlat>
+                  <Text fontSize={24} lineHeight={1} fontWeight={600}>
+                    {liquidity}
+                  </Text>
+                  <Text marginLeft={10}>{liquidityChange}</Text>
+                </RowFlat>
+                <RowFlat style={{ marginTop: '10px' }}>
+                  <Hint>Total Liquidity</Hint>
+                </RowFlat>
+              </Column>
+            </TopPanel>
+            <TopPanel rounded color="black" p={24}>
+              <Column>
+                <RowFlat>
+                  <Text fontSize={24} lineHeight={1} fontWeight={600}>
+                    {reserve0 ? formattedNum(reserve0) : ''}
+                  </Text>
+                </RowFlat>
+                <RowFlat style={{ marginTop: '10px' }}>
+                  <Hint>{token0 ? token0.symbol + ' balance' : ''}</Hint>
+                </RowFlat>
+              </Column>
+            </TopPanel>
+            <TopPanel rounded color="black" p={24}>
+              <Column>
+                <RowFlat>
+                  <Text fontSize={24} lineHeight={1} fontWeight={600}>
+                    {reserve1 ? formattedNum(reserve1) : ''}
+                  </Text>
+                </RowFlat>
+                <RowFlat style={{ marginTop: '10px' }}>
+                  <Hint>{token1 ? token1.symbol + ' balance' : ''}</Hint>
+                </RowFlat>
+              </Column>
+            </TopPanel>
+          </PanelWrapper>
+        )}
+        {!below1080 && (
+          <>
+            <ListHeader>Pool Details</ListHeader>
+            <Panel
+              rounded
+              style={{
+                border: '1px solid rgba(43, 43, 43, 0.05)',
+                marginBottom: '60px'
+              }}
+              p={20}
+            >
+              <TokenDetailsLayout>
+                <Column>
+                  <Text color="#888D9B">Pool Name</Text>
+                  <GroupedOverflow>
+                    <Text style={{ marginTop: '1rem' }} fontSize={18} fontWeight="500">
+                      {token0 && token1 ? token0.symbol + '-' + token1.symbol + ' Pool' : ''}
+                    </Text>
+                  </GroupedOverflow>
+                </Column>
+                <Column>
+                  <Text color="#888D9B">Pool Address</Text>
+                  <GroupedOverflow>
+                    <Text style={{ marginTop: '1rem' }} fontSize={18} fontWeight="500">
+                      {pairAddress.slice(0, 6) + '...' + pairAddress.slice(38, 42)}
+                    </Text>
+                    <CopyHelper toCopy={pairAddress} />
+                  </GroupedOverflow>
+                </Column>
+                <Column>
+                  <Text color="#888D9B">{token0 && token0.symbol + ' address'}</Text>
+                  <GroupedOverflow>
+                    <Text style={{ marginTop: '1rem' }} fontSize={18} fontWeight="500">
+                      {token0 && token0.id.slice(0, 6) + '...' + token0.id.slice(38, 42)}
+                    </Text>
+                    <CopyHelper toCopy={token0?.id} />
+                  </GroupedOverflow>
+                </Column>
+                <Column>
+                  <Text color="#888D9B">{token1 && token1.symbol + ' address'}</Text>
+                  <GroupedOverflow>
+                    <Text style={{ marginTop: '1rem' }} fontSize={18} fontWeight="500">
+                      {token1 && token1.id.slice(0, 6) + '...' + token1.id.slice(38, 42)}
+                    </Text>
+                    <CopyHelper toCopy={token1?.id} />
+                  </GroupedOverflow>
+                </Column>
+                <ButtonLight color={backgroundColor}>
+                  <Link external href={'https://etherscan.io/address/' + pairAddress}>
+                    View on Etherscan ↗
+                  </Link>
+                </ButtonLight>
+              </TokenDetailsLayout>
+            </Panel>
+          </>
+        )}
+        <Box mb={20}>
           <AutoRow gap="10px" pl={4}>
             <Option
               onClick={() => {
@@ -329,7 +428,7 @@ function PairPage({ pairAddress }) {
               Removes
             </Option>
           </AutoRow>
-        </ListOptions>
+        </Box>
         <Panel
           rounded
           style={{

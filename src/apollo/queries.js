@@ -1,13 +1,34 @@
 import gql from 'graphql-tag'
 
-export const ETH_PRICE = gql`
-  query bundles {
-    bundles(where: { id: 1 }) {
+export const GET_BLOCK = gql`
+  query blocks($timestamp: Int!) {
+    blocks(first: 1, orderBy: timestamp, orderDirection: asc, where: { timestamp_gt: $timestamp }) {
       id
-      ethPrice
+      number
+      timestamp
     }
   }
 `
+
+export const ETH_PRICE = block => {
+  const queryString = block
+    ? `
+    query bundles {
+      bundles(where: { id: 1 } block: {number: ${block}}) {
+        id
+        ethPrice
+      }
+    }
+  `
+    : ` query bundles {
+      bundles(where: { id: 1 }) {
+        id
+        ethPrice
+      }
+    }
+  `
+  return gql(queryString)
+}
 
 export const PAIR_CHART = gql`
   query pairDayDatas($pairAddress: Bytes!) {
@@ -125,7 +146,7 @@ export const PAIR_DATA = (pairAddress, block) => {
 
 export const GLOBAL_CHART = gql`
   query uniswapDayDatas {
-    uniswapDayDatas(orderBy: date, orderDirection: desc) {
+    uniswapDayDatas(orderBy: date, orderDirection: asc) {
       id
       date
       totalVolumeUSD
@@ -153,7 +174,7 @@ export const GLOBAL_DATA = block => {
        {number: ` +
       block +
       `}` +
-      ` where: { id: "0xe2f197885abe8ec7c866cFf76605FD06d4576218" }) {
+      ` where: { id: "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f" }) {
         id
         totalVolumeUSD
         totalVolumeETH
@@ -164,7 +185,7 @@ export const GLOBAL_DATA = block => {
     }`
     : `query uniswapFactories {
       uniswapFactories(
-        where: { id: "0xe2f197885abe8ec7c866cFf76605FD06d4576218" }) {
+        where: { id: "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f" }) {
         id
         totalVolumeUSD
         totalVolumeETH
@@ -250,7 +271,7 @@ export const GLOBAL_TXNS = gql`
 
 export const All_PAIRS = gql`
   query pairs {
-    pairs {
+    pairs(orderBy: reserveUSD, orderDirection: desc) {
       id
     }
   }
@@ -267,7 +288,7 @@ export const All_TOKENS = gql`
 
 export const TOKEN_CHART = gql`
   query tokenDayDatas($tokenAddr: String!) {
-    tokenDayDatas(orderBy: date, orderDirection: desc, where: { token: $tokenAddr }) {
+    tokenDayDatas(orderBy: date, orderDirection: asc, where: { token: $tokenAddr }) {
       id
       date
       totalLiquidityToken
@@ -313,11 +334,13 @@ export const TOKEN_DATA = (tokenAddress, block) => {
         reserveUSD
         volumeUSD
         token0 {
+          id
           name
           symbol
           derivedETH
         }
         token1 {
+          id
           name
           symbol
           derivedETH
@@ -343,11 +366,13 @@ export const TOKEN_DATA = (tokenAddress, block) => {
       reserveUSD
       volumeUSD
       token0 {
+        id
         name
         symbol
         derivedETH
       }
       token1 {
+        id
         name
         symbol
         derivedETH

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo, useRef } from 'react'
 import styled from 'styled-components'
 
 import Row from '../Row'
@@ -8,6 +8,9 @@ import { BasicLink } from '../Link'
 
 import { useAllTokenData } from '../../contexts/TokenData'
 import { useAllPairs } from '../../contexts/PairData'
+import DoubleTokenLogo from '../DoubleLogo'
+import { useMedia } from 'react-use'
+import { useOutsideClick } from '../../hooks'
 
 const Wrapper = styled.div`
   display: flex;
@@ -101,13 +104,17 @@ const Blue = styled.span`
   }
 `
 
-export const Search = ({ small = false }) => {
+export const Search = React.forwardRef((props, ref) => {
   const allTokens = useAllTokenData()
   const allPairs = useAllPairs()
   const [showMenu, toggleMenu] = useState(false)
   const [value, setValue] = useState('')
   const [, toggleShadow] = useState(false)
   const [, toggleBottomShadow] = useState(false)
+
+  const below700 = useMedia('(max-width: 700px)')
+  const below470 = useMedia('(max-width: 470px)')
+  const below410 = useMedia('(max-width: 410px)')
 
   useEffect(() => {
     if (value !== '') {
@@ -187,6 +194,12 @@ export const Search = ({ small = false }) => {
     setValue('')
   }
 
+  const innerRef = useRef()
+  const [focused, setFocused] = useState(false)
+  useOutsideClick(innerRef, val => {
+    !focused && toggleMenu(false)
+  })
+
   return (
     <div
       style={{
@@ -195,16 +208,29 @@ export const Search = ({ small = false }) => {
         position: 'relative',
         width: '100%'
       }}
+      ref={innerRef}
     >
-      <Wrapper open={showMenu} shadow={true} large={!small}>
+      <Wrapper open={showMenu} shadow={true} large={!props.small}>
         <SearchIconLarge />
         <Input
-          large={!small}
+          large={!props.small}
           type={'text'}
-          placeholder={'Search all Uniswap pools and tokens...'}
+          placeholder={
+            below410
+              ? 'Search...'
+              : below470
+              ? 'Search Uniswap...'
+              : below700
+              ? 'Search pools and tokens...'
+              : 'Search all Uniswap pools and tokens...'
+          }
           value={value}
           onChange={e => {
             setValue(e.target.value)
+          }}
+          onFocus={() => {
+            toggleMenu(true)
+            setFocused(true)
           }}
         />
       </Wrapper>
@@ -250,7 +276,7 @@ export const Search = ({ small = false }) => {
               return (
                 <BasicLink to={'/pair/' + key} key={key} onClick={onDismiss}>
                   <MenuItem>
-                    <TokenLogo address={allPairs[key].id}></TokenLogo>
+                    <DoubleTokenLogo a0={allPairs?.[key]?.token0?.id} a1={allPairs?.[key]?.token1?.id} margin={true} />
                     <span>{allPairs[key].token0.symbol + '-' + allPairs[key].token1.symbol} Pool</span>
                   </MenuItem>
                 </BasicLink>
@@ -272,6 +298,6 @@ export const Search = ({ small = false }) => {
       )}
     </div>
   )
-}
+})
 
 export default Search

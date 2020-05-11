@@ -72,7 +72,7 @@ const GlobalChart = ({ chartData }) => {
           </Row>
         </RowBetween>
       )}
-      {chartFilter === 'liqRaw' && chartData && (
+      {chartFilter === 'liqRaw' && (
         <ResponsiveContainer aspect={below1080 ? 60 / 28 : 60 / 28}>
           <AreaChart margin={{ top: 20, right: 0, bottom: 6, left: 10 }} barCategoryGap={1} data={chartData}>
             <defs>

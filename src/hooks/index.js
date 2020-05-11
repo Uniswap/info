@@ -9,7 +9,7 @@ export function useColor(tokenAddress) {
   const [color, setColor] = useState('#2172E5')
   if (tokenAddress) {
     const path = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${isAddress(
-      's'
+      tokenAddress
     )}/logo.png`
     if (path) {
       Vibrant.from(path).getPalette((err, palette) => {
@@ -49,4 +49,20 @@ export function useCopyClipboard(timeout = 500) {
   }, [isCopied, setIsCopied, timeout])
 
   return [isCopied, staticCopy]
+}
+
+export const useOutsideClick = (ref, callback) => {
+  const handleClick = e => {
+    if (ref.current && !ref.current.contains(e.target)) {
+      callback(true)
+    } else {
+      callback(false)
+    }
+  }
+  useEffect(() => {
+    document.addEventListener('click', handleClick)
+    return () => {
+      document.removeEventListener('click', handleClick)
+    }
+  })
 }

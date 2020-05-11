@@ -5,7 +5,7 @@ import { AutoRow, RowBetween } from '../Row'
 
 import { toK, toNiceDate, toNiceDateYear } from '../../helpers'
 import { OptionButton } from '../ButtonStyled'
-import { darken, lighten } from 'polished'
+import { darken } from 'polished'
 import { useMedia } from 'react-use'
 
 const ChartWrapper = styled.div`
@@ -13,12 +13,12 @@ const ChartWrapper = styled.div`
   height: 100%;
 `
 
-const StackedAreaChart = ({ chartData, color }) => {
+const TokenChart = ({ chartData, color }) => {
   const [chartFilter, setChartFilter] = useState('liq')
   const [timeWindow, setTimeWindow] = useState('week')
 
   const below1080 = useMedia('(max-width: 1080px)')
-  const below600 = useMedia('(max-width: 600px)')
+  const below680 = useMedia('(max-width: 680px)')
 
   return (
     <ChartWrapper>
@@ -31,21 +31,23 @@ const StackedAreaChart = ({ chartData, color }) => {
             Volume
           </OptionButton>
         </AutoRow>
-        <AutoRow justify="flex-end" gap="10px">
-          <OptionButton active={timeWindow === 'week'} onClick={() => setTimeWindow('week')}>
-            1 Week
-          </OptionButton>
-          <OptionButton active={timeWindow === 'month'} onClick={() => setTimeWindow('month')}>
-            1 Month
-          </OptionButton>
-          <OptionButton active={timeWindow === 'all'} onClick={() => setTimeWindow('all')}>
-            All Time
-          </OptionButton>
-        </AutoRow>
+        {!below680 && (
+          <AutoRow justify="flex-end" gap="10px">
+            <OptionButton active={timeWindow === 'week'} onClick={() => setTimeWindow('week')}>
+              1 Week
+            </OptionButton>
+            <OptionButton active={timeWindow === 'month'} onClick={() => setTimeWindow('month')}>
+              1 Month
+            </OptionButton>
+            <OptionButton active={timeWindow === 'all'} onClick={() => setTimeWindow('all')}>
+              All Time
+            </OptionButton>
+          </AutoRow>
+        )}
       </RowBetween>
       {chartFilter === 'liq' && chartData && (
-        <ResponsiveContainer aspect={60 / 32}>
-          <AreaChart margin={{ top: 10, right: 0, bottom: 6, left: 0 }} barCategoryGap={1} data={chartData}>
+        <ResponsiveContainer aspect={below1080 ? 60 / 32 : 60 / 12}>
+          <AreaChart margin={{ top: 0, right: 10, bottom: 6, left: -20 }} barCategoryGap={1} data={chartData}>
             <defs>
               <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor={color} stopOpacity={0.35} />
@@ -102,8 +104,8 @@ const StackedAreaChart = ({ chartData, color }) => {
         </ResponsiveContainer>
       )}
       {chartFilter === 'vol' && (
-        <ResponsiveContainer aspect={60 / 12}>
-          <BarChart margin={{ top: 0, right: 0, bottom: 6, left: 10 }} barCategoryGap={1} data={chartData}>
+        <ResponsiveContainer aspect={below1080 ? 60 / 32 : 60 / 12}>
+          <BarChart margin={{ top: 0, right: 10, bottom: 6, left: -30 }} barCategoryGap={1} data={chartData}>
             <XAxis
               tickLine={false}
               axisLine={false}
@@ -152,4 +154,4 @@ const StackedAreaChart = ({ chartData, color }) => {
   )
 }
 
-export default StackedAreaChart
+export default TokenChart

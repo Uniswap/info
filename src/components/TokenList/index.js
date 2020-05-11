@@ -281,7 +281,7 @@ function TopTokenList({ tokens }) {
               setSortDirection(!sortDirection)
             }}
           >
-            Volume {below1300 ? '(24hrs)' : '(24 Hours)'}{' '}
+            Volume (24hrs)
             {sortedColumn === SORT_FIELD.VOL ? (!sortDirection ? '↑' : '↓') : ''}
           </ClickableText>
         </Flex>
@@ -294,7 +294,7 @@ function TopTokenList({ tokens }) {
                 setSortDirection(!sortDirection)
               }}
             >
-              Price Change {below1300 ? '(24hrs)' : '(24 Hours)'}{' '}
+              Price Change (24hrs)
               {sortedColumn === SORT_FIELD.CHANGE ? (!sortDirection ? '↑' : '↓') : ''}
             </ClickableText>
           </Flex>

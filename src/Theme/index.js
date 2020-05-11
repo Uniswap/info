@@ -100,7 +100,7 @@ export const ThemedBackground = styled.div`
   right: 0;
   height: 1000px;
   max-width: 100vw !important;
-  width: 100v !important;
+  width: 100vw !important;
   z-index: -1;
   background: ${({ backgroundColor }) =>
     `linear-gradient(180deg, ${backgroundColor} 0%, rgba(255, 255, 255, 0) 100%);`};

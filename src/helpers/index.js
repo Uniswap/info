@@ -2,6 +2,8 @@ import { BigNumber } from 'bignumber.js'
 import dayjs from 'dayjs'
 import { ethers } from 'ethers'
 import utc from 'dayjs/plugin/utc'
+import { blockClient } from '../apollo/client'
+import { GET_BLOCK } from '../apollo/queries'
 
 BigNumber.set({ EXPONENTIAL_AT: 50 })
 
@@ -11,6 +13,17 @@ export const toNiceDate = date => {
   // let df = new Date(date * 1000).toUTCString('MMMM DD')
   let x = dayjs.utc(dayjs.unix(date)).format('MMM DD')
   return x
+}
+
+export async function getBlockFromTimestamp(timestamp) {
+  let result = await blockClient.query({
+    query: GET_BLOCK,
+    variables: {
+      timestamp: timestamp
+    },
+    fetchPolicy: 'cache-first'
+  })
+  return result?.data?.blocks?.[0]?.number
 }
 
 export const toNiceDateYear = date => dayjs.utc(dayjs.unix(date)).format('MMMM DD, YYYY')
@@ -81,9 +94,10 @@ var priceFormatter = new Intl.NumberFormat('en-US', {
 })
 
 export const formattedNum = (number, usd = false) => {
-  if (isNaN(number) || number === '') {
+  if (isNaN(number) || number === '' || number === undefined) {
     return ''
   }
+
   let num = parseFloat(number)
   if (num === 0) {
     if (usd) {
@@ -119,7 +133,12 @@ export const get2DayPercentFormatted = (valueNow, value24HoursAgo, value48HoursA
   let amountChange = secondDayValue - firstDayValue
 
   let percentChange = ''
-  const adjustedPercentChange = ((amountChange / firstDayValue) * 100).toFixed(2)
+  const adjustedPercentChange = (parseFloat(amountChange) / parseFloat(firstDayValue)).toFixed(2) * 100
+
+  if (firstDayValue === 0) {
+    return [secondDayValue, '+100']
+  }
+
   adjustedPercentChange > 0 ? (percentChange = '+') : (percentChange = '')
   percentChange += adjustedPercentChange
 
@@ -132,7 +151,8 @@ export const get2DayPercentFormatted = (valueNow, value24HoursAgo, value48HoursA
 
 export const getPercentFormatted = (valueNow, value24HoursAgo) => {
   let percentChange = ''
-  const adjustedPercentChange = ((valueNow - value24HoursAgo) / value24HoursAgo).toFixed(2)
+  const adjustedPercentChange = ((valueNow - value24HoursAgo) / value24HoursAgo).toFixed(2) * 100
+
   adjustedPercentChange > 0 ? (percentChange = '+') : (percentChange = '')
   percentChange += adjustedPercentChange
 

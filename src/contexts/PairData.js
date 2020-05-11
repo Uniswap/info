@@ -1,14 +1,14 @@
 import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect } from 'react'
 
 import { client } from '../apollo/client'
-import { PAIR_DATA, PAIR_CHART, PAIR_TXNS, All_PAIRS, TOKEN_TXNS } from '../apollo/queries'
+import { PAIR_DATA, PAIR_CHART, All_PAIRS, TOKEN_TXNS } from '../apollo/queries'
 
 import { useEthPrice } from './GlobalData'
 
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 
-import { get2DayPercentFormatted, getPercentFormatted } from '../helpers'
+import { get2DayPercentFormatted, getPercentFormatted, getBlockFromTimestamp } from '../helpers'
 
 const UPDATE = 'UPDATE'
 const UPDATE_PAIR_TXNS = 'UPDATE_PAIR_TXNS'
@@ -123,11 +123,11 @@ const getAllPairs = async () => {
 }
 
 const getPairData = async (address, ethPrice) => {
-  let oneDayBlock = 6426343
-  let twoDayBlock = 6420546
-  // const utcCurrentTime = dayjs()
-  // const utcOneDayBack = utcCurrentTime.subtract(1, 'day')
-  // const utcTwoDaysBack = utcCurrentTime.subtract(2, 'day')
+  const utcCurrentTime = dayjs()
+  const utcOneDayBack = utcCurrentTime.subtract(1, 'day').unix()
+  const utcTwoDaysBack = utcCurrentTime.subtract(2, 'day').unix()
+  let oneDayBlock = await getBlockFromTimestamp(utcOneDayBack)
+  let twoDayBlock = await getBlockFromTimestamp(utcTwoDaysBack)
 
   let data = []
   let result = await client.query({
@@ -185,6 +185,7 @@ const getPairData = async (address, ethPrice) => {
     data.liquidityChangeUSD = 0
     data.liquidityChangeETH = 0
   }
+
   return data
 }
 
@@ -224,6 +225,8 @@ const getPairChartData = async pairAddress => {
     // add the day index to the set of days
     dayIndexSet.add((data[i].date / oneDay).toFixed(0))
     dayIndexArray.push(data[i])
+    dayData.dailyVolumeUSD = parseFloat(dayData.dailyVolumeUSD)
+    dayData.reserveUSD = parseFloat(dayData.reserveUSD)
   })
 
   if (data[0]) {
@@ -238,6 +241,7 @@ const getPairChartData = async pairAddress => {
         data.push({
           date: nextDay,
           dayString: nextDay,
+          dailyVolumeUSD: 0,
           reserveUSD: latestLiquidityUSD
         })
       } else {
@@ -247,7 +251,9 @@ const getPairChartData = async pairAddress => {
       timestamp = nextDay
     }
   }
+
   data = data.sort((a, b) => (parseInt(a.date) > parseInt(b.date) ? 1 : -1))
+
   return data
 }
 

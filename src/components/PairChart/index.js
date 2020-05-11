@@ -5,7 +5,7 @@ import { RowBetween, AutoRow } from '../Row'
 
 import { toK, toNiceDate, toNiceDateYear } from '../../helpers'
 import { OptionButton } from '../ButtonStyled'
-import { lighten, darken } from 'polished'
+import { darken } from 'polished'
 
 const ChartWrapper = styled.div`
   padding-top: 40px;
@@ -41,7 +41,7 @@ const GlobalChart = ({ chartData, color }) => {
       </RowBetween>
       {chartFilter === 'liq' && (
         <ResponsiveContainer aspect={60 / 12}>
-          <AreaChart margin={{ top: 0, right: 0, bottom: 6, left: 10 }} barCategoryGap={1} data={chartData}>
+          <AreaChart margin={{ top: 0, right: 0, bottom: 6, left: 0 }} barCategoryGap={1} data={chartData}>
             <defs>
               <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor={color} stopOpacity={0.35} />
@@ -56,10 +56,10 @@ const GlobalChart = ({ chartData, color }) => {
               minTickGap={80}
               tickFormatter={tick => toNiceDate(tick)}
               dataKey="date"
+              tick={{ fill: 'black' }}
             />
             <YAxis
               type="number"
-              tickMargin={16}
               orientation="left"
               tickFormatter={tick => toK(tick)}
               axisLine={false}
@@ -67,6 +67,7 @@ const GlobalChart = ({ chartData, color }) => {
               interval="preserveEnd"
               minTickGap={80}
               yAxisId={0}
+              tick={{ fill: 'black' }}
             />
             <Tooltip
               cursor={true}
@@ -76,9 +77,8 @@ const GlobalChart = ({ chartData, color }) => {
               contentStyle={{
                 padding: '10px 14px',
                 borderRadius: 10,
-                borderColor: 'transparent',
-                backgroundColor: lighten(0.1, color),
-                color: lighten(0.4, color)
+                borderColor: color,
+                color: 'black'
               }}
               wrapperStyle={{ top: -70, left: -10 }}
             />
@@ -106,6 +106,7 @@ const GlobalChart = ({ chartData, color }) => {
               tickMargin={14}
               tickFormatter={tick => toNiceDate(tick)}
               dataKey="date"
+              tick={{ fill: 'black' }}
             />
             <YAxis
               type="number"
@@ -116,6 +117,7 @@ const GlobalChart = ({ chartData, color }) => {
               interval="preserveEnd"
               minTickGap={80}
               yAxisId={0}
+              tick={{ fill: 'black' }}
             />
             <Tooltip
               cursor={{ fill: color, opacity: 0.1 }}
@@ -125,9 +127,8 @@ const GlobalChart = ({ chartData, color }) => {
               contentStyle={{
                 padding: '10px 14px',
                 borderRadius: 10,
-                borderColor: 'transparent',
-                backgroundColor: lighten(0.1, color),
-                color: lighten(0.4, color)
+                borderColor: color,
+                color: 'black'
               }}
               wrapperStyle={{ top: -70, left: -10 }}
             />

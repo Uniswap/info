@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import 'feather-icons'
 import { Text, Box } from 'rebass'
 import styled from 'styled-components'
@@ -22,6 +22,7 @@ import { useAllPairs } from '../contexts/PairData'
 import { Search } from '../components/Search'
 import EthLogo from '../assets/eth.png'
 import { useMedia } from 'react-use'
+import { useOutsideClick } from '../hooks'
 
 const PageWrapper = styled.div`
   display: flex;
@@ -142,18 +143,33 @@ function GlobalPage() {
   const [currency] = useCurrentCurrency()
 
   const ethPrice = useEthPrice()
-  const formattedEthPrice = formattedNum(ethPrice, true)
+  const formattedEthPrice = ethPrice ? formattedNum(ethPrice, true) : ''
 
   const [, setColor] = useColor()
 
-  const liquidity = currency === 'ETH' ? formattedNum(totalLiquidityETH) : formattedNum(totalLiquidityUSD, true)
+  const liquidity =
+    currency === 'ETH'
+      ? formattedNum(totalLiquidityETH)
+      : totalLiquidityUSD
+      ? formattedNum(totalLiquidityUSD, true)
+      : ''
 
   const liquidityChange =
-    currency === 'ETH' ? formattedNum(liquidityChangeETH) + '%' : formattedNum(liquidityChangeUSD) + '%'
+    currency === 'ETH'
+      ? formattedNum(liquidityChangeETH) + '%'
+      : liquidityChangeUSD
+      ? formattedNum(liquidityChangeUSD) + '%'
+      : ''
 
-  const volume = currency === 'ETH' ? formattedNum(oneDayVolumeETH, true) : formattedNum(oneDayVolumeUSD, true)
+  const volume =
+    currency === 'ETH'
+      ? formattedNum(oneDayVolumeETH, true)
+      : oneDayVolumeUSD
+      ? formattedNum(oneDayVolumeUSD, true)
+      : ''
 
-  const volumeChange = currency === 'ETH' ? formattedNum(volumeChangeETH) + '%' : formattedNum(volumeChangeUSD) + '%'
+  const volumeChange =
+    currency === 'ETH' ? formattedNum(volumeChangeETH) + '%' : volumeChangeUSD ? volumeChangeUSD + '%' : ''
 
   useEffect(() => {
     setColor('#FE6DDE')
@@ -161,10 +177,17 @@ function GlobalPage() {
 
   const below1080 = useMedia('(max-width: 1080px)')
 
+  const [outsideMain, setOutsideMain] = useState(false)
+  const ref = useRef()
+
+  useOutsideClick(ref, val => {
+    setOutsideMain(val)
+  })
+
   return (
     <PageWrapper>
       <ThemedBackground />
-      <Search />
+      <Search ref={ref} outsideMain={outsideMain} />
       {below1080 && (
         <Box mb={20}>
           <Box mb={20} mt={30}>
@@ -190,9 +213,9 @@ function GlobalPage() {
                     </RowBetween>
                     <RowBetween align="flex-end">
                       <Text fontSize={36} lineHeight={1} fontWeight={600}>
-                        {liquidity}
+                        {liquidity && liquidity}
                       </Text>
-                      <Text>{liquidityChange}</Text>
+                      <Text>{liquidityChange && liquidityChange}</Text>
                     </RowBetween>
                   </AutoColumn>
                   <AutoColumn gap="20px">
@@ -228,9 +251,11 @@ function GlobalPage() {
               <PaddedGroup>
                 <Column>
                   <RowFlat>
-                    <Text fontSize={36} lineHeight={1} fontWeight={600}>
-                      {formattedEthPrice}
-                    </Text>
+                    {formattedEthPrice && (
+                      <Text fontSize={36} lineHeight={1} fontWeight={600}>
+                        {formattedEthPrice}
+                      </Text>
+                    )}
                     {/* <Text marginLeft="10px">{liquidityChange}</Text> */}
                   </RowFlat>
                   <RowFlat style={{ marginTop: '10px' }}>
@@ -246,7 +271,7 @@ function GlobalPage() {
                     <Text fontSize={36} lineHeight={1} fontWeight={600}>
                       {liquidity}
                     </Text>
-                    <Text marginLeft="10px">{liquidityChange}</Text>
+                    <Text marginLeft="10px">{liquidityChange && liquidityChange}</Text>
                   </RowFlat>
                   <RowFlat style={{ marginTop: '10px' }}>
                     <Hint>Total Liquidity</Hint>
@@ -268,7 +293,7 @@ function GlobalPage() {
                     <Text fontSize={36} lineHeight={1} fontWeight={600}>
                       {oneDayTxns}
                     </Text>
-                    <Text marginLeft="10px">{txnChange}%</Text>
+                    <Text marginLeft="10px">{txnChange && txnChange + '%'}</Text>
                   </RowFlat>
                   <RowFlat style={{ marginTop: '10px' }}>
                     <Hint>Transactions (24hrs)</Hint>

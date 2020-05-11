@@ -49,6 +49,10 @@ export default function Title({ token, pair }) {
   const below1080 = useMedia('(max-width: 1080px)')
 
   function getName() {
+    if (below1080) {
+      return ''
+    }
+
     if (symbol0 && symbol1) {
       return (
         <div>

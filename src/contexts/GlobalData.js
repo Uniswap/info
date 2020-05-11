@@ -6,7 +6,7 @@ import { GLOBAL_DATA, GLOBAL_TXNS, GLOBAL_CHART, ETH_PRICE } from '../apollo/que
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 
-import { get2DayPercentFormatted, getPercentFormatted } from '../helpers'
+import { get2DayPercentFormatted, getPercentFormatted, getBlockFromTimestamp } from '../helpers'
 
 const UPDATE = 'UPDATE'
 const UPDATE_TXNS = 'UPDATE_TXNS'
@@ -65,9 +65,10 @@ function reducer(state, { type, payload }) {
       }
     }
     case UPDATE_ETH_PRICE: {
-      const { ethPrice } = payload
+      const { ethPrice, ethPriceChange } = payload
       return {
-        ethPrice
+        ethPrice,
+        ethPriceChange
       }
     }
     default: {
@@ -105,11 +106,12 @@ export default function Provider({ children }) {
     })
   }, [])
 
-  const updateEthPrice = useCallback(ethPrice => {
+  const updateEthPrice = useCallback((ethPrice, ethPriceChange) => {
     dispatch({
       type: UPDATE_ETH_PRICE,
       payload: {
-        ethPrice
+        ethPrice,
+        ethPriceChange
       }
     })
   }, [])
@@ -130,11 +132,11 @@ export default function Provider({ children }) {
 }
 
 async function getGlobalData() {
-  // const utcCurrentTime = dayjs()
-  // const utcOneDayBack = utcCurrentTime.subtract(1, 'day')
-  // const utcTwoDaysBack = utcCurrentTime.subtract(2, 'day')
-  let oneDayBlock = 6426343
-  let twoDayBlock = 6420546
+  const utcCurrentTime = dayjs()
+  const utcOneDayBack = utcCurrentTime.subtract(1, 'day').unix()
+  const utcTwoDaysBack = utcCurrentTime.subtract(2, 'day').unix()
+  let oneDayBlock = await getBlockFromTimestamp(utcOneDayBack)
+  let twoDayBlock = await getBlockFromTimestamp(utcTwoDaysBack)
 
   let result = await client.query({
     query: GLOBAL_DATA(),
@@ -208,7 +210,6 @@ const getChartData = async () => {
   // fill in empty days
   let timestamp = data[0].date ? data[0].date : startTime
   let latestLiquidityUSD = data[0].totalLiquidityUSD
-  let latestVolumeUSD = parseFloat(data[0].totalVolumeUSD)
   let latestDayDats = data[0].mostLiquidTokens
   let index = 1
   while (timestamp < utcEndTime.unix() - oneDay) {
@@ -217,13 +218,12 @@ const getChartData = async () => {
     if (!dayIndexSet.has(currentDayIndex)) {
       data.push({
         date: nextDay,
-        totalVolumeUSD: latestVolumeUSD,
+        dailyVolumeUSD: 0,
         totalLiquidityUSD: latestLiquidityUSD,
         mostLiquidTokens: latestDayDats
       })
     } else {
       latestLiquidityUSD = dayIndexArray[index].totalLiquidityUSD
-      latestVolumeUSD = parseFloat(dayIndexArray[index].totalVolumeUSD)
       latestDayDats = dayIndexArray[index].mostLiquidTokens
       index = index + 1
     }
@@ -259,19 +259,32 @@ const getGlobalTransactions = async () => {
         return transactions.swaps.push(swap)
       })
     }
+    return true
   })
   return transactions
 }
 
 const getEthPrice = async () => {
+  const utcCurrentTime = dayjs()
+  const utcOneDayBack = utcCurrentTime.subtract(1, 'day').unix()
+  let oneDayBlock = await getBlockFromTimestamp(utcOneDayBack)
+
   let result = await client.query({
-    query: ETH_PRICE,
+    query: ETH_PRICE(),
     fetchPolicy: 'cache-first'
   })
 
-  return result && result.data && result.data.bundles && result.data.bundles[0] && result.data.bundles[0].ethPrice
-    ? result.data.bundles[0].ethPrice
-    : 0
+  let resultOneDay = await client.query({
+    query: ETH_PRICE(oneDayBlock),
+    fetchPolicy: 'cache-first'
+  })
+
+  const priceChangeETH = getPercentFormatted(
+    result?.data?.bundles[0]?.ethPrice,
+    resultOneDay?.data?.bundles[0]?.ethPrice
+  )
+
+  return [result?.data?.bundles[0]?.ethPrice, priceChangeETH]
 }
 
 export function Updater() {
@@ -279,11 +292,11 @@ export function Updater() {
   useEffect(() => {
     async function fetchData() {
       let globalData = await getGlobalData()
-      update(globalData)
+      globalData && update(globalData)
       let txns = await getGlobalTransactions()
       updateTransactions(txns)
       let chartData = await getChartData()
-      updateChart(chartData)
+      chartData && updateChart(chartData)
     }
     fetchData()
   }, [update, updateTransactions, updateChart])
@@ -311,8 +324,8 @@ export function useEthPrice() {
   useEffect(() => {
     async function checkForEthPrice() {
       if (!ethPrice) {
-        let newPrice = await getEthPrice()
-        updateEthPrice(newPrice)
+        let [newPrice, priceChange] = await getEthPrice()
+        updateEthPrice(newPrice, priceChange)
       }
     }
     checkForEthPrice()

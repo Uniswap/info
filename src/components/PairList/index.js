@@ -102,7 +102,6 @@ function PairList({ pairs }) {
   const allPairData = useAllPairs()
 
   const below740 = useMedia('(max-width: 740px)')
-  const below600 = useMedia('(max-width: 600px)')
 
   // pagination
   const [page, setPage] = useState(1)
@@ -142,7 +141,7 @@ function PairList({ pairs }) {
       })
       .slice(ITEMS_PER_PAGE * (page - 1), page * ITEMS_PER_PAGE)
 
-  const ListItem = ({ item, index }) => {
+  const ListItem = ({ item }) => {
     const itemData = usePairData(item.id)
     const liquidity = currency === 'ETH' ? 'Ξ ' + formattedNum(item.reserveUSD) : formattedNum(item.reserveUSD, true)
     const volume =
@@ -151,7 +150,7 @@ function PairList({ pairs }) {
     return (
       <DashGrid style={{ height: '60px' }}>
         <DataText area="name" fontWeight="500">
-          <DoubleTokenLogo a0={item.token0.id || ''} a1={item.token1.id || ''} />
+          <DoubleTokenLogo a0={item.token0.id || ''} a1={item.token1.id || ''} margin={true} />
           <CustomLink
             style={{ marginLeft: '20px', whiteSpace: 'nowrap' }}
             to={'/pair/' + item.id}
@@ -207,7 +206,7 @@ function PairList({ pairs }) {
                 setSortDirection(!sortDirection)
               }}
             >
-              Volume {below600 ? '(24hrs)' : '(24 Hours)'}{' '}
+              Volume (24hrs)
               {sortedColumn === SORT_FIELD.VOL ? (!sortDirection ? '↑' : '↓') : ''}
             </ClickableText>
           </Flex>

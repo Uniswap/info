@@ -2,7 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 import TokenLogo from '../TokenLogo'
 
-export default function DoubleTokenLogo({ a0, a1, size = 16, margin = false }) {
+export default function DoubleTokenLogo({ a0, a1, size = 24, margin = false }) {
   const TokenWrapper = styled.div`
     position: relative;
     display: flex;
