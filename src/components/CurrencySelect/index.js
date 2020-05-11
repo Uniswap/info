@@ -1,43 +1,24 @@
-import React, { useState } from 'react'
-import styled from 'styled-components'
+import React, { useState } from "react"
+import styled from "styled-components"
 
-const MobileSelect = styled.div`
-  width: 65px;
-  height: 38px;
-  background-color: rgba(255, 255, 255, 0.3);
-  border-radius: 20px;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  font-weight: 500;
-  font-size: 16px;
-  color: white;
+import { useCurrentCurrency } from "../../contexts/Application"
 
-  :hover {
-    cursor: pointer;
-  }
-
-  @media screen and (min-width: 40em) {
-    display: none;
-  }
-  & > * {
-    pointer-events: none;
-  }
-`
+import Row from "../Row"
+import { ChevronDown as Arrow } from "react-feather"
 
 const Select = styled.div`
-  width: 130px;
-  height: 38px;
-  background-color: rgba(255, 255, 255, 0.1);
-  border-radius: 20px;
+  position: relative;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
+
+  width: fit-content;
+  height: 38px;
+  border-radius: 20px;
   font-weight: 500;
   font-size: 16px;
-  color: white;
+  color: ${({ theme }) => theme.textColor};
 
   :hover {
     cursor: pointer;
@@ -48,44 +29,45 @@ const Select = styled.div`
   }
 `
 
-const SelectOption = styled.div`
-  width: 65px;
-  height: 38px;
-  background-color: ${props => (props.active ? 'rgba(255, 255, 255, 0.3)' : 'rgba(255, 255, 255, 0)')};
-  border-radius: 20px;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  font-weight: 500;
-  font-size: 16px;
-  color: white;
-  user-select: none;
+const ArrowStyled = styled(Arrow)`
+  height: 20px;
+  width: 20px;
+  margin-left: 6px;
 `
 
-const CurrencySelect = ({ setCurrencyUnit, currencyUnit }) => {
-  const [activeCurrency, setActiveCurrency] = useState(currencyUnit)
+const Option = styled(Row)`
+  position: absolute;
+  top: 40px;
+`
 
-  const update = () => {
-    if (currencyUnit === 'USD') {
-      setCurrencyUnit('ETH')
-      setActiveCurrency('ETH')
+const CurrencySelect = () => {
+  const [showDropdown, toggleDropdown] = useState(false)
+  const [currency, toggleCurrency] = useCurrentCurrency()
+
+  const getOther = () => {
+    if (currency === "USD") {
+      return "ETH"
     } else {
-      setCurrencyUnit('USD')
-      setActiveCurrency('USD')
+      return "USD"
     }
   }
 
   return (
     <>
-      <MobileSelect onClick={() => update()}> {currencyUnit} </MobileSelect>
       <Select>
-        <SelectOption active={activeCurrency === 'USD'} onClick={() => update()}>
-          USD
-        </SelectOption>
-        <SelectOption active={activeCurrency === 'ETH'} onClick={() => update()}>
-          ETH
-        </SelectOption>
+        <Row onClick={() => toggleDropdown(!showDropdown)}>
+          {currency} <ArrowStyled />
+        </Row>
+        {showDropdown && (
+          <Option
+            onClick={() => {
+              toggleDropdown(!showDropdown)
+              toggleCurrency()
+            }}
+          >
+            {getOther()}
+          </Option>
+        )}
       </Select>
     </>
   )

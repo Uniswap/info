@@ -15,18 +15,16 @@ const Image = styled.img`
   border-radius: 1rem;
 `
 
-const PlaceHolder = styled.div`
+const PlaceHolder = styled.span`
   width: ${({ size }) => size};
   height: ${({ size }) => size};
   border-radius: 1rem;
   display: flex;
   align-items: center;
   justify-items: center;
-  margin-right: ${({ header }) => (header ? '0.5em' : '0')};
-  margin-top: ${({ header }) => (header ? '-0.5em' : '0')};
 `
 
-export default function TokenLogo({ address, header = false, size = '1rem', ...rest }) {
+export default function TokenLogo({ address, header = false, size = '24px', ...rest }) {
   const [error, setError] = useState(false)
 
   useEffect(() => {
@@ -36,7 +34,7 @@ export default function TokenLogo({ address, header = false, size = '1rem', ...r
   if (error || BAD_IMAGES[address]) {
     return (
       <PlaceHolder size={size} header={header}>
-        <span role="img" aria-label="thinking" style={{ height: '20px', width: '20px' }}>
+        <span role="img" aria-label="thinking" alt="">
           🤔
         </span>
       </PlaceHolder>

@@ -1,8 +1,14 @@
 import React from 'react'
-import { Text, Flex } from 'rebass'
 import { useHistory } from 'react-router-dom'
-import Emoji from '../Emoji'
 import styled from 'styled-components'
+
+import { Text, Flex } from 'rebass'
+import { useTokenData } from '../../contexts/TokenData'
+import { usePairData } from '../../contexts/PairData'
+import Link from '../Link'
+import Row, { RowFixed } from '../Row'
+import Unicorn from '../../assets/unicorn.svg'
+import { useMedia } from 'react-use'
 
 const TitleWrapper = styled.div`
   text-decoration: none;
@@ -12,18 +18,73 @@ const TitleWrapper = styled.div`
   }
 `
 
-export default function Title() {
+const UniIcon = styled(Link)`
+  transition: transform 0.3s ease;
+  :hover {
+    transform: rotate(-5deg);
+  }
+`
+
+const TitleText = styled(Row)`
+  width: fit-content;
+  white-space: nowrap;
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 32px;
+
+  @media screen and (max-width: 1080px) {
+    font-size: 20px;
+    line-height: normal;
+  }
+`
+
+export default function Title({ token, pair }) {
   const history = useHistory()
+
+  const { name, symbol } = useTokenData(token)
+  const { token0, token1 } = usePairData(pair)
+  const symbol0 = token0 && token0.symbol
+  const symbol1 = token1 && token1.symbol
+
+  const below1080 = useMedia('(max-width: 1080px)')
+
+  function getName() {
+    if (below1080) {
+      return ''
+    }
+
+    if (symbol0 && symbol1) {
+      return (
+        <div>
+          / <span style={{ fontWeight: 400 }}>{symbol0 + '-' + symbol1}</span>
+        </div>
+      )
+    }
+    if (name && symbol) {
+      return (
+        <div>
+          /{' '}
+          <span style={{ fontWeight: 400 }}>
+            {!below1080 ? name : ''} {'(' + symbol + ')'}
+          </span>
+        </div>
+      )
+    } else {
+      return ''
+    }
+  }
 
   return (
     <TitleWrapper onClick={() => history.push('/')}>
       <Flex alignItems="center">
-        <Text fontSize="1.5rem" lineHeight="1">
-          <Emoji symbol="🦄" label="Unicorn" />
-        </Text>
-
-        <Text fontWeight={500} mx="0.5rem" color="white" lineHeight="1.5rem" style={{ textDecorationColor: 'blue' }}>
-          Info
+        <RowFixed>
+          <UniIcon id="link" onClick={() => history.push('/')}>
+            <img src={Unicorn} alt="logo" />
+          </UniIcon>
+          <TitleText>Uniswap Info</TitleText>
+        </RowFixed>
+        <Text fontWeight={600} mx="10px" lineHeight="1.5rem">
+          {getName()}
         </Text>
       </Flex>
     </TitleWrapper>

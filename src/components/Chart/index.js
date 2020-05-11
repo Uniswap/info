@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Area, XAxis, YAxis, ResponsiveContainer, Bar, BarChart, CartesianGrid, Tooltip, AreaChart } from 'recharts'
 import styled from 'styled-components'
 import { useMedia } from 'react-use'
-import { toK, toNiceDate, toNiceDateYear, toMonthlyYear, toWeeklyYear } from '../../helpers'
+import { toK, toNiceDate, toNiceDateYear } from '../../helpers'
 
 const ChartWrapper = styled.div`
   padding-top: 1em;
@@ -12,16 +12,12 @@ const ChartWrapper = styled.div`
   }
 `
 
-const Chart = ({ data, monthlyData, weeklyData, chartOption, currencyUnit, symbol, timeWindow }) => {
+const Chart = ({ data, chartOption, currencyUnit, symbol }) => {
   const [chartData, setChartData] = useState([])
   useEffect(() => {
     setChartData([])
     setChartData(data)
   }, [data, chartOption, currencyUnit])
-
-  const isMonthly = timeWindow === 'monthly'
-
-  const isWeekly = timeWindow === 'weekly'
 
   const isMobile = useMedia('(max-width: 40em)')
   if (chartOption === 'price' && chartData && data) {
@@ -190,11 +186,7 @@ const Chart = ({ data, monthlyData, weeklyData, chartOption, currencyUnit, symbo
     return (
       <ChartWrapper>
         <ResponsiveContainer aspect={isMobile ? 60 / 22 : 60 / 12}>
-          <BarChart
-            margin={{ top: 0, right: 0, bottom: 6, left: 10 }}
-            barCategoryGap={1}
-            data={isWeekly ? weeklyData : isMonthly ? monthlyData : chartData}
-          >
+          <BarChart margin={{ top: 0, right: 0, bottom: 6, left: 10 }} barCategoryGap={1} data={chartData}>
             <CartesianGrid stroke="#f5f5f5" />
             <XAxis
               tickLine={false}
@@ -219,9 +211,7 @@ const Chart = ({ data, monthlyData, weeklyData, chartOption, currencyUnit, symbo
             <Tooltip
               cursor={true}
               formatter={val => toK(val, true)}
-              labelFormatter={label =>
-                isWeekly ? toWeeklyYear(label) : isMonthly ? toMonthlyYear(label) : toNiceDateYear(label)
-              }
+              labelFormatter={label => toNiceDateYear(label)}
               labelStyle={{ paddingTop: 4 }}
               contentStyle={{
                 padding: '10px 14px',
@@ -233,19 +223,7 @@ const Chart = ({ data, monthlyData, weeklyData, chartOption, currencyUnit, symbo
             <Bar
               type="monotone"
               name={'Volume' + (currencyUnit === 'USD' ? ' (USD)' : ' (ETH)')}
-              dataKey={
-                currencyUnit === 'USD'
-                  ? isMonthly
-                    ? 'monthlyVolumeUSD'
-                    : isWeekly
-                    ? 'weeklyVolumeUSD'
-                    : 'usdVolume'
-                  : isMonthly
-                  ? 'monthlyVolumeETH'
-                  : isWeekly
-                  ? 'weeklyVolumeETH'
-                  : 'ethVolume'
-              }
+              dataKey={currencyUnit === 'USD' ? 'usdVolume' : 'ethVolume'}
               fill="var(--c-token)"
               opacity={'0.4'}
               yAxisId={0}
