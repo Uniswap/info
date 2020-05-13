@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Area, XAxis, YAxis, ResponsiveContainer, Tooltip, AreaChart, BarChart, Bar } from 'recharts'
+import { Area, XAxis, YAxis, ResponsiveContainer, Tooltip, AreaChart, BarChart, Bar, CartesianGrid } from 'recharts'
 import Row, { RowBetween } from '../Row'
 import { toK, toNiceDate, toNiceDateYear } from '../../helpers'
 import { OptionButton } from '../ButtonStyled'
@@ -7,6 +7,7 @@ import { useMedia } from 'react-use'
 import { useTimeframe } from '../../contexts/Application'
 import DropdownSelect from '../DropdownSelect'
 import { timeframeOptions } from '../../constants'
+import { TYPE } from '../../Theme'
 
 const CHART_VIEW = {
   VOLUME: 'Volume',
@@ -41,7 +42,7 @@ const GlobalChart = ({ chartData, display }) => {
                 active={chartView === CHART_VIEW.LIQUIDITY}
                 onClick={() => setChartView(CHART_VIEW.LIQUIDITY)}
               >
-                Liquidity
+                <TYPE.main fontSize={'1rem'}>Liquidity</TYPE.main>
               </OptionButton>
             ) : (
               <OptionButton
@@ -49,7 +50,7 @@ const GlobalChart = ({ chartData, display }) => {
                 active={chartView === CHART_VIEW.VOLUME}
                 onClick={() => setChartView(CHART_VIEW.VOLUME)}
               >
-                Volume
+                <TYPE.main fontSize={'1rem'}>Volume</TYPE.main>
               </OptionButton>
             )}
           </Row>
@@ -79,35 +80,43 @@ const GlobalChart = ({ chartData, display }) => {
       )}
       {chartView === CHART_VIEW.LIQUIDITY && (
         <ResponsiveContainer aspect={below1080 ? 60 / 28 : 60 / 28}>
-          <AreaChart margin={{ top: 20, right: 0, bottom: 6, left: 10 }} barCategoryGap={1} data={chartData}>
+          <AreaChart margin={{ top: 20, right: 0, bottom: 6, left: 0 }} barCategoryGap={1} data={chartData}>
             <defs>
               <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="#ff007a" stopOpacity={1} />
                 <stop offset="95%" stopColor="#ff007a" stopOpacity={0.5} />
               </linearGradient>
             </defs>
+            <CartesianGrid strokeDasharray="3 3" />
+
             <XAxis
-              tickLine={false}
-              axisLine={false}
+              tickLine={true}
+              axisLine={true}
               interval="preserveEnd"
               tickMargin={16}
-              minTickGap={100}
+              minTickGap={50}
               tickFormatter={tick => toNiceDate(tick)}
               dataKey="date"
+              mirror={true}
               tick={{ fill: 'black' }}
+              padding={{ right: 40, bottom: 0 }}
             />
             <YAxis
               type="number"
-              orientation="left"
+              orientation="right"
               tickFormatter={tick => '$' + toK(tick)}
-              axisLine={false}
-              tickLine={false}
+              axisLine={true}
+              tickLine={true}
               interval={0}
               minTickGap={50}
               yAxisId={0}
-              padding={{ top: 20, bottom: 20 }}
+              mirror={true}
+              padding={{ top: 0, bottom: 0 }}
               tick={{ fill: 'black' }}
               hide={below600}
+              contentStyle={{
+                zIndex: '100'
+              }}
             />
             <Tooltip
               cursor={{ stroke: 'white', strokeWidth: 1 }}
@@ -117,7 +126,7 @@ const GlobalChart = ({ chartData, display }) => {
               contentStyle={{
                 padding: '10px 14px',
                 borderRadius: 10,
-                borderColor: 'rgba(254, 109, 222, 0.8)',
+                borderColor: '#ff007a80',
                 color: 'black'
               }}
               wrapperStyle={{ top: -70, left: -10 }}
@@ -139,7 +148,7 @@ const GlobalChart = ({ chartData, display }) => {
       )}
       {chartView === CHART_VIEW.VOLUME && (
         <ResponsiveContainer aspect={60 / 28}>
-          <BarChart margin={{ top: 20, right: 0, bottom: 6, left: 10 }} barCategoryGap={1} data={chartData}>
+          <BarChart margin={{ top: 20, right: 0, bottom: 6, left: 0 }} barCategoryGap={1} data={chartData}>
             <XAxis
               tickLine={false}
               axisLine={false}
@@ -149,19 +158,26 @@ const GlobalChart = ({ chartData, display }) => {
               tickFormatter={tick => toNiceDate(tick)}
               dataKey="date"
               tick={{ fill: 'black' }}
+              mirror={true}
+              padding={{ right: 40, bottom: 0 }}
             />
             <YAxis
               type="number"
-              axisLine={false}
-              tickMargin={16}
+              axisLine={true}
+              tickMargin={0}
               tickFormatter={tick => '$' + toK(tick, true, true)}
-              tickLine={false}
+              tickLine={true}
               interval="preserveEnd"
-              minTickGap={80}
+              minTickGap={20}
+              padding={{ top: 0, bottom: 0 }}
+              mirror={true}
               yAxisId={0}
               tick={{ fill: 'black' }}
               domain={[0, 'dataMax']}
+              orientation={'right'}
             />
+            <CartesianGrid strokeDasharray="3 3" />
+
             <Tooltip
               cursor={{ fill: '#ff007a', opacity: 0.1 }}
               formatter={val => toK(val, true)}
@@ -179,8 +195,8 @@ const GlobalChart = ({ chartData, display }) => {
               type="monotone"
               name={'Volume'}
               dataKey={'dailyVolumeUSD'}
-              fill="#ff007a"
-              opacity={'0.4'}
+              fill="#ff007a40"
+              opacity={'1'}
               yAxisId={0}
               stroke="#ff007a80"
             />

@@ -67,7 +67,7 @@ const ListOptions = styled(AutoRow)`
 const GridRow = styled.div`
   display: inline-grid;
   width: 100%;
-  min-height: 400px;
+  /* min-height: 400px; */
   grid-template-columns: 50% 50%;
   column-gap: 6px;
   align-items: start;
