@@ -49,27 +49,29 @@ const ThemedBackground = styled.div`
   top: 0;
   left: 0;
   right: 0;
-  height: 900px;
+  height: 200vh;
   max-width: 100vw;
   z-index: -1;
+
+  transform: translateY(-70vh);
   background: ${({ theme }) => theme.background};
 `
 
 const ListOptions = styled(AutoRow)`
-  height: 40px
+  height: 40px;
   width: 100%;
-  font-size: 24px;
+  font-size: 1.25rem;
   font-weight: 600;
 
   @media screen and (max-width: 640px) {
-    font-size: 16px
+    font-size: 1rem;
   }
 `
 
 const GridRow = styled.div`
   display: inline-grid;
   width: 100%;
-  min-height: 500px;
+  min-height: 400px;
   grid-template-columns: 30% 70%;
   column-gap: 6px;
   align-items: start;
@@ -89,26 +91,28 @@ const Panel = styled.div`
   justify-content: flex-start;
   border-radius: 20px;
   background-color: ${({ theme }) => theme.panelColor};
+  padding: 1.25rem;
+  box-sizing: border-box;
 `
 
 const SpacedColumn = styled.div`
   display: flex;
   flex-direction: column;
-  justify-content: space-around;
+  justify-content: flex-start;
   height: 100%;
   padding: 24px;
 `
 
 const ChartWrapper = styled.div`
   height: 100%;
-  padding: 24px;
+  /* padding: 24px; */
 `
 
 const PaddedGroup = styled.div`
-  padding: 24px;
-  @media screen and (max-width: 640px) {
+  /* padding: 24px; */
+  /* @media screen and (max-width: 640px) {
     padding: 20px;
-  }
+  } */
 `
 
 const EthIcon = styled.img`
@@ -192,7 +196,7 @@ function GlobalPage() {
         <Box mb={20}>
           <Box mb={20} mt={30}>
             <Panel>
-              <Box padding="20px">
+              <Box>
                 <AutoColumn gap="40px">
                   <AutoColumn gap="20px">
                     <RowBetween>
@@ -200,7 +204,7 @@ function GlobalPage() {
                       <div />
                     </RowBetween>
                     <RowBetween align="flex-end">
-                      <Text fontSize={36} lineHeight={1} fontWeight={600}>
+                      <Text fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
                         {volume}
                       </Text>
                       <Text>{volumeChange}</Text>
@@ -212,7 +216,7 @@ function GlobalPage() {
                       <div />
                     </RowBetween>
                     <RowBetween align="flex-end">
-                      <Text fontSize={36} lineHeight={1} fontWeight={600}>
+                      <Text fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
                         {liquidity && liquidity}
                       </Text>
                       <Text>{liquidityChange && liquidityChange}</Text>
@@ -224,7 +228,7 @@ function GlobalPage() {
                       <div />
                     </RowBetween>
                     <RowBetween align="flex-end">
-                      <Text fontSize={36} lineHeight={1} fontWeight={600}>
+                      <Text fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
                         {oneDayTxns}
                       </Text>
                       <Text>{txnChange}</Text>
@@ -252,7 +256,7 @@ function GlobalPage() {
                 <Column>
                   <RowFlat>
                     {formattedEthPrice && (
-                      <Text fontSize={36} lineHeight={1} fontWeight={600}>
+                      <Text fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
                         {formattedEthPrice}
                       </Text>
                     )}
@@ -265,10 +269,10 @@ function GlobalPage() {
               </PaddedGroup>
             </Panel>
             <Panel>
-              <SpacedColumn>
+              <AutoColumn gap="40px">
                 <Column>
                   <RowFlat>
-                    <Text fontSize={36} lineHeight={1} fontWeight={600}>
+                    <Text fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
                       {liquidity}
                     </Text>
                     <Text marginLeft="10px">{liquidityChange && liquidityChange}</Text>
@@ -279,7 +283,7 @@ function GlobalPage() {
                 </Column>
                 <Column>
                   <RowFlat>
-                    <Text fontSize={36} lineHeight={1} fontWeight={600}>
+                    <Text fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
                       {volume}
                     </Text>
                     <Text marginLeft="10px">{volumeChange}</Text>
@@ -290,7 +294,7 @@ function GlobalPage() {
                 </Column>
                 <Column>
                   <RowFlat>
-                    <Text fontSize={36} lineHeight={1} fontWeight={600}>
+                    <Text fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
                       {oneDayTxns}
                     </Text>
                     <Text marginLeft="10px">{txnChange && txnChange + '%'}</Text>
@@ -299,7 +303,7 @@ function GlobalPage() {
                     <Hint>Transactions (24hrs)</Hint>
                   </RowFlat>
                 </Column>
-              </SpacedColumn>
+              </AutoColumn>
             </Panel>
           </LeftGroup>
           <Panel style={{ height: '100%' }}>
@@ -317,6 +321,7 @@ function GlobalPage() {
                 onClick={() => {
                   setTokenFilter('TOKENS')
                 }}
+                fontSize={'1rem'}
                 color={tokenFilter === 'TOKENS' ? 'black' : '#aeaeae'}
               >
                 Top Tokens
@@ -327,6 +332,7 @@ function GlobalPage() {
                 onClick={() => {
                   setTokenFilter('PAIRS')
                 }}
+                fontSize={'1rem'}
                 color={tokenFilter === 'PAIRS' ? 'black' : '#aeaeae'}
               >
                 Top Pairs
@@ -347,6 +353,7 @@ function GlobalPage() {
                 onClick={() => {
                   setTxFilter('ALL')
                 }}
+                fontSize={'1rem'}
                 color={txFilter !== 'ALL' ? '#aeaeae' : 'black'}
               >
                 All
@@ -357,6 +364,7 @@ function GlobalPage() {
                 onClick={() => {
                   setTxFilter('SWAP')
                 }}
+                fontSize={'1rem'}
                 color={txFilter !== 'SWAP' ? '#aeaeae' : 'black'}
               >
                 Swaps
@@ -367,6 +375,7 @@ function GlobalPage() {
                 onClick={() => {
                   setTxFilter('ADD')
                 }}
+                fontSize={'1rem'}
                 color={txFilter !== 'ADD' ? '#aeaeae' : 'black'}
               >
                 Adds
@@ -377,6 +386,7 @@ function GlobalPage() {
                 onClick={() => {
                   setTxFilter('REMOVE')
                 }}
+                fontSize={'1rem'}
                 color={txFilter !== 'REMOVE' ? '#aeaeae' : 'black'}
               >
                 Removes

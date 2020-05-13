@@ -77,8 +77,8 @@ const GlobalChart = ({ chartData }) => {
           <AreaChart margin={{ top: 20, right: 0, bottom: 6, left: 10 }} barCategoryGap={1} data={chartData}>
             <defs>
               <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#ff007a" stopOpacity={0.2} />
-                <stop offset="95%" stopColor="#ff007a" stopOpacity={0} />
+                <stop offset="5%" stopColor="#ff007a" stopOpacity={1} />
+                <stop offset="95%" stopColor="#ff007a" stopOpacity={0.5} />
               </linearGradient>
             </defs>
             <XAxis
@@ -165,7 +165,7 @@ const GlobalChart = ({ chartData }) => {
               contentStyle={{
                 padding: '10px 14px',
                 borderRadius: 10,
-                borderColor: 'rgba(254, 109, 222, 0.8)',
+                borderColor: '#ff007a80',
                 color: 'black'
               }}
               wrapperStyle={{ top: -70, left: -10 }}
@@ -177,7 +177,7 @@ const GlobalChart = ({ chartData }) => {
               fill="#ff007a"
               opacity={'0.4'}
               yAxisId={0}
-              stroke="rgba(254, 109, 222, 0.8)"
+              stroke="#ff007a80"
             />
           </BarChart>
         </ResponsiveContainer>

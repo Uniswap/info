@@ -12,14 +12,6 @@ export default function ThemeProvider({ children }) {
 }
 
 const theme = (darkMode, color) => ({
-  background: darkMode
-    ? 'black'
-    : `linear-gradient(
-      180deg,
-      rgb(255, 0, 122, 0.6) 0%,
-      rgb(255, 0, 122, 0) 100%
-    );`,
-
   customColor: color,
   textColor: darkMode ? color : 'black',
 
@@ -29,7 +21,7 @@ const theme = (darkMode, color) => ({
   uniswapPink: darkMode ? '#ff007a' : 'black',
 
   concreteGray: darkMode ? '#292C2F' : '#FAFAFA',
-  inputBackground: darkMode ? '#1F1F1F' : 'rgba(255, 255, 255, 0.4)',
+  inputBackground: darkMode ? '#1F1F1F' : '#FAFAFA',
   shadowColor: darkMode ? '#000' : '#2F80ED',
   mercuryGray: darkMode ? '#333333' : '#E1E1E1',
 
@@ -64,7 +56,9 @@ const theme = (darkMode, color) => ({
   red1: '#FF6871',
   green1: '#27AE60',
   yellow1: '#FFE270',
-  yellow2: '#F3841E'
+  yellow2: '#F3841E',
+
+  background: darkMode ? 'black' : `radial-gradient(50% 50% at 50% 50%, #ff007a30 0%, #F7F8FA 100%)`
 })
 
 export const Hover = styled.div`
@@ -119,7 +113,8 @@ export const GlobalStyle = createGlobalStyle`
     padding: 0;
     width: 100%;
     height: 100%;
-    overflow: hidden;    
+    overflow: hidden;
+    font-size: 14px;    
   }
 
   body > div {
@@ -137,7 +132,7 @@ export const GlobalStyle = createGlobalStyle`
   }
 
   html {
-    font-size: 16px;
+    font-size: 1rem;
     font-variant: none;
     color: 'black';
     background-color: ${({ theme }) => theme.backgroundColor};

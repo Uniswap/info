@@ -1,10 +1,10 @@
-import React, { useState } from "react"
-import styled from "styled-components"
+import React, { useState } from 'react'
+import styled from 'styled-components'
 
-import { useCurrentCurrency } from "../../contexts/Application"
+import { useCurrentCurrency } from '../../contexts/Application'
 
-import Row from "../Row"
-import { ChevronDown as Arrow } from "react-feather"
+import Row from '../Row'
+import { ChevronDown as Arrow } from 'react-feather'
 
 const Select = styled.div`
   position: relative;
@@ -17,7 +17,7 @@ const Select = styled.div`
   height: 38px;
   border-radius: 20px;
   font-weight: 500;
-  font-size: 16px;
+  font-size: 1rem;
   color: ${({ theme }) => theme.textColor};
 
   :hover {
@@ -45,10 +45,10 @@ const CurrencySelect = () => {
   const [currency, toggleCurrency] = useCurrentCurrency()
 
   const getOther = () => {
-    if (currency === "USD") {
-      return "ETH"
+    if (currency === 'USD') {
+      return 'ETH'
     } else {
-      return "USD"
+      return 'USD'
     }
   }
 

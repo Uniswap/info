@@ -96,13 +96,13 @@ const ClickableText = styled(Text)`
   user-select: none;
 
   @media screen and (max-width: 640px) {
-    font-size: 14px;
+    font-size: 0.85rem;
   }
 `
 
 const DataText = styled(Flex)`
   @media screen and (max-width: 40em) {
-    font-size: 14px;
+    font-size: 0.85rem;
   }
 
   align-items: center;

@@ -48,7 +48,7 @@ const DashboardWrapper = styled.div`
 `
 
 const ListHeader = styled.div`
-  font-size: 24px;
+  font-size: 1.25rem;
   font-weight: 600;
   width: 100%;
   margin: 5rem 0 2rem 0;
@@ -84,12 +84,12 @@ const TopPanel = styled(Panel)`
 `
 
 const TokenName = styled.div`
-  font-size: 36px;
+  font-size: 1.5rem;
   font-weight: 600;
   line-height: 32px;
 
   @media screen and (max-width: 1080px) {
-    font-size: 24px;
+    font-size: 1.25rem;
     line-height: normal;
   }
 `

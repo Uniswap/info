@@ -35,7 +35,7 @@ const Select = styled.div`
   border-top-right-radius: 0;
   border-top-left-radius: 0;
   font-weight: 500;
-  font-size: 16px;
+  font-size: 1rem;
   color: black;
   :hover {
     cursor: pointer;

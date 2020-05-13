@@ -5,7 +5,7 @@ import { Plus } from 'react-feather'
 
 const Base = styled(RebassButton)`
   padding: 8px 12px;
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 600;
   border-radius: 12px;
   cursor: pointer;

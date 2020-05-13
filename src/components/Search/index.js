@@ -24,6 +24,9 @@ const Wrapper = styled.div`
   background: ${({ theme }) => theme.inputBackground};
   border-bottom-right-radius: ${({ open }) => (open ? '0px' : '12px')};
   border-bottom-left-radius: ${({ open }) => (open ? '0px' : '12px')};
+  box-shadow: 0 2.8px 2.8px -9px rgba(0, 0, 0, 0.008), 0 6.7px 6.7px -9px rgba(0, 0, 0, 0.012),
+    0 12.5px 12.6px -9px rgba(0, 0, 0, 0.015), 0 22.3px 22.6px -9px rgba(0, 0, 0, 0.018),
+    0 41.8px 42.2px -9px rgba(0, 0, 0, 0.022), 0 100px 101px -9px rgba(0, 0, 0, 0.03);
 `
 const Input = styled.input`
   position: relative;
@@ -44,7 +47,7 @@ const Input = styled.input`
 
   @media screen and (max-width: 640px) {
     ::placeholder {
-      font-size: 16px;
+      font-size: 0.85rem;
     }
   }
 `
@@ -58,7 +61,7 @@ const SearchIconLarge = styled(SearchIcon)`
 
 const Menu = styled.div`
   display: flex;
-  flex-direction: column
+  flex-direction: column;
   z-index: 10;
   width: 100%;
   top: 50px;
@@ -69,12 +72,13 @@ const Menu = styled.div`
   background: white;
   border-bottom-right-radius: 12px;
   border-bottom-left-radius: 12px;
-  box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.04), 0px 4px 8px rgba(0, 0, 0, 0.04), 0px 16px 24px rgba(0, 0, 0, 0.04), 0px 24px 32px rgba(0, 0, 0, 0.04);
+  box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.04), 0px 4px 8px rgba(0, 0, 0, 0.04), 0px 16px 24px rgba(0, 0, 0, 0.04),
+    0px 24px 32px rgba(0, 0, 0, 0.04);
 `
 
 const MenuItem = styled(Row)`
   padding: 1rem;
-  font-size: 16px;
+  font-size: 0.85rem;
   & > * {
     margin-right: 6px;
   }

@@ -7,7 +7,11 @@ import { useTokenData } from '../../contexts/TokenData'
 import { usePairData } from '../../contexts/PairData'
 import Link from '../Link'
 import Row, { RowFixed } from '../Row'
-import Unicorn from '../../assets/unicorn.svg'
+import Logo from '../../assets/logo.svg'
+import Wordmark from '../../assets/wordmark.svg'
+import LogoDark from '../../assets/logo_white.svg'
+import WordmarkDark from '../../assets/wordmark_white.svg'
+
 import { useMedia } from 'react-use'
 
 const TitleWrapper = styled.div`
@@ -28,12 +32,12 @@ const UniIcon = styled(Link)`
 const TitleText = styled(Row)`
   width: fit-content;
   white-space: nowrap;
-  font-size: 26px;
+  font-size: 1.25rem;
   font-weight: 800;
   line-height: 32px;
 
   @media screen and (max-width: 1080px) {
-    font-size: 20px;
+    font-size: 1.25rem;
     line-height: normal;
   }
 `
@@ -79,9 +83,9 @@ export default function Title({ token, pair }) {
       <Flex alignItems="center">
         <RowFixed>
           <UniIcon id="link" onClick={() => history.push('/')}>
-            <img src={Unicorn} alt="logo" />
+            <img src={Logo} alt="logo" />
           </UniIcon>
-          <TitleText>Uniswap Info</TitleText>
+          <img style={{ marginLeft: '4px', marginTop: '0px' }} src={Wordmark} alt="logo" />
         </RowFixed>
         <Text fontWeight={600} mx="10px" lineHeight="1.5rem">
           {getName()}

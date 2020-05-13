@@ -51,20 +51,20 @@ const DashboardWrapper = styled.div`
 `
 
 const TokenName = styled.div`
-  font-size: 36px;
+  font-size: 1.5rem;
   font-weight: 600;
   line-height: 32px;
 `
 
 const ListHeader = styled.div`
-  font-size: 24px;
+  font-size: 1.25rem;
   font-weight: 600;
   width: 100%;
   margin: 5rem 0 2rem 0;
 `
 
 const AccountSearch = styled.input`
-  font-size: 14px;
+  font-size: 0.85rem;
   border: none;
   outline: none;
   width: 90%;
