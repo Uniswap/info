@@ -1,14 +1,12 @@
 import React from 'react'
 import { ThemeProvider as StyledComponentsThemeProvider, createGlobalStyle } from 'styled-components'
-import { useColor } from '../contexts/Application'
 import { useDarkModeManager } from '../contexts/LocalStorage'
 import styled from 'styled-components'
 
 export default function ThemeProvider({ children }) {
   const [darkMode] = useDarkModeManager()
-  const [color] = useColor()
 
-  return <StyledComponentsThemeProvider theme={theme(darkMode, color)}>{children}</StyledComponentsThemeProvider>
+  return <StyledComponentsThemeProvider theme={theme(darkMode)}>{children}</StyledComponentsThemeProvider>
 }
 
 const theme = (darkMode, color) => ({

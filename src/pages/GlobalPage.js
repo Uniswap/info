@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState } from 'react'
 import 'feather-icons'
 import { Text, Box } from 'rebass'
 import styled from 'styled-components'
@@ -10,11 +10,8 @@ import PairList from '../components/PairList'
 import TopTokenList from '../components/TokenList'
 import TxnList from '../components/TxnList'
 import GlobalChart from '../components/GlobalChart'
-
 import { Hover } from '../Theme'
-
 import { formattedNum } from '../helpers'
-import { useColor } from '../contexts/Application'
 import { useGlobalData, useEthPrice } from '../contexts/GlobalData'
 import { useAllTokenData } from '../contexts/TokenData'
 import { useCurrentCurrency } from '../contexts/Application'
@@ -22,7 +19,6 @@ import { useAllPairs } from '../contexts/PairData'
 import { Search } from '../components/Search'
 import EthLogo from '../assets/eth.png'
 import { useMedia } from 'react-use'
-import { useOutsideClick } from '../hooks'
 
 const PageWrapper = styled.div`
   display: flex;
@@ -145,8 +141,6 @@ function GlobalPage() {
   const ethPrice = useEthPrice()
   const formattedEthPrice = ethPrice ? formattedNum(ethPrice, true) : ''
 
-  const [, setColor] = useColor()
-
   const liquidity =
     currency === 'ETH'
       ? formattedNum(totalLiquidityETH)
@@ -171,23 +165,12 @@ function GlobalPage() {
   const volumeChange =
     currency === 'ETH' ? formattedNum(volumeChangeETH) + '%' : volumeChangeUSD ? volumeChangeUSD + '%' : ''
 
-  useEffect(() => {
-    setColor('#FE6DDE')
-  }, [setColor])
-
   const below1080 = useMedia('(max-width: 1080px)')
-
-  const [outsideMain, setOutsideMain] = useState(false)
-  const ref = useRef()
-
-  useOutsideClick(ref, val => {
-    setOutsideMain(val)
-  })
 
   return (
     <PageWrapper>
       <ThemedBackground />
-      <Search ref={ref} outsideMain={outsideMain} />
+      <Search small={false} />
       {below1080 && (
         <Box mb={20}>
           <Box mb={20} mt={30}>

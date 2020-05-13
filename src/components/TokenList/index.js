@@ -136,7 +136,6 @@ function TopTokenList({ tokens }) {
 
   const [currency] = useCurrentCurrency()
 
-  const below1300 = useMedia('(max-width: 1300px)')
   const below1080 = useMedia('(max-width: 1080px)')
   const below680 = useMedia('(max-width: 680px)')
 

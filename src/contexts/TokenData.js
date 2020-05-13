@@ -195,10 +195,11 @@ const getTokenData = async (address, ethPrice) => {
     data.liquidityChangeUSD = 100
     data.liquidityChangeETH = 100
   } else {
-    // new tokens
+    // new tokens with no txns yet
     data.priceUSD = 0
     data.totalLiquidityUSD = 0
     data.oneDayVolumeETH = 0
+    data.oneDayVolumeUSD = 0
     data.volumeChangeUSD = 0
     data.volumeChangeETH = 0
     data.priceChangeUSD = 0
@@ -206,6 +207,8 @@ const getTokenData = async (address, ethPrice) => {
     data.liquidityChangeUSD = 0
     data.liquidityChangeETH = 0
   }
+  console.log(data)
+
   return data
 }
 
