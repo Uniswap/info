@@ -51,9 +51,11 @@ export function useCopyClipboard(timeout = 500) {
   return [isCopied, staticCopy]
 }
 
-export const useOutsideClick = (ref, callback) => {
+export const useOutsideClick = (ref, ref2, callback) => {
   const handleClick = e => {
-    if (ref.current && !ref.current.contains(e.target)) {
+    if (ref.current && ref.current && !ref2.current) {
+      callback(true)
+    } else if (ref.current && !ref.current.contains(e.target) && ref2.current && !ref2.current.contains(e.target)) {
       callback(true)
     } else {
       callback(false)

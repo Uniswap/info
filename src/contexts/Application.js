@@ -1,16 +1,11 @@
 import React, { createContext, useContext, useReducer, useMemo, useCallback } from 'react'
+import { timeframeOptions } from '../constants'
 
 const UPDATE = 'UPDATE'
-const UPDATE_COLOR = 'UPDATE_COLOR'
+const UPDATE_TIMEFRAME = 'UPDATE_TIMEFRAME'
 
-export function safeAccess(object, path) {
-  return object
-    ? path.reduce(
-        (accumulator, currentValue) => (accumulator && accumulator[currentValue] ? accumulator[currentValue] : null),
-        object
-      )
-    : null
-}
+const TIME_KEY = 'TIME_KEY'
+const CURRENCY = 'CURRENCY'
 
 const ApplicationContext = createContext()
 
@@ -24,14 +19,14 @@ function reducer(state, { type, payload }) {
       const { currency } = payload
       return {
         ...state,
-        currency
+        CURRENCY: currency
       }
     }
-    case UPDATE_COLOR: {
-      const { color } = payload
+    case UPDATE_TIMEFRAME: {
+      const { newTimeFrame } = payload
       return {
         ...state,
-        color
+        TIME_KEY: newTimeFrame
       }
     }
     default: {
@@ -41,7 +36,7 @@ function reducer(state, { type, payload }) {
 }
 
 export default function Provider({ children }) {
-  const [state, dispatch] = useReducer(reducer, { currency: 'USD' })
+  const [state, dispatch] = useReducer(reducer, { CURRENCY: 'USD', TIME_KEY: timeframeOptions.ALL_TIME })
   const update = useCallback(currency => {
     dispatch({
       type: UPDATE,
@@ -51,17 +46,19 @@ export default function Provider({ children }) {
     })
   }, [])
 
-  const updateColor = useCallback(color => {
+  const updateTimeframe = useCallback(newTimeFrame => {
     dispatch({
-      type: UPDATE_COLOR,
+      type: UPDATE_TIMEFRAME,
       payload: {
-        color
+        newTimeFrame
       }
     })
   }, [])
 
   return (
-    <ApplicationContext.Provider value={useMemo(() => [state, { update, updateColor }], [state, update, updateColor])}>
+    <ApplicationContext.Provider
+      value={useMemo(() => [state, { update, updateTimeframe }], [state, update, updateTimeframe])}
+    >
       {children}
     </ApplicationContext.Provider>
   )
@@ -76,10 +73,11 @@ export function useCurrentCurrency() {
       update('ETH')
     }
   }, [state, update])
-  return [state.currency, toggleCurrency]
+  return [state[CURRENCY], toggleCurrency]
 }
 
-export function useColor() {
-  const [state, { updateColor }] = useApplicationContext()
-  return [state.color, updateColor]
+export function useTimeframe() {
+  const [state, { updateTimeframe }] = useApplicationContext()
+  const activeTimeframe = state?.[TIME_KEY]
+  return [activeTimeframe, updateTimeframe]
 }

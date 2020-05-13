@@ -8,8 +8,8 @@ import { ChevronDown as Arrow } from 'react-feather'
 const Wrapper = styled.div`
   z-index: 20;
   position: relative;
-  background-color: #f4dce8;
-  width: 120px;
+  background-color: rgb(183, 177, 183, 0.3);
+  width: 100px;
   padding: 10px;
   border-radius: 16px;
   display: flex;
@@ -24,12 +24,12 @@ const Wrapper = styled.div`
   border-bottom-left-radius: ${({ open }) => open && '0px'};
 `
 
-const Select = styled.div`
+const Dropdown = styled.div`
   position: absolute;
   top: 40px;
   padding-top: 60px;
   width: calc(100% - 40px);
-  background-color: #f4dce8;
+  background-color: rgb(183, 177, 183, 0.3);
   padding: 20px;
   border-radius: 16px;
   border-top-right-radius: 0;
@@ -48,7 +48,11 @@ const ArrowStyled = styled(Arrow)`
   margin-left: 6px;
 `
 
-const Option = styled(Row)``
+const Option = styled(Row)`
+  :hover {
+    background-color: ;
+  }
+`
 
 const DropdownSelect = ({ options, active, setActive }) => {
   const [showDropdown, toggleDropdown] = useState(false)
@@ -56,14 +60,15 @@ const DropdownSelect = ({ options, active, setActive }) => {
   return (
     <Wrapper open={showDropdown}>
       <Row onClick={() => toggleDropdown(!showDropdown)} justify="center">
-        {active.text} <ArrowStyled />
+        {active} <ArrowStyled />
       </Row>
       {showDropdown && (
-        <Select>
+        <Dropdown>
           <AutoColumn gap="20px">
-            {options.map((option, index) => {
+            {Object.keys(options).map((key, index) => {
+              let option = options[key]
               return (
-                !(option.value === active.value) && (
+                option !== active && (
                   <Option
                     onClick={() => {
                       toggleDropdown(!showDropdown)
@@ -71,13 +76,13 @@ const DropdownSelect = ({ options, active, setActive }) => {
                     }}
                     key={index}
                   >
-                    {option.text}
+                    {option}
                   </Option>
                 )
               )
             })}
           </AutoColumn>
-        </Select>
+        </Dropdown>
       )}
     </Wrapper>
   )

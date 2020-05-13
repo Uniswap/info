@@ -128,12 +128,13 @@ export const formattedNum = (number, usd = false) => {
 
 export const get2DayPercentFormatted = (valueNow, value24HoursAgo, value48HoursAgo) => {
   // get volume info for both 24 hour periods
+
   let firstDayValue = value24HoursAgo - value48HoursAgo
   let secondDayValue = valueNow - value24HoursAgo
-  let amountChange = secondDayValue - firstDayValue
 
   let percentChange = ''
-  const adjustedPercentChange = (parseFloat(amountChange) / parseFloat(firstDayValue)).toFixed(2) * 100
+  const adjustedPercentChange =
+    (parseFloat(secondDayValue - firstDayValue) / parseFloat(firstDayValue)).toFixed(2) * 100
 
   if (firstDayValue === 0) {
     return [secondDayValue, '+100']

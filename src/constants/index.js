@@ -1,21 +1,11 @@
-export const timeframeOptions = [
-  { value: '1week', label: '1 week' },
-  { value: '1month', label: '1 month' },
-  { value: '3months', label: '3 months' },
-  { value: 'all', label: 'All time' }
-]
+export const FACTORY_ADDRESS = '0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f'
 
-export const getTimeFrame = current => {
-  switch (current) {
-    case 'all':
-      return timeframeOptions[3]
-    case '1week':
-      return timeframeOptions[0]
-    case '1month':
-      return timeframeOptions[1]
-    case '3months':
-      return timeframeOptions[2]
-    default:
-      return timeframeOptions[3]
-  }
+export const BUNDLE_ID = '1'
+
+export const timeframeOptions = {
+  WEEK: '1 week',
+  MONTH: '1 month',
+  THREE_MONTHS: '3 months',
+  YEAR: '1 year',
+  ALL_TIME: 'All time'
 }

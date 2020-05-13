@@ -9,8 +9,7 @@ import { BasicLink } from '../Link'
 import { useAllTokenData } from '../../contexts/TokenData'
 import { useAllPairs } from '../../contexts/PairData'
 import DoubleTokenLogo from '../DoubleLogo'
-import { useMedia } from 'react-use'
-import { useOutsideClick } from '../../hooks'
+import { useMedia, usePrevious } from 'react-use'
 
 const Wrapper = styled.div`
   display: flex;
@@ -74,6 +73,7 @@ const Menu = styled.div`
   border-bottom-left-radius: 12px;
   box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.04), 0px 4px 8px rgba(0, 0, 0, 0.04), 0px 16px 24px rgba(0, 0, 0, 0.04),
     0px 24px 32px rgba(0, 0, 0, 0.04);
+  display: ${({ hide }) => hide && 'none'};
 `
 
 const MenuItem = styled(Row)`
@@ -90,6 +90,7 @@ const MenuItem = styled(Row)`
 
 const Heading = styled(Row)`
   padding: 1rem;
+  display: ${({ hide = false }) => hide && 'none'};
 `
 
 const FilterSection = styled(Heading)`
@@ -108,7 +109,7 @@ const Blue = styled.span`
   }
 `
 
-export const Search = React.forwardRef((props, ref) => {
+export const Search = (small = false) => {
   const allTokens = useAllTokenData()
   const allPairs = useAllPairs()
   const [showMenu, toggleMenu] = useState(false)
@@ -198,10 +199,24 @@ export const Search = React.forwardRef((props, ref) => {
     setValue('')
   }
 
-  const innerRef = useRef()
-  const [focused, setFocused] = useState(false)
-  useOutsideClick(innerRef, val => {
-    !focused && toggleMenu(false)
+  // refs to detect clicks outside modal
+  const wrapperRef = useRef()
+  const menuRef = useRef()
+
+  const handleClick = e => {
+    if (
+      !(menuRef.current && menuRef.current.contains(e.target)) &&
+      !(wrapperRef.current && wrapperRef.current.contains(e.target))
+    ) {
+      toggleMenu(false)
+    }
+  }
+
+  useEffect(() => {
+    document.addEventListener('click', handleClick)
+    return () => {
+      document.removeEventListener('click', handleClick)
+    }
   })
 
   return (
@@ -212,13 +227,13 @@ export const Search = React.forwardRef((props, ref) => {
         position: 'relative',
         width: '100%'
       }}
-      ref={innerRef}
     >
-      <Wrapper open={showMenu} shadow={true} large={!props.small}>
+      <Wrapper open={showMenu} shadow={true} large={!small}>
         <SearchIconLarge />
         <Input
-          large={!props.small}
+          large={!small}
           type={'text'}
+          ref={wrapperRef}
           placeholder={
             below410
               ? 'Search...'
@@ -234,74 +249,72 @@ export const Search = React.forwardRef((props, ref) => {
           }}
           onFocus={() => {
             toggleMenu(true)
-            setFocused(true)
           }}
         />
       </Wrapper>
-      {showMenu && (
-        <Menu>
-          <FilterSection>
-            <Gray>Filter Results</Gray>
-          </FilterSection>
-          <Heading>
-            <Gray>Tokens</Gray>
+      <Menu hide={!showMenu} ref={menuRef}>
+        <FilterSection>
+          <Gray>Filter Results</Gray>
+        </FilterSection>
+        <Heading>
+          <Gray>Tokens</Gray>
+        </Heading>
+        <div>
+          {Object.keys(filteredTokenList).length === 0 && <MenuItem>No results</MenuItem>}
+          {filteredTokenList.slice(0, tokensShown).map(key => {
+            return (
+              <BasicLink to={'/token/' + key} key={key} onClick={onDismiss}>
+                <MenuItem>
+                  <TokenLogo address={allTokens[key].id}></TokenLogo>
+                  <span>{allTokens[key].name}</span>
+                  <span>({allTokens[key].symbol})</span>
+                </MenuItem>
+              </BasicLink>
+            )
+          })}
+
+          <Heading
+            hide={!(Object.keys(filteredTokenList).length > 3 && Object.keys(filteredTokenList).length >= tokensShown)}
+          >
+            <Blue
+              onClick={() => {
+                setTokensShown(tokensShown + 5)
+              }}
+            >
+              See more...
+            </Blue>
           </Heading>
-          <div>
-            {Object.keys(filteredTokenList).length === 0 && <MenuItem>No results</MenuItem>}
-            {filteredTokenList.slice(0, tokensShown).map(key => {
-              return (
-                <BasicLink to={'/token/' + key} key={key} onClick={onDismiss}>
-                  <MenuItem>
-                    <TokenLogo address={allTokens[key].id}></TokenLogo>
-                    <span>{allTokens[key].name}</span>
-                    <span>({allTokens[key].symbol})</span>
-                  </MenuItem>
-                </BasicLink>
-              )
-            })}
-            {Object.keys(filteredTokenList).length > 3 && Object.keys(filteredTokenList).length >= tokensShown && (
-              <Heading>
-                <Blue
-                  onClick={() => {
-                    setTokensShown(tokensShown + 5)
-                  }}
-                >
-                  See more...
-                </Blue>
-              </Heading>
-            )}
-          </div>
-          <Heading>
-            <Gray>Pools</Gray>
+        </div>
+        <Heading>
+          <Gray>Pools</Gray>
+        </Heading>
+        <div>
+          {Object.keys(filteredPairList).length === 0 && <MenuItem>No results</MenuItem>}
+          {filteredPairList.slice(0, pairsShown).map(key => {
+            return (
+              <BasicLink to={'/pair/' + key} key={key} onClick={onDismiss}>
+                <MenuItem>
+                  <DoubleTokenLogo a0={allPairs?.[key]?.token0?.id} a1={allPairs?.[key]?.token1?.id} margin={true} />
+                  <span>{allPairs[key].token0.symbol + '-' + allPairs[key].token1.symbol} Pool</span>
+                </MenuItem>
+              </BasicLink>
+            )
+          })}
+          <Heading
+            hide={!(Object.keys(filteredPairList).length > 3 && Object.keys(filteredPairList).length >= pairsShown)}
+          >
+            <Blue
+              onClick={() => {
+                setPairsShown(pairsShown + 5)
+              }}
+            >
+              See more...
+            </Blue>
           </Heading>
-          <div>
-            {Object.keys(filteredPairList).length === 0 && <MenuItem>No results</MenuItem>}
-            {filteredPairList.slice(0, pairsShown).map(key => {
-              return (
-                <BasicLink to={'/pair/' + key} key={key} onClick={onDismiss}>
-                  <MenuItem>
-                    <DoubleTokenLogo a0={allPairs?.[key]?.token0?.id} a1={allPairs?.[key]?.token1?.id} margin={true} />
-                    <span>{allPairs[key].token0.symbol + '-' + allPairs[key].token1.symbol} Pool</span>
-                  </MenuItem>
-                </BasicLink>
-              )
-            })}
-            {Object.keys(filteredPairList).length > 3 && Object.keys(filteredPairList).length >= pairsShown && (
-              <Heading>
-                <Blue
-                  onClick={() => {
-                    setPairsShown(pairsShown + 5)
-                  }}
-                >
-                  See more...
-                </Blue>
-              </Heading>
-            )}
-          </div>
-        </Menu>
-      )}
+        </div>
+      </Menu>
     </div>
   )
-})
+}
 
 export default Search

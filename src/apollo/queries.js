@@ -1,4 +1,5 @@
 import gql from 'graphql-tag'
+import { FACTORY_ADDRESS, BUNDLE_ID } from '../constants'
 
 export const GET_BLOCK = gql`
   query blocks($timestamp: Int!) {
@@ -14,14 +15,14 @@ export const ETH_PRICE = block => {
   const queryString = block
     ? `
     query bundles {
-      bundles(where: { id: 1 } block: {number: ${block}}) {
+      bundles(where: { id: ${BUNDLE_ID} } block: {number: ${block}}) {
         id
         ethPrice
       }
     }
   `
     : ` query bundles {
-      bundles(where: { id: 1 }) {
+      bundles(where: { id: ${BUNDLE_ID} }) {
         id
         ethPrice
       }
@@ -174,7 +175,7 @@ export const GLOBAL_DATA = block => {
        {number: ` +
       block +
       `}` +
-      ` where: { id: "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f" }) {
+      ` where: { id: "${FACTORY_ADDRESS}" }) {
         id
         totalVolumeUSD
         totalVolumeETH
@@ -185,7 +186,7 @@ export const GLOBAL_DATA = block => {
     }`
     : `query uniswapFactories {
       uniswapFactories(
-        where: { id: "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f" }) {
+        where: { id: "${FACTORY_ADDRESS}" }) {
         id
         totalVolumeUSD
         totalVolumeETH

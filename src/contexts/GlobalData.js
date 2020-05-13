@@ -1,28 +1,17 @@
 import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect } from 'react'
-
-import { client } from '../apollo/client'
 import { GLOBAL_DATA, GLOBAL_TXNS, GLOBAL_CHART, ETH_PRICE } from '../apollo/queries'
-
+import { client } from '../apollo/client'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
-
 import { get2DayPercentFormatted, getPercentFormatted, getBlockFromTimestamp } from '../helpers'
 
 const UPDATE = 'UPDATE'
 const UPDATE_TXNS = 'UPDATE_TXNS'
 const UPDATE_CHART = 'UPDATE_CHART'
 const UPDATE_ETH_PRICE = 'UPDATE_ETH_PRICE'
+const ETH_PRICE_KEY = 'ETH_PRICE_KEY'
 
 dayjs.extend(utc)
-
-export function safeAccess(object, path) {
-  return object
-    ? path.reduce(
-        (accumulator, currentValue) => (accumulator && accumulator[currentValue] ? accumulator[currentValue] : null),
-        object
-      )
-    : null
-}
 
 const GlobalDataContext = createContext()
 
@@ -67,7 +56,7 @@ function reducer(state, { type, payload }) {
     case UPDATE_ETH_PRICE: {
       const { ethPrice, ethPriceChange } = payload
       return {
-        ethPrice,
+        ETH_PRICE_KEY: ethPrice,
         ethPriceChange
       }
     }
@@ -320,7 +309,7 @@ export function useGlobalData() {
 
 export function useEthPrice() {
   const [state, { updateEthPrice }] = useGlobalDataContext()
-  const ethPrice = safeAccess(state, ['ethPrice'])
+  const ethPrice = state?.[ETH_PRICE_KEY]
   useEffect(() => {
     async function checkForEthPrice() {
       if (!ethPrice) {
@@ -330,5 +319,6 @@ export function useEthPrice() {
     }
     checkForEthPrice()
   }, [ethPrice, updateEthPrice])
+
   return ethPrice
 }
