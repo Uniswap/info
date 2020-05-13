@@ -1,11 +1,10 @@
 import React, { useState } from 'react'
 import 'feather-icons'
-import { Text, Box } from 'rebass'
+import { Box } from 'rebass'
 import styled from 'styled-components'
 
-import { RowFlat, AutoRow, RowBetween } from '../components/Row'
-import Column, { AutoColumn } from '../components/Column'
-import { Hint } from '../components'
+import { AutoRow, RowBetween } from '../components/Row'
+import { AutoColumn } from '../components/Column'
 import PairList from '../components/PairList'
 import TopTokenList from '../components/TokenList'
 import TxnList from '../components/TxnList'
@@ -27,14 +26,13 @@ const PageWrapper = styled.div`
   justify-content: center;
   padding-bottom: 100px;
   width: calc(100% - 20px);
-  padding: 0 40px;
   overflow: scroll;
   & > * {
     width: 100%;
     max-width: 1240px;
   }
 
-  @media screen and (max-width: 640px) {
+  @media screen and (max-width: 1080px) {
     width: calc(100% - 40px);
     padding: 0 20px;
   }
@@ -83,6 +81,7 @@ const TopGroup = styled.div`
 
 const Panel = styled.div`
   width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -100,11 +99,16 @@ const ChartWrapper = styled.div`
   /* padding: 24px; */
 `
 
-const PaddedGroup = styled.div`
-  /* padding: 24px; */
-  /* @media screen and (max-width: 640px) {
-    padding: 20px;
-  } */
+const ListGrouping = styled(GridRow)`
+  @media screen and (max-width: 1020px) {
+    display: inline-grid;
+    width: 100%;
+    min-height: 400px;
+    grid-template-columns: 100%;
+    grid-template-rows: 50% 50%;
+    column-gap: 6px;
+    align-items: start;
+  }
 `
 
 const EthIcon = styled.img`
@@ -168,7 +172,7 @@ function GlobalPage() {
     <PageWrapper>
       <ThemedBackground />
       <Search small={false} />
-      {below1080 && (
+      {below1080 && ( // mobile card
         <Box mb={20}>
           <Box mb={20} mt={30}>
             <Panel>
@@ -207,7 +211,7 @@ function GlobalPage() {
                       <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
                         {oneDayTxns ? oneDayTxns : '0'}
                       </TYPE.main>
-                      <TYPE.main>{txnChange}</TYPE.main>
+                      <TYPE.main>{txnChange && txnChange + '%'}</TYPE.main>
                     </RowBetween>
                   </AutoColumn>
                 </AutoColumn>
@@ -223,7 +227,7 @@ function GlobalPage() {
           </Box>
         </Box>
       )}
-      {!below1080 && (
+      {!below1080 && ( // desktop
         <TopGroup style={{ marginTop: '40px' }}>
           <Panel>
             <AutoColumn gap="20px">
@@ -241,7 +245,6 @@ function GlobalPage() {
               </RowBetween>
             </AutoColumn>
           </Panel>
-
           <Panel>
             <AutoColumn gap="20px">
               <RowBetween>
@@ -280,7 +283,7 @@ function GlobalPage() {
                 <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
                   {oneDayTxns}
                 </TYPE.main>
-                <TYPE.main>{txnChange}</TYPE.main>
+                <TYPE.main>{txnChange && txnChange + '%'}</TYPE.main>
               </RowBetween>
             </AutoColumn>
           </Panel>
@@ -300,27 +303,9 @@ function GlobalPage() {
           </Panel>
         </GridRow>
       )}
-      <GridRow>
+      <ListGrouping>
         <Panel style={{ marginTop: '6px' }}>
-          <PaddedGroup>
-            <ListOptions gap="10px">
-              <Hover>
-                <TYPE.main
-                  onClick={() => {
-                    setTokenFilter('PAIRS')
-                  }}
-                  fontSize={'1rem'}
-                >
-                  Top Pairs
-                </TYPE.main>
-              </Hover>
-            </ListOptions>
-          </PaddedGroup>
-
-          <PairList pairs={pairs && Object.keys(pairs).map(key => pairs[key])} />
-        </Panel>
-        <Panel style={{ marginTop: '6px' }}>
-          <PaddedGroup>
+          <ListOptions gap="10px">
             <Hover>
               <TYPE.main
                 onClick={() => {
@@ -328,62 +313,73 @@ function GlobalPage() {
                 }}
                 fontSize={'1rem'}
               >
-                Top Tokens
-              </TYPE.main>
-            </Hover>
-          </PaddedGroup>
-          <TopTokenList tokens={allTokenData} />
-        </Panel>
-      </GridRow>
-      <Panel style={{ marginTop: '6px' }}>
-        <PaddedGroup>
-          <ListOptions gap="10px">
-            <Hover>
-              <TYPE.main
-                onClick={() => {
-                  setTxFilter('ALL')
-                }}
-                fontSize={'1rem'}
-                color={txFilter !== 'ALL' ? '#aeaeae' : 'black'}
-              >
-                All
-              </TYPE.main>
-            </Hover>
-            <Hover>
-              <TYPE.main
-                onClick={() => {
-                  setTxFilter('SWAP')
-                }}
-                fontSize={'1rem'}
-                color={txFilter !== 'SWAP' ? '#aeaeae' : 'black'}
-              >
-                Swaps
-              </TYPE.main>
-            </Hover>
-            <Hover>
-              <TYPE.main
-                onClick={() => {
-                  setTxFilter('ADD')
-                }}
-                fontSize={'1rem'}
-                color={txFilter !== 'ADD' ? '#aeaeae' : 'black'}
-              >
-                Adds
-              </TYPE.main>
-            </Hover>
-            <Hover>
-              <TYPE.main
-                onClick={() => {
-                  setTxFilter('REMOVE')
-                }}
-                fontSize={'1rem'}
-                color={txFilter !== 'REMOVE' ? '#aeaeae' : 'black'}
-              >
-                Removes
+                Top Pairs
               </TYPE.main>
             </Hover>
           </ListOptions>
-        </PaddedGroup>
+          <PairList pairs={pairs && Object.keys(pairs).map(key => pairs[key])} />
+        </Panel>
+        <Panel style={{ marginTop: '6px' }}>
+          <Hover>
+            <TYPE.main
+              onClick={() => {
+                setTokenFilter('PAIRS')
+              }}
+              fontSize={'1rem'}
+            >
+              Top Tokens
+            </TYPE.main>
+          </Hover>
+          <TopTokenList tokens={allTokenData} />
+        </Panel>
+      </ListGrouping>
+      <Panel style={{ margin: '1rem 0' }}>
+        <ListOptions gap="10px">
+          <Hover>
+            <TYPE.main
+              onClick={() => {
+                setTxFilter('ALL')
+              }}
+              fontSize={'1rem'}
+              color={txFilter !== 'ALL' ? '#aeaeae' : 'black'}
+            >
+              All
+            </TYPE.main>
+          </Hover>
+          <Hover>
+            <TYPE.main
+              onClick={() => {
+                setTxFilter('SWAP')
+              }}
+              fontSize={'1rem'}
+              color={txFilter !== 'SWAP' ? '#aeaeae' : 'black'}
+            >
+              Swaps
+            </TYPE.main>
+          </Hover>
+          <Hover>
+            <TYPE.main
+              onClick={() => {
+                setTxFilter('ADD')
+              }}
+              fontSize={'1rem'}
+              color={txFilter !== 'ADD' ? '#aeaeae' : 'black'}
+            >
+              Adds
+            </TYPE.main>
+          </Hover>
+          <Hover>
+            <TYPE.main
+              onClick={() => {
+                setTxFilter('REMOVE')
+              }}
+              fontSize={'1rem'}
+              color={txFilter !== 'REMOVE' ? '#aeaeae' : 'black'}
+            >
+              Removes
+            </TYPE.main>
+          </Hover>
+        </ListOptions>
         <TxnList transactions={transactions} txFilter={txFilter} />
       </Panel>
     </PageWrapper>

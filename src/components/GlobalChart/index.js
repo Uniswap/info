@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { Area, XAxis, YAxis, ResponsiveContainer, Tooltip, AreaChart, BarChart, Bar } from 'recharts'
 import Row, { RowBetween } from '../Row'
 import { toK, toNiceDate, toNiceDateYear } from '../../helpers'
@@ -14,16 +14,19 @@ const CHART_VIEW = {
 }
 
 const GlobalChart = ({ chartData, display }) => {
-  const [chartView, setChartView] = useState(CHART_VIEW.LIQUIDITY)
+  const [chartView, setChartView] = useState(display === 'volume' ? CHART_VIEW.VOLUME : CHART_VIEW.LIQUIDITY)
   const [activeWindow, setActiveWindow] = useTimeframe()
 
   const below1080 = useMedia('(max-width: 1080px)')
   const below600 = useMedia('(max-width: 600px)')
 
-  useEffect(() => {
-    // Update the document title using the browser API
-    display && display === 'volume' ? setChartView(CHART_VIEW.VOLUME) : setChartView(CHART_VIEW.LIQUIDITY)
-  })
+  function toggleView() {
+    if (chartView === CHART_VIEW.VOLUME) {
+      setChartView(CHART_VIEW.LIQUIDITY)
+    } else {
+      setChartView(CHART_VIEW.VOLUME)
+    }
+  }
 
   return chartData ? (
     <>
@@ -35,23 +38,14 @@ const GlobalChart = ({ chartData, display }) => {
       ) : (
         <RowBetween marginBottom={'10px'}>
           <Row>
-            {display === 'volume' ? (
-              <OptionButton
-                style={{ marginRight: '10px' }}
-                active={chartView === CHART_VIEW.LIQUIDITY}
-                onClick={() => setChartView(CHART_VIEW.LIQUIDITY)}
-              >
-                Liquidity
-              </OptionButton>
-            ) : (
-              <OptionButton
-                style={{ marginRight: '10px' }}
-                active={chartView === CHART_VIEW.VOLUME}
-                onClick={() => setChartView(CHART_VIEW.VOLUME)}
-              >
-                Volume
-              </OptionButton>
-            )}
+            <OptionButton
+              style={{ marginRight: '10px' }}
+              active={true}
+              onClick={display ? () => {} : toggleView}
+              disabled={!!display}
+            >
+              {chartView == CHART_VIEW.VOLUME ? 'Volume' : 'Liquidity'}
+            </OptionButton>
           </Row>
           <Row justify="flex-end">
             <OptionButton
