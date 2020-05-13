@@ -15,16 +15,19 @@ const CHART_VIEW = {
 }
 
 const GlobalChart = ({ chartData, display }) => {
-  const [chartView, setChartView] = useState(CHART_VIEW.LIQUIDITY)
+  const [chartView, setChartView] = useState(display === 'volume' ? CHART_VIEW.VOLUME : CHART_VIEW.LIQUIDITY)
   const [activeWindow, setActiveWindow] = useTimeframe()
 
   const below1080 = useMedia('(max-width: 1080px)')
   const below600 = useMedia('(max-width: 600px)')
 
-  useEffect(() => {
-    // Update the document title using the browser API
-    display && display === 'volume' ? setChartView(CHART_VIEW.VOLUME) : setChartView(CHART_VIEW.LIQUIDITY)
-  })
+  function toggleView() {
+    if (chartView === CHART_VIEW.VOLUME) {
+      setChartView(CHART_VIEW.LIQUIDITY)
+    } else {
+      setChartView(CHART_VIEW.VOLUME)
+    }
+  }
 
   return chartData ? (
     <>

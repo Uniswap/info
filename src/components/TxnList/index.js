@@ -81,7 +81,7 @@ const DashGrid = styled.div`
 `
 
 const ListWrapper = styled.div`
-  padding: 0 40px;
+  padding: 20px 40px;
 
   @media screen and (max-width: 640px) {
     padding: 0 20px;

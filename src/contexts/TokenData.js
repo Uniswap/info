@@ -207,7 +207,6 @@ const getTokenData = async (address, ethPrice) => {
     data.liquidityChangeUSD = 0
     data.liquidityChangeETH = 0
   }
-  console.log(data)
 
   return data
 }

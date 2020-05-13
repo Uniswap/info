@@ -104,14 +104,11 @@ export const OptionButton = styled.div`
   font-weight: ${({ active }) => (active ? 600 : 500)};
   width: fit-content;
   white-space: nowrap;
-  &:hover {
-    cursor: pointer;
-  }
-  /* background-color: ${({ active }) => (active ? 'rgba(0, 0, 0, 0.06);' : 'rgba(0, 0, 0, 0.02);')}; */
   padding: 6px;
   border-radius: 6px;
 
   :hover {
-    background-color: rgba(0, 0, 0, 0.06);
+    cursor: ${({ disabled }) => !disabled && 'pointer'};
+    background-color: ${({ disabled }) => !disabled && 'rgba(0, 0, 0, 0.06)'};
   }
 `
