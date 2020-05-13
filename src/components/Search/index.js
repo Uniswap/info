@@ -17,7 +17,7 @@ const Wrapper = styled.div`
   flex-direction: row;
   align-items: center;
   justify-content: flex-end;
-  padding: ${({ large }) => (large ? '12px' : '8px 16px')};
+  padding: ${({ large }) => (large ? '12px' : '12px 16px')};
   border: 1px solid ${({ theme }) => theme.inputBackground};
   border-radius: 12px;
   background: ${({ theme }) => theme.inputBackground};

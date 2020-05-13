@@ -10,7 +10,7 @@ import PairList from '../components/PairList'
 import TopTokenList from '../components/TokenList'
 import TxnList from '../components/TxnList'
 import GlobalChart from '../components/GlobalChart'
-import { Hover } from '../Theme'
+import { Hover, TYPE } from '../Theme'
 import { formattedNum } from '../helpers'
 import { useGlobalData, useEthPrice } from '../contexts/GlobalData'
 import { useAllTokenData } from '../contexts/TokenData'
@@ -26,7 +26,7 @@ const PageWrapper = styled.div`
   align-items: center;
   justify-content: center;
   padding-bottom: 100px;
-  width: calc(100% - 80px);
+  width: calc(100% - 20px);
   padding: 0 40px;
   overflow: scroll;
   & > * {
@@ -68,16 +68,17 @@ const GridRow = styled.div`
   display: inline-grid;
   width: 100%;
   min-height: 400px;
-  grid-template-columns: 30% 70%;
+  grid-template-columns: 50% 50%;
   column-gap: 6px;
   align-items: start;
 `
 
-const LeftGroup = styled.div`
-  display: grid;
-  grid-template-rows: min-content auto;
-  row-gap: 6px;
-  height: 100%;
+const TopGroup = styled.div`
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  column-gap: 6px;
+  display: inline-grid;
+  width: 100%;
+  align-items: start;
 `
 
 const Panel = styled.div`
@@ -85,18 +86,13 @@ const Panel = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  border-radius: 20px;
-  background-color: ${({ theme }) => theme.panelColor};
+  border-radius: 12px;
+  background-color: ${({ theme }) => theme.advancedBG};
   padding: 1.25rem;
   box-sizing: border-box;
-`
-
-const SpacedColumn = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  height: 100%;
-  padding: 24px;
+  box-shadow: 0 1.1px 2.8px -9px rgba(0, 0, 0, 0.008), 0 2.7px 6.7px -9px rgba(0, 0, 0, 0.012),
+    0 5px 12.6px -9px rgba(0, 0, 0, 0.015), 0 8.9px 22.6px -9px rgba(0, 0, 0, 0.018),
+    0 16.7px 42.2px -9px rgba(0, 0, 0, 0.022), 0 40px 101px -9px rgba(0, 0, 0, 0.03);
 `
 
 const ChartWrapper = styled.div`
@@ -112,11 +108,8 @@ const PaddedGroup = styled.div`
 `
 
 const EthIcon = styled.img`
-  height: 26px;
-  width: 26px;
-  position: absolute;
-  top: 24px;
-  right: 20px;
+  height: 20px;
+  width: 20px;
 `
 
 function GlobalPage() {
@@ -143,31 +136,31 @@ function GlobalPage() {
   const [currency] = useCurrentCurrency()
 
   const ethPrice = useEthPrice()
-  const formattedEthPrice = ethPrice ? formattedNum(ethPrice, true) : ''
+  const formattedEthPrice = ethPrice ? formattedNum(ethPrice, true) : '0.00'
 
   const liquidity =
     currency === 'ETH'
       ? formattedNum(totalLiquidityETH)
       : totalLiquidityUSD
       ? formattedNum(totalLiquidityUSD, true)
-      : ''
+      : '0.00'
 
   const liquidityChange =
     currency === 'ETH'
       ? formattedNum(liquidityChangeETH) + '%'
       : liquidityChangeUSD
       ? formattedNum(liquidityChangeUSD) + '%'
-      : ''
+      : '0.00'
 
   const volume =
     currency === 'ETH'
       ? formattedNum(oneDayVolumeETH, true)
       : oneDayVolumeUSD
       ? formattedNum(oneDayVolumeUSD, true)
-      : ''
+      : '0.00'
 
   const volumeChange =
-    currency === 'ETH' ? formattedNum(volumeChangeETH) + '%' : volumeChangeUSD ? volumeChangeUSD + '%' : ''
+    currency === 'ETH' ? formattedNum(volumeChangeETH) + '%' : volumeChangeUSD ? volumeChangeUSD + '%' : '0.00'
 
   const below1080 = useMedia('(max-width: 1080px)')
 
@@ -183,38 +176,38 @@ function GlobalPage() {
                 <AutoColumn gap="40px">
                   <AutoColumn gap="20px">
                     <RowBetween>
-                      <Text>Volume (24hrs)</Text>
+                      <TYPE.main>Volume (24hrs)</TYPE.main>
                       <div />
                     </RowBetween>
                     <RowBetween align="flex-end">
-                      <Text fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
+                      <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
                         {volume}
-                      </Text>
-                      <Text>{volumeChange}</Text>
+                      </TYPE.main>
+                      <TYPE.main>{volumeChange}</TYPE.main>
                     </RowBetween>
                   </AutoColumn>
                   <AutoColumn gap="20px">
                     <RowBetween>
-                      <Text>Total Liquidity</Text>
+                      <TYPE.main>Total Liquidity</TYPE.main>
                       <div />
                     </RowBetween>
                     <RowBetween align="flex-end">
-                      <Text fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
+                      <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
                         {liquidity && liquidity}
-                      </Text>
-                      <Text>{liquidityChange && liquidityChange}</Text>
+                      </TYPE.main>
+                      <TYPE.main>{liquidityChange && liquidityChange}</TYPE.main>
                     </RowBetween>
                   </AutoColumn>
                   <AutoColumn gap="20px">
                     <RowBetween>
-                      <Text>Transactions (24hrs)</Text>
+                      <TYPE.main>Transactions (24hrs)</TYPE.main>
                       <div />
                     </RowBetween>
                     <RowBetween align="flex-end">
-                      <Text fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
-                        {oneDayTxns}
-                      </Text>
-                      <Text>{txnChange}</Text>
+                      <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
+                        {oneDayTxns ? oneDayTxns : '0'}
+                      </TYPE.main>
+                      <TYPE.main>{txnChange}</TYPE.main>
                     </RowBetween>
                   </AutoColumn>
                 </AutoColumn>
@@ -231,108 +224,122 @@ function GlobalPage() {
         </Box>
       )}
       {!below1080 && (
-        <GridRow style={{ marginTop: '40px' }}>
-          <LeftGroup>
-            <Panel style={{ position: 'relative' }}>
-              <EthIcon src={EthLogo} />
-              <PaddedGroup>
-                <Column>
-                  <RowFlat>
-                    {formattedEthPrice && (
-                      <Text fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
-                        {formattedEthPrice}
-                      </Text>
-                    )}
-                    {/* <Text marginLeft="10px">{liquidityChange}</Text> */}
-                  </RowFlat>
-                  <RowFlat style={{ marginTop: '10px' }}>
-                    <Hint>ETH Uniprice</Hint>
-                  </RowFlat>
-                </Column>
-              </PaddedGroup>
-            </Panel>
-            <Panel>
-              <AutoColumn gap="40px">
-                <Column>
-                  <RowFlat>
-                    <Text fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
-                      {liquidity}
-                    </Text>
-                    <Text marginLeft="10px">{liquidityChange && liquidityChange}</Text>
-                  </RowFlat>
-                  <RowFlat style={{ marginTop: '10px' }}>
-                    <Hint>Total Liquidity</Hint>
-                  </RowFlat>
-                </Column>
-                <Column>
-                  <RowFlat>
-                    <Text fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
-                      {volume}
-                    </Text>
-                    <Text marginLeft="10px">{volumeChange}</Text>
-                  </RowFlat>
-                  <RowFlat style={{ marginTop: '10px' }}>
-                    <Hint>Volume (24hrs)</Hint>
-                  </RowFlat>
-                </Column>
-                <Column>
-                  <RowFlat>
-                    <Text fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
-                      {oneDayTxns}
-                    </Text>
-                    <Text marginLeft="10px">{txnChange && txnChange + '%'}</Text>
-                  </RowFlat>
-                  <RowFlat style={{ marginTop: '10px' }}>
-                    <Hint>Transactions (24hrs)</Hint>
-                  </RowFlat>
-                </Column>
-              </AutoColumn>
-            </Panel>
-          </LeftGroup>
+        <TopGroup style={{ marginTop: '40px' }}>
+          <Panel>
+            <AutoColumn gap="20px">
+              <RowBetween>
+                <TYPE.main>Uniswap ETH price</TYPE.main>
+                <div />
+              </RowBetween>
+              <RowBetween align="flex-end">
+                {formattedEthPrice && (
+                  <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
+                    {formattedEthPrice}
+                  </TYPE.main>
+                )}
+                <EthIcon src={EthLogo} />
+              </RowBetween>
+            </AutoColumn>
+          </Panel>
+
+          <Panel>
+            <AutoColumn gap="20px">
+              <RowBetween>
+                <TYPE.main>Volume (24hrs)</TYPE.main>
+                <div />
+              </RowBetween>
+              <RowBetween align="flex-end">
+                <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
+                  {volume}
+                </TYPE.main>
+                <TYPE.main>{volumeChange}</TYPE.main>
+              </RowBetween>
+            </AutoColumn>
+          </Panel>
+          <Panel>
+            <AutoColumn gap="20px">
+              <RowBetween>
+                <TYPE.main>Total Liquidity</TYPE.main>
+                <div />
+              </RowBetween>
+              <RowBetween align="flex-end">
+                <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
+                  {liquidity && liquidity}
+                </TYPE.main>
+                <TYPE.main>{liquidityChange && liquidityChange}</TYPE.main>
+              </RowBetween>
+            </AutoColumn>
+          </Panel>
+          <Panel>
+            <AutoColumn gap="20px">
+              <RowBetween>
+                <TYPE.main>Transactions (24hrs)</TYPE.main>
+                <div />
+              </RowBetween>
+              <RowBetween align="flex-end">
+                <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
+                  {oneDayTxns}
+                </TYPE.main>
+                <TYPE.main>{txnChange}</TYPE.main>
+              </RowBetween>
+            </AutoColumn>
+          </Panel>
+        </TopGroup>
+      )}
+      {!below1080 && (
+        <GridRow style={{ marginTop: '6px' }}>
           <Panel style={{ height: '100%' }}>
             <ChartWrapper area="fill" rounded>
-              <GlobalChart chartData={chartData} />
+              <GlobalChart chartData={chartData} display="liquidity" />
+            </ChartWrapper>
+          </Panel>
+          <Panel style={{ height: '100%' }}>
+            <ChartWrapper area="fill" rounded>
+              <GlobalChart chartData={chartData} display="volume" />
             </ChartWrapper>
           </Panel>
         </GridRow>
       )}
-      <Panel style={{ marginTop: '6px' }}>
-        <PaddedGroup>
-          <ListOptions gap="10px">
+      <GridRow>
+        <Panel style={{ marginTop: '6px' }}>
+          <PaddedGroup>
+            <ListOptions gap="10px">
+              <Hover>
+                <TYPE.main
+                  onClick={() => {
+                    setTokenFilter('PAIRS')
+                  }}
+                  fontSize={'1rem'}
+                >
+                  Top Pairs
+                </TYPE.main>
+              </Hover>
+            </ListOptions>
+          </PaddedGroup>
+
+          <PairList pairs={pairs && Object.keys(pairs).map(key => pairs[key])} />
+        </Panel>
+        <Panel style={{ marginTop: '6px' }}>
+          <PaddedGroup>
             <Hover>
-              <Text
-                onClick={() => {
-                  setTokenFilter('TOKENS')
-                }}
-                fontSize={'1rem'}
-                color={tokenFilter === 'TOKENS' ? 'black' : '#aeaeae'}
-              >
-                Top Tokens
-              </Text>
-            </Hover>
-            <Hover>
-              <Text
+              <TYPE.main
                 onClick={() => {
                   setTokenFilter('PAIRS')
                 }}
                 fontSize={'1rem'}
-                color={tokenFilter === 'PAIRS' ? 'black' : '#aeaeae'}
               >
-                Top Pairs
-              </Text>
+                Top Tokens
+              </TYPE.main>
             </Hover>
-          </ListOptions>
-        </PaddedGroup>
-        {allTokenData && tokenFilter === 'TOKENS' && <TopTokenList tokens={allTokenData} />}
-        {allTokenData && tokenFilter === 'PAIRS' && (
-          <PairList pairs={pairs && Object.keys(pairs).map(key => pairs[key])} />
-        )}
-      </Panel>
+          </PaddedGroup>
+          <TopTokenList tokens={allTokenData} />
+        </Panel>
+      </GridRow>
       <Panel style={{ marginTop: '6px' }}>
         <PaddedGroup>
           <ListOptions gap="10px">
             <Hover>
-              <Text
+              <TYPE.main
                 onClick={() => {
                   setTxFilter('ALL')
                 }}
@@ -340,10 +347,10 @@ function GlobalPage() {
                 color={txFilter !== 'ALL' ? '#aeaeae' : 'black'}
               >
                 All
-              </Text>
+              </TYPE.main>
             </Hover>
             <Hover>
-              <Text
+              <TYPE.main
                 onClick={() => {
                   setTxFilter('SWAP')
                 }}
@@ -351,10 +358,10 @@ function GlobalPage() {
                 color={txFilter !== 'SWAP' ? '#aeaeae' : 'black'}
               >
                 Swaps
-              </Text>
+              </TYPE.main>
             </Hover>
             <Hover>
-              <Text
+              <TYPE.main
                 onClick={() => {
                   setTxFilter('ADD')
                 }}
@@ -362,10 +369,10 @@ function GlobalPage() {
                 color={txFilter !== 'ADD' ? '#aeaeae' : 'black'}
               >
                 Adds
-              </Text>
+              </TYPE.main>
             </Hover>
             <Hover>
-              <Text
+              <TYPE.main
                 onClick={() => {
                   setTxFilter('REMOVE')
                 }}
@@ -373,7 +380,7 @@ function GlobalPage() {
                 color={txFilter !== 'REMOVE' ? '#aeaeae' : 'black'}
               >
                 Removes
-              </Text>
+              </TYPE.main>
             </Hover>
           </ListOptions>
         </PaddedGroup>

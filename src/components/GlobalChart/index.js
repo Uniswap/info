@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Area, XAxis, YAxis, ResponsiveContainer, Tooltip, AreaChart, BarChart, Bar } from 'recharts'
 import Row, { RowBetween } from '../Row'
 import { toK, toNiceDate, toNiceDateYear } from '../../helpers'
@@ -13,12 +13,17 @@ const CHART_VIEW = {
   LIQUIDITY: 'Liquidity'
 }
 
-const GlobalChart = ({ chartData }) => {
+const GlobalChart = ({ chartData, display }) => {
   const [chartView, setChartView] = useState(CHART_VIEW.LIQUIDITY)
   const [activeWindow, setActiveWindow] = useTimeframe()
 
   const below1080 = useMedia('(max-width: 1080px)')
   const below600 = useMedia('(max-width: 600px)')
+
+  useEffect(() => {
+    // Update the document title using the browser API
+    display && display === 'volume' ? setChartView(CHART_VIEW.VOLUME) : setChartView(CHART_VIEW.LIQUIDITY)
+  })
 
   return chartData ? (
     <>
@@ -30,20 +35,23 @@ const GlobalChart = ({ chartData }) => {
       ) : (
         <RowBetween marginBottom={'10px'}>
           <Row>
-            <OptionButton
-              style={{ marginRight: '10px' }}
-              active={chartView === CHART_VIEW.LIQUIDITY}
-              onClick={() => setChartView(CHART_VIEW.LIQUIDITY)}
-            >
-              Liquidity
-            </OptionButton>
-            <OptionButton
-              style={{ marginRight: '10px' }}
-              active={chartView === CHART_VIEW.VOLUME}
-              onClick={() => setChartView(CHART_VIEW.VOLUME)}
-            >
-              Volume
-            </OptionButton>
+            {display === 'volume' ? (
+              <OptionButton
+                style={{ marginRight: '10px' }}
+                active={chartView === CHART_VIEW.LIQUIDITY}
+                onClick={() => setChartView(CHART_VIEW.LIQUIDITY)}
+              >
+                Liquidity
+              </OptionButton>
+            ) : (
+              <OptionButton
+                style={{ marginRight: '10px' }}
+                active={chartView === CHART_VIEW.VOLUME}
+                onClick={() => setChartView(CHART_VIEW.VOLUME)}
+              >
+                Volume
+              </OptionButton>
+            )}
           </Row>
           <Row justify="flex-end">
             <OptionButton

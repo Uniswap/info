@@ -57,17 +57,17 @@ const DashGrid = styled.div`
   }
 
   @media screen and (min-width: 740px) {
-    grid-template-columns: 100px 1fr 200px 200px;
+    grid-template-columns: 1.5fr 1fr 1fr 1fr;
     grid-template-areas: 'name liq vol supply';
   }
 `
 
 const ListWrapper = styled.div`
-  padding: 0 40px;
+  /* padding: 0 40px; */
 
-  @media screen and (max-width: 640px) {
+  /* @media screen and (max-width: 640px) {
     padding: 0 20px;
-  }
+  } */
 `
 
 const ClickableText = styled(Text)`
