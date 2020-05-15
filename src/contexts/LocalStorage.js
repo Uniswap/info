@@ -1,23 +1,16 @@
-import React, {
-  createContext,
-  useContext,
-  useReducer,
-  useMemo,
-  useCallback,
-  useEffect
-} from "react"
+import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect } from 'react'
 
-const UNISWAP = "UNISWAP"
+const UNISWAP = 'UNISWAP'
 
-const VERSION = "VERSION"
+const VERSION = 'VERSION'
 const CURRENT_VERSION = 0
-const LAST_SAVED = "LAST_SAVED"
+const LAST_SAVED = 'LAST_SAVED'
 
-const DARK_MODE = "DARK_MODE"
+const DARK_MODE = 'DARK_MODE'
 
 const UPDATABLE_KEYS = [DARK_MODE]
 
-const UPDATE_KEY = "UPDATE_KEY"
+const UPDATE_KEY = 'UPDATE_KEY'
 
 const LocalStorageContext = createContext()
 
@@ -39,9 +32,7 @@ function reducer(state, { type, payload }) {
       }
     }
     default: {
-      throw Error(
-        `Unexpected action type in LocalStorageContext reducer: '${type}'.`
-      )
+      throw Error(`Unexpected action type in LocalStorageContext reducer: '${type}'.`)
     }
   }
 }
@@ -73,9 +64,7 @@ export default function Provider({ children }) {
   }, [])
 
   return (
-    <LocalStorageContext.Provider
-      value={useMemo(() => [state, { updateKey }], [state, updateKey])}
-    >
+    <LocalStorageContext.Provider value={useMemo(() => [state, { updateKey }], [state, updateKey])}>
       {children}
     </LocalStorageContext.Provider>
   )
@@ -85,10 +74,7 @@ export function Updater() {
   const [state] = useLocalStorageContext()
 
   useEffect(() => {
-    window.localStorage.setItem(
-      UNISWAP,
-      JSON.stringify({ ...state, [LAST_SAVED]: Math.floor(Date.now() / 1000) })
-    )
+    window.localStorage.setItem(UNISWAP, JSON.stringify({ ...state, [LAST_SAVED]: Math.floor(Date.now() / 1000) }))
   })
 
   return null
@@ -101,13 +87,11 @@ export function useDarkModeManager() {
 
   const toggleDarkMode = useCallback(
     value => {
-      updateKey(
-        DARK_MODE,
-        value === false || value === true ? value : !isDarkMode
-      )
+      updateKey(DARK_MODE, value === false || value === true ? value : !isDarkMode)
     },
     [updateKey, isDarkMode]
   )
 
-  return [state[DARK_MODE], toggleDarkMode]
+  // return [state[DARK_MODE], toggleDarkMode]
+  return [false, toggleDarkMode]
 }

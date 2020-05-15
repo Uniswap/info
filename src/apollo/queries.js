@@ -108,15 +108,20 @@ export const PAIR_DATA = (pairAddress, block) => {
           id
           symbol
           name
+          totalLiquidity
+          derivedETH
         }
         token1 {
           id
           symbol
           name
+          totalLiquidity
+          derivedETH
         }
         reserve0
         reserve1
         reserveUSD
+        reserveETH
         volumeUSD
       }
     }`
@@ -129,11 +134,15 @@ export const PAIR_DATA = (pairAddress, block) => {
           id
           symbol
           name
+          totalLiquidity
+          derivedETH
         }
         token1 {
           id
           symbol
           name
+          totalLiquidity
+          derivedETH
         }
         reserve0
         reserve1

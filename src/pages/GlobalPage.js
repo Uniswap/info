@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import 'feather-icons'
 import { Box } from 'rebass'
 import styled from 'styled-components'
@@ -10,14 +10,13 @@ import TopTokenList from '../components/TokenList'
 import TxnList from '../components/TxnList'
 import GlobalChart from '../components/GlobalChart'
 import { Hover, TYPE } from '../Theme'
-import { formattedNum } from '../helpers'
+import { formattedNum, formattedPercent } from '../helpers'
 import { useGlobalData, useEthPrice } from '../contexts/GlobalData'
 import { useAllTokenData } from '../contexts/TokenData'
-import { useCurrentCurrency } from '../contexts/Application'
 import { useAllPairs } from '../contexts/PairData'
 import { Search } from '../components/Search'
-import EthLogo from '../assets/eth.png'
 import { useMedia } from 'react-use'
+import TokenLogo from '../components/TokenLogo'
 
 const PageWrapper = styled.div`
   display: flex;
@@ -65,7 +64,6 @@ const ListOptions = styled(AutoRow)`
 const GridRow = styled.div`
   display: inline-grid;
   width: 100%;
-  /* min-height: 400px; */
   grid-template-columns: 50% 50%;
   column-gap: 6px;
   align-items: start;
@@ -96,39 +94,22 @@ const Panel = styled.div`
 
 const ChartWrapper = styled.div`
   height: 100%;
-  /* padding: 24px; */
 `
 
-const ListGrouping = styled(GridRow)`
-  @media screen and (max-width: 1020px) {
-    display: inline-grid;
-    width: 100%;
-    min-height: 400px;
-    grid-template-columns: 100%;
-    grid-template-rows: 50% 50%;
-    column-gap: 6px;
-    align-items: start;
-  }
-`
-
-const EthIcon = styled.img`
-  height: 20px;
-  width: 20px;
-`
+const LIST_VIEW = {
+  TOKENS: 'tokens',
+  PAIRS: 'pairs'
+}
 
 function GlobalPage() {
   const [txFilter, setTxFilter] = useState('ALL')
-  const [tokenFilter, setTokenFilter] = useState('TOKENS')
+  const [listView, setListView] = useState(LIST_VIEW.PAIRS)
 
   const {
     totalLiquidityUSD,
-    totalLiquidityETH,
     oneDayVolumeUSD,
-    oneDayVolumeETH,
     volumeChangeUSD,
-    volumeChangeETH,
     liquidityChangeUSD,
-    liquidityChangeETH,
     oneDayTxns,
     txnChange,
     transactions,
@@ -137,34 +118,19 @@ function GlobalPage() {
 
   const allTokenData = useAllTokenData()
   const pairs = useAllPairs()
-  const [currency] = useCurrentCurrency()
 
   const ethPrice = useEthPrice()
-  const formattedEthPrice = ethPrice ? formattedNum(ethPrice, true) : '0.00'
+  const formattedEthPrice = ethPrice ? formattedNum(ethPrice, true) : '-'
 
-  const liquidity =
-    currency === 'ETH'
-      ? formattedNum(totalLiquidityETH)
-      : totalLiquidityUSD
-      ? formattedNum(totalLiquidityUSD, true)
-      : '0.00'
+  const liquidity = totalLiquidityUSD ? formattedNum(totalLiquidityUSD, true) : '-'
 
-  const liquidityChange =
-    currency === 'ETH'
-      ? formattedNum(liquidityChangeETH) + '%'
-      : liquidityChangeUSD
-      ? formattedNum(liquidityChangeUSD) + '%'
-      : '0.00'
+  const liquidityChange = liquidityChangeUSD ? formattedPercent(liquidityChangeUSD) : ''
 
-  const volume =
-    currency === 'ETH'
-      ? formattedNum(oneDayVolumeETH, true)
-      : oneDayVolumeUSD
-      ? formattedNum(oneDayVolumeUSD, true)
-      : '0.00'
+  const volume = oneDayVolumeUSD ? formattedNum(oneDayVolumeUSD, true) : '-'
 
-  const volumeChange =
-    currency === 'ETH' ? formattedNum(volumeChangeETH) + '%' : volumeChangeUSD ? volumeChangeUSD + '%' : '0.00'
+  const volumeChange = volumeChangeUSD ? formattedPercent(volumeChangeUSD) : ''
+
+  let txnChangeFormatted = txnChange ? formattedPercent(txnChange) : ''
 
   const below1080 = useMedia('(max-width: 1080px)')
 
@@ -209,9 +175,9 @@ function GlobalPage() {
                     </RowBetween>
                     <RowBetween align="flex-end">
                       <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
-                        {oneDayTxns ? oneDayTxns : '0'}
+                        {oneDayTxns ? oneDayTxns : '-'}
                       </TYPE.main>
-                      <TYPE.main>{txnChange && txnChange + '%'}</TYPE.main>
+                      <TYPE.main>{txnChangeFormatted && txnChangeFormatted}</TYPE.main>
                     </RowBetween>
                   </AutoColumn>
                 </AutoColumn>
@@ -241,21 +207,7 @@ function GlobalPage() {
                     {formattedEthPrice}
                   </TYPE.main>
                 )}
-                <EthIcon src={EthLogo} />
-              </RowBetween>
-            </AutoColumn>
-          </Panel>
-          <Panel>
-            <AutoColumn gap="20px">
-              <RowBetween>
-                <TYPE.main>Volume (24hrs)</TYPE.main>
-                <div />
-              </RowBetween>
-              <RowBetween align="flex-end">
-                <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
-                  {volume}
-                </TYPE.main>
-                <TYPE.main>{volumeChange}</TYPE.main>
+                <TokenLogo address={'0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'} />
               </RowBetween>
             </AutoColumn>
           </Panel>
@@ -276,6 +228,20 @@ function GlobalPage() {
           <Panel>
             <AutoColumn gap="20px">
               <RowBetween>
+                <TYPE.main>Volume (24hrs)</TYPE.main>
+                <div />
+              </RowBetween>
+              <RowBetween align="flex-end">
+                <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
+                  {volume}
+                </TYPE.main>
+                <TYPE.main>{volumeChange}</TYPE.main>
+              </RowBetween>
+            </AutoColumn>
+          </Panel>
+          <Panel>
+            <AutoColumn gap="20px">
+              <RowBetween>
                 <TYPE.main>Transactions (24hrs)</TYPE.main>
                 <div />
               </RowBetween>
@@ -283,7 +249,7 @@ function GlobalPage() {
                 <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
                   {oneDayTxns}
                 </TYPE.main>
-                <TYPE.main>{txnChange && txnChange + '%'}</TYPE.main>
+                <TYPE.main>{txnChangeFormatted && txnChangeFormatted}</TYPE.main>
               </RowBetween>
             </AutoColumn>
           </Panel>
@@ -303,36 +269,37 @@ function GlobalPage() {
           </Panel>
         </GridRow>
       )}
-      <ListGrouping>
-        <Panel style={{ marginTop: '6px' }}>
-          <ListOptions gap="10px">
-            <Hover>
-              <TYPE.main
-                onClick={() => {
-                  setTokenFilter('PAIRS')
-                }}
-                fontSize={'1rem'}
-              >
-                Top Pairs
-              </TYPE.main>
-            </Hover>
-          </ListOptions>
-          <PairList pairs={pairs && Object.keys(pairs).map(key => pairs[key])} />
-        </Panel>
-        <Panel style={{ marginTop: '6px' }}>
+      <Panel style={{ marginTop: '6px' }}>
+        <ListOptions gap="10px">
           <Hover>
             <TYPE.main
               onClick={() => {
-                setTokenFilter('PAIRS')
+                setListView(LIST_VIEW.TOKENS)
               }}
               fontSize={'1rem'}
+              color={listView === LIST_VIEW.PAIRS ? '#aeaeae' : 'black'}
             >
-              Top Tokens
+              Tokens
             </TYPE.main>
           </Hover>
+          <Hover>
+            <TYPE.main
+              onClick={() => {
+                setListView(LIST_VIEW.PAIRS)
+              }}
+              fontSize={'1rem'}
+              color={listView === LIST_VIEW.TOKENS ? '#aeaeae' : 'black'}
+            >
+              Pairs
+            </TYPE.main>
+          </Hover>
+        </ListOptions>
+        {listView === LIST_VIEW.PAIRS ? (
+          <PairList pairs={pairs && Object.keys(pairs).map(key => pairs[key])} />
+        ) : (
           <TopTokenList tokens={allTokenData} />
-        </Panel>
-      </ListGrouping>
+        )}
+      </Panel>
       <Panel style={{ margin: '1rem 0' }}>
         <ListOptions gap="10px">
           <Hover>

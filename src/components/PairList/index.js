@@ -62,13 +62,7 @@ const DashGrid = styled.div`
   }
 `
 
-const ListWrapper = styled.div`
-  /* padding: 0 40px; */
-
-  /* @media screen and (max-width: 640px) {
-    padding: 0 20px;
-  } */
-`
+const ListWrapper = styled.div``
 
 const ClickableText = styled(Text)`
   &:hover {
@@ -150,7 +144,7 @@ function PairList({ pairs }) {
     return (
       <DashGrid style={{ height: '60px' }}>
         <DataText area="name" fontWeight="500">
-          <DoubleTokenLogo a0={item.token0.id || ''} a1={item.token1.id || ''} margin={true} />
+          <DoubleTokenLogo a0={item.token0.id} a1={item.token1.id} margin={true} />
           <CustomLink
             style={{ marginLeft: '20px', whiteSpace: 'nowrap' }}
             to={'/pair/' + item.id}

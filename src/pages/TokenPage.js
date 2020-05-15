@@ -151,7 +151,12 @@ const Break = styled.div`
 function getPercentSign(value) {
   return (
     <Text fontSize={14} lineHeight={1.2}>
-      {value !== undefined && (value < 0 ? value + '% ↓' : parseInt(value) === 0 ? value + '%' : value + '% ↑')}
+      {value !== undefined &&
+        (value < 0
+          ? parseFloat(value).toFixed(2) + '% ↓'
+          : parseInt(value) === 0
+          ? parseFloat(value).toFixed(2) + '%'
+          : parseFloat(value).toFixed(2) + '% ↑')}
     </Text>
   )
 }

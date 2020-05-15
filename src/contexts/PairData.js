@@ -8,7 +8,7 @@ import { useEthPrice } from './GlobalData'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 
-import { get2DayPercentFormatted, getPercentFormatted, getBlockFromTimestamp } from '../helpers'
+import { getPercentChange, get2DayPercentChange, getBlockFromTimestamp } from '../helpers'
 
 const UPDATE = 'UPDATE'
 const UPDATE_PAIR_TXNS = 'UPDATE_PAIR_TXNS'
@@ -149,20 +149,21 @@ const getPairData = async (address, ethPrice) => {
   })
   twoDayData = twoDayResult.data.pairs[0]
   if (data && oneDayData && twoDayData) {
-    const [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentFormatted(
+    const [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentChange(
       data.volumeUSD,
       oneDayData.volumeUSD ? oneDayData.volumeUSD : 0,
       twoDayData.volumeUSD ? twoDayData.volumeUSD : 0
     )
-    const [oneDayVolumeETH, volumeChangeETH] = get2DayPercentFormatted(
+    const [oneDayVolumeETH, volumeChangeETH] = get2DayPercentChange(
       data.tradeVolumeETH,
       oneDayData.tradeVolumeETH ? oneDayData.tradeVolumeETH : 0,
       twoDayData.tradeVolumeETH ? twoDayData.tradeVolumeETH : 0
     )
 
-    const liquidityChangeUSD = getPercentFormatted(data.reserveUSD * ethPrice, oneDayData.reserveUSD)
-    const liquidityChangeETH = getPercentFormatted(data.reserveUSD, oneDayData.reserveUSD)
+    const liquidityChangeUSD = getPercentChange(data.reserveUSD, oneDayData.reserveUSD)
+    const liquidityChangeETH = getPercentChange(data.reserveUSD, oneDayData.reserveUSD)
 
+    data.reserveUSD = data.reserveETH ? data.reserveETH * ethPrice : data.reserveUSD
     data.oneDayVolumeUSD = oneDayVolumeUSD
     data.oneDayVolumeETH = oneDayVolumeETH
     data.volumeChangeUSD = volumeChangeUSD

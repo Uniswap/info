@@ -3,7 +3,7 @@ import { GLOBAL_DATA, GLOBAL_TXNS, GLOBAL_CHART, ETH_PRICE } from '../apollo/que
 import { client } from '../apollo/client'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
-import { get2DayPercentFormatted, getPercentFormatted, getBlockFromTimestamp } from '../helpers'
+import { getPercentChange, getBlockFromTimestamp, get2DayPercentChange } from '../helpers'
 
 const UPDATE = 'UPDATE'
 const UPDATE_TXNS = 'UPDATE_TXNS'
@@ -120,7 +120,7 @@ export default function Provider({ children }) {
   )
 }
 
-async function getGlobalData() {
+async function getGlobalData(ethPrice) {
   const utcCurrentTime = dayjs()
   const utcOneDayBack = utcCurrentTime.subtract(1, 'day').unix()
   const utcTwoDaysBack = utcCurrentTime.subtract(2, 'day').unix()
@@ -143,27 +143,29 @@ async function getGlobalData() {
     fetchPolicy: 'cache-first'
   })
   let twoDayData = twoDayResult.data.uniswapFactories[0]
+
   if (data && oneDayData && twoDayData) {
-    const [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentFormatted(
+    const [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentChange(
       data.totalVolumeUSD,
       oneDayData.totalVolumeUSD ? oneDayData.totalVolumeUSD : 0,
       twoDayData.totalVolumeUSD ? twoDayData.totalVolumeUSD : 0
     )
 
-    const [oneDayVolumeETH, volumeChangeETH] = get2DayPercentFormatted(
+    const [oneDayVolumeETH, volumeChangeETH] = get2DayPercentChange(
       data.totalVolumeETH,
       oneDayData.totalVolumeETH ? oneDayData.totalVolumeETH : 0,
       twoDayData.totalVolumeETH ? twoDayData.totalVolumeETH : 0
     )
 
-    const [oneDayTxns, txnChange] = get2DayPercentFormatted(
+    const [oneDayTxns, txnChange] = get2DayPercentChange(
       data.txCount,
       oneDayData.txCount ? oneDayData.txCount : 0,
       twoDayData.txCount ? twoDayData.txCount : 0
     )
 
-    const liquidityChangeUSD = getPercentFormatted(data.totalLiquidityUSD, oneDayData.totalLiquidityUSD)
-    const liquidityChangeETH = getPercentFormatted(data.totalLiquidityETH, oneDayData.totalLiquidityETH)
+    data.totalLiquidityUSD = data.totalLiquidityETH * ethPrice
+    const liquidityChangeUSD = getPercentChange(data.totalLiquidityETH, oneDayData.totalLiquidityETH)
+    const liquidityChangeETH = getPercentChange(data.totalLiquidityETH, oneDayData.totalLiquidityETH)
     data.oneDayVolumeUSD = oneDayVolumeUSD
     data.volumeChangeUSD = volumeChangeUSD
     data.oneDayVolumeETH = oneDayVolumeETH
@@ -268,27 +270,29 @@ const getEthPrice = async () => {
     fetchPolicy: 'cache-first'
   })
 
-  const priceChangeETH = getPercentFormatted(
-    result?.data?.bundles[0]?.ethPrice,
-    resultOneDay?.data?.bundles[0]?.ethPrice
-  )
+  const priceChangeETH = getPercentChange(result?.data?.bundles[0]?.ethPrice, resultOneDay?.data?.bundles[0]?.ethPrice)
 
   return [result?.data?.bundles[0]?.ethPrice, priceChangeETH]
 }
 
 export function Updater() {
   const [, { update, updateTransactions, updateChart }] = useGlobalDataContext()
+  const ethPrice = useEthPrice()
   useEffect(() => {
     async function fetchData() {
-      let globalData = await getGlobalData()
+      let globalData = await getGlobalData(ethPrice)
       globalData && update(globalData)
+
+      // txn data
       let txns = await getGlobalTransactions()
       updateTransactions(txns)
+
+      // historical stuff for chart
       let chartData = await getChartData()
       chartData && updateChart(chartData)
     }
-    fetchData()
-  }, [update, updateTransactions, updateChart])
+    ethPrice && fetchData()
+  }, [update, updateTransactions, updateChart, ethPrice])
   return null
 }
 

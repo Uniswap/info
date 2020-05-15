@@ -1,9 +1,11 @@
+import React from 'react'
 import { BigNumber } from 'bignumber.js'
 import dayjs from 'dayjs'
 import { ethers } from 'ethers'
 import utc from 'dayjs/plugin/utc'
 import { blockClient } from '../apollo/client'
 import { GET_BLOCK } from '../apollo/queries'
+import { Text } from 'rebass'
 
 BigNumber.set({ EXPONENTIAL_AT: 50 })
 
@@ -97,7 +99,6 @@ export const formattedNum = (number, usd = false) => {
   if (isNaN(number) || number === '' || number === undefined) {
     return ''
   }
-
   let num = parseFloat(number)
   if (num === 0) {
     if (usd) {
@@ -110,7 +111,7 @@ export const formattedNum = (number, usd = false) => {
   }
 
   if (num > 1000) {
-    return Number(parseFloat(num).toFixed(0)).toLocaleString()
+    return (usd ? '$' : '') + Number(parseFloat(num).toFixed(0))
   }
 
   if (usd) {
@@ -126,42 +127,45 @@ export const formattedNum = (number, usd = false) => {
   return Number(parseFloat(num).toFixed(4))
 }
 
-export const get2DayPercentFormatted = (valueNow, value24HoursAgo, value48HoursAgo) => {
-  // get volume info for both 24 hour periods
+export function formattedPercent(percent) {
+  if (percent < 0.0001 && percent > 0) {
+    return <Text color="green">{'< 0.0001%'}</Text>
+  }
 
+  if (percent < 0 && percent > -0.0001) {
+    return <Text color="red">{'< 0.0001%'}</Text>
+  }
+
+  let fixedPercent = percent.toFixed(2)
+  if (fixedPercent === '0.00') {
+    return '0%'
+  }
+  if (fixedPercent > 0) {
+    return <Text color="green">{`+${fixedPercent}%`}</Text>
+  } else {
+    return <Text color="red">{`${fixedPercent}%`}</Text>
+  }
+}
+
+export const get2DayPercentChange = (valueNow, value24HoursAgo, value48HoursAgo) => {
+  // get volume info for both 24 hour periods
   let firstDayValue = value24HoursAgo - value48HoursAgo
   let secondDayValue = valueNow - value24HoursAgo
 
-  let percentChange = ''
-  const adjustedPercentChange =
-    (parseFloat(secondDayValue - firstDayValue) / parseFloat(firstDayValue)).toFixed(2) * 100
+  const adjustedPercentChange = (parseFloat(secondDayValue - firstDayValue) / parseFloat(firstDayValue)) * 100
 
-  if (firstDayValue === 0) {
-    return [secondDayValue, '+100']
-  }
-
-  adjustedPercentChange > 0 ? (percentChange = '+') : (percentChange = '')
-  percentChange += adjustedPercentChange
-
-  if (isNaN(percentChange) || !isFinite(percentChange)) {
+  if (isNaN(adjustedPercentChange) || !isFinite(adjustedPercentChange)) {
     return [secondDayValue, 0]
   }
-
-  return [secondDayValue, percentChange]
+  return [secondDayValue, adjustedPercentChange]
 }
 
-export const getPercentFormatted = (valueNow, value24HoursAgo) => {
-  let percentChange = ''
-  const adjustedPercentChange = ((valueNow - value24HoursAgo) / value24HoursAgo).toFixed(2) * 100
-
-  adjustedPercentChange > 0 ? (percentChange = '+') : (percentChange = '')
-  percentChange += adjustedPercentChange
-
-  if (isNaN(percentChange)) {
+export const getPercentChange = (valueNow, value24HoursAgo) => {
+  const adjustedPercentChange = ((valueNow - value24HoursAgo) / value24HoursAgo) * 100
+  if (isNaN(adjustedPercentChange)) {
     return 0
   }
-
-  return percentChange
+  return adjustedPercentChange
 }
 
 export function isEquivalent(a, b) {

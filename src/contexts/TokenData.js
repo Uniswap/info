@@ -8,7 +8,7 @@ import { useEthPrice } from './GlobalData'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 
-import { get2DayPercentFormatted, getPercentFormatted, getBlockFromTimestamp } from '../helpers'
+import { get2DayPercentChange, getPercentChange, getBlockFromTimestamp } from '../helpers'
 
 const UPDATE = 'UPDATE'
 const UPDATE_TOKEN_TXNS = 'UPDATE_TOKEN_TXNS'
@@ -130,22 +130,25 @@ const getTokenData = async (address, ethPrice) => {
   let twoDayBlock = await getBlockFromTimestamp(utcTwoDaysBack)
 
   // initialize data arrays
-  let data = []
-  let oneDayData = []
-  let twoDayData = []
+  let data = {}
+  let oneDayData = {}
+  let twoDayData = {}
 
   // fetch all current and historical data
   let result = await client.query({
     query: TOKEN_DATA(address),
     fetchPolicy: 'cache-first'
   })
-  data = result.data && result.data.tokens && result.data.tokens[0]
+  data = result?.data?.tokens?.[0]
 
+  // get results from 24 hours in past
   let oneDayResult = await client.query({
     query: TOKEN_DATA(address, oneDayBlock),
     fetchPolicy: 'cache-first'
   })
   oneDayData = oneDayResult.data.tokens[0]
+
+  // get results from 48 hours in past
   let twoDayResult = await client.query({
     query: TOKEN_DATA(address, twoDayBlock),
     fetchPolicy: 'cache-first'
@@ -153,59 +156,39 @@ const getTokenData = async (address, ethPrice) => {
   twoDayData = twoDayResult.data.tokens[0]
 
   // calculate percentage changes and daily changes
-  if (data && oneDayData && twoDayData) {
-    const [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentFormatted(
-      data.tradeVolumeUSD,
-      oneDayData.tradeVolumeUSD ? oneDayData.tradeVolumeUSD : 0,
-      twoDayData.tradeVolumeUSD ? twoDayData.tradeVolumeUSD : 0
-    )
+  const [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentChange(
+    data.tradeVolumeUSD,
+    oneDayData?.tradeVolumeUSD,
+    twoDayData?.tradeVolumeUSD
+  )
 
-    const [oneDayVolumeETH, volumeChangeETH] = get2DayPercentFormatted(
-      data.tradeVolumeETH,
-      oneDayData.tradeVolumeETH ? oneDayData.tradeVolumeETH : 0,
-      twoDayData.tradeVolumeETH ? twoDayData.tradeVolumeETH : 0
-    )
+  const [oneDayVolumeETH, volumeChangeETH] = get2DayPercentChange(
+    data.tradeVolumeETH,
+    oneDayData?.tradeVolumeETH ? oneDayData?.tradeVolumeETH : 0,
+    twoDayData?.tradeVolumeETH ? twoDayData?.tradeVolumeETH : 0
+  )
 
-    const priceChangeUSD = getPercentFormatted(data.derivedETH * ethPrice, oneDayData.derivedETH * ethPrice)
-    const priceChangeETH = getPercentFormatted(data.derivedETH, oneDayData.priceETH)
-    const liquidityChangeUSD = getPercentFormatted(data.totalLiquidityUSD, oneDayData.totalLiquidityUSD)
-    const liquidityChangeETH = getPercentFormatted(data.totalLiquidityETH, oneDayData.totalLiquidityETH)
+  const priceChangeUSD = getPercentChange(data.derivedETH, oneDayData?.derivedETH)
+  const priceChangeETH = getPercentChange(data.derivedETH, oneDayData?.priceETH)
+  const liquidityChangeUSD = getPercentChange(data.totalLiquidityUSD, oneDayData?.totalLiquidityUSD)
+  const liquidityChangeETH = getPercentChange(data.totalLiquidityETH, oneDayData?.totalLiquidityETH)
 
-    // set data
-    data.priceUSD = data.derivedETH * ethPrice
-    data.totalLiquidityUSD = data.totalLiquidity * ethPrice * data.derivedETH
-    data.oneDayVolumeUSD = oneDayVolumeUSD
-    data.oneDayVolumeETH = oneDayVolumeETH
-    data.volumeChangeUSD = volumeChangeUSD
-    data.volumeChangeETH = volumeChangeETH
-    data.priceChangeUSD = priceChangeUSD
-    data.priceChangeETH = priceChangeETH
-    data.liquidityChangeUSD = liquidityChangeUSD
-    data.liquidityChangeETH = liquidityChangeETH
-  } else if (data && !oneDayData) {
-    // new tokens
-    data.priceUSD = data.derivedETH * ethPrice
-    data.totalLiquidityUSD = data.totalLiquidity * ethPrice * data.derivedETH
+  // set data
+  data.priceUSD = data.derivedETH * ethPrice
+  data.totalLiquidityUSD = data.totalLiquidity * ethPrice * data.derivedETH
+  data.oneDayVolumeUSD = oneDayVolumeUSD
+  data.oneDayVolumeETH = oneDayVolumeETH
+  data.volumeChangeUSD = volumeChangeUSD
+  data.volumeChangeETH = volumeChangeETH
+  data.priceChangeUSD = priceChangeUSD
+  data.priceChangeETH = priceChangeETH
+  data.liquidityChangeUSD = liquidityChangeUSD
+  data.liquidityChangeETH = liquidityChangeETH
+
+  // new tokens
+  if (!oneDayData && data) {
     data.oneDayVolumeUSD = data.tradeVolumeUSD
     data.oneDayVolumeETH = data.tradeVolume * data.derivedETH
-    data.volumeChangeUSD = 100
-    data.volumeChangeETH = 100
-    data.priceChangeUSD = 100
-    data.priceChangeETH = 100
-    data.liquidityChangeUSD = 100
-    data.liquidityChangeETH = 100
-  } else {
-    // new tokens with no txns yet
-    data.priceUSD = 0
-    data.totalLiquidityUSD = 0
-    data.oneDayVolumeETH = 0
-    data.oneDayVolumeUSD = 0
-    data.volumeChangeUSD = 0
-    data.volumeChangeETH = 0
-    data.priceChangeUSD = 0
-    data.priceChangeETH = 0
-    data.liquidityChangeUSD = 0
-    data.liquidityChangeETH = 0
   }
 
   return data

@@ -10,8 +10,7 @@ import Row from '../Row'
 import LocalLoader from '../LocalLoader'
 import { Divider } from '..'
 
-import { useCurrentCurrency } from '../../contexts/Application'
-import { formattedNum } from '../../helpers'
+import { formattedNum, formattedPercent } from '../../helpers'
 import { useMedia } from 'react-use'
 
 dayjs.extend(utc)
@@ -134,8 +133,6 @@ function TopTokenList({ tokens }) {
   const [sortedColumn, setSortedColumn] = useState(SORT_FIELD.LIQ)
   const [filteredItems, setFilteredItems] = useState()
 
-  const [currency] = useCurrentCurrency()
-
   const below1080 = useMedia('(max-width: 1080px)')
   const below680 = useMedia('(max-width: 680px)')
 
@@ -197,24 +194,12 @@ function TopTokenList({ tokens }) {
         )} */}
         {!below1080 && (
           <DataText area="price" color="text" fontWeight="500">
-            {currency === 'ETH' ? 'Ξ ' + formattedNum(item.derivedETH) : formattedNum(item.priceUSD, true)}
+            {formattedNum(item.priceUSD, true)}
           </DataText>
         )}
-        <DataText area="liq">
-          {currency === 'ETH'
-            ? 'Ξ ' + formattedNum(item.totalLiquidityETH)
-            : formattedNum(item.totalLiquidityUSD, true)}
-        </DataText>
-        <DataText area="vol">
-          {currency === 'ETH'
-            ? 'Ξ ' + formattedNum(item.oneDayVolumeETH, true)
-            : formattedNum(item.oneDayVolumeUSD, true)}
-        </DataText>
-        {!below1080 && (
-          <DataText area="change">
-            {currency === 'ETH' ? formattedNum(item.priceChangeETH) : formattedNum(item.priceChangeUSD)}%
-          </DataText>
-        )}
+        <DataText area="liq">{formattedNum(item.totalLiquidityUSD, true)}</DataText>
+        <DataText area="vol">{formattedNum(item.oneDayVolumeUSD, true)}</DataText>
+        {!below1080 && <DataText area="change">{formattedPercent(item.priceChangeUSD)}</DataText>}
       </DashGrid>
     )
   }

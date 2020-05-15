@@ -39,23 +39,14 @@ const GlobalChart = ({ chartData, display }) => {
       ) : (
         <RowBetween marginBottom={'10px'}>
           <Row>
-            {display === 'volume' ? (
-              <OptionButton
-                style={{ marginRight: '10px' }}
-                active={chartView === CHART_VIEW.LIQUIDITY}
-                onClick={() => setChartView(CHART_VIEW.LIQUIDITY)}
-              >
-                <TYPE.main fontSize={'1rem'}>Liquidity</TYPE.main>
-              </OptionButton>
-            ) : (
-              <OptionButton
-                style={{ marginRight: '10px' }}
-                active={chartView === CHART_VIEW.VOLUME}
-                onClick={() => setChartView(CHART_VIEW.VOLUME)}
-              >
-                <TYPE.main fontSize={'1rem'}>Volume</TYPE.main>
-              </OptionButton>
-            )}
+            <OptionButton
+              style={{ marginRight: '10px' }}
+              active={chartView === CHART_VIEW.LIQUIDITY}
+              onClick={!display ? toggleView : () => {}}
+              disabled={!!display}
+            >
+              <TYPE.main fontSize={'1rem'}>{chartView}</TYPE.main>
+            </OptionButton>
           </Row>
           <Row justify="flex-end">
             <OptionButton
@@ -183,8 +174,8 @@ const GlobalChart = ({ chartData, display }) => {
 
             <Tooltip
               cursor={{ fill: '#ff007a', opacity: 0.1 }}
-              formatter={val => toK(val, true)}
-              labelFormatter={label => '$' + toNiceDateYear(label)}
+              formatter={val => '$' + toK(val, true)}
+              labelFormatter={label => toNiceDateYear(label)}
               labelStyle={{ paddingTop: 4 }}
               contentStyle={{
                 padding: '10px 14px',
@@ -198,10 +189,10 @@ const GlobalChart = ({ chartData, display }) => {
               type="monotone"
               name={'Volume'}
               dataKey={'dailyVolumeUSD'}
-              fill="#ff007a40"
+              fill="#ff007a80"
               opacity={'1'}
               yAxisId={0}
-              stroke="#ff007a80"
+              stroke={'#ff007a'}
             />
           </BarChart>
         </ResponsiveContainer>
