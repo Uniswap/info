@@ -6,11 +6,11 @@ import { Text, Flex } from 'rebass'
 import { useTokenData } from '../../contexts/TokenData'
 import { usePairData } from '../../contexts/PairData'
 import Link from '../Link'
-import Row, { RowFixed } from '../Row'
+import { RowFixed } from '../Row'
 import Logo from '../../assets/logo.svg'
 import Wordmark from '../../assets/wordmark.svg'
-import LogoDark from '../../assets/logo_white.svg'
-import WordmarkDark from '../../assets/wordmark_white.svg'
+// import LogoDark from '../../assets/logo_white.svg'
+// import WordmarkDark from '../../assets/wordmark_white.svg'
 
 import { useMedia } from 'react-use'
 
@@ -26,19 +26,6 @@ const UniIcon = styled(Link)`
   transition: transform 0.3s ease;
   :hover {
     transform: rotate(-5deg);
-  }
-`
-
-const TitleText = styled(Row)`
-  width: fit-content;
-  white-space: nowrap;
-  font-size: 1.25rem;
-  font-weight: 800;
-  line-height: 32px;
-
-  @media screen and (max-width: 1080px) {
-    font-size: 1.25rem;
-    line-height: normal;
   }
 `
 
