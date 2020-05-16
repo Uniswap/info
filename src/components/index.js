@@ -1,10 +1,10 @@
-import React from "react"
-import styled from "styled-components"
-import { Text, Box } from "rebass"
+import React from 'react'
+import styled from 'styled-components'
+import { Text, Box } from 'rebass'
 
-import Link from "./Link"
+import Link from './Link'
 
-import { urls } from "../helpers"
+import { urls } from '../helpers'
 
 const Divider = styled(Box)`
   height: 1px;
@@ -22,7 +22,7 @@ const Address = ({ address, token, ...rest }) => (
     color="button"
     href={token ? urls.showToken(address) : urls.showAddress(address)}
     external
-    style={{ wordBreak: "break-all" }}
+    style={{ wordBreak: 'break-all' }}
     {...rest}
   >
     {address}

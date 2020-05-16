@@ -1,13 +1,13 @@
-import React from "react"
-import { Link as RebassLink } from "rebass"
-import { Link as RouterLink } from "react-router-dom"
-import PropTypes from "prop-types"
-import styled from "styled-components"
+import React from 'react'
+import { Link as RebassLink } from 'rebass'
+import { Link as RouterLink } from 'react-router-dom'
+import PropTypes from 'prop-types'
+import styled from 'styled-components'
 
 const Link = ({ external, children, ...rest }) => (
   <RebassLink
-    target={external ? "_blank" : null}
-    rel={external ? "noopener noreferrer" : null}
+    target={external ? '_blank' : null}
+    rel={external ? 'noopener noreferrer' : null}
     color="#2f80ed"
     {...rest}
   >
