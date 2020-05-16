@@ -1,26 +1,18 @@
-import React from "react"
-import ReactDOM from "react-dom"
+import React from 'react'
+import ReactDOM from 'react-dom'
 
-import ThemeProvider, { GlobalStyle } from "./Theme"
+import ThemeProvider, { GlobalStyle } from './Theme'
 
-import LocalStorageContextProvider, {
-  Updater as LocalStorageContextUpdater
-} from "./contexts/LocalStorage"
+import LocalStorageContextProvider, { Updater as LocalStorageContextUpdater } from './contexts/LocalStorage'
 
-import TokenDataContextProvider, {
-  Updater as TokenDataContextUpdater
-} from "./contexts/TokenData"
+import TokenDataContextProvider, { Updater as TokenDataContextUpdater } from './contexts/TokenData'
 
-import GlobalDataContextProvider, {
-  Updater as GlobalDataContextUpdater
-} from "./contexts/GlobalData"
+import GlobalDataContextProvider from './contexts/GlobalData'
 
-import PairDataContextProvider, {
-  Updater as PairDataContextUpdater
-} from "./contexts/PairData"
-import ApplicationContextProvider from "./contexts/Application"
+import PairDataContextProvider, { Updater as PairDataContextUpdater } from './contexts/PairData'
+import ApplicationContextProvider from './contexts/Application'
 
-import App from "./App"
+import App from './App'
 
 function ContextProviders({ children }) {
   return (
@@ -42,7 +34,6 @@ function Updaters() {
       <LocalStorageContextUpdater />
       <PairDataContextUpdater />
       <TokenDataContextUpdater />
-      <GlobalDataContextUpdater />
     </>
   )
 }
@@ -57,5 +48,5 @@ ReactDOM.render(
       </>
     </ThemeProvider>
   </ContextProviders>,
-  document.getElementById("root")
+  document.getElementById('root')
 )

@@ -9,7 +9,7 @@ import { BasicLink } from '../Link'
 import { useAllTokenData } from '../../contexts/TokenData'
 import { useAllPairs } from '../../contexts/PairData'
 import DoubleTokenLogo from '../DoubleLogo'
-import { useMedia, usePrevious } from 'react-use'
+import { useMedia } from 'react-use'
 
 const Wrapper = styled.div`
   display: flex;

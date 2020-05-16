@@ -4,6 +4,8 @@ import { client } from '../apollo/client'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { getPercentChange, getBlockFromTimestamp, get2DayPercentChange } from '../helpers'
+import { useTimeframe } from './Application'
+import { timeframeOptions } from '../constants'
 
 const UPDATE = 'UPDATE'
 const UPDATE_TXNS = 'UPDATE_TXNS'
@@ -25,18 +27,7 @@ function reducer(state, { type, payload }) {
       const { data } = payload
       return {
         ...state,
-        totalVolumeUSD: data.totalVolumeUSD,
-        totalVolumeETH: data.totalVolumeETH,
-        totalLiquidityUSD: data.totalLiquidityUSD,
-        totalLiquidityETH: data.totalLiquidityETH,
-        oneDayVolumeUSD: data.oneDayVolumeUSD,
-        oneDayVolumeETH: data.oneDayVolumeETH,
-        volumeChangeUSD: data.volumeChangeUSD,
-        volumeChangeETH: data.volumeChangeETH,
-        liquidityChangeUSD: data.liquidityChangeUSD,
-        liquidityChangeETH: data.liquidityChangeETH,
-        oneDayTxns: data.oneDayTxns,
-        txnChange: data.txnChange
+        globalData: data
       }
     }
     case UPDATE_TXNS: {
@@ -179,13 +170,30 @@ async function getGlobalData(ethPrice) {
   return data
 }
 
-const getChartData = async () => {
+const getChartData = async activeWindow => {
   const utcEndTime = dayjs.utc()
-  let utcStartTime = utcEndTime.subtract(1, 'year')
+
+  // based on window, get starttime
+  let utcStartTime
+  switch (activeWindow) {
+    case timeframeOptions.WEEK:
+      utcStartTime = utcEndTime.subtract(1, 'week').startOf('day')
+      break
+    case timeframeOptions.ALL_TIME:
+      utcStartTime = utcEndTime.subtract(1, 'year')
+      break
+    default:
+      utcStartTime = utcEndTime.subtract(1, 'year').startOf('year')
+      break
+  }
   let startTime = utcStartTime.unix() - 1
+
   let result = await client.query({
     query: GLOBAL_CHART,
-    fetchPolicy: 'network-only'
+    variables: {
+      startTime
+    },
+    fetchPolicy: 'cache-first'
   })
   let data = result.data.uniswapDayDatas
   let dayIndexSet = new Set()
@@ -222,6 +230,7 @@ const getChartData = async () => {
   }
 
   data = data.sort((a, b) => (parseInt(a.date) > parseInt(b.date) ? 1 : -1))
+
   return data
 }
 
@@ -275,40 +284,56 @@ const getEthPrice = async () => {
   return [result?.data?.bundles[0]?.ethPrice, priceChangeETH]
 }
 
-export function Updater() {
-  const [, { update, updateTransactions, updateChart }] = useGlobalDataContext()
+export function useGlobalData() {
+  const [state, { update }] = useGlobalDataContext()
   const ethPrice = useEthPrice()
+
+  const data = state?.globalData
+
   useEffect(() => {
     async function fetchData() {
-      let globalData = await getGlobalData(ethPrice)
-      globalData && update(globalData)
-
-      // txn data
-      let txns = await getGlobalTransactions()
-      updateTransactions(txns)
-
-      // historical stuff for chart
-      let chartData = await getChartData()
-      chartData && updateChart(chartData)
-    }
-    ethPrice && fetchData()
-  }, [update, updateTransactions, updateChart, ethPrice])
-  return null
-}
-
-export function useGlobalData() {
-  const [state, { updateChart }] = useGlobalDataContext()
-  useEffect(() => {
-    async function checkChartData() {
-      if (!state.chartData) {
-        getChartData().then(chartData => {
-          updateChart(chartData)
-        })
+      if (!data && ethPrice) {
+        let globalData = await getGlobalData(ethPrice)
+        globalData && update(globalData)
       }
     }
-    checkChartData()
-  }, [state, updateChart])
-  return state
+    fetchData()
+  }, [ethPrice, update, data])
+
+  return data || {}
+}
+
+export function useGlobalChartData() {
+  const [state, { updateChart }] = useGlobalDataContext()
+  const [activeWindow] = useTimeframe()
+
+  const chartData = state?.chartData
+
+  useEffect(() => {
+    async function fetchData() {
+      // historical stuff for chart
+      let chartData = await getChartData(activeWindow)
+      chartData && updateChart(chartData)
+    }
+    activeWindow && fetchData()
+  }, [activeWindow, updateChart, chartData])
+
+  return chartData
+}
+
+export function useGlobalTransactions() {
+  const [state, { updateTransactions }] = useGlobalDataContext()
+  const transactions = state?.transactions
+  useEffect(() => {
+    async function fetchData() {
+      if (!transactions) {
+        let txns = await getGlobalTransactions()
+        updateTransactions(txns)
+      }
+    }
+    fetchData()
+  }, [updateTransactions, transactions])
+  return transactions
 }
 
 export function useEthPrice() {

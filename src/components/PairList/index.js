@@ -57,8 +57,13 @@ const DashGrid = styled.div`
   }
 
   @media screen and (min-width: 740px) {
-    grid-template-columns: 1.5fr 1fr 1fr 1fr;
-    grid-template-areas: 'name liq vol supply';
+    grid-template-columns: 1.5fr 1fr 1fr 180px 140px;
+    grid-template-areas: 'name liq vol supply swap';
+  }
+
+  @media screen and (min-width: 1080px) {
+    grid-template-columns: 1.5fr 1fr 1fr 1fr 180px 140px;
+    grid-template-areas: 'name liq vol txCount supply swap';
   }
 `
 
@@ -96,6 +101,7 @@ function PairList({ pairs }) {
   const allPairData = useAllPairs()
 
   const below740 = useMedia('(max-width: 740px)')
+  const below1080 = useMedia('(max-width: 1080px)')
 
   // pagination
   const [page, setPage] = useState(1)
@@ -156,14 +162,22 @@ function PairList({ pairs }) {
           </CustomLink>
         </DataText>
         <DataText area="liq">{liquidity}</DataText>
-        <>
-          <DataText area="vol">{volume}</DataText>
-        </>
+        <DataText area="vol">{volume}</DataText>
+        {!below1080 && <DataText area="txCount">{itemData.oneDayTxns}</DataText>}
         {!below740 && (
           <DataText area="supply">
             <ButtonFaded>
               <Link external href={''}>
                 + Join Pool
+              </Link>
+            </ButtonFaded>
+          </DataText>
+        )}
+        {!below740 && (
+          <DataText area="swap">
+            <ButtonFaded>
+              <Link external href={''}>
+                Swap Tokens
               </Link>
             </ButtonFaded>
           </DataText>
@@ -205,9 +219,19 @@ function PairList({ pairs }) {
             </ClickableText>
           </Flex>
         </>
+        {!below1080 && (
+          <Flex alignItems="center">
+            <Text area="txCount">Transactions (24hrs)</Text>
+          </Flex>
+        )}
         {!below740 && (
           <Flex alignItems="center">
             <Text area="supply">Supply</Text>
+          </Flex>
+        )}
+        {!below740 && (
+          <Flex alignItems="center">
+            <Text area="swap">Swap</Text>
           </Flex>
         )}
       </DashGrid>

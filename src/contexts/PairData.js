@@ -132,7 +132,7 @@ const getPairData = async (address, ethPrice) => {
   let data = []
   let result = await client.query({
     query: PAIR_DATA(address),
-    fetchPolicy: 'no-cache'
+    fetchPolicy: 'cache-first'
   })
   data = result.data && result.data.pairs && result.data.pairs[0]
   let oneDayData = []
@@ -140,51 +140,48 @@ const getPairData = async (address, ethPrice) => {
 
   let oneDayResult = await client.query({
     query: PAIR_DATA(address, oneDayBlock),
-    fetchPolicy: 'no-cache'
+    fetchPolicy: 'cache-first'
   })
   oneDayData = oneDayResult.data.pairs[0]
   let twoDayResult = await client.query({
     query: PAIR_DATA(address, twoDayBlock),
-    fetchPolicy: 'no-cache'
+    fetchPolicy: 'cache-first'
   })
   twoDayData = twoDayResult.data.pairs[0]
-  if (data && oneDayData && twoDayData) {
-    const [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentChange(
-      data.volumeUSD,
-      oneDayData.volumeUSD ? oneDayData.volumeUSD : 0,
-      twoDayData.volumeUSD ? twoDayData.volumeUSD : 0
-    )
-    const [oneDayVolumeETH, volumeChangeETH] = get2DayPercentChange(
-      data.tradeVolumeETH,
-      oneDayData.tradeVolumeETH ? oneDayData.tradeVolumeETH : 0,
-      twoDayData.tradeVolumeETH ? twoDayData.tradeVolumeETH : 0
-    )
 
-    const liquidityChangeUSD = getPercentChange(data.reserveUSD, oneDayData.reserveUSD)
-    const liquidityChangeETH = getPercentChange(data.reserveUSD, oneDayData.reserveUSD)
+  const [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentChange(
+    data.volumeUSD,
+    oneDayData?.volumeUSD ? oneDayData?.volumeUSD : 0,
+    twoDayData?.volumeUSD ? twoDayData?.volumeUSD : 0
+  )
+  const [oneDayVolumeETH, volumeChangeETH] = get2DayPercentChange(
+    data.tradeVolumeETH,
+    oneDayData?.tradeVolumeETH ? oneDayData?.tradeVolumeETH : 0,
+    twoDayData?.tradeVolumeETH ? twoDayData?.tradeVolumeETH : 0
+  )
 
-    data.reserveUSD = data.reserveETH ? data.reserveETH * ethPrice : data.reserveUSD
-    data.oneDayVolumeUSD = oneDayVolumeUSD
-    data.oneDayVolumeETH = oneDayVolumeETH
-    data.volumeChangeUSD = volumeChangeUSD
-    data.volumeChangeETH = volumeChangeETH
-    data.liquidityChangeUSD = liquidityChangeUSD
-    data.liquidityChangeETH = liquidityChangeETH
-  } else if (data && !oneDayData) {
-    // no historical values yet
-    data.oneDayVolumeUSD = data.volumeUSD
-    data.oneDayVolumeETH = 0
-    data.volumeChangeUSD = 100
-    data.volumeChangeETH = 100
-    data.liquidityChangeUSD = 100
-    data.liquidityChangeETH = 100
-  } else {
-    data.oneDayVolumeUSD = 0
-    data.oneDayVolumeETH = 0
-    data.volumeChangeUSD = 0
-    data.volumeChangeETH = 0
-    data.liquidityChangeUSD = 0
-    data.liquidityChangeETH = 0
+  const [oneDayTxns] = get2DayPercentChange(
+    data.txCount,
+    oneDayData?.txCount ? oneDayData?.txCount : 0,
+    twoDayData?.txCount ? twoDayData?.txCount : 0
+  )
+
+  const liquidityChangeUSD = getPercentChange(data.reserveUSD, oneDayData?.reserveUSD)
+  const liquidityChangeETH = getPercentChange(data.reserveUSD, oneDayData?.reserveUSD)
+
+  data.reserveUSD = data.reserveETH ? data.reserveETH * ethPrice : data.reserveUSD
+  data.oneDayVolumeUSD = oneDayVolumeUSD
+  data.oneDayVolumeETH = oneDayVolumeETH
+  data.volumeChangeUSD = volumeChangeUSD
+  data.volumeChangeETH = volumeChangeETH
+  data.liquidityChangeUSD = liquidityChangeUSD
+  data.liquidityChangeETH = liquidityChangeETH
+  data.oneDayTxns = oneDayTxns
+
+  // new tokens
+  if (!oneDayData && data) {
+    data.oneDayVolumeUSD = data.tradeVolumeUSD
+    data.oneDayVolumeETH = data.tradeVolume * data.derivedETH
   }
 
   return data

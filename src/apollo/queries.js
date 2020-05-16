@@ -102,8 +102,9 @@ export const PAIR_DATA = (pairAddress, block) => {
     ? `
     query pairs {
       pairs(block: {number: ${block} 
-      } where: { id: "${pairAddress}"}) {
+      } where: { id: "${pairAddress}"} ) {
         id
+        txCount
         token0 {
           id
           symbol
@@ -130,6 +131,7 @@ export const PAIR_DATA = (pairAddress, block) => {
       pairAddress +
       `"}) {
         id
+        txCount
         token0 {
           id
           symbol
@@ -155,8 +157,8 @@ export const PAIR_DATA = (pairAddress, block) => {
 }
 
 export const GLOBAL_CHART = gql`
-  query uniswapDayDatas {
-    uniswapDayDatas(orderBy: date, orderDirection: asc) {
+  query uniswapDayDatas($startTime: Int!) {
+    uniswapDayDatas(where: { date_gt: $startTime }, orderBy: date, orderDirection: asc) {
       id
       date
       totalVolumeUSD

@@ -168,14 +168,14 @@ const getTokenData = async (address, ethPrice) => {
     twoDayData?.tradeVolumeETH ? twoDayData?.tradeVolumeETH : 0
   )
 
-  const priceChangeUSD = getPercentChange(data.derivedETH, oneDayData?.derivedETH)
-  const priceChangeETH = getPercentChange(data.derivedETH, oneDayData?.priceETH)
-  const liquidityChangeUSD = getPercentChange(data.totalLiquidityUSD, oneDayData?.totalLiquidityUSD)
-  const liquidityChangeETH = getPercentChange(data.totalLiquidityETH, oneDayData?.totalLiquidityETH)
+  const priceChangeUSD = getPercentChange(data?.derivedETH, oneDayData?.derivedETH)
+  const priceChangeETH = getPercentChange(data?.derivedETH, oneDayData?.priceETH)
+  const liquidityChangeUSD = getPercentChange(data?.totalLiquidityUSD, oneDayData?.totalLiquidityUSD)
+  const liquidityChangeETH = getPercentChange(data?.totalLiquidityETH, oneDayData?.totalLiquidityETH)
 
   // set data
-  data.priceUSD = data.derivedETH * ethPrice
-  data.totalLiquidityUSD = data.totalLiquidity * ethPrice * data.derivedETH
+  data.priceUSD = data?.derivedETH * ethPrice
+  data.totalLiquidityUSD = data?.totalLiquidity * ethPrice * data?.derivedETH
   data.oneDayVolumeUSD = oneDayVolumeUSD
   data.oneDayVolumeETH = oneDayVolumeETH
   data.volumeChangeUSD = volumeChangeUSD

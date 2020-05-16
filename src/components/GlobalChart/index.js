@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { Area, XAxis, YAxis, ResponsiveContainer, Tooltip, AreaChart, BarChart, Bar, CartesianGrid } from 'recharts'
 import Row, { RowBetween } from '../Row'
 import { toK, toNiceDate, toNiceDateYear } from '../../helpers'
@@ -57,13 +57,6 @@ const GlobalChart = ({ chartData, display }) => {
               1 Week
             </OptionButton>
             <OptionButton
-              style={{ marginRight: '10px' }}
-              active={activeWindow === timeframeOptions.MONTH}
-              onClick={() => setActiveWindow(timeframeOptions.MONTH)}
-            >
-              1 Month
-            </OptionButton>
-            <OptionButton
               active={activeWindow === timeframeOptions.ALL_TIME}
               onClick={() => setActiveWindow(timeframeOptions.ALL_TIME)}
             >
@@ -101,7 +94,7 @@ const GlobalChart = ({ chartData, display }) => {
               tickFormatter={tick => '$' + toK(tick)}
               axisLine={true}
               tickLine={true}
-              interval={0}
+              interval="preserveEnd"
               minTickGap={50}
               yAxisId={0}
               mirror={true}
@@ -136,6 +129,7 @@ const GlobalChart = ({ chartData, display }) => {
               name={'Liquidity'}
               yAxisId={0}
               fill="url(#colorUv)"
+              isAnimationActive={false}
             />
           </AreaChart>
         </ResponsiveContainer>
@@ -171,7 +165,6 @@ const GlobalChart = ({ chartData, display }) => {
               orientation={'right'}
             />
             <CartesianGrid strokeDasharray="3 3" />
-
             <Tooltip
               cursor={{ fill: '#ff007a', opacity: 0.1 }}
               formatter={val => '$' + toK(val, true)}
@@ -193,6 +186,7 @@ const GlobalChart = ({ chartData, display }) => {
               opacity={'1'}
               yAxisId={0}
               stroke={'#ff007a'}
+              isAnimationActive={false}
             />
           </BarChart>
         </ResponsiveContainer>

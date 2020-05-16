@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState } from 'react'
 import 'feather-icons'
 import { Box } from 'rebass'
 import styled from 'styled-components'
@@ -11,7 +11,7 @@ import TxnList from '../components/TxnList'
 import GlobalChart from '../components/GlobalChart'
 import { Hover, TYPE } from '../Theme'
 import { formattedNum, formattedPercent } from '../helpers'
-import { useGlobalData, useEthPrice } from '../contexts/GlobalData'
+import { useGlobalData, useEthPrice, useGlobalChartData, useGlobalTransactions } from '../contexts/GlobalData'
 import { useAllTokenData } from '../contexts/TokenData'
 import { useAllPairs } from '../contexts/PairData'
 import { Search } from '../components/Search'
@@ -111,10 +111,12 @@ function GlobalPage() {
     volumeChangeUSD,
     liquidityChangeUSD,
     oneDayTxns,
-    txnChange,
-    transactions,
-    chartData
+    txnChange
   } = useGlobalData()
+
+  const chartData = useGlobalChartData()
+
+  const transactions = useGlobalTransactions()
 
   const allTokenData = useAllTokenData()
   const pairs = useAllPairs()
@@ -175,7 +177,7 @@ function GlobalPage() {
                     </RowBetween>
                     <RowBetween align="flex-end">
                       <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
-                        {oneDayTxns ? oneDayTxns : '-'}
+                        {!!oneDayTxns ? oneDayTxns : '-'}
                       </TYPE.main>
                       <TYPE.main>{txnChangeFormatted && txnChangeFormatted}</TYPE.main>
                     </RowBetween>
@@ -257,7 +259,7 @@ function GlobalPage() {
       )}
       {!below1080 && (
         <GridRow style={{ marginTop: '6px' }}>
-          <Panel style={{ height: '100%' }}>
+          <Panel style={{ height: '100%', minHeight: '300px' }}>
             <ChartWrapper area="fill" rounded>
               <GlobalChart chartData={chartData} display="liquidity" />
             </ChartWrapper>
@@ -274,23 +276,23 @@ function GlobalPage() {
           <Hover>
             <TYPE.main
               onClick={() => {
-                setListView(LIST_VIEW.TOKENS)
-              }}
-              fontSize={'1rem'}
-              color={listView === LIST_VIEW.PAIRS ? '#aeaeae' : 'black'}
-            >
-              Tokens
-            </TYPE.main>
-          </Hover>
-          <Hover>
-            <TYPE.main
-              onClick={() => {
                 setListView(LIST_VIEW.PAIRS)
               }}
               fontSize={'1rem'}
               color={listView === LIST_VIEW.TOKENS ? '#aeaeae' : 'black'}
             >
               Pairs
+            </TYPE.main>
+          </Hover>
+          <Hover>
+            <TYPE.main
+              onClick={() => {
+                setListView(LIST_VIEW.TOKENS)
+              }}
+              fontSize={'1rem'}
+              color={listView === LIST_VIEW.PAIRS ? '#aeaeae' : 'black'}
+            >
+              Tokens
             </TYPE.main>
           </Hover>
         </ListOptions>

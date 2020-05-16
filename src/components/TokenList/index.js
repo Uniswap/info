@@ -73,8 +73,8 @@ const DashGrid = styled.div`
   @media screen and (min-width: 1080px) {
     display: grid;
     grid-gap: 1em;
-    grid-template-columns: 1.5fr 0.6fr 1fr 1fr 1fr;
-    grid-template-areas: 'name price liq vol change';
+    grid-template-columns: 1.5fr 0.6fr 1fr 1fr 1fr 1fr;
+    grid-template-areas: 'name symbol price liq vol change';
   }
 `
 
@@ -187,11 +187,11 @@ function TopTokenList({ tokens }) {
             </CustomLink>
           </Row>
         </DataText>
-        {/* {!below680 && (
+        {!below680 && (
           <DataText area="symbol" color="text" fontWeight="500">
             {item.symbol}
           </DataText>
-        )} */}
+        )}
         {!below1080 && (
           <DataText area="price" color="text" fontWeight="500">
             {formattedNum(item.priceUSD, true)}
@@ -217,10 +217,10 @@ function TopTokenList({ tokens }) {
               setSortDirection(!sortDirection)
             }}
           >
-            Name {sortedColumn === SORT_FIELD.NAME ? (!sortDirection ? '↑' : '↓') : ''}
+            {below680 ? 'Symbol' : 'Name'} {sortedColumn === SORT_FIELD.NAME ? (!sortDirection ? '↑' : '↓') : ''}
           </ClickableText>
         </Flex>
-        {/* {!below680 && (
+        {!below680 && (
           <Flex alignItems="center">
             <ClickableText
               area="symbol"
@@ -232,7 +232,7 @@ function TopTokenList({ tokens }) {
               Symbol {sortedColumn === SORT_FIELD.SYMBOL ? (!sortDirection ? '↑' : '↓') : ''}
             </ClickableText>
           </Flex>
-        )} */}
+        )}
         {!below1080 && (
           <Flex alignItems="center">
             <ClickableText
