@@ -1,49 +1,34 @@
+import React from 'react'
 import { BigNumber } from 'bignumber.js'
 import dayjs from 'dayjs'
-import { client } from '../apollo/client'
-import { ExportToCsv } from 'export-to-csv'
 import { ethers } from 'ethers'
 import utc from 'dayjs/plugin/utc'
-
-import { TRANSACTIONS_QUERY_SKIPPABLE } from '../apollo/queries'
+import { blockClient } from '../apollo/client'
+import { GET_BLOCK } from '../apollo/queries'
+import { Text } from 'rebass'
 
 BigNumber.set({ EXPONENTIAL_AT: 50 })
 
 dayjs.extend(utc)
 
 export const toNiceDate = date => {
-  return dayjs.utc(dayjs.unix(date)).format('MMM DD')
+  // let df = new Date(date * 1000).toUTCString('MMMM DD')
+  let x = dayjs.utc(dayjs.unix(date)).format('MMM DD')
+  return x
 }
 
-export const toMonthlyDate = date => {
-  return dayjs.utc(dayjs.unix(date)).format('MMM')
-}
-
-export const toWeeklyDate = date => {
-  const formatted = dayjs.utc(dayjs.unix(date))
-  date = new Date(formatted)
-  const day = new Date(formatted).getDay()
-  var lessDays = day === 0 ? 6 : day - 1
-  var wkStart = new Date(new Date(date).setDate(date.getDate() - lessDays))
-  var wkEnd = new Date(new Date(wkStart).setDate(wkStart.getDate() + 6))
-
-  return dayjs.utc(wkStart).format('MMM DD') + ' - ' + dayjs.utc(wkEnd).format('MMM DD')
+export async function getBlockFromTimestamp(timestamp) {
+  let result = await blockClient.query({
+    query: GET_BLOCK,
+    variables: {
+      timestamp: timestamp
+    },
+    fetchPolicy: 'cache-first'
+  })
+  return result?.data?.blocks?.[0]?.number
 }
 
 export const toNiceDateYear = date => dayjs.utc(dayjs.unix(date)).format('MMMM DD, YYYY')
-
-export const toMonthlyYear = date => dayjs.utc(dayjs.unix(date)).format('MMMM YYYY')
-
-export const toWeeklyYear = date => {
-  const formatted = dayjs.utc(dayjs.unix(date))
-  date = new Date(formatted)
-  const day = new Date(formatted).getDay()
-  var lessDays = day === 0 ? 6 : day - 1
-  var wkStart = new Date(new Date(date).setDate(date.getDate() - lessDays))
-  var wkEnd = new Date(new Date(wkStart).setDate(wkStart.getDate() + 6))
-
-  return dayjs.utc(wkStart).format('MMM DD YYYY') + ' - ' + dayjs.utc(wkEnd).format('MMM DD YYYY')
-}
 
 export const isAddress = value => {
   try {
@@ -53,28 +38,13 @@ export const isAddress = value => {
   }
 }
 
-export const isWeb3Available = async () => {
-  /* eslint-disable */
-  if (typeof window.ethereum !== 'undefined') {
-    window.web3 = new Web3(ethereum)
-    try {
-      await ethereum.enable()
-      return true
-    } catch (error) {
-      return false
-    }
-  } else if (typeof window.web3 !== 'undefined') {
-    window.web3 = new Web3(web3.currentProvider)
-    return true
-  } else {
-    return false
-  }
-  /* eslint-enable */
-}
-
-export const toK = (num, fixed) => {
-  const formatter = divideBy => (fixed === true ? Number(num / divideBy).toFixed(4) : Number(num / divideBy))
-
+export const toK = (num, fixed, cutoff = false) => {
+  const formatter = divideBy =>
+    fixed === true
+      ? cutoff
+        ? Number(num / divideBy).toFixed(0)
+        : Number(num / divideBy).toFixed(4)
+      : Number(num / divideBy)
   if (num > 999999 || num < -999999) {
     return `${formatter(1000000)}M`
   } else if (num > 999 || num < -999) {
@@ -119,56 +89,6 @@ export const formatNumber = num => {
   return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
 }
 
-export const getAllTransactions = async address => {
-  // current time
-  const utcEndTime = dayjs.utc()
-  let utcStartTime
-  utcStartTime = utcEndTime.subtract(2, 'year').startOf('day')
-  let startTime = utcStartTime.unix() - 1 // -1 because we filter on greater than in the query
-  let data = []
-  let skipCount = 0
-  let fetchingData = true
-
-  while (fetchingData) {
-    let result = await client.query({
-      query: TRANSACTIONS_QUERY_SKIPPABLE,
-      variables: {
-        exchangeAddr: address,
-        skip: skipCount
-      },
-      fetchPolicy: 'network-only'
-    })
-    if (result) {
-      skipCount = skipCount + 100
-      if (result.data.transactions.length === 0) {
-        fetchingData = false
-      } else if (result.data.transactions[result.data.transactions.length - 1].timestamp < startTime) {
-        fetchingData = false
-      }
-      data = data.concat(result.data.transactions)
-    }
-  }
-
-  const options = {
-    fieldSeparator: ',',
-    quoteStrings: '"',
-    decimalSeparator: '.',
-    showLabels: true,
-    showTitle: true,
-    title: 'My Awesome CSV',
-    useTextFile: false,
-    useBom: true,
-    useKeysAsHeaders: true
-    // headers: ['Column 1', 'Column 2', etc...] <-- Won't work with useKeysAsHeaders present!
-  }
-  let csvdata = []
-  Object.keys(data).map(index => {
-    return csvdata.push(data[index])
-  })
-  const csvExporter = new ExportToCsv(options)
-  csvExporter.generateCsv(data)
-}
-
 // using a currency library here in case we want to add more in future
 var priceFormatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
@@ -176,58 +96,89 @@ var priceFormatter = new Intl.NumberFormat('en-US', {
 })
 
 export const formattedNum = (number, usd = false) => {
-  if (isNaN(number) || number === '') {
+  if (isNaN(number) || number === '' || number === undefined) {
     return ''
   }
   let num = parseFloat(number)
   if (num === 0) {
+    if (usd) {
+      return '$0'
+    }
     return 0
   }
   if (num < 0.0001) {
-    return '< 0.0001'
+    return usd ? '< $0.0001' : '< 0.0001'
   }
 
   if (num > 1000) {
-    return Number(parseFloat(num).toFixed(0)).toLocaleString()
+    return (usd ? '$' : '') + Number(parseFloat(num).toFixed(0))
   }
 
   if (usd) {
     if (num < 0.01) {
+      if (usd) {
+        return '$' + Number(parseFloat(num).toFixed(4))
+      }
       return Number(parseFloat(num).toFixed(4))
     }
     let usdString = priceFormatter.format(num)
-    return usdString.slice(1, usdString.length)
+    return '$' + usdString.slice(1, usdString.length)
   }
   return Number(parseFloat(num).toFixed(4))
 }
 
-export const get2DayPercentFormatted = (valueNow, value24HoursAgo, value48HoursAgo) => {
+export function formattedPercent(percent) {
+  if (percent < 0.0001 && percent > 0) {
+    return <Text color="green">{'< 0.0001%'}</Text>
+  }
+
+  if (percent < 0 && percent > -0.0001) {
+    return <Text color="red">{'< 0.0001%'}</Text>
+  }
+
+  let fixedPercent = percent.toFixed(2)
+  if (fixedPercent === '0.00') {
+    return '0%'
+  }
+  if (fixedPercent > 0) {
+    return <Text color="green">{`+${fixedPercent}%`}</Text>
+  } else {
+    return <Text color="red">{`${fixedPercent}%`}</Text>
+  }
+}
+
+export const get2DayPercentChange = (valueNow, value24HoursAgo, value48HoursAgo) => {
   // get volume info for both 24 hour periods
   let firstDayValue = value24HoursAgo - value48HoursAgo
   let secondDayValue = valueNow - value24HoursAgo
-  let amountChange = secondDayValue - firstDayValue
 
-  let percentChange = ''
-  const adjustedPercentChange = ((amountChange / firstDayValue) * 100).toFixed(2)
-  adjustedPercentChange > 0 ? (percentChange = '+') : (percentChange = '')
-  percentChange += adjustedPercentChange
+  const adjustedPercentChange = (parseFloat(secondDayValue - firstDayValue) / parseFloat(firstDayValue)) * 100
 
-  if (isNaN(percentChange) || !isFinite(percentChange)) {
+  if (isNaN(adjustedPercentChange) || !isFinite(adjustedPercentChange)) {
     return [secondDayValue, 0]
   }
-
-  return [secondDayValue, percentChange]
+  return [secondDayValue, adjustedPercentChange]
 }
 
-export const getPercentFormatted = (valueNow, value24HoursAgo) => {
-  let percentChange = ''
-  const adjustedPercentChange = (((valueNow - value24HoursAgo) / value24HoursAgo) * 100).toFixed(2)
-  adjustedPercentChange > 0 ? (percentChange = '+') : (percentChange = '')
-  percentChange += adjustedPercentChange
-
-  if (isNaN(percentChange)) {
+export const getPercentChange = (valueNow, value24HoursAgo) => {
+  const adjustedPercentChange = ((valueNow - value24HoursAgo) / value24HoursAgo) * 100
+  if (isNaN(adjustedPercentChange)) {
     return 0
   }
+  return adjustedPercentChange
+}
 
-  return percentChange
+export function isEquivalent(a, b) {
+  var aProps = Object.getOwnPropertyNames(a)
+  var bProps = Object.getOwnPropertyNames(b)
+  if (aProps.length !== bProps.length) {
+    return false
+  }
+  for (var i = 0; i < aProps.length; i++) {
+    var propName = aProps[i]
+    if (a[propName] !== b[propName]) {
+      return false
+    }
+  }
+  return true
 }

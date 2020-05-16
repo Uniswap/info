@@ -19,6 +19,15 @@ const panelPseudo = css`
 
 const Panel = styled(RebassBox)`
   position: relative;
+  box-shadow:
+  0 1.1px 2.8px -9px rgba(0, 0, 0, 0.008),
+  0 2.7px 6.7px -9px rgba(0, 0, 0, 0.012),
+  0 5px 12.6px -9px rgba(0, 0, 0, 0.015),
+  0 8.9px 22.6px -9px rgba(0, 0, 0, 0.018),
+  0 16.7px 42.2px -9px rgba(0, 0, 0, 0.022),
+  0 40px 101px -9px rgba(0, 0, 0, 0.03)
+;
+
 
   ${props => (props.area ? `grid-area: ${props.area};` : null)}
 
