@@ -12,7 +12,7 @@ import { Divider } from '../../components'
 import { formattedNum } from '../../helpers'
 import { usePairData, useAllPairs } from '../../contexts/PairData'
 import DoubleTokenLogo from '../DoubleLogo'
-import { ButtonFaded } from '../ButtonStyled'
+import { ButtonLight, ButtonDark } from '../ButtonStyled'
 
 dayjs.extend(utc)
 
@@ -21,7 +21,7 @@ const PageButtons = styled.div`
   display: flex;
   justify-content: center;
   margin-top: 2em;
-  margin-bottom: 2em;
+  margin-bottom: 0.5em;
 `
 
 const Arrow = styled.div`
@@ -56,18 +56,18 @@ const DashGrid = styled.div`
   }
 
   @media screen and (min-width: 740px) {
-    grid-template-columns: 1.5fr 1fr 1fr 180px 140px;
+    grid-template-columns: 1.5fr 1fr 1fr 180px 70px;
     grid-template-areas: ' name liq vol pool swap';
   }
 
   @media screen and (min-width: 1080px) {
-    grid-template-columns: 1.5fr 1fr 1fr 1fr 140px 140px;
+    grid-template-columns: 1.5fr 1fr 1fr 1fr 140px 70px;
     grid-template-areas: ' name liq vol txCount pool swap';
   }
 
   @media screen and (min-width: 1200px) {
-    grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr 1fr 140px 140px;
-    grid-template-areas: ' name liq reserve0 reserve0 vol txCount pool swap';
+    grid-template-columns: 1.5fr 1fr 1fr 1fr 140px 70px;
+    grid-template-areas: ' name liq vol txCount pool swap';
   }
 `
 
@@ -103,7 +103,7 @@ const SORT_FIELD = {
   RESERVE1: 'reserve1'
 }
 
-function PairList({ pairs }) {
+function PairList({ pairs, color }) {
   const allPairData = useAllPairs()
 
   const below740 = useMedia('(max-width: 740px)')
@@ -179,26 +179,24 @@ function PairList({ pairs }) {
           </CustomLink>
         </DataText>
         <DataText area="liq">{liquidity}</DataText>
-        {!below1200 && <DataText area="reserve0">{formattedNum(item.reserve0) + ' ' + item.token0.symbol}</DataText>}
-        {!below1200 && <DataText area="reserve1">{formattedNum(item.reserve1) + ' ' + item.token1.symbol}</DataText>}
         <DataText area="vol">{volume}</DataText>
         {!below1080 && <DataText area="txCount">{itemData.oneDayTxns}</DataText>}
         {!below740 && (
           <DataText area="pool">
-            <ButtonFaded>
-              <Link external href={''}>
-                + Join Pool
+            <ButtonLight color={color}>
+              <Link color={color} external href={''}>
+                + Add Liquidity
               </Link>
-            </ButtonFaded>
+            </ButtonLight>
           </DataText>
         )}
         {!below740 && (
           <DataText area="swap">
-            <ButtonFaded>
-              <Link external href={''}>
-                Swap Tokens
+            <ButtonDark color={color}>
+              <Link color={'white'} external href={''}>
+                Trade
               </Link>
-            </ButtonFaded>
+            </ButtonDark>
           </DataText>
         )}
       </DashGrid>
@@ -207,7 +205,7 @@ function PairList({ pairs }) {
 
   return (
     <ListWrapper>
-      <DashGrid center={true} style={{ height: '60px' }}>
+      <DashGrid center={true} style={{ height: 'fit-content', padding: '0 0 1rem 0' }}>
         <Flex alignItems="center" justifyContent="flexStart">
           <Text area="name" fontWeight="500">
             Name
@@ -224,32 +222,6 @@ function PairList({ pairs }) {
             Liquidity {sortedColumn === SORT_FIELD.LIQ ? (!sortDirection ? '↑' : '↓') : ''}
           </ClickableText>
         </Flex>
-        {!below1200 && (
-          <Flex alignItems="center" justifyContent="flexEnd">
-            <ClickableText
-              area="reserve1"
-              onClick={e => {
-                setSortedColumn(SORT_FIELD.RESERVE0)
-                setSortDirection(sortedColumn !== SORT_FIELD.RESERVE0 ? true : !sortDirection)
-              }}
-            >
-              Token Liquidity {sortedColumn === SORT_FIELD.RESERVE0 ? (!sortDirection ? '↑' : '↓') : ''}
-            </ClickableText>
-          </Flex>
-        )}
-        {!below1200 && (
-          <Flex alignItems="center" justifyContent="flexEnd">
-            <ClickableText
-              area="reserve1"
-              onClick={e => {
-                setSortedColumn(SORT_FIELD.RESERVE1)
-                setSortDirection(sortedColumn !== SORT_FIELD.RESERVE1 ? true : !sortDirection)
-              }}
-            >
-              Token Liquidity {sortedColumn === SORT_FIELD.RESERVE1 ? (!sortDirection ? '↑' : '↓') : ''}
-            </ClickableText>
-          </Flex>
-        )}
         <>
           <Flex alignItems="center">
             <ClickableText

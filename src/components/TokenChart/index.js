@@ -9,8 +9,8 @@ import { darken } from 'polished'
 import { useMedia } from 'react-use'
 
 const ChartWrapper = styled.div`
-  margin-top: 40px;
   height: 100%;
+  min-height: 300px;
 `
 
 const TokenChart = ({ chartData, color }) => {

@@ -133,11 +133,19 @@ export function formattedPercent(percent) {
   }
 
   if (percent < 0.0001 && percent > 0) {
-    return <Text color="green">{'< 0.0001%'}</Text>
+    return (
+      <Text fontWeight={500} fontSize={'1rem'} color="green">
+        {'< 0.0001%'}
+      </Text>
+    )
   }
 
   if (percent < 0 && percent > -0.0001) {
-    return <Text color="red">{'< 0.0001%'}</Text>
+    return (
+      <Text fontWeight={500} fontSize={'1rem'} color="red">
+        {'< 0.0001%'}
+      </Text>
+    )
   }
 
   let fixedPercent = percent.toFixed(2)
@@ -145,9 +153,9 @@ export function formattedPercent(percent) {
     return '0%'
   }
   if (fixedPercent > 0) {
-    return <Text color="green">{`+${fixedPercent}%`}</Text>
+    return <Text fontWeight={500} fontSize={'1rem'} color="green">{`+${fixedPercent}%`}</Text>
   } else {
-    return <Text color="red">{`${fixedPercent}%`}</Text>
+    return <Text fontWeight={500} fontSize={'1rem'} color="red">{`${fixedPercent}%`}</Text>
   }
 }
 

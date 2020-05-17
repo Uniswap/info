@@ -6,6 +6,7 @@ import utc from 'dayjs/plugin/utc'
 import { formatTime, formattedNum, urls } from '../../helpers'
 import { useMedia } from 'react-use'
 import { useCurrentCurrency } from '../../contexts/Application'
+import { RowFixed } from '../Row'
 
 import LocalLoader from '../LocalLoader'
 import { Box, Flex, Text } from 'rebass'
@@ -19,7 +20,7 @@ const PageButtons = styled.div`
   display: flex;
   justify-content: center;
   margin-top: 2em;
-  margin-bottom: 2em;
+  margin-bottom: 0.5em;
 `
 
 const Arrow = styled.div`
@@ -39,7 +40,7 @@ const List = styled(Box)`
 const DashGrid = styled.div`
   display: grid;
   grid-gap: 1em;
-  grid-template-columns: 100px 1fr 1fr;
+  grid-template-columns: 160px 1fr 1fr;
   grid-template-areas: 'txn value time';
 
   > * {
@@ -80,14 +81,6 @@ const DashGrid = styled.div`
   }
 `
 
-const ListWrapper = styled.div`
-  /* padding: 20px 40px;
-
-  @media screen and (max-width: 640px) {
-    padding: 0 20px;
-  } */
-`
-
 const ClickableText = styled(Text)`
   &:hover {
     cursor: pointer;
@@ -114,6 +107,17 @@ const DataText = styled(Flex)`
   }
 `
 
+const SortText = styled.button`
+  cursor: pointer;
+  font-weight: ${({ active, theme }) => (active ? 500 : 400)};
+  margin-right: 0.5rem !important;
+  border: none;
+  background-color: transparent;
+  font-size: 1rem;
+  padding: 0px;
+  color: ${({ active, theme }) => (active ? theme.text1 : theme.text3)};
+`
+
 const SORT_FIELD = {
   VALUE: 'amountUSD',
   AMOUNT0: 'token0Amount',
@@ -122,7 +126,7 @@ const SORT_FIELD = {
 }
 
 // @TODO rework into virtualized list
-function TxnList({ transactions, txFilter }) {
+function TxnList({ transactions }) {
   // page state
   const [page, setPage] = useState(1)
   const [maxPage, setMaxPage] = useState(1)
@@ -132,6 +136,7 @@ function TxnList({ transactions, txFilter }) {
   const [sortDirection, setSortDirection] = useState(true)
   const [sortedColumn, setSortedColumn] = useState(SORT_FIELD.TIMESTAMP)
   const [filteredItems, setFilteredItems] = useState()
+  const [txFilter, setTxFilter] = useState('ALL')
 
   const [currency] = useCurrentCurrency()
 
@@ -282,13 +287,43 @@ function TxnList({ transactions, txFilter }) {
   }
 
   return (
-    <ListWrapper>
-      <DashGrid center={true} style={{ height: '60px' }}>
-        <Flex alignItems="center">
-          <Text color="text" area="txn" fontWeight="500">
-            Transaction
-          </Text>
-        </Flex>
+    <>
+      <DashGrid center={true} style={{ height: 'fit-content', padding: '0 0 1rem 0' }}>
+        <RowFixed area="txn" gap="10px" pl={4}>
+          <SortText
+            onClick={() => {
+              setTxFilter('ALL')
+            }}
+            active={txFilter === 'ALL'}
+          >
+            All
+          </SortText>
+          <SortText
+            onClick={() => {
+              setTxFilter('SWAP')
+            }}
+            active={txFilter === 'SWAP'}
+          >
+            Swaps
+          </SortText>
+          <SortText
+            onClick={() => {
+              setTxFilter('ADD')
+            }}
+            active={txFilter === 'ADD'}
+          >
+            Adds
+          </SortText>
+          <SortText
+            onClick={() => {
+              setTxFilter('REMOVE')
+            }}
+            active={txFilter === 'REMOVE'}
+          >
+            Removes
+          </SortText>
+        </RowFixed>
+
         <Flex alignItems="center" justifyContent="flexStart">
           <ClickableText
             color="textDim"
@@ -383,7 +418,7 @@ function TxnList({ transactions, txFilter }) {
           <Arrow faded={page === maxPage ? true : false}>→</Arrow>
         </div>
       </PageButtons>
-    </ListWrapper>
+    </>
   )
 }
 

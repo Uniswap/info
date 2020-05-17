@@ -19,15 +19,24 @@ const panelPseudo = css`
 
 const Panel = styled(RebassBox)`
   position: relative;
-  box-shadow:
+  background-color: ${({ theme }) => theme.advancedBG};
+  padding: 1.25rem;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  border-radius: 12px;
+  /* box-shadow:
   0 1.1px 2.8px -9px rgba(0, 0, 0, 0.008),
   0 2.7px 6.7px -9px rgba(0, 0, 0, 0.012),
   0 5px 12.6px -9px rgba(0, 0, 0, 0.015),
   0 8.9px 22.6px -9px rgba(0, 0, 0, 0.018),
   0 16.7px 42.2px -9px rgba(0, 0, 0, 0.022),
   0 40px 101px -9px rgba(0, 0, 0, 0.03)
-;
+; */
 
+  ${props => props.background && `background-color: ${props.theme.advancedBG};`}
 
   ${props => (props.area ? `grid-area: ${props.area};` : null)}
 
@@ -57,3 +66,18 @@ const Panel = styled(RebassBox)`
 `
 
 export default Panel
+
+// const Panel = styled.div`
+//   width: 100%;
+//   height: 100%;
+//   display: flex;
+//   flex-direction: column;
+//   justify-content: flex-start;
+//   border-radius: 12px;
+//   background-color: ${({ theme }) => theme.advancedBG};
+//   padding: 1.25rem;
+//   box-sizing: border-box;
+//   box-shadow: 0 1.1px 2.8px -9px rgba(0, 0, 0, 0.008), 0 2.7px 6.7px -9px rgba(0, 0, 0, 0.012),
+//     0 5px 12.6px -9px rgba(0, 0, 0, 0.015), 0 8.9px 22.6px -9px rgba(0, 0, 0, 0.018),
+//     0 16.7px 42.2px -9px rgba(0, 0, 0, 0.022), 0 40px 101px -9px rgba(0, 0, 0, 0.03);
+// `

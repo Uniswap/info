@@ -13,13 +13,14 @@ import { ButtonLight, ButtonDark } from '../components/ButtonStyled'
 import TxnList from '../components/TxnList'
 import TokenChart from '../components/TokenChart'
 import { formattedNum, formattedPercent } from '../helpers'
-import { Hint } from '../components/.'
 
 import { useTokenData, useTokenTransactions, useTokenChartData } from '../contexts/TokenData'
-import { Hover, ThemedBackground } from '../Theme'
+import { TYPE, ThemedBackground } from '../Theme'
 import { useColor } from '../hooks'
 import CopyHelper from '../components/Copy'
 import { useMedia } from 'react-use'
+import { Search } from 'react-feather'
+import { transparentize } from 'polished'
 
 const PageWrapper = styled.div`
   display: flex;
@@ -42,44 +43,29 @@ const PageWrapper = styled.div`
   }
 `
 
-const TopPercent = styled.div`
-  align-self: flex-end;
-  margin-left: 10px;
-`
-
 const DashboardWrapper = styled.div`
   width: 100%;
-`
-
-const TokenName = styled.div`
-  font-size: 1.5rem;
-  font-weight: 600;
-  line-height: 32px;
-`
-
-const ListHeader = styled.div`
-  font-size: 1.25rem;
-  font-weight: 600;
-  width: 100%;
-  margin: 5rem 0 2rem 0;
 `
 
 const AccountSearch = styled.input`
   font-size: 0.85rem;
   border: none;
   outline: none;
+  background-color: transparent;
   width: 90%;
+  margin-left: 0.5rem;
   &:focus {
     outline: none;
   }
 `
 
 const AccountSearchWrapper = styled.div`
-  width: 390px;
-  background-color: white;
+  width: 190px;
+  background-color: ${({ theme }) => theme.bg2};
+
   border-radius: 40px;
   height: 40px;
-  color: #6c7284;
+  color: ${({ theme }) => theme.text2};
   padding: 0 0.5em 0 1em;
   display: flex;
   align-items: center;
@@ -90,38 +76,23 @@ const AccountSearchWrapper = styled.div`
   }
 `
 const PanelWrapper = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  display: inline-grid;
   width: 100%;
-  margin: 40px 0;
-`
-
-const TopPanel = styled(Panel)`
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  width: fit-content;
-
-  @media screen and (max-width: 64em) {
-    width: 100%;
-    border-radius: 0
-
-    &:nth-of-type(3) {
-      margin-bottom: 20px;
-      border-radius: 0 0 1em 1em;
+  align-items: start;
+  @media screen and (max-width: 1024px) {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+    > * {
+      grid-column: 1 / 4;
     }
 
-    &:first-of-type {
-      border-radius: 1em 1em 0 0;
+    > * {
+      &:first-child {
+        width: 100%;
+      }
     }
-  }
-`
-
-const EmojiWrapper = styled.span`
-  width: 10%;
-  &:hover {
-    cursor: pointer;
   }
 `
 
@@ -136,22 +107,22 @@ const TokenDetailsLayout = styled.div`
     align-items: center;
     justify-items: end;
   }
-`
+  @media screen and (max-width: 1024px) {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+    > * {
+      grid-column: 1 / 4;
+      margin-bottom: 1rem;
+    }
 
-const ShadedBox = styled.div`
-  background: rgba(255, 255, 255, 0.4);
-  border-radius: 20px;
-`
-
-const Break = styled.div`
-  width: 50px;
-  height: 2px;
-  background: black;
+    &:last-child {
+      align-items: start;
+      justify-items: start;
+    }
+  }
 `
 
 function TokenPage({ address }) {
-  const [txFilter, setTxFilter] = useState('ALL')
-
   const [accountInput, setAccountInput] = useState('')
 
   const {
@@ -191,209 +162,127 @@ function TokenPage({ address }) {
 
   const tokenLiquidityFormatted = totalLiquidity ? formattedNum(totalLiquidity) : '-'
 
-  const Option = ({ onClick, active, children }) => {
-    return (
-      <Hover>
-        <Text onClick={onClick} color={!active ? '#aeaeae' : 'black'} fontWeight={600} fontSize={24}>
-          {children}
-        </Text>
-      </Hover>
-    )
-  }
-
   const below1080 = useMedia('(max-width: 1080px)')
 
   return (
     <PageWrapper>
-      <ThemedBackground backgroundColor={backgroundColor} />
-      {below1080 && (
-        <ShadedBox style={{ width: '100%' }}>
-          <AutoColumn gap="40px" style={{ padding: '20px' }}>
-            <RowBetween>
-              <TokenLogo address={address} size="32px" />
-              <RowFixed justify="flex-end">
-                <ButtonLight color={backgroundColor}>+ Add Liquidity</ButtonLight>
-                <ButtonDark ml={10} color={backgroundColor}>
-                  Trade
-                </ButtonDark>
-              </RowFixed>
-            </RowBetween>
-            <TokenName>{name ? name + ' ' : ''}</TokenName>
-            <AutoColumn gap="10px">
-              <RowFlat style={{ lineHeight: '22px' }}>
-                <Text fontSize={36} fontWeight={600}>
-                  {price}
-                </Text>
-                <TopPercent>{priceChange}</TopPercent>
-              </RowFlat>
-              <Hint>Price</Hint>
-            </AutoColumn>
-            <AutoColumn gap="10px">
-              <RowFlat style={{ lineHeight: '22px' }}>
-                <Text fontSize={24} fontWeight={600}>
-                  {volume}
-                </Text>
-                <TopPercent>{volumeChange}</TopPercent>
-              </RowFlat>
-              <Hint>24hr Volume</Hint>
-            </AutoColumn>
-            <AutoColumn gap="10px">
-              <RowFlat style={{ lineHeight: '22px' }}>
-                <Text fontSize={24} fontWeight={600}>
-                  {liquidity}
-                </Text>
-                <TopPercent>{liquidityChange}</TopPercent>
-              </RowFlat>
-              <Hint>Total Liquidity</Hint>
-            </AutoColumn>
-            <AutoColumn gap="10px">
-              <RowFlat style={{ lineHeight: '22px' }}>
-                <Text fontSize={24} fontWeight={600}>
-                  {tokenLiquidityFormatted && formattedNum(tokenLiquidityFormatted)}
-                </Text>
-                <TopPercent>{liquidityChange}</TopPercent>
-              </RowFlat>
-              <Hint>Total Liquidity Token</Hint>
-            </AutoColumn>
-            <Break />
-            <AutoRow gap="10px">
-              <AutoColumn gap="20px">
-                <Text fontSize={16} fontWeight="500">
-                  {symbol}
-                </Text>
-                <Text>Symbol</Text>
-              </AutoColumn>
-              <AutoColumn gap="20px">
-                <Text fontSize={16} fontWeight="500">
-                  {name}
-                </Text>
-                <Text>Name</Text>
-              </AutoColumn>
-              <AutoColumn gap="20px">
-                <RowFixed>
-                  <Text fontSize={16} fontWeight="500">
-                    {address.slice(0, 6) + '...' + address.slice(38, 42)}
-                  </Text>
-                  <CopyHelper toCopy={address} />
-                </RowFixed>
-                <Text>Address</Text>
-              </AutoColumn>
-            </AutoRow>
-          </AutoColumn>
-        </ShadedBox>
-      )}
-      {!below1080 && (
-        <RowBetween mb={20} mt={20}>
-          <RowFixed>
+      <ThemedBackground backgroundColor={transparentize(0.8, backgroundColor)} />
+      <RowBetween mt={20} style={{ flexWrap: 'wrap' }}>
+        <RowFixed style={{ flexWrap: 'wrap' }}>
+          <RowFixed mb={20}>
             <TokenLogo address={address} size="32px" />
-            <RowFlat style={{ marginLeft: '10px' }}>
-              <TokenName>
-                {name ? name + ' ' : ''} {symbol ? '(' + symbol + ')' : ''} {price}
-              </TokenName>
-              <TopPercent>{priceChange}</TopPercent>
-            </RowFlat>
+            <Text fontSize={'2rem'} fontWeight={600} style={{ margin: '0 1rem' }}>
+              {name ? name + ' ' : ''} {symbol ? '(' + symbol + ')' : ''}
+            </Text>{' '}
           </RowFixed>
-          <RowFixed justify="flex-end">
+          {!below1080 && (
+            <RowFixed mb={20}>
+              <Text fontSize={'2rem'} fontWeight={500} style={{ marginRight: '1rem' }}>
+                {price}
+              </Text>
+              {priceChange}
+            </RowFixed>
+          )}
+        </RowFixed>
+        <span>
+          <RowFixed mb={20} ml={'2.5rem'} style={{ flexDirection: below1080 ? 'row-reverse' : 'initial' }}>
             <ButtonLight color={backgroundColor}>+ Add Liquidity</ButtonLight>
-            <ButtonDark ml={10} color={backgroundColor}>
+            <ButtonDark ml={'.5rem'} mr={below1080 && '.5rem'} color={backgroundColor}>
               Trade
             </ButtonDark>
           </RowFixed>
-        </RowBetween>
-      )}
+        </span>
+      </RowBetween>
       <DashboardWrapper>
-        {!below1080 && (
-          <PanelWrapper>
-            <TopPanel rounded color="black" p={24}>
-              <Column>
-                <RowFlat>
-                  <Text fontSize={24} lineHeight={1} fontWeight={600}>
-                    {volume}
-                  </Text>
-                  <div style={{ marginLeft: '10px' }}>{volumeChange}</div>
-                </RowFlat>
-                <RowFlat style={{ marginTop: '10px' }}>
-                  <Hint>Volume (24hrs)</Hint>
-                </RowFlat>
-              </Column>
-            </TopPanel>
-            <TopPanel rounded color="black" p={24}>
-              <Column>
-                <RowFlat>
-                  <Text fontSize={24} lineHeight={1} fontWeight={600}>
-                    {liquidity}
-                  </Text>
-                  <Text marginLeft={'10px'}>{liquidityChange}</Text>
-                </RowFlat>
-                <RowFlat style={{ marginTop: '10px' }}>
-                  <Hint>Total Liquidity</Hint>
-                </RowFlat>
-              </Column>
-            </TopPanel>
-            <TopPanel rounded color="black" p={24}>
-              <Column>
-                <RowFlat>
-                  <Text fontSize={24} lineHeight={1} fontWeight={600}>
-                    {tokenLiquidityFormatted}
-                  </Text>
-                </RowFlat>
-                <RowFlat style={{ marginTop: '10px' }}>
-                  <Hint>Total Liquidity Token</Hint>
-                </RowFlat>
-              </Column>
-            </TopPanel>
-          </PanelWrapper>
-        )}
-        <div area="fill" rounded="true" style={{ height: '300px' }}>
-          <TokenChart chartData={chartData} token={address} color={backgroundColor} />
-        </div>
+        <>
+          {!below1080 && (
+            <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '1rem' }}>
+              Token Stats
+            </TYPE.main>
+          )}
 
-        <ListHeader>Top Pairs</ListHeader>
+          <PanelWrapper style={{ marginTop: '1.5rem' }}>
+            {below1080 && (
+              <Panel>
+                <AutoColumn gap="20px">
+                  <RowBetween>
+                    <TYPE.main>Price</TYPE.main>
+                    <div />
+                  </RowBetween>
+                  <RowBetween align="flex-end">
+                    {' '}
+                    <TYPE.main fontSize={'2rem'} lineHeight={1} fontWeight={600}>
+                      {price}
+                    </TYPE.main>
+                    <TYPE.main>{priceChange}</TYPE.main>
+                  </RowBetween>
+                </AutoColumn>
+              </Panel>
+            )}
+            <Panel>
+              <AutoColumn gap="20px">
+                <RowBetween>
+                  <TYPE.main>Volume (24hrs)</TYPE.main>
+                  <div />
+                </RowBetween>
+                <RowBetween align="flex-end">
+                  <TYPE.main fontSize={'2rem'} lineHeight={1} fontWeight={600}>
+                    {volume}
+                  </TYPE.main>
+                  <TYPE.main>{volumeChange}</TYPE.main>
+                </RowBetween>
+              </AutoColumn>
+            </Panel>
+            <Panel>
+              <AutoColumn gap="20px">
+                <RowBetween>
+                  <TYPE.main>Total Liquidity</TYPE.main>
+                  <div />
+                </RowBetween>
+                <RowBetween align="flex-end">
+                  <TYPE.main fontSize={'2rem'} lineHeight={1} fontWeight={600}>
+                    {liquidity}
+                  </TYPE.main>
+                  <TYPE.main>{liquidityChange}</TYPE.main>
+                </RowBetween>
+              </AutoColumn>
+            </Panel>
+            <Panel>
+              <AutoColumn gap="20px">
+                <RowBetween>
+                  <TYPE.main>Total Liquidity Tokens</TYPE.main>
+                  <div />
+                </RowBetween>
+                <RowBetween align="flex-end">
+                  <TYPE.main fontSize={'2rem'} lineHeight={1} fontWeight={600}>
+                    {tokenLiquidityFormatted}
+                  </TYPE.main>
+                  {/* <TYPE.main>{volumeChange}</TYPE.main> */}
+                </RowBetween>
+              </AutoColumn>
+            </Panel>
+            <Panel style={{ gridColumn: '1/4' }}>
+              <TokenChart chartData={chartData} token={address} color={backgroundColor} />
+            </Panel>
+          </PanelWrapper>
+        </>
+        <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
+          Top Pairs
+        </TYPE.main>{' '}
         <Panel
           rounded
           style={{
-            border: '1px solid rgba(43, 43, 43, 0.05)'
+            border: '1px solid rgba(43, 43, 43, 0.05)',
+            marginTop: '1.5rem'
           }}
           p={20}
         >
-          {address ? <PairList address={address} pairs={allPairs} /> : <Loader />}
+          {address ? <PairList color={backgroundColor} address={address} pairs={allPairs} /> : <Loader />}
         </Panel>
-        <RowBetween mt={40} mb={40}>
-          <AutoRow gap="10px" pl={4}>
-            <Option
-              onClick={() => {
-                setTxFilter('ALL')
-              }}
-              active={txFilter === 'ALL'}
-            >
-              All
-            </Option>
-            <Option
-              onClick={() => {
-                setTxFilter('SWAP')
-              }}
-              active={txFilter === 'SWAP'}
-            >
-              Swaps
-            </Option>
-            <Option
-              onClick={() => {
-                setTxFilter('ADD')
-              }}
-              active={txFilter === 'ADD'}
-            >
-              Adds
-            </Option>
-            <Option
-              onClick={() => {
-                setTxFilter('REMOVE')
-              }}
-              active={txFilter === 'REMOVE'}
-            >
-              Removes
-            </Option>
-          </AutoRow>
+        <RowBetween mt={40} mb={'1rem'}>
+          <TYPE.main fontSize={'1.125rem'}>Transactions</TYPE.main>{' '}
           <AccountSearchWrapper>
+            <Search size={16} />
             <AccountSearch
               value={accountInput}
               placeholder={'Filter by account'}
@@ -401,11 +290,6 @@ function TokenPage({ address }) {
                 setAccountInput(e.target.value)
               }}
             />
-            <EmojiWrapper>
-              <span role="img" aria-label="magnify">
-                🔍
-              </span>
-            </EmojiWrapper>
           </AccountSearchWrapper>
         </RowBetween>
         <Panel
@@ -413,46 +297,46 @@ function TokenPage({ address }) {
           style={{
             border: '1px solid rgba(43, 43, 43, 0.05)'
           }}
-          p={20}
         >
-          {transactions ? <TxnList transactions={transactions} txFilter={txFilter} /> : <Loader />}
+          {transactions ? <TxnList transactions={transactions} /> : <Loader />}
         </Panel>
-        {!below1080 && (
-          <>
-            <ListHeader>Token Details</ListHeader>
-            <Panel
-              rounded
-              style={{
-                border: '1px solid rgba(43, 43, 43, 0.05)'
-              }}
-              p={20}
-            >
-              <TokenDetailsLayout>
-                <Column>
-                  <Text color="#888D9B">Symbol</Text>
-                  <Text style={{ marginTop: '1rem' }} fontSize={24} fontWeight="500">
-                    {symbol}
+        <>
+          <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
+            Token Information
+          </TYPE.main>{' '}
+          <Panel
+            rounded
+            style={{
+              border: '1px solid rgba(43, 43, 43, 0.05)',
+              marginTop: '1.5rem'
+            }}
+            p={20}
+          >
+            <TokenDetailsLayout>
+              <Column>
+                <TYPE.main>Symbol</TYPE.main>
+                <Text style={{ marginTop: '.5rem' }} fontSize={24} fontWeight="500">
+                  {symbol}
+                </Text>
+              </Column>
+              <Column>
+                <TYPE.main>Name</TYPE.main>
+                <Text style={{ marginTop: '.5rem' }} fontSize={24} fontWeight="500">
+                  {name}
+                </Text>
+              </Column>
+              <Column>
+                <TYPE.main>Address</TYPE.main>
+                <AutoRow align="flex-end">
+                  <Text style={{ marginTop: '.5rem' }} fontSize={24} fontWeight="500">
+                    {address.slice(0, 8) + '...' + address.slice(36, 42)}
                   </Text>
-                </Column>
-                <Column>
-                  <Text color="#888D9B">Name</Text>
-                  <Text style={{ marginTop: '1rem' }} fontSize={24} fontWeight="500">
-                    {name}
-                  </Text>
-                </Column>
-                <Column>
-                  <Text color="#888D9B">Address</Text>
-                  <AutoRow align="flex-end">
-                    <Text style={{ marginTop: '1rem' }} fontSize={24} fontWeight="500">
-                      {address.slice(0, 8) + '...' + address.slice(36, 42)}
-                    </Text>
-                    <CopyHelper toCopy={address} />
-                  </AutoRow>
-                </Column>
-              </TokenDetailsLayout>
-            </Panel>
-          </>
-        )}
+                  <CopyHelper toCopy={address} />
+                </AutoRow>
+              </Column>
+            </TokenDetailsLayout>
+          </Panel>
+        </>
       </DashboardWrapper>
     </PageWrapper>
   )
