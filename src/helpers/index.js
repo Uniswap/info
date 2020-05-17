@@ -128,6 +128,10 @@ export const formattedNum = (number, usd = false) => {
 }
 
 export function formattedPercent(percent) {
+  if (!percent) {
+    return '0%'
+  }
+
   if (percent < 0.0001 && percent > 0) {
     return <Text color="green">{'< 0.0001%'}</Text>
   }

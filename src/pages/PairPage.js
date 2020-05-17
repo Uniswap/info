@@ -13,7 +13,7 @@ import { Hint } from '../components'
 import TxnList from '../components/TxnList'
 import Loader from '../components/Loader'
 
-import { formattedNum } from '../helpers'
+import { formattedNum, formattedPercent } from '../helpers'
 import { useColor } from '../hooks'
 import { usePairData, usePairTransactions, usePairChartData } from '../contexts/PairData'
 import { useCurrentCurrency } from '../contexts/Application'
@@ -51,7 +51,7 @@ const ListHeader = styled.div`
   font-size: 1.25rem;
   font-weight: 600;
   width: 100%;
-  margin: 5rem 0 2rem 0;
+  margin: 2rem 0 2rem 0;
 `
 
 const PanelWrapper = styled.div`
@@ -141,7 +141,7 @@ const Break = styled.div`
 const Option = ({ onClick, active, children }) => {
   return (
     <Hover>
-      <Text onClick={onClick} color={!active ? '#aeaeae' : 'black'} fontWeight={600} fontSize={24}>
+      <Text onClick={onClick} color={!active ? '#aeaeae' : 'black'} fontWeight={500} fontSize={'1rem'}>
         {children}
       </Text>
     </Hover>
@@ -150,34 +150,28 @@ const Option = ({ onClick, active, children }) => {
 
 function PairPage({ pairAddress }) {
   const [txFilter, setTxFilter] = useState('ALL')
-  const [currency] = useCurrentCurrency()
   const {
     token0,
     token1,
     reserve0,
     reserve1,
-    combinedBalanceETH,
     reserveUSD,
-    oneDayVolumeETH,
     oneDayVolumeUSD,
     volumeChangeUSD,
-    volumeChangeETH,
-    liquidityChangeUSD,
-    liquidityChangeETH
+    liquidityChangeUSD
   } = usePairData(pairAddress)
   const chartData = usePairChartData(pairAddress)
   const transactions = usePairTransactions(pairAddress)
 
   const backgroundColor = useColor(pairAddress)
 
-  const liquidity = currency === 'ETH' ? 'Ξ ' + formattedNum(combinedBalanceETH) : '$' + formattedNum(reserveUSD)
+  const liquidity = reserveUSD ? formattedNum(reserveUSD, true) : '-'
 
-  const liquidityChange =
-    currency === 'ETH' ? formattedNum(liquidityChangeETH) + '%' : formattedNum(liquidityChangeUSD) + '%'
+  const liquidityChange = liquidityChangeUSD ? formattedPercent(liquidityChangeUSD) : ''
 
-  const volume = currency === 'ETH' ? 'Ξ ' + formattedNum(oneDayVolumeETH) : '$' + formattedNum(oneDayVolumeUSD)
+  const volume = oneDayVolumeUSD ? formattedNum(oneDayVolumeUSD, true) : '-'
 
-  const volumeChange = currency === 'ETH' ? formattedNum(volumeChangeETH) + '%' : formattedNum(volumeChangeUSD) + '%'
+  const volumeChange = volumeChangeUSD ? formattedPercent(volumeChangeUSD) : ''
 
   const below1080 = useMedia('(max-width: 1080px)')
 
@@ -280,9 +274,6 @@ function PairPage({ pairAddress }) {
         </RowBetween>
       )}
       <DashboardWrapper>
-        <ChartWrapper>
-          <PairChart chartData={chartData} color={backgroundColor} />
-        </ChartWrapper>
         {!below1080 && (
           <PanelWrapper>
             <TopPanel rounded color="black" p={24}>
@@ -337,6 +328,55 @@ function PairPage({ pairAddress }) {
             </TopPanel>
           </PanelWrapper>
         )}
+        <ChartWrapper>
+          <PairChart chartData={chartData} color={backgroundColor} />
+        </ChartWrapper>
+
+        <Panel
+          rounded
+          style={{
+            border: '1px solid rgba(43, 43, 43, 0.05)'
+          }}
+          padding={'20px'}
+        >
+          <Box mb={20}>
+            <AutoRow gap="10px" pl={4}>
+              <Option
+                onClick={() => {
+                  setTxFilter('ALL')
+                }}
+                active={txFilter === 'ALL'}
+              >
+                All
+              </Option>
+              <Option
+                onClick={() => {
+                  setTxFilter('SWAP')
+                }}
+                active={txFilter === 'SWAP'}
+              >
+                Swaps
+              </Option>
+              <Option
+                onClick={() => {
+                  setTxFilter('ADD')
+                }}
+                active={txFilter === 'ADD'}
+              >
+                Adds
+              </Option>
+              <Option
+                onClick={() => {
+                  setTxFilter('REMOVE')
+                }}
+                active={txFilter === 'REMOVE'}
+              >
+                Removes
+              </Option>
+            </AutoRow>
+          </Box>
+          {transactions ? <TxnList transactions={transactions} txFilter={txFilter} /> : <Loader />}
+        </Panel>
         {!below1080 && (
           <>
             <ListHeader>Pool Details</ListHeader>
@@ -344,7 +384,7 @@ function PairPage({ pairAddress }) {
               rounded
               style={{
                 border: '1px solid rgba(43, 43, 43, 0.05)',
-                marginBottom: '60px'
+                marginBottom: '40px'
               }}
               p={20}
             >
@@ -393,50 +433,6 @@ function PairPage({ pairAddress }) {
             </Panel>
           </>
         )}
-        <Box mb={20}>
-          <AutoRow gap="10px" pl={4}>
-            <Option
-              onClick={() => {
-                setTxFilter('ALL')
-              }}
-              active={txFilter === 'ALL'}
-            >
-              All
-            </Option>
-            <Option
-              onClick={() => {
-                setTxFilter('SWAPS')
-              }}
-              active={txFilter === 'SWAPS'}
-            >
-              Swaps
-            </Option>
-            <Option
-              onClick={() => {
-                setTxFilter('ADDS')
-              }}
-              active={txFilter === 'ADDS'}
-            >
-              Adds
-            </Option>
-            <Option
-              onClick={() => {
-                setTxFilter('REMOVES')
-              }}
-              active={txFilter === 'REMOVES'}
-            >
-              Removes
-            </Option>
-          </AutoRow>
-        </Box>
-        <Panel
-          rounded
-          style={{
-            border: '1px solid rgba(43, 43, 43, 0.05)'
-          }}
-        >
-          {transactions ? <TxnList transactions={transactions} txFilter={txFilter} /> : <Loader />}
-        </Panel>
       </DashboardWrapper>
     </PageWrapper>
   )

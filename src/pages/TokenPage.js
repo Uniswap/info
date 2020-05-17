@@ -12,11 +12,10 @@ import Column, { AutoColumn } from '../components/Column'
 import { ButtonLight, ButtonDark } from '../components/ButtonStyled'
 import TxnList from '../components/TxnList'
 import TokenChart from '../components/TokenChart'
-import { formattedNum } from '../helpers'
+import { formattedNum, formattedPercent } from '../helpers'
 import { Hint } from '../components/.'
 
 import { useTokenData, useTokenTransactions, useTokenChartData } from '../contexts/TokenData'
-import { useCurrentCurrency } from '../contexts/Application'
 import { Hover, ThemedBackground } from '../Theme'
 import { useColor } from '../hooks'
 import CopyHelper from '../components/Copy'
@@ -30,6 +29,8 @@ const PageWrapper = styled.div`
   padding-bottom: 100px;
   width: calc(100% - 80px);
   padding: 0 40px;
+
+  padding-bottom: 80px;
 
   @media screen and (max-width: 640px) {
     width: calc(100% - 40px);
@@ -148,19 +149,6 @@ const Break = styled.div`
   background: black;
 `
 
-function getPercentSign(value) {
-  return (
-    <Text fontSize={14} lineHeight={1.2}>
-      {value !== undefined &&
-        (value < 0
-          ? parseFloat(value).toFixed(2) + '% ↓'
-          : parseInt(value) === 0
-          ? parseFloat(value).toFixed(2) + '%'
-          : parseFloat(value).toFixed(2) + '% ↑')}
-    </Text>
-  )
-}
-
 function TokenPage({ address }) {
   const [txFilter, setTxFilter] = useState('ALL')
 
@@ -171,23 +159,14 @@ function TokenPage({ address }) {
     name,
     symbol,
     priceUSD,
-    derivedETH,
     allPairs,
     oneDayVolumeUSD,
-    oneDayVolumeETH,
     totalLiquidityUSD,
-    totalLiquidityETH,
     totalLiquidity,
     volumeChangeUSD,
-    volumeChangeETH,
     priceChangeUSD,
-    priceChangeETH,
-    liquidityChangeUSD,
-    liquidityChangeETH
+    liquidityChangeUSD
   } = useTokenData(address)
-
-  // global values
-  const [currency] = useCurrentCurrency()
 
   // detect color from token
   const backgroundColor = useColor(id)
@@ -199,16 +178,18 @@ function TokenPage({ address }) {
   const transactions = useTokenTransactions(address)
 
   // price
-  const price = currency === 'ETH' ? 'Ξ ' + formattedNum(derivedETH) : formattedNum(priceUSD, true)
-  const priceChange = currency === 'ETH' ? getPercentSign(priceChangeETH) : getPercentSign(priceChangeUSD)
+  const price = priceUSD ? formattedNum(priceUSD, true) : '-'
+  const priceChange = priceChangeUSD ? formattedPercent(priceChangeUSD) : ''
 
   // volume
-  const volume = currency === 'ETH' ? 'Ξ ' + formattedNum(oneDayVolumeETH) : formattedNum(oneDayVolumeUSD, true)
-  const volumeChange = currency === 'ETH' ? getPercentSign(volumeChangeETH) : getPercentSign(volumeChangeUSD)
+  const volume = oneDayVolumeUSD ? formattedNum(oneDayVolumeUSD, true) : '-'
+  const volumeChange = volumeChangeUSD ? formattedPercent(volumeChangeUSD) : ''
 
   // liquidity
-  const liquidity = currency === 'ETH' ? 'Ξ ' + formattedNum(totalLiquidityETH) : formattedNum(totalLiquidityUSD, true)
-  const liquidityChange = currency === 'ETH' ? getPercentSign(liquidityChangeETH) : getPercentSign(liquidityChangeUSD)
+  const liquidity = totalLiquidityUSD ? formattedNum(totalLiquidityUSD, true) : '-'
+  const liquidityChange = liquidityChangeUSD ? formattedPercent(liquidityChangeUSD) : ''
+
+  const tokenLiquidityFormatted = totalLiquidity ? formattedNum(totalLiquidity) : '-'
 
   const Option = ({ onClick, active, children }) => {
     return (
@@ -268,7 +249,7 @@ function TokenPage({ address }) {
             <AutoColumn gap="10px">
               <RowFlat style={{ lineHeight: '22px' }}>
                 <Text fontSize={24} fontWeight={600}>
-                  {totalLiquidity && formattedNum(totalLiquidity)}
+                  {tokenLiquidityFormatted && formattedNum(tokenLiquidityFormatted)}
                 </Text>
                 <TopPercent>{liquidityChange}</TopPercent>
               </RowFlat>
@@ -321,9 +302,6 @@ function TokenPage({ address }) {
         </RowBetween>
       )}
       <DashboardWrapper>
-        <div area="fill" rounded="true" style={{ height: '300px' }}>
-          <TokenChart chartData={chartData} token={address} color={backgroundColor} />
-        </div>
         {!below1080 && (
           <PanelWrapper>
             <TopPanel rounded color="black" p={24}>
@@ -356,7 +334,7 @@ function TokenPage({ address }) {
               <Column>
                 <RowFlat>
                   <Text fontSize={24} lineHeight={1} fontWeight={600}>
-                    {totalLiquidity && formattedNum(totalLiquidity)}
+                    {tokenLiquidityFormatted}
                   </Text>
                 </RowFlat>
                 <RowFlat style={{ marginTop: '10px' }}>
@@ -366,48 +344,17 @@ function TokenPage({ address }) {
             </TopPanel>
           </PanelWrapper>
         )}
-        {!below1080 && (
-          <>
-            <ListHeader>Token Details</ListHeader>
-            <Panel
-              rounded
-              style={{
-                border: '1px solid rgba(43, 43, 43, 0.05)'
-              }}
-              p={20}
-            >
-              <TokenDetailsLayout>
-                <Column>
-                  <Text color="#888D9B">Symbol</Text>
-                  <Text style={{ marginTop: '1rem' }} fontSize={24} fontWeight="500">
-                    {symbol}
-                  </Text>
-                </Column>
-                <Column>
-                  <Text color="#888D9B">Name</Text>
-                  <Text style={{ marginTop: '1rem' }} fontSize={24} fontWeight="500">
-                    {name}
-                  </Text>
-                </Column>
-                <Column>
-                  <Text color="#888D9B">Address</Text>
-                  <AutoRow align="flex-end">
-                    <Text style={{ marginTop: '1rem' }} fontSize={24} fontWeight="500">
-                      {address.slice(0, 8) + '...' + address.slice(36, 42)}
-                    </Text>
-                    <CopyHelper toCopy={address} />
-                  </AutoRow>
-                </Column>
-              </TokenDetailsLayout>
-            </Panel>
-          </>
-        )}
+        <div area="fill" rounded="true" style={{ height: '300px' }}>
+          <TokenChart chartData={chartData} token={address} color={backgroundColor} />
+        </div>
+
         <ListHeader>Top Pairs</ListHeader>
         <Panel
           rounded
           style={{
             border: '1px solid rgba(43, 43, 43, 0.05)'
           }}
+          p={20}
         >
           {address ? <PairList address={address} pairs={allPairs} /> : <Loader />}
         </Panel>
@@ -466,9 +413,46 @@ function TokenPage({ address }) {
           style={{
             border: '1px solid rgba(43, 43, 43, 0.05)'
           }}
+          p={20}
         >
           {transactions ? <TxnList transactions={transactions} txFilter={txFilter} /> : <Loader />}
         </Panel>
+        {!below1080 && (
+          <>
+            <ListHeader>Token Details</ListHeader>
+            <Panel
+              rounded
+              style={{
+                border: '1px solid rgba(43, 43, 43, 0.05)'
+              }}
+              p={20}
+            >
+              <TokenDetailsLayout>
+                <Column>
+                  <Text color="#888D9B">Symbol</Text>
+                  <Text style={{ marginTop: '1rem' }} fontSize={24} fontWeight="500">
+                    {symbol}
+                  </Text>
+                </Column>
+                <Column>
+                  <Text color="#888D9B">Name</Text>
+                  <Text style={{ marginTop: '1rem' }} fontSize={24} fontWeight="500">
+                    {name}
+                  </Text>
+                </Column>
+                <Column>
+                  <Text color="#888D9B">Address</Text>
+                  <AutoRow align="flex-end">
+                    <Text style={{ marginTop: '1rem' }} fontSize={24} fontWeight="500">
+                      {address.slice(0, 8) + '...' + address.slice(36, 42)}
+                    </Text>
+                    <CopyHelper toCopy={address} />
+                  </AutoRow>
+                </Column>
+              </TokenDetailsLayout>
+            </Panel>
+          </>
+        )}
       </DashboardWrapper>
     </PageWrapper>
   )

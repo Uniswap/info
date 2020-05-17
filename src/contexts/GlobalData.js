@@ -1,11 +1,11 @@
-import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect } from 'react'
-import { GLOBAL_DATA, GLOBAL_TXNS, GLOBAL_CHART, ETH_PRICE } from '../apollo/queries'
+import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect, useState } from 'react'
 import { client } from '../apollo/client'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
-import { getPercentChange, getBlockFromTimestamp, get2DayPercentChange } from '../helpers'
 import { useTimeframe } from './Application'
 import { timeframeOptions } from '../constants'
+import { getPercentChange, getBlockFromTimestamp, get2DayPercentChange } from '../helpers'
+import { GLOBAL_DATA, GLOBAL_TXNS, GLOBAL_CHART, ETH_PRICE } from '../apollo/queries'
 
 const UPDATE = 'UPDATE'
 const UPDATE_TXNS = 'UPDATE_TXNS'
@@ -170,28 +170,13 @@ async function getGlobalData(ethPrice) {
   return data
 }
 
-const getChartData = async activeWindow => {
+const getChartData = async oldestDateToFetch => {
   const utcEndTime = dayjs.utc()
-
-  // based on window, get starttime
-  let utcStartTime
-  switch (activeWindow) {
-    case timeframeOptions.WEEK:
-      utcStartTime = utcEndTime.subtract(1, 'week').startOf('day')
-      break
-    case timeframeOptions.ALL_TIME:
-      utcStartTime = utcEndTime.subtract(1, 'year')
-      break
-    default:
-      utcStartTime = utcEndTime.subtract(1, 'year').startOf('year')
-      break
-  }
-  let startTime = utcStartTime.unix() - 1
 
   let result = await client.query({
     query: GLOBAL_CHART,
     variables: {
-      startTime
+      startTime: oldestDateToFetch
     },
     fetchPolicy: 'cache-first'
   })
@@ -207,7 +192,7 @@ const getChartData = async activeWindow => {
   })
 
   // fill in empty days
-  let timestamp = data[0].date ? data[0].date : startTime
+  let timestamp = data[0].date ? data[0].date : oldestDateToFetch
   let latestLiquidityUSD = data[0].totalLiquidityUSD
   let latestDayDats = data[0].mostLiquidTokens
   let index = 1
@@ -304,19 +289,42 @@ export function useGlobalData() {
 }
 
 export function useGlobalChartData() {
-  const [state, { updateChart }] = useGlobalDataContext()
+  // const [state, { updateChart }] = useGlobalDataContext()
+  const [chartData, setChartData] = useState()
+  const [oldestDateFetch, setOldestDateFetched] = useState()
   const [activeWindow] = useTimeframe()
 
-  const chartData = state?.chartData
+  // monitor the old date fetched
+  useEffect(() => {
+    const utcEndTime = dayjs.utc()
+    // based on window, get starttime
+    let utcStartTime
+    switch (activeWindow) {
+      case timeframeOptions.WEEK:
+        utcStartTime = utcEndTime.subtract(1, 'week').startOf('day')
+        break
+      case timeframeOptions.ALL_TIME:
+        utcStartTime = utcEndTime.subtract(1, 'year')
+        break
+      default:
+        utcStartTime = utcEndTime.subtract(1, 'year').startOf('year')
+        break
+    }
+    let startTime = utcStartTime.unix() - 1
+
+    if ((activeWindow && startTime < oldestDateFetch) || !oldestDateFetch) {
+      setOldestDateFetched(startTime)
+    }
+  }, [activeWindow, oldestDateFetch])
 
   useEffect(() => {
     async function fetchData() {
       // historical stuff for chart
-      let chartData = await getChartData(activeWindow)
-      chartData && updateChart(chartData)
+      let newChartData = await getChartData(oldestDateFetch)
+      setChartData(newChartData)
     }
-    activeWindow && fetchData()
-  }, [activeWindow, updateChart, chartData])
+    oldestDateFetch && fetchData()
+  }, [oldestDateFetch])
 
   return chartData
 }
