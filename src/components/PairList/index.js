@@ -108,7 +108,7 @@ function PairList({ pairs, color }) {
 
   const below740 = useMedia('(max-width: 740px)')
   const below1080 = useMedia('(max-width: 1080px)')
-  const below1200 = useMedia('(max-width: 1200px)')
+  // const below1200 = useMedia('(max-width: 1200px)')
 
   // pagination
   const [page, setPage] = useState(1)

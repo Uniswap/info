@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react'
-import { darken, transparentize } from 'polished'
+// import { darken, transparentize } from 'polished'
 import Vibrant from 'node-vibrant'
 import { hex } from 'wcag-contrast'
 import { isAddress } from '../helpers'
@@ -15,7 +15,7 @@ export function useColor(tokenAddress) {
       Vibrant.from(path).getPalette((err, palette) => {
         if (palette && palette.Vibrant) {
           let detectedHex = palette.Vibrant.hex
-          let AAscore = hex(detectedHex, '#FFF')
+          // let AAscore = hex(detectedHex, '#FFF')
           // while (AAscore < 3) {
           //   detectedHex = darken(0.01, detectedHex)
           //   AAscore = hex(detectedHex, '#FFF')

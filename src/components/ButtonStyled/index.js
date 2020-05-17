@@ -64,7 +64,7 @@ export const ButtonLight = styled(Base)`
 
   :hover {
     background-color: ${({ color, theme }) =>
-      color ? transparentize(0.6, color) : transparentize(0.4, theme.advancedBG)};
+      color ? transparentize(0.8, color) : transparentize(0.4, theme.advancedBG)};
   }
 `
 
