@@ -5,11 +5,7 @@ import { client } from './apollo/client'
 import { Route, Switch, BrowserRouter, withRouter, Redirect } from 'react-router-dom'
 import ScrolToTop from './components/ScrollToTop'
 
-import { useAllTokens } from './contexts/TokenData'
-
 import GlobalPage from './pages/GlobalPage'
-import TokenPage from './pages/TokenPage'
-import PairPage from './pages/PairPage'
 import NavHeader from './components/NavHeader'
 import LocalLoader from './components/LocalLoader'
 import { AutoColumn } from './components/Column'
@@ -44,9 +40,6 @@ const MigrateBanner = styled(AutoColumn)`
 
 function App() {
   const NavHeaderUpdated = withRouter(props => <NavHeader default {...props} />)
-
-  const allTokens = useAllTokens()
-
   const below750 = useMedia('(max-width: 750px)')
   const below490 = useMedia('(max-width: 490px)')
 
@@ -77,59 +70,16 @@ function App() {
             </>
           )}
         </MigrateBanner>
-        {allTokens ? (
-          <BrowserRouter>
-            <ScrolToTop />
-            <Switch>
-              <Route
-                exacts
-                strict
-                path="/token/:tokenAddress"
-                render={({ match }) => {
-                  const searched =
-                    allTokens &&
-                    allTokens.filter(token => {
-                      return token.id.toLowerCase() === match.params.tokenAddress.toLowerCase()
-                    })
-                  if (allTokens && searched.length > 0) {
-                    return (
-                      <>
-                        <NavHeaderUpdated token={match.params.tokenAddress.toLowerCase()} />
-                        <TokenPage address={match.params.tokenAddress.toLowerCase()} />
-                      </>
-                    )
-                  } else {
-                    return <Redirect to="/home" />
-                  }
-                }}
-              />
-              <Route
-                exacts
-                strict
-                path="/pair/:pairAddress"
-                render={({ match }) => {
-                  if (true) {
-                    return (
-                      <>
-                        <NavHeaderUpdated pair={match.params.pairAddress.toLowerCase()} />
-                        <PairPage pairAddress={match.params.pairAddress.toLowerCase()} />
-                      </>
-                    )
-                  } else {
-                    return <Redirect to="/home" />
-                  }
-                }}
-              />
-              <Route path="/home">
-                <NavHeaderUpdated />
-                <GlobalPage />
-              </Route>
-              <Redirect to="/home" />
-            </Switch>
-          </BrowserRouter>
-        ) : (
-          <LocalLoader fill="true" />
-        )}
+        <BrowserRouter>
+          <ScrolToTop />
+          <Switch>
+            <Route path="/home">
+              <NavHeaderUpdated />
+              <GlobalPage />
+            </Route>
+            <Redirect to="/home" />
+          </Switch>
+        </BrowserRouter>
       </AppWrapper>
     </ApolloProvider>
   )

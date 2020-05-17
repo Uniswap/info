@@ -1,20 +1,16 @@
-import React, { useState } from 'react'
+import React from 'react'
 import 'feather-icons'
 import { Box } from 'rebass'
 import styled from 'styled-components'
 
-import { AutoRow, RowBetween } from '../components/Row'
+import { RowBetween } from '../components/Row'
 import { AutoColumn } from '../components/Column'
-import PairList from '../components/PairList'
-import TopTokenList from '../components/TokenList'
-import TxnList from '../components/TxnList'
+
 import GlobalChart from '../components/GlobalChart'
-import { Hover, TYPE } from '../Theme'
+import { TYPE } from '../Theme'
 import { formattedNum, formattedPercent } from '../helpers'
-import { useGlobalData, useEthPrice, useGlobalChartData, useGlobalTransactions } from '../contexts/GlobalData'
-import { useAllTokenData } from '../contexts/TokenData'
-import { useAllPairs } from '../contexts/PairData'
-import { Search } from '../components/Search'
+import { useGlobalData, useEthPrice, useGlobalChartData } from '../contexts/GlobalData'
+
 import { useMedia } from 'react-use'
 import TokenLogo from '../components/TokenLogo'
 
@@ -50,25 +46,6 @@ const ThemedBackground = styled.div`
   background: ${({ theme }) => theme.background};
 `
 
-const ListOptions = styled(AutoRow)`
-  height: 40px;
-  width: 100%;
-  font-size: 1.25rem;
-  font-weight: 600;
-
-  @media screen and (max-width: 640px) {
-    font-size: 1rem;
-  }
-`
-
-const GridRow = styled.div`
-  display: inline-grid;
-  width: 100%;
-  grid-template-columns: 50% 50%;
-  column-gap: 6px;
-  align-items: start;
-`
-
 const TopGroup = styled.div`
   grid-template-columns: 1fr 1fr 1fr 1fr;
   column-gap: 6px;
@@ -96,15 +73,7 @@ const ChartWrapper = styled.div`
   height: 100%;
 `
 
-const LIST_VIEW = {
-  TOKENS: 'tokens',
-  PAIRS: 'pairs'
-}
-
 function GlobalPage() {
-  const [txFilter, setTxFilter] = useState('ALL')
-  const [listView, setListView] = useState(LIST_VIEW.PAIRS)
-
   const {
     totalLiquidityUSD,
     oneDayVolumeUSD,
@@ -115,11 +84,6 @@ function GlobalPage() {
   } = useGlobalData()
 
   const chartData = useGlobalChartData()
-
-  const transactions = useGlobalTransactions()
-
-  const allTokenData = useAllTokenData()
-  const pairs = useAllPairs()
 
   const ethPrice = useEthPrice()
   const formattedEthPrice = ethPrice ? formattedNum(ethPrice, true) : '-'
@@ -139,7 +103,6 @@ function GlobalPage() {
   return (
     <PageWrapper>
       <ThemedBackground />
-      <Search small={false} />
       {below1080 && ( // mobile card
         <Box mb={20}>
           <Box mb={20} mt={30}>
@@ -257,100 +220,6 @@ function GlobalPage() {
           </Panel>
         </TopGroup>
       )}
-      {!below1080 && (
-        <GridRow style={{ marginTop: '6px' }}>
-          <Panel style={{ height: '100%', minHeight: '300px' }}>
-            <ChartWrapper area="fill" rounded>
-              <GlobalChart chartData={chartData} display="liquidity" />
-            </ChartWrapper>
-          </Panel>
-          <Panel style={{ height: '100%' }}>
-            <ChartWrapper area="fill" rounded>
-              <GlobalChart chartData={chartData} display="volume" />
-            </ChartWrapper>
-          </Panel>
-        </GridRow>
-      )}
-      <Panel style={{ marginTop: '6px' }}>
-        <ListOptions gap="10px">
-          <Hover>
-            <TYPE.main
-              onClick={() => {
-                setListView(LIST_VIEW.PAIRS)
-              }}
-              fontSize={'1rem'}
-              color={listView === LIST_VIEW.TOKENS ? '#aeaeae' : 'black'}
-            >
-              Pairs
-            </TYPE.main>
-          </Hover>
-          <Hover>
-            <TYPE.main
-              onClick={() => {
-                setListView(LIST_VIEW.TOKENS)
-              }}
-              fontSize={'1rem'}
-              color={listView === LIST_VIEW.PAIRS ? '#aeaeae' : 'black'}
-            >
-              Tokens
-            </TYPE.main>
-          </Hover>
-        </ListOptions>
-        {listView === LIST_VIEW.PAIRS ? (
-          <PairList pairs={pairs && Object.keys(pairs).map(key => pairs[key])} />
-        ) : (
-          <TopTokenList tokens={allTokenData} />
-        )}
-      </Panel>
-      <Panel style={{ margin: '1rem 0' }}>
-        <ListOptions gap="10px">
-          <Hover>
-            <TYPE.main
-              onClick={() => {
-                setTxFilter('ALL')
-              }}
-              fontSize={'1rem'}
-              color={txFilter !== 'ALL' ? '#aeaeae' : 'black'}
-            >
-              All
-            </TYPE.main>
-          </Hover>
-          <Hover>
-            <TYPE.main
-              onClick={() => {
-                setTxFilter('SWAP')
-              }}
-              fontSize={'1rem'}
-              color={txFilter !== 'SWAP' ? '#aeaeae' : 'black'}
-            >
-              Swaps
-            </TYPE.main>
-          </Hover>
-          <Hover>
-            <TYPE.main
-              onClick={() => {
-                setTxFilter('ADD')
-              }}
-              fontSize={'1rem'}
-              color={txFilter !== 'ADD' ? '#aeaeae' : 'black'}
-            >
-              Adds
-            </TYPE.main>
-          </Hover>
-          <Hover>
-            <TYPE.main
-              onClick={() => {
-                setTxFilter('REMOVE')
-              }}
-              fontSize={'1rem'}
-              color={txFilter !== 'REMOVE' ? '#aeaeae' : 'black'}
-            >
-              Removes
-            </TYPE.main>
-          </Hover>
-        </ListOptions>
-        <TxnList transactions={transactions} txFilter={txFilter} />
-      </Panel>
     </PageWrapper>
   )
 }

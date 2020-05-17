@@ -5,11 +5,8 @@ import ThemeProvider, { GlobalStyle } from './Theme'
 
 import LocalStorageContextProvider, { Updater as LocalStorageContextUpdater } from './contexts/LocalStorage'
 
-import TokenDataContextProvider, { Updater as TokenDataContextUpdater } from './contexts/TokenData'
-
 import GlobalDataContextProvider from './contexts/GlobalData'
 
-import PairDataContextProvider, { Updater as PairDataContextUpdater } from './contexts/PairData'
 import ApplicationContextProvider from './contexts/Application'
 
 import App from './App'
@@ -18,11 +15,7 @@ function ContextProviders({ children }) {
   return (
     <LocalStorageContextProvider>
       <ApplicationContextProvider>
-        <TokenDataContextProvider>
-          <GlobalDataContextProvider>
-            <PairDataContextProvider>{children}</PairDataContextProvider>
-          </GlobalDataContextProvider>
-        </TokenDataContextProvider>
+        <GlobalDataContextProvider></GlobalDataContextProvider>
       </ApplicationContextProvider>
     </LocalStorageContextProvider>
   )
@@ -32,8 +25,6 @@ function Updaters() {
   return (
     <>
       <LocalStorageContextUpdater />
-      <PairDataContextUpdater />
-      <TokenDataContextUpdater />
     </>
   )
 }

@@ -15,6 +15,13 @@ export const client = new ApolloClient({
   cache: new InMemoryCache()
 })
 
+export const v1Client = new ApolloClient({
+  link: new HttpLink({
+    uri: 'https://api.thegraph.com/subgraphs/name/ianlapham/uniswapbackup'
+  }),
+  cache: new InMemoryCache()
+})
+
 export const blockClient = new ApolloClient({
   link: new HttpLink({
     uri: 'https://api.thegraph.com/subgraphs/name/blocklytics/ethereum-blocks'
