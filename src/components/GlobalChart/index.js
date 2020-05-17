@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Area, XAxis, YAxis, ResponsiveContainer, Tooltip, AreaChart, BarChart, Bar, CartesianGrid } from 'recharts'
 import Row, { RowBetween } from '../Row'
 import { toK, toNiceDate, toNiceDateYear } from '../../helpers'
@@ -8,19 +8,26 @@ import { useTimeframe } from '../../contexts/Application'
 import DropdownSelect from '../DropdownSelect'
 import { timeframeOptions } from '../../constants'
 import { TYPE } from '../../Theme'
+import { useGlobalChartData } from '../../contexts/GlobalData'
+import dayjs from 'dayjs'
 
 const CHART_VIEW = {
   VOLUME: 'Volume',
   LIQUIDITY: 'Liquidity'
 }
 
-const GlobalChart = ({ chartData, display }) => {
+const GlobalChart = ({ display }) => {
+  // chart options
   const [chartView, setChartView] = useState(display === 'volume' ? CHART_VIEW.VOLUME : CHART_VIEW.LIQUIDITY)
-  const [activeWindow, setActiveWindow] = useTimeframe()
 
-  const below1080 = useMedia('(max-width: 1080px)')
-  const below600 = useMedia('(max-width: 600px)')
+  // local window used for this chart only, global window for all data detching
+  const [localWindow, setLocalWindow] = useState(timeframeOptions.WEEK)
+  const [, setGlobalWindow] = useTimeframe()
 
+  // global historical data
+  const chartData = useGlobalChartData()
+
+  // switch between voluem and liquidity on larger screens
   function toggleView() {
     if (chartView === CHART_VIEW.VOLUME) {
       setChartView(CHART_VIEW.LIQUIDITY)
@@ -29,12 +36,45 @@ const GlobalChart = ({ chartData, display }) => {
     }
   }
 
+  // update the app time window so it can fetch more points if needed
+  useEffect(() => {
+    setGlobalWindow(localWindow)
+  }, [localWindow, setGlobalWindow])
+
+  // find start time based on required time window, update domain
+  const utcEndTime = dayjs.utc()
+  // based on window, get starttime
+  let utcStartTime
+  switch (localWindow) {
+    case timeframeOptions.WEEK:
+      utcStartTime =
+        utcEndTime
+          .subtract(1, 'week')
+          .startOf('day')
+          .unix() - 1
+      break
+    case timeframeOptions.ALL_TIME:
+      utcStartTime = utcEndTime.subtract(1, 'year').unix() - 1
+      break
+    default:
+      utcStartTime =
+        utcEndTime
+          .subtract(1, 'year')
+          .startOf('year')
+          .unix() - 1
+      break
+  }
+  const domain = [dataMin => (dataMin > utcStartTime ? dataMin : utcStartTime), 'dataMax']
+
+  const below1080 = useMedia('(max-width: 1080px)')
+  const below600 = useMedia('(max-width: 600px)')
+
   return chartData ? (
     <>
       {below600 ? (
         <RowBetween mb={40}>
           <DropdownSelect options={CHART_VIEW} active={chartView} setActive={setChartView} />
-          <DropdownSelect options={timeframeOptions} active={activeWindow} setActive={setActiveWindow} />
+          <DropdownSelect options={timeframeOptions} active={localWindow} setActive={setLocalWindow} />
         </RowBetween>
       ) : (
         <RowBetween marginBottom={'10px'}>
@@ -51,14 +91,14 @@ const GlobalChart = ({ chartData, display }) => {
           <Row justify="flex-end">
             <OptionButton
               style={{ marginRight: '10px' }}
-              active={activeWindow === timeframeOptions.WEEK}
-              onClick={() => setActiveWindow(timeframeOptions.WEEK)}
+              active={localWindow === timeframeOptions.WEEK}
+              onClick={() => setLocalWindow(timeframeOptions.WEEK)}
             >
               1 Week
             </OptionButton>
             <OptionButton
-              active={activeWindow === timeframeOptions.ALL_TIME}
-              onClick={() => setActiveWindow(timeframeOptions.ALL_TIME)}
+              active={localWindow === timeframeOptions.ALL_TIME}
+              onClick={() => setLocalWindow(timeframeOptions.ALL_TIME)}
             >
               All Time
             </OptionButton>
@@ -87,6 +127,8 @@ const GlobalChart = ({ chartData, display }) => {
               mirror={true}
               tick={{ fill: 'black' }}
               padding={{ right: 40, bottom: 0 }}
+              type={'number'}
+              domain={domain}
             />
             <YAxis
               type="number"
@@ -148,7 +190,10 @@ const GlobalChart = ({ chartData, display }) => {
               tick={{ fill: 'black' }}
               mirror={true}
               padding={{ right: 40, bottom: 0 }}
+              type={'number'}
+              domain={domain}
             />
+
             <YAxis
               type="number"
               axisLine={true}

@@ -10,7 +10,6 @@ import Link, { CustomLink } from '../Link'
 import { Divider } from '../../components'
 
 import { formattedNum } from '../../helpers'
-import { useCurrentCurrency } from '../../contexts/Application'
 import { usePairData, useAllPairs } from '../../contexts/PairData'
 import DoubleTokenLogo from '../DoubleLogo'
 import { ButtonFaded } from '../ButtonStyled'
@@ -49,7 +48,7 @@ const DashGrid = styled.div`
     justify-content: flex-end;
     width: 100%;
 
-    &:first-child {
+    :first-child {
       justify-content: flex-start;
       text-align: left;
       width: 100px;
@@ -58,12 +57,17 @@ const DashGrid = styled.div`
 
   @media screen and (min-width: 740px) {
     grid-template-columns: 1.5fr 1fr 1fr 180px 140px;
-    grid-template-areas: 'name liq vol supply swap';
+    grid-template-areas: ' name liq vol pool swap';
   }
 
   @media screen and (min-width: 1080px) {
-    grid-template-columns: 1.5fr 1fr 1fr 1fr 180px 140px;
-    grid-template-areas: 'name liq vol txCount supply swap';
+    grid-template-columns: 1.5fr 1fr 1fr 1fr 140px 140px;
+    grid-template-areas: ' name liq vol txCount pool swap';
+  }
+
+  @media screen and (min-width: 1200px) {
+    grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr 1fr 140px 140px;
+    grid-template-areas: ' name liq reserve0 reserve0 vol txCount pool swap';
   }
 `
 
@@ -93,15 +97,18 @@ const DataText = styled(Flex)`
 
 const SORT_FIELD = {
   LIQ: 'reserveUSD',
-  VOL: 'oneDayVolumeUSD'
+  VOL: 'oneDayVolumeUSD',
+  TXNS: 'oneDayTxns',
+  RESERVE0: 'reserve0',
+  RESERVE1: 'reserve1'
 }
 
 function PairList({ pairs }) {
-  const [currency] = useCurrentCurrency()
   const allPairData = useAllPairs()
 
   const below740 = useMedia('(max-width: 740px)')
   const below1080 = useMedia('(max-width: 1080px)')
+  const below1200 = useMedia('(max-width: 1200px)')
 
   // pagination
   const [page, setPage] = useState(1)
@@ -141,15 +148,25 @@ function PairList({ pairs }) {
       })
       .slice(ITEMS_PER_PAGE * (page - 1), page * ITEMS_PER_PAGE)
 
-  const ListItem = ({ item }) => {
+  const ListItem = ({ item, index }) => {
     const itemData = usePairData(item.id)
-    const liquidity = currency === 'ETH' ? 'Ξ ' + formattedNum(item.reserveUSD) : formattedNum(item.reserveUSD, true)
-    const volume =
-      currency === 'ETH' ? 'Ξ ' + formattedNum(itemData.oneDayVolumeETH) : formattedNum(itemData.oneDayVolumeUSD, true)
+    const liquidity = formattedNum(item.reserveUSD, true)
+    const volume = formattedNum(itemData.oneDayVolumeUSD, true)
+
+    if (item.token0.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
+      item.token0.name = 'ETH (Wrapped)'
+      item.token0.symbol = 'ETH'
+    }
+
+    if (item.token1.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
+      item.token1.name = 'ETH (Wrapped)'
+      item.token1.symbol = 'ETH'
+    }
 
     return (
       <DashGrid style={{ height: '60px' }}>
         <DataText area="name" fontWeight="500">
+          <div style={{ marginRight: '1rem' }}>{index}</div>
           <DoubleTokenLogo a0={item.token0.id} a1={item.token1.id} margin={true} />
           <CustomLink
             style={{ marginLeft: '20px', whiteSpace: 'nowrap' }}
@@ -162,10 +179,12 @@ function PairList({ pairs }) {
           </CustomLink>
         </DataText>
         <DataText area="liq">{liquidity}</DataText>
+        {!below1200 && <DataText area="reserve0">{formattedNum(item.reserve0) + ' ' + item.token0.symbol}</DataText>}
+        {!below1200 && <DataText area="reserve1">{formattedNum(item.reserve1) + ' ' + item.token1.symbol}</DataText>}
         <DataText area="vol">{volume}</DataText>
         {!below1080 && <DataText area="txCount">{itemData.oneDayTxns}</DataText>}
         {!below740 && (
-          <DataText area="supply">
+          <DataText area="pool">
             <ButtonFaded>
               <Link external href={''}>
                 + Join Pool
@@ -199,19 +218,45 @@ function PairList({ pairs }) {
             area="liq"
             onClick={e => {
               setSortedColumn(SORT_FIELD.LIQ)
-              setSortDirection(!sortDirection)
+              setSortDirection(sortedColumn !== SORT_FIELD.LIQ ? true : !sortDirection)
             }}
           >
             Liquidity {sortedColumn === SORT_FIELD.LIQ ? (!sortDirection ? '↑' : '↓') : ''}
           </ClickableText>
         </Flex>
+        {!below1200 && (
+          <Flex alignItems="center" justifyContent="flexEnd">
+            <ClickableText
+              area="reserve1"
+              onClick={e => {
+                setSortedColumn(SORT_FIELD.RESERVE0)
+                setSortDirection(sortedColumn !== SORT_FIELD.RESERVE0 ? true : !sortDirection)
+              }}
+            >
+              Token Liquidity {sortedColumn === SORT_FIELD.RESERVE0 ? (!sortDirection ? '↑' : '↓') : ''}
+            </ClickableText>
+          </Flex>
+        )}
+        {!below1200 && (
+          <Flex alignItems="center" justifyContent="flexEnd">
+            <ClickableText
+              area="reserve1"
+              onClick={e => {
+                setSortedColumn(SORT_FIELD.RESERVE1)
+                setSortDirection(sortedColumn !== SORT_FIELD.RESERVE1 ? true : !sortDirection)
+              }}
+            >
+              Token Liquidity {sortedColumn === SORT_FIELD.RESERVE1 ? (!sortDirection ? '↑' : '↓') : ''}
+            </ClickableText>
+          </Flex>
+        )}
         <>
           <Flex alignItems="center">
             <ClickableText
               area="vol"
               onClick={e => {
                 setSortedColumn(SORT_FIELD.VOL)
-                setSortDirection(!sortDirection)
+                setSortDirection(sortedColumn !== SORT_FIELD.VOL ? true : !sortDirection)
               }}
             >
               Volume (24hrs)
@@ -221,12 +266,21 @@ function PairList({ pairs }) {
         </>
         {!below1080 && (
           <Flex alignItems="center">
-            <Text area="txCount">Transactions (24hrs)</Text>
+            <ClickableText
+              area="txnCount"
+              onClick={e => {
+                setSortedColumn(SORT_FIELD.TXNS)
+                setSortDirection(sortedColumn !== SORT_FIELD.TXNS ? true : !sortDirection)
+              }}
+            >
+              Transactions (24hrs)
+              {sortedColumn === SORT_FIELD.TXNS ? (!sortDirection ? '↑' : '↓') : ''}
+            </ClickableText>
           </Flex>
         )}
         {!below740 && (
           <Flex alignItems="center">
-            <Text area="supply">Supply</Text>
+            <Text area="pool">Pool</Text>
           </Flex>
         )}
         {!below740 && (

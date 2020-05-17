@@ -112,6 +112,7 @@ const Blue = styled.span`
 export const Search = (small = false) => {
   const allTokens = useAllTokenData()
   const allPairs = useAllPairs()
+
   const [showMenu, toggleMenu] = useState(false)
   const [value, setValue] = useState('')
   const [, toggleShadow] = useState(false)
@@ -132,38 +133,68 @@ export const Search = (small = false) => {
   const escapeStringRegexp = string => string
 
   const filteredTokenList = useMemo(() => {
-    return Object.keys(allTokens).filter(address => {
-      const regexMatches = Object.keys(allTokens[address]).map(tokenEntryKey => {
-        const isAddress = value.slice(0, 2) === '0x'
-        if (tokenEntryKey === 'id' && isAddress) {
-          return allTokens[address][tokenEntryKey].match(new RegExp(escapeStringRegexp(value), 'i'))
+    return Object.keys(allTokens)
+      .sort((a, b) => {
+        const tokenA = allTokens[a]
+        const tokenB = allTokens[b]
+        if (tokenA.totalLiquidityUSD && tokenB.totalLiquidityUSD) {
+          return tokenA.totalLiquidityUSD > tokenB.totalLiquidityUSD ? -1 : 1
         }
-        if (tokenEntryKey === 'symbol' && !isAddress) {
-          return allTokens[address][tokenEntryKey].match(new RegExp(escapeStringRegexp(value), 'i'))
+        if (tokenA.totalLiquidityUSD && !tokenB.totalLiquidityUSD) {
+          return -1
         }
-        return false
+        if (!tokenA.totalLiquidityUSD && tokenB.totalLiquidityUSD) {
+          return 1
+        }
+        return 1
       })
-      return regexMatches.some(m => m)
-    })
+      .filter(address => {
+        const regexMatches = Object.keys(allTokens[address]).map(tokenEntryKey => {
+          const isAddress = value.slice(0, 2) === '0x'
+          if (tokenEntryKey === 'id' && isAddress) {
+            return allTokens[address][tokenEntryKey].match(new RegExp(escapeStringRegexp(value), 'i'))
+          }
+          if (tokenEntryKey === 'symbol' && !isAddress) {
+            return allTokens[address][tokenEntryKey].match(new RegExp(escapeStringRegexp(value), 'i'))
+          }
+          return false
+        })
+        return regexMatches.some(m => m)
+      })
   }, [allTokens, value])
 
   const filteredPairList = useMemo(() => {
-    return Object.keys(allPairs).filter(pair => {
-      const regexMatches = Object.keys(allPairs[pair]).map(field => {
-        const isAddress = value.slice(0, 2) === '0x'
-        if (field === 'id' && isAddress) {
-          return allPairs[pair][field].match(new RegExp(escapeStringRegexp(value), 'i'))
+    return Object.keys(allPairs)
+      .sort((a, b) => {
+        const pairA = allPairs[a]
+        const pairB = allPairs[b]
+        if (pairA.reserveUSD && pairB.reserveUSD) {
+          return pairA.reserveUSD > pairB.reserveUSD ? -1 : 1
         }
-        if (field === 'token0') {
-          return allPairs[pair][field].symbol.match(new RegExp(escapeStringRegexp(value), 'i'))
+        if (pairA.reserveUSD && !pairB.reserveUSD) {
+          return -1
         }
-        if (field === 'token1') {
-          return allPairs[pair][field].symbol.match(new RegExp(escapeStringRegexp(value), 'i'))
+        if (!pairA.reserveUSD && pairB.reserveUSD) {
+          return 1
         }
-        return false
+        return 1
       })
-      return regexMatches.some(m => m)
-    })
+      .filter(pair => {
+        const regexMatches = Object.keys(allPairs[pair]).map(field => {
+          const isAddress = value.slice(0, 2) === '0x'
+          if (field === 'id' && isAddress) {
+            return allPairs[pair][field].match(new RegExp(escapeStringRegexp(value), 'i'))
+          }
+          if (field === 'token0') {
+            return allPairs[pair][field].symbol.match(new RegExp(escapeStringRegexp(value), 'i'))
+          }
+          if (field === 'token1') {
+            return allPairs[pair][field].symbol.match(new RegExp(escapeStringRegexp(value), 'i'))
+          }
+          return false
+        })
+        return regexMatches.some(m => m)
+      })
   }, [allPairs, value])
 
   useEffect(() => {
@@ -240,8 +271,8 @@ export const Search = (small = false) => {
               : below470
               ? 'Search Uniswap...'
               : below700
-              ? 'Search pools and tokens...'
-              : 'Search all Uniswap pools and tokens...'
+              ? 'Search pairs and tokens...'
+              : 'Search all Uniswap pairs and tokens...'
           }
           value={value}
           onChange={e => {
@@ -286,7 +317,7 @@ export const Search = (small = false) => {
           </Heading>
         </div>
         <Heading>
-          <Gray>Pools</Gray>
+          <Gray>Pairs</Gray>
         </Heading>
         <div>
           {Object.keys(filteredPairList).length === 0 && <MenuItem>No results</MenuItem>}
@@ -295,7 +326,7 @@ export const Search = (small = false) => {
               <BasicLink to={'/pair/' + key} key={key} onClick={onDismiss}>
                 <MenuItem>
                   <DoubleTokenLogo a0={allPairs?.[key]?.token0?.id} a1={allPairs?.[key]?.token1?.id} margin={true} />
-                  <span>{allPairs[key].token0.symbol + '-' + allPairs[key].token1.symbol} Pool</span>
+                  <span>{allPairs[key].token0.symbol + '-' + allPairs[key].token1.symbol} Pair</span>
                 </MenuItem>
               </BasicLink>
             )

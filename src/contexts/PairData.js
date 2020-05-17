@@ -260,16 +260,15 @@ export function Updater() {
   const ethPrice = useEthPrice()
   useEffect(() => {
     async function getData() {
-      ethPrice &&
-        getAllPairs().then(allPairs => {
-          allPairs.map(async pair => {
-            return getPairData(pair.id, ethPrice).then(data => {
-              data && update(data)
-            })
-          })
+      const allPairs = await getAllPairs()
+      if (allPairs) {
+        allPairs.map(async pair => {
+          const pairData = await getPairData(pair.id, ethPrice)
+          pairData && update(pairData)
         })
+      }
     }
-    getData()
+    ethPrice && getData()
   }, [update, ethPrice])
   return null
 }
@@ -280,10 +279,9 @@ export function usePairData(pairAddress) {
   const pairData = safeAccess(state, [pairAddress])
   useEffect(() => {
     async function checkForPairData() {
-      if (!pairData && pairAddress) {
-        getPairData(pairAddress, ethPrice).then(data => {
-          update(data)
-        })
+      if (!pairData && pairAddress && ethPrice) {
+        let data = await getPairData(pairAddress)
+        update(data)
       }
     }
     checkForPairData()

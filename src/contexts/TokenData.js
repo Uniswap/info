@@ -119,6 +119,7 @@ const getAllTokens = async () => {
     fetchPolicy: 'cache-first'
   })
   data = data.concat(result.data.tokens)
+
   return data
 }
 
@@ -189,6 +190,11 @@ const getTokenData = async (address, ethPrice) => {
   if (!oneDayData && data) {
     data.oneDayVolumeUSD = data.tradeVolumeUSD
     data.oneDayVolumeETH = data.tradeVolume * data.derivedETH
+  }
+
+  if (data.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
+    data.name = 'ETH (Wrapped)'
+    data.symbol = 'ETH'
   }
 
   return data
@@ -286,6 +292,7 @@ export function useTokenData(tokenAddress) {
       update(data)
     })
   }
+
   return tokenData || {}
 }
 
@@ -339,6 +346,7 @@ export function useAllTokens() {
     }
     getTokens()
   }, [])
+
   return allTokens
 }
 

@@ -36,7 +36,7 @@ function reducer(state, { type, payload }) {
 }
 
 export default function Provider({ children }) {
-  const [state, dispatch] = useReducer(reducer, { CURRENCY: 'USD', TIME_KEY: timeframeOptions.ALL_TIME })
+  const [state, dispatch] = useReducer(reducer, { CURRENCY: 'USD', TIME_KEY: timeframeOptions.WEEK })
   const update = useCallback(currency => {
     dispatch({
       type: UPDATE,

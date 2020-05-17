@@ -245,6 +245,14 @@ function TxnList({ transactions, txFilter }) {
   const below780 = useMedia('(max-width: 780px)')
 
   const ListItem = ({ item }) => {
+    if (item.token0Symbol === 'WETH') {
+      item.token0Symbol = 'ETH'
+    }
+
+    if (item.token1Symbol === 'WETH') {
+      item.token1Symbol = 'ETH'
+    }
+
     return (
       <DashGrid style={{ height: '60px' }}>
         <DataText area="txn" fontWeight="500">
@@ -287,7 +295,7 @@ function TxnList({ transactions, txFilter }) {
             area="value"
             onClick={e => {
               setSortedColumn(SORT_FIELD.VALUE)
-              setSortDirection(!sortDirection)
+              setSortDirection(sortedColumn !== SORT_FIELD.VALUE ? true : !sortDirection)
             }}
           >
             Total Value {sortedColumn === SORT_FIELD.VALUE ? (!sortDirection ? '↑' : '↓') : ''}
@@ -300,7 +308,7 @@ function TxnList({ transactions, txFilter }) {
               color="textDim"
               onClick={() => {
                 setSortedColumn(SORT_FIELD.AMOUNT0)
-                setSortDirection(!sortDirection)
+                setSortDirection(sortedColumn !== SORT_FIELD.AMOUNT0 ? true : !sortDirection)
               }}
             >
               Token 0 Amount {sortedColumn === SORT_FIELD.AMOUNT0 ? (!sortDirection ? '↑' : '↓') : ''}
@@ -315,7 +323,7 @@ function TxnList({ transactions, txFilter }) {
                 color="textDim"
                 onClick={() => {
                   setSortedColumn(SORT_FIELD.AMOUNT1)
-                  setSortDirection(!sortDirection)
+                  setSortDirection(sortedColumn !== SORT_FIELD.AMOUNT1 ? true : !sortDirection)
                 }}
               >
                 Token 1 Amount {sortedColumn === SORT_FIELD.AMOUNT1 ? (!sortDirection ? '↑' : '↓') : ''}
@@ -335,7 +343,7 @@ function TxnList({ transactions, txFilter }) {
               color="textDim"
               onClick={() => {
                 setSortedColumn(SORT_FIELD.TIMESTAMP)
-                setSortDirection(!sortDirection)
+                setSortDirection(sortedColumn !== SORT_FIELD.TIMESTAMP ? true : !sortDirection)
               }}
             >
               Time {sortedColumn === SORT_FIELD.TIMESTAMP ? (!sortDirection ? '↑' : '↓') : ''}

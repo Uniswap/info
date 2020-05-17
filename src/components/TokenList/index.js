@@ -7,7 +7,6 @@ import { Box, Flex, Text } from 'rebass'
 import TokenLogo from '../TokenLogo'
 import { CustomLink } from '../Link'
 import Row from '../Row'
-import LocalLoader from '../LocalLoader'
 import { Divider } from '..'
 
 import { formattedNum, formattedPercent } from '../../helpers'
@@ -170,11 +169,12 @@ function TopTokenList({ tokens }) {
       })
       .slice(ITEMS_PER_PAGE * (page - 1), page * ITEMS_PER_PAGE)
 
-  const ListItem = ({ item }) => {
+  const ListItem = ({ item, index }) => {
     return (
       <DashGrid style={{ height: '60px' }}>
         <DataText area="name" fontWeight="500">
           <Row>
+            <div style={{ marginRight: '1rem' }}>{index}</div>
             <TokenLogo address={item.address} />
             <CustomLink
               style={{ marginLeft: '16px', whiteSpace: 'nowrap' }}
@@ -214,7 +214,7 @@ function TopTokenList({ tokens }) {
             fontWeight="500"
             onClick={e => {
               setSortedColumn(SORT_FIELD.NAME)
-              setSortDirection(!sortDirection)
+              setSortDirection(sortedColumn !== SORT_FIELD.NAMe ? true : !sortDirection)
             }}
           >
             {below680 ? 'Symbol' : 'Name'} {sortedColumn === SORT_FIELD.NAME ? (!sortDirection ? '↑' : '↓') : ''}
@@ -226,7 +226,7 @@ function TopTokenList({ tokens }) {
               area="symbol"
               onClick={e => {
                 setSortedColumn(SORT_FIELD.SYMBOL)
-                setSortDirection(!sortDirection)
+                setSortDirection(sortedColumn !== SORT_FIELD.SYMBOL ? true : !sortDirection)
               }}
             >
               Symbol {sortedColumn === SORT_FIELD.SYMBOL ? (!sortDirection ? '↑' : '↓') : ''}
@@ -239,7 +239,7 @@ function TopTokenList({ tokens }) {
               area="price"
               onClick={e => {
                 setSortedColumn(SORT_FIELD.PRICE)
-                setSortDirection(!sortDirection)
+                setSortDirection(sortedColumn !== SORT_FIELD.PRICE ? true : !sortDirection)
               }}
             >
               Price {sortedColumn === SORT_FIELD.PRICE ? (!sortDirection ? '↑' : '↓') : ''}
@@ -251,7 +251,7 @@ function TopTokenList({ tokens }) {
             area="liq"
             onClick={e => {
               setSortedColumn(SORT_FIELD.LIQ)
-              setSortDirection(!sortDirection)
+              setSortDirection(sortedColumn !== SORT_FIELD.LIQ ? true : !sortDirection)
             }}
           >
             Liquidity {sortedColumn === SORT_FIELD.LIQ ? (!sortDirection ? '↑' : '↓') : ''}
@@ -262,7 +262,7 @@ function TopTokenList({ tokens }) {
             area="vol"
             onClick={e => {
               setSortedColumn(SORT_FIELD.VOL)
-              setSortDirection(!sortDirection)
+              setSortDirection(sortedColumn !== SORT_FIELD.VOL ? true : !sortDirection)
             }}
           >
             Volume (24hrs)
@@ -275,7 +275,7 @@ function TopTokenList({ tokens }) {
               area="change"
               onClick={e => {
                 setSortedColumn(SORT_FIELD.CHANGE)
-                setSortDirection(!sortDirection)
+                setSortDirection(sortedColumn !== SORT_FIELD.CHANGE ? true : !sortDirection)
               }}
             >
               Price Change (24hrs)
@@ -286,9 +286,7 @@ function TopTokenList({ tokens }) {
       </DashGrid>
       <Divider />
       <List p={0}>
-        {!filteredList ? (
-          <LocalLoader />
-        ) : (
+        {filteredList &&
           filteredList.map((item, index) => {
             return (
               <div key={index}>
@@ -296,8 +294,7 @@ function TopTokenList({ tokens }) {
                 <Divider />
               </div>
             )
-          })
-        )}
+          })}
       </List>
       <PageButtons>
         <div
