@@ -7,7 +7,6 @@ import { Box, Flex, Text } from 'rebass'
 import TokenLogo from '../TokenLogo'
 import { CustomLink } from '../Link'
 import Row from '../Row'
-import LocalLoader from '../LocalLoader'
 import { Divider } from '..'
 
 import { formattedNum, formattedPercent } from '../../helpers'
