@@ -139,8 +139,8 @@ function PairList({ pairs, color }) {
     pairs
       .sort((a, b) => {
         // pull in calculated one day volume
-        a.oneDayVolumeUSD = allPairData?.[a.id]?.oneDayVolumeUSD
-        b.oneDayVolumeUSD = allPairData?.[b.id]?.oneDayVolumeUSD
+        a.oneDayVolumeUSD = allPairData?.[a.id]?.oneDayVolumeUSD || 0
+        b.oneDayVolumeUSD = allPairData?.[b.id]?.oneDayVolumeUSD || 0
 
         a.oneWeekVolumeUSD = allPairData?.[a.id]?.oneWeekVolumeUSD
         b.oneWeekVolumeUSD = allPairData?.[b.id]?.oneWeekVolumeUSD
@@ -276,7 +276,7 @@ function PairList({ pairs, color }) {
             return (
               item && (
                 <div key={index}>
-                  <ListItem key={index} index={index + 1} item={item} />
+                  <ListItem key={index} index={(page - 1) * 10 + index + 1} item={item} />
                   <Divider />
                 </div>
               )

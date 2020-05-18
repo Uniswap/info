@@ -285,7 +285,7 @@ function TopTokenList({ tokens }) {
           filteredList.map((item, index) => {
             return (
               <div key={index}>
-                <ListItem key={index} index={index + 1} item={item} />
+                <ListItem key={index} index={(page - 1) * 10 + index + 1} item={item} />
                 <Divider />
               </div>
             )
