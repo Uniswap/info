@@ -9,7 +9,6 @@ import { AutoColumn } from '../Column'
 import { useMedia } from 'react-use'
 import { useV1Data } from '../../contexts/V1Data'
 import { useGlobalData } from '../../contexts/GlobalData'
-// import { formattedNum, toK } from '../../helpers'
 import { toK } from '../../helpers'
 import { ButtonDark } from '../ButtonStyled'
 
@@ -25,24 +24,26 @@ const Header = styled.div`
 `
 
 const CombinedWrapper = styled(RowFixed)`
-border: 1px solid ${({ theme }) => theme.primary1}
+border: 1px solid ${({ theme }) => theme.primary2}
 border-radius: 12px;
-padding: .25rem 0.25rem .25rem .5rem ;
+padding: .25rem 0.25rem .25rem .75rem ;
 `
 
 const CombinedData = styled.div`
   color: ${({ theme }) => theme.primary1};
-  margin-right: 0.5rem;
+  margin-right: 0.75rem;
+  font-size: 1rem;
 `
 
 export default function NavHeader({ token, pair }) {
   const isHome = !token && !pair
 
+  const below1024 = useMedia('(max-width: 1024px)')
   const below600 = useMedia('(max-width: 600px)')
 
-  const { liquidityUsd, txCount, dailyVolumeUSD } = useV1Data()
+  const { liquidityUsd, dailyVolumeUSD } = useV1Data()
 
-  const { totalLiquidityUSD, oneDayVolumeUSD, oneDayTxns } = useGlobalData()
+  const { totalLiquidityUSD, oneDayVolumeUSD } = useGlobalData()
 
   const liquidity =
     totalLiquidityUSD && liquidityUsd ? '$' + toK(parseFloat(totalLiquidityUSD) + parseFloat(liquidityUsd), true) : ''
@@ -64,14 +65,22 @@ export default function NavHeader({ token, pair }) {
           <div style={{ width: '370px' }}>{!isHome && <Search small={true} />}</div>
           {isHome && !below600 && (
             <CombinedWrapper>
-              <CombinedData>
-                Combined Liquidity: <b>{liquidity}</b>
-              </CombinedData>
-              <CombinedData>
-                Combined volume: <b>{volume}</b>
-                {/* Combined Txns: {txns} */}
-              </CombinedData>
-              <ButtonDark href="https://combined.uniswap.info">View combined ↗</ButtonDark>
+              {!below1024 && (
+                <>
+                  <CombinedData>
+                    Combined Liquidity: <b>{liquidity}</b>
+                  </CombinedData>
+                  <CombinedData>
+                    Combined Vol: <b>{volume}</b>
+                  </CombinedData>
+                  {/* <CombinedData>
+                    Combined Txns: <b>{txns}</b>
+                  </CombinedData> */}
+                </>
+              )}
+              <ButtonDark style={{ minWidth: 'initial' }} href="https://combined.uniswap.info">
+                View combined {below1024 && 'data'} ↗
+              </ButtonDark>
             </CombinedWrapper>
           )}
         </RowFixed>
