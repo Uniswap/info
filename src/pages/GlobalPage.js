@@ -88,7 +88,6 @@ const LIST_VIEW = {
 }
 
 function GlobalPage() {
-  const [txFilter, setTxFilter] = useState('ALL')
   const [listView, setListView] = useState(LIST_VIEW.PAIRS)
 
   const {
@@ -301,7 +300,7 @@ function GlobalPage() {
         Transactions
       </TYPE.main>
       <Panel style={{ margin: '1rem 0' }}>
-        <TxnList transactions={transactions} txFilter={txFilter} />
+        <TxnList transactions={transactions} />
       </Panel>
     </PageWrapper>
   )

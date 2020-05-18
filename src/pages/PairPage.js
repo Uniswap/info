@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import 'feather-icons'
 import styled from 'styled-components'
 
@@ -6,19 +6,18 @@ import { Text } from 'rebass'
 import Panel from '../components/Panel'
 import TokenLogo from '../components/TokenLogo'
 
-import { RowFlat, AutoRow, RowBetween, RowFixed } from '../components/Row'
+import { AutoRow, RowBetween, RowFixed } from '../components/Row'
 import Column, { AutoColumn } from '../components/Column'
 import { ButtonLight, ButtonDark } from '../components/ButtonStyled'
 import PairChart from '../components/PairChart'
 import Link from '../components/Link'
-import { Hint } from '../components'
 import TxnList from '../components/TxnList'
 import Loader from '../components/Loader'
 
 import { formattedNum, formattedPercent } from '../helpers'
 import { useColor } from '../hooks'
 import { usePairData, usePairTransactions, usePairChartData } from '../contexts/PairData'
-import { ThemedBackground, Hover, TYPE } from '../Theme'
+import { ThemedBackground, TYPE } from '../Theme'
 import CopyHelper from '../components/Copy'
 import { useMedia } from 'react-use'
 import DoubleTokenLogo from '../components/DoubleLogo'
@@ -120,18 +119,7 @@ const TokenDetailsLayout = styled.div`
   }
 `
 
-const Option = ({ onClick, active, children }) => {
-  return (
-    <Hover>
-      <Text onClick={onClick} color={!active ? '#aeaeae' : 'black'} fontWeight={500} fontSize={'1rem'}>
-        {children}
-      </Text>
-    </Hover>
-  )
-}
-
 function PairPage({ pairAddress }) {
-  const [txFilter, setTxFilter] = useState('ALL')
   const {
     token0,
     token1,
@@ -270,7 +258,7 @@ function PairPage({ pairAddress }) {
               marginTop: '1.5rem'
             }}
           >
-            {transactions ? <TxnList transactions={transactions} txFilter={txFilter} /> : <Loader />}
+            {transactions ? <TxnList transactions={transactions} /> : <Loader />}
           </Panel>
           <RowBetween style={{ marginTop: '3rem' }}>
             <TYPE.main fontSize={'1.125rem'}>Pair Information</TYPE.main>{' '}

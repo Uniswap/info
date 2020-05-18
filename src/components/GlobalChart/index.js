@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Area, XAxis, YAxis, ResponsiveContainer, Tooltip, AreaChart, BarChart, Bar, CartesianGrid } from 'recharts'
+import { Area, XAxis, YAxis, ResponsiveContainer, Tooltip, AreaChart, BarChart, Bar } from 'recharts'
 import Row, { RowBetween } from '../Row'
 import { toK, toNiceDate, toNiceDateYear } from '../../helpers'
 import { OptionButton } from '../ButtonStyled'
