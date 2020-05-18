@@ -200,7 +200,7 @@ const getPairData = async (address, ethPrice) => {
 
     // new tokens
     if (!oneDayData && data) {
-      data.oneDayVolumeUSD = data.tradeVolumeUSD
+      data.oneDayVolumeUSD = data.volumeUSD
       data.oneDayVolumeETH = data.tradeVolume * data.derivedETH
     }
   } catch (e) {
