@@ -4,7 +4,7 @@ import styled from 'styled-components'
 
 import { Text } from 'rebass'
 import Panel from '../components/Panel'
-import TokenLogo from '../components/TokenLogo'
+// import TokenLogo from '../components/TokenLogo'
 
 import { AutoRow, RowBetween, RowFixed } from '../components/Row'
 import Column, { AutoColumn } from '../components/Column'
