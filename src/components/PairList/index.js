@@ -179,8 +179,6 @@ function PairList({ pairs }) {
           </CustomLink>
         </DataText>
         <DataText area="liq">{liquidity}</DataText>
-        {!below1200 && <DataText area="reserve0">{formattedNum(item.reserve0) + ' ' + item.token0.symbol}</DataText>}
-        {!below1200 && <DataText area="reserve1">{formattedNum(item.reserve1) + ' ' + item.token1.symbol}</DataText>}
         <DataText area="vol">{volume}</DataText>
         {!below1200 && <DataText area="volWeek">{formattedNum(itemData.oneWeekVolumeUSD, true)}</DataText>}
         {!below1200 && <DataText area="fees">{formattedNum(itemData.oneDayVolumeUSD * 0.003, true)}</DataText>}
