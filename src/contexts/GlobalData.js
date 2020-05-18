@@ -326,7 +326,6 @@ const getEthPrice = async () => {
 }
 
 async function getV1Data() {
-  console.log('fetch')
   dayjs.extend(utc)
 
   let data = {}
