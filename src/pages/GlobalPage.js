@@ -105,8 +105,6 @@ function GlobalPage() {
 
   const below1080 = useMedia('(max-width: 1080px)')
 
-  const below600 = useMedia('(max-width: 600px)')
-
   const v1Data = useV1Data()
 
   return (
