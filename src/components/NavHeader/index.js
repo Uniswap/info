@@ -49,16 +49,20 @@ export default function NavHeader({ token, pair }) {
       <RowBetween>
         <Title token={token} pair={pair} />
         <RowFixed>
-          <Link href="https://www.uniswap.info">
+          <Link href="https://www.v1.uniswap.info">
             <DarkButton>
               <Text fontWeight={600} color="white">
                 V1 Analytics →
               </Text>
             </DarkButton>
           </Link>
-          <PinkButton>
-            <Text fontWeight={600}>Launch V2 Analytics →</Text>
-          </PinkButton>
+          <Link href="https://www.uniswap.info">
+            <PinkButton>
+              <Text fontWeight={600} color="white">
+                Launch V2 Analytics →
+              </Text>
+            </PinkButton>
+          </Link>
         </RowFixed>
       </RowBetween>
     </Header>

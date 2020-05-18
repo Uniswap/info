@@ -47,6 +47,7 @@ const TopGroup = styled.div`
     display: flex;
     flex-direction: column;
     width: 100%;
+    grid-template-rows: auto;
     align-items: start;
   }
 `
@@ -54,6 +55,7 @@ const TopGroup = styled.div`
 const Panel = styled.div`
   width: 100%;
   height: 100%;
+
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -64,6 +66,10 @@ const Panel = styled.div`
   box-shadow: 0 1.1px 2.8px -9px rgba(0, 0, 0, 0.008), 0 2.7px 6.7px -9px rgba(0, 0, 0, 0.012),
     0 5px 12.6px -9px rgba(0, 0, 0, 0.015), 0 8.9px 22.6px -9px rgba(0, 0, 0, 0.018),
     0 16.7px 42.2px -9px rgba(0, 0, 0, 0.022), 0 40px 101px -9px rgba(0, 0, 0, 0.03);
+
+  @media only screen and (max-width: 600px) {
+    max-height: 100px;
+  }
 `
 
 const OverviewGroup = styled.div`
@@ -73,6 +79,7 @@ const OverviewGroup = styled.div`
 
   @media only screen and (max-width: 1080px) {
     flex-direction: column;
+    height: 340px;
   }
 `
 
@@ -97,6 +104,8 @@ function GlobalPage() {
   let txnChangeFormatted = txnChange ? formattedPercent(txnChange) : ''
 
   const below1080 = useMedia('(max-width: 1080px)')
+
+  const below600 = useMedia('(max-width: 600px)')
 
   const v1Data = useV1Data()
 
@@ -155,9 +164,11 @@ function GlobalPage() {
                 </AutoColumn>
               </Panel>
             </AutoColumn>
-            <Panel style={{ width: below1080 ? '100%' : '50%', marginTop: below1080 ? '40px' : 0 }}>
-              <PieChart v1={v1Data && parseFloat(v1Data.liquidityUsd)} v2={parseFloat(totalLiquidityUSD)} />
-            </Panel>
+            {!below1080 && (
+              <Panel style={{ width: below1080 ? '100%' : '50%', marginTop: below1080 ? '40px' : 0 }}>
+                <PieChart v1={v1Data && parseFloat(v1Data.liquidityUsd)} v2={parseFloat(totalLiquidityUSD)} />
+              </Panel>
+            )}
           </OverviewGroup>
         </AutoColumn>
         <AutoColumn gap="20px">
@@ -165,7 +176,7 @@ function GlobalPage() {
             <Text fontSize={24} fontWeight={600}>
               V2 Stats
             </Text>
-            <Link href="">
+            <Link href="https://www.uniswap.info">
               <TYPE.pink fontSize={20} fontWeight={500}>
                 View More
               </TYPE.pink>
@@ -221,7 +232,7 @@ function GlobalPage() {
             <Text fontSize={24} fontWeight={600}>
               V1 Stats
             </Text>
-            <Link href="">
+            <Link href="https://www.v1.uniswap.info">
               <TYPE.pink fontSize={20} fontWeight={500}>
                 View More
               </TYPE.pink>
