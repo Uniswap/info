@@ -9,7 +9,9 @@ import { AutoColumn } from '../Column'
 import { useMedia } from 'react-use'
 import { useV1Data } from '../../contexts/V1Data'
 import { useGlobalData } from '../../contexts/GlobalData'
-import { formattedNum, toK } from '../../helpers'
+// import { formattedNum, toK } from '../../helpers'
+import { toK } from '../../helpers'
+import { ButtonDark } from '../ButtonStyled'
 
 const Header = styled.div`
   width: calc(100% - 80px);
@@ -20,6 +22,17 @@ const Header = styled.div`
     width: calc(100% - 40px);
     padding: 32px 20px;
   }
+`
+
+const CombinedWrapper = styled(RowFixed)`
+border: 1px solid ${({ theme }) => theme.primary1}
+border-radius: 12px;
+padding: .25rem 0.25rem .25rem .5rem ;
+`
+
+const CombinedData = styled.div`
+  color: ${({ theme }) => theme.primary1};
+  margin-right: 0.5rem;
 `
 
 export default function NavHeader({ token, pair }) {
@@ -34,7 +47,7 @@ export default function NavHeader({ token, pair }) {
   const liquidity =
     totalLiquidityUSD && liquidityUsd ? '$' + toK(parseFloat(totalLiquidityUSD) + parseFloat(liquidityUsd), true) : ''
   const volume = oneDayVolumeUSD && dailyVolumeUSD ? '$' + toK(oneDayVolumeUSD + dailyVolumeUSD, true) : ''
-  const txns = oneDayTxns && txCount ? formattedNum(oneDayTxns + txCount) : ''
+  // const txns = oneDayTxns && txCount ? formattedNum(oneDayTxns + txCount) : ''
 
   return below600 ? (
     <Header>
@@ -49,10 +62,17 @@ export default function NavHeader({ token, pair }) {
         <Title token={token} pair={pair} />
         <RowFixed>
           <div style={{ width: '370px' }}>{!isHome && <Search small={true} />}</div>
-          {isHome && (
-            <div>
-              Combined Liquidity: {liquidity} Combined volume: {volume} Combined Txns: {txns}
-            </div>
+          {isHome && !below600 && (
+            <CombinedWrapper>
+              <CombinedData>
+                Combined Liquidity: <b>{liquidity}</b>
+              </CombinedData>
+              <CombinedData>
+                Combined volume: <b>{volume}</b>
+                {/* Combined Txns: {txns} */}
+              </CombinedData>
+              <ButtonDark href="https://combined.uniswap.info">View combined ↗</ButtonDark>
+            </CombinedWrapper>
           )}
         </RowFixed>
       </RowBetween>
