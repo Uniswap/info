@@ -4,14 +4,15 @@ import styled from 'styled-components'
 import Row from '../Row'
 import { AutoColumn } from '../Column'
 import { ChevronDown as Arrow } from 'react-feather'
+import { Text } from 'rebass'
 
 const Wrapper = styled.div`
   z-index: 20;
   position: relative;
   background-color: rgb(183, 177, 183, 0.3);
   width: 100px;
-  padding: 10px;
-  border-radius: 16px;
+  padding: 4px 10px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -26,12 +27,12 @@ const Wrapper = styled.div`
 
 const Dropdown = styled.div`
   position: absolute;
-  top: 40px;
-  padding-top: 60px;
+  top: 28px;
+  padding-top: 40px;
   width: calc(100% - 40px);
   background-color: rgb(183, 177, 183, 0.3);
-  padding: 20px;
-  border-radius: 16px;
+  padding: 10px 20px;
+  border-radius: 8px;
   border-top-right-radius: 0;
   border-top-left-radius: 0;
   font-weight: 500;
@@ -76,7 +77,9 @@ const DropdownSelect = ({ options, active, setActive }) => {
                     }}
                     key={index}
                   >
-                    {option}
+                    <Text fontWeight={400} fontSize={14}>
+                      {option}
+                    </Text>
                   </Option>
                 )
               )

@@ -73,6 +73,10 @@ const TextWrapper = styled(Text)`
 export const TYPE = {
   main(props) {
     return <TextWrapper fontWeight={500} color={'text1'} {...props} />
+  },
+
+  pink(props) {
+    return <TextWrapper fontWeight={500} color={props.faded ? 'grey' : 'primaryText1'} {...props} />
   }
 }
 

@@ -303,6 +303,7 @@ export const TOKEN_CHART = gql`
     tokenDayDatas(orderBy: date, orderDirection: asc, where: { token: $tokenAddr }) {
       id
       date
+      priceUSD
       totalLiquidityToken
       totalLiquidityUSD
       totalLiquidityETH
@@ -341,6 +342,7 @@ export const TOKEN_DATA = (tokenAddress, block) => {
       tradeVolume
       tradeVolumeUSD
       totalLiquidity
+      txCount
       allPairs(orderBy: reserveUSD, orderDirection: desc) {
         id
         reserveUSD
@@ -373,6 +375,7 @@ export const TOKEN_DATA = (tokenAddress, block) => {
     tradeVolume
     tradeVolumeUSD
     totalLiquidity
+    txCount
     allPairs(orderBy: reserveUSD, orderDirection: desc) {
       id
       reserveUSD

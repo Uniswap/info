@@ -11,7 +11,7 @@ import { RowFixed } from '../Row'
 import LocalLoader from '../LocalLoader'
 import { Box, Flex, Text } from 'rebass'
 import Link from '../Link'
-import { Divider } from '..'
+import { Divider, EmptyCard } from '..'
 
 dayjs.extend(utc)
 
@@ -116,6 +116,7 @@ const SortText = styled.button`
   font-size: 1rem;
   padding: 0px;
   color: ${({ active, theme }) => (active ? theme.text1 : theme.text3)};
+  outline: none;
 `
 
 const SORT_FIELD = {
@@ -125,12 +126,32 @@ const SORT_FIELD = {
   TIMESTAMP: 'timestamp'
 }
 
+const TXN_TYPE = {
+  SWAP: 'SWAP',
+  ADD: 'ADD',
+  REMOVE: 'REMOVE'
+}
+
+const ITEMS_PER_PAGE = 10
+
+function getTransactionType(event, symbol0, symbol1) {
+  switch (event) {
+    case TXN_TYPE.ADD:
+      return 'Add ' + symbol0 + ' and ' + symbol1
+    case TXN_TYPE.REMOVE:
+      return 'Remove ' + symbol0 + ' and ' + symbol1
+    case TXN_TYPE.SWAP:
+      return 'Swap ' + symbol0 + ' for ' + symbol1
+    default:
+      return ''
+  }
+}
+
 // @TODO rework into virtualized list
-function TxnList({ transactions, color }) {
+function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
   // page state
   const [page, setPage] = useState(1)
   const [maxPage, setMaxPage] = useState(1)
-  const ITEMS_PER_PAGE = 10
 
   // sorting
   const [sortDirection, setSortDirection] = useState(true)
@@ -145,14 +166,9 @@ function TxnList({ transactions, color }) {
     setPage(1)
   }, [transactions])
 
-  const TXN_TYPE = {
-    SWAP: 'SWAP',
-    ADD: 'ADD',
-    REMOVE: 'REMOVE'
-  }
   // parse the txns and format for UI
   useEffect(() => {
-    if (transactions) {
+    if (transactions && transactions.mints && transactions.burns && transactions.swaps) {
       let newTxns = []
       if (transactions.mints.length > 0) {
         transactions.mints.map(mint => {
@@ -186,14 +202,24 @@ function TxnList({ transactions, color }) {
       }
       if (transactions.swaps.length > 0) {
         transactions.swaps.map(swap => {
+          const netToken0 = swap.amount0In - swap.amount0Out
+          const netToken1 = swap.amount1In - swap.amount1Out
+
           let newTxn = {}
+
+          if (netToken0 < 0) {
+            newTxn.token0Symbol = swap.pair.token1.symbol
+            newTxn.token1Symbol = swap.pair.token0.symbol
+          } else if (netToken1 < 0) {
+            newTxn.token0Symbol = swap.pair.token0.symbol
+            newTxn.token1Symbol = swap.pair.token1.symbol
+          }
+
           newTxn.hash = swap.transaction.id
           newTxn.timestamp = swap.transaction.timestamp
           newTxn.type = TXN_TYPE.SWAP
-          newTxn.token0Amount = swap.amount0In + swap.amount0Out
-          newTxn.token1Amount = swap.amount1In + swap.amount1Out
-          newTxn.token0Symbol = swap.pair.token0.symbol
-          newTxn.token1Symbol = swap.pair.token1.symbol
+          newTxn.token0Amount = Math.abs(netToken0)
+          newTxn.token1Amount = Math.abs(netToken1)
           newTxn.amountUSD = swap.amountUSD
           newTxn.account = swap.to
           return newTxns.push(newTxn)
@@ -217,24 +243,11 @@ function TxnList({ transactions, color }) {
         setMaxPage(Math.floor(filtered.length / ITEMS_PER_PAGE) + extraPages)
       }
     }
-  }, [transactions, TXN_TYPE.ADD, TXN_TYPE.REMOVE, TXN_TYPE.SWAP, txFilter])
+  }, [transactions, txFilter])
 
   useEffect(() => {
     setPage(1)
   }, [txFilter])
-
-  function getTransactionType(event, symbol0, symbol1) {
-    switch (event) {
-      case TXN_TYPE.ADD:
-        return 'Add ' + symbol0 + ' and ' + symbol1
-      case TXN_TYPE.REMOVE:
-        return 'Remove ' + symbol0 + ' and ' + symbol1
-      case TXN_TYPE.SWAP:
-        return 'Swap ' + symbol0 + ' for ' + symbol1
-      default:
-        return ''
-    }
-  }
 
   const filteredList =
     filteredItems &&
@@ -346,7 +359,8 @@ function TxnList({ transactions, color }) {
                 setSortDirection(sortedColumn !== SORT_FIELD.AMOUNT0 ? true : !sortDirection)
               }}
             >
-              Token 0 Amount {sortedColumn === SORT_FIELD.AMOUNT0 ? (!sortDirection ? '↑' : '↓') : ''}
+              {symbol0Override ? symbol0Override + ' Amount' : 'Token Amount'}{' '}
+              {sortedColumn === SORT_FIELD.AMOUNT0 ? (!sortDirection ? '↑' : '↓') : ''}
             </ClickableText>
           </Flex>
         )}
@@ -361,7 +375,8 @@ function TxnList({ transactions, color }) {
                   setSortDirection(sortedColumn !== SORT_FIELD.AMOUNT1 ? true : !sortDirection)
                 }}
               >
-                Token 1 Amount {sortedColumn === SORT_FIELD.AMOUNT1 ? (!sortDirection ? '↑' : '↓') : ''}
+                {symbol1Override ? symbol1Override + ' Amount' : 'Token Amount'}{' '}
+                {sortedColumn === SORT_FIELD.AMOUNT1 ? (!sortDirection ? '↑' : '↓') : ''}
               </ClickableText>
             </Flex>
           )}
@@ -390,6 +405,8 @@ function TxnList({ transactions, color }) {
       <List p={0}>
         {!filteredList ? (
           <LocalLoader />
+        ) : filteredList.length === 0 ? (
+          <EmptyCard>No transactions on this pair yet.</EmptyCard>
         ) : (
           filteredList.map((item, index) => {
             return (

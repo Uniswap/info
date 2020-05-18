@@ -11,10 +11,39 @@ BigNumber.set({ EXPONENTIAL_AT: 50 })
 
 dayjs.extend(utc)
 
+export function getPoolLink(token0Address, token1Address = null) {
+  if (!token1Address) {
+    return `https://deploy-preview-782--uniswap.netlify.app/add/${token0Address}-${
+      token0Address === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
+        ? 'ETH'
+        : '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
+    }`
+  } else {
+    return `https://deploy-preview-782--uniswap.netlify.app/add/${token0Address}-${token1Address}`
+  }
+}
+
+export function getSwapLink(token0Address, token1Address = null) {
+  if (!token1Address) {
+    return `https://deploy-preview-782--uniswap.netlify.app/swap?inputToken=${token0Address}`
+  } else {
+    return `https://deploy-preview-782--uniswap.netlify.app/swap?inputToken=${token0Address}&outputToken=${token1Address}`
+  }
+}
+
 export const toNiceDate = date => {
-  // let df = new Date(date * 1000).toUTCString('MMMM DD')
   let x = dayjs.utc(dayjs.unix(date)).format('MMM DD')
   return x
+}
+
+export const toWeeklyDate = date => {
+  const formatted = dayjs.utc(dayjs.unix(date))
+  date = new Date(formatted)
+  const day = new Date(formatted).getDay()
+  var lessDays = day === 6 ? 0 : day + 1
+  var wkStart = new Date(new Date(date).setDate(date.getDate() - lessDays))
+  var wkEnd = new Date(new Date(wkStart).setDate(wkStart.getDate() + 6))
+  return dayjs.utc(wkStart).format('MMM DD') + ' - ' + dayjs.utc(wkEnd).format('MMM DD')
 }
 
 export async function getBlockFromTimestamp(timestamp) {
@@ -92,7 +121,8 @@ export const formatNumber = num => {
 // using a currency library here in case we want to add more in future
 var priceFormatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
-  currency: 'USD'
+  currency: 'USD',
+  minimumFractionDigits: 2
 })
 
 export const formattedNum = (number, usd = false) => {
@@ -111,7 +141,7 @@ export const formattedNum = (number, usd = false) => {
   }
 
   if (num > 1000) {
-    return (usd ? '$' : '') + Number(parseFloat(num).toFixed(0))
+    return usd ? '$' + Number(parseFloat(num).toFixed(2)) : '' + Number(parseFloat(num).toFixed(0))
   }
 
   if (usd) {
@@ -128,8 +158,12 @@ export const formattedNum = (number, usd = false) => {
 }
 
 export function formattedPercent(percent) {
-  if (!percent) {
-    return '0%'
+  if (!percent || percent === 0) {
+    return (
+      <Text fontWeight={500} fontSize={'1rem'}>
+        0%
+      </Text>
+    )
   }
 
   if (percent < 0.0001 && percent > 0) {

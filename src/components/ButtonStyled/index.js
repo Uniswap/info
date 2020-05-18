@@ -59,8 +59,9 @@ export const ButtonLight = styled(Base)`
   background-color: ${({ color, theme }) => (color ? transparentize(0.9, color) : transparentize(0.9, theme.primary1))};
   color: ${({ color, theme }) => (color ? darken(0.1, color) : theme.primary1)};
 
-  width: fit-content;
+  min-width: fit-content;
   border-radius: 12px;
+  white-space: nowrap;
 
   a {
     color: ${({ color, theme }) => (color ? darken(0.1, color) : theme.primary1)};
@@ -77,6 +78,7 @@ export const ButtonDark = styled(Base)`
   color: white;
   width: fit-content;
   border-radius: 12px;
+  white-space: nowrap;
 
   :hover {
     background-color: ${({ color, theme }) => (color ? darken(0.1, color) : darken(0.1, theme.primary1))};
@@ -86,6 +88,11 @@ export const ButtonDark = styled(Base)`
 export const ButtonFaded = styled(Base)`
   background-color: rgba(0, 0, 0, 0.02);
   color: (255, 255, 255, 0.5);
+  white-space: nowrap;
+
+  :hover {
+    opacity: 0.5;
+  }
 `
 
 export function ButtonPlusDull({ disabled, children, ...rest }) {
