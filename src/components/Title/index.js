@@ -34,7 +34,7 @@ export default function Title({ token, pair }) {
             <img src={LogoDark} alt="logo" />
           </UniIcon>
           <img style={{ marginLeft: '4px', marginTop: '0px' }} src={WordmarkDark} alt="logo" />
-          <Text marginLeft={10} fontSize={12}>
+          <Text marginLeft={10} fontSize={16} marginTop={'2px'}>
             / Flippening
           </Text>
         </RowFixed>
