@@ -25,9 +25,9 @@ export function getPoolLink(token0Address, token1Address = null) {
 
 export function getSwapLink(token0Address, token1Address = null) {
   if (!token1Address) {
-    return `https://uniswap.exchange/swap?inputToken=${token0Address}`
+    return `https://uniswap.exchange/swap?inputCurrency=${token0Address}`
   } else {
-    return `https://uniswap.exchange/swap?inputToken=${token0Address}&outputToken=${token1Address}`
+    return `https://uniswap.exchange/swap?inputCurrency=${token0Address}&outputCurrency=${token1Address}`
   }
 }
 
