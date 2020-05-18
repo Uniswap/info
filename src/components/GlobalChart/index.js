@@ -133,25 +133,19 @@ const GlobalChart = ({ display }) => {
       {chartData && chartView === CHART_VIEW.LIQUIDITY && (
         <ResponsiveContainer aspect={below1080 ? 60 / 28 : 60 / 28}>
           <AreaChart margin={{ top: 20, right: 0, bottom: 6, left: 0 }} barCategoryGap={1} data={chartData}>
-            <defs>
-              <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#ff007a" stopOpacity={0.3} />
-                <stop offset="95%" stopColor="#ff007a" stopOpacity={0.2} />
-              </linearGradient>
-            </defs>
-            {/* <CartesianGrid strokeDasharray="3 3" /> */}
             <Area
               key={'other'}
               dataKey={'totalLiquidityUSD'}
               stackId="2"
-              strokeWidth={2}
-              stroke={'#ff007a80'}
+              strokeWidth={1}
+              stroke={'#ff007a'}
               dot={false}
               type="monotone"
               name={'Liquidity'}
               yAxisId={0}
-              fill="url(#colorUv)"
+              opacity={'1'}
               isAnimationActive={false}
+              fill="#ff007a80"
             />
             <XAxis
               tickLine={true}
@@ -238,9 +232,8 @@ const GlobalChart = ({ display }) => {
               domain={[0, 'dataMax']}
               orientation={'right'}
             />
-            {/* <CartesianGrid strokeDasharray="3 3" /> */}
             <Tooltip
-              cursor={{ fill: '#ff007a', opacity: 0.1 }}
+              cursor={{ fill: '#ff007a', opacity: 0.4 }}
               formatter={val => '$' + toK(val, true)}
               labelFormatter={label =>
                 volumeWindow === VOLUME_WINDOW.WEEKLY ? toWeeklyDate(label - 1) : toNiceDateYear(label)
@@ -258,9 +251,10 @@ const GlobalChart = ({ display }) => {
               type="monotone"
               name={'Volume'}
               dataKey={volumeWindow === VOLUME_WINDOW.DAYS ? 'dailyVolumeUSD' : 'weeklyVolumeUSD'}
-              fill="#ff007a80"
-              opacity={'1'}
+              fill="#ff007a"
+              opacity={'0.5'}
               yAxisId={0}
+              strokeWidth={2}
               stroke={'#ff007a'}
               isAnimationActive={false}
             />

@@ -185,7 +185,7 @@ function PairList({ pairs, color }) {
         <DataText area="liq">{liquidity}</DataText>
         <DataText area="vol">{volume}</DataText>
         {!below1080 && <DataText area="volWeek">{formattedNum(itemData.oneWeekVolumeUSD, true)}</DataText>}
-        {!below1080 && <DataText area="fees">{formattedNum(itemData.oneWeekVolumeUSD * 0.003, true)}</DataText>}
+        {!below1080 && <DataText area="fees">{formattedNum(itemData.oneDayVolumeUSD * 0.003, true)}</DataText>}
         {!below740 && (
           <Flex area="pool" justifyContent="flex-end" alignItems="center">
             <ButtonLight color={color} style={{ marginRight: '10px' }}>

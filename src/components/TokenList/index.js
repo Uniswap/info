@@ -73,17 +73,11 @@ const DashGrid = styled.div`
     display: grid;
     grid-gap: 1em;
     grid-template-columns: 1.5fr 0.6fr 1fr 1fr 1fr 1fr;
-    grid-template-areas: 'name symbol price liq vol change';
+    grid-template-areas: 'name symbol liq vol price change';
   }
 `
 
-const ListWrapper = styled.div`
-  /* padding: 0 40px;
-
-  @media screen and (max-width: 640px) {
-    padding: 0 20px;
-  } */
-`
+const ListWrapper = styled.div``
 
 const ClickableText = styled(Text)`
   text-align: end;
@@ -192,13 +186,13 @@ function TopTokenList({ tokens }) {
             {item.symbol}
           </DataText>
         )}
+        <DataText area="liq">{formattedNum(item.totalLiquidityUSD, true)}</DataText>
+        <DataText area="vol">{formattedNum(item.oneDayVolumeUSD, true)}</DataText>
         {!below1080 && (
           <DataText area="price" color="text" fontWeight="500">
             {formattedNum(item.priceUSD, true)}
           </DataText>
         )}
-        <DataText area="liq">{formattedNum(item.totalLiquidityUSD, true)}</DataText>
-        <DataText area="vol">{formattedNum(item.oneDayVolumeUSD, true)}</DataText>
         {!below1080 && <DataText area="change">{formattedPercent(item.priceChangeUSD)}</DataText>}
       </DashGrid>
     )
@@ -233,19 +227,7 @@ function TopTokenList({ tokens }) {
             </ClickableText>
           </Flex>
         )}
-        {!below1080 && (
-          <Flex alignItems="center">
-            <ClickableText
-              area="price"
-              onClick={e => {
-                setSortedColumn(SORT_FIELD.PRICE)
-                setSortDirection(sortedColumn !== SORT_FIELD.PRICE ? true : !sortDirection)
-              }}
-            >
-              Price {sortedColumn === SORT_FIELD.PRICE ? (!sortDirection ? '↑' : '↓') : ''}
-            </ClickableText>
-          </Flex>
-        )}
+
         <Flex alignItems="center">
           <ClickableText
             area="liq"
@@ -269,6 +251,19 @@ function TopTokenList({ tokens }) {
             {sortedColumn === SORT_FIELD.VOL ? (!sortDirection ? '↑' : '↓') : ''}
           </ClickableText>
         </Flex>
+        {!below1080 && (
+          <Flex alignItems="center">
+            <ClickableText
+              area="price"
+              onClick={e => {
+                setSortedColumn(SORT_FIELD.PRICE)
+                setSortDirection(sortedColumn !== SORT_FIELD.PRICE ? true : !sortDirection)
+              }}
+            >
+              Price {sortedColumn === SORT_FIELD.PRICE ? (!sortDirection ? '↑' : '↓') : ''}
+            </ClickableText>
+          </Flex>
+        )}
         {!below1080 && (
           <Flex alignItems="center">
             <ClickableText
