@@ -7,45 +7,84 @@ import { toK, toNiceDate, toNiceDateYear } from '../../helpers'
 import { OptionButton } from '../ButtonStyled'
 import { darken } from 'polished'
 import { useMedia } from 'react-use'
+import { timeframeOptions } from '../../constants'
+import dayjs from 'dayjs'
+import { useTokenChartData } from '../../contexts/TokenData'
 
 const ChartWrapper = styled.div`
   margin-top: 40px;
   height: 100%;
 `
 
-const TokenChart = ({ chartData, color }) => {
-  const [chartFilter, setChartFilter] = useState('liq')
-  const [timeWindow, setTimeWindow] = useState('week')
+const CHART_VIEW = {
+  VOLUME: 'Volume',
+  LIQUIDITY: 'Liquidity'
+}
+
+const TokenChart = ({ address, color }) => {
+  const [chartFilter, setChartFilter] = useState(CHART_VIEW.LIQUIDITY)
+
+  const chartData = useTokenChartData(address)
+
+  const [timeWindow, setTimeWindow] = useState(timeframeOptions.ALL_TIME)
 
   const below1080 = useMedia('(max-width: 1080px)')
-  const below680 = useMedia('(max-width: 680px)')
+
+  // find start time based on required time window, update domain
+  const utcEndTime = dayjs.utc()
+  // based on window, get starttime
+  let utcStartTime
+  switch (timeWindow) {
+    case timeframeOptions.WEEK:
+      utcStartTime =
+        utcEndTime
+          .subtract(1, 'week')
+          .startOf('day')
+          .unix() - 1
+      break
+    case timeframeOptions.ALL_TIME:
+      utcStartTime = utcEndTime.subtract(1, 'year').unix() - 1
+      break
+    default:
+      utcStartTime =
+        utcEndTime
+          .subtract(1, 'year')
+          .startOf('year')
+          .unix() - 1
+      break
+  }
+  const domain = [dataMin => (dataMin > utcStartTime ? dataMin : utcStartTime), 'dataMax']
 
   return (
     <ChartWrapper>
       <RowBetween mb={40}>
         <AutoRow gap="10px">
-          <OptionButton active={chartFilter === 'liq'} onClick={() => setChartFilter('liq')}>
+          <OptionButton
+            active={chartFilter === CHART_VIEW.LIQUIDITY}
+            onClick={() => setChartFilter(CHART_VIEW.LIQUIDITY)}
+          >
             Liquidity
           </OptionButton>
-          <OptionButton active={chartFilter === 'vol'} onClick={() => setChartFilter('vol')}>
+          <OptionButton active={chartFilter === CHART_VIEW.VOLUME} onClick={() => setChartFilter(CHART_VIEW.VOLUME)}>
             Volume
           </OptionButton>
         </AutoRow>
-        {!below680 && (
-          <AutoRow justify="flex-end" gap="10px">
-            <OptionButton active={timeWindow === 'week'} onClick={() => setTimeWindow('week')}>
-              1 Week
-            </OptionButton>
-            <OptionButton active={timeWindow === 'month'} onClick={() => setTimeWindow('month')}>
-              1 Month
-            </OptionButton>
-            <OptionButton active={timeWindow === 'all'} onClick={() => setTimeWindow('all')}>
-              All Time
-            </OptionButton>
-          </AutoRow>
-        )}
+        <AutoRow justify="flex-end" gap="10px">
+          <OptionButton
+            active={timeWindow === timeframeOptions.WEEK}
+            onClick={() => setTimeWindow(timeframeOptions.WEEK)}
+          >
+            1 Week
+          </OptionButton>
+          <OptionButton
+            active={timeWindow === timeframeOptions.ALL_TIME}
+            onClick={() => setTimeWindow(timeframeOptions.ALL_TIME)}
+          >
+            All Time
+          </OptionButton>
+        </AutoRow>
       </RowBetween>
-      {chartFilter === 'liq' && chartData && (
+      {chartFilter === CHART_VIEW.LIQUIDITY && chartData && (
         <ResponsiveContainer aspect={below1080 ? 60 / 32 : 60 / 12}>
           <AreaChart margin={{ top: 0, right: 10, bottom: 6, left: -20 }} barCategoryGap={1} data={chartData}>
             <defs>
@@ -63,6 +102,8 @@ const TokenChart = ({ chartData, color }) => {
               tickFormatter={tick => toNiceDate(tick)}
               dataKey="date"
               tick={{ fill: 'black' }}
+              type={'number'}
+              domain={domain}
             />
             <YAxis
               type="number"
@@ -103,7 +144,7 @@ const TokenChart = ({ chartData, color }) => {
           </AreaChart>
         </ResponsiveContainer>
       )}
-      {chartFilter === 'vol' && (
+      {chartFilter === CHART_VIEW.VOLUME && (
         <ResponsiveContainer aspect={below1080 ? 60 / 32 : 60 / 12}>
           <BarChart margin={{ top: 0, right: 10, bottom: 6, left: -30 }} barCategoryGap={1} data={chartData}>
             <XAxis
@@ -114,6 +155,8 @@ const TokenChart = ({ chartData, color }) => {
               tickMargin={14}
               tickFormatter={tick => toNiceDate(tick)}
               dataKey="date"
+              type={'number'}
+              domain={domain}
             />
             <YAxis
               type="number"

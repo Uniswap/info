@@ -15,7 +15,7 @@ import Loader from '../components/Loader'
 
 import { formattedNum, formattedPercent } from '../helpers'
 import { useColor } from '../hooks'
-import { usePairData, usePairTransactions, usePairChartData } from '../contexts/PairData'
+import { usePairData, usePairTransactions } from '../contexts/PairData'
 import { ThemedBackground, Hover } from '../Theme'
 import CopyHelper from '../components/Copy'
 import { useMedia } from 'react-use'
@@ -124,6 +124,7 @@ const ShadedBox = styled.div`
   background: rgba(255, 255, 255, 0.4);
   border-radius: 20px;
   padding: 20px;
+  width: calc(100% - 20px);
 `
 
 const TopPercent = styled.div`
@@ -159,7 +160,7 @@ function PairPage({ pairAddress }) {
     volumeChangeUSD,
     liquidityChangeUSD
   } = usePairData(pairAddress)
-  const chartData = usePairChartData(pairAddress)
+
   const transactions = usePairTransactions(pairAddress)
 
   const backgroundColor = useColor(pairAddress)
@@ -168,7 +169,7 @@ function PairPage({ pairAddress }) {
 
   const liquidityChange = liquidityChangeUSD ? formattedPercent(liquidityChangeUSD) : ''
 
-  const volume = oneDayVolumeUSD ? formattedNum(oneDayVolumeUSD, true) : '-'
+  const volume = oneDayVolumeUSD ? formattedNum(oneDayVolumeUSD, true) : oneDayVolumeUSD === 0 ? '$0' : '-'
 
   const volumeChange = volumeChangeUSD ? formattedPercent(volumeChangeUSD) : ''
 
@@ -178,7 +179,7 @@ function PairPage({ pairAddress }) {
     <PageWrapper>
       <ThemedBackground backgroundColor={backgroundColor} />
       {below1080 && (
-        <ShadedBox style={{ width: '100%' }}>
+        <ShadedBox>
           <AutoColumn gap="40px">
             <RowBetween>
               {token0 && token1 && (
@@ -328,7 +329,7 @@ function PairPage({ pairAddress }) {
           </PanelWrapper>
         )}
         <ChartWrapper>
-          <PairChart chartData={chartData} color={backgroundColor} />
+          <PairChart address={pairAddress} color={backgroundColor} />
         </ChartWrapper>
 
         <Panel
@@ -374,7 +375,16 @@ function PairPage({ pairAddress }) {
               </Option>
             </AutoRow>
           </Box>
-          {transactions ? <TxnList transactions={transactions} txFilter={txFilter} /> : <Loader />}
+          {transactions ? (
+            <TxnList
+              transactions={transactions}
+              txFilter={txFilter}
+              symbol0Override={token0?.symbol}
+              symbol1Override={token1?.symbol}
+            />
+          ) : (
+            <Loader />
+          )}
         </Panel>
         {!below1080 && (
           <>

@@ -6,41 +6,89 @@ import { RowBetween, AutoRow } from '../Row'
 import { toK, toNiceDate, toNiceDateYear } from '../../helpers'
 import { OptionButton } from '../ButtonStyled'
 import { darken } from 'polished'
+import { usePairChartData } from '../../contexts/PairData'
+import { timeframeOptions } from '../../constants'
+import dayjs from 'dayjs'
+import { useMedia } from 'react-use'
 
 const ChartWrapper = styled.div`
   padding-top: 40px;
 `
 
-const GlobalChart = ({ chartData, color }) => {
-  const options = [{ text: 'All Time' }, { text: '3 Months' }, { text: '1 week' }]
-  const [chartFilter, setChartFilter] = useState('liq')
-  const [timeWindow, setTimeWindow] = useState(options[0])
+const CHART_VIEW = {
+  VOLUME: 'Volume',
+  LIQUIDITY: 'Liquidity'
+}
+
+const PairChart = ({ address, color }) => {
+  const [chartFilter, setChartFilter] = useState(CHART_VIEW.LIQUIDITY)
+
+  const chartData = usePairChartData(address)
+
+  const [timeWindow, setTimeWindow] = useState(timeframeOptions.ALL_TIME)
+
+  const below1080 = useMedia('(max-width: 1080px)')
+
+  // find start time based on required time window, update domain
+  const utcEndTime = dayjs.utc()
+  // based on window, get starttime
+  let utcStartTime
+  switch (timeWindow) {
+    case timeframeOptions.WEEK:
+      utcStartTime =
+        utcEndTime
+          .subtract(1, 'week')
+          .startOf('day')
+          .unix() - 1
+      break
+    case timeframeOptions.ALL_TIME:
+      utcStartTime = utcEndTime.subtract(1, 'year').unix() - 1
+      break
+    default:
+      utcStartTime =
+        utcEndTime
+          .subtract(1, 'year')
+          .startOf('year')
+          .unix() - 1
+      break
+  }
+  const domain = [dataMin => (dataMin > utcStartTime ? dataMin : utcStartTime), 'dataMax']
+
+  if (chartData && chartData.length === 0) {
+    return <div></div>
+  }
 
   return (
     <ChartWrapper>
       <RowBetween mb={40}>
         <AutoRow gap="10px">
-          <OptionButton active={chartFilter === 'liq'} onClick={() => setChartFilter('liq')}>
+          <OptionButton
+            active={chartFilter === CHART_VIEW.LIQUIDITY}
+            onClick={() => setChartFilter(CHART_VIEW.LIQUIDITY)}
+          >
             Liquidity
           </OptionButton>
-          <OptionButton active={chartFilter === 'vol'} onClick={() => setChartFilter('vol')}>
+          <OptionButton active={chartFilter === CHART_VIEW.VOLUME} onClick={() => setChartFilter(CHART_VIEW.VOLUME)}>
             Volume
           </OptionButton>
         </AutoRow>
         <AutoRow justify="flex-end" gap="10px">
-          <OptionButton active={timeWindow === 'week'} onClick={() => setTimeWindow('week')}>
+          <OptionButton
+            active={timeWindow === timeframeOptions.WEEK}
+            onClick={() => setTimeWindow(timeframeOptions.WEEK)}
+          >
             1 Week
           </OptionButton>
-          <OptionButton active={timeWindow === 'month'} onClick={() => setTimeWindow('month')}>
-            1 Month
-          </OptionButton>
-          <OptionButton active={timeWindow === 'all'} onClick={() => setTimeWindow('all')}>
+          <OptionButton
+            active={timeWindow === timeframeOptions.ALL_TIME}
+            onClick={() => setTimeWindow(timeframeOptions.ALL_TIME)}
+          >
             All Time
           </OptionButton>
         </AutoRow>
       </RowBetween>
-      {chartFilter === 'liq' && (
-        <ResponsiveContainer aspect={60 / 12}>
+      {chartFilter === CHART_VIEW.LIQUIDITY && (
+        <ResponsiveContainer aspect={below1080 ? 60 / 28 : 60 / 12}>
           <AreaChart margin={{ top: 0, right: 0, bottom: 6, left: 0 }} barCategoryGap={1} data={chartData}>
             <defs>
               <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
@@ -57,6 +105,8 @@ const GlobalChart = ({ chartData, color }) => {
               tickFormatter={tick => toNiceDate(tick)}
               dataKey="date"
               tick={{ fill: 'black' }}
+              type={'number'}
+              domain={domain}
             />
             <YAxis
               type="number"
@@ -95,9 +145,13 @@ const GlobalChart = ({ chartData, color }) => {
           </AreaChart>
         </ResponsiveContainer>
       )}
-      {chartFilter === 'vol' && (
-        <ResponsiveContainer aspect={60 / 12}>
-          <BarChart margin={{ top: 0, right: 0, bottom: 6, left: 10 }} barCategoryGap={1} data={chartData}>
+      {chartFilter === CHART_VIEW.VOLUME && (
+        <ResponsiveContainer aspect={below1080 ? 60 / 28 : 60 / 12}>
+          <BarChart
+            margin={{ top: 0, right: 0, bottom: 6, left: below1080 ? 0 : 10 }}
+            barCategoryGap={1}
+            data={chartData}
+          >
             <XAxis
               tickLine={false}
               axisLine={false}
@@ -107,6 +161,8 @@ const GlobalChart = ({ chartData, color }) => {
               tickFormatter={tick => toNiceDate(tick)}
               dataKey="date"
               tick={{ fill: 'black' }}
+              type={'number'}
+              domain={domain}
             />
             <YAxis
               type="number"
@@ -148,4 +204,4 @@ const GlobalChart = ({ chartData, color }) => {
   )
 }
 
-export default GlobalChart
+export default PairChart

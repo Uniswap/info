@@ -79,6 +79,11 @@ export const ButtonDark = styled(Base)`
 export const ButtonFaded = styled(Base)`
   background-color: rgba(0, 0, 0, 0.02);
   color: (255, 255, 255, 0.5);
+  white-space: nowrap;
+
+  :hover {
+    opacity: 0.5;
+  }
 `
 
 export function ButtonPlusDull({ disabled, children, ...rest }) {

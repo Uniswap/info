@@ -11,10 +11,27 @@ BigNumber.set({ EXPONENTIAL_AT: 50 })
 
 dayjs.extend(utc)
 
+export function getPoolLink(token0Address, token1Address) {
+  return `https://deploy-preview-782--uniswap.netlify.app/add/${token0Address}-${token1Address}`
+}
+
+export function getSwapLink(token0Address, token1Address) {
+  return `https://deploy-preview-782--uniswap.netlify.app/swap?inputToken=${token0Address}&outputToken=${token1Address}`
+}
+
 export const toNiceDate = date => {
-  // let df = new Date(date * 1000).toUTCString('MMMM DD')
   let x = dayjs.utc(dayjs.unix(date)).format('MMM DD')
   return x
+}
+
+export const toWeeklyDate = date => {
+  const formatted = dayjs.utc(dayjs.unix(date))
+  date = new Date(formatted)
+  const day = new Date(formatted).getDay()
+  var lessDays = day === 6 ? 0 : day + 1
+  var wkStart = new Date(new Date(date).setDate(date.getDate() - lessDays))
+  var wkEnd = new Date(new Date(wkStart).setDate(wkStart.getDate() + 6))
+  return dayjs.utc(wkStart).format('MMM DD') + ' - ' + dayjs.utc(wkEnd).format('MMM DD')
 }
 
 export async function getBlockFromTimestamp(timestamp) {

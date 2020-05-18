@@ -3,6 +3,7 @@ import 'feather-icons'
 import { Text } from 'rebass'
 import styled from 'styled-components'
 
+import Link from '../components/Link'
 import Panel from '../components/Panel'
 import TokenLogo from '../components/TokenLogo'
 import PairList from '../components/PairList'
@@ -15,7 +16,7 @@ import TokenChart from '../components/TokenChart'
 import { formattedNum, formattedPercent } from '../helpers'
 import { Hint } from '../components/.'
 
-import { useTokenData, useTokenTransactions, useTokenChartData } from '../contexts/TokenData'
+import { useTokenData, useTokenTransactions } from '../contexts/TokenData'
 import { Hover, ThemedBackground } from '../Theme'
 import { useColor } from '../hooks'
 import CopyHelper from '../components/Copy'
@@ -171,9 +172,6 @@ function TokenPage({ address }) {
   // detect color from token
   const backgroundColor = useColor(id)
 
-  // daily data
-  const chartData = useTokenChartData(address)
-
   // all transactions with this token
   const transactions = useTokenTransactions(address)
 
@@ -182,7 +180,7 @@ function TokenPage({ address }) {
   const priceChange = priceChangeUSD ? formattedPercent(priceChangeUSD) : ''
 
   // volume
-  const volume = oneDayVolumeUSD ? formattedNum(oneDayVolumeUSD, true) : '-'
+  const volume = oneDayVolumeUSD ? formattedNum(oneDayVolumeUSD, true) : oneDayVolumeUSD === 0 ? '$0' : '-'
   const volumeChange = volumeChangeUSD ? formattedPercent(volumeChangeUSD) : ''
 
   // liquidity
@@ -345,7 +343,7 @@ function TokenPage({ address }) {
           </PanelWrapper>
         )}
         <div area="fill" rounded="true" style={{ height: '300px' }}>
-          <TokenChart chartData={chartData} token={address} color={backgroundColor} />
+          <TokenChart address={address} color={backgroundColor} />
         </div>
 
         <ListHeader>Top Pairs</ListHeader>
@@ -449,6 +447,11 @@ function TokenPage({ address }) {
                     <CopyHelper toCopy={address} />
                   </AutoRow>
                 </Column>
+                <ButtonLight color={backgroundColor}>
+                  <Link external href={'https://etherscan.io/address/' + address}>
+                    View on Etherscan ↗
+                  </Link>
+                </ButtonLight>
               </TokenDetailsLayout>
             </Panel>
           </>

@@ -6,6 +6,7 @@ import { useTimeframe } from './Application'
 import { timeframeOptions } from '../constants'
 import { getPercentChange, getBlockFromTimestamp, get2DayPercentChange } from '../helpers'
 import { GLOBAL_DATA, GLOBAL_TXNS, GLOBAL_CHART, ETH_PRICE } from '../apollo/queries'
+import weekOfYear from 'dayjs/plugin/weekOfYear'
 
 const UPDATE = 'UPDATE'
 const UPDATE_TXNS = 'UPDATE_TXNS'
@@ -14,6 +15,7 @@ const UPDATE_ETH_PRICE = 'UPDATE_ETH_PRICE'
 const ETH_PRICE_KEY = 'ETH_PRICE_KEY'
 
 dayjs.extend(utc)
+dayjs.extend(weekOfYear)
 
 const GlobalDataContext = createContext()
 
@@ -112,161 +114,205 @@ export default function Provider({ children }) {
 }
 
 async function getGlobalData(ethPrice) {
-  const utcCurrentTime = dayjs()
-  const utcOneDayBack = utcCurrentTime.subtract(1, 'day').unix()
-  const utcTwoDaysBack = utcCurrentTime.subtract(2, 'day').unix()
-  let oneDayBlock = await getBlockFromTimestamp(utcOneDayBack)
-  let twoDayBlock = await getBlockFromTimestamp(utcTwoDaysBack)
+  let data = {}
+  let oneDayData = {}
+  let twoDayData = {}
 
-  let result = await client.query({
-    query: GLOBAL_DATA(),
-    fetchPolicy: 'cache-first'
-  })
-  let data = result.data.uniswapFactories[0]
-  let oneDayResult = await client.query({
-    query: GLOBAL_DATA(oneDayBlock),
-    fetchPolicy: 'cache-first'
-  })
-  let oneDayData = oneDayResult.data.uniswapFactories[0]
+  try {
+    const utcCurrentTime = dayjs()
+    const utcOneDayBack = utcCurrentTime.subtract(1, 'day').unix()
+    const utcTwoDaysBack = utcCurrentTime.subtract(2, 'day').unix()
+    let oneDayBlock = await getBlockFromTimestamp(utcOneDayBack)
+    let twoDayBlock = await getBlockFromTimestamp(utcTwoDaysBack)
 
-  let twoDayResult = await client.query({
-    query: GLOBAL_DATA(twoDayBlock),
-    fetchPolicy: 'cache-first'
-  })
-  let twoDayData = twoDayResult.data.uniswapFactories[0]
+    let result = await client.query({
+      query: GLOBAL_DATA(),
+      fetchPolicy: 'cache-first'
+    })
+    data = result.data.uniswapFactories[0]
+    let oneDayResult = await client.query({
+      query: GLOBAL_DATA(oneDayBlock),
+      fetchPolicy: 'cache-first'
+    })
+    oneDayData = oneDayResult.data.uniswapFactories[0]
 
-  if (data && oneDayData && twoDayData) {
-    const [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentChange(
-      data.totalVolumeUSD,
-      oneDayData.totalVolumeUSD ? oneDayData.totalVolumeUSD : 0,
-      twoDayData.totalVolumeUSD ? twoDayData.totalVolumeUSD : 0
-    )
+    let twoDayResult = await client.query({
+      query: GLOBAL_DATA(twoDayBlock),
+      fetchPolicy: 'cache-first'
+    })
+    twoDayData = twoDayResult.data.uniswapFactories[0]
 
-    const [oneDayVolumeETH, volumeChangeETH] = get2DayPercentChange(
-      data.totalVolumeETH,
-      oneDayData.totalVolumeETH ? oneDayData.totalVolumeETH : 0,
-      twoDayData.totalVolumeETH ? twoDayData.totalVolumeETH : 0
-    )
+    if (data && oneDayData && twoDayData) {
+      const [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentChange(
+        data.totalVolumeUSD,
+        oneDayData.totalVolumeUSD ? oneDayData.totalVolumeUSD : 0,
+        twoDayData.totalVolumeUSD ? twoDayData.totalVolumeUSD : 0
+      )
 
-    const [oneDayTxns, txnChange] = get2DayPercentChange(
-      data.txCount,
-      oneDayData.txCount ? oneDayData.txCount : 0,
-      twoDayData.txCount ? twoDayData.txCount : 0
-    )
+      const [oneDayVolumeETH, volumeChangeETH] = get2DayPercentChange(
+        data.totalVolumeETH,
+        oneDayData.totalVolumeETH ? oneDayData.totalVolumeETH : 0,
+        twoDayData.totalVolumeETH ? twoDayData.totalVolumeETH : 0
+      )
 
-    data.totalLiquidityUSD = data.totalLiquidityETH * ethPrice
-    const liquidityChangeUSD = getPercentChange(data.totalLiquidityETH, oneDayData.totalLiquidityETH)
-    const liquidityChangeETH = getPercentChange(data.totalLiquidityETH, oneDayData.totalLiquidityETH)
-    data.oneDayVolumeUSD = oneDayVolumeUSD
-    data.volumeChangeUSD = volumeChangeUSD
-    data.oneDayVolumeETH = oneDayVolumeETH
-    data.volumeChangeETH = volumeChangeETH
-    data.liquidityChangeUSD = liquidityChangeUSD
-    data.liquidityChangeETH = liquidityChangeETH
-    data.oneDayTxns = oneDayTxns
-    data.txnChange = txnChange
+      const [oneDayTxns, txnChange] = get2DayPercentChange(
+        data.txCount,
+        oneDayData.txCount ? oneDayData.txCount : 0,
+        twoDayData.txCount ? twoDayData.txCount : 0
+      )
+
+      data.totalLiquidityUSD = data.totalLiquidityETH * ethPrice
+      const liquidityChangeUSD = getPercentChange(data.totalLiquidityETH, oneDayData.totalLiquidityETH)
+      const liquidityChangeETH = getPercentChange(data.totalLiquidityETH, oneDayData.totalLiquidityETH)
+      data.oneDayVolumeUSD = oneDayVolumeUSD
+      data.volumeChangeUSD = volumeChangeUSD
+      data.oneDayVolumeETH = oneDayVolumeETH
+      data.volumeChangeETH = volumeChangeETH
+      data.liquidityChangeUSD = liquidityChangeUSD
+      data.liquidityChangeETH = liquidityChangeETH
+      data.oneDayTxns = oneDayTxns
+      data.txnChange = txnChange
+    }
+  } catch (e) {
+    console.log(e)
   }
 
   return data
 }
 
 const getChartData = async oldestDateToFetch => {
+  let data = []
+  let weeklyData = []
+
   const utcEndTime = dayjs.utc()
 
-  let result = await client.query({
-    query: GLOBAL_CHART,
-    variables: {
-      startTime: oldestDateToFetch
-    },
-    fetchPolicy: 'cache-first'
-  })
-  let data = result.data.uniswapDayDatas
-  let dayIndexSet = new Set()
-  let dayIndexArray = []
-  const oneDay = 24 * 60 * 60
-  data.forEach((dayData, i) => {
-    // add the day index to the set of days
-    dayIndexSet.add((data[i].date / oneDay).toFixed(0))
-    dayIndexArray.push(data[i])
-    dayData.dailyVolumeUSD = parseFloat(dayData.dailyVolumeUSD)
-  })
+  try {
+    let result = await client.query({
+      query: GLOBAL_CHART,
+      variables: {
+        startTime: oldestDateToFetch
+      },
+      fetchPolicy: 'cache-first'
+    })
+    data = result.data.uniswapDayDatas
 
-  // fill in empty days
-  let timestamp = data[0].date ? data[0].date : oldestDateToFetch
-  let latestLiquidityUSD = data[0].totalLiquidityUSD
-  let latestDayDats = data[0].mostLiquidTokens
-  let index = 1
-  while (timestamp < utcEndTime.unix() - oneDay) {
-    const nextDay = timestamp + oneDay
-    let currentDayIndex = (nextDay / oneDay).toFixed(0)
-    if (!dayIndexSet.has(currentDayIndex)) {
-      data.push({
-        date: nextDay,
-        dailyVolumeUSD: 0,
-        totalLiquidityUSD: latestLiquidityUSD,
-        mostLiquidTokens: latestDayDats
+    if (data) {
+      let dayIndexSet = new Set()
+      let dayIndexArray = []
+      const oneDay = 24 * 60 * 60
+      data.forEach((dayData, i) => {
+        // add the day index to the set of days
+        dayIndexSet.add((data[i].date / oneDay).toFixed(0))
+        dayIndexArray.push(data[i])
+        dayData.dailyVolumeUSD = parseFloat(dayData.dailyVolumeUSD)
       })
-    } else {
-      latestLiquidityUSD = dayIndexArray[index].totalLiquidityUSD
-      latestDayDats = dayIndexArray[index].mostLiquidTokens
-      index = index + 1
+
+      // fill in empty days
+      let timestamp = data[0].date ? data[0].date : oldestDateToFetch
+      let latestLiquidityUSD = data[0].totalLiquidityUSD
+      let latestDayDats = data[0].mostLiquidTokens
+      let index = 1
+      while (timestamp < utcEndTime.unix() - oneDay) {
+        const nextDay = timestamp + oneDay
+        let currentDayIndex = (nextDay / oneDay).toFixed(0)
+        if (!dayIndexSet.has(currentDayIndex)) {
+          data.push({
+            date: nextDay,
+            dailyVolumeUSD: 0,
+            totalLiquidityUSD: latestLiquidityUSD,
+            mostLiquidTokens: latestDayDats
+          })
+        } else {
+          latestLiquidityUSD = dayIndexArray[index].totalLiquidityUSD
+          latestDayDats = dayIndexArray[index].mostLiquidTokens
+          index = index + 1
+        }
+        timestamp = nextDay
+      }
     }
-    timestamp = nextDay
+
+    data = data.sort((a, b) => (parseInt(a.date) > parseInt(b.date) ? 1 : -1))
+    let startIndexWeekly = -1
+    let currentWeek = -1
+    data.forEach((dayData, i) => {
+      const week = dayjs.utc(dayjs.unix(data[i].date)).week()
+      if (week !== currentWeek) {
+        currentWeek = week
+        startIndexWeekly++
+      }
+      weeklyData[startIndexWeekly] = weeklyData[startIndexWeekly] || {}
+      weeklyData[startIndexWeekly].date = data[i].date
+      weeklyData[startIndexWeekly].weeklyVolumeUSD = weeklyData[startIndexWeekly].weeklyVolumeUSD
+        ? weeklyData[startIndexWeekly].weeklyVolumeUSD + data[i].dailyVolumeUSD
+        : data[i].dailyVolumeUSD
+    })
+  } catch (e) {
+    console.log(e)
   }
-
-  data = data.sort((a, b) => (parseInt(a.date) > parseInt(b.date) ? 1 : -1))
-
-  return data
+  return [data, weeklyData]
 }
 
 const getGlobalTransactions = async () => {
-  let result = await client.query({
-    query: GLOBAL_TXNS,
-    fetchPolicy: 'cache-first'
-  })
-  const transactions = {}
-  transactions.mints = []
-  transactions.burns = []
-  transactions.swaps = []
-  result.data.transactions.map(transaction => {
-    if (transaction.mints.length > 0) {
-      transaction.mints.map(mint => {
-        return transactions.mints.push(mint)
+  let transactions = {}
+
+  try {
+    let result = await client.query({
+      query: GLOBAL_TXNS,
+      fetchPolicy: 'cache-first'
+    })
+    transactions.mints = []
+    transactions.burns = []
+    transactions.swaps = []
+    result?.data?.transactions &&
+      result.data.transactions.map(transaction => {
+        if (transaction.mints.length > 0) {
+          transaction.mints.map(mint => {
+            return transactions.mints.push(mint)
+          })
+        }
+        if (transaction.burns.length > 0) {
+          transaction.burns.map(burn => {
+            return transactions.burns.push(burn)
+          })
+        }
+        if (transaction.swaps.length > 0) {
+          transaction.swaps.map(swap => {
+            return transactions.swaps.push(swap)
+          })
+        }
+        return true
       })
-    }
-    if (transaction.burns.length > 0) {
-      transaction.burns.map(burn => {
-        return transactions.burns.push(burn)
-      })
-    }
-    if (transaction.swaps.length > 0) {
-      transaction.swaps.map(swap => {
-        return transactions.swaps.push(swap)
-      })
-    }
-    return true
-  })
+  } catch (e) {
+    console.log(e)
+  }
+
   return transactions
 }
 
 const getEthPrice = async () => {
   const utcCurrentTime = dayjs()
   const utcOneDayBack = utcCurrentTime.subtract(1, 'day').unix()
-  let oneDayBlock = await getBlockFromTimestamp(utcOneDayBack)
 
-  let result = await client.query({
-    query: ETH_PRICE(),
-    fetchPolicy: 'cache-first'
-  })
+  let ethPrice = 0
+  let priceChangeETH = 0
 
-  let resultOneDay = await client.query({
-    query: ETH_PRICE(oneDayBlock),
-    fetchPolicy: 'cache-first'
-  })
+  try {
+    let oneDayBlock = await getBlockFromTimestamp(utcOneDayBack)
+    let result = await client.query({
+      query: ETH_PRICE(),
+      fetchPolicy: 'cache-first'
+    })
+    let resultOneDay = await client.query({
+      query: ETH_PRICE(oneDayBlock),
+      fetchPolicy: 'cache-first'
+    })
+    priceChangeETH = getPercentChange(result?.data?.bundles[0]?.ethPrice, resultOneDay?.data?.bundles[0]?.ethPrice)
+    ethPrice = result?.data?.bundles[0]?.ethPrice
+  } catch (e) {
+    console.log(e)
+  }
 
-  const priceChangeETH = getPercentChange(result?.data?.bundles[0]?.ethPrice, resultOneDay?.data?.bundles[0]?.ethPrice)
-
-  return [result?.data?.bundles[0]?.ethPrice, priceChangeETH]
+  return [ethPrice, priceChangeETH]
 }
 
 export function useGlobalData() {
@@ -289,8 +335,8 @@ export function useGlobalData() {
 }
 
 export function useGlobalChartData() {
-  // const [state, { updateChart }] = useGlobalDataContext()
   const [chartData, setChartData] = useState()
+  const [weeklyData, setWeeklyData] = useState()
   const [oldestDateFetch, setOldestDateFetched] = useState()
   const [activeWindow] = useTimeframe()
 
@@ -320,13 +366,14 @@ export function useGlobalChartData() {
   useEffect(() => {
     async function fetchData() {
       // historical stuff for chart
-      let newChartData = await getChartData(oldestDateFetch)
+      let [newChartData, newWeeklyData] = await getChartData(oldestDateFetch)
       setChartData(newChartData)
+      setWeeklyData(newWeeklyData)
     }
     oldestDateFetch && fetchData()
   }, [oldestDateFetch])
 
-  return chartData
+  return [chartData, weeklyData]
 }
 
 export function useGlobalTransactions() {
