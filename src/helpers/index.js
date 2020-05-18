@@ -121,7 +121,8 @@ export const formatNumber = num => {
 // using a currency library here in case we want to add more in future
 var priceFormatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
-  currency: 'USD'
+  currency: 'USD',
+  minimumFractionDigits: 2
 })
 
 export const formattedNum = (number, usd = false) => {
@@ -140,7 +141,7 @@ export const formattedNum = (number, usd = false) => {
   }
 
   if (num > 1000) {
-    return (usd ? '$' : '') + Number(parseFloat(num).toFixed(0))
+    return usd ? '$' + Number(parseFloat(num).toFixed(2)) : '' + Number(parseFloat(num).toFixed(0))
   }
 
   if (usd) {
