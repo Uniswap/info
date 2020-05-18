@@ -1,16 +1,13 @@
 import React from 'react'
 import { ThemeProvider as StyledComponentsThemeProvider, createGlobalStyle } from 'styled-components'
-import { useDarkModeManager } from '../contexts/LocalStorage'
 import styled from 'styled-components'
 import { Text } from 'rebass'
 
 export default function ThemeProvider({ children }) {
-  const [darkMode] = useDarkModeManager()
-
-  return <StyledComponentsThemeProvider theme={theme(darkMode)}>{children}</StyledComponentsThemeProvider>
+  return <StyledComponentsThemeProvider theme={theme(true)}>{children}</StyledComponentsThemeProvider>
 }
 
-const theme = (darkMode, color) => ({
+const theme = (darkMode = true, color) => ({
   customColor: color,
   textColor: darkMode ? color : 'black',
 
@@ -39,7 +36,7 @@ const theme = (darkMode, color) => ({
 
   //specialty colors
   modalBG: darkMode ? 'rgba(0,0,0,0.85)' : 'rgba(0,0,0,0.6)',
-  advancedBG: darkMode ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.6)',
+  advancedBG: darkMode ? 'rgba(255, 255, 255, 0.2);' : 'rgba(255,255,255,0.6)',
 
   //primary colors
   primary1: darkMode ? '#2172E5' : '#ff007a',
@@ -62,11 +59,11 @@ const theme = (darkMode, color) => ({
   yellow1: '#FFE270',
   yellow2: '#F3841E',
 
-  background: darkMode ? 'black' : `radial-gradient(50% 50% at 50% 50%, #ff007a30 0%, #F7F8FA 100%)`
+  background: 'black'
 })
 
 const TextWrapper = styled(Text)`
-  color: ${({ color, theme }) => theme[color]};
+  color: 'white';
 `
 
 export const TYPE = {
@@ -90,11 +87,11 @@ export const Link = styled.a.attrs({
   color: ${({ theme }) => theme.primary1};
   font-weight: 500;
   :hover {
-    text-decoration: underline;
+    text-decoration: none;
   }
   :focus {
     outline: none;
-    text-decoration: underline;
+    text-decoration: none;
   }
   :active {
     text-decoration: none;
@@ -129,12 +126,14 @@ export const GlobalStyle = createGlobalStyle`
     height: 100%;
     overflow: hidden;
     font-size: 14px;    
+    color: white;
   }
 
   body > div {
     height: 100%;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+    color: 'white'
   } 
 
   a {
@@ -148,7 +147,7 @@ export const GlobalStyle = createGlobalStyle`
   html {
     font-size: 1rem;
     font-variant: none;
-    color: 'black';
+    color: 'white';
     background-color: ${({ theme }) => theme.backgroundColor};
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;

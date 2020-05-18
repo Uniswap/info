@@ -106,12 +106,9 @@ export const formattedNum = (number, usd = false) => {
     }
     return 0
   }
+
   if (num < 0.0001) {
     return usd ? '< $0.0001' : '< 0.0001'
-  }
-
-  if (num > 1000) {
-    return (usd ? '$' : '') + Number(parseFloat(num).toFixed(0))
   }
 
   if (usd) {
@@ -124,6 +121,11 @@ export const formattedNum = (number, usd = false) => {
     let usdString = priceFormatter.format(num)
     return '$' + usdString.slice(1, usdString.length)
   }
+
+  if (num > 1000) {
+    return (usd ? '$' : '') + Number(parseFloat(num).toFixed(0)).toLocaleString()
+  }
+
   return Number(parseFloat(num).toFixed(4))
 }
 

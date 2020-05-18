@@ -15,7 +15,7 @@ function ContextProviders({ children }) {
   return (
     <LocalStorageContextProvider>
       <ApplicationContextProvider>
-        <GlobalDataContextProvider></GlobalDataContextProvider>
+        <GlobalDataContextProvider>{children}</GlobalDataContextProvider>
       </ApplicationContextProvider>
     </LocalStorageContextProvider>
   )

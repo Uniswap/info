@@ -1,6 +1,32 @@
 import gql from 'graphql-tag'
 import { FACTORY_ADDRESS, BUNDLE_ID } from '../constants'
 
+export const UNISWAP_GLOBALS_QUERY = gql`
+  query totals {
+    uniswap(id: "1") {
+      totalVolumeUSD
+      totalVolumeInEth
+      totalLiquidityUSD
+      totalLiquidityInEth
+      txCount
+      exchangeCount
+    }
+  }
+`
+
+export const UNISWAP_GLOBALS_24HOURS_AGO_QUERY = gql`
+  query uniswapHistoricalDatas($date: Int!) {
+    uniswapHistoricalDatas(where: { timestamp_lt: $date }, first: 1, orderBy: timestamp, orderDirection: desc) {
+      totalVolumeInEth
+      totalVolumeUSD
+      totalLiquidityInEth
+      totalLiquidityUSD
+      txCount
+      timestamp
+    }
+  }
+`
+
 export const GET_BLOCK = gql`
   query blocks($timestamp: Int!) {
     blocks(first: 1, orderBy: timestamp, orderDirection: asc, where: { timestamp_gt: $timestamp }) {

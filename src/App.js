@@ -7,10 +7,6 @@ import ScrolToTop from './components/ScrollToTop'
 
 import GlobalPage from './pages/GlobalPage'
 import NavHeader from './components/NavHeader'
-import LocalLoader from './components/LocalLoader'
-import { AutoColumn } from './components/Column'
-import Link from './components/Link'
-import { useMedia } from 'react-use'
 
 const AppWrapper = styled.div`
   position: relative;
@@ -24,52 +20,12 @@ const AppWrapper = styled.div`
   justify-content: flex-start;
 `
 
-const MigrateBanner = styled(AutoColumn)`
-  width: 100%;
-  padding: 12px 0;
-  display: flex;
-  justify-content: center;
-  background-color: rgba(255, 255, 255, 0.3);
-  color: ${({ theme }) => theme.text1};
-  font-weight: 500;
-  text-align: center;
-  a {
-    color: ${({ theme }) => theme.text1};
-  }
-`
-
 function App() {
   const NavHeaderUpdated = withRouter(props => <NavHeader default {...props} />)
-  const below750 = useMedia('(max-width: 750px)')
-  const below490 = useMedia('(max-width: 490px)')
 
   return (
     <ApolloProvider client={client}>
       <AppWrapper>
-        <MigrateBanner>
-          {below490 ? (
-            <>
-              For V1 analytics&nbsp;
-              <Link href="https://uniswap.info/" target="_blank">
-                <b>click here ↗</b>
-              </Link>
-            </>
-          ) : below750 ? (
-            <>
-              <b>This site is for Uniswap V2 only.</b>&nbsp;For V1 analytics&nbsp;
-              <Link href="https://uniswap.info/" target="_blank">
-                <b>click here ↗</b>
-              </Link>
-            </>
-          ) : (
-            <>
-              <b>This site displays analystics for Uniswap V2 only.</b> To see Uniswap V1 analytics&nbsp;
-              <Link href="https://uniswap.info/" target="_blank">
-                <b>click here ↗</b>
-              </Link>
-            </>
-          )}
-        </MigrateBanner>
         <BrowserRouter>
           <ScrolToTop />
           <Switch>
