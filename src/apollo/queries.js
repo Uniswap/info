@@ -341,6 +341,7 @@ export const TOKEN_DATA = (tokenAddress, block) => {
       tradeVolume
       tradeVolumeUSD
       totalLiquidity
+      txCount
       allPairs(orderBy: reserveUSD, orderDirection: desc) {
         id
         reserveUSD
@@ -373,6 +374,7 @@ export const TOKEN_DATA = (tokenAddress, block) => {
     tradeVolume
     tradeVolumeUSD
     totalLiquidity
+    txCount
     allPairs(orderBy: reserveUSD, orderDirection: desc) {
       id
       reserveUSD

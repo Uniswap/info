@@ -166,9 +166,11 @@ function TokenPage({ address }) {
     totalLiquidity,
     volumeChangeUSD,
     priceChangeUSD,
-    liquidityChangeUSD
+    liquidityChangeUSD,
+    oneDayTxns
   } = useTokenData(address)
 
+  console.log(oneDayTxns)
   // detect color from token
   const backgroundColor = useColor(id)
 

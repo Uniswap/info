@@ -173,6 +173,8 @@ const getTokenData = async (address, ethPrice) => {
       twoDayData?.tradeVolumeETH ? twoDayData?.tradeVolumeETH : 0
     )
 
+    const oneDayTxns = parseFloat(data.txCount) - parseFloat(oneDayData?.txCount)
+
     const priceChangeUSD = getPercentChange(data?.derivedETH, oneDayData?.derivedETH)
     const priceChangeETH = getPercentChange(data?.derivedETH, oneDayData?.priceETH)
     const liquidityChangeUSD = getPercentChange(data?.totalLiquidityUSD, oneDayData?.totalLiquidityUSD)
@@ -189,11 +191,13 @@ const getTokenData = async (address, ethPrice) => {
     data.priceChangeETH = priceChangeETH
     data.liquidityChangeUSD = liquidityChangeUSD
     data.liquidityChangeETH = liquidityChangeETH
+    data.oneDayTxns = oneDayTxns
 
     // new tokens
     if (!oneDayData && data) {
       data.oneDayVolumeUSD = data.tradeVolumeUSD
       data.oneDayVolumeETH = data.tradeVolume * data.derivedETH
+      data.oneDayTxns = data.txCount
     }
 
     if (data.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
