@@ -72,10 +72,25 @@ const GlobalChart = ({ display }) => {
       break
   }
 
-  const domain = chartData && [dataMin => (dataMin > utcStartTime ? dataMin : utcStartTime), 'dataMax']
+  const domain = chartData && [dataMin => (parseFloat(dataMin) > utcStartTime ? dataMin : utcStartTime), 'dataMax']
 
   const below1080 = useMedia('(max-width: 1080px)')
   const below600 = useMedia('(max-width: 600px)')
+
+  const chartDataFiltered =
+    chartData &&
+    Object.keys(chartData)
+      ?.map(key => {
+        let item = chartData[key]
+        if (item.date > utcStartTime) {
+          return item
+        } else {
+          return
+        }
+      })
+      .filter(item => {
+        return !!item
+      })
 
   return chartData ? (
     <>
@@ -155,7 +170,7 @@ const GlobalChart = ({ display }) => {
               minTickGap={50}
               tickFormatter={tick => toNiceDate(tick)}
               dataKey="date"
-              mirror={true}
+              // mirror={true}
               tick={{ fill: 'black' }}
               padding={{ right: 0, bottom: 0 }}
               type={'number'}
@@ -170,7 +185,7 @@ const GlobalChart = ({ display }) => {
               interval="preserveEnd"
               minTickGap={50}
               yAxisId={0}
-              mirror={true}
+              // mirror={true}
               padding={{ top: 0, bottom: 0 }}
               tick={{ fill: 'black' }}
               hide={below600}
@@ -198,12 +213,12 @@ const GlobalChart = ({ display }) => {
         <ResponsiveContainer aspect={60 / 28}>
           <BarChart
             margin={{ top: 20, right: 0, bottom: 6, left: 0 }}
-            data={volumeWindow === VOLUME_WINDOW.DAYS ? chartData : weeklyData}
+            data={volumeWindow === VOLUME_WINDOW.DAYS ? chartDataFiltered : weeklyData}
             barCategoryGap={0}
           >
             <XAxis
               tickLine={false}
-              axisLine={false}
+              axisLine={true}
               interval="preserveStartEnd"
               tickMargin={14}
               tickFormatter={tick =>
@@ -211,29 +226,25 @@ const GlobalChart = ({ display }) => {
               }
               dataKey="date"
               tick={{ fill: 'black' }}
-              mirror={true}
               padding={{ right: 0, bottom: 0 }}
-              type={'number'}
-              domain={domain}
+              allowDataOverflow={true}
               minTickGap={80}
             />
 
             <YAxis
               axisLine={true}
-              tickMargin={16}
               tickFormatter={tick => '$' + toK(tick, true, true)}
               tickLine={true}
               interval="preserveEnd"
               minTickGap={20}
-              padding={{ top: 0, bottom: 0 }}
-              mirror={true}
+              padding={{ top: 0, bottom: 0, left: 20 }}
               yAxisId={0}
               tick={{ fill: 'black' }}
               domain={[0, 'dataMax']}
               orientation={'right'}
             />
             <Tooltip
-              cursor={{ fill: '#ff007a', opacity: 0.4 }}
+              cursor={{ fill: '#ff007a', opacity: 0.1 }}
               formatter={val => '$' + toK(val, true)}
               labelFormatter={label =>
                 volumeWindow === VOLUME_WINDOW.WEEKLY ? toWeeklyDate(label - 1) : toNiceDateYear(label)

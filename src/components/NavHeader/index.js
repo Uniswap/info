@@ -3,7 +3,6 @@ import styled from 'styled-components'
 
 import Title from '../Title'
 import Search from '../Search'
-// import CurrencySelect from '../CurrencySelect'
 import { RowFixed, RowBetween } from '../Row'
 import { AutoColumn } from '../Column'
 import { useMedia } from 'react-use'
