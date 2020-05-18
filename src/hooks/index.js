@@ -1,11 +1,11 @@
 import { useState, useCallback, useEffect } from 'react'
-// import { darken, transparentize } from 'polished'
+import { shade } from 'polished'
 import Vibrant from 'node-vibrant'
 import { hex } from 'wcag-contrast'
 import { isAddress } from '../helpers'
 import copy from 'copy-to-clipboard'
 
-export function useColor(tokenAddress) {
+export function useColor(tokenAddress, token) {
   const [color, setColor] = useState('#2172E5')
   if (tokenAddress) {
     const path = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${isAddress(
@@ -15,13 +15,16 @@ export function useColor(tokenAddress) {
       Vibrant.from(path).getPalette((err, palette) => {
         if (palette && palette.Vibrant) {
           let detectedHex = palette.Vibrant.hex
-          // let AAscore = hex(detectedHex, '#FFF')
-          // while (AAscore < 3) {
-          //   detectedHex = darken(0.01, detectedHex)
-          //   AAscore = hex(detectedHex, '#FFF')
-          // }
-          console.log(detectedHex)
-          setColor(detectedHex)
+          let AAscore = hex(detectedHex, '#FFF')
+          while (AAscore < 3) {
+            detectedHex = shade(0.005, detectedHex)
+            AAscore = hex(detectedHex, '#FFF')
+          }
+          if (token === 'DAI') {
+            setColor('#FAAB14')
+          } else {
+            setColor(detectedHex)
+          }
         }
       })
     }

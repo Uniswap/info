@@ -25,7 +25,7 @@ const PageButtons = styled.div`
 `
 
 const Arrow = styled.div`
-  color: #2f80ed;
+  color: ${({ theme }) => theme.primary1};
   opacity: ${props => (props.faded ? 0.3 : 1)};
   padding: 0 20px;
   user-select: none;
@@ -41,8 +41,8 @@ const List = styled(Box)`
 const DashGrid = styled.div`
   display: grid;
   grid-gap: 1em;
-  grid-template-columns: 100px 1fr 1fr;
-  grid-template-areas: 'name liq vol';
+  grid-template-columns: 20px 100px 1fr 1fr;
+  grid-template-areas: '# name liq vol';
 
   > * {
     justify-content: flex-end;
@@ -51,23 +51,29 @@ const DashGrid = styled.div`
     :first-child {
       justify-content: flex-start;
       text-align: left;
+      width: 20px;
+    }
+
+    :nth-child(2) {
+      justify-content: flex-start;
+      text-align: left;
       width: 100px;
     }
   }
 
   @media screen and (min-width: 740px) {
-    grid-template-columns: 1.5fr 1fr 1fr 180px 70px;
-    grid-template-areas: ' name liq vol pool swap';
+    grid-template-columns: 20px 1.5fr 1fr 1fr 200px 70px;
+    grid-template-areas: '# name liq vol pool swap';
   }
 
   @media screen and (min-width: 1080px) {
-    grid-template-columns: 1.5fr 1fr 1fr 1fr 140px 70px;
-    grid-template-areas: ' name liq vol txCount pool swap';
+    grid-template-columns: 20px 1.5fr 1fr 1fr 1fr 200px 70px;
+    grid-template-areas: '# name liq vol txCount pool swap';
   }
 
   @media screen and (min-width: 1200px) {
-    grid-template-columns: 1.5fr 1fr 1fr 1fr 140px 70px;
-    grid-template-areas: ' name liq vol txCount pool swap';
+    grid-template-columns: 20px 1.5fr 1fr 1fr 1fr 200px 70px;
+    grid-template-areas: '# name liq vol txCount pool swap';
   }
 `
 
@@ -165,15 +171,18 @@ function PairList({ pairs, color }) {
 
     return (
       <DashGrid style={{ height: '60px' }}>
+        <DataText area="#" fontWeight="500">
+          <div>{index}</div>
+        </DataText>
         <DataText area="name" fontWeight="500">
-          <div style={{ marginRight: '1rem' }}>{index}</div>
-          <DoubleTokenLogo a0={item.token0.id} a1={item.token1.id} margin={true} />
+          <DoubleTokenLogo size={20} a0={item.token0.id} a1={item.token1.id} margin={true} />
           <CustomLink
             style={{ marginLeft: '20px', whiteSpace: 'nowrap' }}
             to={'/pair/' + item.id}
             onClick={() => {
               window.scrollTo(0, 0)
             }}
+            color={color}
           >
             {item.token0.symbol + '-' + item.token1.symbol}
           </CustomLink>
@@ -206,6 +215,11 @@ function PairList({ pairs, color }) {
   return (
     <ListWrapper>
       <DashGrid center={true} style={{ height: 'fit-content', padding: '0 0 1rem 0' }}>
+        <Flex alignItems="center" justifyContent="flexStart">
+          <Text area="#" fontWeight="500">
+            #
+          </Text>
+        </Flex>
         <Flex alignItems="center" justifyContent="flexStart">
           <Text area="name" fontWeight="500">
             Name
@@ -252,12 +266,12 @@ function PairList({ pairs, color }) {
         )}
         {!below740 && (
           <Flex alignItems="center">
-            <Text area="pool">Pool</Text>
+            <Text area="pool"></Text>
           </Flex>
         )}
         {!below740 && (
           <Flex alignItems="center">
-            <Text area="swap">Swap</Text>
+            <Text area="swap"></Text>
           </Flex>
         )}
       </DashGrid>

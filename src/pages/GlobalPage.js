@@ -112,13 +112,13 @@ function GlobalPage() {
 
   const liquidity = totalLiquidityUSD ? formattedNum(totalLiquidityUSD, true) : '-'
 
-  const liquidityChange = liquidityChangeUSD ? formattedPercent(liquidityChangeUSD) : ''
+  const liquidityChange = liquidityChangeUSD ? formattedPercent(liquidityChangeUSD) : '-'
 
   const volume = oneDayVolumeUSD ? formattedNum(oneDayVolumeUSD, true) : '-'
 
-  const volumeChange = volumeChangeUSD ? formattedPercent(volumeChangeUSD) : ''
+  const volumeChange = volumeChangeUSD ? formattedPercent(volumeChangeUSD) : '-'
 
-  let txnChangeFormatted = txnChange ? formattedPercent(txnChange) : ''
+  let txnChangeFormatted = txnChange ? formattedPercent(txnChange) : '-'
 
   const below1080 = useMedia('(max-width: 1080px)')
 
@@ -126,9 +126,12 @@ function GlobalPage() {
     <PageWrapper>
       <ThemedBackground />
       <Search small={false} />
+      <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
+        Overall Stats
+      </TYPE.main>
       {below1080 && ( // mobile card
         <Box mb={20}>
-          <Box mb={20} mt={30}>
+          <Box mb={20} mt={0}>
             <Panel>
               <Box>
                 <AutoColumn gap="40px">
@@ -182,7 +185,7 @@ function GlobalPage() {
         </Box>
       )}
       {!below1080 && ( // desktop
-        <TopGroup style={{ marginTop: '40px' }}>
+        <TopGroup style={{ marginTop: '1.5rem' }}>
           <Panel>
             <AutoColumn gap="20px">
               <RowBetween>
@@ -243,6 +246,7 @@ function GlobalPage() {
           </Panel>
         </TopGroup>
       )}
+
       {!below1080 && (
         <GridRow style={{ marginTop: '6px' }}>
           <Panel style={{ height: '100%', minHeight: '300px' }}>
@@ -257,84 +261,44 @@ function GlobalPage() {
           </Panel>
         </GridRow>
       )}
+
+      <ListOptions gap="10px" style={{ marginTop: '2rem', marginBottom: '.5rem' }}>
+        <Hover>
+          <TYPE.main
+            onClick={() => {
+              setListView(LIST_VIEW.PAIRS)
+            }}
+            fontSize={'1.125rem'}
+            color={listView === LIST_VIEW.TOKENS ? '#aeaeae' : 'black'}
+          >
+            Pairs
+          </TYPE.main>
+        </Hover>
+        <Hover>
+          <TYPE.main
+            onClick={() => {
+              setListView(LIST_VIEW.TOKENS)
+            }}
+            fontSize={'1.125rem'}
+            color={listView === LIST_VIEW.PAIRS ? '#aeaeae' : 'black'}
+          >
+            Tokens
+          </TYPE.main>
+        </Hover>
+      </ListOptions>
+
       <Panel style={{ marginTop: '6px' }}>
-        <ListOptions gap="10px">
-          <Hover>
-            <TYPE.main
-              onClick={() => {
-                setListView(LIST_VIEW.PAIRS)
-              }}
-              fontSize={'1rem'}
-              color={listView === LIST_VIEW.TOKENS ? '#aeaeae' : 'black'}
-            >
-              Pairs
-            </TYPE.main>
-          </Hover>
-          <Hover>
-            <TYPE.main
-              onClick={() => {
-                setListView(LIST_VIEW.TOKENS)
-              }}
-              fontSize={'1rem'}
-              color={listView === LIST_VIEW.PAIRS ? '#aeaeae' : 'black'}
-            >
-              Tokens
-            </TYPE.main>
-          </Hover>
-        </ListOptions>
         {listView === LIST_VIEW.PAIRS ? (
           <PairList pairs={pairs && Object.keys(pairs).map(key => pairs[key])} />
         ) : (
           <TopTokenList tokens={allTokenData} />
         )}
       </Panel>
+
+      <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '2rem' }}>
+        Transactions
+      </TYPE.main>
       <Panel style={{ margin: '1rem 0' }}>
-        <ListOptions gap="10px">
-          <Hover>
-            <TYPE.main
-              onClick={() => {
-                setTxFilter('ALL')
-              }}
-              fontSize={'1rem'}
-              color={txFilter !== 'ALL' ? '#aeaeae' : 'black'}
-            >
-              All
-            </TYPE.main>
-          </Hover>
-          <Hover>
-            <TYPE.main
-              onClick={() => {
-                setTxFilter('SWAP')
-              }}
-              fontSize={'1rem'}
-              color={txFilter !== 'SWAP' ? '#aeaeae' : 'black'}
-            >
-              Swaps
-            </TYPE.main>
-          </Hover>
-          <Hover>
-            <TYPE.main
-              onClick={() => {
-                setTxFilter('ADD')
-              }}
-              fontSize={'1rem'}
-              color={txFilter !== 'ADD' ? '#aeaeae' : 'black'}
-            >
-              Adds
-            </TYPE.main>
-          </Hover>
-          <Hover>
-            <TYPE.main
-              onClick={() => {
-                setTxFilter('REMOVE')
-              }}
-              fontSize={'1rem'}
-              color={txFilter !== 'REMOVE' ? '#aeaeae' : 'black'}
-            >
-              Removes
-            </TYPE.main>
-          </Hover>
-        </ListOptions>
         <TxnList transactions={transactions} txFilter={txFilter} />
       </Panel>
     </PageWrapper>

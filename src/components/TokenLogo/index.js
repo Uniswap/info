@@ -9,6 +9,7 @@ const BAD_IMAGES = {}
 const Inline = styled.div`
   display: flex;
   align-items: center;
+  align-self: center;
 `
 
 const Image = styled.img`

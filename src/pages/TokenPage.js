@@ -12,6 +12,8 @@ import Column, { AutoColumn } from '../components/Column'
 import { ButtonLight, ButtonDark } from '../components/ButtonStyled'
 import TxnList from '../components/TxnList'
 import TokenChart from '../components/TokenChart'
+import Link from '../components/Link'
+
 import { formattedNum, formattedPercent } from '../helpers'
 
 import { useTokenData, useTokenTransactions, useTokenChartData } from '../contexts/TokenData'
@@ -77,6 +79,7 @@ const AccountSearchWrapper = styled.div`
 `
 const PanelWrapper = styled.div`
   grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: max-content;
   gap: 6px;
   display: inline-grid;
   width: 100%;
@@ -140,7 +143,7 @@ function TokenPage({ address }) {
   } = useTokenData(address)
 
   // detect color from token
-  const backgroundColor = useColor(id)
+  const backgroundColor = useColor(id, symbol)
 
   // daily data
   const chartData = useTokenChartData(address)
@@ -166,23 +169,23 @@ function TokenPage({ address }) {
 
   return (
     <PageWrapper>
-      <ThemedBackground backgroundColor={transparentize(0.8, backgroundColor)} />
+      <ThemedBackground backgroundColor={transparentize(0.6, backgroundColor)} />
       <RowBetween mt={20} style={{ flexWrap: 'wrap' }}>
         <RowFixed style={{ flexWrap: 'wrap' }}>
-          <RowFixed mb={20}>
-            <TokenLogo address={address} size="32px" />
+          <RowFixed mb={20} style={{ alignItems: 'baseline' }}>
+            <TokenLogo address={address} size="32px" style={{ alignSelf: 'center' }} />
             <Text fontSize={'2rem'} fontWeight={600} style={{ margin: '0 1rem' }}>
               {name ? name + ' ' : ''} {symbol ? '(' + symbol + ')' : ''}
             </Text>{' '}
+            {!below1080 && (
+              <>
+                <Text fontSize={'2rem'} fontWeight={500} style={{ marginRight: '1rem' }}>
+                  {price}
+                </Text>
+                {priceChange}
+              </>
+            )}
           </RowFixed>
-          {!below1080 && (
-            <RowFixed mb={20}>
-              <Text fontSize={'2rem'} fontWeight={500} style={{ marginRight: '1rem' }}>
-                {price}
-              </Text>
-              {priceChange}
-            </RowFixed>
-          )}
         </RowFixed>
         <span>
           <RowFixed mb={20} ml={'2.5rem'} style={{ flexDirection: below1080 ? 'row-reverse' : 'initial' }}>
@@ -196,7 +199,7 @@ function TokenPage({ address }) {
       <DashboardWrapper>
         <>
           {!below1080 && (
-            <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '1rem' }}>
+            <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '2rem' }}>
               Token Stats
             </TYPE.main>
           )}
@@ -261,7 +264,7 @@ function TokenPage({ address }) {
                 </RowBetween>
               </AutoColumn>
             </Panel>
-            <Panel style={{ gridColumn: '1/4' }}>
+            <Panel style={{ gridColumn: below1080 ? '1' : '2/4', gridRow: below1080 ? '' : '1/4' }}>
               <TokenChart chartData={chartData} token={address} color={backgroundColor} />
             </Panel>
           </PanelWrapper>
@@ -298,12 +301,12 @@ function TokenPage({ address }) {
             border: '1px solid rgba(43, 43, 43, 0.05)'
           }}
         >
-          {transactions ? <TxnList transactions={transactions} /> : <Loader />}
+          {transactions ? <TxnList color={backgroundColor} transactions={transactions} /> : <Loader />}
         </Panel>
         <>
-          <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
-            Token Information
-          </TYPE.main>{' '}
+          <RowBetween style={{ marginTop: '3rem' }}>
+            <TYPE.main fontSize={'1.125rem'}>Token Information</TYPE.main>{' '}
+          </RowBetween>
           <Panel
             rounded
             style={{
@@ -334,6 +337,11 @@ function TokenPage({ address }) {
                   <CopyHelper toCopy={address} />
                 </AutoRow>
               </Column>
+              <ButtonLight color={backgroundColor}>
+                <Link color={backgroundColor} external href={'https://etherscan.io/address/' + address}>
+                  View on Etherscan ↗
+                </Link>
+              </ButtonLight>
             </TokenDetailsLayout>
           </Panel>
         </>

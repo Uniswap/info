@@ -20,12 +20,14 @@ const Wrapper = styled.div`
   padding: ${({ large }) => (large ? '12px' : '12px 16px')};
   border: 1px solid ${({ theme }) => theme.inputBackground};
   border-radius: 12px;
-  background: ${({ theme }) => theme.inputBackground};
+  background: ${({ theme, large }) => (large ? theme.inputBG : theme.advancedBG)};
   border-bottom-right-radius: ${({ open }) => (open ? '0px' : '12px')};
   border-bottom-left-radius: ${({ open }) => (open ? '0px' : '12px')};
-  box-shadow: 0 2.8px 2.8px -9px rgba(0, 0, 0, 0.008), 0 6.7px 6.7px -9px rgba(0, 0, 0, 0.012),
+  ${({ large }) =>
+    large &&
+    ` box-shadow: 0 2.8px 2.8px -9px rgba(0, 0, 0, 0.008), 0 6.7px 6.7px -9px rgba(0, 0, 0, 0.012),
     0 12.5px 12.6px -9px rgba(0, 0, 0, 0.015), 0 22.3px 22.6px -9px rgba(0, 0, 0, 0.018),
-    0 41.8px 42.2px -9px rgba(0, 0, 0, 0.022), 0 100px 101px -9px rgba(0, 0, 0, 0.03);
+    0 41.8px 42.2px -9px rgba(0, 0, 0, 0.022), 0 100px 101px -9px rgba(0, 0, 0, 0.03);`}
 `
 const Input = styled.input`
   position: relative;

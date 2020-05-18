@@ -110,7 +110,7 @@ const DataText = styled(Flex)`
 const SortText = styled.button`
   cursor: pointer;
   font-weight: ${({ active, theme }) => (active ? 500 : 400)};
-  margin-right: 0.5rem !important;
+  margin-right: 0.75rem !important;
   border: none;
   background-color: transparent;
   font-size: 1rem;
@@ -126,7 +126,7 @@ const SORT_FIELD = {
 }
 
 // @TODO rework into virtualized list
-function TxnList({ transactions }) {
+function TxnList({ transactions, color }) {
   // page state
   const [page, setPage] = useState(1)
   const [maxPage, setMaxPage] = useState(1)
@@ -261,7 +261,7 @@ function TxnList({ transactions }) {
     return (
       <DashGrid style={{ height: '60px' }}>
         <DataText area="txn" fontWeight="500">
-          <Link external href={urls.showTransaction(item.hash)}>
+          <Link color={color} external href={urls.showTransaction(item.hash)}>
             {getTransactionType(item.type, item.token0Symbol, item.token1Symbol)}
           </Link>
         </DataText>
@@ -276,7 +276,7 @@ function TxnList({ transactions }) {
         )}
         {!below1080 && (
           <DataText area="account">
-            <Link external href={'https://etherscan.io/address/' + item.account}>
+            <Link color={color} external href={'https://etherscan.io/address/' + item.account}>
               {item.account && item.account.slice(0, 6) + '...' + item.account.slice(38, 42)}
             </Link>
           </DataText>

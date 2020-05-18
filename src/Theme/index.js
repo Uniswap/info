@@ -15,7 +15,7 @@ const theme = (darkMode, color) => ({
   textColor: darkMode ? color : 'black',
 
   panelColor: darkMode ? 'rgba(255, 255, 255, 0)' : 'rgba(255, 255, 255, 0)',
-  backgroundColor: darkMode ? '#212429' : '#FFFFFF',
+  backgroundColor: darkMode ? '#212429' : '#F7F8FA',
 
   uniswapPink: darkMode ? '#ff007a' : 'black',
 
@@ -61,6 +61,7 @@ const theme = (darkMode, color) => ({
   green1: '#27AE60',
   yellow1: '#FFE270',
   yellow2: '#F3841E',
+  link: '#2172E5',
 
   background: darkMode ? 'black' : `radial-gradient(50% 50% at 50% 50%, #ff007a30 0%, #F7F8FA 100%)`
 })
@@ -107,8 +108,10 @@ export const ThemedBackground = styled.div`
   left: 0;
   right: 0;
   height: 1000px;
+  overflow: hidden;
   max-width: 100vw !important;
   width: 100vw !important;
+  user-select: none;
   z-index: -1;
   background: ${({ backgroundColor }) =>
     `linear-gradient(180deg, ${backgroundColor} 0%, rgba(255, 255, 255, 0) 100%);`};
