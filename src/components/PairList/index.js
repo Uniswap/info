@@ -41,8 +41,8 @@ const List = styled(Box)`
 const DashGrid = styled.div`
   display: grid;
   grid-gap: 1em;
-  grid-template-columns: 20px 100px 1fr 1fr;
-  grid-template-areas: '# name liq vol';
+  grid-template-columns: 100px 1fr 1fr;
+  grid-template-areas: 'name liq vol';
 
   > * {
     justify-content: flex-end;
@@ -168,9 +168,6 @@ function PairList({ pairs, color }) {
 
     return (
       <DashGrid style={{ height: '60px' }}>
-        <DataText area="#" fontWeight="500">
-          <div>{index}</div>
-        </DataText>
         <DataText area="name" fontWeight="500">
           <div style={{ marginRight: '20px' }}>{index}</div>
           <DoubleTokenLogo size={20} a0={item.token0.id} a1={item.token1.id} margin={!below740} />

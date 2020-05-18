@@ -97,8 +97,6 @@ const TokenDetailsLayout = styled.div`
 `
 
 function TokenPage({ address }) {
-  const [accountInput, setAccountInput] = useState('')
-
   const {
     id,
     name,

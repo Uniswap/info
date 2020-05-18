@@ -231,7 +231,7 @@ function PairPage({ pairAddress, history }) {
             </Panel>
           </PanelWrapper>
           <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
-            Token Info
+            Pooled Tokens
           </TYPE.main>
           <TokenWrapper style={{ marginTop: '1.5rem' }}>
             <Panel>
