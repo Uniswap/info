@@ -90,20 +90,20 @@ const ClickableText = styled(Text)`
   text-align: end;
 
   @media screen and (max-width: 640px) {
-    font-size: 0.85rem;
+    font-size: 14px;
   }
 `
 
 const DataText = styled(Flex)`
-  @media screen and (max-width: 40em) {
-    font-size: 0.85rem;
-  }
-
   align-items: center;
   text-align: right;
 
   & > * {
     font-size: 1em;
+  }
+
+  @media screen and (max-width: 40em) {
+    font-size: 0.85rem;
   }
 `
 
@@ -117,6 +117,10 @@ const SortText = styled.button`
   padding: 0px;
   color: ${({ active, theme }) => (active ? theme.text1 : theme.text3)};
   outline: none;
+
+  @media screen and (max-width: 600px) {
+    font-size: 14px;
+  }
 `
 
 const SORT_FIELD = {

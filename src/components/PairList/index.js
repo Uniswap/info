@@ -83,15 +83,15 @@ const ClickableText = styled(Text)`
 `
 
 const DataText = styled(Flex)`
-  @media screen and (max-width: 40em) {
-    font-size: 0.85rem;
-  }
-
   align-items: center;
   text-align: center;
 
   & > * {
     font-size: 1em;
+  }
+
+  @media screen and (max-width: 600px) {
+    font-size: 13px;
   }
 `
 
@@ -106,6 +106,7 @@ const SORT_FIELD = {
 function PairList({ pairs, color }) {
   const allPairData = useAllPairs()
 
+  const below600 = useMedia('(max-width: 600px)')
   const below740 = useMedia('(max-width: 740px)')
   const below1080 = useMedia('(max-width: 1080px)')
 
@@ -169,8 +170,8 @@ function PairList({ pairs, color }) {
     return (
       <DashGrid style={{ height: '60px' }}>
         <DataText area="name" fontWeight="500">
-          <div style={{ marginRight: '20px' }}>{index}</div>
-          <DoubleTokenLogo size={20} a0={item.token0.id} a1={item.token1.id} margin={!below740} />
+          {!below600 && <div style={{ marginRight: '20px' }}>{index}</div>}
+          <DoubleTokenLogo size={below600 ? 16 : 20} a0={item.token0.id} a1={item.token1.id} margin={!below740} />
           <CustomLink
             style={{ marginLeft: '20px', whiteSpace: 'nowrap' }}
             to={'/pair/' + item.id}
@@ -188,16 +189,14 @@ function PairList({ pairs, color }) {
         {!below1080 && <DataText area="fees">{formattedNum(itemData.oneDayVolumeUSD * 0.003, true)}</DataText>}
         {!below740 && (
           <Flex area="pool" justifyContent="flex-end" alignItems="center">
-            <ButtonLight color={color} style={{ marginRight: '10px' }}>
-              <Link color={color} external href={getPoolLink(item.token0?.id, item.token1?.id)}>
+            <Link color={color} external href={getPoolLink(item.token0?.id, item.token1?.id)}>
+              <ButtonLight color={color} style={{ marginRight: '10px' }}>
                 + Add Liquidity
-              </Link>
-            </ButtonLight>
-            <ButtonDark color={color}>
-              <Link color={'white'} external href={getSwapLink(item.token0?.id, item.token1?.id)}>
-                Trade
-              </Link>
-            </ButtonDark>
+              </ButtonLight>
+            </Link>
+            <Link color={'white'} external href={getSwapLink(item.token0?.id, item.token1?.id)}>
+              <ButtonDark color={color}>Trade</ButtonDark>
+            </Link>
           </Flex>
         )}
       </DashGrid>
