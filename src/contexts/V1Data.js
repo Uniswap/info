@@ -107,7 +107,6 @@ export function useV1Data() {
       data.dailyVolumeUSD = volumeChangeUSD
 
       setGlobalData(data)
-      console.log('fetching')
     }
 
     !globalData && fetchGlobalData()
