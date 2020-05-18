@@ -58,17 +58,22 @@ const theme = (darkMode = true, color) => ({
   green1: '#27AE60',
   yellow1: '#FFE270',
   yellow2: '#F3841E',
+  pink: '#ff007a',
 
   background: 'black'
 })
 
 const TextWrapper = styled(Text)`
   color: 'white';
+  color: ${({ color, theme }) => color && theme[color]};
 `
 
 export const TYPE = {
   main(props) {
-    return <TextWrapper fontWeight={500} color={'text1'} {...props} />
+    return <TextWrapper fontWeight={500} color={props.color} {...props} />
+  },
+  pink(props) {
+    return <TextWrapper fontWeight={500} color={'#ff007a'} {...props} />
   }
 }
 

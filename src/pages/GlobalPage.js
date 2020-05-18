@@ -6,7 +6,7 @@ import styled from 'styled-components'
 import { RowBetween } from '../components/Row'
 import { AutoColumn } from '../components/Column'
 
-import { TYPE } from '../Theme'
+import { TYPE, Link } from '../Theme'
 import { formattedNum, formattedPercent } from '../helpers'
 import { useGlobalData } from '../contexts/GlobalData'
 
@@ -161,9 +161,16 @@ function GlobalPage() {
           </OverviewGroup>
         </AutoColumn>
         <AutoColumn gap="20px">
-          <Text fontSize={24} fontWeight={600}>
-            V2 Stats
-          </Text>
+          <RowBetween>
+            <Text fontSize={24} fontWeight={600}>
+              V2 Stats
+            </Text>
+            <Link href="">
+              <TYPE.pink fontSize={20} fontWeight={500}>
+                View More
+              </TYPE.pink>
+            </Link>
+          </RowBetween>
           <TopGroup>
             <Panel style={{ marginBottom: below1080 ? '20px' : 0 }}>
               <AutoColumn gap="20px">
@@ -210,9 +217,16 @@ function GlobalPage() {
           </TopGroup>
         </AutoColumn>
         <AutoColumn gap="20px">
-          <Text fontSize={24} fontWeight={600}>
-            V1 Stats
-          </Text>
+          <RowBetween>
+            <Text fontSize={24} fontWeight={600}>
+              V1 Stats
+            </Text>
+            <Link href="">
+              <TYPE.pink fontSize={20} fontWeight={500}>
+                View More
+              </TYPE.pink>
+            </Link>
+          </RowBetween>
           <TopGroup>
             <Panel style={{ marginBottom: below1080 ? '20px' : 0 }}>
               <AutoColumn gap="20px">
