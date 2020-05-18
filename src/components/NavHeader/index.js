@@ -3,14 +3,13 @@ import styled from 'styled-components'
 
 import Title from '../Title'
 import Search from '../Search'
-// import CurrencySelect from '../CurrencySelect'
 import { RowFixed, RowBetween } from '../Row'
 import { AutoColumn } from '../Column'
 import { useMedia } from 'react-use'
-import { useV1Data } from '../../contexts/V1Data'
 import { useGlobalData } from '../../contexts/GlobalData'
 import { toK } from '../../helpers'
 import { ButtonDark } from '../ButtonStyled'
+import Link from '../Link'
 
 const Header = styled.div`
   width: calc(100% - 80px);
@@ -24,9 +23,10 @@ const Header = styled.div`
 `
 
 const CombinedWrapper = styled(RowFixed)`
-border: 1px solid ${({ theme }) => theme.primary2}
+/* border: 1px solid ${({ theme }) => theme.primary2} */
 border-radius: 16px;
 padding: .25rem 0.25rem .25rem .75rem ;
+justify-content: flex-end;
 `
 
 const CombinedData = styled.div`
@@ -41,14 +41,14 @@ export default function NavHeader({ token, pair }) {
   const below1024 = useMedia('(max-width: 1024px)')
   const below600 = useMedia('(max-width: 600px)')
 
-  const { liquidityUsd, dailyVolumeUSD } = useV1Data()
-
-  const { totalLiquidityUSD, oneDayVolumeUSD } = useGlobalData()
+  const { totalLiquidityUSD, oneDayVolumeUSD, v1Data } = useGlobalData()
 
   const liquidity =
-    totalLiquidityUSD && liquidityUsd ? '$' + toK(parseFloat(totalLiquidityUSD) + parseFloat(liquidityUsd), true) : ''
-  const volume = oneDayVolumeUSD && dailyVolumeUSD ? '$' + toK(oneDayVolumeUSD + dailyVolumeUSD, true) : ''
-  // const txns = oneDayTxns && txCount ? formattedNum(oneDayTxns + txCount) : ''
+    totalLiquidityUSD && v1Data?.liquidityUsd
+      ? '$' + toK(parseFloat(totalLiquidityUSD) + parseFloat(v1Data?.liquidityUsd), true)
+      : ''
+  const volume =
+    oneDayVolumeUSD && v1Data?.dailyVolumeUSD ? '$' + toK(oneDayVolumeUSD + v1Data?.dailyVolumeUSD, true) : ''
 
   return below600 ? (
     <Header>
@@ -78,9 +78,9 @@ export default function NavHeader({ token, pair }) {
                   </CombinedData> */}
                 </>
               )}
-              <ButtonDark style={{ minWidth: 'initial' }} href="https://combined.uniswap.info">
-                View combined {below1024 && 'data'} ↗
-              </ButtonDark>
+              <Link href="https://migrate.uniswap.info" target="_blank">
+                <ButtonDark style={{ minWidth: 'initial' }}>View combined {below1024 && 'data'} ↗</ButtonDark>
+              </Link>
             </CombinedWrapper>
           )}
         </RowFixed>
