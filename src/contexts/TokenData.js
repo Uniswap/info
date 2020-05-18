@@ -167,31 +167,21 @@ const getTokenData = async (address, ethPrice) => {
       twoDayData?.tradeVolumeUSD
     )
 
-    const [oneDayVolumeETH, volumeChangeETH] = get2DayPercentChange(
-      data.tradeVolumeETH,
-      oneDayData?.tradeVolumeETH ? oneDayData?.tradeVolumeETH : 0,
-      twoDayData?.tradeVolumeETH ? twoDayData?.tradeVolumeETH : 0
-    )
-
-    const oneDayTxns = parseFloat(data.txCount) - parseFloat(oneDayData?.txCount)
+    // calculate percentage changes and daily changes
+    const [oneDayTxns, txnChange] = get2DayPercentChange(data.txCount, oneDayData?.txCount, twoDayData?.txCount)
 
     const priceChangeUSD = getPercentChange(data?.derivedETH, oneDayData?.derivedETH)
-    const priceChangeETH = getPercentChange(data?.derivedETH, oneDayData?.priceETH)
     const liquidityChangeUSD = getPercentChange(data?.totalLiquidityUSD, oneDayData?.totalLiquidityUSD)
-    const liquidityChangeETH = getPercentChange(data?.totalLiquidityETH, oneDayData?.totalLiquidityETH)
 
     // set data
     data.priceUSD = data?.derivedETH * ethPrice
     data.totalLiquidityUSD = data?.totalLiquidity * ethPrice * data?.derivedETH
     data.oneDayVolumeUSD = oneDayVolumeUSD
-    data.oneDayVolumeETH = oneDayVolumeETH
     data.volumeChangeUSD = volumeChangeUSD
-    data.volumeChangeETH = volumeChangeETH
     data.priceChangeUSD = priceChangeUSD
-    data.priceChangeETH = priceChangeETH
     data.liquidityChangeUSD = liquidityChangeUSD
-    data.liquidityChangeETH = liquidityChangeETH
     data.oneDayTxns = oneDayTxns
+    data.txnChange = txnChange
 
     // new tokens
     if (!oneDayData && data) {
@@ -257,6 +247,7 @@ const getTokenChartData = async tokenAddress => {
     // fill in empty days
     let timestamp = data[0] && data[0].date ? data[0].date : startTime
     let latestLiquidityUSD = data[0] && data[0].totalLiquidityUSD
+    let latestPriceUSD = data[0] && data[0].priceUSD
     let latestPairDatas = data[0] && data[0].mostLiquidPairs
     let index = 1
     while (timestamp < utcEndTime.unix() - oneDay) {
@@ -267,11 +258,13 @@ const getTokenChartData = async tokenAddress => {
           date: nextDay,
           dayString: nextDay,
           dailyVolumeUSD: 0,
+          priceUSD: latestPriceUSD,
           totalLiquidityUSD: latestLiquidityUSD,
           mostLiquidPairs: latestPairDatas
         })
       } else {
         latestLiquidityUSD = dayIndexArray[index].totalLiquidityUSD
+        latestPriceUSD = dayIndexArray[index].priceUSD
         latestPairDatas = dayIndexArray[index].mostLiquidPairs
         index = index + 1
       }

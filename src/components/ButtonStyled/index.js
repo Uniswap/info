@@ -2,6 +2,7 @@ import React from 'react'
 import { Button as RebassButton } from 'rebass/styled-components'
 import styled from 'styled-components'
 import { Plus } from 'react-feather'
+import { darken, transparentize } from 'polished'
 
 const Base = styled(RebassButton)`
   padding: 8px 12px;
@@ -55,24 +56,32 @@ const ContentWrapper = styled.div`
 `
 
 export const ButtonLight = styled(Base)`
-  background-color: rgba(255, 255, 255, 0.8);
-  width: fit-content;
+  background-color: ${({ color, theme }) => (color ? transparentize(0.9, color) : transparentize(0.9, theme.primary1))};
+  color: ${({ color, theme }) => (color ? darken(0.1, color) : theme.primary1)};
+
+  min-width: fit-content;
   border-radius: 12px;
-  color: black;
+  white-space: nowrap;
+
+  a {
+    color: ${({ color, theme }) => (color ? darken(0.1, color) : theme.primary1)};
+  }
 
   :hover {
-    background-color: rgba(255, 255, 255, 0.4);
+    background-color: ${({ color, theme }) =>
+      color ? transparentize(0.8, color) : transparentize(0.8, theme.primary1)};
   }
 `
 
 export const ButtonDark = styled(Base)`
-  background-color: black;
+  background-color: ${({ color, theme }) => (color ? color : theme.primary1)};
   color: white;
   width: fit-content;
   border-radius: 12px;
+  white-space: nowrap;
 
   :hover {
-    background-color: (0, 0, 0, 0.5);
+    background-color: ${({ color, theme }) => (color ? darken(0.1, color) : darken(0.1, theme.primary1))};
   }
 `
 

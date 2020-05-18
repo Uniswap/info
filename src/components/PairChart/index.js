@@ -3,16 +3,18 @@ import styled from 'styled-components'
 import { Area, XAxis, YAxis, ResponsiveContainer, Tooltip, AreaChart, BarChart, Bar } from 'recharts'
 import { RowBetween, AutoRow } from '../Row'
 
-import { toK, toNiceDate, toNiceDateYear } from '../../helpers'
+import { toK, toNiceDate, toNiceDateYear, formattedNum } from '../../helpers'
 import { OptionButton } from '../ButtonStyled'
 import { darken } from 'polished'
 import { usePairChartData } from '../../contexts/PairData'
 import { timeframeOptions } from '../../constants'
 import dayjs from 'dayjs'
 import { useMedia } from 'react-use'
+import { EmptyCard } from '..'
 
 const ChartWrapper = styled.div`
-  padding-top: 40px;
+  height: 100%;
+  min-height: 300px;
 `
 
 const CHART_VIEW = {
@@ -55,7 +57,11 @@ const PairChart = ({ address, color }) => {
   const domain = [dataMin => (dataMin > utcStartTime ? dataMin : utcStartTime), 'dataMax']
 
   if (chartData && chartData.length === 0) {
-    return <div></div>
+    return (
+      <ChartWrapper>
+        <EmptyCard height="300px">No historical data yet.</EmptyCard>{' '}
+      </ChartWrapper>
+    )
   }
 
   return (
@@ -88,7 +94,7 @@ const PairChart = ({ address, color }) => {
         </AutoRow>
       </RowBetween>
       {chartFilter === CHART_VIEW.LIQUIDITY && (
-        <ResponsiveContainer aspect={below1080 ? 60 / 28 : 60 / 12}>
+        <ResponsiveContainer aspect={below1080 ? 60 / 32 : 60 / 16}>
           <AreaChart margin={{ top: 0, right: 0, bottom: 6, left: 0 }} barCategoryGap={1} data={chartData}>
             <defs>
               <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
@@ -111,7 +117,7 @@ const PairChart = ({ address, color }) => {
             <YAxis
               type="number"
               orientation="left"
-              tickFormatter={tick => toK(tick)}
+              tickFormatter={tick => '$' + toK(tick)}
               axisLine={false}
               tickLine={false}
               interval="preserveEnd"
@@ -121,7 +127,7 @@ const PairChart = ({ address, color }) => {
             />
             <Tooltip
               cursor={true}
-              formatter={val => toK(val, true)}
+              formatter={val => formattedNum(val, true)}
               labelFormatter={label => toNiceDateYear(label)}
               labelStyle={{ paddingTop: 4 }}
               contentStyle={{
@@ -146,7 +152,7 @@ const PairChart = ({ address, color }) => {
         </ResponsiveContainer>
       )}
       {chartFilter === CHART_VIEW.VOLUME && (
-        <ResponsiveContainer aspect={below1080 ? 60 / 28 : 60 / 12}>
+        <ResponsiveContainer aspect={below1080 ? 60 / 32 : 60 / 16}>
           <BarChart
             margin={{ top: 0, right: 0, bottom: 6, left: below1080 ? 0 : 10 }}
             barCategoryGap={1}
@@ -168,7 +174,7 @@ const PairChart = ({ address, color }) => {
               type="number"
               axisLine={false}
               tickMargin={16}
-              tickFormatter={tick => toK(tick)}
+              tickFormatter={tick => '$' + toK(tick)}
               tickLine={false}
               interval="preserveEnd"
               minTickGap={80}
@@ -177,7 +183,7 @@ const PairChart = ({ address, color }) => {
             />
             <Tooltip
               cursor={{ fill: color, opacity: 0.1 }}
-              formatter={val => toK(val, true)}
+              formatter={val => formattedNum(val, true)}
               labelFormatter={label => toNiceDateYear(label)}
               labelStyle={{ paddingTop: 4 }}
               contentStyle={{

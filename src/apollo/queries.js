@@ -303,6 +303,7 @@ export const TOKEN_CHART = gql`
     tokenDayDatas(orderBy: date, orderDirection: asc, where: { token: $tokenAddr }) {
       id
       date
+      priceUSD
       totalLiquidityToken
       totalLiquidityUSD
       totalLiquidityETH

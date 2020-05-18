@@ -178,7 +178,7 @@ const getPairData = async (address, ethPrice) => {
       twoDayData?.tradeVolumeETH ? twoDayData?.tradeVolumeETH : 0
     )
 
-    const [oneDayTxns] = get2DayPercentChange(
+    const [oneDayTxns, txnChange] = get2DayPercentChange(
       data.txCount,
       oneDayData?.txCount ? oneDayData?.txCount : 0,
       twoDayData?.txCount ? twoDayData?.txCount : 0
@@ -196,6 +196,7 @@ const getPairData = async (address, ethPrice) => {
     data.liquidityChangeUSD = liquidityChangeUSD
     data.liquidityChangeETH = liquidityChangeETH
     data.oneDayTxns = oneDayTxns
+    data.txnChange = txnChange
 
     // new tokens
     if (!oneDayData && data) {

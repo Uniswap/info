@@ -1,25 +1,28 @@
-import React, { useState } from 'react'
+import React from 'react'
+import { withRouter } from 'react-router-dom'
 import 'feather-icons'
 import styled from 'styled-components'
 
-import { Text, Box } from 'rebass'
+import { Text } from 'rebass'
 import Panel from '../components/Panel'
-import { RowFlat, AutoRow, RowBetween, RowFixed } from '../components/Row'
+
+import { AutoRow, RowBetween, RowFixed } from '../components/Row'
 import Column, { AutoColumn } from '../components/Column'
 import { ButtonLight, ButtonDark } from '../components/ButtonStyled'
 import PairChart from '../components/PairChart'
 import Link from '../components/Link'
-import { Hint } from '../components'
 import TxnList from '../components/TxnList'
 import Loader from '../components/Loader'
 
-import { formattedNum, formattedPercent } from '../helpers'
+import { formattedNum, formattedPercent, getPoolLink, getSwapLink } from '../helpers'
 import { useColor } from '../hooks'
 import { usePairData, usePairTransactions } from '../contexts/PairData'
-import { ThemedBackground, Hover } from '../Theme'
+import { ThemedBackground, TYPE } from '../Theme'
 import CopyHelper from '../components/Copy'
 import { useMedia } from 'react-use'
 import DoubleTokenLogo from '../components/DoubleLogo'
+import { transparentize } from 'polished'
+import TokenLogo from '../components/TokenLogo'
 
 const PageWrapper = styled.div`
   display: flex;
@@ -30,6 +33,7 @@ const PageWrapper = styled.div`
   width: calc(100% - 80px);
   padding: 0 40px;
   overflow: scroll;
+  padding-bottom: 80px;
 
   @media screen and (max-width: 640px) {
     width: calc(100% - 40px);
@@ -46,110 +50,77 @@ const DashboardWrapper = styled.div`
   width: 100%;
 `
 
-const ListHeader = styled.div`
-  font-size: 1.25rem;
-  font-weight: 600;
-  width: 100%;
-  margin: 2rem 0 2rem 0;
-`
-
 const PanelWrapper = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: max-content;
+  gap: 6px;
+  display: inline-grid;
   width: 100%;
-  margin: 40px 0;
-`
-
-const TopPanel = styled(Panel)`
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  width: fit-content;
-
-  @media screen and (max-width: 64em) {
-    width: 100%;
-    border-radius: 0
-
-    &:nth-of-type(3) {
-      margin-bottom: 20px;
-      border-radius: 0 0 1em 1em;
+  align-items: start;
+  @media screen and (max-width: 1024px) {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+    > * {
+      grid-column: 1 / 4;
     }
 
-    &:first-of-type {
-      border-radius: 1em 1em 0 0;
+    > * {
+      &:first-child {
+        width: 100%;
+      }
     }
   }
 `
 
-const TokenName = styled.div`
-  font-size: 1.5rem;
-  font-weight: 600;
-  line-height: 32px;
+const TokenWrapper = styled.div`
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: max-content;
+  gap: 6px;
+  display: inline-grid;
+  width: 100%;
+  align-items: start;
+  @media screen and (max-width: 1024px) {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+    > * {
+      grid-column: 1 / 4;
+    }
 
-  @media screen and (max-width: 1080px) {
-    font-size: 1.25rem;
-    line-height: normal;
+    > * {
+      &:first-child {
+        width: 100%;
+      }
+    }
   }
 `
 
 const TokenDetailsLayout = styled.div`
   display: inline-grid;
   width: 100%;
-  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
-  & > :last-child {
-    align-self: center;
-    justify-self: end;
+  grid-template-columns: auto auto auto auto 1fr;
+  column-gap: 30px;
+  align-items: start;
+
+  &:last-child {
+    align-items: center;
+    justify-items: end;
+  }
+  @media screen and (max-width: 1024px) {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+    > * {
+      grid-column: 1 / 4;
+      margin-bottom: 1rem;
+    }
+
+    &:last-child {
+      align-items: start;
+      justify-items: start;
+    }
   }
 `
 
-const GroupedOverflow = styled.div`
-  display: flex;
-  align-items: flex-end;
-
-  min-width: 0;
-  max-width: 240px;
-  div {
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-`
-
-const ChartWrapper = styled.div`
-  margin-bottom: 40px;
-`
-const ShadedBox = styled.div`
-  background: rgba(255, 255, 255, 0.4);
-  border-radius: 20px;
-  padding: 20px;
-  width: calc(100% - 20px);
-`
-
-const TopPercent = styled.div`
-  align-self: flex-end;
-  margin-left: 10px;
-`
-
-const Break = styled.div`
-  width: 50px;
-  height: 2px;
-  background: black;
-`
-
-const Option = ({ onClick, active, children }) => {
-  return (
-    <Hover>
-      <Text onClick={onClick} color={!active ? '#aeaeae' : 'black'} fontWeight={500} fontSize={'1rem'}>
-        {children}
-      </Text>
-    </Hover>
-  )
-}
-
-function PairPage({ pairAddress }) {
-  const [txFilter, setTxFilter] = useState('ALL')
+function PairPage({ pairAddress, history }) {
   const {
     token0,
     token1,
@@ -158,293 +129,222 @@ function PairPage({ pairAddress }) {
     reserveUSD,
     oneDayVolumeUSD,
     volumeChangeUSD,
-    liquidityChangeUSD
+    liquidityChangeUSD,
+    oneDayTxns,
+    txnChange
   } = usePairData(pairAddress)
 
   const transactions = usePairTransactions(pairAddress)
-
   const backgroundColor = useColor(pairAddress)
 
+  // liquidity
   const liquidity = reserveUSD ? formattedNum(reserveUSD, true) : '-'
+  const liquidityChange = formattedPercent(liquidityChangeUSD)
 
-  const liquidityChange = liquidityChangeUSD ? formattedPercent(liquidityChangeUSD) : ''
-
+  // volume
   const volume = oneDayVolumeUSD ? formattedNum(oneDayVolumeUSD, true) : oneDayVolumeUSD === 0 ? '$0' : '-'
+  const volumeChange = formattedPercent(volumeChangeUSD)
 
-  const volumeChange = volumeChangeUSD ? formattedPercent(volumeChangeUSD) : ''
+  const txnChangeFormatted = formattedPercent(txnChange)
 
   const below1080 = useMedia('(max-width: 1080px)')
 
   return (
     <PageWrapper>
-      <ThemedBackground backgroundColor={backgroundColor} />
-      {below1080 && (
-        <ShadedBox>
-          <AutoColumn gap="40px">
-            <RowBetween>
-              {token0 && token1 && (
-                <DoubleTokenLogo a0={token0?.id || ''} a1={token1?.id || ''} size={32} margin={true} />
-              )}
-              <RowFixed justify="flex-end">
-                <ButtonLight color={backgroundColor}>+ Add Liquidity</ButtonLight>
-              </RowFixed>
-            </RowBetween>
-            <TokenName>{token0 && token1 ? token0.symbol + '-' + token1.symbol + ' Pool' : ''}</TokenName>
-            <AutoColumn gap="10px">
-              <RowFlat style={{ lineHeight: '22px' }}>
-                <Text fontSize={24} fontWeight={600}>
-                  {volume}
-                </Text>
-                <TopPercent>{volumeChange}</TopPercent>
-              </RowFlat>
-              <Hint>24hr Volume</Hint>
-            </AutoColumn>
-            <AutoColumn gap="10px">
-              <RowFlat style={{ lineHeight: '22px' }}>
-                <Text fontSize={24} fontWeight={600}>
-                  {liquidity}
-                </Text>
-                <TopPercent>{liquidityChange}</TopPercent>
-              </RowFlat>
-              <Hint>Total Liquidity</Hint>
-            </AutoColumn>
-            <AutoColumn gap="10px">
-              <RowFlat style={{ lineHeight: '22px' }}>
-                <Text fontSize={24} fontWeight={600}>
-                  {reserve0 ? formattedNum(reserve0) : ''}
-                </Text>
-              </RowFlat>
-              <Hint>{token0 ? token0.symbol + ' balance' : ''}</Hint>
-            </AutoColumn>
-            <AutoColumn gap="10px">
-              <RowFlat style={{ lineHeight: '22px' }}>
-                <Text fontSize={24} fontWeight={600}>
-                  {reserve1 ? formattedNum(reserve1) : ''}
-                </Text>
-              </RowFlat>
-              <Hint>{token1 ? token1.symbol + ' balance' : ''}</Hint>
-            </AutoColumn>
-            <Break />
-            <AutoRow gap="10px">
+      <ThemedBackground backgroundColor={transparentize(0.6, backgroundColor)} />
+      <RowBetween mt={20} style={{ flexWrap: 'wrap' }}>
+        <RowFixed style={{ flexWrap: 'wrap' }}>
+          <RowFixed mb={20} style={{ alignItems: 'baseline' }}>
+            {token0 && token1 && (
+              <DoubleTokenLogo a0={token0?.id || ''} a1={token1?.id || ''} size={32} margin={true} />
+            )}{' '}
+            <Text fontSize={'2rem'} fontWeight={600} style={{ margin: '0 1rem' }}>
+              {token0 && token1 ? token0.symbol + '-' + token1.symbol + ' Pool' : ''}
+            </Text>{' '}
+          </RowFixed>
+        </RowFixed>
+        <span>
+          <RowFixed mb={20} ml={'2.5rem'} style={{ flexDirection: below1080 ? 'row-reverse' : 'initial' }}>
+            <Link external href={getPoolLink(token0?.id, token1?.id)}>
+              <ButtonLight color={backgroundColor}>+ Add Liquidity</ButtonLight>
+            </Link>
+            <Link external href={getSwapLink(token0?.id, token1?.id)}>
+              <ButtonDark ml={'.5rem'} mr={below1080 && '.5rem'} color={backgroundColor}>
+                Trade
+              </ButtonDark>
+            </Link>
+          </RowFixed>
+        </span>
+      </RowBetween>
+      <DashboardWrapper>
+        <>
+          {!below1080 && (
+            <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '2rem' }}>
+              Token Stats
+            </TYPE.main>
+          )}
+          <PanelWrapper style={{ marginTop: '1.5rem' }}>
+            <Panel>
               <AutoColumn gap="20px">
-                <RowFixed>
-                  <Text fontSize={16} fontWeight="500">
+                <RowBetween>
+                  <TYPE.main>Total Liquidity</TYPE.main>
+                  <div />
+                </RowBetween>
+                <RowBetween align="flex-end">
+                  <TYPE.main fontSize={'2rem'} lineHeight={1} fontWeight={600}>
+                    {liquidity}
+                  </TYPE.main>
+                  <TYPE.main>{liquidityChange}</TYPE.main>
+                </RowBetween>
+              </AutoColumn>
+            </Panel>
+            <Panel>
+              <AutoColumn gap="20px">
+                <RowBetween>
+                  <TYPE.main>Volume (24hrs)</TYPE.main>
+                  <div />
+                </RowBetween>
+                <RowBetween align="flex-end">
+                  <TYPE.main fontSize={'2rem'} lineHeight={1} fontWeight={600}>
+                    {volume}
+                  </TYPE.main>
+                  <TYPE.main>{volumeChange}</TYPE.main>
+                </RowBetween>
+              </AutoColumn>
+            </Panel>
+            <Panel>
+              <AutoColumn gap="20px">
+                <RowBetween>
+                  <TYPE.main>Transactions (24hrs)</TYPE.main>
+                  <div />
+                </RowBetween>
+                <RowBetween align="flex-end">
+                  <TYPE.main fontSize={'2rem'} lineHeight={1} fontWeight={600}>
+                    {oneDayTxns}
+                  </TYPE.main>
+                  <TYPE.main>{txnChangeFormatted}</TYPE.main>
+                </RowBetween>
+              </AutoColumn>
+            </Panel>
+            <Panel style={{ gridColumn: below1080 ? '1' : '2/4', gridRow: below1080 ? '' : '1/4' }}>
+              <PairChart address={pairAddress} color={backgroundColor} />
+            </Panel>
+          </PanelWrapper>
+          <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
+            Token Info
+          </TYPE.main>
+          <TokenWrapper style={{ marginTop: '1.5rem' }}>
+            <Panel>
+              <AutoColumn gap="4px">
+                <RowBetween>
+                  <TYPE.main>{token0 ? token0.symbol + ' balance' : ''}</TYPE.main>
+                  <div />
+                </RowBetween>
+                <RowBetween align="flex-end">
+                  <AutoRow gap="0.5rem">
+                    <TokenLogo address={token0?.id} size="24px" />
+                    <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
+                      {reserve0 ? formattedNum(reserve0) : ''}
+                    </TYPE.main>
+                  </AutoRow>
+                  <ButtonLight color={backgroundColor}>
+                    <Link color={backgroundColor} onClick={() => history.push(`/token/${token0.id}`)}>
+                      View Token
+                    </Link>
+                  </ButtonLight>
+                </RowBetween>
+              </AutoColumn>
+            </Panel>
+            <Panel>
+              <AutoColumn gap="4px">
+                <RowBetween>
+                  <TYPE.main>{token1 ? token1.symbol + ' balance' : ''}</TYPE.main>
+                  <div />
+                </RowBetween>
+                <RowBetween align="flex-end">
+                  <AutoRow gap="0.5rem">
+                    <TokenLogo address={token1?.id} size="24px" />
+                    <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
+                      {reserve1 ? formattedNum(reserve1) : ''}
+                    </TYPE.main>
+                  </AutoRow>
+                  <ButtonLight color={backgroundColor}>
+                    <Link color={backgroundColor} onClick={() => history.push(`/token/${token1.id}`)}>
+                      View Token
+                    </Link>
+                  </ButtonLight>{' '}
+                </RowBetween>
+              </AutoColumn>
+            </Panel>
+          </TokenWrapper>
+          <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
+            Transactions
+          </TYPE.main>{' '}
+          <Panel
+            style={{
+              border: '1px solid rgba(43, 43, 43, 0.05)',
+              marginTop: '1.5rem'
+            }}
+          >
+            {transactions ? <TxnList transactions={transactions} /> : <Loader />}
+          </Panel>
+          <RowBetween style={{ marginTop: '3rem' }}>
+            <TYPE.main fontSize={'1.125rem'}>Pool Information</TYPE.main>{' '}
+          </RowBetween>
+          <Panel
+            rounded
+            style={{
+              border: '1px solid rgba(43, 43, 43, 0.05)',
+              marginTop: '1.5rem'
+            }}
+            p={20}
+          >
+            <TokenDetailsLayout>
+              <Column>
+                <TYPE.main>Pool Name</TYPE.main>
+                <Text style={{ marginTop: '.5rem' }} fontSize={24} fontWeight="500">
+                  {token0 && token1 ? token0.symbol + '-' + token1.symbol + ' Pool' : ''}
+                </Text>
+              </Column>
+
+              <Column>
+                <TYPE.main>Pool Address</TYPE.main>
+                <AutoRow align="flex-end">
+                  <Text style={{ marginTop: '.5rem' }} fontSize={24} fontWeight="500">
                     {pairAddress.slice(0, 6) + '...' + pairAddress.slice(38, 42)}
                   </Text>
                   <CopyHelper toCopy={pairAddress} />
-                </RowFixed>
-                <Text>Pool Address</Text>
-              </AutoColumn>
-              <AutoColumn gap="20px">
-                <RowFixed>
-                  <Text fontSize={16} fontWeight="500">
-                    {token0 && token0?.id.slice(0, 6) + '...' + token0?.id.slice(38, 42)}
+                </AutoRow>
+              </Column>
+              <Column>
+                <TYPE.main>{token0 && token0.symbol + ' Address'}</TYPE.main>
+                <AutoRow align="flex-end">
+                  <Text style={{ marginTop: '.5rem' }} fontSize={24} fontWeight="500">
+                    {token0 && token0.id.slice(0, 6) + '...' + token0.id.slice(38, 42)}
                   </Text>
                   <CopyHelper toCopy={token0?.id} />
-                </RowFixed>
-                <Text>{token0 && token0.symbol + ' address'}</Text>
-              </AutoColumn>
-              <AutoColumn gap="20px">
-                <RowFixed>
-                  <Text fontSize={16} fontWeight="500">
-                    {token1 && token1?.id.slice(0, 6) + '...' + token1?.id.slice(38, 42)}
+                </AutoRow>
+              </Column>
+              <Column>
+                <TYPE.main>{token1 && token1.symbol + ' Address'}</TYPE.main>
+                <AutoRow align="flex-end">
+                  <Text style={{ marginTop: '.5rem' }} fontSize={24} fontWeight="500">
+                    {token1 && token1.id.slice(0, 6) + '...' + token1.id.slice(38, 42)}
                   </Text>
                   <CopyHelper toCopy={token1?.id} />
-                </RowFixed>
-                <Text>{token1 && token1.symbol + ' address'}</Text>
-              </AutoColumn>
-            </AutoRow>
-          </AutoColumn>
-        </ShadedBox>
-      )}
-      {!below1080 && (
-        <RowBetween mb={20} mt={20}>
-          <RowFixed>
-            <DoubleTokenLogo a0={token0?.id || ''} a1={token1?.id || ''} size={32} margin={true} />
-            <RowFlat style={{ marginLeft: '10px' }}>
-              <TokenName>{token0 && token1 ? token0.symbol + '-' + token1.symbol + ' Pool' : ''}</TokenName>
-            </RowFlat>
-          </RowFixed>
-          <RowFixed justify="flex-end">
-            <ButtonLight color={backgroundColor}>+ Add Liquidity</ButtonLight>
-            <ButtonDark ml={10} color={backgroundColor}>
-              Trade
-            </ButtonDark>
-          </RowFixed>
-        </RowBetween>
-      )}
-      <DashboardWrapper>
-        {!below1080 && (
-          <PanelWrapper>
-            <TopPanel rounded color="black" p={24}>
-              <Column>
-                <RowFlat>
-                  <Text fontSize={24} lineHeight={1} fontWeight={600}>
-                    {volume}
-                  </Text>
-                  <Text marginLeft={10}>{volumeChange}</Text>
-                </RowFlat>
-                <RowFlat style={{ marginTop: '10px' }}>
-                  <Hint>Volume (24hrs)</Hint>
-                </RowFlat>
+                </AutoRow>
               </Column>
-            </TopPanel>
-            <TopPanel rounded color="black" p={24}>
-              <Column>
-                <RowFlat>
-                  <Text fontSize={24} lineHeight={1} fontWeight={600}>
-                    {liquidity}
-                  </Text>
-                  <Text marginLeft={10}>{liquidityChange}</Text>
-                </RowFlat>
-                <RowFlat style={{ marginTop: '10px' }}>
-                  <Hint>Total Liquidity</Hint>
-                </RowFlat>
-              </Column>
-            </TopPanel>
-            <TopPanel rounded color="black" p={24}>
-              <Column>
-                <RowFlat>
-                  <Text fontSize={24} lineHeight={1} fontWeight={600}>
-                    {reserve0 ? formattedNum(reserve0) : ''}
-                  </Text>
-                </RowFlat>
-                <RowFlat style={{ marginTop: '10px' }}>
-                  <Hint>{token0 ? token0.symbol + ' balance' : ''}</Hint>
-                </RowFlat>
-              </Column>
-            </TopPanel>
-            <TopPanel rounded color="black" p={24}>
-              <Column>
-                <RowFlat>
-                  <Text fontSize={24} lineHeight={1} fontWeight={600}>
-                    {reserve1 ? formattedNum(reserve1) : ''}
-                  </Text>
-                </RowFlat>
-                <RowFlat style={{ marginTop: '10px' }}>
-                  <Hint>{token1 ? token1.symbol + ' balance' : ''}</Hint>
-                </RowFlat>
-              </Column>
-            </TopPanel>
-          </PanelWrapper>
-        )}
-        <ChartWrapper>
-          <PairChart address={pairAddress} color={backgroundColor} />
-        </ChartWrapper>
-
-        <Panel
-          rounded
-          style={{
-            border: '1px solid rgba(43, 43, 43, 0.05)'
-          }}
-          padding={'20px'}
-        >
-          <Box mb={20}>
-            <AutoRow gap="10px" pl={4}>
-              <Option
-                onClick={() => {
-                  setTxFilter('ALL')
-                }}
-                active={txFilter === 'ALL'}
-              >
-                All
-              </Option>
-              <Option
-                onClick={() => {
-                  setTxFilter('SWAP')
-                }}
-                active={txFilter === 'SWAP'}
-              >
-                Swaps
-              </Option>
-              <Option
-                onClick={() => {
-                  setTxFilter('ADD')
-                }}
-                active={txFilter === 'ADD'}
-              >
-                Adds
-              </Option>
-              <Option
-                onClick={() => {
-                  setTxFilter('REMOVE')
-                }}
-                active={txFilter === 'REMOVE'}
-              >
-                Removes
-              </Option>
-            </AutoRow>
-          </Box>
-          {transactions ? (
-            <TxnList
-              transactions={transactions}
-              txFilter={txFilter}
-              symbol0Override={token0?.symbol}
-              symbol1Override={token1?.symbol}
-            />
-          ) : (
-            <Loader />
-          )}
-        </Panel>
-        {!below1080 && (
-          <>
-            <ListHeader>Pool Details</ListHeader>
-            <Panel
-              rounded
-              style={{
-                border: '1px solid rgba(43, 43, 43, 0.05)',
-                marginBottom: '40px'
-              }}
-              p={20}
-            >
-              <TokenDetailsLayout>
-                <Column>
-                  <Text color="#888D9B">Pool Name</Text>
-                  <GroupedOverflow>
-                    <Text style={{ marginTop: '1rem' }} fontSize={18} fontWeight="500">
-                      {token0 && token1 ? token0.symbol + '-' + token1.symbol + ' Pool' : ''}
-                    </Text>
-                  </GroupedOverflow>
-                </Column>
-                <Column>
-                  <Text color="#888D9B">Pool Address</Text>
-                  <GroupedOverflow>
-                    <Text style={{ marginTop: '1rem' }} fontSize={18} fontWeight="500">
-                      {pairAddress.slice(0, 6) + '...' + pairAddress.slice(38, 42)}
-                    </Text>
-                    <CopyHelper toCopy={pairAddress} />
-                  </GroupedOverflow>
-                </Column>
-                <Column>
-                  <Text color="#888D9B">{token0 && token0.symbol + ' address'}</Text>
-                  <GroupedOverflow>
-                    <Text style={{ marginTop: '1rem' }} fontSize={18} fontWeight="500">
-                      {token0 && token0.id.slice(0, 6) + '...' + token0.id.slice(38, 42)}
-                    </Text>
-                    <CopyHelper toCopy={token0?.id} />
-                  </GroupedOverflow>
-                </Column>
-                <Column>
-                  <Text color="#888D9B">{token1 && token1.symbol + ' address'}</Text>
-                  <GroupedOverflow>
-                    <Text style={{ marginTop: '1rem' }} fontSize={18} fontWeight="500">
-                      {token1 && token1.id.slice(0, 6) + '...' + token1.id.slice(38, 42)}
-                    </Text>
-                    <CopyHelper toCopy={token1?.id} />
-                  </GroupedOverflow>
-                </Column>
-                <ButtonLight color={backgroundColor}>
-                  <Link external href={'https://etherscan.io/address/' + pairAddress}>
-                    View on Etherscan ↗
-                  </Link>
-                </ButtonLight>
-              </TokenDetailsLayout>
-            </Panel>
-          </>
-        )}
+              <ButtonLight color={backgroundColor}>
+                <Link color={backgroundColor} external href={'https://etherscan.io/address/' + pairAddress}>
+                  View on Etherscan ↗
+                </Link>
+              </ButtonLight>
+            </TokenDetailsLayout>
+          </Panel>
+        </>
       </DashboardWrapper>
     </PageWrapper>
   )
 }
 
-export default PairPage
+export default withRouter(PairPage)

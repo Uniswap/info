@@ -15,7 +15,7 @@ const theme = (darkMode, color) => ({
   textColor: darkMode ? color : 'black',
 
   panelColor: darkMode ? 'rgba(255, 255, 255, 0)' : 'rgba(255, 255, 255, 0)',
-  backgroundColor: darkMode ? '#212429' : '#FFFFFF',
+  backgroundColor: darkMode ? '#212429' : '#F7F8FA',
 
   uniswapPink: darkMode ? '#ff007a' : 'black',
 
@@ -39,7 +39,7 @@ const theme = (darkMode, color) => ({
 
   //specialty colors
   modalBG: darkMode ? 'rgba(0,0,0,0.85)' : 'rgba(0,0,0,0.6)',
-  advancedBG: darkMode ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.6)',
+  advancedBG: darkMode ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.4)',
 
   //primary colors
   primary1: darkMode ? '#2172E5' : '#ff007a',
@@ -61,6 +61,7 @@ const theme = (darkMode, color) => ({
   green1: '#27AE60',
   yellow1: '#FFE270',
   yellow2: '#F3841E',
+  link: '#2172E5',
 
   background: darkMode ? 'black' : `radial-gradient(50% 50% at 50% 50%, #ff007a30 0%, #F7F8FA 100%)`
 })
@@ -72,6 +73,10 @@ const TextWrapper = styled(Text)`
 export const TYPE = {
   main(props) {
     return <TextWrapper fontWeight={500} color={'text1'} {...props} />
+  },
+
+  pink(props) {
+    return <TextWrapper fontWeight={500} color={props.faded ? 'grey' : 'primaryText1'} {...props} />
   }
 }
 
@@ -106,12 +111,27 @@ export const ThemedBackground = styled.div`
   top: 0;
   left: 0;
   right: 0;
-  height: 1000px;
+  /* height: 1000px;
+  overflow: hidden;
   max-width: 100vw !important;
   width: 100vw !important;
+  user-select: none;
   z-index: -1;
   background: ${({ backgroundColor }) =>
-    `linear-gradient(180deg, ${backgroundColor} 0%, rgba(255, 255, 255, 0) 100%);`};
+    `linear-gradient(180deg, ${backgroundColor} 0%, rgba(255, 255, 255, 0) 100%);`}; */
+
+  max-width: 100vw !important;
+  width: 100vw !important;
+  height: 200vh;
+  background: ${({ theme, backgroundColor }) =>
+    `radial-gradient(50% 50% at 50% 50%, ${backgroundColor} 0%, rgba(255, 255, 255, 0) 100%)`};
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  /* opacity: 0.1; */
+  z-index: -1;
+
+  transform: translateY(-110vh);
 `
 
 export const GlobalStyle = createGlobalStyle`

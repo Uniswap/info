@@ -11,12 +11,24 @@ BigNumber.set({ EXPONENTIAL_AT: 50 })
 
 dayjs.extend(utc)
 
-export function getPoolLink(token0Address, token1Address) {
-  return `https://deploy-preview-782--uniswap.netlify.app/add/${token0Address}-${token1Address}`
+export function getPoolLink(token0Address, token1Address = null) {
+  if (!token1Address) {
+    return `https://deploy-preview-782--uniswap.netlify.app/add/${token0Address}-${
+      token0Address === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
+        ? 'ETH'
+        : '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
+    }`
+  } else {
+    return `https://deploy-preview-782--uniswap.netlify.app/add/${token0Address}-${token1Address}`
+  }
 }
 
-export function getSwapLink(token0Address, token1Address) {
-  return `https://deploy-preview-782--uniswap.netlify.app/swap?inputToken=${token0Address}&outputToken=${token1Address}`
+export function getSwapLink(token0Address, token1Address = null) {
+  if (!token1Address) {
+    return `https://deploy-preview-782--uniswap.netlify.app/swap?inputToken=${token0Address}`
+  } else {
+    return `https://deploy-preview-782--uniswap.netlify.app/swap?inputToken=${token0Address}&outputToken=${token1Address}`
+  }
 }
 
 export const toNiceDate = date => {
@@ -145,16 +157,28 @@ export const formattedNum = (number, usd = false) => {
 }
 
 export function formattedPercent(percent) {
-  if (!percent) {
-    return '0%'
+  if (!percent || percent === 0) {
+    return (
+      <Text fontWeight={500} fontSize={'1rem'}>
+        0%
+      </Text>
+    )
   }
 
   if (percent < 0.0001 && percent > 0) {
-    return <Text color="green">{'< 0.0001%'}</Text>
+    return (
+      <Text fontWeight={500} fontSize={'1rem'} color="green">
+        {'< 0.0001%'}
+      </Text>
+    )
   }
 
   if (percent < 0 && percent > -0.0001) {
-    return <Text color="red">{'< 0.0001%'}</Text>
+    return (
+      <Text fontWeight={500} fontSize={'1rem'} color="red">
+        {'< 0.0001%'}
+      </Text>
+    )
   }
 
   let fixedPercent = percent.toFixed(2)
@@ -162,9 +186,9 @@ export function formattedPercent(percent) {
     return '0%'
   }
   if (fixedPercent > 0) {
-    return <Text color="green">{`+${fixedPercent}%`}</Text>
+    return <Text fontWeight={500} fontSize={'1rem'} color="green">{`+${fixedPercent}%`}</Text>
   } else {
-    return <Text color="red">{`${fixedPercent}%`}</Text>
+    return <Text fontWeight={500} fontSize={'1rem'} color="red">{`${fixedPercent}%`}</Text>
   }
 }
 

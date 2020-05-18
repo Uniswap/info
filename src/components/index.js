@@ -29,4 +29,13 @@ const Address = ({ address, token, ...rest }) => (
   </Link>
 )
 
-export { Hint, Divider, Address }
+const EmptyCard = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  border-radius: 20px;
+  height: ${({ height }) => height && height};
+`
+
+export { Hint, Divider, Address, EmptyCard }

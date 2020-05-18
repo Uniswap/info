@@ -17,6 +17,7 @@ import { useAllPairs } from '../contexts/PairData'
 import { Search } from '../components/Search'
 import { useMedia } from 'react-use'
 import TokenLogo from '../components/TokenLogo'
+import Panel from '../components/Panel'
 
 const PageWrapper = styled.div`
   display: flex;
@@ -77,21 +78,6 @@ const TopGroup = styled.div`
   align-items: start;
 `
 
-const Panel = styled.div`
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  border-radius: 12px;
-  background-color: ${({ theme }) => theme.advancedBG};
-  padding: 1.25rem;
-  box-sizing: border-box;
-  box-shadow: 0 1.1px 2.8px -9px rgba(0, 0, 0, 0.008), 0 2.7px 6.7px -9px rgba(0, 0, 0, 0.012),
-    0 5px 12.6px -9px rgba(0, 0, 0, 0.015), 0 8.9px 22.6px -9px rgba(0, 0, 0, 0.018),
-    0 16.7px 42.2px -9px rgba(0, 0, 0, 0.022), 0 40px 101px -9px rgba(0, 0, 0, 0.03);
-`
-
 const ChartWrapper = styled.div`
   height: 100%;
 `
@@ -102,7 +88,6 @@ const LIST_VIEW = {
 }
 
 function GlobalPage() {
-  const [txFilter, setTxFilter] = useState('ALL')
   const [listView, setListView] = useState(LIST_VIEW.PAIRS)
 
   const {
@@ -124,13 +109,13 @@ function GlobalPage() {
 
   const liquidity = totalLiquidityUSD ? formattedNum(totalLiquidityUSD, true) : '-'
 
-  const liquidityChange = liquidityChangeUSD ? formattedPercent(liquidityChangeUSD) : ''
+  const liquidityChange = liquidityChangeUSD ? formattedPercent(liquidityChangeUSD) : '-'
 
   const volume = oneDayVolumeUSD ? formattedNum(oneDayVolumeUSD, true) : '-'
 
-  const volumeChange = volumeChangeUSD ? formattedPercent(volumeChangeUSD) : ''
+  const volumeChange = volumeChangeUSD ? formattedPercent(volumeChangeUSD) : '-'
 
-  let txnChangeFormatted = txnChange ? formattedPercent(txnChange) : ''
+  let txnChangeFormatted = txnChange ? formattedPercent(txnChange) : '-'
 
   const below1080 = useMedia('(max-width: 1080px)')
 
@@ -138,9 +123,14 @@ function GlobalPage() {
     <PageWrapper>
       <ThemedBackground />
       <Search small={false} />
+      {!below1080 && (
+        <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
+          Overall Stats
+        </TYPE.main>
+      )}
       {below1080 && ( // mobile card
         <Box mb={20}>
-          <Box mb={20} mt={30}>
+          <Box mb={20} mt={'1.5rem'}>
             <Panel>
               <Box>
                 <AutoColumn gap="40px">
@@ -194,7 +184,7 @@ function GlobalPage() {
         </Box>
       )}
       {!below1080 && ( // desktop
-        <TopGroup style={{ marginTop: '40px' }}>
+        <TopGroup style={{ marginTop: '1.5rem' }}>
           <Panel>
             <AutoColumn gap="20px">
               <RowBetween>
@@ -255,6 +245,7 @@ function GlobalPage() {
           </Panel>
         </TopGroup>
       )}
+
       {!below1080 && (
         <GridRow style={{ marginTop: '6px' }}>
           <Panel style={{ height: '100%', minHeight: '300px' }}>
@@ -269,85 +260,45 @@ function GlobalPage() {
           </Panel>
         </GridRow>
       )}
+
+      <ListOptions gap="10px" style={{ marginTop: '2rem', marginBottom: '.5rem' }}>
+        <Hover>
+          <TYPE.main
+            onClick={() => {
+              setListView(LIST_VIEW.PAIRS)
+            }}
+            fontSize={'1.125rem'}
+            color={listView === LIST_VIEW.TOKENS ? '#aeaeae' : 'black'}
+          >
+            Pairs
+          </TYPE.main>
+        </Hover>
+        <Hover>
+          <TYPE.main
+            onClick={() => {
+              setListView(LIST_VIEW.TOKENS)
+            }}
+            fontSize={'1.125rem'}
+            color={listView === LIST_VIEW.PAIRS ? '#aeaeae' : 'black'}
+          >
+            Tokens
+          </TYPE.main>
+        </Hover>
+      </ListOptions>
+
       <Panel style={{ marginTop: '6px' }}>
-        <ListOptions gap="10px">
-          <Hover>
-            <TYPE.main
-              onClick={() => {
-                setListView(LIST_VIEW.PAIRS)
-              }}
-              fontSize={'1rem'}
-              color={listView === LIST_VIEW.TOKENS ? '#aeaeae' : 'black'}
-            >
-              Pairs
-            </TYPE.main>
-          </Hover>
-          <Hover>
-            <TYPE.main
-              onClick={() => {
-                setListView(LIST_VIEW.TOKENS)
-              }}
-              fontSize={'1rem'}
-              color={listView === LIST_VIEW.PAIRS ? '#aeaeae' : 'black'}
-            >
-              Tokens
-            </TYPE.main>
-          </Hover>
-        </ListOptions>
         {listView === LIST_VIEW.PAIRS ? (
           <PairList pairs={pairs && Object.keys(pairs).map(key => pairs[key])} />
         ) : (
           <TopTokenList tokens={allTokenData} />
         )}
       </Panel>
+
+      <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '2rem' }}>
+        Transactions
+      </TYPE.main>
       <Panel style={{ margin: '1rem 0' }}>
-        <ListOptions gap="10px">
-          <Hover>
-            <TYPE.main
-              onClick={() => {
-                setTxFilter('ALL')
-              }}
-              fontSize={'1rem'}
-              color={txFilter !== 'ALL' ? '#aeaeae' : 'black'}
-            >
-              All
-            </TYPE.main>
-          </Hover>
-          <Hover>
-            <TYPE.main
-              onClick={() => {
-                setTxFilter('SWAP')
-              }}
-              fontSize={'1rem'}
-              color={txFilter !== 'SWAP' ? '#aeaeae' : 'black'}
-            >
-              Swaps
-            </TYPE.main>
-          </Hover>
-          <Hover>
-            <TYPE.main
-              onClick={() => {
-                setTxFilter('ADD')
-              }}
-              fontSize={'1rem'}
-              color={txFilter !== 'ADD' ? '#aeaeae' : 'black'}
-            >
-              Adds
-            </TYPE.main>
-          </Hover>
-          <Hover>
-            <TYPE.main
-              onClick={() => {
-                setTxFilter('REMOVE')
-              }}
-              fontSize={'1rem'}
-              color={txFilter !== 'REMOVE' ? '#aeaeae' : 'black'}
-            >
-              Removes
-            </TYPE.main>
-          </Hover>
-        </ListOptions>
-        <TxnList transactions={transactions} txFilter={txFilter} />
+        <TxnList transactions={transactions} />
       </Panel>
     </PageWrapper>
   )
