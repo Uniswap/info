@@ -15,6 +15,8 @@ import LocalLoader from './components/LocalLoader'
 import { AutoColumn } from './components/Column'
 import Link from './components/Link'
 import { useMedia } from 'react-use'
+import { useGlobalData, useGlobalChartData } from './contexts/GlobalData'
+import { useAllPairs } from './contexts/PairData'
 
 const AppWrapper = styled.div`
   position: relative;
@@ -50,6 +52,10 @@ function App() {
   const below750 = useMedia('(max-width: 750px)')
   const below490 = useMedia('(max-width: 490px)')
 
+  const globalData = useGlobalData()
+  const globalChartData = useGlobalChartData()
+  const allPairData = useAllPairs()
+
   return (
     <ApolloProvider client={client}>
       <AppWrapper>
@@ -77,7 +83,13 @@ function App() {
             </>
           )}
         </MigrateBanner>
-        {allTokens ? (
+        {allTokens &&
+        globalData &&
+        Object.keys(globalData).length > 0 &&
+        globalChartData &&
+        Object.keys(globalChartData).length > 0 &&
+        allPairData &&
+        Object.keys(allPairData).length > 8 ? (
           <BrowserRouter>
             <ScrolToTop />
             <Switch>

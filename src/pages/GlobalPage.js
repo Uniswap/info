@@ -11,7 +11,7 @@ import TxnList from '../components/TxnList'
 import GlobalChart from '../components/GlobalChart'
 import { Hover, TYPE } from '../Theme'
 import { formattedNum, formattedPercent } from '../helpers'
-import { useGlobalData, useEthPrice, useGlobalChartData, useGlobalTransactions } from '../contexts/GlobalData'
+import { useGlobalData, useEthPrice, useGlobalTransactions } from '../contexts/GlobalData'
 import { useAllTokenData } from '../contexts/TokenData'
 import { useAllPairs } from '../contexts/PairData'
 import { Search } from '../components/Search'
@@ -114,8 +114,6 @@ function GlobalPage() {
     txnChange
   } = useGlobalData()
 
-  const chartData = useGlobalChartData()
-
   const transactions = useGlobalTransactions()
 
   const allTokenData = useAllTokenData()
@@ -189,7 +187,7 @@ function GlobalPage() {
           <Box>
             <Panel>
               <ChartWrapper area="fill" rounded>
-                <GlobalChart chartData={chartData} />
+                <GlobalChart />
               </ChartWrapper>
             </Panel>
           </Box>
@@ -261,12 +259,12 @@ function GlobalPage() {
         <GridRow style={{ marginTop: '6px' }}>
           <Panel style={{ height: '100%', minHeight: '300px' }}>
             <ChartWrapper area="fill" rounded>
-              <GlobalChart chartData={chartData} display="liquidity" />
+              <GlobalChart display="liquidity" />
             </ChartWrapper>
           </Panel>
           <Panel style={{ height: '100%' }}>
             <ChartWrapper area="fill" rounded>
-              <GlobalChart chartData={chartData} display="volume" />
+              <GlobalChart display="volume" />
             </ChartWrapper>
           </Panel>
         </GridRow>

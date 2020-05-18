@@ -9,7 +9,7 @@ import styled from 'styled-components'
 import Link, { CustomLink } from '../Link'
 import { Divider } from '../../components'
 
-import { formattedNum } from '../../helpers'
+import { formattedNum, getPoolLink, getSwapLink } from '../../helpers'
 import { usePairData, useAllPairs } from '../../contexts/PairData'
 import DoubleTokenLogo from '../DoubleLogo'
 import { ButtonFaded } from '../ButtonStyled'
@@ -56,18 +56,18 @@ const DashGrid = styled.div`
   }
 
   @media screen and (min-width: 740px) {
-    grid-template-columns: 1.5fr 1fr 1fr 180px 140px;
-    grid-template-areas: ' name liq vol pool swap';
+    grid-template-columns: 1.5fr 1fr 1fr 180px;
+    grid-template-areas: ' name liq vol pool ';
   }
 
   @media screen and (min-width: 1080px) {
-    grid-template-columns: 1.5fr 1fr 1fr 1fr 140px 140px;
-    grid-template-areas: ' name liq vol txCount pool swap';
+    grid-template-columns: 1.5fr 1fr 1fr 1fr 200px;
+    grid-template-areas: ' name liq vol txCount pool ';
   }
 
   @media screen and (min-width: 1200px) {
-    grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr 1fr 140px 140px;
-    grid-template-areas: ' name liq reserve0 reserve0 vol txCount pool swap';
+    grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr 1fr 180px;
+    grid-template-areas: ' name liq vol volWeek fees txCount pool';
   }
 `
 
@@ -99,8 +99,8 @@ const SORT_FIELD = {
   LIQ: 'reserveUSD',
   VOL: 'oneDayVolumeUSD',
   TXNS: 'oneDayTxns',
-  RESERVE0: 'reserve0',
-  RESERVE1: 'reserve1'
+  VOL_7DAYS: 'oneWeekVolumeUSD',
+  FEES: 'oneDayVolumeUSD'
 }
 
 function PairList({ pairs }) {
@@ -166,8 +166,8 @@ function PairList({ pairs }) {
     return (
       <DashGrid style={{ height: '60px' }}>
         <DataText area="name" fontWeight="500">
-          <div style={{ marginRight: '1rem' }}>{index}</div>
-          <DoubleTokenLogo a0={item.token0.id} a1={item.token1.id} margin={true} />
+          <div style={{ marginRight: !below740 ? '1rem' : '8px' }}>{index}</div>
+          <DoubleTokenLogo a0={item.token0.id} a1={item.token1.id} margin={!below740} />
           <CustomLink
             style={{ marginLeft: '20px', whiteSpace: 'nowrap' }}
             to={'/pair/' + item.id}
@@ -179,24 +179,20 @@ function PairList({ pairs }) {
           </CustomLink>
         </DataText>
         <DataText area="liq">{liquidity}</DataText>
-        {!below1200 && <DataText area="reserve0">{formattedNum(item.reserve0) + ' ' + item.token0.symbol}</DataText>}
-        {!below1200 && <DataText area="reserve1">{formattedNum(item.reserve1) + ' ' + item.token1.symbol}</DataText>}
         <DataText area="vol">{volume}</DataText>
+        {!below1200 && <DataText area="volWeek">{formattedNum(itemData.oneWeekVolumeUSD, true)}</DataText>}
+        {!below1200 && <DataText area="fees">{formattedNum(itemData.oneDayVolumeUSD * 0.003, true)}</DataText>}
         {!below1080 && <DataText area="txCount">{itemData.oneDayTxns}</DataText>}
         {!below740 && (
           <DataText area="pool">
-            <ButtonFaded>
-              <Link external href={''}>
-                + Join Pool
+            <ButtonFaded style={{ marginRight: '10px' }}>
+              <Link external href={getPoolLink(item.token0.id, item.token1.id)}>
+                + Pool
               </Link>
             </ButtonFaded>
-          </DataText>
-        )}
-        {!below740 && (
-          <DataText area="swap">
             <ButtonFaded>
-              <Link external href={''}>
-                Swap Tokens
+              <Link external href={getSwapLink(item.token0.id, item.token1.id)}>
+                Swap
               </Link>
             </ButtonFaded>
           </DataText>
@@ -224,46 +220,45 @@ function PairList({ pairs }) {
             Liquidity {sortedColumn === SORT_FIELD.LIQ ? (!sortDirection ? '↑' : '↓') : ''}
           </ClickableText>
         </Flex>
+        <Flex alignItems="center">
+          <ClickableText
+            area="vol"
+            onClick={e => {
+              setSortedColumn(SORT_FIELD.VOL)
+              setSortDirection(sortedColumn !== SORT_FIELD.VOL ? true : !sortDirection)
+            }}
+          >
+            Volume (24hrs)
+            {sortedColumn === SORT_FIELD.VOL ? (!sortDirection ? '↑' : '↓') : ''}
+          </ClickableText>
+        </Flex>
         {!below1200 && (
           <Flex alignItems="center" justifyContent="flexEnd">
             <ClickableText
-              area="reserve1"
+              area="volWeek"
               onClick={e => {
-                setSortedColumn(SORT_FIELD.RESERVE0)
-                setSortDirection(sortedColumn !== SORT_FIELD.RESERVE0 ? true : !sortDirection)
+                setSortedColumn(SORT_FIELD.VOL_7DAYS)
+                setSortDirection(sortedColumn !== SORT_FIELD.VOL_7DAYS ? true : !sortDirection)
               }}
             >
-              Token Liquidity {sortedColumn === SORT_FIELD.RESERVE0 ? (!sortDirection ? '↑' : '↓') : ''}
+              Volume (7d) {sortedColumn === SORT_FIELD.VOL_7DAYS ? (!sortDirection ? '↑' : '↓') : ''}
             </ClickableText>
           </Flex>
         )}
         {!below1200 && (
           <Flex alignItems="center" justifyContent="flexEnd">
             <ClickableText
-              area="reserve1"
+              area="fees"
               onClick={e => {
-                setSortedColumn(SORT_FIELD.RESERVE1)
-                setSortDirection(sortedColumn !== SORT_FIELD.RESERVE1 ? true : !sortDirection)
+                setSortedColumn(SORT_FIELD.FEES)
+                setSortDirection(sortedColumn !== SORT_FIELD.FEES ? true : !sortDirection)
               }}
             >
-              Token Liquidity {sortedColumn === SORT_FIELD.RESERVE1 ? (!sortDirection ? '↑' : '↓') : ''}
+              Fees (24hr) {sortedColumn === SORT_FIELD.FEES ? (!sortDirection ? '↑' : '↓') : ''}
             </ClickableText>
           </Flex>
         )}
-        <>
-          <Flex alignItems="center">
-            <ClickableText
-              area="vol"
-              onClick={e => {
-                setSortedColumn(SORT_FIELD.VOL)
-                setSortDirection(sortedColumn !== SORT_FIELD.VOL ? true : !sortDirection)
-              }}
-            >
-              Volume (24hrs)
-              {sortedColumn === SORT_FIELD.VOL ? (!sortDirection ? '↑' : '↓') : ''}
-            </ClickableText>
-          </Flex>
-        </>
+
         {!below1080 && (
           <Flex alignItems="center">
             <ClickableText
@@ -279,13 +274,8 @@ function PairList({ pairs }) {
           </Flex>
         )}
         {!below740 && (
-          <Flex alignItems="center">
-            <Text area="pool">Pool</Text>
-          </Flex>
-        )}
-        {!below740 && (
-          <Flex alignItems="center">
-            <Text area="swap">Swap</Text>
+          <Flex alignItems="center" justifyContent="center">
+            <Text area="pool">Interface</Text>
           </Flex>
         )}
       </DashGrid>

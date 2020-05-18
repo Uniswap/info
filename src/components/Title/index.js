@@ -16,6 +16,7 @@ import { useMedia } from 'react-use'
 
 const TitleWrapper = styled.div`
   text-decoration: none;
+  height: 40px;
 
   &:hover {
     cursor: pointer;

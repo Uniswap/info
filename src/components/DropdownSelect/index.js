@@ -4,6 +4,7 @@ import styled from 'styled-components'
 import Row from '../Row'
 import { AutoColumn } from '../Column'
 import { ChevronDown as Arrow } from 'react-feather'
+import { Text } from 'rebass'
 
 const Wrapper = styled.div`
   z-index: 20;
@@ -76,7 +77,9 @@ const DropdownSelect = ({ options, active, setActive }) => {
                     }}
                     key={index}
                   >
-                    {option}
+                    <Text fontWeight={400} fontSize={14}>
+                      {option}
+                    </Text>
                   </Option>
                 )
               )
