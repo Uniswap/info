@@ -20,7 +20,6 @@ export function getSwapLink(token0Address, token1Address) {
 }
 
 export const toNiceDate = date => {
-  // let df = new Date(date * 1000).toUTCString('MMMM DD')
   let x = dayjs.utc(dayjs.unix(date)).format('MMM DD')
   return x
 }
