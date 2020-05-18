@@ -48,16 +48,18 @@ export default function Title({ token, pair }) {
     if (symbol0 && symbol1) {
       return (
         <div>
-          / <span style={{ fontWeight: 400 }}>{symbol0 + '-' + symbol1}</span>
+          <span style={{ fontWeight: 400, verticalAlign: '-webkit-baseline-middle' }}>
+            {' '}
+            / {symbol0 + '-' + symbol1}
+          </span>
         </div>
       )
     }
     if (name && symbol) {
       return (
         <div>
-          /{' '}
-          <span style={{ fontWeight: 400 }}>
-            {!below1080 ? name : ''} {'(' + symbol + ')'}
+          <span style={{ fontWeight: 400, verticalAlign: '-webkit-baseline-middle' }}>
+            / {!below1080 ? name : ''} {'(' + symbol + ')'}
           </span>
         </div>
       )
@@ -75,7 +77,7 @@ export default function Title({ token, pair }) {
           </UniIcon>
           <img style={{ marginLeft: '4px', marginTop: '0px' }} src={Wordmark} alt="logo" />
         </RowFixed>
-        <Text fontWeight={600} mx="10px" lineHeight="1.5rem">
+        <Text fontWeight={600} mx="4px" lineHeight="1.5rem">
           {getName()}
         </Text>
       </Flex>

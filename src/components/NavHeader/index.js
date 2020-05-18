@@ -23,9 +23,10 @@ const Header = styled.div`
 `
 
 const CombinedWrapper = styled(RowFixed)`
-border: 1px solid ${({ theme }) => theme.primary2}
+/* border: 1px solid ${({ theme }) => theme.primary2} */
 border-radius: 16px;
 padding: .25rem 0.25rem .25rem .75rem ;
+justify-content: flex-end;
 `
 
 const CombinedData = styled.div`
@@ -78,7 +79,7 @@ export default function NavHeader({ token, pair }) {
                 </>
               )}
               <ButtonDark style={{ minWidth: 'initial' }} href="https://combined.uniswap.info">
-                View combined {below1024 && 'data'} ↗
+                View combined ↗
               </ButtonDark>
             </CombinedWrapper>
           )}
