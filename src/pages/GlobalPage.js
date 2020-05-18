@@ -126,12 +126,14 @@ function GlobalPage() {
     <PageWrapper>
       <ThemedBackground />
       <Search small={false} />
-      <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
-        Overall Stats
-      </TYPE.main>
+      {!below1080 && (
+        <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
+          Overall Stats
+        </TYPE.main>
+      )}
       {below1080 && ( // mobile card
         <Box mb={20}>
-          <Box mb={20} mt={0}>
+          <Box mb={20} mt={'1.5rem'}>
             <Panel>
               <Box>
                 <AutoColumn gap="40px">

@@ -7,9 +7,7 @@ import { toK, toNiceDate, toNiceDateYear } from '../../helpers'
 import { OptionButton } from '../ButtonStyled'
 import { darken } from 'polished'
 
-const ChartWrapper = styled.div`
-  padding-top: 40px;
-`
+const ChartWrapper = styled.div``
 
 const GlobalChart = ({ chartData, color }) => {
   const options = [{ text: 'All Time' }, { text: '3 Months' }, { text: '1 week' }]

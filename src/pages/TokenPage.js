@@ -225,20 +225,6 @@ function TokenPage({ address }) {
             <Panel>
               <AutoColumn gap="20px">
                 <RowBetween>
-                  <TYPE.main>Volume (24hrs)</TYPE.main>
-                  <div />
-                </RowBetween>
-                <RowBetween align="flex-end">
-                  <TYPE.main fontSize={'2rem'} lineHeight={1} fontWeight={600}>
-                    {volume}
-                  </TYPE.main>
-                  <TYPE.main>{volumeChange}</TYPE.main>
-                </RowBetween>
-              </AutoColumn>
-            </Panel>
-            <Panel>
-              <AutoColumn gap="20px">
-                <RowBetween>
                   <TYPE.main>Total Liquidity</TYPE.main>
                   <div />
                 </RowBetween>
@@ -253,7 +239,22 @@ function TokenPage({ address }) {
             <Panel>
               <AutoColumn gap="20px">
                 <RowBetween>
-                  <TYPE.main>Total Liquidity Tokens</TYPE.main>
+                  <TYPE.main>Volume (24hrs)</TYPE.main>
+                  <div />
+                </RowBetween>
+                <RowBetween align="flex-end">
+                  <TYPE.main fontSize={'2rem'} lineHeight={1} fontWeight={600}>
+                    {volume}
+                  </TYPE.main>
+                  <TYPE.main>{volumeChange}</TYPE.main>
+                </RowBetween>
+              </AutoColumn>
+            </Panel>
+
+            <Panel>
+              <AutoColumn gap="20px">
+                <RowBetween>
+                  <TYPE.main>Total Pooled {symbol}</TYPE.main>
                   <div />
                 </RowBetween>
                 <RowBetween align="flex-end">

@@ -107,14 +107,27 @@ export const ThemedBackground = styled.div`
   top: 0;
   left: 0;
   right: 0;
-  height: 1000px;
+  /* height: 1000px;
   overflow: hidden;
   max-width: 100vw !important;
   width: 100vw !important;
   user-select: none;
   z-index: -1;
   background: ${({ backgroundColor }) =>
-    `linear-gradient(180deg, ${backgroundColor} 0%, rgba(255, 255, 255, 0) 100%);`};
+    `linear-gradient(180deg, ${backgroundColor} 0%, rgba(255, 255, 255, 0) 100%);`}; */
+
+  max-width: 100vw !important;
+  width: 100vw !important;
+  height: 200vh;
+  background: ${({ theme, backgroundColor }) =>
+    `radial-gradient(50% 50% at 50% 50%, ${backgroundColor} 0%, rgba(255, 255, 255, 0) 100%)`};
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  /* opacity: 0.1; */
+  z-index: -1;
+
+  transform: translateY(-110vh);
 `
 
 export const GlobalStyle = createGlobalStyle`

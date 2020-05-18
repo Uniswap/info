@@ -18,7 +18,7 @@ const Wrapper = styled.div`
   align-items: center;
   justify-content: flex-end;
   padding: ${({ large }) => (large ? '12px' : '12px 16px')};
-  border: 1px solid ${({ theme }) => theme.inputBackground};
+  /* border: 1px solid ${({ theme }) => theme.inputBackground}; */
   border-radius: 12px;
   background: ${({ theme, large }) => (large ? theme.inputBG : theme.advancedBG)};
   border-bottom-right-radius: ${({ open }) => (open ? '0px' : '12px')};
@@ -48,7 +48,7 @@ const Input = styled.input`
 
   @media screen and (max-width: 640px) {
     ::placeholder {
-      font-size: 0.85rem;
+      font-size: 1rem;
     }
   }
 `
@@ -56,7 +56,7 @@ const Input = styled.input`
 const SearchIconLarge = styled(SearchIcon)`
   height: 20px;
   width: 20px;
-  margin-right: 4px;
+  margin-right: 0.5rem;
   color: ${({ theme }) => theme.textColor};
 `
 

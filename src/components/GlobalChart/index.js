@@ -110,12 +110,25 @@ const GlobalChart = ({ display }) => {
           <AreaChart margin={{ top: 20, right: 0, bottom: 6, left: 0 }} barCategoryGap={1} data={chartData}>
             <defs>
               <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#ff007a" stopOpacity={1} />
-                <stop offset="95%" stopColor="#ff007a" stopOpacity={0.5} />
+                <stop offset="5%" stopColor="#ff007a" stopOpacity={0.3} />
+                <stop offset="95%" stopColor="#ff007a" stopOpacity={0.2} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" />
+            {/* <CartesianGrid strokeDasharray="3 3" /> */}
 
+            <Area
+              key={'other'}
+              dataKey={'totalLiquidityUSD'}
+              stackId="2"
+              strokeWidth={2}
+              stroke={'#ff007a80'}
+              dot={false}
+              type="monotone"
+              name={'Liquidity'}
+              yAxisId={0}
+              fill="url(#colorUv)"
+              isAnimationActive={false}
+            />
             <XAxis
               tickLine={true}
               axisLine={true}
@@ -126,7 +139,7 @@ const GlobalChart = ({ display }) => {
               dataKey="date"
               mirror={true}
               tick={{ fill: 'black' }}
-              padding={{ right: 40, bottom: 0 }}
+              padding={{ right: 0, bottom: 0 }}
               type={'number'}
               domain={domain}
             />
@@ -160,28 +173,25 @@ const GlobalChart = ({ display }) => {
               }}
               wrapperStyle={{ top: -70, left: -10 }}
             />
-            <Area
-              key={'other'}
-              dataKey={'totalLiquidityUSD'}
-              stackId="2"
-              strokeWidth={2}
-              stroke={'#ff007a'}
-              dot={false}
-              type="monotone"
-              name={'Liquidity'}
-              yAxisId={0}
-              fill="url(#colorUv)"
-              isAnimationActive={false}
-            />
           </AreaChart>
         </ResponsiveContainer>
       )}
       {chartView === CHART_VIEW.VOLUME && (
         <ResponsiveContainer aspect={60 / 28}>
           <BarChart margin={{ top: 20, right: 0, bottom: 6, left: 0 }} barCategoryGap={1} data={chartData}>
+            <Bar
+              type="monotone"
+              name={'Volume'}
+              dataKey={'dailyVolumeUSD'}
+              fill="#ff007a30"
+              opacity={'1'}
+              yAxisId={0}
+              stroke={'#ff007a80'}
+              isAnimationActive={false}
+            />
             <XAxis
-              tickLine={false}
-              axisLine={false}
+              tickLine={true}
+              axisLine={true}
               interval="preserveEnd"
               minTickGap={80}
               tickMargin={14}
@@ -189,7 +199,7 @@ const GlobalChart = ({ display }) => {
               dataKey="date"
               tick={{ fill: 'black' }}
               mirror={true}
-              padding={{ right: 40, bottom: 0 }}
+              padding={{ right: 0, bottom: 0 }}
               type={'number'}
               domain={domain}
             />
@@ -209,7 +219,7 @@ const GlobalChart = ({ display }) => {
               domain={[0, 'dataMax']}
               orientation={'right'}
             />
-            <CartesianGrid strokeDasharray="3 3" />
+            {/* <CartesianGrid strokeDasharray="3 3" /> */}
             <Tooltip
               cursor={{ fill: '#ff007a', opacity: 0.1 }}
               formatter={val => '$' + toK(val, true)}
@@ -222,16 +232,6 @@ const GlobalChart = ({ display }) => {
                 color: 'black'
               }}
               wrapperStyle={{ top: -70, left: -10 }}
-            />
-            <Bar
-              type="monotone"
-              name={'Volume'}
-              dataKey={'dailyVolumeUSD'}
-              fill="#ff007a80"
-              opacity={'1'}
-              yAxisId={0}
-              stroke={'#ff007a'}
-              isAnimationActive={false}
             />
           </BarChart>
         </ResponsiveContainer>
