@@ -88,12 +88,12 @@ const GlobalChart = ({ display }) => {
         <RowBetween marginBottom={'10px'}>
           <Row>
             <OptionButton
-              style={{ marginRight: '10px' }}
+              style={{ marginRight: '10px', paddingLeft: '0px' }}
               active={chartView === CHART_VIEW.LIQUIDITY}
               onClick={!display ? toggleView : () => {}}
               disabled={!!display}
             >
-              <TYPE.main fontSize={'1rem'}>{chartView}</TYPE.main>
+              <TYPE.main>{chartView}</TYPE.main>
             </OptionButton>
           </Row>
           <Row justify="flex-end">
