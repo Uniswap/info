@@ -120,8 +120,10 @@ export default function NavHeader({ exchanges, setCurrencyUnit, currencyUnit }) 
   return (
     <>
       <MigrateBannerSmall>
-        <b>V2 is here!&nbsp;</b> <Link href="https://migrate.uniswap.exchange/">Migrate your liquidity&nbsp;</Link>or{' '}
-        <Link href="https://uniswap.exchange"> &nbsp;use V2 ↗</Link>
+        Uniswap V1 only. To see Uniswap V2 analytics&nbsp;
+        <Link href="https://uniswap.info">
+          <b>click here ↗</b>
+        </Link>
       </MigrateBannerSmall>
       <MigrateBannerLarge>
         This site displays analytics for Uniswap V1 only. To see Uniswap V2 analytics&nbsp;
