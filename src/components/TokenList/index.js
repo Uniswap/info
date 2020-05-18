@@ -168,7 +168,7 @@ function TopTokenList({ tokens }) {
       <DashGrid style={{ height: '60px' }}>
         <DataText area="name" fontWeight="500">
           <Row>
-            <div style={{ marginRight: '1rem' }}>{index}</div>
+            {!below680 && <div style={{ marginRight: '1rem' }}>{index}</div>}
             <TokenLogo address={item.address} />
             <CustomLink
               style={{ marginLeft: '16px', whiteSpace: 'nowrap' }}
