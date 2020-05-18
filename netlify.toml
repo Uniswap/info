@@ -1,3 +1,9 @@
+# forward v2 subdomain to apex
+[[redirects]]
+  from = "https://v2.uniswap.info/*"
+  to = "https://uniswap.info/:splat"
+  status = 301
+
 # support SPA setup
 [[redirects]]
   from = "/*"

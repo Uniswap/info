@@ -115,10 +115,10 @@ export function ButtonCustom({ children, bgColor, color, ...rest }) {
 }
 
 export const OptionButton = styled.div`
-  font-weight: ${({ active }) => (active ? 600 : 500)};
+  font-weight: ${({ active }) => (active ? 600 : 400)};
   width: fit-content;
   white-space: nowrap;
-  padding: 6px;
+  padding: 0 6px;
   border-radius: 6px;
 
   :hover {

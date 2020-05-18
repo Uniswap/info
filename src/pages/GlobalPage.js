@@ -68,6 +68,7 @@ const GridRow = styled.div`
   grid-template-columns: 50% 50%;
   column-gap: 6px;
   align-items: start;
+  justify-content: center;
 `
 
 const TopGroup = styled.div`
