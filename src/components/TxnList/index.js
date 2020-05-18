@@ -6,11 +6,12 @@ import utc from 'dayjs/plugin/utc'
 import { formatTime, formattedNum, urls } from '../../helpers'
 import { useMedia } from 'react-use'
 import { useCurrentCurrency } from '../../contexts/Application'
+import { RowFixed } from '../Row'
 
 import LocalLoader from '../LocalLoader'
 import { Box, Flex, Text } from 'rebass'
 import Link from '../Link'
-import { Divider } from '..'
+import { Divider, EmptyCard } from '..'
 
 dayjs.extend(utc)
 
@@ -19,7 +20,7 @@ const PageButtons = styled.div`
   display: flex;
   justify-content: center;
   margin-top: 2em;
-  margin-bottom: 2em;
+  margin-bottom: 0.5em;
 `
 
 const Arrow = styled.div`
@@ -39,7 +40,7 @@ const List = styled(Box)`
 const DashGrid = styled.div`
   display: grid;
   grid-gap: 1em;
-  grid-template-columns: 100px 1fr 1fr;
+  grid-template-columns: 160px 1fr 1fr;
   grid-template-areas: 'txn value time';
 
   > * {
@@ -80,14 +81,6 @@ const DashGrid = styled.div`
   }
 `
 
-const ListWrapper = styled.div`
-  /* padding: 20px 40px;
-
-  @media screen and (max-width: 640px) {
-    padding: 0 20px;
-  } */
-`
-
 const ClickableText = styled(Text)`
   &:hover {
     cursor: pointer;
@@ -114,13 +107,16 @@ const DataText = styled(Flex)`
   }
 `
 
-const EmptyCard = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 200px;
-  border-radius: 20px;
-  border: 1px solid #484848;
+const SortText = styled.button`
+  cursor: pointer;
+  font-weight: ${({ active, theme }) => (active ? 500 : 400)};
+  margin-right: 0.75rem !important;
+  border: none;
+  background-color: transparent;
+  font-size: 1rem;
+  padding: 0px;
+  color: ${({ active, theme }) => (active ? theme.text1 : theme.text3)};
+  outline: none;
 `
 
 const SORT_FIELD = {
@@ -152,7 +148,7 @@ function getTransactionType(event, symbol0, symbol1) {
 }
 
 // @TODO rework into virtualized list
-function TxnList({ transactions, txFilter, symbol0Override, symbol1Override }) {
+function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
   // page state
   const [page, setPage] = useState(1)
   const [maxPage, setMaxPage] = useState(1)
@@ -161,6 +157,7 @@ function TxnList({ transactions, txFilter, symbol0Override, symbol1Override }) {
   const [sortDirection, setSortDirection] = useState(true)
   const [sortedColumn, setSortedColumn] = useState(SORT_FIELD.TIMESTAMP)
   const [filteredItems, setFilteredItems] = useState()
+  const [txFilter, setTxFilter] = useState('ALL')
 
   const [currency] = useCurrentCurrency()
 
@@ -277,7 +274,7 @@ function TxnList({ transactions, txFilter, symbol0Override, symbol1Override }) {
     return (
       <DashGrid style={{ height: '60px' }}>
         <DataText area="txn" fontWeight="500">
-          <Link external href={urls.showTransaction(item.hash)}>
+          <Link color={color} external href={urls.showTransaction(item.hash)}>
             {getTransactionType(item.type, item.token0Symbol, item.token1Symbol)}
           </Link>
         </DataText>
@@ -292,7 +289,7 @@ function TxnList({ transactions, txFilter, symbol0Override, symbol1Override }) {
         )}
         {!below1080 && (
           <DataText area="account">
-            <Link external href={'https://etherscan.io/address/' + item.account}>
+            <Link color={color} external href={'https://etherscan.io/address/' + item.account}>
               {item.account && item.account.slice(0, 6) + '...' + item.account.slice(38, 42)}
             </Link>
           </DataText>
@@ -303,13 +300,43 @@ function TxnList({ transactions, txFilter, symbol0Override, symbol1Override }) {
   }
 
   return (
-    <ListWrapper>
-      <DashGrid center={true} style={{ height: '60px' }}>
-        <Flex alignItems="center">
-          <Text color="text" area="txn" fontWeight="500">
-            Transaction
-          </Text>
-        </Flex>
+    <>
+      <DashGrid center={true} style={{ height: 'fit-content', padding: '0 0 1rem 0' }}>
+        <RowFixed area="txn" gap="10px" pl={4}>
+          <SortText
+            onClick={() => {
+              setTxFilter('ALL')
+            }}
+            active={txFilter === 'ALL'}
+          >
+            All
+          </SortText>
+          <SortText
+            onClick={() => {
+              setTxFilter('SWAP')
+            }}
+            active={txFilter === 'SWAP'}
+          >
+            Swaps
+          </SortText>
+          <SortText
+            onClick={() => {
+              setTxFilter('ADD')
+            }}
+            active={txFilter === 'ADD'}
+          >
+            Adds
+          </SortText>
+          <SortText
+            onClick={() => {
+              setTxFilter('REMOVE')
+            }}
+            active={txFilter === 'REMOVE'}
+          >
+            Removes
+          </SortText>
+        </RowFixed>
+
         <Flex alignItems="center" justifyContent="flexStart">
           <ClickableText
             color="textDim"
@@ -408,7 +435,7 @@ function TxnList({ transactions, txFilter, symbol0Override, symbol1Override }) {
           <Arrow faded={page === maxPage ? true : false}>→</Arrow>
         </div>
       </PageButtons>
-    </ListWrapper>
+    </>
   )
 }
 

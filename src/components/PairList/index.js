@@ -12,7 +12,7 @@ import { Divider } from '../../components'
 import { formattedNum, getPoolLink, getSwapLink } from '../../helpers'
 import { usePairData, useAllPairs } from '../../contexts/PairData'
 import DoubleTokenLogo from '../DoubleLogo'
-import { ButtonFaded } from '../ButtonStyled'
+import { ButtonLight, ButtonDark } from '../ButtonStyled'
 
 dayjs.extend(utc)
 
@@ -21,11 +21,11 @@ const PageButtons = styled.div`
   display: flex;
   justify-content: center;
   margin-top: 2em;
-  margin-bottom: 2em;
+  margin-bottom: 0.5em;
 `
 
 const Arrow = styled.div`
-  color: #2f80ed;
+  color: ${({ theme }) => theme.primary1};
   opacity: ${props => (props.faded ? 0.3 : 1)};
   padding: 0 20px;
   user-select: none;
@@ -51,23 +51,23 @@ const DashGrid = styled.div`
     :first-child {
       justify-content: flex-start;
       text-align: left;
-      width: 100px;
+      width: 20px;
     }
   }
 
   @media screen and (min-width: 740px) {
-    grid-template-columns: 1.5fr 1fr 1fr 180px;
+    grid-template-columns: 1.5fr 1fr 1fr 300px;
     grid-template-areas: ' name liq vol pool ';
   }
 
   @media screen and (min-width: 1080px) {
-    grid-template-columns: 1.5fr 1fr 1fr 1fr 200px;
-    grid-template-areas: ' name liq vol txCount pool ';
+    grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr 300px;
+    grid-template-areas: ' name liq vol volWeek fees pool ';
   }
 
   @media screen and (min-width: 1200px) {
-    grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr 1fr 180px;
-    grid-template-areas: ' name liq vol volWeek fees txCount pool';
+    grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr 300px;
+    grid-template-areas: ' name liq vol volWeek fees pool';
   }
 `
 
@@ -103,12 +103,11 @@ const SORT_FIELD = {
   FEES: 'oneDayVolumeUSD'
 }
 
-function PairList({ pairs }) {
+function PairList({ pairs, color }) {
   const allPairData = useAllPairs()
 
   const below740 = useMedia('(max-width: 740px)')
   const below1080 = useMedia('(max-width: 1080px)')
-  const below1200 = useMedia('(max-width: 1200px)')
 
   // pagination
   const [page, setPage] = useState(1)
@@ -142,6 +141,10 @@ function PairList({ pairs }) {
         // pull in calculated one day volume
         a.oneDayVolumeUSD = allPairData?.[a.id]?.oneDayVolumeUSD
         b.oneDayVolumeUSD = allPairData?.[b.id]?.oneDayVolumeUSD
+
+        a.oneWeekVolumeUSD = allPairData?.[a.id]?.oneWeekVolumeUSD
+        b.oneWeekVolumeUSD = allPairData?.[b.id]?.oneWeekVolumeUSD
+
         return parseFloat(a[sortedColumn]) > parseFloat(b[sortedColumn])
           ? (sortDirection ? -1 : 1) * 1
           : (sortDirection ? -1 : 1) * -1
@@ -166,36 +169,36 @@ function PairList({ pairs }) {
     return (
       <DashGrid style={{ height: '60px' }}>
         <DataText area="name" fontWeight="500">
-          <div style={{ marginRight: !below740 ? '1rem' : '8px' }}>{index}</div>
-          <DoubleTokenLogo a0={item.token0.id} a1={item.token1.id} margin={!below740} />
+          <div style={{ marginRight: '20px' }}>{index}</div>
+          <DoubleTokenLogo size={20} a0={item.token0.id} a1={item.token1.id} margin={!below740} />
           <CustomLink
             style={{ marginLeft: '20px', whiteSpace: 'nowrap' }}
             to={'/pair/' + item.id}
             onClick={() => {
               window.scrollTo(0, 0)
             }}
+            color={color}
           >
             {item.token0.symbol + '-' + item.token1.symbol}
           </CustomLink>
         </DataText>
         <DataText area="liq">{liquidity}</DataText>
         <DataText area="vol">{volume}</DataText>
-        {!below1200 && <DataText area="volWeek">{formattedNum(itemData.oneWeekVolumeUSD, true)}</DataText>}
-        {!below1200 && <DataText area="fees">{formattedNum(itemData.oneDayVolumeUSD * 0.003, true)}</DataText>}
-        {!below1080 && <DataText area="txCount">{itemData.oneDayTxns}</DataText>}
+        {!below1080 && <DataText area="volWeek">{formattedNum(itemData.oneWeekVolumeUSD, true)}</DataText>}
+        {!below1080 && <DataText area="fees">{formattedNum(itemData.oneWeekVolumeUSD * 0.003, true)}</DataText>}
         {!below740 && (
-          <DataText area="pool">
-            <ButtonFaded style={{ marginRight: '10px' }}>
-              <Link external href={getPoolLink(item.token0.id, item.token1.id)}>
-                + Pool
+          <Flex area="pool" justifyContent="flex-end" alignItems="center">
+            <ButtonLight color={color} style={{ marginRight: '10px' }}>
+              <Link color={color} external href={getPoolLink(item.token0?.id, item.token1?.id)}>
+                + Add Liquidity
               </Link>
-            </ButtonFaded>
-            <ButtonFaded>
-              <Link external href={getSwapLink(item.token0.id, item.token1.id)}>
-                Swap
+            </ButtonLight>
+            <ButtonDark color={color}>
+              <Link color={'white'} external href={getSwapLink(item.token0?.id, item.token1?.id)}>
+                Trade
               </Link>
-            </ButtonFaded>
-          </DataText>
+            </ButtonDark>
+          </Flex>
         )}
       </DashGrid>
     )
@@ -203,7 +206,7 @@ function PairList({ pairs }) {
 
   return (
     <ListWrapper>
-      <DashGrid center={true} style={{ height: '60px' }}>
+      <DashGrid center={true} style={{ height: 'fit-content', padding: '0 0 1rem 0' }}>
         <Flex alignItems="center" justifyContent="flexStart">
           <Text area="name" fontWeight="500">
             Name
@@ -232,7 +235,7 @@ function PairList({ pairs }) {
             {sortedColumn === SORT_FIELD.VOL ? (!sortDirection ? '↑' : '↓') : ''}
           </ClickableText>
         </Flex>
-        {!below1200 && (
+        {!below1080 && (
           <Flex alignItems="center" justifyContent="flexEnd">
             <ClickableText
               area="volWeek"
@@ -245,7 +248,7 @@ function PairList({ pairs }) {
             </ClickableText>
           </Flex>
         )}
-        {!below1200 && (
+        {!below1080 && (
           <Flex alignItems="center" justifyContent="flexEnd">
             <ClickableText
               area="fees"
@@ -258,24 +261,9 @@ function PairList({ pairs }) {
             </ClickableText>
           </Flex>
         )}
-
-        {!below1080 && (
-          <Flex alignItems="center">
-            <ClickableText
-              area="txnCount"
-              onClick={e => {
-                setSortedColumn(SORT_FIELD.TXNS)
-                setSortDirection(sortedColumn !== SORT_FIELD.TXNS ? true : !sortDirection)
-              }}
-            >
-              Transactions (24hrs)
-              {sortedColumn === SORT_FIELD.TXNS ? (!sortDirection ? '↑' : '↓') : ''}
-            </ClickableText>
-          </Flex>
-        )}
         {!below740 && (
           <Flex alignItems="center" justifyContent="center">
-            <Text area="pool">Interface</Text>
+            <Text area="pool"></Text>
           </Flex>
         )}
       </DashGrid>

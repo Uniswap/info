@@ -11,8 +11,8 @@ const Wrapper = styled.div`
   position: relative;
   background-color: rgb(183, 177, 183, 0.3);
   width: 100px;
-  padding: 10px;
-  border-radius: 16px;
+  padding: 4px 10px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -27,12 +27,12 @@ const Wrapper = styled.div`
 
 const Dropdown = styled.div`
   position: absolute;
-  top: 40px;
-  padding-top: 60px;
+  top: 28px;
+  padding-top: 40px;
   width: calc(100% - 40px);
   background-color: rgb(183, 177, 183, 0.3);
-  padding: 20px;
-  border-radius: 16px;
+  padding: 10px 20px;
+  border-radius: 8px;
   border-top-right-radius: 0;
   border-top-left-radius: 0;
   font-weight: 500;

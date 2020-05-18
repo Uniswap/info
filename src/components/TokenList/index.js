@@ -206,7 +206,7 @@ function TopTokenList({ tokens }) {
 
   return (
     <ListWrapper>
-      <DashGrid center={true} style={{ height: '60px' }}>
+      <DashGrid center={true} style={{ height: 'fit-content', padding: '0 0 1rem 0' }}>
         <Flex alignItems="center" justifyContent="flexStart">
           <ClickableText
             color="text"
