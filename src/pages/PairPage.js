@@ -154,12 +154,12 @@ function PairPage({ pairAddress, history }) {
       <ThemedBackground backgroundColor={transparentize(0.6, backgroundColor)} />
       <RowBetween mt={20} style={{ flexWrap: 'wrap' }}>
         <RowFixed style={{ flexWrap: 'wrap' }}>
-          <RowFixed mb={20} style={{ alignItems: 'baseline' }}>
+          <RowFixed mb={20}>
             {token0 && token1 && (
               <DoubleTokenLogo a0={token0?.id || ''} a1={token1?.id || ''} size={32} margin={true} />
             )}{' '}
             <Text fontSize={'2rem'} fontWeight={600} style={{ margin: '0 1rem' }}>
-              {token0 && token1 ? token0.symbol + '-' + token1.symbol + ' Pool' : ''}
+              {token0 && token1 ? token0.symbol + '-' + token1.symbol + ' Pair' : ''}
             </Text>{' '}
           </RowFixed>
         </RowFixed>
@@ -180,7 +180,7 @@ function PairPage({ pairAddress, history }) {
         <>
           {!below1080 && (
             <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '2rem' }}>
-              Token Stats
+              Pair Stats
             </TYPE.main>
           )}
           <PanelWrapper style={{ marginTop: '1.5rem' }}>
@@ -231,7 +231,7 @@ function PairPage({ pairAddress, history }) {
             </Panel>
           </PanelWrapper>
           <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
-            Token Info
+            Pooled Tokens
           </TYPE.main>
           <TokenWrapper style={{ marginTop: '1.5rem' }}>
             <Panel>
@@ -289,7 +289,7 @@ function PairPage({ pairAddress, history }) {
             {transactions ? <TxnList transactions={transactions} /> : <Loader />}
           </Panel>
           <RowBetween style={{ marginTop: '3rem' }}>
-            <TYPE.main fontSize={'1.125rem'}>Pool Information</TYPE.main>{' '}
+            <TYPE.main fontSize={'1.125rem'}>Pair Information</TYPE.main>{' '}
           </RowBetween>
           <Panel
             rounded
@@ -301,14 +301,14 @@ function PairPage({ pairAddress, history }) {
           >
             <TokenDetailsLayout>
               <Column>
-                <TYPE.main>Pool Name</TYPE.main>
+                <TYPE.main>Pair Name</TYPE.main>
                 <Text style={{ marginTop: '.5rem' }} fontSize={24} fontWeight="500">
-                  {token0 && token1 ? token0.symbol + '-' + token1.symbol + ' Pool' : ''}
+                  {token0 && token1 ? token0.symbol + '-' + token1.symbol : ''}
                 </Text>
               </Column>
 
               <Column>
-                <TYPE.main>Pool Address</TYPE.main>
+                <TYPE.main>Pair Address</TYPE.main>
                 <AutoRow align="flex-end">
                   <Text style={{ marginTop: '.5rem' }} fontSize={24} fontWeight="500">
                     {pairAddress.slice(0, 6) + '...' + pairAddress.slice(38, 42)}
