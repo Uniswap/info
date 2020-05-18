@@ -13,21 +13,21 @@ dayjs.extend(utc)
 
 export function getPoolLink(token0Address, token1Address = null) {
   if (!token1Address) {
-    return `https://deploy-preview-782--uniswap.netlify.app/add/${token0Address}-${
+    return `https://uniswap.exchange/add/${token0Address}-${
       token0Address === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
         ? 'ETH'
         : '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
     }`
   } else {
-    return `https://deploy-preview-782--uniswap.netlify.app/add/${token0Address}-${token1Address}`
+    return `https://uniswap.exchange/add/${token0Address}-${token1Address}`
   }
 }
 
 export function getSwapLink(token0Address, token1Address = null) {
   if (!token1Address) {
-    return `https://deploy-preview-782--uniswap.netlify.app/swap?inputToken=${token0Address}`
+    return `https://uniswap.exchange/swap?inputToken=${token0Address}`
   } else {
-    return `https://deploy-preview-782--uniswap.netlify.app/swap?inputToken=${token0Address}&outputToken=${token1Address}`
+    return `https://uniswap.exchange/swap?inputToken=${token0Address}&outputToken=${token1Address}`
   }
 }
 
@@ -141,7 +141,9 @@ export const formattedNum = (number, usd = false) => {
   }
 
   if (num > 1000) {
-    return usd ? '$' + Number(parseFloat(num).toFixed(2)) : '' + Number(parseFloat(num).toFixed(0))
+    return usd
+      ? '$' + Number(parseFloat(num).toFixed(2)).toLocaleString()
+      : '' + Number(parseFloat(num).toFixed(0)).toLocaleString()
   }
 
   if (usd) {

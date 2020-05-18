@@ -63,21 +63,21 @@ function App() {
           {below490 ? (
             <>
               For V1 analytics&nbsp;
-              <Link href="https://uniswap.info/" target="_blank">
+              <Link href="https://v1.uniswap.info/" target="_blank">
                 <b>click here ↗</b>
               </Link>
             </>
           ) : below750 ? (
             <>
               <b>This site is for Uniswap V2 only.</b>&nbsp;For V1 analytics&nbsp;
-              <Link href="https://uniswap.info/" target="_blank">
+              <Link href="https://v1.uniswap.info/" target="_blank">
                 <b>click here ↗</b>
               </Link>
             </>
           ) : (
             <>
-              <b>This site displays analystics for Uniswap V2 only.</b> To see Uniswap V1 analytics&nbsp;
-              <Link href="https://uniswap.info/" target="_blank">
+              <b>This site displays analytics for Uniswap V2 only.</b> To see Uniswap V1 analytics&nbsp;
+              <Link href="https://v1.uniswap.info/" target="_blank">
                 <b>click here ↗</b>
               </Link>
             </>

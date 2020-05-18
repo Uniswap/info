@@ -289,6 +289,34 @@ export const Search = (small = false) => {
         <FilterSection>
           <Gray>Filter Results</Gray>
         </FilterSection>
+
+        <Heading>
+          <Gray>Pairs</Gray>
+        </Heading>
+        <div>
+          {Object.keys(filteredPairList).length === 0 && <MenuItem>No results</MenuItem>}
+          {filteredPairList.slice(0, pairsShown).map(key => {
+            return (
+              <BasicLink to={'/pair/' + key} key={key} onClick={onDismiss}>
+                <MenuItem>
+                  <DoubleTokenLogo a0={allPairs?.[key]?.token0?.id} a1={allPairs?.[key]?.token1?.id} margin={true} />
+                  <span>{allPairs[key].token0.symbol + '-' + allPairs[key].token1.symbol} Pair</span>
+                </MenuItem>
+              </BasicLink>
+            )
+          })}
+          <Heading
+            hide={!(Object.keys(filteredPairList).length > 3 && Object.keys(filteredPairList).length >= pairsShown)}
+          >
+            <Blue
+              onClick={() => {
+                setPairsShown(pairsShown + 5)
+              }}
+            >
+              See more...
+            </Blue>
+          </Heading>
+        </div>
         <Heading>
           <Gray>Tokens</Gray>
         </Heading>
@@ -312,33 +340,6 @@ export const Search = (small = false) => {
             <Blue
               onClick={() => {
                 setTokensShown(tokensShown + 5)
-              }}
-            >
-              See more...
-            </Blue>
-          </Heading>
-        </div>
-        <Heading>
-          <Gray>Pairs</Gray>
-        </Heading>
-        <div>
-          {Object.keys(filteredPairList).length === 0 && <MenuItem>No results</MenuItem>}
-          {filteredPairList.slice(0, pairsShown).map(key => {
-            return (
-              <BasicLink to={'/pair/' + key} key={key} onClick={onDismiss}>
-                <MenuItem>
-                  <DoubleTokenLogo a0={allPairs?.[key]?.token0?.id} a1={allPairs?.[key]?.token1?.id} margin={true} />
-                  <span>{allPairs[key].token0.symbol + '-' + allPairs[key].token1.symbol} Pair</span>
-                </MenuItem>
-              </BasicLink>
-            )
-          })}
-          <Heading
-            hide={!(Object.keys(filteredPairList).length > 3 && Object.keys(filteredPairList).length >= pairsShown)}
-          >
-            <Blue
-              onClick={() => {
-                setPairsShown(pairsShown + 5)
               }}
             >
               See more...
