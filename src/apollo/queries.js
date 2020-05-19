@@ -317,7 +317,7 @@ export const All_PAIRS = gql`
 
 export const All_TOKENS = gql`
   query tokens {
-    tokens {
+    tokens(orderBy: tradeVolumeUSD, orderDirection: desc) {
       id
       symbol
     }
