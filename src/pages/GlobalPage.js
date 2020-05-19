@@ -144,7 +144,7 @@ function GlobalPage() {
                       <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
                         {volume}
                       </TYPE.main>
-                      <TYPE.main>{volumeChange}</TYPE.main>
+                      <TYPE.main fontSize={12}>{volumeChange}</TYPE.main>
                     </RowBetween>
                   </AutoColumn>
                   <AutoColumn gap="20px">
@@ -156,7 +156,7 @@ function GlobalPage() {
                       <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
                         {liquidity && liquidity}
                       </TYPE.main>
-                      <TYPE.main>{liquidityChange && liquidityChange}</TYPE.main>
+                      <TYPE.main fontSize={12}>{liquidityChange && liquidityChange}</TYPE.main>
                     </RowBetween>
                   </AutoColumn>
                   <AutoColumn gap="20px">
@@ -168,7 +168,7 @@ function GlobalPage() {
                       <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
                         {!!oneDayTxns ? oneDayTxns : '-'}
                       </TYPE.main>
-                      <TYPE.main>{txnChangeFormatted && txnChangeFormatted}</TYPE.main>
+                      <TYPE.main fontSize={12}>{txnChangeFormatted && txnChangeFormatted}</TYPE.main>
                     </RowBetween>
                   </AutoColumn>
                 </AutoColumn>
@@ -212,7 +212,7 @@ function GlobalPage() {
                 <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
                   {liquidity && liquidity}
                 </TYPE.main>
-                <TYPE.main>{liquidityChange && liquidityChange}</TYPE.main>
+                <TYPE.main fontSize={14}>{liquidityChange && liquidityChange}</TYPE.main>
               </RowBetween>
             </AutoColumn>
           </Panel>
@@ -226,7 +226,7 @@ function GlobalPage() {
                 <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
                   {volume}
                 </TYPE.main>
-                <TYPE.main>{volumeChange}</TYPE.main>
+                <TYPE.main fontSize={14}>{volumeChange}</TYPE.main>
               </RowBetween>
             </AutoColumn>
           </Panel>
@@ -240,7 +240,7 @@ function GlobalPage() {
                 <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
                   {oneDayTxns}
                 </TYPE.main>
-                <TYPE.main>{txnChangeFormatted && txnChangeFormatted}</TYPE.main>
+                <TYPE.main fontSize={14}>{txnChangeFormatted && txnChangeFormatted}</TYPE.main>
               </RowBetween>
             </AutoColumn>
           </Panel>
