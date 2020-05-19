@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Link, useHistory } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 
 import styled from 'styled-components'
 import Title from '../Title'
@@ -8,6 +8,7 @@ import CurrencySelect from '../CurrencySelect'
 import Panel from '../Panel'
 import { isMobile } from 'react-device-detect'
 import { useMedia } from 'react-use'
+import Link from '../Link'
 
 const Header = styled(Panel)`
   display: grid;
@@ -121,13 +122,13 @@ export default function NavHeader({ exchanges, setCurrencyUnit, currencyUnit }) 
     <>
       <MigrateBannerSmall>
         Uniswap V1 only. To see Uniswap V2 analytics&nbsp;
-        <Link href="https://uniswap.info">
+        <Link href="https://uniswap.info" external={true}>
           <b>click here ↗</b>
         </Link>
       </MigrateBannerSmall>
       <MigrateBannerLarge>
         This site displays analytics for Uniswap V1 only. To see Uniswap V2 analytics&nbsp;
-        <Link href="https://uniswap.info">
+        <Link href="https://uniswap.info" external={true}>
           <b>click here ↗</b>
         </Link>
       </MigrateBannerLarge>
