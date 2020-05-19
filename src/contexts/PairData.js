@@ -314,7 +314,7 @@ export function usePairData(pairAddress) {
     async function checkForPairData() {
       if (!pairData && pairAddress && ethPrice) {
         let data = await getPairData(pairAddress)
-        update(data)
+        data && update(data)
       }
     }
     checkForPairData()
