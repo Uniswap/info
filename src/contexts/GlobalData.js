@@ -151,7 +151,7 @@ async function getGlobalData(ethPrice) {
 
     if (data && oneDayData && twoDayData) {
       const [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentChange(
-        data.totalVolumeUSD - 21082593545,
+        data.totalVolumeUSD,
         oneDayData.totalVolumeUSD ? oneDayData.totalVolumeUSD : 0,
         twoDayData.totalVolumeUSD ? twoDayData.totalVolumeUSD : 0
       )
