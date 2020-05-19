@@ -166,37 +166,39 @@ export const Search = (small = false) => {
   }, [allTokens, value])
 
   const filteredPairList = useMemo(() => {
-    return Object.keys(allPairs)
-      .sort((a, b) => {
-        const pairA = allPairs[a]
-        const pairB = allPairs[b]
-        if (pairA.reserveUSD && pairB.reserveUSD) {
-          return pairA.reserveUSD > pairB.reserveUSD ? -1 : 1
-        }
-        if (pairA.reserveUSD && !pairB.reserveUSD) {
-          return -1
-        }
-        if (!pairA.reserveUSD && pairB.reserveUSD) {
-          return 1
-        }
-        return 1
-      })
-      .filter(pair => {
-        const regexMatches = Object.keys(allPairs[pair]).map(field => {
-          const isAddress = value.slice(0, 2) === '0x'
-          if (field === 'id' && isAddress) {
-            return allPairs[pair][field].match(new RegExp(escapeStringRegexp(value), 'i'))
-          }
-          if (field === 'token0') {
-            return allPairs[pair][field].symbol.match(new RegExp(escapeStringRegexp(value), 'i'))
-          }
-          if (field === 'token1') {
-            return allPairs[pair][field].symbol.match(new RegExp(escapeStringRegexp(value), 'i'))
-          }
-          return false
+    return (
+      Object.keys(allPairs)
+        // .sort((a, b) => {
+        //   const pairA = allPairData[a]
+        //   const pairB = allPairData[b]
+        //   if (pairA.reserveUSD && pairB.reserveUSD) {
+        //     return pairA.reserveUSD > pairB.reserveUSD ? -1 : 1
+        //   }
+        //   if (pairA.reserveUSD && !pairB.reserveUSD) {
+        //     return -1
+        //   }
+        //   if (!pairA.reserveUSD && pairB.reserveUSD) {
+        //     return 1
+        //   }
+        //   return 1
+        // })
+        .filter(pair => {
+          const regexMatches = Object.keys(allPairs[pair]).map(field => {
+            const isAddress = value.slice(0, 2) === '0x'
+            if (field === 'id' && isAddress) {
+              return allPairs[pair][field].match(new RegExp(escapeStringRegexp(value), 'i'))
+            }
+            if (field === 'token0') {
+              return allPairs[pair][field].symbol.match(new RegExp(escapeStringRegexp(value), 'i'))
+            }
+            if (field === 'token1') {
+              return allPairs[pair][field].symbol.match(new RegExp(escapeStringRegexp(value), 'i'))
+            }
+            return false
+          })
+          return regexMatches.some(m => m)
         })
-        return regexMatches.some(m => m)
-      })
+    )
   }, [allPairs, value])
 
   useEffect(() => {
@@ -297,7 +299,7 @@ export const Search = (small = false) => {
           {Object.keys(filteredPairList).length === 0 && <MenuItem>No results</MenuItem>}
           {filteredPairList.slice(0, pairsShown).map(key => {
             return (
-              <BasicLink to={'/pair/' + key} key={key} onClick={onDismiss}>
+              <BasicLink to={'/pair/' + allPairs[key].id} key={key} onClick={onDismiss}>
                 <MenuItem>
                   <DoubleTokenLogo a0={allPairs?.[key]?.token0?.id} a1={allPairs?.[key]?.token1?.id} margin={true} />
                   <span>{allPairs[key].token0.symbol + '-' + allPairs[key].token1.symbol} Pair</span>

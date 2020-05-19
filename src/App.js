@@ -16,7 +16,6 @@ import { AutoColumn } from './components/Column'
 import Link from './components/Link'
 import { useMedia } from 'react-use'
 import { useGlobalData, useGlobalChartData } from './contexts/GlobalData'
-import { useAllPairs } from './contexts/PairData'
 
 const AppWrapper = styled.div`
   position: relative;
@@ -54,7 +53,6 @@ function App() {
 
   const globalData = useGlobalData()
   const globalChartData = useGlobalChartData()
-  const allPairData = useAllPairs()
 
   return (
     <ApolloProvider client={client}>
@@ -87,9 +85,7 @@ function App() {
         globalData &&
         Object.keys(globalData).length > 0 &&
         globalChartData &&
-        Object.keys(globalChartData).length > 0 &&
-        allPairData &&
-        Object.keys(allPairData).length > 8 ? (
+        Object.keys(globalChartData).length > 0 ? (
           <BrowserRouter>
             <ScrolToTop />
             <Switch>

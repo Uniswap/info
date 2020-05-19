@@ -10,7 +10,7 @@ import Link, { CustomLink } from '../Link'
 import { Divider } from '../../components'
 
 import { formattedNum, getPoolLink, getSwapLink } from '../../helpers'
-import { usePairData, useAllPairs } from '../../contexts/PairData'
+import { usePairData, useAllPairData } from '../../contexts/PairData'
 import DoubleTokenLogo from '../DoubleLogo'
 import { ButtonLight, ButtonDark } from '../ButtonStyled'
 
@@ -104,8 +104,6 @@ const SORT_FIELD = {
 }
 
 function PairList({ pairs, color }) {
-  const allPairData = useAllPairs()
-
   const below600 = useMedia('(max-width: 600px)')
   const below740 = useMedia('(max-width: 740px)')
   const below1080 = useMedia('(max-width: 1080px)')
@@ -114,6 +112,8 @@ function PairList({ pairs, color }) {
   const [page, setPage] = useState(1)
   const [maxPage, setMaxPage] = useState(1)
   const ITEMS_PER_PAGE = 10
+
+  const allPairData = useAllPairData()
 
   // sorting
   const [sortDirection, setSortDirection] = useState(true)
@@ -138,13 +138,21 @@ function PairList({ pairs, color }) {
     pairs &&
     allPairData &&
     pairs
-      .sort((a, b) => {
-        // pull in calculated one day volume
-        a.oneDayVolumeUSD = allPairData?.[a.id]?.oneDayVolumeUSD || 0
-        b.oneDayVolumeUSD = allPairData?.[b.id]?.oneDayVolumeUSD || 0
+      .sort((pairA, pairB) => {
+        let a = allPairData[pairA.id]
+        let b = allPairData[pairB.id]
 
-        a.oneWeekVolumeUSD = allPairData?.[a.id]?.oneWeekVolumeUSD
-        b.oneWeekVolumeUSD = allPairData?.[b.id]?.oneWeekVolumeUSD
+        if (a && !b) {
+          return 1
+        }
+
+        if (b && !a) {
+          return -1
+        }
+
+        if (!a && !b) {
+          return 1
+        }
 
         return parseFloat(a[sortedColumn]) > parseFloat(b[sortedColumn])
           ? (sortDirection ? -1 : 1) * 1
@@ -153,54 +161,64 @@ function PairList({ pairs, color }) {
       .slice(ITEMS_PER_PAGE * (page - 1), page * ITEMS_PER_PAGE)
 
   const ListItem = ({ item, index }) => {
-    const itemData = usePairData(item.id)
-    const liquidity = formattedNum(item.reserveUSD, true)
-    const volume = formattedNum(itemData.oneDayVolumeUSD, true)
+    const pairData = usePairData(item.id)
 
-    if (item.token0.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
-      item.token0.name = 'ETH (Wrapped)'
-      item.token0.symbol = 'ETH'
+    if (pairData && pairData.token0 && pairData.token1) {
+      const liquidity = formattedNum(pairData.reserveUSD, true)
+      const volume = formattedNum(pairData.oneDayVolumeUSD, true)
+
+      if (pairData.token0.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
+        pairData.token0.name = 'ETH (Wrapped)'
+        pairData.token0.symbol = 'ETH'
+      }
+
+      if (pairData.token1.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
+        pairData.token1.name = 'ETH (Wrapped)'
+        pairData.token1.symbol = 'ETH'
+      }
+
+      return (
+        <DashGrid style={{ height: '60px' }}>
+          <DataText area="name" fontWeight="500">
+            {!below600 && <div style={{ marginRight: '20px' }}>{index}</div>}
+            <DoubleTokenLogo
+              size={below600 ? 16 : 20}
+              a0={pairData.token0.id}
+              a1={pairData.token1.id}
+              margin={!below740}
+            />
+            <CustomLink
+              style={{ marginLeft: '20px', whiteSpace: 'nowrap' }}
+              to={'/pair/' + item.id}
+              onClick={() => {
+                window.scrollTo(0, 0)
+              }}
+              color={color}
+            >
+              {pairData.token0.symbol + '-' + pairData.token1.symbol}
+            </CustomLink>
+          </DataText>
+          <DataText area="liq">{liquidity}</DataText>
+          <DataText area="vol">{volume}</DataText>
+          {!below1080 && <DataText area="volWeek">{formattedNum(pairData.oneWeekVolumeUSD, true)}</DataText>}
+          {!below1080 && <DataText area="fees">{formattedNum(pairData.oneDayVolumeUSD * 0.003, true)}</DataText>}
+          {!below740 && (
+            <Flex area="pool" justifyContent="flex-end" alignItems="center">
+              <Link color={color} external href={getPoolLink(pairData.token0?.id, pairData.token1?.id)}>
+                <ButtonLight color={color} style={{ marginRight: '10px' }}>
+                  + Add Liquidity
+                </ButtonLight>
+              </Link>
+              <Link color={'white'} external href={getSwapLink(pairData.token0?.id, pairData.token1?.id)}>
+                <ButtonDark color={color}>Trade</ButtonDark>
+              </Link>
+            </Flex>
+          )}
+        </DashGrid>
+      )
+    } else {
+      return ''
     }
-
-    if (item.token1.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
-      item.token1.name = 'ETH (Wrapped)'
-      item.token1.symbol = 'ETH'
-    }
-
-    return (
-      <DashGrid style={{ height: '60px' }}>
-        <DataText area="name" fontWeight="500">
-          {!below600 && <div style={{ marginRight: '20px' }}>{index}</div>}
-          <DoubleTokenLogo size={below600 ? 16 : 20} a0={item.token0.id} a1={item.token1.id} margin={!below740} />
-          <CustomLink
-            style={{ marginLeft: '20px', whiteSpace: 'nowrap' }}
-            to={'/pair/' + item.id}
-            onClick={() => {
-              window.scrollTo(0, 0)
-            }}
-            color={color}
-          >
-            {item.token0.symbol + '-' + item.token1.symbol}
-          </CustomLink>
-        </DataText>
-        <DataText area="liq">{liquidity}</DataText>
-        <DataText area="vol">{volume}</DataText>
-        {!below1080 && <DataText area="volWeek">{formattedNum(itemData.oneWeekVolumeUSD, true)}</DataText>}
-        {!below1080 && <DataText area="fees">{formattedNum(itemData.oneDayVolumeUSD * 0.003, true)}</DataText>}
-        {!below740 && (
-          <Flex area="pool" justifyContent="flex-end" alignItems="center">
-            <Link color={color} external href={getPoolLink(item.token0?.id, item.token1?.id)}>
-              <ButtonLight color={color} style={{ marginRight: '10px' }}>
-                + Add Liquidity
-              </ButtonLight>
-            </Link>
-            <Link color={'white'} external href={getSwapLink(item.token0?.id, item.token1?.id)}>
-              <ButtonDark color={color}>Trade</ButtonDark>
-            </Link>
-          </Flex>
-        )}
-      </DashGrid>
-    )
   }
 
   return (

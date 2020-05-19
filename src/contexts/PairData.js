@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect } from 'react'
 
 import { client } from '../apollo/client'
-import { PAIR_DATA, PAIR_CHART, All_PAIRS, TOKEN_TXNS } from '../apollo/queries'
+import { PAIR_DATA, PAIR_CHART, ALL_PAIRS, TOKEN_TXNS, TOP_PAIRS } from '../apollo/queries'
 
 import { useEthPrice } from './GlobalData'
 
@@ -13,6 +13,8 @@ import { getPercentChange, get2DayPercentChange, getBlockFromTimestamp } from '.
 const UPDATE = 'UPDATE'
 const UPDATE_PAIR_TXNS = 'UPDATE_PAIR_TXNS'
 const UPDATE_CHART_DATA = 'UPDATE_CHART_DATA'
+const UPDATE_TOP_PAIRS = 'UPDATE_TOP_PAIRS'
+const UPDATE_ALL_PAIRS = 'UPDATE_ALL_PAIRS'
 
 dayjs.extend(utc)
 
@@ -34,19 +36,32 @@ function usePairDataContext() {
 function reducer(state, { type, payload }) {
   switch (type) {
     case UPDATE: {
-      const { data } = payload
-      const store = {}
-      Object.keys(data).map(item => {
-        return (store[item] = data[item])
-      })
+      const { pairAddress, data } = payload
       return {
         ...state,
-        [data.id]: {
-          ...(safeAccess(state, [data.id]) || {}),
-          ...store
+        [pairAddress]: {
+          ...state?.[pairAddress],
+          data
         }
       }
     }
+
+    case UPDATE_TOP_PAIRS: {
+      const { topPairs } = payload
+      return {
+        ...state,
+        topPairs
+      }
+    }
+
+    case UPDATE_ALL_PAIRS: {
+      const { allPairs } = payload
+      return {
+        ...state,
+        allPairs
+      }
+    }
+
     case UPDATE_PAIR_TXNS: {
       const { address, transactions } = payload
       return {
@@ -75,11 +90,32 @@ function reducer(state, { type, payload }) {
 
 export default function Provider({ children }) {
   const [state, dispatch] = useReducer(reducer, {})
-  const update = useCallback(data => {
+
+  // update pair specific data
+  const update = useCallback((pairAddress, data) => {
     dispatch({
       type: UPDATE,
       payload: {
+        pairAddress,
         data
+      }
+    })
+  }, [])
+
+  const updateTopPairs = useCallback(topPairs => {
+    dispatch({
+      type: UPDATE_TOP_PAIRS,
+      payload: {
+        topPairs
+      }
+    })
+  }, [])
+
+  const updateAllPairs = useCallback(allPairs => {
+    dispatch({
+      type: UPDATE_ALL_PAIRS,
+      payload: {
+        allPairs
       }
     })
   }, [])
@@ -100,11 +136,13 @@ export default function Provider({ children }) {
 
   return (
     <PairDataContext.Provider
-      value={useMemo(() => [state, { update, updatePairTxns, updateChartData }], [
+      value={useMemo(() => [state, { update, updatePairTxns, updateChartData, updateTopPairs, updateAllPairs }], [
         state,
         update,
         updatePairTxns,
-        updateChartData
+        updateChartData,
+        updateTopPairs,
+        updateAllPairs
       ])}
     >
       {children}
@@ -112,14 +150,41 @@ export default function Provider({ children }) {
   )
 }
 
-const getAllPairs = async () => {
+const getTopPairs = async () => {
   let data = []
   try {
     let result = await client.query({
-      query: All_PAIRS,
+      query: TOP_PAIRS,
       fetchPolicy: 'cache-first'
     })
     data = data.concat(result.data.pairs)
+  } catch (e) {
+    console.log(e)
+  }
+  return data
+}
+
+const getAllPairs = async () => {
+  let data = []
+  let skip = 0
+  let allFound = false
+  try {
+    while (!allFound) {
+      let result = await client.query({
+        query: ALL_PAIRS,
+        variables: {
+          skip: skip
+        },
+        fetchPolicy: 'cache-first'
+      })
+
+      data = data.concat(result.data.pairs)
+      if (result.data.pairs.length !== 100) {
+        allFound = true
+      } else {
+        skip += 100
+      }
+    }
   } catch (e) {
     console.log(e)
   }
@@ -165,7 +230,7 @@ const getPairData = async (address, ethPrice) => {
     let oneWeekData = oneWeekResult.data.pairs[0]
 
     const [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentChange(
-      data.volumeUSD,
+      data?.volumeUSD,
       oneDayData?.volumeUSD ? oneDayData?.volumeUSD : 0,
       twoDayData?.volumeUSD ? twoDayData?.volumeUSD : 0
     )
@@ -289,42 +354,50 @@ const getPairChartData = async pairAddress => {
 }
 
 export function Updater() {
-  const [, { update }] = usePairDataContext()
+  const [, { update, updateTopPairs, updateAllPairs }] = usePairDataContext()
   const ethPrice = useEthPrice()
   useEffect(() => {
     async function getData() {
-      const allPairs = await getAllPairs()
-      if (allPairs) {
-        allPairs.map(async pair => {
+      // get top pairs for overview list
+      const topPairs = await getTopPairs()
+      if (topPairs) {
+        topPairs.map(async pair => {
           const pairData = await getPairData(pair.id, ethPrice)
-          pairData && update(pairData)
+          pairData && update(pair.id, pairData)
         })
+        updateTopPairs(topPairs)
       }
+
+      // get the rest of the pairs
+      let allPairs = await getAllPairs()
+      allPairs && updateAllPairs(allPairs)
     }
     ethPrice && getData()
-  }, [update, ethPrice])
+  }, [update, ethPrice, updateTopPairs, updateAllPairs])
   return null
 }
 
 export function usePairData(pairAddress) {
   const [state, { update }] = usePairDataContext()
   const ethPrice = useEthPrice()
-  const pairData = safeAccess(state, [pairAddress])
+  const pairData = state?.[pairAddress]?.data
+
   useEffect(() => {
     async function checkForPairData() {
       if (!pairData && pairAddress && ethPrice) {
         let data = await getPairData(pairAddress)
-        data && update(data)
+        data && update(pairAddress, data)
       }
     }
     checkForPairData()
   }, [pairData, pairAddress, ethPrice, update])
+
   return pairData || {}
 }
 
 export function usePairTransactions(pairAddress) {
   const [state, { updatePairTxns }] = usePairDataContext()
-  const pairTxns = safeAccess(state, [pairAddress, 'txns'])
+  const pairTxns = state?.[pairAddress]?.txns
   useEffect(() => {
     async function checkForTxns() {
       if (!pairTxns) {
@@ -339,7 +412,8 @@ export function usePairTransactions(pairAddress) {
 
 export function usePairChartData(pairAddress) {
   const [state, { updateChartData }] = usePairDataContext()
-  const chartData = safeAccess(state, [pairAddress, 'chartData'])
+  const chartData = state?.[pairAddress]?.chartData
+
   useEffect(() => {
     async function checkForChartData() {
       if (!chartData) {
@@ -352,7 +426,19 @@ export function usePairChartData(pairAddress) {
   return chartData
 }
 
-export function useAllPairs() {
+export function useAllPairData() {
   const [state] = usePairDataContext()
   return state
+}
+
+export function useTopPairs() {
+  const [state] = usePairDataContext()
+  const topPairs = state?.topPairs
+  return topPairs
+}
+
+export function useAllPairs() {
+  const [state] = usePairDataContext()
+  const allPairs = state?.allPairs
+  return allPairs
 }

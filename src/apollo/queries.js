@@ -307,10 +307,28 @@ export const GLOBAL_TXNS = gql`
   }
 `
 
-export const All_PAIRS = gql`
+export const TOP_PAIRS = gql`
   query pairs {
-    pairs(orderBy: reserveUSD, orderDirection: desc) {
+    pairs(first: 100, orderBy: reserveUSD, orderDirection: desc) {
       id
+    }
+  }
+`
+
+export const ALL_PAIRS = gql`
+  query pairs($skip: Int!) {
+    pairs(first: 100, orderBy: reserveUSD, orderDirection: desc, skip: $skip) {
+      id
+      token0 {
+        id
+        name
+        symbol
+      }
+      token1 {
+        id
+        name
+        symbol
+      }
     }
   }
 `

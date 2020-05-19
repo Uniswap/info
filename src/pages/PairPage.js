@@ -241,17 +241,15 @@ function PairPage({ pairAddress, history }) {
                   <div />
                 </RowBetween>
                 <RowBetween align="flex-end">
-                  <AutoRow gap="0.5rem">
-                    <TokenLogo address={token0?.id} size="24px" />
+                  <RowFixed>
+                    <TokenLogo address={token0?.id} size="24px" style={{ marginRight: '10px' }} />
                     <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
                       {reserve0 ? formattedNum(reserve0) : ''}
                     </TYPE.main>
-                  </AutoRow>
-                  <ButtonLight color={backgroundColor}>
-                    <Link color={backgroundColor} onClick={() => history.push(`/token/${token0.id}`)}>
-                      View Token
-                    </Link>
-                  </ButtonLight>
+                  </RowFixed>
+                  <Link color={backgroundColor} onClick={() => history.push(`/token/${token0.id}`)}>
+                    <ButtonLight color={backgroundColor}>View Token</ButtonLight>
+                  </Link>
                 </RowBetween>
               </AutoColumn>
             </Panel>
@@ -262,17 +260,15 @@ function PairPage({ pairAddress, history }) {
                   <div />
                 </RowBetween>
                 <RowBetween align="flex-end">
-                  <AutoRow gap="0.5rem">
-                    <TokenLogo address={token1?.id} size="24px" />
+                  <RowFixed>
+                    <TokenLogo address={token1?.id} size="24px" style={{ marginRight: '10px' }} />
                     <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
                       {reserve1 ? formattedNum(reserve1) : ''}
                     </TYPE.main>
-                  </AutoRow>
-                  <ButtonLight color={backgroundColor}>
-                    <Link color={backgroundColor} onClick={() => history.push(`/token/${token1.id}`)}>
-                      View Token
-                    </Link>
-                  </ButtonLight>{' '}
+                  </RowFixed>
+                  <Link color={backgroundColor} onClick={() => history.push(`/token/${token1.id}`)}>
+                    <ButtonLight color={backgroundColor}>View Token</ButtonLight>
+                  </Link>
                 </RowBetween>
               </AutoColumn>
             </Panel>
