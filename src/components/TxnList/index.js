@@ -290,8 +290,8 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
         </DataText>
         {!below780 && (
           <>
-            <DataText area="amountToken">{formattedNum(item.token0Amount) + ' ' + item.token0Symbol}</DataText>
             <DataText area="amountOther">{formattedNum(item.token1Amount) + ' ' + item.token1Symbol}</DataText>
+            <DataText area="amountToken">{formattedNum(item.token0Amount) + ' ' + item.token0Symbol}</DataText>
           </>
         )}
         {!below1080 && (
