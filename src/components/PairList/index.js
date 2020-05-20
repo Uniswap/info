@@ -10,7 +10,7 @@ import Link, { CustomLink } from '../Link'
 import { Divider } from '../../components'
 
 import { formattedNum, getPoolLink, getSwapLink } from '../../helpers'
-import { usePairData, useAllPairData } from '../../contexts/PairData'
+import { useDataForList } from '../../contexts/PairData'
 import DoubleTokenLogo from '../DoubleLogo'
 import { ButtonLight, ButtonDark } from '../ButtonStyled'
 
@@ -108,8 +108,7 @@ function PairList({ pairs, color }) {
   const below740 = useMedia('(max-width: 740px)')
   const below1080 = useMedia('(max-width: 1080px)')
 
-  // all pair data for sorting on values
-  const allPairData = useAllPairData()
+  const listData = useDataForList(pairs)
 
   // pagination
   const [page, setPage] = useState(1)
@@ -135,34 +134,8 @@ function PairList({ pairs, color }) {
     }
   }, [pairs])
 
-  // const sortedPairs =
-  //   pairs &&
-  //   allPairData &&
-  //   pairs
-  //     // .sort((pairA, pairB) => {
-  //     //   let a = allPairData[pairA.id]?.data
-  //     //   let b = allPairData[pairB.id]?.data
-
-  //     //   if (a && !b) {
-  //     //     return 1
-  //     //   }
-
-  //     //   if (b && !a) {
-  //     //     return -1
-  //     //   }
-
-  //     //   if (!a && !b) {
-  //     //     return 1
-  //     //   }
-
-  //     //   return parseFloat(a[sortedColumn]) > parseFloat(b[sortedColumn])
-  //     //     ? (sortDirection ? -1 : 1) * 1
-  //     //     : (sortDirection ? -1 : 1) * -1
-  //     // })
-  //     .slice(ITEMS_PER_PAGE * (page - 1), page * ITEMS_PER_PAGE)
-
   const ListItem = ({ item, index }) => {
-    const pairData = usePairData(item.id)
+    const pairData = item
 
     if (pairData && pairData.token0 && pairData.token1) {
       const liquidity = formattedNum(pairData.reserveUSD, true)
@@ -223,19 +196,27 @@ function PairList({ pairs, color }) {
   }
 
   const memoList = useMemo(() => {
-    return pairs.map((item, index) => {
-      return (
-        item && (
-          <div key={index}>
-            <ListItem key={index} index={(page - 1) * 10 + index + 1} item={item} />
-            <Divider />
-          </div>
-        )
-      )
-    })
-  }, [page, pairs])
-
-  console.log('rendering')
+    return (
+      listData &&
+      listData
+        .sort((pairA, pairB) => {
+          return parseFloat(pairA[sortedColumn]) > parseFloat(pairB[sortedColumn])
+            ? (sortDirection ? -1 : 1) * 1
+            : (sortDirection ? -1 : 1) * -1
+        })
+        .slice(ITEMS_PER_PAGE * (page - 1), page * ITEMS_PER_PAGE)
+        .map((item, index) => {
+          return (
+            item && (
+              <div key={index}>
+                <ListItem key={index} index={(page - 1) * 10 + index + 1} item={item} />
+                <Divider />
+              </div>
+            )
+          )
+        })
+    )
+  }, [listData, page, sortDirection, sortedColumn])
 
   return (
     <ListWrapper>

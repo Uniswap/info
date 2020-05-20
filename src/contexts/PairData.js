@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect } from 'react'
+import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect, useState } from 'react'
 
 import { client } from '../apollo/client'
 import { PAIR_DATA, PAIR_CHART, ALL_PAIRS, TOKEN_TXNS, TOP_PAIRS } from '../apollo/queries'
@@ -8,7 +8,7 @@ import { useEthPrice } from './GlobalData'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 
-import { getPercentChange, get2DayPercentChange, getBlockFromTimestamp } from '../helpers'
+import { getPercentChange, get2DayPercentChange, getBlockFromTimestamp, isAddress } from '../helpers'
 
 const UPDATE = 'UPDATE'
 const UPDATE_PAIR_TXNS = 'UPDATE_PAIR_TXNS'
@@ -272,6 +272,16 @@ const getPairData = async (address, ethPrice) => {
     console.log(e)
   }
 
+  if (data?.token0?.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
+    data.token0.name = 'ETH (Wrapped)'
+    data.token0.symbol = 'ETH'
+  }
+
+  if (data?.token1?.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
+    data.token1.name = 'ETH (Wrapped)'
+    data.token1.symbol = 'ETH'
+  }
+
   return data
 }
 
@@ -367,7 +377,6 @@ export function Updater() {
         const topPairs = await getTopPairs()
         if (topPairs) {
           topPairs.map(async pair => {
-            console.log('fetching from top pairs')
             const pairData = await getPairData(pair.id, ethPrice)
             pairData && update(pair.id, pairData)
           })
@@ -386,33 +395,67 @@ export function Updater() {
   return null
 }
 
+/**
+ * @todo
+ * store these updates to reduce future redundant calls
+ */
+export function useDataForList(pairList) {
+  const [state, { update }] = usePairDataContext()
+  const ethPrice = useEthPrice()
+
+  const [fetched, setFetched] = useState()
+
+  useEffect(() => {
+    async function fetchData() {
+      let fetched = []
+      let unfetched = []
+      pairList.map(async pair => {
+        let currentData = state?.[pair.id]?.data
+        if (!currentData) {
+          unfetched.push(getPairData(pair.id, ethPrice))
+        } else {
+          fetched.push(currentData)
+        }
+      })
+      Promise.all(unfetched).then(results => {
+        setFetched(fetched.concat(results))
+      })
+    }
+
+    if (pairList && !fetched) {
+      fetchData()
+    }
+  }, [update, ethPrice, pairList, state, fetched])
+
+  return fetched
+}
+
+/**
+ * Get all the current and 24hr changes for a pair
+ */
 export function usePairData(pairAddress) {
   const [state, { update }] = usePairDataContext()
   const ethPrice = useEthPrice()
   const pairData = state?.[pairAddress]?.data
 
   useEffect(() => {
-    // console.log('address changed')
-  }, [pairAddress])
-
-  // const fetchedResult = useMemo(() => {
-  //   async function fetchData() {
-  //     console.log('fetching from use pair')
-  //     let data = await getPairData(pairAddress, 200)
-  //     return data
-  //   }
-  //   return fetchData()
-  // }, [pairAddress])
-
-  // useEffect(() => {
-  //   if (!pairData && pairAddress && fetchedResult) {
-  //     update(pairAddress, fetchedResult)
-  //   }
-  // }, [fetchedResult, pairAddress, pairData, update])
+    async function fetchData() {
+      if (!pairData && pairAddress) {
+        let data = await getPairData(pairAddress, ethPrice)
+        update(pairAddress, data)
+      }
+    }
+    if (!pairData && pairAddress && ethPrice && isAddress(pairAddress)) {
+      fetchData()
+    }
+  }, [pairAddress, pairData, update, ethPrice])
 
   return pairData || {}
 }
 
+/**
+ * Get most recent txns for a pair
+ */
 export function usePairTransactions(pairAddress) {
   const [state, { updatePairTxns }] = usePairDataContext()
   const pairTxns = state?.[pairAddress]?.txns
@@ -444,17 +487,18 @@ export function usePairChartData(pairAddress) {
   return chartData
 }
 
-export function useAllPairData() {
-  const [state] = usePairDataContext()
-  return state
-}
-
+/**
+ * Get list of top pairs by volume, used for global page
+ */
 export function useTopPairs() {
   const [state] = usePairDataContext()
   const topPairs = state?.topPairs
   return topPairs
 }
 
+/**
+ * Get list of all pairs in Uniswap
+ */
 export function useAllPairs() {
   const [state] = usePairDataContext()
   const allPairs = state?.allPairs

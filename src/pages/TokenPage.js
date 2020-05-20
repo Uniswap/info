@@ -22,7 +22,6 @@ import { useColor } from '../hooks'
 import CopyHelper from '../components/Copy'
 import { useMedia } from 'react-use'
 import { transparentize } from 'polished'
-import { usePairsForToken } from '../contexts/PairData'
 
 const PageWrapper = styled.div`
   display: flex;
