@@ -13,7 +13,7 @@ import { Hover, TYPE } from '../Theme'
 import { formattedNum, formattedPercent } from '../helpers'
 import { useGlobalData, useEthPrice, useGlobalTransactions } from '../contexts/GlobalData'
 import { useAllTokenData } from '../contexts/TokenData'
-import { useAllPairs } from '../contexts/PairData'
+import { useTopPairs } from '../contexts/PairData'
 import { Search } from '../components/Search'
 import { useMedia } from 'react-use'
 import TokenLogo from '../components/TokenLogo'
@@ -103,7 +103,8 @@ function GlobalPage() {
   const transactions = useGlobalTransactions()
 
   const allTokenData = useAllTokenData()
-  const pairs = useAllPairs()
+
+  const topPairs = useTopPairs()
 
   const ethPrice = useEthPrice()
   const formattedEthPrice = ethPrice ? formattedNum(ethPrice, true) : '-'
@@ -288,11 +289,7 @@ function GlobalPage() {
       </ListOptions>
 
       <Panel style={{ marginTop: '6px' }}>
-        {listView === LIST_VIEW.PAIRS ? (
-          <PairList pairs={pairs && Object.keys(pairs).map(key => pairs[key])} />
-        ) : (
-          <TopTokenList tokens={allTokenData} />
-        )}
+        {listView === LIST_VIEW.PAIRS ? <PairList pairs={topPairs} /> : <TopTokenList tokens={allTokenData} />}
       </Panel>
 
       <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '2rem' }}>

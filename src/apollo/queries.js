@@ -238,7 +238,7 @@ export const GLOBAL_DATA = block => {
 
 export const GLOBAL_TXNS = gql`
   query transactions {
-    transactions(first: 200, orderBy: timestamp, orderDirection: desc) {
+    transactions(first: 50, orderBy: timestamp, orderDirection: desc) {
       mints {
         transaction {
           id
@@ -307,19 +307,38 @@ export const GLOBAL_TXNS = gql`
   }
 `
 
-export const All_PAIRS = gql`
+export const TOP_PAIRS = gql`
   query pairs {
-    pairs(orderBy: reserveUSD, orderDirection: desc) {
+    pairs(first: 100, orderBy: reserveUSD, orderDirection: desc) {
       id
     }
   }
 `
 
-export const All_TOKENS = gql`
+export const ALL_PAIRS = gql`
+  query pairs($skip: Int!) {
+    pairs(first: 100, orderBy: reserveUSD, orderDirection: desc, skip: $skip) {
+      id
+      token0 {
+        id
+        name
+        symbol
+      }
+      token1 {
+        id
+        name
+        symbol
+      }
+    }
+  }
+`
+
+export const TOP_TOKENS = gql`
   query tokens {
-    tokens(orderBy: tradeVolumeUSD, orderDirection: desc) {
+    tokens(first: 100, orderBy: tradeVolumeUSD, orderDirection: desc) {
       id
       symbol
+      name
     }
   }
 `
@@ -369,7 +388,7 @@ export const TOKEN_DATA = (tokenAddress, block) => {
       tradeVolumeUSD
       totalLiquidity
       txCount
-      allPairs(orderBy: reserveUSD, orderDirection: desc) {
+      allPairs(first: 30, orderBy: reserveUSD, orderDirection: desc) {
         id
         reserveUSD
         volumeUSD
@@ -402,7 +421,7 @@ export const TOKEN_DATA = (tokenAddress, block) => {
     tradeVolumeUSD
     totalLiquidity
     txCount
-    allPairs(orderBy: reserveUSD, orderDirection: desc) {
+    allPairs(first: 30, orderBy: reserveUSD, orderDirection: desc) {
       id
       reserveUSD
       volumeUSD
@@ -419,6 +438,7 @@ export const TOKEN_DATA = (tokenAddress, block) => {
         derivedETH
       }
     }
+    
   }
 }`
   return gql(queryString)

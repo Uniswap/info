@@ -118,6 +118,8 @@ function TokenPage({ address }) {
   // all transactions with this token
   const transactions = useTokenTransactions(address)
 
+  // const allPairsData = usePairsForToken(address)
+
   // price
   const price = priceUSD ? formattedNum(priceUSD, true) : ''
   const priceChange = priceChangeUSD ? formattedPercent(priceChangeUSD) : ''

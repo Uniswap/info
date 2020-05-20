@@ -7,7 +7,7 @@ import Link from './Link'
 import { urls } from '../helpers'
 
 const Divider = styled(Box)`
-  height: 1px;
+  max-height: 1px;
   background-color: rgba(43, 43, 43, 0.05);
 `
 

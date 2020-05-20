@@ -1,14 +1,14 @@
-import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect, useState } from 'react'
+import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect } from 'react'
 
 import { client } from '../apollo/client'
-import { TOKEN_DATA, All_TOKENS, TOKEN_TXNS, TOKEN_CHART } from '../apollo/queries'
+import { TOKEN_DATA, TOKEN_TXNS, TOKEN_CHART, TOP_TOKENS } from '../apollo/queries'
 
 import { useEthPrice } from './GlobalData'
 
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 
-import { get2DayPercentChange, getPercentChange, getBlockFromTimestamp } from '../helpers'
+import { get2DayPercentChange, getPercentChange, getBlockFromTimestamp, isAddress } from '../helpers'
 
 const UPDATE = 'UPDATE'
 const UPDATE_TOKEN_TXNS = 'UPDATE_TOKEN_TXNS'
@@ -112,11 +112,11 @@ export default function Provider({ children }) {
   )
 }
 
-const getAllTokens = async () => {
+const getTopTokens = async () => {
   let data = []
   try {
     let result = await client.query({
-      query: All_TOKENS,
+      query: TOP_TOKENS,
       fetchPolicy: 'cache-first'
     })
     data = data.concat(result.data.tokens)
@@ -282,8 +282,8 @@ export function Updater() {
   const ethPrice = useEthPrice()
   useEffect(() => {
     ethPrice &&
-      getAllTokens().then(allTokens => {
-        allTokens.map(async token => {
+      getTopTokens().then(topTokens => {
+        topTokens.map(async token => {
           let data = await getTokenData(token.id, ethPrice)
           data && update(data)
         })
@@ -299,7 +299,7 @@ export function useTokenData(tokenAddress) {
   if (!tokenAddress) {
     return {}
   }
-  if (!tokenData && ethPrice) {
+  if (!tokenData && ethPrice && isAddress(tokenAddress)) {
     getTokenData(tokenAddress, ethPrice).then(data => {
       update(data)
     })
@@ -347,19 +347,6 @@ export function useTokenChartData(tokenAddress) {
     checkForChartData()
   }, [chartData, tokenAddress, updateChartData])
   return chartData
-}
-
-export function useAllTokens() {
-  const [allTokens, setAllTokens] = useState()
-  useEffect(() => {
-    async function getTokens() {
-      const tokens = await getAllTokens()
-      setAllTokens(tokens)
-    }
-    getTokens()
-  }, [])
-
-  return allTokens
 }
 
 export function useAllTokenData() {

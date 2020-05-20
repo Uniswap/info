@@ -5,8 +5,6 @@ import { client } from './apollo/client'
 import { Route, Switch, BrowserRouter, withRouter, Redirect } from 'react-router-dom'
 import ScrolToTop from './components/ScrollToTop'
 
-import { useAllTokens } from './contexts/TokenData'
-
 import GlobalPage from './pages/GlobalPage'
 import TokenPage from './pages/TokenPage'
 import PairPage from './pages/PairPage'
@@ -16,7 +14,7 @@ import { AutoColumn } from './components/Column'
 import Link from './components/Link'
 import { useMedia } from 'react-use'
 import { useGlobalData, useGlobalChartData } from './contexts/GlobalData'
-import { useAllPairs } from './contexts/PairData'
+import { isAddress } from './helpers'
 
 const AppWrapper = styled.div`
   position: relative;
@@ -48,14 +46,11 @@ const MigrateBanner = styled(AutoColumn)`
 function App() {
   const NavHeaderUpdated = withRouter(props => <NavHeader default {...props} />)
 
-  const allTokens = useAllTokens()
-
   const below750 = useMedia('(max-width: 750px)')
   const below490 = useMedia('(max-width: 490px)')
 
   const globalData = useGlobalData()
   const globalChartData = useGlobalChartData()
-  const allPairData = useAllPairs()
 
   return (
     <ApolloProvider client={client}>
@@ -84,13 +79,10 @@ function App() {
             </>
           )}
         </MigrateBanner>
-        {allTokens &&
-        globalData &&
+        {globalData &&
         Object.keys(globalData).length > 0 &&
         globalChartData &&
-        Object.keys(globalChartData).length > 0 &&
-        allPairData &&
-        Object.keys(allPairData).length > 8 ? (
+        Object.keys(globalChartData).length > 0 ? (
           <BrowserRouter>
             <ScrolToTop />
             <Switch>
@@ -99,12 +91,7 @@ function App() {
                 strict
                 path="/token/:tokenAddress"
                 render={({ match }) => {
-                  const searched =
-                    allTokens &&
-                    allTokens.filter(token => {
-                      return token.id.toLowerCase() === match.params.tokenAddress.toLowerCase()
-                    })
-                  if (allTokens && searched.length > 0) {
+                  if (isAddress(match.params.tokenAddress.toLowerCase())) {
                     return (
                       <>
                         <NavHeaderUpdated token={match.params.tokenAddress.toLowerCase()} />
