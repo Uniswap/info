@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { useMedia } from 'react-use'
 import dayjs from 'dayjs'
 import LocalLoader from '../LocalLoader'
@@ -108,6 +108,9 @@ function PairList({ pairs, color }) {
   const below740 = useMedia('(max-width: 740px)')
   const below1080 = useMedia('(max-width: 1080px)')
 
+  // all pair data for sorting on values
+  const allPairData = useAllPairData()
+
   // pagination
   const [page, setPage] = useState(1)
   const [maxPage, setMaxPage] = useState(1)
@@ -132,34 +135,34 @@ function PairList({ pairs, color }) {
     }
   }, [pairs])
 
-  const sortedPairs =
-    pairs &&
-    pairs
-      // .sort((pairA, pairB) => {
-      //   let a = allPairData[pairA.id]
-      //   let b = allPairData[pairB.id]
+  // const sortedPairs =
+  //   pairs &&
+  //   allPairData &&
+  //   pairs
+  //     // .sort((pairA, pairB) => {
+  //     //   let a = allPairData[pairA.id]?.data
+  //     //   let b = allPairData[pairB.id]?.data
 
-      //   if (a && !b) {
-      //     return 1
-      //   }
+  //     //   if (a && !b) {
+  //     //     return 1
+  //     //   }
 
-      //   if (b && !a) {
-      //     return -1
-      //   }
+  //     //   if (b && !a) {
+  //     //     return -1
+  //     //   }
 
-      //   if (!a && !b) {
-      //     return 1
-      //   }
+  //     //   if (!a && !b) {
+  //     //     return 1
+  //     //   }
 
-      //   return parseFloat(a[sortedColumn]) > parseFloat(b[sortedColumn])
-      //     ? (sortDirection ? -1 : 1) * 1
-      //     : (sortDirection ? -1 : 1) * -1
-      // })
-      .slice(ITEMS_PER_PAGE * (page - 1), page * ITEMS_PER_PAGE)
+  //     //   return parseFloat(a[sortedColumn]) > parseFloat(b[sortedColumn])
+  //     //     ? (sortDirection ? -1 : 1) * 1
+  //     //     : (sortDirection ? -1 : 1) * -1
+  //     // })
+  //     .slice(ITEMS_PER_PAGE * (page - 1), page * ITEMS_PER_PAGE)
 
   const ListItem = ({ item, index }) => {
-    // const pairData = usePairData(item.id)
-    const pairData = item
+    const pairData = usePairData(item.id)
 
     if (pairData && pairData.token0 && pairData.token1) {
       const liquidity = formattedNum(pairData.reserveUSD, true)
@@ -218,6 +221,21 @@ function PairList({ pairs, color }) {
       return ''
     }
   }
+
+  const memoList = useMemo(() => {
+    return pairs.map((item, index) => {
+      return (
+        item && (
+          <div key={index}>
+            <ListItem key={index} index={(page - 1) * 10 + index + 1} item={item} />
+            <Divider />
+          </div>
+        )
+      )
+    })
+  }, [page, pairs])
+
+  console.log('rendering')
 
   return (
     <ListWrapper>
@@ -283,22 +301,7 @@ function PairList({ pairs, color }) {
         )}
       </DashGrid>
       <Divider />
-      <List p={0}>
-        {!sortedPairs ? (
-          <LocalLoader />
-        ) : (
-          sortedPairs.map((item, index) => {
-            return (
-              item && (
-                <div key={index}>
-                  <ListItem key={index} index={(page - 1) * 10 + index + 1} item={item} />
-                  <Divider />
-                </div>
-              )
-            )
-          })
-        )}
-      </List>
+      <List p={0}>{!memoList ? <LocalLoader /> : memoList}</List>
       <PageButtons>
         <div
           onClick={e => {

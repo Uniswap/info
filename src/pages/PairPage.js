@@ -247,7 +247,7 @@ function PairPage({ pairAddress, history }) {
                       {reserve0 ? formattedNum(reserve0) : ''}
                     </TYPE.main>
                   </RowFixed>
-                  <Link color={backgroundColor} onClick={() => history.push(`/token/${token0.id}`)}>
+                  <Link color={backgroundColor} onClick={() => history.push(`/token/${token0?.id}`)}>
                     <ButtonLight color={backgroundColor}>View Token</ButtonLight>
                   </Link>
                 </RowBetween>

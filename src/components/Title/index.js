@@ -34,9 +34,9 @@ export default function Title({ token, pair }) {
   const history = useHistory()
 
   const { name, symbol } = useTokenData(token)
-  const { token0, token1 } = usePairData(pair)
-  const symbol0 = token0 && token0.symbol
-  const symbol1 = token1 && token1.symbol
+  // const { token0, token1 } = usePairData(pair)
+  const symbol0 = 'token0 && token0.symbol'
+  const symbol1 = 'token1 && token1.symbol'
 
   const below1080 = useMedia('(max-width: 1080px)')
 

@@ -9,7 +9,6 @@ import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 
 import { getPercentChange, get2DayPercentChange, getBlockFromTimestamp } from '../helpers'
-import { useTokenData } from './TokenData'
 
 const UPDATE = 'UPDATE'
 const UPDATE_PAIR_TXNS = 'UPDATE_PAIR_TXNS'
@@ -393,42 +392,25 @@ export function usePairData(pairAddress) {
   const pairData = state?.[pairAddress]?.data
 
   useEffect(() => {
-    async function checkForPairData() {
-      if (!pairData && pairAddress && ethPrice) {
-        console.log('fetching from usepair')
-        let data = await getPairData(pairAddress)
-        data && update(pairAddress, data)
-      }
-    }
-    checkForPairData()
-  }, [pairData, pairAddress, ethPrice, update])
+    // console.log('address changed')
+  }, [pairAddress])
+
+  // const fetchedResult = useMemo(() => {
+  //   async function fetchData() {
+  //     console.log('fetching from use pair')
+  //     let data = await getPairData(pairAddress, 200)
+  //     return data
+  //   }
+  //   return fetchData()
+  // }, [pairAddress])
+
+  // useEffect(() => {
+  //   if (!pairData && pairAddress && fetchedResult) {
+  //     update(pairAddress, fetchedResult)
+  //   }
+  // }, [fetchedResult, pairAddress, pairData, update])
 
   return pairData || {}
-}
-
-export function usePairsForToken(tokenAddress) {
-  const tokenData = useTokenData(tokenAddress)
-  const [state, { update }] = usePairDataContext()
-
-  if (tokenData) {
-    let x = tokenData.allPairs
-      .filter(pair => {
-        let pairData = state?.[pair.id]?.data
-        if (pairData) {
-          return true
-        } else {
-          getPairData(pair.id).then(newPairData => {
-            newPairData && update(pair.id, newPairData)
-          })
-          return false
-        }
-      })
-      .map(pair => {
-        let pairData = state?.[pair.id]?.data
-        return pairData
-      })
-    return x
-  }
 }
 
 export function usePairTransactions(pairAddress) {

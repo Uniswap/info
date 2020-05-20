@@ -437,6 +437,7 @@ export const TOKEN_DATA = (tokenAddress, block) => {
         derivedETH
       }
     }
+    
   }
 }`
   return gql(queryString)

@@ -289,11 +289,7 @@ function GlobalPage() {
       </ListOptions>
 
       <Panel style={{ marginTop: '6px' }}>
-        {listView === LIST_VIEW.PAIRS ? (
-          <PairList pairs={topPairs && Object.keys(topPairs).map(key => topPairs[key])} />
-        ) : (
-          <TopTokenList tokens={allTokenData} />
-        )}
+        {listView === LIST_VIEW.PAIRS ? <PairList pairs={topPairs} /> : <TopTokenList tokens={allTokenData} />}
       </Panel>
 
       <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '2rem' }}>

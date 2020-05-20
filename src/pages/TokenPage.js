@@ -119,8 +119,7 @@ function TokenPage({ address }) {
   // all transactions with this token
   const transactions = useTokenTransactions(address)
 
-  const allPairsData = usePairsForToken(address)
-  console.log(allPairsData)
+  // const allPairsData = usePairsForToken(address)
 
   // price
   const price = priceUSD ? formattedNum(priceUSD, true) : ''
@@ -257,7 +256,7 @@ function TokenPage({ address }) {
           }}
           p={20}
         >
-          {address ? <PairList color={backgroundColor} address={address} pairs={allPairsData} /> : <Loader />}
+          {address ? <PairList color={backgroundColor} address={address} pairs={allPairs} /> : <Loader />}
         </Panel>
         <RowBetween mt={40} mb={'1rem'}>
           <TYPE.main fontSize={'1.125rem'}>Transactions</TYPE.main> <div />
