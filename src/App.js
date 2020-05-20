@@ -14,6 +14,7 @@ import { AutoColumn } from './components/Column'
 import Link from './components/Link'
 import { useMedia } from 'react-use'
 import { useGlobalData, useGlobalChartData } from './contexts/GlobalData'
+import { isAddress } from './helpers'
 
 const AppWrapper = styled.div`
   position: relative;
@@ -89,12 +90,7 @@ function App() {
                 strict
                 path="/token/:tokenAddress"
                 render={({ match }) => {
-                  // const searched =
-                  //   allTokens &&
-                  //   allTokens.filter(token => {
-                  //     return token.id.toLowerCase() === match.params.tokenAddress.toLowerCase()
-                  //   })
-                  if (true) {
+                  if (isAddress(match.params.tokenAddress.toLowerCase())) {
                     return (
                       <>
                         <NavHeaderUpdated token={match.params.tokenAddress.toLowerCase()} />

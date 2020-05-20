@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useMedia } from 'react-use'
 import dayjs from 'dayjs'
 import LocalLoader from '../LocalLoader'
@@ -195,28 +195,25 @@ function PairList({ pairs, color }) {
     }
   }
 
-  const memoList = useMemo(() => {
-    return (
-      listData &&
-      listData
-        .sort((pairA, pairB) => {
-          return parseFloat(pairA[sortedColumn]) > parseFloat(pairB[sortedColumn])
-            ? (sortDirection ? -1 : 1) * 1
-            : (sortDirection ? -1 : 1) * -1
-        })
-        .slice(ITEMS_PER_PAGE * (page - 1), page * ITEMS_PER_PAGE)
-        .map((item, index) => {
-          return (
-            item && (
-              <div key={index}>
-                <ListItem key={index} index={(page - 1) * 10 + index + 1} item={item} />
-                <Divider />
-              </div>
-            )
+  const pairList =
+    listData &&
+    listData
+      .sort((pairA, pairB) => {
+        return parseFloat(pairA[sortedColumn]) > parseFloat(pairB[sortedColumn])
+          ? (sortDirection ? -1 : 1) * 1
+          : (sortDirection ? -1 : 1) * -1
+      })
+      .slice(ITEMS_PER_PAGE * (page - 1), page * ITEMS_PER_PAGE)
+      .map((item, index) => {
+        return (
+          item && (
+            <div key={index}>
+              <ListItem key={index} index={(page - 1) * 10 + index + 1} item={item} />
+              <Divider />
+            </div>
           )
-        })
-    )
-  }, [listData, page, sortDirection, sortedColumn])
+        )
+      })
 
   return (
     <ListWrapper>
@@ -282,7 +279,7 @@ function PairList({ pairs, color }) {
         )}
       </DashGrid>
       <Divider />
-      <List p={0}>{!memoList ? <LocalLoader /> : memoList}</List>
+      <List p={0}>{!pairList ? <LocalLoader /> : pairList}</List>
       <PageButtons>
         <div
           onClick={e => {
