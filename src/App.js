@@ -39,6 +39,7 @@ const MigrateBanner = styled(AutoColumn)`
   color: ${({ theme }) => theme.text1};
   font-weight: 500;
   text-align: center;
+  z-index: 10;
   a {
     color: ${({ theme }) => theme.text1};
   }
