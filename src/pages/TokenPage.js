@@ -22,6 +22,7 @@ import { useColor } from '../hooks'
 import CopyHelper from '../components/Copy'
 import { useMedia } from 'react-use'
 import { transparentize } from 'polished'
+import { usePairsForToken } from '../contexts/PairData'
 
 const PageWrapper = styled.div`
   display: flex;
@@ -117,6 +118,9 @@ function TokenPage({ address }) {
 
   // all transactions with this token
   const transactions = useTokenTransactions(address)
+
+  const allPairsData = usePairsForToken(address)
+  console.log(allPairsData)
 
   // price
   const price = priceUSD ? formattedNum(priceUSD, true) : ''
@@ -253,7 +257,7 @@ function TokenPage({ address }) {
           }}
           p={20}
         >
-          {address ? <PairList color={backgroundColor} address={address} pairs={allPairs} /> : <Loader />}
+          {address ? <PairList color={backgroundColor} address={address} pairs={allPairsData} /> : <Loader />}
         </Panel>
         <RowBetween mt={40} mb={'1rem'}>
           <TYPE.main fontSize={'1.125rem'}>Transactions</TYPE.main> <div />

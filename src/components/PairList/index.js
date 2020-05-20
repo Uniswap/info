@@ -113,8 +113,6 @@ function PairList({ pairs, color }) {
   const [maxPage, setMaxPage] = useState(1)
   const ITEMS_PER_PAGE = 10
 
-  const allPairData = useAllPairData()
-
   // sorting
   const [sortDirection, setSortDirection] = useState(true)
   const [sortedColumn, setSortedColumn] = useState(SORT_FIELD.LIQ)
@@ -136,32 +134,32 @@ function PairList({ pairs, color }) {
 
   const sortedPairs =
     pairs &&
-    allPairData &&
     pairs
-      .sort((pairA, pairB) => {
-        let a = allPairData[pairA.id]
-        let b = allPairData[pairB.id]
+      // .sort((pairA, pairB) => {
+      //   let a = allPairData[pairA.id]
+      //   let b = allPairData[pairB.id]
 
-        if (a && !b) {
-          return 1
-        }
+      //   if (a && !b) {
+      //     return 1
+      //   }
 
-        if (b && !a) {
-          return -1
-        }
+      //   if (b && !a) {
+      //     return -1
+      //   }
 
-        if (!a && !b) {
-          return 1
-        }
+      //   if (!a && !b) {
+      //     return 1
+      //   }
 
-        return parseFloat(a[sortedColumn]) > parseFloat(b[sortedColumn])
-          ? (sortDirection ? -1 : 1) * 1
-          : (sortDirection ? -1 : 1) * -1
-      })
+      //   return parseFloat(a[sortedColumn]) > parseFloat(b[sortedColumn])
+      //     ? (sortDirection ? -1 : 1) * 1
+      //     : (sortDirection ? -1 : 1) * -1
+      // })
       .slice(ITEMS_PER_PAGE * (page - 1), page * ITEMS_PER_PAGE)
 
   const ListItem = ({ item, index }) => {
-    const pairData = usePairData(item.id)
+    // const pairData = usePairData(item.id)
+    const pairData = item
 
     if (pairData && pairData.token0 && pairData.token1) {
       const liquidity = formattedNum(pairData.reserveUSD, true)

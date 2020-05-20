@@ -121,6 +121,7 @@ export default function Provider({ children }) {
 }
 
 async function getGlobalData(ethPrice) {
+  console.log('fetching global')
   let data = {}
   let oneDayData = {}
   let twoDayData = {}
@@ -191,6 +192,7 @@ async function getGlobalData(ethPrice) {
 }
 
 const getChartData = async oldestDateToFetch => {
+  console.log('fetching global chart')
   let data = []
   let weeklyData = []
 
@@ -263,6 +265,7 @@ const getChartData = async oldestDateToFetch => {
 }
 
 const getGlobalTransactions = async () => {
+  console.log('fetching txns')
   let transactions = {}
 
   try {

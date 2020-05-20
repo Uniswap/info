@@ -9,6 +9,7 @@ import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 
 import { getPercentChange, get2DayPercentChange, getBlockFromTimestamp } from '../helpers'
+import { useTokenData } from './TokenData'
 
 const UPDATE = 'UPDATE'
 const UPDATE_PAIR_TXNS = 'UPDATE_PAIR_TXNS'
@@ -354,26 +355,35 @@ const getPairChartData = async pairAddress => {
 }
 
 export function Updater() {
-  const [, { update, updateTopPairs, updateAllPairs }] = usePairDataContext()
+  const [state, { update, updateTopPairs, updateAllPairs }] = usePairDataContext()
   const ethPrice = useEthPrice()
+
+  const topPairList = state?.topPairs
+  const allPairList = state?.allPairs
+
   useEffect(() => {
     async function getData() {
-      // get top pairs for overview list
-      const topPairs = await getTopPairs()
-      if (topPairs) {
-        topPairs.map(async pair => {
-          const pairData = await getPairData(pair.id, ethPrice)
-          pairData && update(pair.id, pairData)
-        })
-        updateTopPairs(topPairs)
+      if (!topPairList) {
+        // get top pairs for overview list
+        const topPairs = await getTopPairs()
+        if (topPairs) {
+          topPairs.map(async pair => {
+            console.log('fetching from top pairs')
+            const pairData = await getPairData(pair.id, ethPrice)
+            pairData && update(pair.id, pairData)
+          })
+          updateTopPairs(topPairs)
+        }
       }
 
-      // get the rest of the pairs
-      let allPairs = await getAllPairs()
-      allPairs && updateAllPairs(allPairs)
+      if (!allPairList) {
+        // get the rest of the pairs
+        let allPairs = await getAllPairs()
+        allPairs && updateAllPairs(allPairs)
+      }
     }
     ethPrice && getData()
-  }, [update, ethPrice, updateTopPairs, updateAllPairs])
+  }, [update, ethPrice, updateTopPairs, updateAllPairs, topPairList, allPairList])
   return null
 }
 
@@ -385,6 +395,7 @@ export function usePairData(pairAddress) {
   useEffect(() => {
     async function checkForPairData() {
       if (!pairData && pairAddress && ethPrice) {
+        console.log('fetching from usepair')
         let data = await getPairData(pairAddress)
         data && update(pairAddress, data)
       }
@@ -393,6 +404,31 @@ export function usePairData(pairAddress) {
   }, [pairData, pairAddress, ethPrice, update])
 
   return pairData || {}
+}
+
+export function usePairsForToken(tokenAddress) {
+  const tokenData = useTokenData(tokenAddress)
+  const [state, { update }] = usePairDataContext()
+
+  if (tokenData) {
+    let x = tokenData.allPairs
+      .filter(pair => {
+        let pairData = state?.[pair.id]?.data
+        if (pairData) {
+          return true
+        } else {
+          getPairData(pair.id).then(newPairData => {
+            newPairData && update(pair.id, newPairData)
+          })
+          return false
+        }
+      })
+      .map(pair => {
+        let pairData = state?.[pair.id]?.data
+        return pairData
+      })
+    return x
+  }
 }
 
 export function usePairTransactions(pairAddress) {
