@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect } from 'react'
 
 import { client } from '../apollo/client'
-import { TOKEN_DATA, TOKEN_TXNS, TOKEN_CHART, TOP_TOKENS } from '../apollo/queries'
+import { TOKEN_DATA, TOKEN_TXNS, TOKEN_CHART, TOKENS_CURRENT, TOKENS_DYNAMIC } from '../apollo/queries'
 
 import { useEthPrice } from './GlobalData'
 
@@ -13,17 +13,9 @@ import { get2DayPercentChange, getPercentChange, getBlockFromTimestamp, isAddres
 const UPDATE = 'UPDATE'
 const UPDATE_TOKEN_TXNS = 'UPDATE_TOKEN_TXNS'
 const UPDATE_CHART_DATA = 'UPDATE_CHART_DATA'
+const UPDATE_TOP_TOKENS = ' UPDATE_TOP_TOKENS'
 
 dayjs.extend(utc)
-
-export function safeAccess(object, path) {
-  return object
-    ? path.reduce(
-        (accumulator, currentValue) => (accumulator && accumulator[currentValue] ? accumulator[currentValue] : null),
-        object
-      )
-    : null
-}
 
 const TokenDataContext = createContext()
 
@@ -34,25 +26,34 @@ function useTokenDataContext() {
 function reducer(state, { type, payload }) {
   switch (type) {
     case UPDATE: {
-      const { data } = payload
-      const store = {}
-      Object.keys(data).map(item => {
-        return (store[item] = data[item])
-      })
+      const { tokenAddress, data } = payload
       return {
         ...state,
-        [data.id]: {
-          ...(safeAccess(state, [data.id]) || {}),
-          ...store
+        [tokenAddress]: {
+          ...state?.[tokenAddress],
+          ...data
         }
       }
     }
+    case UPDATE_TOP_TOKENS: {
+      const { topTokens } = payload
+      let added = {}
+      topTokens &&
+        topTokens.map(token => {
+          return (added[token.id] = token)
+        })
+      return {
+        ...state,
+        ...added
+      }
+    }
+
     case UPDATE_TOKEN_TXNS: {
       const { address, transactions } = payload
       return {
         ...state,
         [address]: {
-          ...(safeAccess(state, [address]) || {}),
+          ...state?.[address],
           txns: transactions
         }
       }
@@ -62,7 +63,7 @@ function reducer(state, { type, payload }) {
       return {
         ...state,
         [address]: {
-          ...(safeAccess(state, [address]) || {}),
+          ...state?.[address],
           chartData
         }
       }
@@ -75,11 +76,21 @@ function reducer(state, { type, payload }) {
 
 export default function Provider({ children }) {
   const [state, dispatch] = useReducer(reducer, {})
-  const update = useCallback(data => {
+  const update = useCallback((tokenAddress, data) => {
     dispatch({
       type: UPDATE,
       payload: {
+        tokenAddress,
         data
+      }
+    })
+  }, [])
+
+  const updateTopTokens = useCallback(topTokens => {
+    dispatch({
+      type: UPDATE_TOP_TOKENS,
+      payload: {
+        topTokens
       }
     })
   }, [])
@@ -100,11 +111,12 @@ export default function Provider({ children }) {
 
   return (
     <TokenDataContext.Provider
-      value={useMemo(() => [state, { update, updateTokenTxns, updateChartData }], [
+      value={useMemo(() => [state, { update, updateTokenTxns, updateChartData, updateTopTokens }], [
         state,
         update,
         updateTokenTxns,
-        updateChartData
+        updateChartData,
+        updateTopTokens
       ])}
     >
       {children}
@@ -112,18 +124,92 @@ export default function Provider({ children }) {
   )
 }
 
-const getTopTokens = async () => {
-  let data = []
+const getTopTokens = async ethPrice => {
+  const utcCurrentTime = dayjs()
+  const utcOneDayBack = utcCurrentTime.subtract(1, 'day').unix()
+  const utcTwoDaysBack = utcCurrentTime.subtract(2, 'day').unix()
+  let oneDayBlock = await getBlockFromTimestamp(utcOneDayBack)
+  let twoDayBlock = await getBlockFromTimestamp(utcTwoDaysBack)
+
   try {
-    let result = await client.query({
-      query: TOP_TOKENS,
+    let current = await client.query({
+      query: TOKENS_CURRENT,
       fetchPolicy: 'cache-first'
     })
-    data = data.concat(result.data.tokens)
+
+    let oneDayResult = await client.query({
+      query: TOKENS_DYNAMIC(oneDayBlock),
+      fetchPolicy: 'cache-first'
+    })
+
+    let twoDayResult = await client.query({
+      query: TOKENS_DYNAMIC(twoDayBlock),
+      fetchPolicy: 'cache-first'
+    })
+
+    let oneDayData = oneDayResult?.data?.tokens.reduce((obj, cur, i) => {
+      return { ...obj, [cur.id]: cur }
+    }, {})
+
+    let twoDayData = twoDayResult?.data?.tokens.reduce((obj, cur, i) => {
+      return { ...obj, [cur.id]: cur }
+    }, {})
+
+    return (
+      current &&
+      oneDayData &&
+      twoDayData &&
+      current?.data?.tokens.map(token => {
+        let data = token
+
+        let oneDayHistory = oneDayData?.[token.id]
+        let twoDayHistory = twoDayData?.[token.id]
+
+        // calculate percentage changes and daily changes
+        const [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentChange(
+          data.tradeVolumeUSD,
+          oneDayHistory?.tradeVolumeUSD,
+          twoDayHistory?.tradeVolumeUSD
+        )
+        const [oneDayTxns, txnChange] = get2DayPercentChange(
+          data.txCount,
+          oneDayHistory?.txCount,
+          twoDayHistory?.txCount
+        )
+
+        // percent changes
+        const priceChangeUSD = getPercentChange(data?.derivedETH, oneDayHistory?.derivedETH)
+        const liquidityChangeUSD = getPercentChange(data?.totalLiquidityUSD, oneDayHistory?.totalLiquidityUSD)
+
+        // set data
+        data.priceUSD = data?.derivedETH * ethPrice
+        data.totalLiquidityUSD = data?.totalLiquidity * ethPrice * data?.derivedETH
+        data.oneDayVolumeUSD = oneDayVolumeUSD
+        data.volumeChangeUSD = volumeChangeUSD
+        data.priceChangeUSD = priceChangeUSD
+        data.liquidityChangeUSD = liquidityChangeUSD
+        data.oneDayTxns = oneDayTxns
+        data.txnChange = txnChange
+
+        // new tokens
+        if (!oneDayHistory && data) {
+          // data.oneDayVolumeUSD = data.tradeVolumeUSD
+          // data.oneDayVolumeETH = data.tradeVolume * data.derivedETH
+          // data.oneDayTxns = data.txCount
+        }
+
+        if (data.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
+          data.name = 'ETH (Wrapped)'
+          data.symbol = 'ETH'
+        }
+        return data
+      })
+    )
+
+    // calculate percentage changes and daily changes
   } catch (e) {
     console.log(e)
   }
-  return data
 }
 
 const getTokenData = async (address, ethPrice) => {
@@ -278,39 +364,38 @@ const getTokenChartData = async tokenAddress => {
 }
 
 export function Updater() {
-  const [, { update, updateChartData }] = useTokenDataContext()
+  const [, { updateTopTokens }] = useTokenDataContext()
   const ethPrice = useEthPrice()
   useEffect(() => {
-    ethPrice &&
-      getTopTokens().then(topTokens => {
-        topTokens.map(async token => {
-          let data = await getTokenData(token.id, ethPrice)
-          data && update(data)
-        })
-      })
-  }, [update, updateChartData, ethPrice])
+    async function getData() {
+      // get top pairs for overview list
+      let topTokens = await getTopTokens(ethPrice)
+      topTokens && updateTopTokens(topTokens)
+    }
+    ethPrice && getData()
+  }, [ethPrice, updateTopTokens])
   return null
 }
 
 export function useTokenData(tokenAddress) {
   const [state, { update }] = useTokenDataContext()
   const ethPrice = useEthPrice()
-  const tokenData = safeAccess(state, [tokenAddress])
-  if (!tokenAddress) {
-    return {}
-  }
-  if (!tokenData && ethPrice && isAddress(tokenAddress)) {
-    getTokenData(tokenAddress, ethPrice).then(data => {
-      update(data)
-    })
-  }
+  const tokenData = state?.[tokenAddress]
+
+  useEffect(() => {
+    if (!tokenData && ethPrice && isAddress(tokenAddress)) {
+      getTokenData(tokenAddress, ethPrice).then(data => {
+        update(tokenAddress, data)
+      })
+    }
+  }, [ethPrice, tokenAddress, tokenData, update])
 
   return tokenData || {}
 }
 
 export function useTokenTransactions(tokenAddress) {
   const [state, { updateTokenTxns }] = useTokenDataContext()
-  const tokenTxns = safeAccess(state, [tokenAddress, 'txns'])
+  const tokenTxns = state?.[tokenAddress]?.txns
 
   const allPairsFormatted =
     state[tokenAddress] &&
@@ -336,7 +421,7 @@ export function useTokenTransactions(tokenAddress) {
 
 export function useTokenChartData(tokenAddress) {
   const [state, { updateChartData }] = useTokenDataContext()
-  const chartData = safeAccess(state, [tokenAddress, 'chartData'])
+  const chartData = state?.[tokenAddress]?.chartData
   useEffect(() => {
     async function checkForChartData() {
       if (!chartData) {

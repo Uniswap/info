@@ -12,14 +12,16 @@ export const client = new ApolloClient({
     // uri: 'https://api.thegraph.com/subgraphs/name/ianlapham/uniswap-v2-local',
     uri: 'https://api.thegraph.com/subgraphs/name/ianlapham/unsiwap3'
   }),
-  cache: new InMemoryCache()
+  cache: new InMemoryCache(),
+  shouldBatch: true
 })
 
 export const v1Client = new ApolloClient({
   link: new HttpLink({
     uri: 'https://api.thegraph.com/subgraphs/name/ianlapham/uniswapbackup'
   }),
-  cache: new InMemoryCache()
+  cache: new InMemoryCache(),
+  shouldBatch: true
 })
 
 export const blockClient = new ApolloClient({

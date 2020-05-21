@@ -1,28 +1,27 @@
 import gql from 'graphql-tag'
 import { FACTORY_ADDRESS, BUNDLE_ID } from '../constants'
 
-export const UNISWAP_GLOBALS_QUERY = gql`
-  query totals {
-    uniswap(id: "1") {
+export const V1_DATA_QUERY = gql`
+  query uniswap($date: Int!, $date2: Int!) {
+    current: uniswap(id: "1") {
       totalVolumeUSD
-      totalVolumeInEth
       totalLiquidityUSD
-      totalLiquidityInEth
       txCount
-      exchangeCount
     }
-  }
-`
-
-export const UNISWAP_GLOBALS_24HOURS_AGO_QUERY = gql`
-  query uniswapHistoricalDatas($date: Int!) {
-    uniswapHistoricalDatas(where: { timestamp_lt: $date }, first: 1, orderBy: timestamp, orderDirection: desc) {
-      totalVolumeInEth
+    oneDay: uniswapHistoricalDatas(where: { timestamp_lt: $date }, first: 1, orderBy: timestamp, orderDirection: desc) {
       totalVolumeUSD
-      totalLiquidityInEth
       totalLiquidityUSD
       txCount
-      timestamp
+    }
+    twoDay: uniswapHistoricalDatas(
+      where: { timestamp_lt: $date2 }
+      first: 1
+      orderBy: timestamp
+      orderDirection: desc
+    ) {
+      totalVolumeUSD
+      totalLiquidityUSD
+      txCount
     }
   }
 `
@@ -307,41 +306,43 @@ export const GLOBAL_TXNS = gql`
   }
 `
 
-export const TOP_PAIRS = gql`
+export const PAIRS_CURRENT = gql`
   query pairs {
     pairs(first: 100, orderBy: reserveUSD, orderDirection: desc) {
       id
-    }
-  }
-`
-
-export const ALL_PAIRS = gql`
-  query pairs($skip: Int!) {
-    pairs(first: 100, orderBy: reserveUSD, orderDirection: desc, skip: $skip) {
-      id
+      txCount
       token0 {
         id
-        name
         symbol
+        name
       }
       token1 {
         id
-        name
         symbol
+        name
       }
+      token0Price
+      token1Price
+      reserveUSD
+      volumeUSD
+      createdAtBlockNumber
     }
   }
 `
 
-export const TOP_TOKENS = gql`
-  query tokens {
-    tokens(first: 100, orderBy: tradeVolumeUSD, orderDirection: desc) {
+export const PAIRS_DYNAMIC = block => {
+  let queryString = `
+  query pairs {
+    pairs(block: {number: ${block}} first: 100, orderBy: reserveUSD, orderDirection: desc) {
       id
-      symbol
-      name
+      txCount
+      reserveUSD
+      volumeUSD
     }
   }
-`
+  `
+  return gql(queryString)
+}
 
 export const TOKEN_CHART = gql`
   query tokenDayDatas($tokenAddr: String!) {
@@ -369,6 +370,56 @@ export const TOKEN_CHART = gql`
     }
   }
 `
+
+export const TOKENS_CURRENT = gql`
+  query tokens {
+    tokens(first: 100, orderBy: tradeVolumeUSD, orderDirection: desc) {
+      id
+      name
+      symbol
+      derivedETH
+      tradeVolume
+      tradeVolumeUSD
+      totalLiquidity
+      txCount
+      allPairs(first: 30, orderBy: reserveUSD, orderDirection: desc) {
+        id
+        reserveUSD
+        volumeUSD
+        token0 {
+          id
+          name
+          symbol
+          derivedETH
+        }
+        token1 {
+          id
+          name
+          symbol
+          derivedETH
+        }
+      }
+    }
+  }
+`
+
+export const TOKENS_DYNAMIC = block => {
+  const queryString = `
+    query tokens {
+      tokens(block: {number: ${block}} first: 100, orderBy: tradeVolumeUSD, orderDirection: desc) {
+        id
+        name
+        symbol
+        derivedETH
+        tradeVolume
+        tradeVolumeUSD
+        totalLiquidity
+        txCount
+      }
+    }
+  `
+  return gql(queryString)
+}
 
 export const TOKEN_DATA = (tokenAddress, block) => {
   const queryString = block
@@ -446,7 +497,7 @@ export const TOKEN_DATA = (tokenAddress, block) => {
 
 export const TOKEN_TXNS = gql`
   query($allPairs: [Bytes]!) {
-    mints(where: { pair_in: $allPairs }, orderBy: timestamp, orderDirection: desc) {
+    mints(first: 30, where: { pair_in: $allPairs }, orderBy: timestamp, orderDirection: desc) {
       transaction {
         id
         timestamp
@@ -467,7 +518,7 @@ export const TOKEN_TXNS = gql`
       amount1
       amountUSD
     }
-    burns(where: { pair_in: $allPairs }, orderBy: timestamp, orderDirection: desc) {
+    burns(first: 30, where: { pair_in: $allPairs }, orderBy: timestamp, orderDirection: desc) {
       transaction {
         id
         timestamp
@@ -488,7 +539,7 @@ export const TOKEN_TXNS = gql`
       amount1
       amountUSD
     }
-    swaps(where: { pair_in: $allPairs }, orderBy: timestamp, orderDirection: desc) {
+    swaps(first: 30, where: { pair_in: $allPairs }, orderBy: timestamp, orderDirection: desc) {
       transaction {
         id
         timestamp

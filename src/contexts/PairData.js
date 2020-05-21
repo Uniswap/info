@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect, useState } from 'react'
 
 import { client } from '../apollo/client'
-import { PAIR_DATA, PAIR_CHART, ALL_PAIRS, TOKEN_TXNS, TOP_PAIRS } from '../apollo/queries'
+import { PAIR_DATA, PAIR_CHART, TOKEN_TXNS, PAIRS_DYNAMIC, PAIRS_CURRENT } from '../apollo/queries'
 
 import { useEthPrice } from './GlobalData'
 
@@ -14,7 +14,6 @@ const UPDATE = 'UPDATE'
 const UPDATE_PAIR_TXNS = 'UPDATE_PAIR_TXNS'
 const UPDATE_CHART_DATA = 'UPDATE_CHART_DATA'
 const UPDATE_TOP_PAIRS = 'UPDATE_TOP_PAIRS'
-const UPDATE_ALL_PAIRS = 'UPDATE_ALL_PAIRS'
 
 dayjs.extend(utc)
 
@@ -41,24 +40,20 @@ function reducer(state, { type, payload }) {
         ...state,
         [pairAddress]: {
           ...state?.[pairAddress],
-          data
+          ...data
         }
       }
     }
 
     case UPDATE_TOP_PAIRS: {
       const { topPairs } = payload
+      let added = {}
+      topPairs.map(pair => {
+        return (added[pair.id] = pair)
+      })
       return {
         ...state,
-        topPairs
-      }
-    }
-
-    case UPDATE_ALL_PAIRS: {
-      const { allPairs } = payload
-      return {
-        ...state,
-        allPairs
+        ...added
       }
     }
 
@@ -111,15 +106,6 @@ export default function Provider({ children }) {
     })
   }, [])
 
-  const updateAllPairs = useCallback(allPairs => {
-    dispatch({
-      type: UPDATE_ALL_PAIRS,
-      payload: {
-        allPairs
-      }
-    })
-  }, [])
-
   const updatePairTxns = useCallback((address, transactions) => {
     dispatch({
       type: UPDATE_PAIR_TXNS,
@@ -136,13 +122,12 @@ export default function Provider({ children }) {
 
   return (
     <PairDataContext.Provider
-      value={useMemo(() => [state, { update, updatePairTxns, updateChartData, updateTopPairs, updateAllPairs }], [
+      value={useMemo(() => [state, { update, updatePairTxns, updateChartData, updateTopPairs }], [
         state,
         update,
         updatePairTxns,
         updateChartData,
-        updateTopPairs,
-        updateAllPairs
+        updateTopPairs
       ])}
     >
       {children}
@@ -150,45 +135,94 @@ export default function Provider({ children }) {
   )
 }
 
-const getTopPairs = async () => {
-  let data = []
+const getTopPairData = async ethPrice => {
+  const utcCurrentTime = dayjs()
+  const utcOneDayBack = utcCurrentTime.subtract(1, 'day').unix()
+  const utcTwoDaysBack = utcCurrentTime.subtract(2, 'day').unix()
+  const utcOneWeekBack = utcCurrentTime.subtract(1, 'week').unix()
+  let oneDayBlock = await getBlockFromTimestamp(utcOneDayBack)
+  let twoDayBlock = await getBlockFromTimestamp(utcTwoDaysBack)
+  let oneWeekBlock = await getBlockFromTimestamp(utcOneWeekBack)
+
   try {
-    let result = await client.query({
-      query: TOP_PAIRS,
+    let current = await client.query({
+      query: PAIRS_CURRENT,
       fetchPolicy: 'cache-first'
     })
-    data = data.concat(result.data.pairs)
-  } catch (e) {
-    console.log(e)
-  }
-  return data
-}
 
-const getAllPairs = async () => {
-  let data = []
-  let skip = 0
-  let allFound = false
-  try {
-    while (!allFound) {
-      let result = await client.query({
-        query: ALL_PAIRS,
-        variables: {
-          skip: skip
-        },
-        fetchPolicy: 'cache-first'
+    let [oneDayResult, twoDayResult, oneWeekResult] = await Promise.all(
+      [oneDayBlock, twoDayBlock, oneWeekBlock].map(async block => {
+        let result = client.query({
+          query: PAIRS_DYNAMIC(block),
+          fetchPolicy: 'cache-first'
+        })
+        return result
       })
+    )
 
-      data = data.concat(result.data.pairs)
-      if (result.data.pairs.length !== 100) {
-        allFound = true
-      } else {
-        skip += 100
-      }
-    }
+    let oneDayData = oneDayResult?.data?.pairs.reduce((obj, cur, i) => {
+      return { ...obj, [cur.id]: cur }
+    }, {})
+
+    let twoDayData = twoDayResult?.data?.pairs.reduce((obj, cur, i) => {
+      return { ...obj, [cur.id]: cur }
+    }, {})
+
+    let oneWeekData = oneWeekResult?.data?.pairs.reduce((obj, cur, i) => {
+      return { ...obj, [cur.id]: cur }
+    }, {})
+
+    // now loop through current exchanges
+    return (
+      current &&
+      current.data.pairs.map(pair => {
+        let data = pair
+        let oneDayHistory = oneDayData?.[pair.id]
+        let twoDayHistory = twoDayData?.[pair.id]
+        let oneWeekHistory = oneWeekData?.[pair.id]
+
+        const [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentChange(
+          data?.volumeUSD,
+          oneDayHistory?.volumeUSD ? oneDayHistory?.volumeUSD : 0,
+          twoDayData?.volumeUSD ? twoDayData?.volumeUSD : 0
+        )
+        const oneWeekVolumeUSD = parseFloat(oneWeekData ? data?.volumeUSD - oneWeekHistory?.volumeUSD : data.volumeUSD)
+        const [oneDayVolumeETH, volumeChangeETH] = get2DayPercentChange(
+          data.tradeVolumeETH,
+          oneDayHistory?.tradeVolumeETH ?? 0,
+          twoDayHistory?.tradeVolumeETH ?? 0
+        )
+        const [oneDayTxns, txnChange] = get2DayPercentChange(
+          data.txCount,
+          oneDayHistory?.txCount ?? 0,
+          twoDayHistory?.txCount ?? 0
+        )
+        const liquidityChangeUSD = getPercentChange(data.reserveUSD, oneDayHistory?.reserveUSD)
+        const liquidityChangeETH = getPercentChange(data.reserveUSD, oneDayHistory?.reserveUSD)
+        data.reserveUSD = data.reserveETH ? data.reserveETH * ethPrice : data.reserveUSD
+        data.oneDayVolumeUSD = oneDayVolumeUSD
+        data.oneDayVolumeETH = oneDayVolumeETH
+        data.oneWeekVolumeUSD = oneWeekVolumeUSD
+        data.volumeChangeUSD = volumeChangeUSD
+        data.volumeChangeETH = volumeChangeETH
+        data.liquidityChangeUSD = liquidityChangeUSD
+        data.liquidityChangeETH = liquidityChangeETH
+        data.oneDayTxns = oneDayTxns
+        data.txnChange = txnChange
+        // new tokens
+        if (!oneDayHistory && data) {
+          data.oneDayVolumeUSD = data.volumeUSD
+          data.oneDayVolumeETH = data.tradeVolume * data.derivedETH
+        }
+        if (!oneWeekHistory && data) {
+          data.oneWeekVolumeUSD = data.volumeUSD
+        }
+        return data
+      })
+    )
   } catch (e) {
     console.log(e)
   }
-  return data
 }
 
 const getPairData = async (address, ethPrice) => {
@@ -264,7 +298,7 @@ const getPairData = async (address, ethPrice) => {
     data.txnChange = txnChange
 
     // new tokens
-    if (!oneDayData && data) {
+    if (!oneDayData && data && data.createdAtBlockNumber > oneDayBlock) {
       data.oneDayVolumeUSD = data.volumeUSD
       data.oneDayVolumeETH = data.tradeVolume * data.derivedETH
     }
@@ -364,34 +398,17 @@ const getPairChartData = async pairAddress => {
 }
 
 export function Updater() {
-  const [state, { update, updateTopPairs, updateAllPairs }] = usePairDataContext()
+  const [, { updateTopPairs }] = usePairDataContext()
   const ethPrice = useEthPrice()
-
-  const topPairList = state?.topPairs
-  const allPairList = state?.allPairs
 
   useEffect(() => {
     async function getData() {
-      if (!topPairList) {
-        // get top pairs for overview list
-        const topPairs = await getTopPairs()
-        if (topPairs) {
-          topPairs.map(async pair => {
-            const pairData = await getPairData(pair.id, ethPrice)
-            pairData && update(pair.id, pairData)
-          })
-          updateTopPairs(topPairs)
-        }
-      }
-
-      if (!allPairList) {
-        // get the rest of the pairs
-        let allPairs = await getAllPairs()
-        allPairs && updateAllPairs(allPairs)
-      }
+      // get top pairs for overview list
+      let topPairs = await getTopPairData(ethPrice)
+      updateTopPairs(topPairs)
     }
     ethPrice && getData()
-  }, [update, ethPrice, updateTopPairs, updateAllPairs, topPairList, allPairList])
+  }, [ethPrice, updateTopPairs])
   return null
 }
 
@@ -400,32 +417,32 @@ export function Updater() {
  * store these updates to reduce future redundant calls
  */
 export function useDataForList(pairList) {
-  const [state, { update }] = usePairDataContext()
+  const [state] = usePairDataContext()
   const ethPrice = useEthPrice()
 
   const [fetched, setFetched] = useState()
 
   useEffect(() => {
-    async function fetchData() {
-      let fetched = []
+    async function call() {
+      let newFetched = []
       let unfetched = []
+
       pairList.map(async pair => {
         let currentData = state?.[pair.id]?.data
         if (!currentData) {
           unfetched.push(getPairData(pair.id, ethPrice))
         } else {
-          fetched.push(currentData)
+          newFetched.push(currentData)
         }
       })
       Promise.all(unfetched).then(results => {
-        setFetched(fetched.concat(results))
+        setFetched(newFetched.concat(results))
       })
     }
-
-    if (pairList && !fetched) {
-      fetchData()
+    if (pairList) {
+      call()
     }
-  }, [update, ethPrice, pairList, state, fetched])
+  }, [ethPrice, state, pairList])
 
   return fetched
 }
@@ -436,7 +453,7 @@ export function useDataForList(pairList) {
 export function usePairData(pairAddress) {
   const [state, { update }] = usePairDataContext()
   const ethPrice = useEthPrice()
-  const pairData = state?.[pairAddress]?.data
+  const pairData = state?.[pairAddress]
 
   useEffect(() => {
     async function fetchData() {
@@ -488,19 +505,19 @@ export function usePairChartData(pairAddress) {
 }
 
 /**
- * Get list of top pairs by volume, used for global page
- */
-export function useTopPairs() {
-  const [state] = usePairDataContext()
-  const topPairs = state?.topPairs
-  return topPairs
-}
-
-/**
  * Get list of all pairs in Uniswap
  */
 export function useAllPairs() {
   const [state] = usePairDataContext()
-  const allPairs = state?.allPairs
-  return allPairs
+
+  const pairsFormatted = useMemo(() => {
+    return (
+      state &&
+      Object.keys(state).map(pairID => {
+        return state[pairID]
+      })
+    )
+  }, [state])
+
+  return pairsFormatted
 }

@@ -10,9 +10,9 @@ import Link, { CustomLink } from '../Link'
 import { Divider } from '../../components'
 
 import { formattedNum, getPoolLink, getSwapLink } from '../../helpers'
-import { useDataForList } from '../../contexts/PairData'
 import DoubleTokenLogo from '../DoubleLogo'
 import { ButtonLight, ButtonDark } from '../ButtonStyled'
+import { withRouter } from 'react-router-dom'
 
 dayjs.extend(utc)
 
@@ -43,6 +43,11 @@ const DashGrid = styled.div`
   grid-gap: 1em;
   grid-template-columns: 100px 1fr 1fr;
   grid-template-areas: 'name liq vol';
+
+  :hover {
+    cursor: ${({ focus }) => focus && 'pointer'};
+    background-color: ${({ focus, theme }) => focus && theme.bg3};
+  }
 
   > * {
     justify-content: flex-end;
@@ -103,12 +108,10 @@ const SORT_FIELD = {
   FEES: 'oneDayVolumeUSD'
 }
 
-function PairList({ pairs, color }) {
+function PairList({ pairs, color, history }) {
   const below600 = useMedia('(max-width: 600px)')
   const below740 = useMedia('(max-width: 740px)')
   const below1080 = useMedia('(max-width: 1080px)')
-
-  const listData = useDataForList(pairs)
 
   // pagination
   const [page, setPage] = useState(1)
@@ -152,7 +155,7 @@ function PairList({ pairs, color }) {
       }
 
       return (
-        <DashGrid style={{ height: '60px' }}>
+        <DashGrid style={{ height: '60px' }} focus={true} onClick={() => history.push('/pair/' + item.id)}>
           <DataText area="name" fontWeight="500">
             {!below600 && <div style={{ marginRight: '20px' }}>{index}</div>}
             <DoubleTokenLogo
@@ -196,8 +199,8 @@ function PairList({ pairs, color }) {
   }
 
   const pairList =
-    listData &&
-    listData
+    pairs &&
+    pairs
       .sort((pairA, pairB) => {
         return parseFloat(pairA[sortedColumn]) > parseFloat(pairB[sortedColumn])
           ? (sortDirection ? -1 : 1) * 1
@@ -301,4 +304,4 @@ function PairList({ pairs, color }) {
   )
 }
 
-export default PairList
+export default withRouter(PairList)

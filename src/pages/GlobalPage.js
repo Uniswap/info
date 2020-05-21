@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import 'feather-icons'
 import { Box } from 'rebass'
 import styled from 'styled-components'
@@ -12,12 +12,12 @@ import GlobalChart from '../components/GlobalChart'
 import { Hover, TYPE } from '../Theme'
 import { formattedNum, formattedPercent } from '../helpers'
 import { useGlobalData, useEthPrice, useGlobalTransactions } from '../contexts/GlobalData'
-import { useAllTokenData } from '../contexts/TokenData'
-import { useTopPairs } from '../contexts/PairData'
+import { useAllPairs, usePairData } from '../contexts/PairData'
 import { Search } from '../components/Search'
 import { useMedia } from 'react-use'
 import TokenLogo from '../components/TokenLogo'
 import Panel from '../components/Panel'
+import { useAllTokenData } from '../contexts/TokenData'
 
 const PageWrapper = styled.div`
   display: flex;
@@ -83,6 +83,15 @@ const ChartWrapper = styled.div`
   height: 100%;
 `
 
+const PriceCard = styled(Panel)`
+  position: absolute;
+  right: -60px;
+  width: fit-content;
+  top: -40px;
+  z-index: 10;
+  background-color: ${({ theme }) => theme.bg4};
+`
+
 const LIST_VIEW = {
   TOKENS: 'tokens',
   PAIRS: 'pairs'
@@ -102,9 +111,8 @@ function GlobalPage() {
 
   const transactions = useGlobalTransactions()
 
-  const allTokenData = useAllTokenData()
-
-  const topPairs = useTopPairs()
+  const allPairs = useAllPairs()
+  const allTokens = useAllTokenData()
 
   const ethPrice = useEthPrice()
   const formattedEthPrice = ethPrice ? formattedNum(ethPrice, true) : '-'
@@ -120,6 +128,33 @@ function GlobalPage() {
   let txnChangeFormatted = txnChange ? formattedPercent(txnChange) : '-'
 
   const below1080 = useMedia('(max-width: 1080px)')
+
+  const daiPair = usePairData('0xa478c2975ab1ea89e8196811f51a7b7ade33eb11')
+  const usdcPair = usePairData('0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc')
+
+  const [daiPerEth, setDaiPerEth] = useState()
+  useEffect(() => {
+    if (daiPair) {
+      if (daiPair.token0?.id === '"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"') {
+        setDaiPerEth(parseFloat(daiPair.token0Price).toFixed(2))
+      } else {
+        setDaiPerEth(parseFloat(daiPair.token0Price).toFixed(2))
+      }
+    }
+  }, [daiPair])
+
+  const [usdcPerEth, setUSDCPerEth] = useState()
+  useEffect(() => {
+    if (usdcPair) {
+      if (usdcPair.token0?.id === '"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"') {
+        setUSDCPerEth(parseFloat(usdcPair.token1Price).toFixed(2))
+      } else {
+        setUSDCPerEth(parseFloat(usdcPair.token0Price).toFixed(2))
+      }
+    }
+  }, [usdcPair])
+
+  const [showPriceCard, setShowPriceCard] = useState(false)
 
   return (
     <PageWrapper>
@@ -187,7 +222,27 @@ function GlobalPage() {
       )}
       {!below1080 && ( // desktop
         <TopGroup style={{ marginTop: '1.5rem' }}>
-          <Panel>
+          <Panel
+            hover={true}
+            onMouseEnter={() => {
+              setShowPriceCard(true)
+            }}
+            onMouseLeave={() => {
+              setShowPriceCard(false)
+            }}
+          >
+            {showPriceCard && (
+              <PriceCard>
+                <AutoColumn gap="10px">
+                  <AutoRow>
+                    <TYPE.main>DAI/ETH: {daiPerEth}</TYPE.main>
+                  </AutoRow>
+                  <AutoRow>
+                    <TYPE.main>USDC/ETH: {usdcPerEth}</TYPE.main>
+                  </AutoRow>
+                </AutoColumn>
+              </PriceCard>
+            )}
             <AutoColumn gap="20px">
               <RowBetween>
                 <TYPE.main>Uniswap ETH price</TYPE.main>
@@ -289,7 +344,7 @@ function GlobalPage() {
       </ListOptions>
 
       <Panel style={{ marginTop: '6px' }}>
-        {listView === LIST_VIEW.PAIRS ? <PairList pairs={topPairs} /> : <TopTokenList tokens={allTokenData} />}
+        {listView === LIST_VIEW.PAIRS ? <PairList pairs={allPairs} /> : <TopTokenList tokens={allTokens} />}
       </Panel>
 
       <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '2rem' }}>
