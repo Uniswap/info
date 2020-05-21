@@ -230,6 +230,8 @@ export const Search = (small = false) => {
   }, [filteredPairList])
 
   function onDismiss() {
+    setPairsShown(3)
+    setTokensShown(3)
     toggleMenu(false)
     setValue('')
   }
@@ -243,6 +245,8 @@ export const Search = (small = false) => {
       !(menuRef.current && menuRef.current.contains(e.target)) &&
       !(wrapperRef.current && wrapperRef.current.contains(e.target))
     ) {
+      setPairsShown(3)
+      setTokensShown(3)
       toggleMenu(false)
     }
   }
