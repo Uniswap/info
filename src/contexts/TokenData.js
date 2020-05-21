@@ -168,18 +168,18 @@ const getTopTokens = async ethPrice => {
         // calculate percentage changes and daily changes
         const [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentChange(
           data.tradeVolumeUSD,
-          oneDayHistory?.tradeVolumeUSD,
-          twoDayHistory?.tradeVolumeUSD
+          oneDayHistory?.tradeVolumeUSD ?? 0,
+          twoDayHistory?.tradeVolumeUSD ?? 0
         )
         const [oneDayTxns, txnChange] = get2DayPercentChange(
           data.txCount,
-          oneDayHistory?.txCount,
-          twoDayHistory?.txCount
+          oneDayHistory?.txCount ?? 0,
+          twoDayHistory?.txCount ?? 0
         )
 
         // percent changes
-        const priceChangeUSD = getPercentChange(data?.derivedETH, oneDayHistory?.derivedETH)
-        const liquidityChangeUSD = getPercentChange(data?.totalLiquidityUSD, oneDayHistory?.totalLiquidityUSD)
+        const priceChangeUSD = getPercentChange(data?.derivedETH, oneDayHistory?.derivedETH ?? 0)
+        const liquidityChangeUSD = getPercentChange(data?.totalLiquidityUSD, oneDayHistory?.totalLiquidityUSD ?? 0)
 
         // set data
         data.priceUSD = data?.derivedETH * ethPrice
@@ -193,9 +193,9 @@ const getTopTokens = async ethPrice => {
 
         // new tokens
         if (!oneDayHistory && data) {
-          // data.oneDayVolumeUSD = data.tradeVolumeUSD
-          // data.oneDayVolumeETH = data.tradeVolume * data.derivedETH
-          // data.oneDayTxns = data.txCount
+          data.oneDayVolumeUSD = data.tradeVolumeUSD
+          data.oneDayVolumeETH = data.tradeVolume * data.derivedETH
+          data.oneDayTxns = data.txCount
         }
 
         if (data.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
