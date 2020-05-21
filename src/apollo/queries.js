@@ -321,6 +321,8 @@ export const PAIRS_CURRENT = gql`
         symbol
         name
       }
+      reserve0
+      reserve1
       token0Price
       token1Price
       reserveUSD

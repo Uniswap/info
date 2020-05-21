@@ -111,7 +111,7 @@ const Blue = styled.span`
   }
 `
 
-export const Search = (small = false) => {
+export const Search = ({ small = false }) => {
   const allTokens = useAllTokenData()
   const allPairs = useAllPairs()
 
@@ -279,6 +279,8 @@ export const Search = (small = false) => {
               : below470
               ? 'Search Uniswap...'
               : below700
+              ? 'Search pairs and tokens...'
+              : small
               ? 'Search pairs and tokens...'
               : 'Search or paste address to find Uniswap pairs and tokens...'
           }
