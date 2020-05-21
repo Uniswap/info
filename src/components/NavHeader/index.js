@@ -44,8 +44,8 @@ export default function NavHeader({ token, pair }) {
   const { totalLiquidityUSD, oneDayVolumeUSD, v1Data } = useGlobalData()
 
   const liquidity =
-    totalLiquidityUSD && v1Data?.liquidityUsd
-      ? '$' + toK(parseFloat(totalLiquidityUSD) + parseFloat(v1Data?.liquidityUsd), true)
+    totalLiquidityUSD && v1Data?.totalLiquidityUSD
+      ? '$' + toK(parseFloat(totalLiquidityUSD) + parseFloat(v1Data?.totalLiquidityUSD), true)
       : ''
   const volume =
     oneDayVolumeUSD && v1Data?.dailyVolumeUSD ? '$' + toK(oneDayVolumeUSD + v1Data?.dailyVolumeUSD, true) : ''
@@ -73,9 +73,6 @@ export default function NavHeader({ token, pair }) {
                   <CombinedData>
                     Combined Vol: <b>{volume}</b>
                   </CombinedData>
-                  {/* <CombinedData>
-                    Combined Txns: <b>{txns}</b>
-                  </CombinedData> */}
                 </>
               )}
               <Link href="https://migrate.uniswap.info" target="_blank">

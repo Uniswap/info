@@ -227,7 +227,7 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
           newTxn.timestamp = swap.transaction.timestamp
           newTxn.type = TXN_TYPE.SWAP
 
-          newTxn.amountUSD = swap.amountUSD
+          newTxn.amountUSD = swap.amountUSD / 2
           newTxn.account = swap.to
           return newTxns.push(newTxn)
         })
@@ -413,7 +413,7 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
         {!filteredList ? (
           <LocalLoader />
         ) : filteredList.length === 0 ? (
-          <EmptyCard>No transactions on this pair yet.</EmptyCard>
+          <EmptyCard>No transactions yet.</EmptyCard>
         ) : (
           filteredList.map((item, index) => {
             return (

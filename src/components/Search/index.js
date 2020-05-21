@@ -7,7 +7,7 @@ import { Search as SearchIcon } from 'react-feather'
 import { BasicLink } from '../Link'
 
 import { useAllTokenData, useTokenData } from '../../contexts/TokenData'
-import { useAllPairs } from '../../contexts/PairData'
+import { useAllPairs, usePairData } from '../../contexts/PairData'
 import DoubleTokenLogo from '../DoubleLogo'
 import { useMedia } from 'react-use'
 
@@ -111,7 +111,7 @@ const Blue = styled.span`
   }
 `
 
-export const Search = (small = false) => {
+export const Search = ({ small = false }) => {
   const allTokens = useAllTokenData()
   const allPairs = useAllPairs()
 
@@ -122,6 +122,7 @@ export const Search = (small = false) => {
 
   // fetch new data on tokens and pairs if needed
   useTokenData(value)
+  usePairData(value)
 
   const below700 = useMedia('(max-width: 700px)')
   const below470 = useMedia('(max-width: 470px)')
@@ -138,53 +139,66 @@ export const Search = (small = false) => {
   const escapeStringRegexp = string => string
 
   const filteredTokenList = useMemo(() => {
-    return Object.keys(allTokens)
-      .sort((a, b) => {
-        const tokenA = allTokens[a]
-        const tokenB = allTokens[b]
-        if (tokenA.totalLiquidityUSD && tokenB.totalLiquidityUSD) {
-          return tokenA.totalLiquidityUSD > tokenB.totalLiquidityUSD ? -1 : 1
-        }
-        if (tokenA.totalLiquidityUSD && !tokenB.totalLiquidityUSD) {
-          return -1
-        }
-        if (!tokenA.totalLiquidityUSD && tokenB.totalLiquidityUSD) {
-          return 1
-        }
-        return 1
-      })
-      .filter(address => {
-        const regexMatches = Object.keys(allTokens[address]).map(tokenEntryKey => {
-          const isAddress = value.slice(0, 2) === '0x'
-          if (tokenEntryKey === 'id' && isAddress) {
-            return allTokens[address][tokenEntryKey].match(new RegExp(escapeStringRegexp(value), 'i'))
-          }
-          if (tokenEntryKey === 'symbol' && !isAddress) {
-            return allTokens[address][tokenEntryKey].match(new RegExp(escapeStringRegexp(value), 'i'))
-          }
-          return false
-        })
-        return regexMatches.some(m => m)
-      })
+    return allTokens
+      ? Object.keys(allTokens)
+          .sort((a, b) => {
+            const tokenA = allTokens[a]
+            const tokenB = allTokens[b]
+            if (tokenA.totalLiquidityUSD && tokenB.totalLiquidityUSD) {
+              return tokenA.totalLiquidityUSD > tokenB.totalLiquidityUSD ? -1 : 1
+            }
+            if (tokenA.totalLiquidityUSD && !tokenB.totalLiquidityUSD) {
+              return -1
+            }
+            if (!tokenA.totalLiquidityUSD && tokenB.totalLiquidityUSD) {
+              return 1
+            }
+            return 1
+          })
+          .filter(address => {
+            const regexMatches = Object.keys(allTokens[address]).map(tokenEntryKey => {
+              const isAddress = value.slice(0, 2) === '0x'
+              if (tokenEntryKey === 'id' && isAddress) {
+                return allTokens[address][tokenEntryKey].match(new RegExp(escapeStringRegexp(value), 'i'))
+              }
+              if (tokenEntryKey === 'symbol' && !isAddress) {
+                return allTokens[address][tokenEntryKey].match(new RegExp(escapeStringRegexp(value), 'i'))
+              }
+              if (tokenEntryKey === 'name' && !isAddress) {
+                return allTokens[address][tokenEntryKey].match(new RegExp(escapeStringRegexp(value), 'i'))
+              }
+              return false
+            })
+            return regexMatches.some(m => m)
+          })
+      : []
   }, [allTokens, value])
 
   const filteredPairList = useMemo(() => {
-    return Object.keys(allPairs).filter(pair => {
-      const regexMatches = Object.keys(allPairs[pair]).map(field => {
-        const isAddress = value.slice(0, 2) === '0x'
-        if (field === 'id' && isAddress) {
-          return allPairs[pair][field].match(new RegExp(escapeStringRegexp(value), 'i'))
-        }
-        if (field === 'token0') {
-          return allPairs[pair][field].symbol.match(new RegExp(escapeStringRegexp(value), 'i'))
-        }
-        if (field === 'token1') {
-          return allPairs[pair][field].symbol.match(new RegExp(escapeStringRegexp(value), 'i'))
-        }
-        return false
-      })
-      return regexMatches.some(m => m)
-    })
+    return allPairs
+      ? Object.keys(allPairs).filter(pair => {
+          const regexMatches = Object.keys(allPairs[pair]).map(field => {
+            const isAddress = value.slice(0, 2) === '0x'
+            if (field === 'id' && isAddress) {
+              return allPairs[pair][field].match(new RegExp(escapeStringRegexp(value), 'i'))
+            }
+            if (field === 'token0') {
+              return (
+                allPairs[pair][field].symbol.match(new RegExp(escapeStringRegexp(value), 'i')) ||
+                allPairs[pair][field].name.match(new RegExp(escapeStringRegexp(value), 'i'))
+              )
+            }
+            if (field === 'token1') {
+              return (
+                allPairs[pair][field].symbol.match(new RegExp(escapeStringRegexp(value), 'i')) ||
+                allPairs[pair][field].name.match(new RegExp(escapeStringRegexp(value), 'i'))
+              )
+            }
+            return false
+          })
+          return regexMatches.some(m => m)
+        })
+      : []
   }, [allPairs, value])
 
   useEffect(() => {
@@ -216,6 +230,8 @@ export const Search = (small = false) => {
   }, [filteredPairList])
 
   function onDismiss() {
+    setPairsShown(3)
+    setTokensShown(3)
     toggleMenu(false)
     setValue('')
   }
@@ -229,6 +245,8 @@ export const Search = (small = false) => {
       !(menuRef.current && menuRef.current.contains(e.target)) &&
       !(wrapperRef.current && wrapperRef.current.contains(e.target))
     ) {
+      setPairsShown(3)
+      setTokensShown(3)
       toggleMenu(false)
     }
   }
@@ -262,6 +280,8 @@ export const Search = (small = false) => {
               ? 'Search Uniswap...'
               : below700
               ? 'Search pairs and tokens...'
+              : small
+              ? 'Search pairs and tokens...'
               : 'Search or paste address to find Uniswap pairs and tokens...'
           }
           value={value}
@@ -282,27 +302,28 @@ export const Search = (small = false) => {
           <Gray>Pairs</Gray>
         </Heading>
         <div>
-          {Object.keys(filteredPairList).length === 0 && <MenuItem>No results</MenuItem>}
-          {filteredPairList.slice(0, pairsShown).map(key => {
-            if (allPairs[key]?.token0?.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
-              allPairs[key].token0.name = 'ETH (Wrapped)'
-              allPairs[key].token0.symbol = 'ETH'
-            }
-            if (allPairs[key]?.token1.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
-              allPairs[key].token1.name = 'ETH (Wrapped)'
-              allPairs[key].token1.symbol = 'ETH'
-            }
-            return (
-              <BasicLink to={'/pair/' + allPairs[key].id} key={key} onClick={onDismiss}>
-                <MenuItem>
-                  <DoubleTokenLogo a0={allPairs?.[key]?.token0?.id} a1={allPairs?.[key]?.token1?.id} margin={true} />
-                  <span style={{ marginLeft: '10px' }}>
-                    {allPairs[key].token0.symbol + '-' + allPairs[key].token1.symbol} Pair
-                  </span>
-                </MenuItem>
-              </BasicLink>
-            )
-          })}
+          {filteredPairList && Object.keys(filteredPairList).length === 0 && <MenuItem>No results</MenuItem>}
+          {filteredPairList &&
+            filteredPairList.slice(0, pairsShown).map(key => {
+              if (allPairs[key]?.token0?.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
+                allPairs[key].token0.name = 'ETH (Wrapped)'
+                allPairs[key].token0.symbol = 'ETH'
+              }
+              if (allPairs[key]?.token1.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
+                allPairs[key].token1.name = 'ETH (Wrapped)'
+                allPairs[key].token1.symbol = 'ETH'
+              }
+              return (
+                <BasicLink to={'/pair/' + allPairs[key].id} key={key} onClick={onDismiss}>
+                  <MenuItem>
+                    <DoubleTokenLogo a0={allPairs?.[key]?.token0?.id} a1={allPairs?.[key]?.token1?.id} margin={true} />
+                    <span style={{ marginLeft: '10px' }}>
+                      {allPairs[key].token0.symbol + '-' + allPairs[key].token1.symbol} Pair
+                    </span>
+                  </MenuItem>
+                </BasicLink>
+              )
+            })}
           <Heading
             hide={!(Object.keys(filteredPairList).length > 3 && Object.keys(filteredPairList).length >= pairsShown)}
           >

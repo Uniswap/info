@@ -108,7 +108,7 @@ function App() {
                 strict
                 path="/pair/:pairAddress"
                 render={({ match }) => {
-                  if (true) {
+                  if (isAddress(match.params.pairAddress.toLowerCase())) {
                     return (
                       <>
                         <NavHeaderUpdated pair={match.params.pairAddress.toLowerCase()} />

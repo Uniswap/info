@@ -10,16 +10,18 @@ export const client = new ApolloClient({
   link: new HttpLink({
     // pending uniswap with 'fixed' trade volumne
     // uri: 'https://api.thegraph.com/subgraphs/name/ianlapham/uniswap-v2-local',
-    uri: 'https://api.thegraph.com/subgraphs/name/ianlapham/unsiwap3'
+    uri: 'https://api.thegraph.com/subgraphs/name/ianlapham/uniswap-v2-local'
   }),
-  cache: new InMemoryCache()
+  cache: new InMemoryCache(),
+  shouldBatch: true
 })
 
 export const v1Client = new ApolloClient({
   link: new HttpLink({
     uri: 'https://api.thegraph.com/subgraphs/name/ianlapham/uniswapbackup'
   }),
-  cache: new InMemoryCache()
+  cache: new InMemoryCache(),
+  shouldBatch: true
 })
 
 export const blockClient = new ApolloClient({

@@ -11,6 +11,7 @@ import { Divider } from '..'
 
 import { formattedNum, formattedPercent } from '../../helpers'
 import { useMedia } from 'react-use'
+import { withRouter } from 'react-router-dom'
 
 dayjs.extend(utc)
 
@@ -58,6 +59,11 @@ const DashGrid = styled.div`
     grid-gap: 1em;
     grid-template-columns: 180px 1fr 1fr 1fr;
     grid-template-areas: 'name symbol liq vol ';
+
+    :hover {
+      cursor: ${({ focus }) => focus && 'pointer'};
+      background-color: ${({ focus, theme }) => focus && theme.bg3};
+    }
 
     > * {
       justify-content: flex-end;
@@ -115,7 +121,7 @@ const SORT_FIELD = {
 }
 
 // @TODO rework into virtualized list
-function TopTokenList({ tokens }) {
+function TopTokenList({ tokens, history }) {
   // page state
   const [page, setPage] = useState(1)
   const [maxPage, setMaxPage] = useState(1)
@@ -165,7 +171,7 @@ function TopTokenList({ tokens }) {
 
   const ListItem = ({ item, index }) => {
     return (
-      <DashGrid style={{ height: '60px' }}>
+      <DashGrid style={{ height: '60px' }} focus={true} onClick={() => history.push('/token/' + item.address)}>
         <DataText area="name" fontWeight="500">
           <Row>
             {!below680 && <div style={{ marginRight: '1rem' }}>{index}</div>}
@@ -312,4 +318,4 @@ function TopTokenList({ tokens }) {
   )
 }
 
-export default TopTokenList
+export default withRouter(TopTokenList)
