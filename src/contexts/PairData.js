@@ -263,8 +263,6 @@ const getPairData = async (address, ethPrice) => {
     })
     let oneWeekData = oneWeekResult.data.pairs[0]
 
-    let newData = data
-
     const [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentChange(
       data?.volumeUSD,
       oneDayData?.volumeUSD ? oneDayData?.volumeUSD : 0,
@@ -281,23 +279,18 @@ const getPairData = async (address, ethPrice) => {
 
     const liquidityChangeUSD = getPercentChange(data.reserveUSD, oneDayData?.reserveUSD)
 
-    newData.reserveUSD = data.reserveETH ? data.reserveETH * ethPrice : data.reserveUSD
-    newData.oneDayVolumeUSD = oneDayVolumeUSD
-    newData.oneWeekVolumeUSD = oneWeekVolumeUSD
-    newData.volumeChangeUSD = volumeChangeUSD
-    newData.liquidityChangeUSD = liquidityChangeUSD
-    newData.oneDayTxns = oneDayTxns
-    newData.txnChange = txnChange
+    data.reserveUSD = data.reserveETH ? data.reserveETH * ethPrice : data.reserveUSD
+    data.oneDayVolumeUSD = oneDayVolumeUSD
+    data.oneWeekVolumeUSD = oneWeekVolumeUSD
+    data.volumeChangeUSD = volumeChangeUSD
+    data.liquidityChangeUSD = liquidityChangeUSD
+    data.oneDayTxns = oneDayTxns
+    data.txnChange = txnChange
 
     // new tokens
     if (!oneDayData && data && data.createdAtBlockNumber > oneDayBlock) {
-<<<<<<< HEAD
-      newData.oneDayVolumeUSD = data.volumeUSD
-      newData.oneDayVolumeETH = data.tradeVolume * data.derivedETH
-=======
       data.oneDayVolumeUSD = data.volumeUSD
       data.oneDayVolumeETH = data.tradeVolume * data.derivedETH
->>>>>>> a51ee7de49baf528d221cbc1fd91f363996b3171
     }
   } catch (e) {
     console.log(e)
