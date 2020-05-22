@@ -271,12 +271,6 @@ const getPairData = async (address, ethPrice) => {
 
     const oneWeekVolumeUSD = parseFloat(oneWeekData ? data?.volumeUSD - oneWeekData?.volumeUSD : data.volumeUSD)
 
-    const [oneDayVolumeETH, volumeChangeETH] = get2DayPercentChange(
-      data.tradeVolumeETH,
-      oneDayData?.tradeVolumeETH ? oneDayData?.tradeVolumeETH : 0,
-      twoDayData?.tradeVolumeETH ? twoDayData?.tradeVolumeETH : 0
-    )
-
     const [oneDayTxns, txnChange] = get2DayPercentChange(
       data.txCount,
       oneDayData?.txCount ? oneDayData?.txCount : 0,
@@ -284,16 +278,12 @@ const getPairData = async (address, ethPrice) => {
     )
 
     const liquidityChangeUSD = getPercentChange(data.reserveUSD, oneDayData?.reserveUSD)
-    const liquidityChangeETH = getPercentChange(data.reserveUSD, oneDayData?.reserveUSD)
 
     data.reserveUSD = data.reserveETH ? data.reserveETH * ethPrice : data.reserveUSD
     data.oneDayVolumeUSD = oneDayVolumeUSD
-    data.oneDayVolumeETH = oneDayVolumeETH
     data.oneWeekVolumeUSD = oneWeekVolumeUSD
     data.volumeChangeUSD = volumeChangeUSD
-    data.volumeChangeETH = volumeChangeETH
     data.liquidityChangeUSD = liquidityChangeUSD
-    data.liquidityChangeETH = liquidityChangeETH
     data.oneDayTxns = oneDayTxns
     data.txnChange = txnChange
 
@@ -420,7 +410,16 @@ export function useDataForList(pairList) {
   const [state] = usePairDataContext()
   const ethPrice = useEthPrice()
 
+  const [stale, setStale] = useState(false)
   const [fetched, setFetched] = useState()
+
+  // reset
+  useEffect(() => {
+    if (pairList) {
+      setStale(false)
+      setFetched()
+    }
+  }, [pairList])
 
   useEffect(() => {
     async function call() {
@@ -439,10 +438,11 @@ export function useDataForList(pairList) {
         setFetched(newFetched.concat(results))
       })
     }
-    if (pairList) {
+    if (ethPrice && pairList && !fetched && !stale) {
+      setStale(true)
       call()
     }
-  }, [ethPrice, state, pairList])
+  }, [ethPrice, state, pairList, stale, fetched])
 
   return fetched
 }
