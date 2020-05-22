@@ -142,7 +142,7 @@ export const formattedNum = (number, usd = false) => {
 
   if (num > 1000) {
     return usd
-      ? '$' + Number(parseFloat(num).toFixed(2)).toLocaleString()
+      ? '$' + Number(parseFloat(num).toFixed(0)).toLocaleString()
       : '' + Number(parseFloat(num).toFixed(0)).toLocaleString()
   }
 
@@ -156,6 +156,7 @@ export const formattedNum = (number, usd = false) => {
     let usdString = priceFormatter.format(num)
     return '$' + usdString.slice(1, usdString.length)
   }
+
   return Number(parseFloat(num).toFixed(4))
 }
 
