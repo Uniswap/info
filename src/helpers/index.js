@@ -6,6 +6,10 @@ import utc from 'dayjs/plugin/utc'
 import { blockClient } from '../apollo/client'
 import { GET_BLOCK } from '../apollo/queries'
 import { Text } from 'rebass'
+import _Decimal from 'decimal.js-light'
+import toFormat from 'toformat'
+
+const Decimal = toFormat(_Decimal)
 
 BigNumber.set({ EXPONENTIAL_AT: 50 })
 
@@ -74,7 +78,9 @@ export const toK = (num, fixed, cutoff = false) => {
         ? Number(num / divideBy).toFixed(0)
         : Number(num / divideBy).toFixed(4)
       : Number(num / divideBy)
-  if (num > 999999 || num < -999999) {
+  if (num > 999999999 || num < -9999999) {
+    return `${formatter(1000000000)}M`
+  } else if (num > 999999 || num < -999999) {
     return `${formatter(1000000)}M`
   } else if (num > 999 || num < -999) {
     return `${formatter(1000)}K`
@@ -125,11 +131,22 @@ var priceFormatter = new Intl.NumberFormat('en-US', {
   minimumFractionDigits: 2
 })
 
+export const toSignificant = (number, significantDigits) => {
+  Decimal.set({ precision: significantDigits + 1, rounding: Decimal.ROUND_UP })
+  const updated = new Decimal(number).toSignificantDigits(significantDigits)
+  return updated.toFormat(updated.decimalPlaces(), { groupSeparator: '' })
+}
+
 export const formattedNum = (number, usd = false) => {
   if (isNaN(number) || number === '' || number === undefined) {
     return usd ? '$0' : 0
   }
   let num = parseFloat(number)
+
+  if (num > 500000000) {
+    return (usd ? '$' : '') + toK(num.toFixed(0), true)
+  }
+
   if (num === 0) {
     if (usd) {
       return '$0'
@@ -147,14 +164,12 @@ export const formattedNum = (number, usd = false) => {
   }
 
   if (usd) {
-    if (num < 0.01) {
-      if (usd) {
-        return '$' + Number(parseFloat(num).toFixed(4))
-      }
-      return Number(parseFloat(num).toFixed(4))
+    if (num < 0.1) {
+      return '$' + Number(parseFloat(num).toFixed(4))
+    } else {
+      let usdString = priceFormatter.format(num)
+      return '$' + usdString.slice(1, usdString.length)
     }
-    let usdString = priceFormatter.format(num)
-    return '$' + usdString.slice(1, usdString.length)
   }
 
   return Number(parseFloat(num).toFixed(4))

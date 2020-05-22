@@ -412,6 +412,7 @@ export function useDataForList(pairList) {
   const [state] = usePairDataContext()
   const ethPrice = useEthPrice()
 
+  const [stale, setStale] = useState(false)
   const [fetched, setFetched] = useState()
 
   useEffect(() => {
@@ -431,10 +432,11 @@ export function useDataForList(pairList) {
         setFetched(newFetched.concat(results))
       })
     }
-    if (ethPrice && pairList && !fetched) {
+    if (ethPrice && pairList && !fetched && !stale) {
+      setStale(true)
       call()
     }
-  }, [ethPrice, state, pairList, fetched])
+  }, [ethPrice, state, pairList, stale, fetched])
 
   return fetched
 }
