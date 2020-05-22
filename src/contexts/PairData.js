@@ -291,8 +291,13 @@ const getPairData = async (address, ethPrice) => {
 
     // new tokens
     if (!oneDayData && data && data.createdAtBlockNumber > oneDayBlock) {
+<<<<<<< HEAD
       newData.oneDayVolumeUSD = data.volumeUSD
       newData.oneDayVolumeETH = data.tradeVolume * data.derivedETH
+=======
+      data.oneDayVolumeUSD = data.volumeUSD
+      data.oneDayVolumeETH = data.tradeVolume * data.derivedETH
+>>>>>>> a51ee7de49baf528d221cbc1fd91f363996b3171
     }
   } catch (e) {
     console.log(e)
