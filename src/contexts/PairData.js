@@ -413,6 +413,14 @@ export function useDataForList(pairList) {
   const [stale, setStale] = useState(false)
   const [fetched, setFetched] = useState()
 
+  // reset
+  useEffect(() => {
+    if (pairList) {
+      setStale(false)
+      setFetched()
+    }
+  }, [pairList])
+
   useEffect(() => {
     async function call() {
       let newFetched = []
