@@ -227,7 +227,7 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
           newTxn.timestamp = swap.transaction.timestamp
           newTxn.type = TXN_TYPE.SWAP
 
-          newTxn.amountUSD = swap.amountUSD / 2
+          newTxn.amountUSD = swap.amountUSD
           newTxn.account = swap.to
           return newTxns.push(newTxn)
         })
