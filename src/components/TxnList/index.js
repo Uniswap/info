@@ -413,7 +413,7 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
         {!filteredList ? (
           <LocalLoader />
         ) : filteredList.length === 0 ? (
-          <EmptyCard>No transactions yet.</EmptyCard>
+          <EmptyCard>No recent transactions found.</EmptyCard>
         ) : (
           filteredList.map((item, index) => {
             return (
