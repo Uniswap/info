@@ -18,9 +18,8 @@ const Wrapper = styled.div`
   align-items: center;
   justify-content: flex-end;
   padding: ${({ large }) => (large ? '12px' : '12px 16px')};
-  /* border: 1px solid ${({ theme }) => theme.inputBackground}; */
   border-radius: 12px;
-  background: ${({ theme, large }) => (large ? theme.inputBG : theme.advancedBG)};
+  background: ${({ theme }) => theme.advancedBG};
   border-bottom-right-radius: ${({ open }) => (open ? '0px' : '12px')};
   border-bottom-left-radius: ${({ open }) => (open ? '0px' : '12px')};
   ${({ large }) =>

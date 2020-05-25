@@ -11,10 +11,15 @@ import { timeframeOptions } from '../../constants'
 import dayjs from 'dayjs'
 import { useMedia } from 'react-use'
 import { EmptyCard } from '..'
+import DropdownSelect from '../DropdownSelect'
 
 const ChartWrapper = styled.div`
   height: 100%;
   min-height: 300px;
+
+  @media screen and (max-width: 600px) {
+    min-height: 200px;
+  }
 `
 
 const CHART_VIEW = {
@@ -30,6 +35,7 @@ const PairChart = ({ address, color }) => {
   const [timeWindow, setTimeWindow] = useState(timeframeOptions.ALL_TIME)
 
   const below1080 = useMedia('(max-width: 1080px)')
+  const below600 = useMedia('(max-width: 600px)')
 
   // find start time based on required time window, update domain
   const utcEndTime = dayjs.utc()
@@ -66,33 +72,40 @@ const PairChart = ({ address, color }) => {
 
   return (
     <ChartWrapper>
-      <RowBetween mb={40}>
-        <AutoRow gap="10px">
-          <OptionButton
-            active={chartFilter === CHART_VIEW.LIQUIDITY}
-            onClick={() => setChartFilter(CHART_VIEW.LIQUIDITY)}
-          >
-            Liquidity
-          </OptionButton>
-          <OptionButton active={chartFilter === CHART_VIEW.VOLUME} onClick={() => setChartFilter(CHART_VIEW.VOLUME)}>
-            Volume
-          </OptionButton>
-        </AutoRow>
-        <AutoRow justify="flex-end" gap="10px">
-          <OptionButton
-            active={timeWindow === timeframeOptions.WEEK}
-            onClick={() => setTimeWindow(timeframeOptions.WEEK)}
-          >
-            1 Week
-          </OptionButton>
-          <OptionButton
-            active={timeWindow === timeframeOptions.ALL_TIME}
-            onClick={() => setTimeWindow(timeframeOptions.ALL_TIME)}
-          >
-            All Time
-          </OptionButton>
-        </AutoRow>
-      </RowBetween>
+      {below600 ? (
+        <RowBetween mb={40}>
+          <DropdownSelect options={CHART_VIEW} active={chartFilter} setActive={setChartFilter} color={color} />
+          <DropdownSelect options={timeframeOptions} active={timeWindow} setActive={setTimeWindow} color={color} />
+        </RowBetween>
+      ) : (
+        <RowBetween mb={40}>
+          <AutoRow gap="10px">
+            <OptionButton
+              active={chartFilter === CHART_VIEW.LIQUIDITY}
+              onClick={() => setChartFilter(CHART_VIEW.LIQUIDITY)}
+            >
+              Liquidity
+            </OptionButton>
+            <OptionButton active={chartFilter === CHART_VIEW.VOLUME} onClick={() => setChartFilter(CHART_VIEW.VOLUME)}>
+              Volume
+            </OptionButton>
+          </AutoRow>
+          <AutoRow justify="flex-end" gap="10px">
+            <OptionButton
+              active={timeWindow === timeframeOptions.WEEK}
+              onClick={() => setTimeWindow(timeframeOptions.WEEK)}
+            >
+              1 Week
+            </OptionButton>
+            <OptionButton
+              active={timeWindow === timeframeOptions.ALL_TIME}
+              onClick={() => setTimeWindow(timeframeOptions.ALL_TIME)}
+            >
+              All Time
+            </OptionButton>
+          </AutoRow>
+        </RowBetween>
+      )}
       {chartFilter === CHART_VIEW.LIQUIDITY && (
         <ResponsiveContainer aspect={below1080 ? 60 / 32 : 60 / 16}>
           <AreaChart margin={{ top: 0, right: 0, bottom: 6, left: 0 }} barCategoryGap={1} data={chartData}>

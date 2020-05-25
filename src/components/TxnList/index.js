@@ -6,12 +6,13 @@ import utc from 'dayjs/plugin/utc'
 import { formatTime, formattedNum, urls } from '../../helpers'
 import { useMedia } from 'react-use'
 import { useCurrentCurrency } from '../../contexts/Application'
-import { RowFixed } from '../Row'
+import { RowFixed, RowBetween } from '../Row'
 
 import LocalLoader from '../LocalLoader'
 import { Box, Flex, Text } from 'rebass'
 import Link from '../Link'
 import { Divider, EmptyCard } from '..'
+import DropdownSelect from '../DropdownSelect'
 
 dayjs.extend(utc)
 
@@ -40,7 +41,7 @@ const List = styled(Box)`
 const DashGrid = styled.div`
   display: grid;
   grid-gap: 1em;
-  grid-template-columns: 160px 1fr 1fr;
+  grid-template-columns: 100px 1fr 1fr;
   grid-template-areas: 'txn value time';
 
   > * {
@@ -131,9 +132,10 @@ const SORT_FIELD = {
 }
 
 const TXN_TYPE = {
-  SWAP: 'SWAP',
-  ADD: 'ADD',
-  REMOVE: 'REMOVE'
+  ALL: 'All',
+  SWAP: 'Swaps',
+  ADD: 'Adds',
+  REMOVE: 'Removes'
 }
 
 const ITEMS_PER_PAGE = 10
@@ -161,7 +163,7 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
   const [sortDirection, setSortDirection] = useState(true)
   const [sortedColumn, setSortedColumn] = useState(SORT_FIELD.TIMESTAMP)
   const [filteredItems, setFilteredItems] = useState()
-  const [txFilter, setTxFilter] = useState('ALL')
+  const [txFilter, setTxFilter] = useState(TXN_TYPE.ALL)
 
   const [currency] = useCurrentCurrency()
 
@@ -234,7 +236,7 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
       }
 
       const filtered = newTxns.filter(item => {
-        if (txFilter !== 'ALL') {
+        if (txFilter !== TXN_TYPE.ALL) {
           return item.type === txFilter
         }
         return true
@@ -309,40 +311,46 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
   return (
     <>
       <DashGrid center={true} style={{ height: 'fit-content', padding: '0 0 1rem 0' }}>
-        <RowFixed area="txn" gap="10px" pl={4}>
-          <SortText
-            onClick={() => {
-              setTxFilter('ALL')
-            }}
-            active={txFilter === 'ALL'}
-          >
-            All
-          </SortText>
-          <SortText
-            onClick={() => {
-              setTxFilter('SWAP')
-            }}
-            active={txFilter === 'SWAP'}
-          >
-            Swaps
-          </SortText>
-          <SortText
-            onClick={() => {
-              setTxFilter('ADD')
-            }}
-            active={txFilter === 'ADD'}
-          >
-            Adds
-          </SortText>
-          <SortText
-            onClick={() => {
-              setTxFilter('REMOVE')
-            }}
-            active={txFilter === 'REMOVE'}
-          >
-            Removes
-          </SortText>
-        </RowFixed>
+        {below780 ? (
+          <RowBetween area="txn">
+            <DropdownSelect options={TXN_TYPE} active={txFilter} setActive={setTxFilter} color={color} />
+          </RowBetween>
+        ) : (
+          <RowFixed area="txn" gap="10px" pl={4}>
+            <SortText
+              onClick={() => {
+                setTxFilter(TXN_TYPE.ALL)
+              }}
+              active={txFilter === TXN_TYPE.ALL}
+            >
+              All
+            </SortText>
+            <SortText
+              onClick={() => {
+                setTxFilter('SWAP')
+              }}
+              active={txFilter === 'SWAP'}
+            >
+              Swaps
+            </SortText>
+            <SortText
+              onClick={() => {
+                setTxFilter('ADD')
+              }}
+              active={txFilter === 'ADD'}
+            >
+              Adds
+            </SortText>
+            <SortText
+              onClick={() => {
+                setTxFilter('REMOVE')
+              }}
+              active={txFilter === 'REMOVE'}
+            >
+              Removes
+            </SortText>
+          </RowFixed>
+        )}
 
         <Flex alignItems="center" justifyContent="flexStart">
           <ClickableText

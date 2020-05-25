@@ -137,6 +137,7 @@ function TokenPage({ address }) {
   const txnChangeFormatted = formattedPercent(txnChange)
 
   const below1080 = useMedia('(max-width: 1080px)')
+  const below600 = useMedia('(max-width: 600px)')
 
   return (
     <PageWrapper>
@@ -159,7 +160,11 @@ function TokenPage({ address }) {
           </RowFixed>
         </RowFixed>
         <span>
-          <RowFixed mb={20} ml={'2.5rem'} style={{ flexDirection: below1080 ? 'row-reverse' : 'initial' }}>
+          <RowFixed
+            mb={20}
+            ml={below600 ? '0' : '2.5rem'}
+            style={{ flexDirection: below1080 ? 'row-reverse' : 'initial' }}
+          >
             <Link href={getPoolLink(address)} target="_blank">
               <ButtonLight color={backgroundColor}>+ Add Liquidity</ButtonLight>
             </Link>
