@@ -105,7 +105,15 @@ const SORT_FIELD = {
   VOL: 'oneDayVolumeUSD',
   TXNS: 'oneDayTxns',
   VOL_7DAYS: 'oneWeekVolumeUSD',
-  FEES: 'oneDayVolumeUSD'
+  FEES: 'FEES'
+}
+
+const FIELD_TO_VALUE = {
+  [SORT_FIELD.LIQ]: 'reserveUSD',
+  [SORT_FIELD.VOL]: 'oneDayVolumeUSD',
+  [SORT_FIELD.TXNS]: 'oneDayTxns',
+  [SORT_FIELD.VOL_7DAYS]: 'oneWeekVolumeUSD',
+  [SORT_FIELD.FEES]: 'oneDayVolumeUSD'
 }
 
 function PairList({ pairs, color, history }) {
@@ -202,7 +210,7 @@ function PairList({ pairs, color, history }) {
     pairs &&
     pairs
       .sort((pairA, pairB) => {
-        return parseFloat(pairA[sortedColumn]) > parseFloat(pairB[sortedColumn])
+        return parseFloat(pairA[FIELD_TO_VALUE[sortedColumn]]) > parseFloat(pairB[FIELD_TO_VALUE[sortedColumn]])
           ? (sortDirection ? -1 : 1) * 1
           : (sortDirection ? -1 : 1) * -1
       })

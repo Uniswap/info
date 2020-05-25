@@ -414,9 +414,7 @@ export function useTokenTransactions(tokenAddress) {
     checkForTxns()
   }, [tokenTxns, tokenAddress, updateTokenTxns, allPairsFormatted])
 
-  return useMemo(() => {
-    return tokenTxns
-  }, [tokenTxns])
+  return tokenTxns
 }
 
 export function useTokenChartData(tokenAddress) {
