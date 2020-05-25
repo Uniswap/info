@@ -96,8 +96,13 @@ const GlobalChart = ({ display }) => {
     <>
       {below600 ? (
         <RowBetween mb={40}>
-          <DropdownSelect options={CHART_VIEW} active={chartView} setActive={setChartView} />
-          <DropdownSelect options={timeframeOptions} active={localWindow} setActive={setLocalWindow} />
+          <DropdownSelect options={CHART_VIEW} active={chartView} setActive={setChartView} color={'#ff007a'} />
+          <DropdownSelect
+            options={timeframeOptions}
+            active={localWindow}
+            setActive={setLocalWindow}
+            color={'#ff007a'}
+          />
         </RowBetween>
       ) : (
         <RowBetween marginBottom={'10px'}>
