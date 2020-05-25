@@ -208,10 +208,8 @@ export const GLOBAL_DATA = block => {
   const queryString = block
     ? ` query uniswapFactories {
       uniswapFactories(block:   
-       {number: ` +
-      block +
-      `}` +
-      ` where: { id: "${FACTORY_ADDRESS}" }) {
+       {number: ${block}} 
+       where: { id: "${FACTORY_ADDRESS}" }) {
         id
         totalVolumeUSD
         totalVolumeETH
@@ -237,7 +235,7 @@ export const GLOBAL_DATA = block => {
 
 export const GLOBAL_TXNS = gql`
   query transactions {
-    transactions(orderBy: timestamp, orderDirection: desc) {
+    transactions(first: 100, orderBy: timestamp, orderDirection: desc) {
       mints(orderBy: timestamp, orderDirection: desc) {
         transaction {
           id
@@ -302,6 +300,51 @@ export const GLOBAL_TXNS = gql`
         amountUSD
         to
       }
+    }
+  }
+`
+
+export const PAIRS_DYNAMIC_BULK = (block, pairs) => {
+  let pairsString = `[`
+  pairs.map(pair => {
+    return (pairsString += `"${pair}"`)
+  })
+  pairsString += ']'
+  let queryString = `
+  query pairs {
+    pairs(where: {id_in: ${pairsString}}, block: {number: ${block}}, orderBy: reserveUSD, orderDirection: desc) {
+      id
+      txCount
+      reserveUSD
+      volumeUSD
+    }
+  }
+  `
+  return gql(queryString)
+}
+
+export const PAIRS_BULK = gql`
+  query pairs($allPairs: [Bytes]!) {
+    pairs(where: { id_in: $allPairs }, orderBy: reserveUSD, orderDirection: desc) {
+      id
+      txCount
+      token0 {
+        id
+        symbol
+        name
+      }
+      token1 {
+        id
+        symbol
+        name
+      }
+      reserve0
+      reserve1
+      token0Price
+      token1Price
+      reserveUSD
+      volumeUSD
+      createdAtBlockNumber
     }
   }
 `
