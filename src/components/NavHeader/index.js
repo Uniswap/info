@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { useHistory } from 'react-router-dom'
+import { useHistory, Link as RouterLink } from 'react-router-dom'
 
 import styled from 'styled-components'
 import Title from '../Title'
@@ -43,7 +43,7 @@ const NavRight = styled.div`
   }
 `
 
-const LinkText = styled(Link)`
+const LinkText = styled(RouterLink)`
   font-weight: 500;
   color: white;
   margin-left: 1em;
