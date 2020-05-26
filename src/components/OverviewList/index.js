@@ -367,7 +367,7 @@ function OverviewList({ currencyUnit }) {
                 window.scrollTo(0, 0)
               }}
             >
-              <Text color="button" area={'name'} fontWeight="500">
+              <Text color="rgb(47, 128, 237)" area={'name'} fontWeight="500">
                 {exchange.tokenName}
               </Text>
             </CustomLink>
