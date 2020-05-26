@@ -327,25 +327,25 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
             </SortText>
             <SortText
               onClick={() => {
-                setTxFilter('SWAP')
+                setTxFilter(TXN_TYPE.SWAP)
               }}
-              active={txFilter === 'SWAP'}
+              active={txFilter === TXN_TYPE.SWAP}
             >
               Swaps
             </SortText>
             <SortText
               onClick={() => {
-                setTxFilter('ADD')
+                setTxFilter(TXN_TYPE.ADD)
               }}
-              active={txFilter === 'ADD'}
+              active={txFilter === TXN_TYPE.ADD}
             >
               Adds
             </SortText>
             <SortText
               onClick={() => {
-                setTxFilter('REMOVE')
+                setTxFilter(TXN_TYPE.REMOVE)
               }}
-              active={txFilter === 'REMOVE'}
+              active={txFilter === TXN_TYPE.REMOVE}
             >
               Removes
             </SortText>
@@ -375,7 +375,7 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
               }}
             >
               {symbol0Override ? symbol0Override + ' Amount' : 'Token Amount'}{' '}
-              {sortedColumn === SORT_FIELD.AMOUNT0 ? (!sortDirection ? '↑' : '↓') : ''}
+              {sortedColumn === SORT_FIELD.AMOUNT0 ? (sortDirection ? '↑' : '↓') : ''}
             </ClickableText>
           </Flex>
         )}
@@ -391,7 +391,7 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
                 }}
               >
                 {symbol1Override ? symbol1Override + ' Amount' : 'Token Amount'}{' '}
-                {sortedColumn === SORT_FIELD.AMOUNT1 ? (!sortDirection ? '↑' : '↓') : ''}
+                {sortedColumn === SORT_FIELD.AMOUNT1 ? (sortDirection ? '↑' : '↓') : ''}
               </ClickableText>
             </Flex>
           )}
