@@ -41,10 +41,13 @@ function reducer(state, { type, payload }) {
       }
     }
     case UPDATE_CHART: {
-      const { chartData } = payload
+      const { daily, weekly } = payload
       return {
         ...state,
-        chartData
+        chartData: {
+          daily,
+          weekly
+        }
       }
     }
     case UPDATE_ETH_PRICE: {
@@ -80,11 +83,12 @@ export default function Provider({ children }) {
     })
   }, [])
 
-  const updateChart = useCallback(chartData => {
+  const updateChart = useCallback((daily, weekly) => {
     dispatch({
       type: UPDATE_CHART,
       payload: {
-        chartData
+        daily,
+        weekly
       }
     })
   }, [])
@@ -339,10 +343,12 @@ export function useGlobalData() {
 }
 
 export function useGlobalChartData() {
-  const [chartData, setChartData] = useState()
-  const [weeklyData, setWeeklyData] = useState()
+  const [state, { updateChart }] = useGlobalDataContext()
   const [oldestDateFetch, setOldestDateFetched] = useState()
   const [activeWindow] = useTimeframe()
+
+  const chartDataDaily = state?.chartData?.daily
+  const chartDataWeekly = state?.chartData?.weekly
 
   // monitor the old date fetched
   useEffect(() => {
@@ -371,13 +377,14 @@ export function useGlobalChartData() {
     async function fetchData() {
       // historical stuff for chart
       let [newChartData, newWeeklyData] = await getChartData(oldestDateFetch)
-      setChartData(newChartData)
-      setWeeklyData(newWeeklyData)
+      updateChart(newChartData, newWeeklyData)
     }
-    oldestDateFetch && fetchData()
-  }, [oldestDateFetch])
+    if (oldestDateFetch && !(chartDataDaily && chartDataWeekly)) {
+      fetchData()
+    }
+  }, [chartDataDaily, chartDataWeekly, oldestDateFetch, updateChart])
 
-  return [chartData, weeklyData]
+  return [chartDataDaily, chartDataWeekly]
 }
 
 export function useGlobalTransactions() {

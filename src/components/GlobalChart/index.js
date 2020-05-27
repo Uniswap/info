@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 import { Area, XAxis, YAxis, ResponsiveContainer, Tooltip, AreaChart, BarChart, Bar } from 'recharts'
 import Row, { RowBetween } from '../Row'
 import { toK, toNiceDate, toWeeklyDate, toNiceDateYear } from '../../helpers'
@@ -43,30 +43,27 @@ const GlobalChart = ({ display }) => {
     }
   }
 
-  // update the app time window so it can fetch more points if needed
+  let utcEndTime = dayjs.utc()
   useEffect(() => {
     setGlobalWindow(localWindow)
   }, [localWindow, setGlobalWindow])
-
-  // find start time based on required time window, update domain
-  const utcEndTime = dayjs.utc()
   // based on window, get starttime
   let utcStartTime
   switch (localWindow) {
     case timeframeOptions.WEEK:
       utcStartTime =
         utcEndTime
-          .subtract(1, 'week')
+          ?.subtract(1, 'week')
           .startOf('day')
           .unix() - 1
       break
     case timeframeOptions.ALL_TIME:
-      utcStartTime = utcEndTime.subtract(1, 'year').unix() - 1
+      utcStartTime = utcEndTime?.subtract(1, 'year').unix() - 1
       break
     default:
       utcStartTime =
         utcEndTime
-          .subtract(1, 'year')
+          ?.subtract(1, 'year')
           .startOf('year')
           .unix() - 1
       break
@@ -77,20 +74,23 @@ const GlobalChart = ({ display }) => {
   const below1080 = useMedia('(max-width: 1080px)')
   const below600 = useMedia('(max-width: 600px)')
 
-  const chartDataFiltered =
-    chartData &&
-    Object.keys(chartData)
-      ?.map(key => {
-        let item = chartData[key]
-        if (item.date > utcStartTime) {
-          return item
-        } else {
-          return
-        }
-      })
-      .filter(item => {
-        return !!item
-      })
+  const chartDataFiltered = useMemo(() => {
+    return (
+      chartData &&
+      Object.keys(chartData)
+        ?.map(key => {
+          let item = chartData[key]
+          if (item.date > utcStartTime) {
+            return item
+          } else {
+            return
+          }
+        })
+        .filter(item => {
+          return !!item
+        })
+    )
+  }, [chartData, utcStartTime])
 
   return chartData ? (
     <>
