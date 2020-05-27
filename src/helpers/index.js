@@ -76,7 +76,7 @@ export const toK = (num, fixed, cutoff = false) => {
     fixed === true
       ? cutoff
         ? Number(num / divideBy).toFixed(0)
-        : Number(num / divideBy).toFixed(4)
+        : Number(num / divideBy).toFixed(2)
       : Number(num / divideBy)
   if (num > 999999999 || num < -9999999) {
     return `${formatter(1000000000)}M`
