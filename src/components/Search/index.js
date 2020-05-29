@@ -17,16 +17,16 @@ const Wrapper = styled.div`
   flex-direction: row;
   align-items: center;
   justify-content: flex-end;
-  padding: ${({ large }) => (large ? '12px' : '12px 16px')};
+  padding: ${({ small }) => (!small ? '12px' : '12px 16px')};
   border-radius: 12px;
   background: ${({ theme }) => theme.advancedBG};
   border-bottom-right-radius: ${({ open }) => (open ? '0px' : '12px')};
   border-bottom-left-radius: ${({ open }) => (open ? '0px' : '12px')};
-  ${({ large }) =>
-    large &&
+  ${({ small }) =>
+    !small &&
     ` box-shadow: 0 2.8px 2.8px -9px rgba(0, 0, 0, 0.008), 0 6.7px 6.7px -9px rgba(0, 0, 0, 0.012),
     0 12.5px 12.6px -9px rgba(0, 0, 0, 0.015), 0 22.3px 22.6px -9px rgba(0, 0, 0, 0.018),
-    0 41.8px 42.2px -9px rgba(0, 0, 0, 0.022), 0 100px 101px -9px rgba(0, 0, 0, 0.03);`}
+    0 41.8px 42.2px -9px rgba(0, 0, 0, 0.022), 0 100px 101px -9px rgba(0, 0, 0, 0.03);`};
 `
 const Input = styled.input`
   position: relative;
@@ -42,7 +42,7 @@ const Input = styled.input`
 
   ::placeholder {
     color: ${({ theme }) => theme.textColor};
-    font-size: ${({ large }) => (large ? '20px' : '16px')};
+    font-size: 16px;
   }
 
   @media screen and (max-width: 640px) {
@@ -266,7 +266,7 @@ export const Search = ({ small = false }) => {
         width: '100%'
       }}
     >
-      <Wrapper open={showMenu} shadow={true} large={!small}>
+      <Wrapper open={showMenu} shadow={true} small={small}>
         <SearchIconLarge />
         <Input
           large={!small}

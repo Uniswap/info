@@ -23,6 +23,7 @@ import CopyHelper from '../components/Copy'
 import { useMedia } from 'react-use'
 import { transparentize } from 'polished'
 import { useDataForList } from '../contexts/PairData'
+import { useEffect } from 'react'
 
 const PageWrapper = styled.div`
   display: flex;
@@ -112,6 +113,10 @@ function TokenPage({ address }) {
     oneDayTxns,
     txnChange
   } = useTokenData(address)
+
+  useEffect(() => {
+    document.querySelector('body').scrollTo(0, 0)
+  }, [])
 
   // detect color from token
   const backgroundColor = useColor(id, symbol)

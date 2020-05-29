@@ -217,15 +217,15 @@ export function formattedPercent(percent) {
 
 export const get2DayPercentChange = (valueNow, value24HoursAgo, value48HoursAgo) => {
   // get volume info for both 24 hour periods
-  let firstDayValue = value24HoursAgo - value48HoursAgo
-  let secondDayValue = valueNow - value24HoursAgo
+  let currentChange = valueNow - value24HoursAgo
+  let previousChange = value24HoursAgo - value48HoursAgo
 
-  const adjustedPercentChange = (parseFloat(secondDayValue - firstDayValue) / parseFloat(firstDayValue)) * 100
+  const adjustedPercentChange = (parseFloat(currentChange - previousChange) / parseFloat(previousChange)) * 100
 
   if (isNaN(adjustedPercentChange) || !isFinite(adjustedPercentChange)) {
-    return [secondDayValue, 0]
+    return [currentChange, 0]
   }
-  return [secondDayValue, adjustedPercentChange]
+  return [currentChange, adjustedPercentChange]
 }
 
 export const getPercentChange = (valueNow, value24HoursAgo) => {

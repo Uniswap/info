@@ -172,14 +172,7 @@ function PairList({ pairs, color, history }) {
               a1={pairData.token1.id}
               margin={!below740}
             />
-            <CustomLink
-              style={{ marginLeft: '20px', whiteSpace: 'nowrap' }}
-              to={'/pair/' + item.id}
-              onClick={() => {
-                window.scrollTo(0, 0)
-              }}
-              color={color}
-            >
+            <CustomLink style={{ marginLeft: '20px', whiteSpace: 'nowrap' }} to={'/pair/' + item.id} color={color}>
               {pairData.token0.symbol + '-' + pairData.token1.symbol}
             </CustomLink>
           </DataText>

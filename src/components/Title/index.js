@@ -9,18 +9,16 @@ import Link from '../Link'
 import { RowFixed } from '../Row'
 import Logo from '../../assets/logo.svg'
 import Wordmark from '../../assets/wordmark.svg'
-// import LogoDark from '../../assets/logo_white.svg'
-// import WordmarkDark from '../../assets/wordmark_white.svg'
-
 import { useMedia } from 'react-use'
 
 const TitleWrapper = styled.div`
   text-decoration: none;
-  height: 40px;
 
   &:hover {
     cursor: pointer;
   }
+
+  z-index: 10;
 `
 
 const UniIcon = styled(Link)`

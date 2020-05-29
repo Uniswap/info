@@ -3,7 +3,6 @@ import styled from 'styled-components'
 import { ApolloProvider } from 'react-apollo'
 import { client } from './apollo/client'
 import { Route, Switch, BrowserRouter, withRouter, Redirect } from 'react-router-dom'
-import ScrolToTop from './components/ScrollToTop'
 
 import GlobalPage from './pages/GlobalPage'
 import TokenPage from './pages/TokenPage'
@@ -58,9 +57,12 @@ function App() {
         <MigrateBanner>
           {below490 ? (
             <>
-              For V1 analytics&nbsp;
               <Link href="https://v1.uniswap.info/" target="_blank">
-                <b>click here ↗</b>
+                <b>V1 Analytics ↗</b>
+              </Link>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              <Link href="https://migrate.uniswap.info/" target="_blank">
+                <b>Combined Analytics ↗</b>
               </Link>
             </>
           ) : below750 ? (
@@ -84,7 +86,6 @@ function App() {
         globalChartData &&
         Object.keys(globalChartData).length > 0 ? (
           <BrowserRouter>
-            <ScrolToTop />
             <Switch>
               <Route
                 exacts

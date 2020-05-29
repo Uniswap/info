@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { withRouter } from 'react-router-dom'
 import 'feather-icons'
 import styled from 'styled-components'
@@ -32,7 +32,6 @@ const PageWrapper = styled.div`
   padding-bottom: 100px;
   width: calc(100% - 80px);
   padding: 0 40px;
-  overflow: scroll;
   padding-bottom: 80px;
 
   @media screen and (max-width: 640px) {
@@ -133,6 +132,10 @@ function PairPage({ pairAddress, history }) {
     oneDayTxns,
     txnChange
   } = usePairData(pairAddress)
+
+  useEffect(() => {
+    document.querySelector('body').scrollTo(0, 0)
+  }, [])
 
   const transactions = usePairTransactions(pairAddress)
   const backgroundColor = useColor(pairAddress)
