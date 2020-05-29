@@ -62,8 +62,13 @@ export default function NavHeader({ token, pair }) {
       <RowBetween>
         <Title token={token} pair={pair} />
         <RowFixed>
-          <div style={{ width: '370px' }}>{!isHome && <Search small={true} />}</div>
-          {isHome && !below600 && (
+          {!isHome && (
+            <div style={{ width: '370px' }}>
+              {' '}
+              <Search small={true} />
+            </div>
+          )}
+          {isHome && (
             <CombinedWrapper>
               {!below1024 && (
                 <>

@@ -193,9 +193,10 @@ async function getBulkPairData(pairList, ethPrice) {
 
         const [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentChange(
           data?.volumeUSD,
-          oneDayHistory?.volumeUSD ? oneDayHistory?.volumeUSD : 0,
-          twoDayData?.volumeUSD ? twoDayData?.volumeUSD : 0
+          oneDayHistory?.volumeUSD ?? 0,
+          twoDayHistory?.volumeUSD ?? 0
         )
+
         const oneWeekVolumeUSD = parseFloat(oneWeekData ? data?.volumeUSD - oneWeekHistory?.volumeUSD : data.volumeUSD)
         const [oneDayVolumeETH, volumeChangeETH] = get2DayPercentChange(
           data.tradeVolumeETH,
@@ -283,9 +284,10 @@ const getTopPairData = async ethPrice => {
 
         const [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentChange(
           data?.volumeUSD,
-          oneDayHistory?.volumeUSD ? oneDayHistory?.volumeUSD : 0,
-          twoDayData?.volumeUSD ? twoDayData?.volumeUSD : 0
+          oneDayHistory?.volumeUSD ?? 0,
+          twoDayHistory?.volumeUSD ?? 0
         )
+
         const oneWeekVolumeUSD = parseFloat(oneWeekData ? data?.volumeUSD - oneWeekHistory?.volumeUSD : data.volumeUSD)
         const [oneDayVolumeETH, volumeChangeETH] = get2DayPercentChange(
           data.tradeVolumeETH,
@@ -445,6 +447,7 @@ const getPairChartData = async pairAddress => {
       fetchPolicy: 'cache-first'
     })
     data = result.data.pairDayDatas
+
     let dayIndexSet = new Set()
     let dayIndexArray = []
     const oneDay = 24 * 60 * 60

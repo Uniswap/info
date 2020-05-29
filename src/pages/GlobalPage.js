@@ -128,6 +128,7 @@ function GlobalPage() {
   let txnChangeFormatted = txnChange ? formattedPercent(txnChange) : '-'
 
   const below1080 = useMedia('(max-width: 1080px)')
+  const below600 = useMedia('(max-width: 600px)')
 
   const daiPair = usePairData('0xa478c2975ab1ea89e8196811f51a7b7ade33eb11')
   const usdcPair = usePairData('0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc')
@@ -159,7 +160,7 @@ function GlobalPage() {
   return (
     <PageWrapper>
       <ThemedBackground />
-      <Search small={false} />
+      <Search small={!!below600} />
       {!below1080 && (
         <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
           Overall Stats

@@ -176,13 +176,7 @@ function TopTokenList({ tokens, history }) {
           <Row>
             {!below680 && <div style={{ marginRight: '1rem' }}>{index}</div>}
             <TokenLogo address={item.address} />
-            <CustomLink
-              style={{ marginLeft: '16px', whiteSpace: 'nowrap' }}
-              to={'/token/' + item.address}
-              onClick={() => {
-                window.scrollTo(0, 0)
-              }}
-            >
+            <CustomLink style={{ marginLeft: '16px', whiteSpace: 'nowrap' }} to={'/token/' + item.address}>
               {below680 ? item.symbol : item.name}
             </CustomLink>
           </Row>
