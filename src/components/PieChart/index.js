@@ -33,7 +33,7 @@ const PieChartComponent = ({ v1, v2 }) => {
         <div />
       </RowBetween>
       {v1 && v2 && (
-        <div style={{ height: 300 }}>
+        <div style={{ height: '300px' }}>
           <ResponsiveContainer>
             <PieChart width={100}>
               <Pie
