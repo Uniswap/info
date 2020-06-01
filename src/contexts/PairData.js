@@ -552,7 +552,13 @@ export function useDataForList(pairList) {
     }
   }, [ethPrice, state, pairList, stale, fetched])
 
-  return fetched
+  let formattedFetch =
+    fetched &&
+    fetched.reduce((obj, cur) => {
+      return { ...obj, [cur.id]: cur }
+    }, {})
+
+  return formattedFetch
 }
 
 /**
