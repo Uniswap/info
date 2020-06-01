@@ -5,7 +5,7 @@ import utc from 'dayjs/plugin/utc'
 import { useTimeframe } from './Application'
 import { timeframeOptions } from '../constants'
 import { getPercentChange, getBlockFromTimestamp, get2DayPercentChange } from '../helpers'
-import { GLOBAL_DATA, GLOBAL_TXNS, GLOBAL_CHART, ETH_PRICE } from '../apollo/queries'
+import { GLOBAL_DATA, GLOBAL_TXNS, GLOBAL_CHART, ETH_PRICE, ALL_PAIRS, ALL_TOKENS } from '../apollo/queries'
 import weekOfYear from 'dayjs/plugin/weekOfYear'
 import { getV1Data } from './V1Data'
 
@@ -14,6 +14,8 @@ const UPDATE_TXNS = 'UPDATE_TXNS'
 const UPDATE_CHART = 'UPDATE_CHART'
 const UPDATE_ETH_PRICE = 'UPDATE_ETH_PRICE'
 const ETH_PRICE_KEY = 'ETH_PRICE_KEY'
+const UPDATE_ALL_PAIRS_IN_UNISWAP = 'UPDAUPDATE_ALL_PAIRS_IN_UNISWAPTE_TOP_PAIRS'
+const UPDATE_ALL_TOKENS_IN_UNISWAP = 'UPDATE_ALL_TOKENS_IN_UNISWAP'
 
 dayjs.extend(utc)
 dayjs.extend(weekOfYear)
@@ -55,6 +57,22 @@ function reducer(state, { type, payload }) {
       return {
         ETH_PRICE_KEY: ethPrice,
         ethPriceChange
+      }
+    }
+
+    case UPDATE_ALL_PAIRS_IN_UNISWAP: {
+      const { allPairs } = payload
+      return {
+        ...state,
+        allPairs
+      }
+    }
+
+    case UPDATE_ALL_TOKENS_IN_UNISWAP: {
+      const { allTokens } = payload
+      return {
+        ...state,
+        allTokens
       }
     }
     default: {
@@ -103,15 +121,40 @@ export default function Provider({ children }) {
     })
   }, [])
 
+  const updateAllPairsInUniswap = useCallback(allPairs => {
+    dispatch({
+      type: UPDATE_ALL_PAIRS_IN_UNISWAP,
+      payload: {
+        allPairs
+      }
+    })
+  }, [])
+
+  const updateAllTokensInUniswap = useCallback(allTokens => {
+    dispatch({
+      type: UPDATE_ALL_TOKENS_IN_UNISWAP,
+      payload: {
+        allTokens
+      }
+    })
+  }, [])
   return (
     <GlobalDataContext.Provider
-      value={useMemo(() => [state, { update, updateTransactions, updateChart, updateEthPrice }], [
-        state,
-        update,
-        updateTransactions,
-        updateChart,
-        updateEthPrice
-      ])}
+      value={useMemo(
+        () => [
+          state,
+          { update, updateTransactions, updateChart, updateEthPrice, updateAllPairsInUniswap, updateAllTokensInUniswap }
+        ],
+        [
+          state,
+          update,
+          updateTransactions,
+          updateChart,
+          updateEthPrice,
+          updateAllPairsInUniswap,
+          updateAllTokensInUniswap
+        ]
+      )}
     >
       {children}
     </GlobalDataContext.Provider>
@@ -323,8 +366,48 @@ const getEthPrice = async () => {
   return [ethPrice, priceChangeETH]
 }
 
+async function getAllPairsOnUniswap() {
+  try {
+    let allFound = false
+    let pairs = []
+    while (!allFound) {
+      let result = await client.query({
+        query: ALL_PAIRS,
+        fetchPolicy: 'cache-first'
+      })
+      pairs = pairs.concat(result?.data?.pairs)
+      if (pairs?.length < 1000) {
+        allFound = true
+      }
+    }
+    return pairs
+  } catch (e) {
+    console.log(e)
+  }
+}
+
+async function getAllTokensOnUniswap() {
+  try {
+    let allFound = false
+    let tokens = []
+    while (!allFound) {
+      let result = await client.query({
+        query: ALL_TOKENS,
+        fetchPolicy: 'cache-first'
+      })
+      tokens = tokens.concat(result?.data?.tokens)
+      if (tokens?.length < 1000) {
+        allFound = true
+      }
+    }
+    return tokens
+  } catch (e) {
+    console.log(e)
+  }
+}
+
 export function useGlobalData() {
-  const [state, { update }] = useGlobalDataContext()
+  const [state, { update, updateAllPairsInUniswap, updateAllTokensInUniswap }] = useGlobalDataContext()
   const ethPrice = useEthPrice()
 
   const data = state?.globalData
@@ -334,10 +417,16 @@ export function useGlobalData() {
       if (!data && ethPrice) {
         let globalData = await getGlobalData(ethPrice)
         globalData && update(globalData)
+
+        let allPairs = await getAllPairsOnUniswap()
+        updateAllPairsInUniswap(allPairs)
+
+        let allTokens = await getAllTokensOnUniswap()
+        updateAllTokensInUniswap(allTokens)
       }
     }
     fetchData()
-  }, [ethPrice, update, data])
+  }, [ethPrice, update, data, updateAllPairsInUniswap, updateAllTokensInUniswap])
 
   return data || {}
 }
@@ -416,4 +505,18 @@ export function useEthPrice() {
   }, [ethPrice, updateEthPrice])
 
   return ethPrice
+}
+
+export function useAllPairsInUniswap() {
+  const [state] = useGlobalDataContext()
+  let allPairs = state?.allPairs
+
+  return allPairs || []
+}
+
+export function useAllTokensInUniswap() {
+  const [state] = useGlobalDataContext()
+  let allTokens = state?.allTokens
+
+  return allTokens || []
 }

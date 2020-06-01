@@ -85,6 +85,7 @@ function reducer(state, { type, payload }) {
         }
       }
     }
+
     default: {
       throw Error(`Unexpected action type in DataContext reducer: '${type}'.`)
     }
@@ -614,17 +615,7 @@ export function usePairChartData(pairAddress) {
 /**
  * Get list of all pairs in Uniswap
  */
-export function useAllPairs() {
+export function useAllPairData() {
   const [state] = usePairDataContext()
-
-  const pairsFormatted = useMemo(() => {
-    return (
-      state &&
-      Object.keys(state).map(pairID => {
-        return state[pairID]
-      })
-    )
-  }, [state])
-
-  return pairsFormatted
+  return state || {}
 }

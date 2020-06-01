@@ -12,7 +12,7 @@ import GlobalChart from '../components/GlobalChart'
 import { Hover, TYPE } from '../Theme'
 import { formattedNum, formattedPercent } from '../helpers'
 import { useGlobalData, useEthPrice, useGlobalTransactions } from '../contexts/GlobalData'
-import { useAllPairs, usePairData } from '../contexts/PairData'
+import { useAllPairData, usePairData } from '../contexts/PairData'
 import { Search } from '../components/Search'
 import { useMedia } from 'react-use'
 import TokenLogo from '../components/TokenLogo'
@@ -111,7 +111,7 @@ function GlobalPage() {
 
   const transactions = useGlobalTransactions()
 
-  const allPairs = useAllPairs()
+  const allPairs = useAllPairData()
   const allTokens = useAllTokenData()
 
   const ethPrice = useEthPrice()
