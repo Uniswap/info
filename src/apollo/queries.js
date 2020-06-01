@@ -349,9 +349,37 @@ export const PAIRS_BULK = gql`
   }
 `
 
+export const ALL_TOKENS = gql`
+  query tokens {
+    tokens(first: 1000) {
+      id
+      name
+      symbol
+    }
+  }
+`
+
+export const ALL_PAIRS = gql`
+  query pairs {
+    pairs(first: 1000) {
+      id
+      token0 {
+        id
+        symbol
+        name
+      }
+      token1 {
+        id
+        symbol
+        name
+      }
+    }
+  }
+`
+
 export const PAIRS_CURRENT = gql`
   query pairs {
-    pairs(first: 100, orderBy: reserveUSD, orderDirection: desc) {
+    pairs(first: 200, orderBy: reserveUSD, orderDirection: desc) {
       id
       txCount
       token0 {
@@ -378,7 +406,7 @@ export const PAIRS_CURRENT = gql`
 export const PAIRS_DYNAMIC = block => {
   let queryString = `
   query pairs {
-    pairs(block: {number: ${block}} first: 100, orderBy: reserveUSD, orderDirection: desc) {
+    pairs(block: {number: ${block}} first: 200, orderBy: reserveUSD, orderDirection: desc) {
       id
       txCount
       reserveUSD
@@ -418,7 +446,7 @@ export const TOKEN_CHART = gql`
 
 export const TOKENS_CURRENT = gql`
   query tokens {
-    tokens(first: 100, orderBy: tradeVolumeUSD, orderDirection: desc) {
+    tokens(first: 200, orderBy: tradeVolumeUSD, orderDirection: desc) {
       id
       name
       symbol
@@ -451,7 +479,7 @@ export const TOKENS_CURRENT = gql`
 export const TOKENS_DYNAMIC = block => {
   const queryString = `
     query tokens {
-      tokens(block: {number: ${block}} first: 100, orderBy: tradeVolumeUSD, orderDirection: desc) {
+      tokens(block: {number: ${block}} first: 200, orderBy: tradeVolumeUSD, orderDirection: desc) {
         id
         name
         symbol

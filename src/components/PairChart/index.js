@@ -15,7 +15,7 @@ import DropdownSelect from '../DropdownSelect'
 
 const ChartWrapper = styled.div`
   height: 100%;
-  min-height: 300px;
+  min-height: 448px;
 
   @media screen and (max-width: 600px) {
     min-height: 200px;
@@ -70,6 +70,8 @@ const PairChart = ({ address, color }) => {
     )
   }
 
+  const aspect = below1080 ? 60 / 32 : 60 / 32
+
   return (
     <ChartWrapper>
       {below600 ? (
@@ -107,7 +109,7 @@ const PairChart = ({ address, color }) => {
         </RowBetween>
       )}
       {chartFilter === CHART_VIEW.LIQUIDITY && (
-        <ResponsiveContainer aspect={below1080 ? 60 / 32 : 60 / 16}>
+        <ResponsiveContainer aspect={aspect}>
           <AreaChart margin={{ top: 0, right: 0, bottom: 6, left: 0 }} barCategoryGap={1} data={chartData}>
             <defs>
               <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
@@ -165,7 +167,7 @@ const PairChart = ({ address, color }) => {
         </ResponsiveContainer>
       )}
       {chartFilter === CHART_VIEW.VOLUME && (
-        <ResponsiveContainer aspect={below1080 ? 60 / 32 : 60 / 16}>
+        <ResponsiveContainer aspect={aspect}>
           <BarChart
             margin={{ top: 0, right: 0, bottom: 6, left: below1080 ? 0 : 10 }}
             barCategoryGap={1}

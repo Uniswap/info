@@ -148,6 +148,11 @@ function PairPage({ pairAddress, history }) {
   const volume = oneDayVolumeUSD ? formattedNum(oneDayVolumeUSD, true) : oneDayVolumeUSD === 0 ? '$0' : '-'
   const volumeChange = formattedPercent(volumeChangeUSD)
 
+  // rates
+  const token0Rate = reserve0 && reserve1 ? formattedNum(reserve1 / reserve0) : '-'
+  const token1Rate = reserve0 && reserve1 ? formattedNum(reserve0 / reserve1) : '-'
+
+  // txn percentage change
   const txnChangeFormatted = formattedPercent(txnChange)
 
   const below1080 = useMedia('(max-width: 1080px)')
@@ -234,7 +239,21 @@ function PairPage({ pairAddress, history }) {
                 </RowBetween>
               </AutoColumn>
             </Panel>
-            <Panel style={{ gridColumn: below1080 ? '1' : '2/4', gridRow: below1080 ? '' : '1/4' }}>
+            <Panel>
+              <AutoColumn gap="20px">
+                <RowBetween>
+                  <TYPE.main>Rates</TYPE.main>
+                  <div />
+                </RowBetween>
+                <TYPE.main fontSize={'20px'} lineHeight={1} fontWeight={600}>
+                  {`1 ${token0?.symbol} = ${token0Rate} ${token1?.symbol}`}
+                </TYPE.main>
+                <TYPE.main fontSize={'20px'} lineHeight={1} fontWeight={600}>
+                  {`1 ${token1?.symbol} = ${token1Rate} ${token0?.symbol}`}
+                </TYPE.main>
+              </AutoColumn>
+            </Panel>
+            <Panel style={{ gridColumn: below1080 ? '1' : '2/4', gridRow: below1080 ? '' : '1/5' }}>
               <PairChart address={pairAddress} color={backgroundColor} />
             </Panel>
           </PanelWrapper>

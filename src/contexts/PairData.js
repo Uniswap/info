@@ -85,6 +85,7 @@ function reducer(state, { type, payload }) {
         }
       }
     }
+
     default: {
       throw Error(`Unexpected action type in DataContext reducer: '${type}'.`)
     }
@@ -551,7 +552,13 @@ export function useDataForList(pairList) {
     }
   }, [ethPrice, state, pairList, stale, fetched])
 
-  return fetched
+  let formattedFetch =
+    fetched &&
+    fetched.reduce((obj, cur) => {
+      return { ...obj, [cur.id]: cur }
+    }, {})
+
+  return formattedFetch
 }
 
 /**
@@ -614,17 +621,7 @@ export function usePairChartData(pairAddress) {
 /**
  * Get list of all pairs in Uniswap
  */
-export function useAllPairs() {
+export function useAllPairData() {
   const [state] = usePairDataContext()
-
-  const pairsFormatted = useMemo(() => {
-    return (
-      state &&
-      Object.keys(state).map(pairID => {
-        return state[pairID]
-      })
-    )
-  }, [state])
-
-  return pairsFormatted
+  return state || {}
 }

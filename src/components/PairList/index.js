@@ -145,8 +145,8 @@ function PairList({ pairs, color, history }) {
     }
   }, [pairs])
 
-  const ListItem = ({ item, index }) => {
-    const pairData = item
+  const ListItem = ({ pairAddress, index }) => {
+    const pairData = pairs[pairAddress]
 
     if (pairData && pairData.token0 && pairData.token1) {
       const liquidity = formattedNum(pairData.reserveUSD, true)
@@ -163,7 +163,7 @@ function PairList({ pairs, color, history }) {
       }
 
       return (
-        <DashGrid style={{ height: '60px' }} focus={true} onClick={() => history.push('/pair/' + item.id)}>
+        <DashGrid style={{ height: '60px' }} focus={true} onClick={() => history.push('/pair/' + pairAddress)}>
           <DataText area="name" fontWeight="500">
             {!below600 && <div style={{ marginRight: '20px' }}>{index}</div>}
             <DoubleTokenLogo
@@ -172,7 +172,7 @@ function PairList({ pairs, color, history }) {
               a1={pairData.token1.id}
               margin={!below740}
             />
-            <CustomLink style={{ marginLeft: '20px', whiteSpace: 'nowrap' }} to={'/pair/' + item.id} color={color}>
+            <CustomLink style={{ marginLeft: '20px', whiteSpace: 'nowrap' }} to={'/pair/' + pairAddress} color={color}>
               {pairData.token0.symbol + '-' + pairData.token1.symbol}
             </CustomLink>
           </DataText>
@@ -201,18 +201,18 @@ function PairList({ pairs, color, history }) {
 
   const pairList =
     pairs &&
-    pairs
+    Object.keys(pairs)
       .sort((pairA, pairB) => {
         return parseFloat(pairA[FIELD_TO_VALUE[sortedColumn]]) > parseFloat(pairB[FIELD_TO_VALUE[sortedColumn]])
           ? (sortDirection ? -1 : 1) * 1
           : (sortDirection ? -1 : 1) * -1
       })
       .slice(ITEMS_PER_PAGE * (page - 1), page * ITEMS_PER_PAGE)
-      .map((item, index) => {
+      .map((pairAddress, index) => {
         return (
-          item && (
+          pairAddress && (
             <div key={index}>
-              <ListItem key={index} index={(page - 1) * 10 + index + 1} item={item} />
+              <ListItem key={index} index={(page - 1) * 10 + index + 1} pairAddress={pairAddress} />
               <Divider />
             </div>
           )

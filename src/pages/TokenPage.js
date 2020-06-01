@@ -121,6 +121,7 @@ function TokenPage({ address }) {
   // detect color from token
   const backgroundColor = useColor(id, symbol)
 
+  // pairs to show in pair list
   const fetchedPairsList = useDataForList(allPairs)
 
   // all transactions with this token
