@@ -57,11 +57,11 @@ async function getEthPriceUSD() {
     },
     fetchPolicy: 'cache-first'
   })
-  return parseFloat(daiResult?.data?.exchange?.price) || 0
+  return daiResult ? parseFloat(daiResult.data.exchange.price) : 0
 }
 export function useEthPriceUSD() {
   const [state, { updateEthPrice }] = useApplicationContext()
-  const ethPrice = state?.[ETH_PRICE_KEY]
+  const ethPrice = state[ETH_PRICE_KEY]
 
   useEffect(() => {
     async function fetch() {
