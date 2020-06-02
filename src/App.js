@@ -91,7 +91,12 @@ function App() {
                   strict
                   path="/token/:tokenAddressURL?"
                   render={({ match }) => {
-                    if (exchanges && tokenToExchangeMap.hasOwnProperty(match.params.tokenAddressURL.toLowerCase())) {
+                    if (
+                      exchanges &&
+                      tokenToExchangeMap &&
+                      match.params.tokenAddressURL &&
+                      tokenToExchangeMap.hasOwnProperty(match.params.tokenAddressURL.toLowerCase())
+                    ) {
                       return (
                         <ExchangeWrapper
                           currencyUnit={currencyUnit}
