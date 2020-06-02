@@ -202,7 +202,9 @@ function PairList({ pairs, color, history }) {
   const pairList =
     pairs &&
     Object.keys(pairs)
-      .sort((pairA, pairB) => {
+      .sort((addressA, addressB) => {
+        const pairA = pairs[addressA]
+        const pairB = pairs[addressB]
         return parseFloat(pairA[FIELD_TO_VALUE[sortedColumn]]) > parseFloat(pairB[FIELD_TO_VALUE[sortedColumn]])
           ? (sortDirection ? -1 : 1) * 1
           : (sortDirection ? -1 : 1) * -1
