@@ -17,6 +17,7 @@ import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 
 import { getPercentChange, get2DayPercentChange, getBlockFromTimestamp, isAddress } from '../helpers'
+import { OVERVIEW_WHITELIST } from '../constants'
 
 const UPDATE = 'UPDATE'
 const UPDATE_PAIR_TXNS = 'UPDATE_PAIR_TXNS'
@@ -499,7 +500,11 @@ export function Updater() {
     async function getData() {
       // get top pairs for overview list
       let topPairs = await getTopPairData(ethPrice)
-      updateTopPairs(topPairs)
+      updateTopPairs(
+        topPairs?.filter(pair => {
+          return OVERVIEW_WHITELIST.includes(pair.token0.id) || OVERVIEW_WHITELIST.includes(pair.token1.id)
+        })
+      )
     }
     ethPrice && getData()
   }, [ethPrice, updateTopPairs])
