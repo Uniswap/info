@@ -94,6 +94,11 @@ const ListWrapper = styled.div`
 
 const CustomLink = styled(Link)`
   margin-left: 0px;
+  text-decoration: none;
+
+  :visited {
+    color: rgb(47, 128, 237);
+  }
 `
 
 const ClickableText = styled(Text)`
@@ -396,7 +401,12 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, txFil
     return (
       <DashGrid style={{ height: '60px' }}>
         <DataText area={'action'} color="text" fontWeight="500">
-          <CustomLink ml="3" color="button" external href={urls.showTransaction(transaction.tx.split('-')[0])}>
+          <CustomLink
+            ml="3"
+            color="rgb(47, 128, 237)"
+            external
+            href={urls.showTransaction(transaction.tx.split('-')[0])}
+          >
             {getTransactionType(transaction.event, tokenSymbol)}
           </CustomLink>
         </DataText>
@@ -422,9 +432,14 @@ function TransactionsList({ tokenSymbol, exchangeAddress, price, priceUSD, txFil
         )}
         {!belowSmall ? (
           <DataText area={'Account'}>
-            <Link ml="3" color="button" external href={'https://etherscan.io/address/' + transaction.user}>
+            <CustomLink
+              ml="3"
+              color="rgb(47, 128, 237)"
+              external
+              href={'https://etherscan.io/address/' + transaction.user}
+            >
               {transaction.user.slice(0, 6) + '...' + transaction.user.slice(38, 42)}
-            </Link>
+            </CustomLink>
           </DataText>
         ) : (
           ''

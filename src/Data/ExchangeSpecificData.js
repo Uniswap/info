@@ -4,11 +4,14 @@ import utc from 'dayjs/plugin/utc'
 import { client } from '../apollo/client'
 import { TICKER_QUERY, TICKER_24HOUR_QUERY } from '../apollo/queries'
 import { get2DayPercentFormatted, getPercentFormatted } from '../helpers'
+import { useEthPriceUSD } from '../contexts/Application'
 
 export function useExchangeSpecificData(exchangeAddress) {
   dayjs.extend(utc)
 
   const [exchangeData, setExchangeData] = useState({})
+
+  const ethPrice = useEthPriceUSD()
 
   useEffect(() => {
     const fetchExchangeData = async function(address) {
@@ -143,7 +146,7 @@ export function useExchangeSpecificData(exchangeAddress) {
       newExchangeData.tokenAddress = tokenAddress
       newExchangeData.price = price
       newExchangeData.invPrice = invPrice
-      newExchangeData.priceUSD = priceUSD
+      newExchangeData.priceUSD = invPrice * ethPrice
       newExchangeData.pricePercentChange = pricePercentChangeUSD
       newExchangeData.pricePercentChangeETH = pricePercentChangeETH
       newExchangeData.volumePercentChangeETH = volumePercentChangeETH
@@ -158,8 +161,10 @@ export function useExchangeSpecificData(exchangeAddress) {
 
       setExchangeData(newExchangeData)
     }
-    fetchExchangeData(exchangeAddress)
-  }, [exchangeAddress])
+    if (ethPrice) {
+      fetchExchangeData(exchangeAddress)
+    }
+  }, [exchangeAddress, ethPrice])
 
   return exchangeData
 }

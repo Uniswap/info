@@ -2,6 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import { Provider } from 'unstated'
 import App from './App'
+import ApplicatonDataContextProvider from './contexts/Application'
 
 /**
  * This is the last legacy data fetching strategy. In future updates we should move this into
@@ -10,9 +11,11 @@ import App from './App'
  */
 export default function AppWrapper() {
   return (
-    <Provider>
-      <App />
-    </Provider>
+    <ApplicatonDataContextProvider>
+      <Provider>
+        <App />
+      </Provider>
+    </ApplicatonDataContextProvider>
   )
 }
 

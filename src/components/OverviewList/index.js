@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, withRouter } from 'react-router-dom'
 import { useMedia } from 'react-use'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
@@ -12,6 +12,7 @@ import TokenLogo from '../TokenLogo'
 import { formattedNum } from '../../helpers'
 import { Divider } from '../../components'
 import Loader from '../../components/Loader'
+import { useEthPriceUSD } from '../../contexts/Application'
 
 dayjs.extend(utc)
 
@@ -85,8 +86,8 @@ const DashGrid = styled.div`
 
 const DashGridClickable = styled(DashGrid)`
   :hover {
-    // background-color: #f8f8f8;
-    // cursor: pointer;
+    background-color: #f8f8f8;
+    cursor: pointer;
   }
 `
 
@@ -141,7 +142,7 @@ const CustomLink = styled(Link)`
 `
 
 // @TODO rework into virtualized list
-function OverviewList({ currencyUnit }) {
+function OverviewList({ currencyUnit, history }) {
   const [exchanges, setExchanges] = useState([])
 
   const [filteredTxs, SetFilteredTxs] = useState([])
@@ -157,6 +158,8 @@ function OverviewList({ currencyUnit }) {
   const [loading, setLoading] = useState(true)
 
   const [sortDirection, setSortDirection] = useState(true)
+
+  const ethPrice = useEthPriceUSD()
 
   const SORT_FIELD = {
     PRICE: 'priceUSD',
@@ -354,7 +357,13 @@ function OverviewList({ currencyUnit }) {
       exchange.tokenName = 'Compound SAI'
     }
     return (
-      <DashGridClickable style={{ height: '60px' }}>
+      <DashGridClickable
+        style={{ height: '60px' }}
+        onClick={() => {
+          history.push('/token/' + exchange.tokenAddress)
+          window.scrollTo(0, 0)
+        }}
+      >
         <Flex alignItems="center" justifyContent="flex-start">
           <div style={{ minWidth: '30px' }}>{id + (page - 1) * TXS_PER_PAGE}</div>
           <LogoBox>
@@ -390,7 +399,7 @@ function OverviewList({ currencyUnit }) {
             <DataText area={'price'}>
               {exchange.price && exchange.priceUSD
                 ? currencyUnit === 'USD'
-                  ? '$' + formattedNum(exchange.priceUSD, true)
+                  ? '$' + formattedNum((1 / exchange.price) * ethPrice, true)
                   : formattedNum(1 / exchange.price) + ' ETH'
                 : ''}
             </DataText>
@@ -565,4 +574,4 @@ OverviewList.propTypes = {
   transactions: PropTypes.array.isRequired
 }
 
-export default OverviewList
+export default withRouter(OverviewList)
