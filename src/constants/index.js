@@ -17,5 +17,6 @@ export const OVERVIEW_WHITELIST = [
   '0xdac17f958d2ee523a2206206994597c13d831ec7', // usdt
   '0x0000000000085d4780b73119b644ae5ecd22b376', //tusd
   '0x5d3a536e4d6dbd6114cc1ead35777bab948e3643', //cdai
-  '0x39aa39c021dfbae8fac545936693ac917d5e7563' // cusdc
+  '0x39aa39c021dfbae8fac545936693ac917d5e7563', // cusdc
+  '0x86fadb80d8d2cff3c3680819e4da99c10232ba0f' // EBASE
 ]

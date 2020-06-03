@@ -455,7 +455,7 @@ export const TOKENS_CURRENT = gql`
       tradeVolumeUSD
       totalLiquidity
       txCount
-      allPairs(first: 200, orderBy: reserveUSD, where: { reserveUSD_gt: 0.1 }, orderDirection: desc) {
+      allPairs(first: 200, orderBy: reserveUSD, orderDirection: desc) {
         id
         reserveUSD
         volumeUSD
@@ -512,7 +512,7 @@ export const TOKEN_DATA = (tokenAddress, block) => {
       tradeVolumeUSD
       totalLiquidity
       txCount
-      allPairs(first: 200, where: {reserveUSD_gt: 1} orderBy: reserveUSD, orderDirection: desc) {
+      allPairs(first: 200, orderBy: reserveUSD, orderDirection: desc) {
         id
         reserveUSD
         volumeUSD
@@ -545,7 +545,7 @@ export const TOKEN_DATA = (tokenAddress, block) => {
     tradeVolumeUSD
     totalLiquidity
     txCount
-    allPairs(first: 200, where: {reserveUSD_gt: 1}, orderBy: reserveUSD, orderDirection: desc) {
+    allPairs(first: 200, orderBy: reserveUSD, orderDirection: desc) {
       id
       reserveUSD
       volumeUSD
