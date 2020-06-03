@@ -233,7 +233,7 @@ function PairPage({ pairAddress, history }) {
                 </RowBetween>
                 <RowBetween align="flex-end">
                   <TYPE.main fontSize={'2rem'} lineHeight={1} fontWeight={600}>
-                    {oneDayTxns}
+                    {oneDayTxns ?? '-'}
                   </TYPE.main>
                   <TYPE.main>{txnChangeFormatted}</TYPE.main>
                 </RowBetween>
@@ -246,10 +246,10 @@ function PairPage({ pairAddress, history }) {
                   <div />
                 </RowBetween>
                 <TYPE.main fontSize={'20px'} lineHeight={1} fontWeight={600}>
-                  {`1 ${token0?.symbol} = ${token0Rate} ${token1?.symbol}`}
+                  {token0 && token1 ? `1 ${token0?.symbol} = ${token0Rate} ${token1?.symbol}` : '-'}
                 </TYPE.main>
                 <TYPE.main fontSize={'20px'} lineHeight={1} fontWeight={600}>
-                  {`1 ${token1?.symbol} = ${token1Rate} ${token0?.symbol}`}
+                  {token0 && token1 ? `1 ${token1?.symbol} = ${token1Rate} ${token0?.symbol}` : '-'}
                 </TYPE.main>
               </AutoColumn>
             </Panel>
