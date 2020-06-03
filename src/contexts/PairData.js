@@ -578,7 +578,6 @@ export function usePairData(pairAddress) {
     async function fetchData() {
       if (!pairData && pairAddress) {
         let data = await getPairData(pairAddress, ethPrice)
-        console.log(data)
         update(pairAddress, data)
       }
     }
