@@ -306,6 +306,7 @@ const getChartData = async oldestDateToFetch => {
         timestamp = nextDay
       }
     }
+    data[data.length - 1].totalLiquidityUSD = data[data.length - 1].totalLiquidityUSD - 61807123
 
     data = data.sort((a, b) => (parseInt(a.date) > parseInt(b.date) ? 1 : -1))
     let startIndexWeekly = -1
@@ -326,7 +327,6 @@ const getChartData = async oldestDateToFetch => {
     console.log(e)
   }
 
-  data[data.length - 1].totalLiquidityUSD = data[data.length - 1].totalLiquidityUSD
   return [data, weeklyData]
 }
 
