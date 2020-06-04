@@ -6,7 +6,7 @@ import Search from '../Search'
 import { RowFixed, RowBetween } from '../Row'
 import { AutoColumn } from '../Column'
 import { useMedia } from 'react-use'
-import { useGlobalData } from '../../contexts/GlobalData'
+import { useGlobalData, useV1Data } from '../../contexts/GlobalData'
 import { toK } from '../../helpers'
 import { ButtonDark } from '../ButtonStyled'
 import Link from '../Link'
@@ -41,7 +41,8 @@ export default function NavHeader({ token, pair }) {
   const below1024 = useMedia('(max-width: 1024px)')
   const below600 = useMedia('(max-width: 600px)')
 
-  const { totalLiquidityUSD, oneDayVolumeUSD, v1Data } = useGlobalData()
+  const { totalLiquidityUSD, oneDayVolumeUSD } = useGlobalData()
+  const v1Data = useV1Data()
 
   const liquidity =
     totalLiquidityUSD && v1Data?.totalLiquidityUSD

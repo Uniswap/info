@@ -19,6 +19,7 @@ import { getV1Data } from './V1Data'
 import { useSubscription } from 'react-apollo'
 
 const UPDATE = 'UPDATE'
+const UPDATE_V1 = 'UPDATE_V1'
 const UPDATE_STAGED = 'UPDATE_STAGED'
 const UPDATE_TXNS = 'UPDATE_TXNS'
 const UPDATE_CHART = 'UPDATE_CHART'
@@ -43,6 +44,13 @@ function reducer(state, { type, payload }) {
       return {
         ...state,
         globalData: data
+      }
+    }
+    case UPDATE_V1: {
+      const { v1Data } = payload
+      return {
+        ...state,
+        v1Data
       }
     }
     case UPDATE_STAGED: {
@@ -102,11 +110,21 @@ function reducer(state, { type, payload }) {
 
 export default function Provider({ children }) {
   const [state, dispatch] = useReducer(reducer, {})
+
   const update = useCallback(data => {
     dispatch({
       type: UPDATE,
       payload: {
         data
+      }
+    })
+  }, [])
+
+  const updateV1 = useCallback(v1Data => {
+    dispatch({
+      type: UPDATE_V1,
+      payload: {
+        v1Data
       }
     })
   }, [])
@@ -175,6 +193,7 @@ export default function Provider({ children }) {
           state,
           {
             update,
+            updateV1,
             updateStaged,
             updateTransactions,
             updateChart,
@@ -186,6 +205,7 @@ export default function Provider({ children }) {
         [
           state,
           update,
+          updateV1,
           updateStaged,
           updateTransactions,
           updateChart,
@@ -305,6 +325,8 @@ const getChartData = async oldestDateToFetch => {
   } catch (e) {
     console.log(e)
   }
+
+  data[data.length - 1].totalLiquidityUSD = data[data.length - 1].totalLiquidityUSD
   return [data, weeklyData]
 }
 
@@ -430,7 +452,7 @@ function formatCombined(data, oneDayData, twoDayData, ethPrice) {
     twoDayData.txCount ? twoDayData.txCount : 0
   )
 
-  data.totalLiquidityUSD = data.totalLiquidityETH * ethPrice
+  data.totalLiquidityUSD = data.totalLiquidityETH * ethPrice - 61807123
   const liquidityChangeUSD = getPercentChange(data.totalLiquidityETH, oneDayData.totalLiquidityETH)
   const liquidityChangeETH = getPercentChange(data.totalLiquidityETH, oneDayData.totalLiquidityETH)
   data.oneDayVolumeUSD = oneDayVolumeUSD
@@ -490,6 +512,23 @@ export function useGlobalData() {
   }, [ethPrice, storedData, updateAllPairsInUniswap, updateAllTokensInUniswap, updateStaged])
 
   return storedData || {}
+}
+
+export function useV1Data() {
+  const [state, { updateV1 }] = useGlobalDataContext()
+  const v1Data = state?.v1Data
+
+  useEffect(() => {
+    async function fetch() {
+      let newData = await getV1Data()
+      updateV1(newData)
+    }
+    if (!v1Data) {
+      fetch()
+    }
+  }, [updateV1, v1Data])
+
+  return v1Data
 }
 
 export function useGlobalChartData() {

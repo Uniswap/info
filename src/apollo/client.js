@@ -4,7 +4,6 @@ import { HttpLink } from 'apollo-link-http'
 import { WebSocketLink } from 'apollo-link-ws'
 import { getMainDefinition } from 'apollo-utilities'
 import { split } from 'apollo-link'
-import { SubscriptionClient, addGraphQLSubscriptions } from 'subscriptions-transport-ws'
 
 // Create an http link:
 const httpLink = new HttpLink({

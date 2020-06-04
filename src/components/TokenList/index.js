@@ -145,7 +145,15 @@ function TopTokenList({ tokens, history }) {
       const tokensArray = []
       Object.keys(tokens).map(key => {
         tokens[key].address = key
-        return tokensArray.push(tokens[key])
+        // hot fix while graph syncs
+        if (
+          key !== '0xc3761eb917cd790b30dad99f6cc5b4ff93c4f9ea' &&
+          key !== '0x495c7f3a713870f68f8b418b355c085dfdc412c3'
+        ) {
+          return tokensArray.push(tokens[key])
+        } else {
+          return null
+        }
       })
       setFilteredItems(tokensArray)
       let extraPages = 1
