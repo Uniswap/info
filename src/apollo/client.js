@@ -9,8 +9,8 @@ export const client = new ApolloClient({
   // to a different host
   link: new HttpLink({
     // pending uniswap with 'fixed' trade volumne
-    // uri: 'https://api.thegraph.com/subgraphs/name/ianlapham/uniswap-v2-local'
-    uri: 'https://api.thegraph.com/subgraphs/name/ianlapham/unsiwap3'
+    uri: 'https://api.thegraph.com/subgraphs/name/ianlapham/uniswap-v2-local'
+    // uri: 'https://api.thegraph.com/subgraphs/name/ianlapham/unsiwap3'
   }),
   cache: new InMemoryCache(),
   shouldBatch: true
