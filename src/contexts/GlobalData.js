@@ -5,11 +5,21 @@ import utc from 'dayjs/plugin/utc'
 import { useTimeframe } from './Application'
 import { timeframeOptions } from '../constants'
 import { getPercentChange, getBlockFromTimestamp, get2DayPercentChange } from '../helpers'
-import { GLOBAL_DATA, GLOBAL_TXNS, GLOBAL_CHART, ETH_PRICE, ALL_PAIRS, ALL_TOKENS } from '../apollo/queries'
+import {
+  GLOBAL_DATA,
+  GLOBAL_TXNS,
+  GLOBAL_CHART,
+  ETH_PRICE,
+  ALL_PAIRS,
+  ALL_TOKENS,
+  GLOBAL_SUBSCRIPTION
+} from '../apollo/queries'
 import weekOfYear from 'dayjs/plugin/weekOfYear'
 import { getV1Data } from './V1Data'
+import { useSubscription } from 'react-apollo'
 
 const UPDATE = 'UPDATE'
+const UPDATE_STAGED = 'UPDATE_STAGED'
 const UPDATE_TXNS = 'UPDATE_TXNS'
 const UPDATE_CHART = 'UPDATE_CHART'
 const UPDATE_ETH_PRICE = 'UPDATE_ETH_PRICE'
@@ -33,6 +43,15 @@ function reducer(state, { type, payload }) {
       return {
         ...state,
         globalData: data
+      }
+    }
+    case UPDATE_STAGED: {
+      const { current, oneDay, twoDay } = payload
+      return {
+        ...state,
+        current,
+        oneDay,
+        twoDay
       }
     }
     case UPDATE_TXNS: {
@@ -92,6 +111,17 @@ export default function Provider({ children }) {
     })
   }, [])
 
+  const updateStaged = useCallback((current, oneDay, twoDay) => {
+    dispatch({
+      type: UPDATE_STAGED,
+      payload: {
+        current,
+        oneDay,
+        twoDay
+      }
+    })
+  }, [])
+
   const updateTransactions = useCallback(transactions => {
     dispatch({
       type: UPDATE_TXNS,
@@ -143,11 +173,20 @@ export default function Provider({ children }) {
       value={useMemo(
         () => [
           state,
-          { update, updateTransactions, updateChart, updateEthPrice, updateAllPairsInUniswap, updateAllTokensInUniswap }
+          {
+            update,
+            updateStaged,
+            updateTransactions,
+            updateChart,
+            updateEthPrice,
+            updateAllPairsInUniswap,
+            updateAllTokensInUniswap
+          }
         ],
         [
           state,
           update,
+          updateStaged,
           updateTransactions,
           updateChart,
           updateEthPrice,
@@ -161,7 +200,7 @@ export default function Provider({ children }) {
   )
 }
 
-async function getGlobalData(ethPrice) {
+async function getStagedData() {
   let data = {}
   let oneDayData = {}
   let twoDayData = {}
@@ -178,6 +217,7 @@ async function getGlobalData(ethPrice) {
       fetchPolicy: 'cache-first'
     })
     data = result.data.uniswapFactories[0]
+
     let oneDayResult = await client.query({
       query: GLOBAL_DATA(oneDayBlock),
       fetchPolicy: 'cache-first'
@@ -189,46 +229,11 @@ async function getGlobalData(ethPrice) {
       fetchPolicy: 'cache-first'
     })
     twoDayData = twoDayResult.data.uniswapFactories[0]
-
-    if (data && oneDayData && twoDayData) {
-      const [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentChange(
-        data.totalVolumeUSD,
-        oneDayData.totalVolumeUSD ? oneDayData.totalVolumeUSD : 0,
-        twoDayData.totalVolumeUSD ? twoDayData.totalVolumeUSD : 0
-      )
-
-      const [oneDayVolumeETH, volumeChangeETH] = get2DayPercentChange(
-        data.totalVolumeETH,
-        oneDayData.totalVolumeETH ? oneDayData.totalVolumeETH : 0,
-        twoDayData.totalVolumeETH ? twoDayData.totalVolumeETH : 0
-      )
-
-      const [oneDayTxns, txnChange] = get2DayPercentChange(
-        data.txCount,
-        oneDayData.txCount ? oneDayData.txCount : 0,
-        twoDayData.txCount ? twoDayData.txCount : 0
-      )
-
-      data.totalLiquidityUSD = data.totalLiquidityETH * ethPrice
-      const liquidityChangeUSD = getPercentChange(data.totalLiquidityETH, oneDayData.totalLiquidityETH)
-      const liquidityChangeETH = getPercentChange(data.totalLiquidityETH, oneDayData.totalLiquidityETH)
-      data.oneDayVolumeUSD = oneDayVolumeUSD
-      data.volumeChangeUSD = volumeChangeUSD
-      data.oneDayVolumeETH = oneDayVolumeETH
-      data.volumeChangeETH = volumeChangeETH
-      data.liquidityChangeUSD = liquidityChangeUSD
-      data.liquidityChangeETH = liquidityChangeETH
-      data.oneDayTxns = oneDayTxns
-      data.txnChange = txnChange
-
-      const v1Data = await getV1Data()
-      data.v1Data = v1Data
-    }
   } catch (e) {
     console.log(e)
   }
 
-  return data
+  return [data, oneDayData, twoDayData]
 }
 
 const getChartData = async oldestDateToFetch => {
@@ -406,17 +411,73 @@ async function getAllTokensOnUniswap() {
   }
 }
 
+function formatCombined(data, oneDayData, twoDayData, ethPrice) {
+  const [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentChange(
+    data.totalVolumeUSD,
+    oneDayData.totalVolumeUSD ? oneDayData.totalVolumeUSD : 0,
+    twoDayData.totalVolumeUSD ? twoDayData.totalVolumeUSD : 0
+  )
+
+  const [oneDayVolumeETH, volumeChangeETH] = get2DayPercentChange(
+    data.totalVolumeETH,
+    oneDayData.totalVolumeETH ? oneDayData.totalVolumeETH : 0,
+    twoDayData.totalVolumeETH ? twoDayData.totalVolumeETH : 0
+  )
+
+  const [oneDayTxns, txnChange] = get2DayPercentChange(
+    data.txCount,
+    oneDayData.txCount ? oneDayData.txCount : 0,
+    twoDayData.txCount ? twoDayData.txCount : 0
+  )
+
+  data.totalLiquidityUSD = data.totalLiquidityETH * ethPrice
+  const liquidityChangeUSD = getPercentChange(data.totalLiquidityETH, oneDayData.totalLiquidityETH)
+  const liquidityChangeETH = getPercentChange(data.totalLiquidityETH, oneDayData.totalLiquidityETH)
+  data.oneDayVolumeUSD = oneDayVolumeUSD
+  data.volumeChangeUSD = volumeChangeUSD
+  data.oneDayVolumeETH = oneDayVolumeETH
+  data.volumeChangeETH = volumeChangeETH
+  data.liquidityChangeUSD = liquidityChangeUSD
+  data.liquidityChangeETH = liquidityChangeETH
+  data.oneDayTxns = oneDayTxns
+  data.txnChange = txnChange
+
+  return data
+}
+
 export function useGlobalData() {
-  const [state, { update, updateAllPairsInUniswap, updateAllTokensInUniswap }] = useGlobalDataContext()
+  const [state, { update, updateStaged, updateAllPairsInUniswap, updateAllTokensInUniswap }] = useGlobalDataContext()
   const ethPrice = useEthPrice()
 
-  const data = state?.globalData
+  const [current, oneDay, twoDay] = [state?.current, state?.oneDay, state?.twoDay]
+  const storedData = state?.globalData
+
+  useSubscription(GLOBAL_SUBSCRIPTION, {
+    client: client,
+    onSubscriptionData: ({ subscriptionData }) => {
+      let newCurrentData = subscriptionData?.data?.uniswapFactories[0]
+      if (oneDay && twoDay && ethPrice) {
+        let newCombined = formatCombined(newCurrentData, oneDay, twoDay, ethPrice)
+        if (storedData.txCount !== newCurrentData.txCount) {
+          update(newCombined)
+          console.log('updating')
+        }
+      }
+    }
+  })
+
+  useEffect(() => {
+    if (current && oneDay && twoDay && ethPrice && !storedData) {
+      let newCombined = formatCombined(current, oneDay, twoDay, ethPrice)
+      update(newCombined)
+    }
+  }, [current, ethPrice, oneDay, storedData, twoDay, update])
 
   useEffect(() => {
     async function fetchData() {
-      if (!data && ethPrice) {
-        let globalData = await getGlobalData(ethPrice)
-        globalData && update(globalData)
+      if (!storedData && ethPrice) {
+        let [currentData, oneDayData, twoDayData] = await getStagedData()
+        updateStaged(currentData, oneDayData, twoDayData)
 
         let allPairs = await getAllPairsOnUniswap()
         updateAllPairsInUniswap(allPairs)
@@ -426,9 +487,9 @@ export function useGlobalData() {
       }
     }
     fetchData()
-  }, [ethPrice, update, data, updateAllPairsInUniswap, updateAllTokensInUniswap])
+  }, [ethPrice, storedData, updateAllPairsInUniswap, updateAllTokensInUniswap, updateStaged])
 
-  return data || {}
+  return storedData || {}
 }
 
 export function useGlobalChartData() {

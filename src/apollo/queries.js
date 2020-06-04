@@ -233,6 +233,19 @@ export const GLOBAL_DATA = block => {
   return gql(queryString)
 }
 
+export const GLOBAL_SUBSCRIPTION = gql`
+  subscription onUniswapFactories {
+    uniswapFactories {
+      id
+      totalVolumeUSD
+      totalVolumeETH
+      totalLiquidityUSD
+      totalLiquidityETH
+      txCount
+    }
+  }
+`
+
 export const GLOBAL_TXNS = gql`
   query transactions {
     transactions(first: 100, orderBy: timestamp, orderDirection: desc) {
