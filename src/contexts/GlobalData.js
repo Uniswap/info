@@ -209,7 +209,7 @@ async function getGlobalData(ethPrice) {
         twoDayData.txCount ? twoDayData.txCount : 0
       )
 
-      data.totalLiquidityUSD = data.totalLiquidityETH * ethPrice - 61807123 // hot fix while graph syncs
+      data.totalLiquidityUSD = data.totalLiquidityETH * ethPrice
       const liquidityChangeUSD = getPercentChange(data.totalLiquidityETH, oneDayData.totalLiquidityETH)
       const liquidityChangeETH = getPercentChange(data.totalLiquidityETH, oneDayData.totalLiquidityETH)
       data.oneDayVolumeUSD = oneDayVolumeUSD
@@ -301,7 +301,6 @@ const getChartData = async oldestDateToFetch => {
     console.log(e)
   }
 
-  data[data.length - 1].totalLiquidityUSD = data[data.length - 1].totalLiquidityUSD - 61807123
   return [data, weeklyData]
 }
 
