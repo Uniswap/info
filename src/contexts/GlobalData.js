@@ -154,7 +154,7 @@ async function getGlobalData(ethPrice) {
       twoDayData.txCount ? twoDayData.txCount : 0
     )
 
-    data.totalLiquidityUSD = data.totalLiquidityETH * ethPrice
+    data.totalLiquidityUSD = data.totalLiquidityETH * ethPrice - 61807123 // hot fix
     const liquidityChangeUSD = getPercentChange(data.totalLiquidityETH, oneDayData.totalLiquidityETH)
     const liquidityChangeETH = getPercentChange(data.totalLiquidityETH, oneDayData.totalLiquidityETH)
     data.oneDayVolumeUSD = oneDayVolumeUSD
