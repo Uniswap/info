@@ -20,3 +20,9 @@ export const OVERVIEW_WHITELIST = [
   '0x39aa39c021dfbae8fac545936693ac917d5e7563', // cusdc
   '0x86fadb80d8d2cff3c3680819e4da99c10232ba0f' // EBASE
 ]
+
+// temp until tracked global liquidity
+export const OVERVIEW_TOKEN_BLACKLIST = [
+  '0x495c7f3a713870f68f8b418b355c085dfdc412c3',
+  '0xc3761eb917cd790b30dad99f6cc5b4ff93c4f9ea'
+]

@@ -122,65 +122,6 @@ export const PAIR_TXNS = gql`
   }
 `
 
-export const PAIR_DATA = (pairAddress, block) => {
-  const queryString = block
-    ? `
-    query pairs {
-      pairs(block: {number: ${block} 
-      } where: { id: "${pairAddress}"} ) {
-        id
-        txCount
-        token0 {
-          id
-          symbol
-          name
-          totalLiquidity
-          derivedETH
-        }
-        token1 {
-          id
-          symbol
-          name
-          totalLiquidity
-          derivedETH
-        }
-        reserve0
-        reserve1
-        reserveUSD
-        reserveETH
-        volumeUSD
-      }
-    }`
-    : ` query pairs {
-      pairs( where: { id: "` +
-      pairAddress +
-      `"}) {
-        id
-        txCount
-        token0 {
-          id
-          symbol
-          name
-          totalLiquidity
-          derivedETH
-        }
-        token1 {
-          id
-          symbol
-          name
-          totalLiquidity
-          derivedETH
-        }
-        reserve0
-        reserve1
-        reserveUSD
-        volumeUSD
-      }
-    }`
-
-  return gql(queryString)
-}
-
 export const GLOBAL_CHART = gql`
   query uniswapDayDatas($startTime: Int!) {
     uniswapDayDatas(where: { date_gt: $startTime }, orderBy: date, orderDirection: asc) {
@@ -304,6 +245,67 @@ export const GLOBAL_TXNS = gql`
   }
 `
 
+export const PAIR_DATA = (pairAddress, block) => {
+  const queryString = block
+    ? `
+    query pairs {
+      pairs(block: {number: ${block} 
+      } where: { id: "${pairAddress}"} ) {
+        id
+        txCount
+        token0 {
+          id
+          symbol
+          name
+          totalLiquidity
+          derivedETH
+        }
+        token1 {
+          id
+          symbol
+          name
+          totalLiquidity
+          derivedETH
+        }
+        reserve0
+        reserve1
+        reserveUSD
+        trackedReserveETH
+        reserveETH
+        volumeUSD
+      }
+    }`
+    : ` query pairs {
+      pairs( where: { id: "` +
+      pairAddress +
+      `"}) {
+        id
+        txCount
+        token0 {
+          id
+          symbol
+          name
+          totalLiquidity
+          derivedETH
+        }
+        token1 {
+          id
+          symbol
+          name
+          totalLiquidity
+          derivedETH
+        }
+        reserve0
+        reserve1
+        reserveUSD
+        trackedReserveETH
+        volumeUSD
+      }
+    }`
+
+  return gql(queryString)
+}
+
 export const PAIRS_DYNAMIC_BULK = (block, pairs) => {
   let pairsString = `[`
   pairs.map(pair => {
@@ -312,10 +314,11 @@ export const PAIRS_DYNAMIC_BULK = (block, pairs) => {
   pairsString += ']'
   let queryString = `
   query pairs {
-    pairs(where: {id_in: ${pairsString}}, block: {number: ${block}}, orderBy: reserveUSD, orderDirection: desc) {
+    pairs(where: {id_in: ${pairsString}}, block: {number: ${block}}, orderBy: trackedReserveETH, orderDirection: desc) {
       id
       txCount
       reserveUSD
+      trackedReserveETH
       volumeUSD
     }
   }
@@ -325,7 +328,7 @@ export const PAIRS_DYNAMIC_BULK = (block, pairs) => {
 
 export const PAIRS_BULK = gql`
   query pairs($allPairs: [Bytes]!) {
-    pairs(where: { id_in: $allPairs }, orderBy: reserveUSD, orderDirection: desc) {
+    pairs(where: { id_in: $allPairs }, orderBy: trackedReserveETH, orderDirection: desc) {
       id
       txCount
       token0 {
@@ -343,6 +346,7 @@ export const PAIRS_BULK = gql`
       token0Price
       token1Price
       reserveUSD
+      trackedReserveETH
       volumeUSD
       createdAtBlockNumber
     }
@@ -379,7 +383,7 @@ export const ALL_PAIRS = gql`
 
 export const PAIRS_CURRENT = gql`
   query pairs {
-    pairs(first: 200, orderBy: reserveUSD, orderDirection: desc) {
+    pairs(first: 200, orderBy: trackedReserveETH, orderDirection: desc) {
       id
       txCount
       token0 {
@@ -394,6 +398,7 @@ export const PAIRS_CURRENT = gql`
       }
       reserve0
       reserve1
+      trackedReserveETH
       token0Price
       token1Price
       reserveUSD
@@ -406,10 +411,11 @@ export const PAIRS_CURRENT = gql`
 export const PAIRS_DYNAMIC = block => {
   let queryString = `
   query pairs {
-    pairs(block: {number: ${block}} first: 200, orderBy: reserveUSD, orderDirection: desc) {
+    pairs(block: {number: ${block}} first: 200, orderBy: trackedReserveETH, orderDirection: desc) {
       id
       txCount
       reserveUSD
+      trackedReserveETH
       volumeUSD
     }
   }
@@ -548,6 +554,7 @@ export const TOKEN_DATA = (tokenAddress, block) => {
     allPairs(first: 200, orderBy: reserveUSD, orderDirection: desc) {
       id
       reserveUSD
+      trackedReserveETH
       volumeUSD
       token0 {
         id
