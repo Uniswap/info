@@ -17,7 +17,6 @@ import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 
 import { getPercentChange, get2DayPercentChange, getBlockFromTimestamp, isAddress } from '../helpers'
-import { OVERVIEW_WHITELIST } from '../constants'
 
 const UPDATE = 'UPDATE'
 const UPDATE_PAIR_TXNS = 'UPDATE_PAIR_TXNS'
@@ -210,9 +209,11 @@ async function getBulkPairData(pairList, ethPrice) {
           oneDayHistory?.txCount ?? 0,
           twoDayHistory?.txCount ?? 0
         )
+
         const liquidityChangeUSD = getPercentChange(data.reserveUSD, oneDayHistory?.reserveUSD)
         const liquidityChangeETH = getPercentChange(data.reserveUSD, oneDayHistory?.reserveUSD)
         data.reserveUSD = data.reserveETH ? data.reserveETH * ethPrice : data.reserveUSD
+        data.trackedReserveUSD = parseFloat(pair.trackedReserveETH) * ethPrice
         data.oneDayVolumeUSD = oneDayVolumeUSD
         data.oneDayVolumeETH = oneDayVolumeETH
         data.oneWeekVolumeUSD = oneWeekVolumeUSD
@@ -304,6 +305,7 @@ const getTopPairData = async ethPrice => {
         const liquidityChangeUSD = getPercentChange(data.reserveUSD, oneDayHistory?.reserveUSD)
         const liquidityChangeETH = getPercentChange(data.reserveUSD, oneDayHistory?.reserveUSD)
         data.reserveUSD = data.reserveETH ? data.reserveETH * ethPrice : data.reserveUSD
+        data.trackedReserveUSD = data.trackedReserveETH * ethPrice
         data.oneDayVolumeUSD = oneDayVolumeUSD
         data.oneDayVolumeETH = oneDayVolumeETH
         data.oneWeekVolumeUSD = oneWeekVolumeUSD
@@ -384,6 +386,10 @@ const getPairData = async (address, ethPrice) => {
     const liquidityChangeUSD = getPercentChange(data.reserveUSD, oneDayData?.reserveUSD)
 
     data.reserveUSD = data.reserveETH ? data.reserveETH * ethPrice : data.reserveUSD
+    data.trackedReserveUSD = data.trackedReserveETH * ethPrice
+
+    console.log(data.trackedReserveETH)
+
     data.oneDayVolumeUSD = oneDayVolumeUSD
     data.oneWeekVolumeUSD = oneWeekVolumeUSD
     data.volumeChangeUSD = volumeChangeUSD
@@ -500,11 +506,7 @@ export function Updater() {
     async function getData() {
       // get top pairs for overview list
       let topPairs = await getTopPairData(ethPrice)
-      updateTopPairs(
-        topPairs?.filter(pair => {
-          return OVERVIEW_WHITELIST.includes(pair.token0.id) || OVERVIEW_WHITELIST.includes(pair.token1.id)
-        })
-      )
+      updateTopPairs(topPairs)
     }
     ethPrice && getData()
   }, [ethPrice, updateTopPairs])
@@ -547,7 +549,8 @@ export function useDataForList(pairList) {
       let newPairData = await getBulkPairData(
         unfetched.map(pair => {
           return pair
-        })
+        }),
+        ethPrice
       )
       setFetched(newFetched.concat(newPairData))
     }

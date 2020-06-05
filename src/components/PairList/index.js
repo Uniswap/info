@@ -101,15 +101,15 @@ const DataText = styled(Flex)`
 `
 
 const SORT_FIELD = {
-  LIQ: 'reserveUSD',
-  VOL: 'oneDayVolumeUSD',
-  TXNS: 'oneDayTxns',
-  VOL_7DAYS: 'oneWeekVolumeUSD',
-  FEES: 'FEES'
+  LIQ: 0,
+  VOL: 1,
+  TXNS: 2,
+  VOL_7DAYS: 3,
+  FEES: 4
 }
 
 const FIELD_TO_VALUE = {
-  [SORT_FIELD.LIQ]: 'reserveUSD',
+  [SORT_FIELD.LIQ]: 'trackedReserveETH', // sort with tracked volume only
   [SORT_FIELD.VOL]: 'oneDayVolumeUSD',
   [SORT_FIELD.TXNS]: 'oneDayTxns',
   [SORT_FIELD.VOL_7DAYS]: 'oneWeekVolumeUSD',
@@ -149,7 +149,7 @@ function PairList({ pairs, color, history }) {
     const pairData = pairs[pairAddress]
 
     if (pairData && pairData.token0 && pairData.token1) {
-      const liquidity = formattedNum(pairData.reserveUSD, true)
+      const liquidity = formattedNum(pairData.trackedReserveUSD, true)
       const volume = formattedNum(pairData.oneDayVolumeUSD, true)
 
       if (pairData.token0.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {

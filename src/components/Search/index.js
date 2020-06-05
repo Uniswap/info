@@ -183,13 +183,13 @@ export const Search = ({ small = false }) => {
           .sort((a, b) => {
             const pairA = allPairData[a.id]
             const pairB = allPairData[b.id]
-            if (pairA?.reserveUSD && pairB?.reserveUSD) {
-              return parseFloat(pairA.reserveUSD) > parseFloat(pairB.reserveUSD) ? -1 : 1
+            if (pairA?.trackedReserveETH && pairB?.trackedReserveETH) {
+              return parseFloat(pairA.trackedReserveETH) > parseFloat(pairB.trackedReserveETH) ? -1 : 1
             }
-            if (pairA?.reserveUSD && !pairB?.reserveUSD) {
+            if (pairA?.trackedReserveETH && !pairB?.trackedReserveETH) {
               return -1
             }
-            if (!pairA?.reserveUSD && pairB?.reserveUSD) {
+            if (!pairA?.trackedReserveETH && pairB?.trackedReserveETH) {
               return 1
             }
             return 0
