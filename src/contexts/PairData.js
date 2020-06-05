@@ -387,9 +387,6 @@ const getPairData = async (address, ethPrice) => {
 
     data.reserveUSD = data.reserveETH ? data.reserveETH * ethPrice : data.reserveUSD
     data.trackedReserveUSD = data.trackedReserveETH * ethPrice
-
-    console.log(data.trackedReserveETH)
-
     data.oneDayVolumeUSD = oneDayVolumeUSD
     data.oneWeekVolumeUSD = oneWeekVolumeUSD
     data.volumeChangeUSD = volumeChangeUSD

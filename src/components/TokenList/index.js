@@ -12,6 +12,7 @@ import { Divider } from '..'
 import { formattedNum, formattedPercent } from '../../helpers'
 import { useMedia } from 'react-use'
 import { withRouter } from 'react-router-dom'
+import { OVERVIEW_TOKEN_BLACKLIST } from '../../constants'
 
 dayjs.extend(utc)
 
@@ -130,7 +131,6 @@ function TopTokenList({ tokens, history }) {
   // sorting
   const [sortDirection, setSortDirection] = useState(true)
   const [sortedColumn, setSortedColumn] = useState(SORT_FIELD.LIQ)
-  const [filteredItems, setFilteredItems] = useState()
 
   const below1080 = useMedia('(max-width: 1080px)')
   const below680 = useMedia('(max-width: 680px)')
@@ -140,25 +140,25 @@ function TopTokenList({ tokens, history }) {
     setPage(1)
   }, [tokens])
 
+  const formattedTokens =
+    tokens &&
+    Object.keys(tokens).map(key => {
+      return !OVERVIEW_TOKEN_BLACKLIST.includes(key) && tokens[key]
+    })
+
   useEffect(() => {
-    if (tokens) {
-      const tokensArray = []
-      Object.keys(tokens).map(key => {
-        tokens[key].address = key
-        return tokensArray.push(tokens[key])
-      })
-      setFilteredItems(tokensArray)
+    if (tokens && formattedTokens) {
       let extraPages = 1
-      if (tokensArray.length % ITEMS_PER_PAGE === 0) {
+      if (formattedTokens.length % ITEMS_PER_PAGE === 0) {
         extraPages = 0
       }
-      setMaxPage(Math.floor(tokensArray.length / ITEMS_PER_PAGE) + extraPages)
+      setMaxPage(Math.floor(formattedTokens.length / ITEMS_PER_PAGE) + extraPages)
     }
-  }, [tokens])
+  }, [tokens, formattedTokens])
 
   const filteredList =
-    filteredItems &&
-    filteredItems
+    formattedTokens &&
+    formattedTokens
       .sort((a, b) => {
         if (sortedColumn === SORT_FIELD.SYMBOL || sortedColumn === SORT_FIELD.NAME) {
           return a[sortedColumn] > b[sortedColumn] ? (sortDirection ? -1 : 1) * 1 : (sortDirection ? -1 : 1) * -1
@@ -175,7 +175,7 @@ function TopTokenList({ tokens, history }) {
         <DataText area="name" fontWeight="500">
           <Row>
             {!below680 && <div style={{ marginRight: '1rem' }}>{index}</div>}
-            <TokenLogo address={item.address} />
+            <TokenLogo address={item.id} />
             <CustomLink style={{ marginLeft: '16px', whiteSpace: 'nowrap' }} to={'/token/' + item.address}>
               {below680 ? item.symbol : item.name}
             </CustomLink>

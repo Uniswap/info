@@ -125,7 +125,7 @@ function PairPage({ pairAddress, history }) {
     token1,
     reserve0,
     reserve1,
-    reserveUSD,
+    trackedReserveUSD,
     oneDayVolumeUSD,
     volumeChangeUSD,
     liquidityChangeUSD,
@@ -141,7 +141,7 @@ function PairPage({ pairAddress, history }) {
   const backgroundColor = useColor(pairAddress)
 
   // liquidity
-  const liquidity = reserveUSD ? formattedNum(reserveUSD, true) : '-'
+  const liquidity = trackedReserveUSD ? formattedNum(trackedReserveUSD, true) : '-'
   const liquidityChange = formattedPercent(liquidityChangeUSD)
 
   // volume
