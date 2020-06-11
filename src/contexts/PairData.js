@@ -457,6 +457,7 @@ const getPairChartData = async pairAddress => {
     let dayIndexArray = []
     const oneDay = 24 * 60 * 60
     data.forEach((dayData, i) => {
+      console.log(dayData)
       // add the day index to the set of days
       dayIndexSet.add((data[i].date / oneDay).toFixed(0))
       dayIndexArray.push(data[i])
