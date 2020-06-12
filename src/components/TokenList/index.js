@@ -171,12 +171,12 @@ function TopTokenList({ tokens, history }) {
 
   const ListItem = ({ item, index }) => {
     return (
-      <DashGrid style={{ height: '60px' }} focus={true} onClick={() => history.push('/token/' + item.address)}>
+      <DashGrid style={{ height: '60px' }} focus={true} onClick={() => history.push('/token/' + item.id)}>
         <DataText area="name" fontWeight="500">
           <Row>
             {!below680 && <div style={{ marginRight: '1rem' }}>{index}</div>}
             <TokenLogo address={item.id} />
-            <CustomLink style={{ marginLeft: '16px', whiteSpace: 'nowrap' }} to={'/token/' + item.address}>
+            <CustomLink style={{ marginLeft: '16px', whiteSpace: 'nowrap' }} to={'/token/' + item.id}>
               {below680 ? item.symbol : item.name}
             </CustomLink>
           </Row>

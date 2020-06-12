@@ -53,9 +53,10 @@ function reducer(state, { type, payload }) {
       }
     }
     case UPDATE_ETH_PRICE: {
-      const { ethPrice, ethPriceChange } = payload
+      const { ethPrice, oneDayPrice, ethPriceChange } = payload
       return {
-        ETH_PRICE_KEY: ethPrice,
+        [ETH_PRICE_KEY]: ethPrice,
+        oneDayPrice,
         ethPriceChange
       }
     }
@@ -111,11 +112,12 @@ export default function Provider({ children }) {
     })
   }, [])
 
-  const updateEthPrice = useCallback((ethPrice, ethPriceChange) => {
+  const updateEthPrice = useCallback((ethPrice, oneDayPrice, ethPriceChange) => {
     dispatch({
       type: UPDATE_ETH_PRICE,
       payload: {
         ethPrice,
+        oneDayPrice,
         ethPriceChange
       }
     })
@@ -346,6 +348,7 @@ const getEthPrice = async () => {
   const utcOneDayBack = utcCurrentTime.subtract(1, 'day').unix()
 
   let ethPrice = 0
+  let ethPriceOneDay = 0
   let priceChangeETH = 0
 
   try {
@@ -358,13 +361,16 @@ const getEthPrice = async () => {
       query: ETH_PRICE(oneDayBlock),
       fetchPolicy: 'cache-first'
     })
-    priceChangeETH = getPercentChange(result?.data?.bundles[0]?.ethPrice, resultOneDay?.data?.bundles[0]?.ethPrice)
-    ethPrice = result?.data?.bundles[0]?.ethPrice
+    const currentPrice = result?.data?.bundles[0]?.ethPrice
+    const oneDayBackPrice = resultOneDay?.data?.bundles[0]?.ethPrice
+    priceChangeETH = getPercentChange(currentPrice, oneDayBackPrice)
+    ethPrice = currentPrice
+    ethPriceOneDay = oneDayBackPrice
   } catch (e) {
     console.log(e)
   }
 
-  return [ethPrice, priceChangeETH]
+  return [ethPrice, ethPriceOneDay, priceChangeETH]
 }
 
 async function getAllPairsOnUniswap() {
@@ -409,7 +415,7 @@ async function getAllTokensOnUniswap() {
 
 export function useGlobalData() {
   const [state, { update, updateAllPairsInUniswap, updateAllTokensInUniswap }] = useGlobalDataContext()
-  const ethPrice = useEthPrice()
+  const [ethPrice] = useEthPrice()
 
   const data = state?.globalData
 
@@ -495,17 +501,18 @@ export function useGlobalTransactions() {
 export function useEthPrice() {
   const [state, { updateEthPrice }] = useGlobalDataContext()
   const ethPrice = state?.[ETH_PRICE_KEY]
+  const ethPriceOld = state?.['oneDayPrice']
   useEffect(() => {
     async function checkForEthPrice() {
       if (!ethPrice) {
-        let [newPrice, priceChange] = await getEthPrice()
-        updateEthPrice(newPrice, priceChange)
+        let [newPrice, oneDayPrice, priceChange] = await getEthPrice()
+        updateEthPrice(newPrice, oneDayPrice, priceChange)
       }
     }
     checkForEthPrice()
   }, [ethPrice, updateEthPrice])
 
-  return ethPrice
+  return [ethPrice, ethPriceOld]
 }
 
 export function useAllPairsInUniswap() {

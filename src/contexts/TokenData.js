@@ -124,7 +124,7 @@ export default function Provider({ children }) {
   )
 }
 
-const getTopTokens = async ethPrice => {
+const getTopTokens = async (ethPrice, ethPriceOld) => {
   const utcCurrentTime = dayjs()
   const utcOneDayBack = utcCurrentTime.subtract(1, 'day').unix()
   const utcTwoDaysBack = utcCurrentTime.subtract(2, 'day').unix()
@@ -178,7 +178,10 @@ const getTopTokens = async ethPrice => {
         )
 
         // percent changes
-        const priceChangeUSD = getPercentChange(data?.derivedETH, oneDayHistory?.derivedETH ?? 0)
+        const priceChangeUSD = getPercentChange(
+          data?.derivedETH * ethPrice,
+          oneDayHistory?.derivedETH ? oneDayHistory?.derivedETH * ethPriceOld : 0
+        )
         const liquidityChangeUSD = getPercentChange(data?.totalLiquidityUSD, oneDayHistory?.totalLiquidityUSD ?? 0)
 
         // set data
@@ -212,7 +215,7 @@ const getTopTokens = async ethPrice => {
   }
 }
 
-const getTokenData = async (address, ethPrice) => {
+const getTokenData = async (address, ethPrice, ethPriceOld) => {
   const utcCurrentTime = dayjs()
   const utcOneDayBack = utcCurrentTime.subtract(1, 'day').unix()
   const utcTwoDaysBack = utcCurrentTime.subtract(2, 'day').unix()
@@ -256,7 +259,7 @@ const getTokenData = async (address, ethPrice) => {
     // calculate percentage changes and daily changes
     const [oneDayTxns, txnChange] = get2DayPercentChange(data.txCount, oneDayData?.txCount, twoDayData?.txCount)
 
-    const priceChangeUSD = getPercentChange(data?.derivedETH, oneDayData?.derivedETH)
+    const priceChangeUSD = getPercentChange(data?.derivedETH * ethPrice, oneDayData?.derivedETH * ethPriceOld)
     const liquidityChangeUSD = getPercentChange(data?.totalLiquidityUSD, oneDayData?.totalLiquidityUSD)
 
     // set data
@@ -365,30 +368,30 @@ const getTokenChartData = async tokenAddress => {
 
 export function Updater() {
   const [, { updateTopTokens }] = useTokenDataContext()
-  const ethPrice = useEthPrice()
+  const [ethPrice, ethPriceOld] = useEthPrice()
   useEffect(() => {
     async function getData() {
       // get top pairs for overview list
-      let topTokens = await getTopTokens(ethPrice)
+      let topTokens = await getTopTokens(ethPrice, ethPriceOld)
       topTokens && updateTopTokens(topTokens)
     }
-    ethPrice && getData()
-  }, [ethPrice, updateTopTokens])
+    ethPrice && ethPriceOld && getData()
+  }, [ethPrice, ethPriceOld, updateTopTokens])
   return null
 }
 
 export function useTokenData(tokenAddress) {
   const [state, { update }] = useTokenDataContext()
-  const ethPrice = useEthPrice()
+  const [ethPrice, ethPriceOld] = useEthPrice()
   const tokenData = state?.[tokenAddress]
 
   useEffect(() => {
-    if (!tokenData && ethPrice && isAddress(tokenAddress)) {
-      getTokenData(tokenAddress, ethPrice).then(data => {
+    if (!tokenData && ethPrice && ethPriceOld && isAddress(tokenAddress)) {
+      getTokenData(tokenAddress, ethPrice, ethPriceOld).then(data => {
         update(tokenAddress, data)
       })
     }
-  }, [ethPrice, tokenAddress, tokenData, update])
+  }, [ethPrice, ethPriceOld, tokenAddress, tokenData, update])
 
   return tokenData || {}
 }
