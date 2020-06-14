@@ -231,16 +231,6 @@ async function getBulkPairData(pairList, ethPrice) {
         if (!oneWeekHistory && data) {
           data.oneWeekVolumeUSD = data.volumeUSD
         }
-        if (data?.token0?.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
-          data.token0.name = 'ETH (Wrapped)'
-          data.token0.symbol = 'ETH'
-        }
-
-        if (data?.token1?.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
-          data.token1.name = 'ETH (Wrapped)'
-          data.token1.symbol = 'ETH'
-        }
-
         return data
       })
     )
@@ -332,16 +322,6 @@ const getTopPairData = async ethPrice => {
         }
         if (!oneWeekHistory && data) {
           data.oneWeekVolumeUSD = data.volumeUSD
-        }
-
-        if (data?.token0?.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
-          data.token0.name = 'ETH (Wrapped)'
-          data.token0.symbol = 'ETH'
-        }
-
-        if (data?.token1?.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
-          data.token1.name = 'ETH (Wrapped)'
-          data.token1.symbol = 'ETH'
         }
         return data
       })
@@ -477,6 +457,7 @@ const getPairChartData = async pairAddress => {
     let dayIndexArray = []
     const oneDay = 24 * 60 * 60
     data.forEach((dayData, i) => {
+      console.log(dayData)
       // add the day index to the set of days
       dayIndexSet.add((data[i].date / oneDay).toFixed(0))
       dayIndexArray.push(data[i])
@@ -517,7 +498,7 @@ const getPairChartData = async pairAddress => {
 
 export function Updater() {
   const [, { updateTopPairs }] = usePairDataContext()
-  const [ethPrice] = useEthPrice()
+  const ethPrice = useEthPrice()
 
   useEffect(() => {
     async function getData() {
@@ -536,7 +517,7 @@ export function Updater() {
  */
 export function useDataForList(pairList) {
   const [state] = usePairDataContext()
-  const [ethPrice] = useEthPrice()
+  const ethPrice = useEthPrice()
 
   const [stale, setStale] = useState(false)
   const [fetched, setFetched] = useState()
@@ -591,7 +572,7 @@ export function useDataForList(pairList) {
  */
 export function usePairData(pairAddress) {
   const [state, { update }] = usePairDataContext()
-  const [ethPrice] = useEthPrice()
+  const ethPrice = useEthPrice()
   const pairData = state?.[pairAddress]
 
   useEffect(() => {

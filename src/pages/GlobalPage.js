@@ -106,7 +106,7 @@ function GlobalPage() {
   const allPairs = useAllPairData()
   const allTokens = useAllTokenData()
 
-  const [ethPrice] = useEthPrice()
+  const ethPrice = useEthPrice()
   const formattedEthPrice = ethPrice ? formattedNum(ethPrice, true) : '-'
 
   const liquidity = totalLiquidityUSD ? formattedNum(totalLiquidityUSD, true) : '-'
