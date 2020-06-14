@@ -377,11 +377,16 @@ async function getAllPairsOnUniswap() {
   try {
     let allFound = false
     let pairs = []
+    let skipCount = 0
     while (!allFound) {
       let result = await client.query({
         query: ALL_PAIRS,
+        variables: {
+          skip: skipCount
+        },
         fetchPolicy: 'cache-first'
       })
+      skipCount = skipCount + 1000
       pairs = pairs.concat(result?.data?.pairs)
       if (pairs?.length < 1000) {
         allFound = true

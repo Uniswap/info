@@ -170,6 +170,9 @@ function TopTokenList({ tokens, history }) {
       .slice(ITEMS_PER_PAGE * (page - 1), page * ITEMS_PER_PAGE)
 
   const ListItem = ({ item, index }) => {
+    if (!item) {
+      return ''
+    }
     return (
       <DashGrid style={{ height: '60px' }} focus={true} onClick={() => history.push('/token/' + item.id)}>
         <DataText area="name" fontWeight="500">

@@ -176,7 +176,7 @@ export const GLOBAL_DATA = block => {
 
 export const GLOBAL_TXNS = gql`
   query transactions {
-    transactions(first: 100, orderBy: timestamp, orderDirection: desc) {
+    transactions(first: 60, orderBy: timestamp, orderDirection: desc) {
       mints(orderBy: timestamp, orderDirection: desc) {
         transaction {
           id
@@ -364,8 +364,8 @@ export const ALL_TOKENS = gql`
 `
 
 export const ALL_PAIRS = gql`
-  query pairs {
-    pairs(first: 1000) {
+  query pairs($skip: Int!) {
+    pairs(first: 1000, skip: $skip) {
       id
       token0 {
         id
