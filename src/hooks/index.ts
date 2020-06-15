@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { shade } from 'polished'
 import Vibrant from 'node-vibrant'
 import { hex } from 'wcag-contrast'
@@ -71,4 +71,28 @@ export const useOutsideClick = (ref, ref2, callback) => {
       document.removeEventListener('click', handleClick)
     }
   })
+}
+
+export default function useInterval(callback: () => void, delay: null | number) {
+  const savedCallback = useRef<() => void>()
+
+  // Remember the latest callback.
+  useEffect(() => {
+    savedCallback.current = callback
+  }, [callback])
+
+  // Set up the interval.
+  useEffect(() => {
+    function tick() {
+      const current = savedCallback.current
+      current && current()
+    }
+
+    if (delay !== null) {
+      tick()
+      const id = setInterval(tick, delay)
+      return () => clearInterval(id)
+    }
+    return
+  }, [delay])
 }
