@@ -18,14 +18,14 @@ const PriceCard = styled(Panel)`
 export default function UniPrice() {
   const daiPair = usePairData('0xa478c2975ab1ea89e8196811f51a7b7ade33eb11')
   const usdcPair = usePairData('0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc')
-  const tusdPair = usePairData('0xb4d0d9df2738abe81b87b66c80851292492d1404')
+  // const tusdPair = usePairData('0xb4d0d9df2738abe81b87b66c80851292492d1404')
   const usdtPair = usePairData('0x0d4a11d5eeaac28ec3f61d100daf4d40471f1852')
 
   const totalLiquidity = useMemo(() => {
-    return daiPair && usdcPair && tusdPair && usdtPair
-      ? daiPair.trackedReserveUSD + usdcPair.trackedReserveUSD + tusdPair.trackedReserveUSD + usdtPair.trackedReserveUSD
+    return daiPair && usdcPair && usdtPair
+      ? daiPair.trackedReserveUSD + usdcPair.trackedReserveUSD + usdtPair.trackedReserveUSD
       : 0
-  }, [daiPair, tusdPair, usdcPair, usdtPair])
+  }, [daiPair, usdcPair, usdtPair])
 
   const [daiPerEth, setDaiPerEth] = useState()
   useEffect(() => {
