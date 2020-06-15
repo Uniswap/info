@@ -388,7 +388,7 @@ async function getAllPairsOnUniswap() {
       })
       skipCount = skipCount + 1000
       pairs = pairs.concat(result?.data?.pairs)
-      if (pairs?.length < 1000) {
+      if (result?.data?.pairs.length < 1000) {
         allFound = true
       }
     }
