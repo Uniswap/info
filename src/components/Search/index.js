@@ -147,13 +147,13 @@ export const Search = ({ small = false }) => {
           .sort((a, b) => {
             const tokenA = allTokenData[a.id]
             const tokenB = allTokenData[b.id]
-            if (tokenA?.totalLiquidityUSD && tokenB?.totalLiquidityUSD) {
-              return tokenA.totalLiquidityUSD > tokenB.totalLiquidityUSD ? -1 : 1
+            if (tokenA?.oneDayVolumeUSD && tokenB?.oneDayVolumeUSD) {
+              return tokenA.oneDayVolumeUSD > tokenB.oneDayVolumeUSD ? -1 : 1
             }
-            if (tokenA?.totalLiquidityUSD && !tokenB?.totalLiquidityUSD) {
+            if (tokenA?.oneDayVolumeUSD && !tokenB?.oneDayVolumeUSD) {
               return -1
             }
-            if (!tokenA?.totalLiquidityUSD && tokenB?.totalLiquidityUSD) {
+            if (!tokenA?.oneDayVolumeUSD && tokenB?.oneDayVolumeUSD) {
               return 1
             }
             return 1

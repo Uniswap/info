@@ -15,6 +15,12 @@ const PriceCard = styled(Panel)`
   background-color: ${({ theme }) => theme.bg1};
 `
 
+function formatPercent(rawPercent) {
+  if (rawPercent < 0.01) {
+    return '<1%'
+  } else return parseFloat(rawPercent * 100).toFixed(0) + '%'
+}
+
 export default function UniPrice() {
   const daiPair = usePairData('0xa478c2975ab1ea89e8196811f51a7b7ade33eb11')
   const usdcPair = usePairData('0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc')
@@ -51,19 +57,15 @@ export default function UniPrice() {
     <PriceCard>
       <AutoColumn gap="10px">
         <RowFixed>
-          <TYPE.main>DAI/ETH: {daiPerEth}</TYPE.main>
+          <TYPE.main>DAI/ETH: {daiPerEth ? daiPerEth : '-'}</TYPE.main>
           <TYPE.light style={{ marginLeft: '10px' }}>
-            {daiPair && totalLiquidity
-              ? parseFloat(daiPair.trackedReserveUSD / totalLiquidity).toFixed(2) * 100 + '%'
-              : '-'}
+            {daiPair && totalLiquidity ? formatPercent(daiPair.trackedReserveUSD / totalLiquidity) : '-'}
           </TYPE.light>
         </RowFixed>
         <RowFixed>
-          <TYPE.main>USDC/ETH: {usdcPerEth}</TYPE.main>
+          <TYPE.main>USDC/ETH: {usdcPerEth ? usdcPerEth : '-'}</TYPE.main>
           <TYPE.light style={{ marginLeft: '10px' }}>
-            {usdcPair && totalLiquidity
-              ? parseFloat(usdcPair.trackedReserveUSD / totalLiquidity).toFixed(2) * 100 + '%'
-              : '-'}
+            {usdcPair && totalLiquidity ? formatPercent(usdcPair.trackedReserveUSD / totalLiquidity) : '-'}
           </TYPE.light>
         </RowFixed>
         {/* <RowFixed>
@@ -75,11 +77,9 @@ export default function UniPrice() {
           </TYPE.light>
         </RowFixed> */}
         <RowFixed>
-          <TYPE.main>USDT/ETH: {usdtPerEth}</TYPE.main>
+          <TYPE.main>USDT/ETH: {usdtPerEth ? usdtPerEth : '-'}</TYPE.main>
           <TYPE.light style={{ marginLeft: '10px' }}>
-            {usdtPair && totalLiquidity
-              ? parseFloat(usdtPair.trackedReserveUSD / totalLiquidity).toFixed(4) * 100 + '%'
-              : '-'}
+            {usdtPair && totalLiquidity ? formatPercent(usdtPair.trackedReserveUSD / totalLiquidity) : '-'}
           </TYPE.light>
         </RowFixed>
       </AutoColumn>

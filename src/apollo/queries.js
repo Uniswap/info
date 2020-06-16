@@ -335,11 +335,13 @@ export const PAIRS_BULK = gql`
         id
         symbol
         name
+        derivedETH
       }
       token1 {
         id
         symbol
         name
+        derivedETH
       }
       reserve0
       reserve1
@@ -390,11 +392,13 @@ export const PAIRS_CURRENT = gql`
         id
         symbol
         name
+        derivedETH
       }
       token1 {
         id
         symbol
         name
+        derivedETH
       }
       reserve0
       reserve1
