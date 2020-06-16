@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { withRouter } from 'react-router-dom'
 import 'feather-icons'
 import styled from 'styled-components'
@@ -23,6 +23,8 @@ import { useMedia } from 'react-use'
 import DoubleTokenLogo from '../components/DoubleLogo'
 import { transparentize } from 'polished'
 import TokenLogo from '../components/TokenLogo'
+import { Hover } from '../components'
+import { useEthPrice } from '../contexts/GlobalData'
 
 const PageWrapper = styled.div`
   display: flex;
@@ -71,28 +73,6 @@ const PanelWrapper = styled.div`
   }
 `
 
-const TokenWrapper = styled.div`
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: max-content;
-  gap: 6px;
-  display: inline-grid;
-  width: 100%;
-  align-items: start;
-  @media screen and (max-width: 1024px) {
-    grid-template-columns: 1fr;
-    align-items: stretch;
-    > * {
-      grid-column: 1 / 4;
-    }
-
-    > * {
-      &:first-child {
-        width: 100%;
-      }
-    }
-  }
-`
-
 const TokenDetailsLayout = styled.div`
   display: inline-grid;
   width: 100%;
@@ -119,12 +99,30 @@ const TokenDetailsLayout = styled.div`
   }
 `
 
+const FixedPanel = styled(Panel)`
+  width: fit-content;
+  padding: 8px 12px;
+
+  :hover {
+    cursor: pointer;
+    background-color: ${({ theme }) => theme.bg2};
+  }
+`
+
+const HoverSpan = styled.span`
+  :hover {
+    cursor: pointer;
+    opacity: 0.7;
+  }
+`
+
 function PairPage({ pairAddress, history }) {
   const {
     token0,
     token1,
     reserve0,
     reserve1,
+    reserveUSD,
     trackedReserveUSD,
     oneDayVolumeUSD,
     volumeChangeUSD,
@@ -141,12 +139,32 @@ function PairPage({ pairAddress, history }) {
   const backgroundColor = useColor(pairAddress)
 
   // liquidity
-  const liquidity = trackedReserveUSD ? formattedNum(trackedReserveUSD, true) : '-'
+  const liquidity = trackedReserveUSD
+    ? formattedNum(trackedReserveUSD, true)
+    : reserveUSD
+    ? formattedNum(reserveUSD, true)
+    : '-'
   const liquidityChange = formattedPercent(liquidityChangeUSD)
+
+  // mark if using untracked liquidity
+  const [usingTracked, setUsingTracked] = useState(true)
+  useEffect(() => {
+    if (!trackedReserveUSD) {
+      setUsingTracked(false)
+    }
+  }, [trackedReserveUSD])
 
   // volume
   const volume = oneDayVolumeUSD ? formattedNum(oneDayVolumeUSD, true) : oneDayVolumeUSD === 0 ? '$0' : '-'
   const volumeChange = formattedPercent(volumeChangeUSD)
+
+  // token data for usd
+  const [ethPrice] = useEthPrice()
+  const token0USD =
+    token0?.derivedETH && ethPrice ? formattedNum(parseFloat(token0.derivedETH) * parseFloat(ethPrice), true) : ''
+
+  const token1USD =
+    token1?.derivedETH && ethPrice ? formattedNum(parseFloat(token1.derivedETH) * parseFloat(ethPrice), true) : ''
 
   // rates
   const token0Rate = reserve0 && reserve1 ? formattedNum(reserve1 / reserve0) : '-'
@@ -168,27 +186,55 @@ function PairPage({ pairAddress, history }) {
               <DoubleTokenLogo a0={token0?.id || ''} a1={token1?.id || ''} size={32} margin={true} />
             )}{' '}
             <Text fontSize={'2rem'} fontWeight={600} style={{ margin: '0 1rem' }}>
-              {token0 && token1 ? token0.symbol + '-' + token1.symbol + ' Pair' : ''}
+              {token0 && token1 ? (
+                <>
+                  <HoverSpan onClick={() => history.push(`/token/${token0?.id}`)}>{token0.symbol}</HoverSpan>
+                  <span>-</span>
+                  <HoverSpan onClick={() => history.push(`/token/${token1?.id}`)}>{token1.symbol}</HoverSpan> Pair
+                </>
+              ) : (
+                ''
+              )}
             </Text>{' '}
           </RowFixed>
         </RowFixed>
-        <span>
-          <RowFixed
-            mb={20}
-            ml={below600 ? '0' : '2.5rem'}
-            style={{ flexDirection: below1080 ? 'row-reverse' : 'initial' }}
-          >
-            <Link external href={getPoolLink(token0?.id, token1?.id)}>
-              <ButtonLight color={backgroundColor}>+ Add Liquidity</ButtonLight>
-            </Link>
-            <Link external href={getSwapLink(token0?.id, token1?.id)}>
-              <ButtonDark ml={'.5rem'} mr={below1080 && '.5rem'} color={backgroundColor}>
-                Trade
-              </ButtonDark>
-            </Link>
-          </RowFixed>
-        </span>
+        <RowFixed
+          mb={20}
+          ml={below600 ? '0' : '2.5rem'}
+          style={{ flexDirection: below1080 ? 'row-reverse' : 'initial' }}
+        >
+          <Link external href={getPoolLink(token0?.id, token1?.id)}>
+            <ButtonLight color={backgroundColor}>+ Add Liquidity</ButtonLight>
+          </Link>
+          <Link external href={getSwapLink(token0?.id, token1?.id)}>
+            <ButtonDark ml={'.5rem'} mr={below1080 && '.5rem'} color={backgroundColor}>
+              Trade
+            </ButtonDark>
+          </Link>
+        </RowFixed>
       </RowBetween>
+      <AutoRow gap="6px">
+        <FixedPanel onClick={() => history.push(`/token/${token0?.id}`)}>
+          <RowFixed>
+            <TokenLogo address={token0?.id} size={'16px'} />
+            <TYPE.main fontSize={'16px'} lineHeight={1} fontWeight={500} ml={'4px'}>
+              {token0 && token1
+                ? `1 ${token0?.symbol} = ${token0Rate} ${token1?.symbol} ${token0USD ? '(' + token0USD + ')' : ''}`
+                : '-'}
+            </TYPE.main>
+          </RowFixed>
+        </FixedPanel>
+        <FixedPanel onClick={() => history.push(`/token/${token1?.id}`)}>
+          <RowFixed>
+            <TokenLogo address={token1?.id} size={'16px'} />
+            <TYPE.main fontSize={'16px'} lineHeight={1} fontWeight={500} ml={'4px'}>
+              {token0 && token1
+                ? `1 ${token1?.symbol} = ${token1Rate} ${token0?.symbol}  ${token1USD ? '(' + token1USD + ')' : ''}`
+                : '-'}
+            </TYPE.main>
+          </RowFixed>
+        </FixedPanel>
+      </AutoRow>
       <DashboardWrapper>
         <>
           {!below1080 && (
@@ -200,7 +246,7 @@ function PairPage({ pairAddress, history }) {
             <Panel>
               <AutoColumn gap="20px">
                 <RowBetween>
-                  <TYPE.main>Total Liquidity</TYPE.main>
+                  <TYPE.main>Total Liquidity {!usingTracked ? '(Untracked)' : ''}</TYPE.main>
                   <div />
                 </RowBetween>
                 <RowBetween align="flex-end">
@@ -242,64 +288,31 @@ function PairPage({ pairAddress, history }) {
             <Panel>
               <AutoColumn gap="20px">
                 <RowBetween>
-                  <TYPE.main>Rates</TYPE.main>
+                  <TYPE.main>Pooled Tokens</TYPE.main>
                   <div />
                 </RowBetween>
-                <TYPE.main fontSize={'20px'} lineHeight={1} fontWeight={600}>
-                  {token0 && token1 ? `1 ${token0?.symbol} = ${token0Rate} ${token1?.symbol}` : '-'}
-                </TYPE.main>
-                <TYPE.main fontSize={'20px'} lineHeight={1} fontWeight={600}>
-                  {token0 && token1 ? `1 ${token1?.symbol} = ${token1Rate} ${token0?.symbol}` : '-'}
-                </TYPE.main>
+                <Hover onClick={() => history.push(`/token/${token0?.id}`)} fade={true}>
+                  <AutoRow gap="4px">
+                    <TokenLogo address={token0?.id} />
+                    <TYPE.main fontSize={20} lineHeight={1} fontWeight={500}>
+                      {reserve0 ? formattedNum(reserve0) : ''} {token0?.symbol ?? ''}
+                    </TYPE.main>
+                  </AutoRow>
+                </Hover>
+                <Hover onClick={() => history.push(`/token/${token1?.id}`)} fade={true}>
+                  <AutoRow gap="4px">
+                    <TokenLogo address={token1?.id} />
+                    <TYPE.main fontSize={20} lineHeight={1} fontWeight={500}>
+                      {reserve1 ? formattedNum(reserve1) : ''} {token1?.symbol ?? ''}
+                    </TYPE.main>
+                  </AutoRow>
+                </Hover>
               </AutoColumn>
             </Panel>
             <Panel style={{ gridColumn: below1080 ? '1' : '2/4', gridRow: below1080 ? '' : '1/5' }}>
               <PairChart address={pairAddress} color={backgroundColor} />
             </Panel>
           </PanelWrapper>
-          <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
-            Pooled Tokens
-          </TYPE.main>
-          <TokenWrapper style={{ marginTop: '1.5rem' }}>
-            <Panel>
-              <AutoColumn gap="4px">
-                <RowBetween>
-                  <TYPE.main>{token0 ? token0.symbol + ' balance' : ''}</TYPE.main>
-                  <div />
-                </RowBetween>
-                <RowBetween align="flex-end">
-                  <RowFixed>
-                    <TokenLogo address={token0?.id} size="24px" style={{ marginRight: '10px' }} />
-                    <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
-                      {reserve0 ? formattedNum(reserve0) : ''}
-                    </TYPE.main>
-                  </RowFixed>
-                  <Link color={backgroundColor} onClick={() => history.push(`/token/${token0?.id}`)}>
-                    <ButtonLight color={backgroundColor}>View Token</ButtonLight>
-                  </Link>
-                </RowBetween>
-              </AutoColumn>
-            </Panel>
-            <Panel>
-              <AutoColumn gap="4px">
-                <RowBetween>
-                  <TYPE.main>{token1 ? token1.symbol + ' balance' : ''}</TYPE.main>
-                  <div />
-                </RowBetween>
-                <RowBetween align="flex-end">
-                  <RowFixed>
-                    <TokenLogo address={token1?.id} size="24px" style={{ marginRight: '10px' }} />
-                    <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
-                      {reserve1 ? formattedNum(reserve1) : ''}
-                    </TYPE.main>
-                  </RowFixed>
-                  <Link color={backgroundColor} onClick={() => history.push(`/token/${token1.id}`)}>
-                    <ButtonLight color={backgroundColor}>View Token</ButtonLight>
-                  </Link>
-                </RowBetween>
-              </AutoColumn>
-            </Panel>
-          </TokenWrapper>
           <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
             Transactions
           </TYPE.main>{' '}

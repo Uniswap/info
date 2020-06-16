@@ -56,6 +56,8 @@ const theme = (darkMode, color) => ({
   secondary2: darkMode ? '#17000b26' : '#F6DDE8',
   secondary3: darkMode ? '#17000b26' : '#FDEAF1',
 
+  shadow1: darkMode ? '#000' : '#2F80ED',
+
   // other
   red1: '#FF6871',
   green1: '#27AE60',
@@ -73,6 +75,14 @@ const TextWrapper = styled(Text)`
 export const TYPE = {
   main(props) {
     return <TextWrapper fontWeight={500} color={'text1'} {...props} />
+  },
+
+  header(props) {
+    return <TextWrapper fontWeight={600} color={'text1'} {...props} />
+  },
+
+  light(props) {
+    return <TextWrapper fontWeight={400} color={'text3'} fontSize={14} {...props} />
   },
 
   pink(props) {

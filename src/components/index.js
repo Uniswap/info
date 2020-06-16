@@ -29,6 +29,13 @@ const Address = ({ address, token, ...rest }) => (
   </Link>
 )
 
+export const Hover = styled.div`
+  :hover {
+    cursor: pointer;
+    opacity: ${({ fade }) => fade && '0.7'};
+  }
+`
+
 const EmptyCard = styled.div`
   display: flex;
   align-items: center;
