@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { withRouter } from 'react-router-dom'
 import 'feather-icons'
 import styled from 'styled-components'
@@ -122,6 +122,7 @@ function PairPage({ pairAddress, history }) {
     token1,
     reserve0,
     reserve1,
+    reserveUSD,
     trackedReserveUSD,
     oneDayVolumeUSD,
     volumeChangeUSD,
@@ -138,8 +139,20 @@ function PairPage({ pairAddress, history }) {
   const backgroundColor = useColor(pairAddress)
 
   // liquidity
-  const liquidity = trackedReserveUSD ? formattedNum(trackedReserveUSD, true) : '-'
+  const liquidity = trackedReserveUSD
+    ? formattedNum(trackedReserveUSD, true)
+    : reserveUSD
+    ? formattedNum(reserveUSD, true)
+    : '-'
   const liquidityChange = formattedPercent(liquidityChangeUSD)
+
+  // mark if using untracked liquidity
+  const [usingTracked, setUsingTracked] = useState(true)
+  useEffect(() => {
+    if (!trackedReserveUSD) {
+      setUsingTracked(false)
+    }
+  }, [trackedReserveUSD])
 
   // volume
   const volume = oneDayVolumeUSD ? formattedNum(oneDayVolumeUSD, true) : oneDayVolumeUSD === 0 ? '$0' : '-'
@@ -233,7 +246,7 @@ function PairPage({ pairAddress, history }) {
             <Panel>
               <AutoColumn gap="20px">
                 <RowBetween>
-                  <TYPE.main>Total Liquidity</TYPE.main>
+                  <TYPE.main>Total Liquidity {!usingTracked ? '(Untracked)' : ''}</TYPE.main>
                   <div />
                 </RowBetween>
                 <RowBetween align="flex-end">

@@ -405,7 +405,6 @@ const getPairData = async (address, ethPrice) => {
 
     const liquidityChangeUSD = getPercentChange(data.reserveUSD, oneDayData?.reserveUSD)
 
-    data.reserveUSD = data.reserveETH ? data.reserveETH * ethPrice : data.reserveUSD
     data.trackedReserveUSD = data.trackedReserveETH * ethPrice
     data.oneDayVolumeUSD = oneDayVolumeUSD
     data.oneWeekVolumeUSD = oneWeekVolumeUSD
