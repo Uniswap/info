@@ -13,6 +13,7 @@ import { formattedNum, getPoolLink, getSwapLink } from '../../helpers'
 import DoubleTokenLogo from '../DoubleLogo'
 import { ButtonLight, ButtonDark } from '../ButtonStyled'
 import { withRouter } from 'react-router-dom'
+import { OVERVIEW_TOKEN_BLACKLIST } from '../../constants'
 
 dayjs.extend(utc)
 
@@ -203,6 +204,12 @@ function PairList({ pairs, color, history }) {
     pairs &&
     Object.keys(pairs)
       .sort((addressA, addressB) => {
+        if (OVERVIEW_TOKEN_BLACKLIST.includes(addressA)) {
+          return 1
+        }
+        if (OVERVIEW_TOKEN_BLACKLIST.includes(addressB)) {
+          return -1
+        }
         const pairA = pairs[addressA]
         const pairB = pairs[addressB]
         return parseFloat(pairA[FIELD_TO_VALUE[sortedColumn]]) > parseFloat(pairB[FIELD_TO_VALUE[sortedColumn]])
