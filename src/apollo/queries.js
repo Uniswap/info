@@ -145,6 +145,32 @@ export const GLOBAL_CHART = gql`
   }
 `
 
+export const VOLUME_OFFSET = gql`
+  query pair($blocked: [Bytes]!) {
+    pairs(where: { id_in: $blocked }) {
+      id
+      volumeUSD
+    }
+  }
+`
+
+export const VOLUME_OFFSET_HISTORIC = (block, blocked) => {
+  let pairsString = `[`
+  blocked.map(pair => {
+    return (pairsString += `"${pair}"`)
+  })
+  pairsString += ']'
+  const queryString = `
+    query pairs {
+      pairs(where: { id_in: ${pairsString} }, block: {number: ${block}}) {
+        id
+        volumeUSD
+      }
+    }
+`
+  return gql(queryString)
+}
+
 export const GLOBAL_DATA = block => {
   const queryString = block
     ? ` query uniswapFactories {

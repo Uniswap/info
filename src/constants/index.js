@@ -25,5 +25,8 @@ export const OVERVIEW_WHITELIST = [
 export const OVERVIEW_TOKEN_BLACKLIST = [
   '0x495c7f3a713870f68f8b418b355c085dfdc412c3',
   '0xc3761eb917cd790b30dad99f6cc5b4ff93c4f9ea',
-  '0xe31debd7abff90b06bca21010dd860d8701fd901'
+  '0xe31debd7abff90b06bca21010dd860d8701fd901', // bomb token
+  '0xed9c854cb02de75ce4c9bba992828d6cb7fd5c71', // bomb pair
+  '0x32026e07a035aae485690ed997c08127907ccc72', // liq token
+  '0x257d37ce4d0796ea2efebcb49b46e34002cc65d3' // liq pair
 ]
