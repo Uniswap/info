@@ -162,6 +162,11 @@ const getTopTokens = async (ethPrice, ethPriceOld) => {
       current?.data?.tokens.map(token => {
         let data = token
 
+        // hotfix
+        if (token.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
+          data.tradeVolumeUSD = data.tradeVolumeUSD - 46662149
+        }
+
         let oneDayHistory = oneDayData?.[token.id]
         let twoDayHistory = twoDayData?.[token.id]
 
@@ -234,6 +239,10 @@ const getTokenData = async (address, ethPrice, ethPriceOld) => {
       fetchPolicy: 'cache-first'
     })
     data = result?.data?.tokens?.[0]
+
+    if (data.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
+      data.tradeVolumeUSD = data.tradeVolumeUSD - 46662149
+    }
 
     // get results from 24 hours in past
     let oneDayResult = await client.query({
