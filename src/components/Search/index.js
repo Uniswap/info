@@ -11,6 +11,7 @@ import { useAllPairData, usePairData } from '../../contexts/PairData'
 import DoubleTokenLogo from '../DoubleLogo'
 import { useMedia } from 'react-use'
 import { useAllPairsInUniswap, useAllTokensInUniswap } from '../../contexts/GlobalData'
+import { OVERVIEW_TOKEN_BLACKLIST } from '../../constants'
 
 const Wrapper = styled.div`
   display: flex;
@@ -145,6 +146,12 @@ export const Search = ({ small = false }) => {
     return allTokens
       ? allTokens
           .sort((a, b) => {
+            if (OVERVIEW_TOKEN_BLACKLIST.includes(a.id)) {
+              return 1
+            }
+            if (OVERVIEW_TOKEN_BLACKLIST.includes(b.id)) {
+              return -1
+            }
             const tokenA = allTokenData[a.id]
             const tokenB = allTokenData[b.id]
             if (tokenA?.oneDayVolumeUSD && tokenB?.oneDayVolumeUSD) {

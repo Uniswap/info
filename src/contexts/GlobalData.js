@@ -192,9 +192,19 @@ async function getGlobalData(ethPrice) {
     })
     twoDayData = twoDayResult.data.uniswapFactories[0]
 
+    //hotfix for global totals
+    let BAD_TIMESTAMP = 1592395803
+    data.totalVolumeUSD = data.totalVolumeUSD - 46662149
+    if (utcOneDayBack > BAD_TIMESTAMP) {
+      oneDayData.totalVolumeUSD = oneDayData.totalVolumeUSD - 46662149
+    }
+    if (utcTwoDaysBack > BAD_TIMESTAMP) {
+      twoDayData.totalVolumeUSD = twoDayData.totalVolumeUSD - 46662149
+    }
+
     if (data && oneDayData && twoDayData) {
       const [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentChange(
-        data.totalVolumeUSD - 46662149, // hotfix
+        data.totalVolumeUSD,
         oneDayData.totalVolumeUSD ? oneDayData.totalVolumeUSD : 0,
         twoDayData.totalVolumeUSD ? twoDayData.totalVolumeUSD : 0
       )
@@ -480,10 +490,10 @@ export function useGlobalChartData() {
       // historical stuff for chart
       let [newChartData, newWeeklyData] = await getChartData(oldestDateFetch)
 
-      //hotfix
       let newData = newChartData.map(item => {
-        if (item.id === '18430') {
-          item.dailyVolumeUSD = item.dailyVolumeUSD - 46662149 / 2
+        //hotfix for global chart
+        if (item.id >= '18430' && item.dailyVolumeUSD > 40000000) {
+          item.dailyVolumeUSD = item.dailyVolumeUSD - 46662149
         }
         return item
       })
