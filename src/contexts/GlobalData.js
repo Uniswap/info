@@ -123,6 +123,9 @@ async function getGlobalData(ethPrice) {
     fetchPolicy: 'cache-first'
   })
   let data = result.data.uniswapFactories[0]
+
+  data.totalVolumeUSD = data.totalVolumeUSD - 46662902
+
   let oneDayResult = await client.query({
     query: GLOBAL_DATA(oneDayBlock),
     fetchPolicy: 'cache-first'
