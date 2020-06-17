@@ -193,7 +193,7 @@ async function getBulkPairData(pairList, ethPrice) {
         let oneWeekHistory = oneWeekData?.[pair.id]
 
         const [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentChange(
-          data.id === '0xed9c854cb02de75ce4c9bba992828d6cb7fd5c71' ? data?.volumeUSD - 46662149 : data?.volumeUSD,
+          data?.volumeUSD,
           oneDayHistory?.volumeUSD ?? 0,
           twoDayHistory?.volumeUSD ?? 0
         )

@@ -481,8 +481,12 @@ export function useGlobalChartData() {
       let [newChartData, newWeeklyData] = await getChartData(oldestDateFetch)
 
       //hotfix
-      let newData = newChartData
-      newData[newData.length - 1].dailyVolumeUSD = newData[newData.length - 1].dailyVolumeUSD - 46662149 / 2
+      let newData = newChartData.map(item => {
+        if (item.id === '18430') {
+          item.dailyVolumeUSD = item.dailyVolumeUSD - 46662149 / 2
+        }
+        return item
+      })
       updateChart(newData, newWeeklyData)
     }
     if (oldestDateFetch && !(chartDataDaily && chartDataWeekly)) {
