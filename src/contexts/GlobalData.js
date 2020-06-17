@@ -194,7 +194,7 @@ async function getGlobalData(ethPrice) {
 
     if (data && oneDayData && twoDayData) {
       const [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentChange(
-        data.totalVolumeUSD,
+        data.totalVolumeUSD - 46662149, // hotfix
         oneDayData.totalVolumeUSD ? oneDayData.totalVolumeUSD : 0,
         twoDayData.totalVolumeUSD ? twoDayData.totalVolumeUSD : 0
       )
@@ -247,7 +247,8 @@ const getChartData = async oldestDateToFetch => {
       },
       fetchPolicy: 'cache-first'
     })
-    data = result.data.uniswapDayDatas
+
+    data = [...result.data.uniswapDayDatas]
 
     if (data) {
       let dayIndexSet = new Set()
@@ -478,7 +479,15 @@ export function useGlobalChartData() {
     async function fetchData() {
       // historical stuff for chart
       let [newChartData, newWeeklyData] = await getChartData(oldestDateFetch)
-      updateChart(newChartData, newWeeklyData)
+
+      //hotfix
+      let newData = newChartData.map(item => {
+        if (item.id === '18430') {
+          item.dailyVolumeUSD = item.dailyVolumeUSD - 46662149 / 2
+        }
+        return item
+      })
+      updateChart(newData, newWeeklyData)
     }
     if (oldestDateFetch && !(chartDataDaily && chartDataWeekly)) {
       fetchData()
