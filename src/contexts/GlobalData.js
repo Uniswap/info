@@ -581,7 +581,10 @@ export function useGlobalChartData() {
     async function fetchData() {
       // historical stuff for chart
       let [newChartData, newWeeklyData] = await getChartData(oldestDateFetch)
+<<<<<<< HEAD
 
+=======
+>>>>>>> 8845e9bad39036f1c6250ae518819dab61779d0b
       updateChart(newChartData, newWeeklyData)
     }
     if (oldestDateFetch && !(chartDataDaily && chartDataWeekly)) {
