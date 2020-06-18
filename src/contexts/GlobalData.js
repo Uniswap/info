@@ -503,16 +503,21 @@ async function getAllPairsOnUniswap() {
 async function getAllTokensOnUniswap() {
   try {
     let allFound = false
+    let skipCount = 0
     let tokens = []
     while (!allFound) {
       let result = await client.query({
         query: ALL_TOKENS,
+        variables: {
+          skip: skipCount
+        },
         fetchPolicy: 'cache-first'
       })
       tokens = tokens.concat(result?.data?.tokens)
-      if (tokens?.length < 1000) {
+      if (result?.data?.tokens?.length < 1000) {
         allFound = true
       }
+      skipCount = skipCount += 1000
     }
     return tokens
   } catch (e) {
