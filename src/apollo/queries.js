@@ -382,8 +382,8 @@ export const PAIRS_BULK = gql`
 `
 
 export const ALL_TOKENS = gql`
-  query tokens {
-    tokens(first: 1000) {
+  query tokens($skip: Int!) {
+    tokens(first: 1000, skip: $skip) {
       id
       name
       symbol
