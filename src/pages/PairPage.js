@@ -274,20 +274,6 @@ function PairPage({ pairAddress, history }) {
             <Panel style={{ height: '100%' }}>
               <AutoColumn gap="20px">
                 <RowBetween>
-                  <TYPE.main>Transactions (24hrs)</TYPE.main>
-                  <div />
-                </RowBetween>
-                <RowBetween align="flex-end">
-                  <TYPE.main fontSize={'2rem'} lineHeight={1} fontWeight={600}>
-                    {oneDayTxns ?? '-'}
-                  </TYPE.main>
-                  <TYPE.main>{txnChangeFormatted}</TYPE.main>
-                </RowBetween>
-              </AutoColumn>
-            </Panel>
-            <Panel style={{ height: '100%' }}>
-              <AutoColumn gap="20px">
-                <RowBetween>
                   <TYPE.main>Fees (24hrs)</TYPE.main>
                   <div />
                 </RowBetween>
@@ -296,6 +282,20 @@ function PairPage({ pairAddress, history }) {
                     {oneDayVolumeUSD ? formattedNum(oneDayVolumeUSD * 0.003, true) : '-'}
                   </TYPE.main>
                   <TYPE.main>{volumeChange}</TYPE.main>
+                </RowBetween>
+              </AutoColumn>
+            </Panel>
+            <Panel style={{ height: '100%' }}>
+              <AutoColumn gap="20px">
+                <RowBetween>
+                  <TYPE.main>Transactions (24hrs)</TYPE.main>
+                  <div />
+                </RowBetween>
+                <RowBetween align="flex-end">
+                  <TYPE.main fontSize={'2rem'} lineHeight={1} fontWeight={600}>
+                    {oneDayTxns ?? '-'}
+                  </TYPE.main>
+                  <TYPE.main>{txnChangeFormatted}</TYPE.main>
                 </RowBetween>
               </AutoColumn>
             </Panel>
