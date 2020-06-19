@@ -243,7 +243,7 @@ function PairPage({ pairAddress, history }) {
             </TYPE.main>
           )}
           <PanelWrapper style={{ marginTop: '1.5rem' }}>
-            <Panel>
+            <Panel style={{ height: '100%' }}>
               <AutoColumn gap="20px">
                 <RowBetween>
                   <TYPE.main>Total Liquidity {!usingTracked ? '(Untracked)' : ''}</TYPE.main>
@@ -257,7 +257,7 @@ function PairPage({ pairAddress, history }) {
                 </RowBetween>
               </AutoColumn>
             </Panel>
-            <Panel>
+            <Panel style={{ height: '100%' }}>
               <AutoColumn gap="20px">
                 <RowBetween>
                   <TYPE.main>Volume (24hrs)</TYPE.main>
@@ -271,7 +271,7 @@ function PairPage({ pairAddress, history }) {
                 </RowBetween>
               </AutoColumn>
             </Panel>
-            <Panel>
+            <Panel style={{ height: '100%' }}>
               <AutoColumn gap="20px">
                 <RowBetween>
                   <TYPE.main>Transactions (24hrs)</TYPE.main>
@@ -285,7 +285,21 @@ function PairPage({ pairAddress, history }) {
                 </RowBetween>
               </AutoColumn>
             </Panel>
-            <Panel>
+            <Panel style={{ height: '100%' }}>
+              <AutoColumn gap="20px">
+                <RowBetween>
+                  <TYPE.main>Fees (24hrs)</TYPE.main>
+                  <div />
+                </RowBetween>
+                <RowBetween align="flex-end">
+                  <TYPE.main fontSize={'2rem'} lineHeight={1} fontWeight={600}>
+                    {oneDayVolumeUSD ? formattedNum(oneDayVolumeUSD * 0.003, true) : '-'}
+                  </TYPE.main>
+                  <TYPE.main>{volumeChange}</TYPE.main>
+                </RowBetween>
+              </AutoColumn>
+            </Panel>
+            <Panel style={{ height: '100%' }}>
               <AutoColumn gap="20px">
                 <RowBetween>
                   <TYPE.main>Pooled Tokens</TYPE.main>
@@ -309,7 +323,7 @@ function PairPage({ pairAddress, history }) {
                 </Hover>
               </AutoColumn>
             </Panel>
-            <Panel style={{ gridColumn: below1080 ? '1' : '2/4', gridRow: below1080 ? '' : '1/5' }}>
+            <Panel style={{ gridColumn: below1080 ? '1' : '2/4', gridRow: below1080 ? '' : '1/6' }}>
               <PairChart address={pairAddress} color={backgroundColor} />
             </Panel>
           </PanelWrapper>
