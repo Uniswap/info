@@ -14,6 +14,7 @@ import Link from './components/Link'
 import { useMedia } from 'react-use'
 import { useGlobalData, useGlobalChartData } from './contexts/GlobalData'
 import { isAddress } from './helpers'
+import AccountPage from './pages/AccountPage'
 
 const AppWrapper = styled.div`
   position: relative;
@@ -82,9 +83,9 @@ function App() {
           )}
         </MigrateBanner>
         {globalData &&
-        Object.keys(globalData).length > 0 &&
+        Object.keys(globalData).length >= 0 &&
         globalChartData &&
-        Object.keys(globalChartData).length > 0 ? (
+        Object.keys(globalChartData).length >= 0 ? (
           <BrowserRouter>
             <Switch>
               <Route
@@ -114,6 +115,23 @@ function App() {
                       <>
                         <NavHeaderUpdated pair={match.params.pairAddress.toLowerCase()} />
                         <PairPage pairAddress={match.params.pairAddress.toLowerCase()} />
+                      </>
+                    )
+                  } else {
+                    return <Redirect to="/home" />
+                  }
+                }}
+              />
+              <Route
+                exacts
+                strict
+                path="/account/:accountAddress"
+                render={({ match }) => {
+                  if (isAddress(match.params.accountAddress.toLowerCase())) {
+                    return (
+                      <>
+                        <NavHeaderUpdated />
+                        <AccountPage account={match.params.accountAddress.toLowerCase()} />
                       </>
                     )
                   } else {

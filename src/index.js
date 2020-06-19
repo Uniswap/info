@@ -12,6 +12,8 @@ import GlobalDataContextProvider from './contexts/GlobalData'
 import PairDataContextProvider, { Updater as PairDataContextUpdater } from './contexts/PairData'
 import ApplicationContextProvider from './contexts/Application'
 
+import UserContextProvider from './contexts/User'
+
 import App from './App'
 
 function ContextProviders({ children }) {
@@ -20,7 +22,9 @@ function ContextProviders({ children }) {
       <ApplicationContextProvider>
         <TokenDataContextProvider>
           <GlobalDataContextProvider>
-            <PairDataContextProvider>{children}</PairDataContextProvider>
+            <PairDataContextProvider>
+              <UserContextProvider>{children}</UserContextProvider>
+            </PairDataContextProvider>
           </GlobalDataContextProvider>
         </TokenDataContextProvider>
       </ApplicationContextProvider>

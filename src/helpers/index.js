@@ -175,7 +175,19 @@ export const formattedNum = (number, usd = false) => {
   return Number(parseFloat(num).toFixed(4))
 }
 
+export function rawPercent(percentRaw) {
+  let percent = parseFloat(percentRaw * 100)
+  if (!percent || percent === 0) {
+    return '0%'
+  }
+  if (percent < 1 && percent > 0) {
+    return '< 1%'
+  }
+  return percent.toFixed(0) + '%'
+}
+
 export function formattedPercent(percent) {
+  percent = parseFloat(percent)
   if (!percent || percent === 0) {
     return (
       <Text fontWeight={500} fontSize={'1rem'}>
