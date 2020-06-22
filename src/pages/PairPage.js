@@ -219,7 +219,9 @@ function PairPage({ pairAddress, history }) {
             <TokenLogo address={token0?.id} size={'16px'} />
             <TYPE.main fontSize={'16px'} lineHeight={1} fontWeight={500} ml={'4px'}>
               {token0 && token1
-                ? `1 ${token0?.symbol} = ${token0Rate} ${token1?.symbol} ${token0USD ? '(' + token0USD + ')' : ''}`
+                ? `1 ${token0?.symbol} = ${token0Rate} ${token1?.symbol} ${
+                    parseFloat(token0?.derivedETH) ? '(' + token0USD + ')' : ''
+                  }`
                 : '-'}
             </TYPE.main>
           </RowFixed>
@@ -229,7 +231,9 @@ function PairPage({ pairAddress, history }) {
             <TokenLogo address={token1?.id} size={'16px'} />
             <TYPE.main fontSize={'16px'} lineHeight={1} fontWeight={500} ml={'4px'}>
               {token0 && token1
-                ? `1 ${token1?.symbol} = ${token1Rate} ${token0?.symbol}  ${token1USD ? '(' + token1USD + ')' : ''}`
+                ? `1 ${token1?.symbol} = ${token1Rate} ${token0?.symbol}  ${
+                    parseFloat(token1?.derivedETH) ? '(' + token1USD + ')' : ''
+                  }`
                 : '-'}
             </TYPE.main>
           </RowFixed>
@@ -279,7 +283,7 @@ function PairPage({ pairAddress, history }) {
                 </RowBetween>
                 <RowBetween align="flex-end">
                   <TYPE.main fontSize={'2rem'} lineHeight={1} fontWeight={600}>
-                    {oneDayVolumeUSD ? formattedNum(oneDayVolumeUSD * 0.003, true) : '-'}
+                    {oneDayVolumeUSD ? formattedNum(oneDayVolumeUSD * 0.003, true) : oneDayVolumeUSD === 0 ? '$0' : '-'}
                   </TYPE.main>
                   <TYPE.main>{volumeChange}</TYPE.main>
                 </RowBetween>
