@@ -7,6 +7,9 @@ import Panel from '../../components/Panel'
 import { useUserTotalSwappedUSD } from './hooks'
 import PositionList from '../../components/PositionList'
 import { formattedNum } from '../../helpers'
+import { AutoRow } from '../../components/Row'
+import { Text } from 'rebass'
+import { AutoColumn } from '../../components/Column'
 
 const PageWrapper = styled.div`
   display: flex;
@@ -40,6 +43,20 @@ const ThemedBackground = styled.div`
   background: ${({ theme }) => theme.background};
 `
 
+const AccountWrapper = styled.div`
+  background-color: rgba(255, 255, 255, 0.2);
+  padding: 6px 16px;
+  border-radius: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: ${({ theme }) => theme.primary1};
+`
+
+const Header = styled.div`
+  margin: 20px 0;
+`
+
 function AccountPage({ account }) {
   let transactions = useUserTransactions(account)
   let totalSwappedUSD = useUserTotalSwappedUSD(account)
@@ -49,15 +66,50 @@ function AccountPage({ account }) {
   return (
     <PageWrapper>
       <ThemedBackground />
-      <div>account: {account}</div>
-      <div>total usd swapped: {formattedNum(parseFloat(totalSwappedUSD), true)}</div>
-      <div>txn count: {!!transactionCount ? transactionCount : 0}</div>
-      <Panel style={{ marginTop: '100px' }}>
-        <PositionList positions={positions} />
+      <Header>
+        <AutoRow gap="10px">
+          <Text fontSize={32} fontWeight={600}>
+            Account
+          </Text>
+          <AccountWrapper>
+            <Text fontSize={20} fontWeight={600}>
+              {account?.slice(0, 6) + '...' + account?.slice(38, 42)}
+            </Text>
+          </AccountWrapper>
+        </AutoRow>
+      </Header>
+      <Panel>
+        <AutoRow gap="40px">
+          <AutoColumn gap="8px">
+            <Text fontSize={24} fontWeight={600}>
+              {formattedNum(parseFloat(totalSwappedUSD), true)}
+            </Text>
+            <Text fontSize={16}>Total Swapped</Text>
+          </AutoColumn>
+          <AutoColumn gap="8px">
+            <Text fontSize={24} fontWeight={600}>
+              {!!transactionCount ? transactionCount : 0}
+            </Text>
+            <Text fontSize={16}>Total Transactions</Text>
+          </AutoColumn>
+        </AutoRow>
       </Panel>
-      <Panel style={{ marginTop: '20px' }}>
-        <TxnList transactions={transactions} />
-      </Panel>
+      <AutoColumn gap="16px" style={{ marginTop: '40px' }}>
+        <Text fontSize={24} fontWeight={600}>
+          Pools
+        </Text>
+        <Panel>
+          <PositionList positions={positions} />
+        </Panel>
+      </AutoColumn>
+      <AutoColumn gap="16px" style={{ marginTop: '40px' }}>
+        <Text fontSize={24} fontWeight={600}>
+          Transactions
+        </Text>
+        <Panel>
+          <TxnList transactions={transactions} />
+        </Panel>
+      </AutoColumn>
     </PageWrapper>
   )
 }
