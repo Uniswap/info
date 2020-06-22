@@ -5,17 +5,7 @@ import utc from 'dayjs/plugin/utc'
 import { useTimeframe } from './Application'
 import { timeframeOptions } from '../constants'
 import { getPercentChange, getBlockFromTimestamp, get2DayPercentChange } from '../helpers'
-import {
-  GLOBAL_DATA,
-  GLOBAL_TXNS,
-  GLOBAL_CHART,
-  ETH_PRICE,
-  ALL_PAIRS,
-  ALL_TOKENS,
-  VOLUME_OFFSET,
-  VOLUME_OFFSET_HISTORIC,
-  PAIR_CHART
-} from '../apollo/queries'
+import { GLOBAL_DATA, GLOBAL_TXNS, GLOBAL_CHART, ETH_PRICE, ALL_PAIRS, ALL_TOKENS, PAIR_CHART } from '../apollo/queries'
 import weekOfYear from 'dayjs/plugin/weekOfYear'
 import { getV1Data } from './V1Data'
 
@@ -173,68 +163,7 @@ export default function Provider({ children }) {
   )
 }
 
-async function getVolumeOffset() {
-  const utcCurrentTime = dayjs()
-  const utcOneDayBack = utcCurrentTime.subtract(1, 'day').unix()
-  const startOfDay = utcCurrentTime.startOf('day')
-  const oneDayBlock = await getBlockFromTimestamp(utcOneDayBack)
-  const startDayBlock = await getBlockFromTimestamp(startOfDay.unix())
-  // const badTxnBlock = await getBlockFromTimestamp(BAD_TIMESTAMP)
-
-  const blocked = ['0xed9c854cb02de75ce4c9bba992828d6cb7fd5c71', '0x32026e07a035aae485690ed997c08127907ccc72']
-
-  let offset = 0
-  let dailyOffset = 0
-  try {
-    let result = await client.query({
-      query: VOLUME_OFFSET,
-      variables: {
-        blocked: blocked
-      },
-      fetchPolicy: 'network-only'
-    })
-
-    let resultOneDay = await client.query({
-      query: VOLUME_OFFSET_HISTORIC(oneDayBlock, blocked),
-      fetchPolicy: 'network-only'
-    })
-
-    let resultStartDay = await client.query({
-      query: VOLUME_OFFSET_HISTORIC(startDayBlock, blocked),
-      fetchPolicy: 'network-only'
-    })
-
-    result.data.pairs.map(pair => {
-      let previousTotal = 0
-      resultStartDay.data.pairs.map(newPair => {
-        if (newPair.id === pair.id) {
-          previousTotal = newPair.volumeUSD
-        }
-        return true
-      })
-      let oneDayVol = pair.volumeUSD - previousTotal
-      return (dailyOffset = dailyOffset + parseFloat(oneDayVol))
-    })
-
-    result.data.pairs.map(pair => {
-      let previousTotal = 0
-      resultOneDay.data.pairs.map(newPair => {
-        if (newPair.id === pair.id) {
-          previousTotal = newPair.volumeUSD
-        }
-        return true
-      })
-      let oneDayVol = pair.volumeUSD - previousTotal
-      return (offset = offset + parseFloat(oneDayVol))
-    })
-  } catch (e) {
-    console.log(e)
-  }
-
-  return offset ? [offset, dailyOffset] : [0, 0] // hard coded volume up to point of bad txn
-}
-
-async function getGlobalData(ethPrice, offset) {
+async function getGlobalData(ethPrice) {
   let data = {}
   let oneDayData = {}
   let twoDayData = {}
@@ -268,9 +197,6 @@ async function getGlobalData(ethPrice, offset) {
         oneDayData.totalVolumeUSD ? oneDayData.totalVolumeUSD : 0,
         twoDayData.totalVolumeUSD ? twoDayData.totalVolumeUSD : 0
       )
-
-      // hotfix
-      oneDayVolumeUSD = oneDayVolumeUSD - offset
 
       const [oneDayVolumeETH, volumeChangeETH] = get2DayPercentChange(
         data.totalVolumeETH,
@@ -533,9 +459,8 @@ export function useGlobalData() {
 
   useEffect(() => {
     async function fetchData() {
-      const [offset] = await getVolumeOffset()
-      if (!data && ethPrice && offset) {
-        let globalData = await getGlobalData(ethPrice, offset)
+      if (!data && ethPrice) {
+        let globalData = await getGlobalData(ethPrice)
         globalData && update(globalData)
 
         let allPairs = await getAllPairsOnUniswap()

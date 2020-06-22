@@ -56,32 +56,6 @@ export const ETH_PRICE = block => {
   return gql(queryString)
 }
 
-export const VOLUME_OFFSET = gql`
-  query pair($blocked: [Bytes]!) {
-    pairs(where: { id_in: $blocked }) {
-      id
-      volumeUSD
-    }
-  }
-`
-
-export const VOLUME_OFFSET_HISTORIC = (block, blocked) => {
-  let pairsString = `[`
-  blocked.map(pair => {
-    return (pairsString += `"${pair}"`)
-  })
-  pairsString += ']'
-  const queryString = `
-    query pairs {
-      pairs(where: { id_in: ${pairsString} }, block: {number: ${block}}) {
-        id
-        volumeUSD
-      }
-    }
-`
-  return gql(queryString)
-}
-
 export const PAIR_CHART = gql`
   query pairDayDatas($pairAddress: Bytes!) {
     pairDayDatas(orderBy: date, orderDirection: asc, where: { pairAddress: $pairAddress }) {
