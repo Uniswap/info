@@ -199,7 +199,7 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
           newTxn.type = TXN_TYPE.REMOVE
           newTxn.token0Amount = burn.amount0
           newTxn.token1Amount = burn.amount1
-          newTxn.account = burn.to
+          newTxn.account = burn.sender
           newTxn.token0Symbol = burn.pair.token0.symbol
           newTxn.token1Symbol = burn.pair.token1.symbol
           newTxn.amountUSD = burn.amountUSD

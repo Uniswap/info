@@ -1,11 +1,10 @@
 import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect, useState } from 'react'
 import { client } from '../apollo/client'
-import { USER_TRANSACTIONS, USER_POSITIONS } from '../apollo/queries'
+import { USER_TRANSACTIONS, USER_POSITIONS, USER_HISTORY, PAIR_DAY_DATA } from '../apollo/queries'
 import { useTimeframe } from './Application'
 import { timeframeOptions } from '../constants'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
-import { getBlockFromTimestamp } from '../helpers'
 
 dayjs.extend(utc)
 
@@ -15,7 +14,7 @@ const UPDATE_USER_POSITION_HISTORY = 'UPDATE_USER_POSITION_HISTORY'
 
 const TRANSACTIONS_KEY = 'TRANSACTIONS_KEY'
 const POSITIONS_KEY = 'POSITIONS_KEY'
-const USER_POSITION_HISTORY_KEY = 'POSITIONS_KEY'
+const USER_POSITION_HISTORY_KEY = 'USER_POSITION_HISTORY_KEY'
 
 const UserContext = createContext()
 
@@ -44,10 +43,10 @@ function reducer(state, { type, payload }) {
     }
 
     case UPDATE_USER_POSITION_HISTORY: {
-      const { account, chartData } = payload
+      const { account, historyData } = payload
       return {
         ...state,
-        [account]: { ...state?.[account], [USER_POSITION_HISTORY_KEY]: chartData }
+        [account]: { ...state?.[account], [USER_POSITION_HISTORY_KEY]: historyData }
       }
     }
 
@@ -82,12 +81,12 @@ export default function Provider({ children }) {
     })
   }, [])
 
-  const updateUserPositionHistory = useCallback((account, chartData) => {
+  const updateUserPositionHistory = useCallback((account, historyData) => {
     dispatch({
       type: UPDATE_USER_POSITION_HISTORY,
       payload: {
         account,
-        chartData
+        historyData
       }
     })
   }, [])
@@ -136,9 +135,11 @@ export function useUserTransactions(account) {
 
 export function useUserLiquidityHistory(account) {
   const [state, { updateUserPositionHistory }] = useUserContext()
-  const transactions = state?.[account]?.[TRANSACTIONS_KEY]
+  const history = state?.[account]?.[USER_POSITION_HISTORY_KEY]
+  // formatetd array to return for chart data
+  const [formattedHistory, setFormattedHistory] = useState()
 
-  const [oldestDateFetch, setOldestDateFetched] = useState()
+  const [startDateTimestamp, setStartDateTimestamp] = useState()
   const [activeWindow] = useTimeframe()
 
   // monitor the old date fetched
@@ -158,47 +159,108 @@ export function useUserLiquidityHistory(account) {
         break
     }
     let startTime = utcStartTime.unix() - 1
-    if ((activeWindow && startTime < oldestDateFetch) || !oldestDateFetch) {
-      setOldestDateFetched(startTime)
+    if ((activeWindow && startTime < startDateTimestamp) || !startDateTimestamp) {
+      setStartDateTimestamp(startTime)
     }
-  }, [activeWindow, oldestDateFetch])
-
-  /**
-   * 1. consume timestamp rang for chart
-   * 2. for each day within range, get block for end of day into array
-   * 3. for each block, get snapshot of user
-   * 4. for each snapshot, sum up over LP positions to get totals
-   * 5. return formatted array of objects
-   */
+  }, [activeWindow, startDateTimestamp])
 
   useEffect(() => {
     async function fetchData() {
       try {
-        let currentTime = oldestDateFetch
-        while (currentTime < dayjs.utc()) {
-          let blockFromTime = await getBlockFromTimestamp(currentTime.endOf('day'))
-          let result = await client.query({
-            query: USER_TRANSACTIONS,
-            variables: {
-              user: account
-            },
-            fetchPolicy: 'no-cache'
-          })
-          if (result?.data) {
-            updateUserPositionHistory(account, result?.data)
-          }
-          currentTime = currentTime + 86400
+        let result = await client.query({
+          query: USER_HISTORY,
+          variables: {
+            user: account
+          },
+          fetchPolicy: 'cache-first'
+        })
+        if (result) {
+          updateUserPositionHistory(account, result.data.liquidityPositionSnapshots)
         }
       } catch (e) {
         console.log(e)
       }
     }
-    if (!transactions && account) {
+    if (!history && account && startDateTimestamp) {
       fetchData()
     }
-  }, [account, transactions, updateUserPositionHistory])
+  }, [account, startDateTimestamp, history, updateUserPositionHistory])
 
-  return transactions || {}
+  const getTopPairDayDatas = useCallback(async (timestampCeiling, history) => {
+    let filtered = await history.map(async position => {
+      if (parseInt(position.timestamp) < timestampCeiling) {
+        let result = await client.query({
+          query: PAIR_DAY_DATA,
+          variables: {
+            pairAddress: position.pair.id,
+            date: parseInt(position.timestamp)
+          },
+          fetchPolicy: 'cache-first'
+        })
+        let reserveUSD = parseFloat(result?.data?.pairDayDatas?.[0]?.reserveUSD)
+        let totalSupply = parseFloat(result?.data?.pairDayDatas?.[0]?.totalSupply)
+        const value = (reserveUSD * parseFloat(position.liquidityTokenBalance)) / parseFloat(totalSupply)
+        return { pairAddress: position.pair.id, timestamp: position.timestamp, value }
+      } else return false
+    })
+    return Promise.all(filtered)
+  }, [])
+
+  useEffect(() => {
+    async function fetchData() {
+      /**
+       * 1. get all snapshots
+       * 2. starting with t0, increment days until now
+       * 3. for each day, grab latest snapshots for each pair
+       * 4. for each of those, grab day data for that pair on that date
+       * 5. calculate USD val for each one, then aggregate
+       */
+      let dayIndex = parseInt(startDateTimestamp / 86400) // get unique day bucket unix
+      const currentDayIndex = parseInt(dayjs.utc().unix() / 86400)
+      let sortedPositions = history.sort((a, b) => {
+        if (parseInt(a.timestamp) > parseInt(b.timestamp)) {
+          return 1
+        }
+        return -1
+      })
+      if (parseInt(sortedPositions[0].timestamp) > dayIndex) {
+        dayIndex = parseInt(parseInt(sortedPositions[0].timestamp) / 86400)
+      }
+
+      let formattedHistory = []
+      while (dayIndex < currentDayIndex) {
+        let dayData = {}
+        let timestampCeiling = dayIndex * 86400 + 86400
+        let liquiditySumUSD = 0
+        let pairTopValues = await getTopPairDayDatas(timestampCeiling, history)
+        let removeDuplicates = {}
+        pairTopValues.map(pairData => {
+          if (
+            pairData &&
+            ((removeDuplicates[pairData.pairAddress] &&
+              removeDuplicates[pairData.pairAddress].timestamp < pairData.timestamp) ||
+              !removeDuplicates[pairData.pairAddress])
+          ) {
+            removeDuplicates[pairData.pairAddress] = pairData
+          }
+          return true
+        })
+        Object.keys(removeDuplicates).map(pairAddress => {
+          return (liquiditySumUSD = liquiditySumUSD + removeDuplicates[pairAddress].value)
+        })
+
+        dayData.date = parseInt(dayIndex) * 86400
+        dayData.valueUSD = liquiditySumUSD
+        formattedHistory.push(dayData)
+        dayIndex = dayIndex + 1
+      }
+      setFormattedHistory(formattedHistory)
+    }
+    if (history) {
+      fetchData()
+    }
+  }, [getTopPairDayDatas, history, startDateTimestamp])
+  return formattedHistory
 }
 
 export function useUserPositions(account) {
@@ -226,5 +288,5 @@ export function useUserPositions(account) {
     }
   }, [account, positions, updatePositions])
 
-  return positions || {}
+  return positions
 }

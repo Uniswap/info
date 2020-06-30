@@ -10,6 +10,8 @@ import { formattedNum } from '../../helpers'
 import { AutoRow } from '../../components/Row'
 import { Text } from 'rebass'
 import { AutoColumn } from '../../components/Column'
+import { calculateTotalLiquidity } from './utils'
+import UserChart from '../../components/UserChart'
 
 const PageWrapper = styled.div`
   display: flex;
@@ -78,13 +80,38 @@ function AccountPage({ account }) {
           </AccountWrapper>
         </AutoRow>
       </Header>
+
       <Panel>
-        <AutoRow gap="40px">
+        <AutoColumn gap="34px">
+          <Text fontSize={24} fontWeight={600}>
+            LP Stats
+          </Text>
+          <AutoRow gap="20px">
+            <AutoColumn gap="8px">
+              <Text fontSize={36} fontWeight={600}>
+                {formattedNum(calculateTotalLiquidity(positions), true)}
+              </Text>
+              <Text fontSize={16}>Liquidity Value</Text>
+            </AutoColumn>
+          </AutoRow>
+        </AutoColumn>
+      </Panel>
+      <Panel style={{ margin: '40px 0' }}>
+        <UserChart account={account} />
+      </Panel>
+      <div style={{ marginTop: '40px' }}>
+        <AutoRow gap="20px">
           <AutoColumn gap="8px">
             <Text fontSize={24} fontWeight={600}>
               {formattedNum(parseFloat(totalSwappedUSD), true)}
             </Text>
-            <Text fontSize={16}>Total Swapped</Text>
+            <Text fontSize={16}>Total Value Swapped</Text>
+          </AutoColumn>
+          <AutoColumn gap="8px">
+            <Text fontSize={24} fontWeight={600}>
+              {formattedNum(parseFloat(totalSwappedUSD * 0.003), true)}
+            </Text>
+            <Text fontSize={16}>Total Fees Paid</Text>
           </AutoColumn>
           <AutoColumn gap="8px">
             <Text fontSize={24} fontWeight={600}>
@@ -93,7 +120,7 @@ function AccountPage({ account }) {
             <Text fontSize={16}>Total Transactions</Text>
           </AutoColumn>
         </AutoRow>
-      </Panel>
+      </div>
       <AutoColumn gap="16px" style={{ marginTop: '40px' }}>
         <Text fontSize={24} fontWeight={600}>
           Pools
@@ -102,6 +129,7 @@ function AccountPage({ account }) {
           <PositionList positions={positions} />
         </Panel>
       </AutoColumn>
+
       <AutoColumn gap="16px" style={{ marginTop: '40px' }}>
         <Text fontSize={24} fontWeight={600}>
           Transactions

@@ -51,14 +51,18 @@ export const toWeeklyDate = date => {
 }
 
 export async function getBlockFromTimestamp(timestamp) {
-  let result = await blockClient.query({
-    query: GET_BLOCK,
-    variables: {
-      timestamp: timestamp
-    },
-    fetchPolicy: 'cache-first'
-  })
-  return result?.data?.blocks?.[0]?.number
+  try {
+    let result = await blockClient.query({
+      query: GET_BLOCK,
+      variables: {
+        timestamp: timestamp
+      },
+      fetchPolicy: 'cache-first'
+    })
+    return result?.data?.blocks?.[0]?.number
+  } catch (e) {
+    return 0
+  }
 }
 
 export const toNiceDateYear = date => dayjs.utc(dayjs.unix(date)).format('MMMM DD, YYYY')

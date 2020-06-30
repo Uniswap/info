@@ -9,7 +9,7 @@ import { CustomLink } from '../Link'
 import { Divider } from '../../components'
 import DoubleTokenLogo from '../DoubleLogo'
 import { withRouter } from 'react-router-dom'
-import { formattedNum, rawPercent } from '../../helpers'
+import { formattedNum, rawPercent, formattedPercent } from '../../helpers'
 
 dayjs.extend(utc)
 
@@ -58,8 +58,8 @@ const DashGrid = styled.div`
   }
 
   @media screen and (min-width: 1200px) {
-    grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr;
-    grid-template-areas: ' name usd ownership token0 token1 ';
+    grid-template-columns: 3fr 1fr 1fr 1fr 0.7fr 1fr;
+    grid-template-areas: ' name ownership market return value manage ';
   }
 `
 
@@ -70,6 +70,7 @@ const ClickableText = styled(Text)`
     cursor: pointer;
     opacity: 0.6;
   }
+
   text-align: end;
   user-select: none;
 `
@@ -120,7 +121,7 @@ function PositionList({ positions, history }) {
       if (positions.length % ITEMS_PER_PAGE === 0) {
         extraPages = 0
       }
-      setMaxPage(Math.floor(positions.length / ITEMS_PER_PAGE) + extraPages)
+      setMaxPage(Math.floor(positions.length / ITEMS_PER_PAGE) + extraPages || 1)
     }
   }, [positions])
 
@@ -128,8 +129,6 @@ function PositionList({ positions, history }) {
     if (position) {
       const poolOwnership = position.liquidityTokenBalance / position.pair.totalSupply
       const valueUSD = poolOwnership * position.pair.reserveUSD
-      const token0 = position.pair.reserve0 * poolOwnership
-      const token1 = position.pair.reserve1 * poolOwnership
       return (
         <DashGrid style={{ height: '60px' }} focus={true}>
           <DataText area="name" fontWeight="500">
@@ -144,10 +143,18 @@ function PositionList({ positions, history }) {
               {position.pair.token0.symbol + '-' + position.pair.token1.symbol}
             </CustomLink>
           </DataText>
-          <DataText area="usd">{formattedNum(valueUSD, true)}</DataText>
           <DataText area="ownership">{rawPercent(poolOwnership)}</DataText>
-          <DataText area="token0">{`${formattedNum(token0)}  ${position.pair.token0.symbol}`}</DataText>
-          <DataText area="toke10">{`${formattedNum(token1)}  ${position.pair.token1.symbol}`}</DataText>
+          <DataText area="market">
+            {`-$312.22 `} ({formattedPercent(-2.34)})
+          </DataText>
+          <DataText area="return">
+            {' '}
+            {`$22.39 `} ({formattedPercent(7.33)})
+          </DataText>
+          <DataText area="value">{formattedNum(valueUSD, true)}</DataText>
+          <DataText area="manage" color="#FF007A">
+            Manage
+          </DataText>
         </DashGrid>
       )
     } else {
@@ -181,53 +188,54 @@ function PositionList({ positions, history }) {
         </Flex>
         <Flex alignItems="center" justifyContent="flexEnd">
           <ClickableText
-            area="usd"
+            area="ownership"
             onClick={e => {
               setSortedColumn(SORT_FIELD.LIQ)
               setSortDirection(sortedColumn !== SORT_FIELD.LIQ ? true : !sortDirection)
             }}
           >
-            Value {sortedColumn === SORT_FIELD.LIQ ? (!sortDirection ? '↑' : '↓') : ''}
+            Pool Ownership {sortedColumn === SORT_FIELD.LIQ ? (!sortDirection ? '↑' : '↓') : ''}
           </ClickableText>
         </Flex>
         <Flex alignItems="center">
           <ClickableText
-            area="ownership"
+            area="market"
             onClick={e => {
               setSortedColumn(SORT_FIELD.VOL)
               setSortDirection(sortedColumn !== SORT_FIELD.VOL ? true : !sortDirection)
             }}
           >
-            Pool Ownership
+            Return Vs. HODL
             {sortedColumn === SORT_FIELD.VOL ? (!sortDirection ? '↑' : '↓') : ''}
           </ClickableText>
         </Flex>
         {!below1080 && (
           <Flex alignItems="center" justifyContent="flexEnd">
             <ClickableText
-              area="token0"
+              area="return"
               onClick={e => {
                 setSortedColumn(SORT_FIELD.VOL_7DAYS)
                 setSortDirection(sortedColumn !== SORT_FIELD.VOL_7DAYS ? true : !sortDirection)
               }}
             >
-              Token 0 {sortedColumn === SORT_FIELD.VOL_7DAYS ? (!sortDirection ? '↑' : '↓') : ''}
+              Combined Return {sortedColumn === SORT_FIELD.VOL_7DAYS ? (!sortDirection ? '↑' : '↓') : ''}
             </ClickableText>
           </Flex>
         )}
         {!below1080 && (
           <Flex alignItems="center" justifyContent="flexEnd">
             <ClickableText
-              area="token1"
+              area="value"
               onClick={e => {
                 setSortedColumn(SORT_FIELD.FEES)
                 setSortDirection(sortedColumn !== SORT_FIELD.FEES ? true : !sortDirection)
               }}
             >
-              Token 1 {sortedColumn === SORT_FIELD.FEES ? (!sortDirection ? '↑' : '↓') : ''}
+              Value{sortedColumn === SORT_FIELD.FEES ? (!sortDirection ? '↑' : '↓') : ''}
             </ClickableText>
           </Flex>
         )}
+        <ClickableText area="manage" color="#FF007A"></ClickableText>
       </DashGrid>
       <Divider />
       <List p={0}>{!positionsSorted ? <LocalLoader /> : positionsSorted}</List>

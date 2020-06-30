@@ -56,6 +56,31 @@ export const ETH_PRICE = block => {
   return gql(queryString)
 }
 
+export const USER = (block, account) => {
+  const queryString = `
+    query users {
+      user(id: "${account}", block: {number: ${block}}) {
+        liquidityPositions
+      }
+    }
+`
+  return gql(queryString)
+}
+
+export const USER_HISTORY = gql`
+  query snapshots($user: Bytes!) {
+    liquidityPositionSnapshots(where: { user: $user }) {
+      timestamp
+      reserveUSD
+      liquidityTokenBalance
+      liquidityTokenTotalSupply
+      pair {
+        id
+      }
+    }
+  }
+`
+
 export const USER_POSITIONS = gql`
   query liquidityPositions($user: Bytes!) {
     liquidityPositions(where: { user: $user }) {
@@ -181,6 +206,20 @@ export const PAIR_CHART = gql`
       dailyVolumeToken0
       dailyVolumeToken1
       dailyVolumeUSD
+      reserveUSD
+    }
+  }
+`
+
+export const PAIR_DAY_DATA = gql`
+  query pairDayDatas($pairAddress: Bytes!, $date: Int!) {
+    pairDayDatas(first: 1, where: { pairAddress: $pairAddress, date_lt: $date }) {
+      id
+      date
+      dailyVolumeToken0
+      dailyVolumeToken1
+      dailyVolumeUSD
+      totalSupply
       reserveUSD
     }
   }
@@ -331,6 +370,7 @@ export const GLOBAL_TXNS = gql`
           }
         }
         to
+        sender
         liquidity
         amount0
         amount1
