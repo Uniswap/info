@@ -142,7 +142,7 @@ const CustomLink = styled(Link)`
 `
 
 // @TODO rework into virtualized list
-function OverviewList({ currencyUnit, history }) {
+function OverviewList({ currencyUnit, setCalculatedLiquidityETH, setCalculatedLiquidityUSD, history }) {
   const [exchanges, setExchanges] = useState([])
 
   const [filteredTxs, SetFilteredTxs] = useState([])
@@ -172,6 +172,20 @@ function OverviewList({ currencyUnit, history }) {
   }
 
   const [sortedColumn, setSortedColumn] = useState(SORT_FIELD.LIQUIDITY)
+
+  // hot fix until subraph with change sycns
+  useEffect(() => {
+    if (exchanges && exchanges.length === 200) {
+      let totalETH = 0
+      let totalUSD = 0
+      exchanges.map(exchange => {
+        totalETH = totalETH + parseFloat(exchange.ethBalance) * 2
+        return (totalUSD = totalUSD + exchange.ethBalance * 2 * exchange.price * exchange.priceUSD)
+      })
+      setCalculatedLiquidityETH(totalETH)
+      setCalculatedLiquidityUSD(totalUSD)
+    }
+  })
 
   function getPercentChangeColor(change) {
     if (change === 0) {
@@ -410,14 +424,7 @@ function OverviewList({ currencyUnit, history }) {
         <DataText area={'liquidity'}>
           {exchangeData24Hour.hasOwnProperty(exchange.id)
             ? currencyUnit === 'USD'
-              ? '$' +
-                formattedNum(
-                  exchange.ethBalance *
-                    2 *
-                    exchangeData24Hour[exchange.id].price *
-                    exchangeData24Hour[exchange.id].priceUSD,
-                  true
-                )
+              ? '$' + formattedNum(exchange.ethBalance * 2 * exchange.price * exchange.priceUSD, true)
               : formattedNum(exchange.ethBalance * 2) + ' ETH'
             : '-'}
         </DataText>
