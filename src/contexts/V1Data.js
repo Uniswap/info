@@ -3,11 +3,14 @@ import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { get2DayPercentChange, getPercentChange } from '../helpers'
 import { v1Client } from '../apollo/client'
-import { UNISWAP_GLOBALS_QUERY, UNISWAP_GLOBALS_24HOURS_AGO_QUERY } from '../apollo/queries'
+import { useEthPrice } from './GlobalData'
+import { UNISWAP_GLOBALS_QUERY, UNISWAP_GLOBALS_24HOURS_AGO_QUERY, V1_TOP_PAIRS } from '../apollo/queries'
 
 export function useV1Data() {
   dayjs.extend(utc)
   const [globalData, setGlobalData] = useState()
+
+  const ethPrice = useEthPrice()
 
   useEffect(() => {
     const fetchGlobalData = async function() {
@@ -74,6 +77,23 @@ export function useV1Data() {
         console.log('error: ', err)
       }
 
+      try {
+        let resultTopPairs = await v1Client.query({
+          query: V1_TOP_PAIRS,
+          fetchPolicy: 'cache-first'
+        })
+        if (resultTopPairs) {
+          // set two day data
+          let totalETH = 0
+          resultTopPairs.data.exchanges.map(exchange => {
+            return (totalETH = totalETH + parseFloat(exchange.ethBalance) * 2)
+          })
+          data.liquidityUsd = totalETH * ethPrice
+        }
+      } catch (err) {
+        console.log('error: ', err)
+      }
+
       // 48 hour windows
       let [volumeChangeUSD, volumePercentChangeUSD] = get2DayPercentChange(
         data.totalVolumeUSD,
@@ -109,8 +129,8 @@ export function useV1Data() {
       setGlobalData(data)
     }
 
-    !globalData && fetchGlobalData()
-  }, [globalData])
+    !globalData && ethPrice && fetchGlobalData()
+  }, [globalData, ethPrice])
 
   return globalData
 }
