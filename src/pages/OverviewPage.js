@@ -170,6 +170,10 @@ export const OverviewPage = function({
 
   const belowSmall = useMedia('(max-width: 40em)')
 
+  // hot fix until subgraph with fix is synced
+  const [calculatedLiquidityETH, setCalculatedLiquidityETH] = useState()
+  const [calculatedLiquidityUSD, setCalculatedLiquidityUSD] = useState()
+
   return (
     <div style={{ marginTop: '0px' }}>
       <ThemedBackground bg="black" />
@@ -208,10 +212,10 @@ export const OverviewPage = function({
                 topLeft={<Hint color="textLight">Total Liquidity</Hint>}
                 bottomLeft={
                   <Text fontSize={24} lineHeight={1} fontWeight={500}>
-                    {globalData.liquidityEth
+                    {calculatedLiquidityUSD
                       ? currencyUnit !== 'USD'
-                        ? 'Ξ ' + formattedNum(parseFloat(globalData.liquidityEth))
-                        : '$' + formattedNum(parseFloat(globalData.liquidityUsd), true)
+                        ? 'Ξ ' + formattedNum(calculatedLiquidityETH)
+                        : '$' + formattedNum(calculatedLiquidityUSD, true)
                       : '-'}
                     {currencyUnit === 'USD' ? '' : <SmallText> ETH</SmallText>}
                   </Text>
@@ -310,7 +314,11 @@ export const OverviewPage = function({
               </Box>
             </ChartWrapper>
             <Panel rounded bg="white" area="transactions">
-              <OverviewList currencyUnit={currencyUnit} />
+              <OverviewList
+                currencyUnit={currencyUnit}
+                setCalculatedLiquidityETH={setCalculatedLiquidityETH}
+                setCalculatedLiquidityUSD={setCalculatedLiquidityUSD}
+              />
             </Panel>
           </OverviewDashboard>
         </DashboardWrapper>
