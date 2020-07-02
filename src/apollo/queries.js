@@ -23,6 +23,9 @@ export const V1_DATA_QUERY = gql`
       totalLiquidityUSD
       txCount
     }
+    exchanges(first: 200, orderBy: ethBalance, orderDirection: desc) {
+      ethBalance
+    }
   }
 `
 

@@ -176,7 +176,7 @@ export const formattedNum = (number, usd = false) => {
     }
   }
 
-  return Number(parseFloat(num).toFixed(4))
+  return Number(parseFloat(num).toFixed(5))
 }
 
 export function rawPercent(percentRaw) {

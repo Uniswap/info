@@ -365,6 +365,17 @@ const getTokenChartData = async tokenAddress => {
       dayIndexSet.add((data[i].date / oneDay).toFixed(0))
       dayIndexArray.push(data[i])
       dayData.dailyVolumeUSD = parseFloat(dayData.dailyVolumeUSD)
+
+      // hot fixes until version without unibomb
+      if (dayData.date === 1592352000 && tokenAddress === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
+        dayData.dailyVolumeUSD = parseFloat(dayData.dailyVolumeUSD) - 92675072
+      }
+      if (dayData.date === 1592438400 && tokenAddress === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
+        dayData.dailyVolumeUSD = parseFloat(dayData.dailyVolumeUSD) - 46360757
+      }
+      if (dayData.date === 1592524800 && tokenAddress === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
+        dayData.dailyVolumeUSD = parseFloat(dayData.dailyVolumeUSD) - 45616105
+      }
     })
     // fill in empty days
     let timestamp = data[0] && data[0].date ? data[0].date : startTime
@@ -396,6 +407,7 @@ const getTokenChartData = async tokenAddress => {
   } catch (e) {
     console.log(e)
   }
+  console.log(data)
   return data
 }
 

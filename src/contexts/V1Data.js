@@ -51,6 +51,12 @@ export async function getV1Data() {
     data.txCountPercentChange = txCountPercentChange
     data.dailyVolumeUSD = volumeChangeUSD
 
+    let totalETH = 0
+    result.data.exchanges.map(exchange => {
+      return (totalETH = totalETH + parseFloat(exchange.ethBalance) * 2)
+    })
+    data.totalETH = totalETH
+
     return data
   } catch (err) {
     console.log('error: ', err)
