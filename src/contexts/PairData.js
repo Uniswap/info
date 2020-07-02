@@ -4,7 +4,7 @@ import { client } from '../apollo/client'
 import {
   PAIR_DATA,
   PAIR_CHART,
-  TOKEN_TXNS,
+  FILTERED_TRANSACTIONS,
   PAIRS_DYNAMIC,
   PAIRS_CURRENT,
   PAIRS_BULK,
@@ -440,7 +440,7 @@ const getPairTransactions = async pairAddress => {
 
   try {
     let result = await client.query({
-      query: TOKEN_TXNS,
+      query: FILTERED_TRANSACTIONS,
       variables: {
         allPairs: [pairAddress]
       },
@@ -570,7 +570,7 @@ export function useDataForList(pairList) {
       )
       setFetched(newFetched.concat(newPairData))
     }
-    if (ethPrice && pairList && !fetched && !stale) {
+    if (ethPrice && pairList && pairList.length > 0 && !fetched && !stale) {
       setStale(true)
       fetchNewPairData()
     }
