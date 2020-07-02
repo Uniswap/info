@@ -405,7 +405,6 @@ async function getAllPairsOnUniswap() {
     let allFound = false
     let pairs = []
     let skipCount = 0
-    console.log('egtting all pairs ')
     while (!allFound) {
       let result = await client.query({
         query: ALL_PAIRS,
@@ -432,7 +431,6 @@ async function getAllTokensOnUniswap() {
     let skipCount = 0
     let tokens = []
     while (!allFound) {
-      console.log('fetching tokens')
       let result = await client.query({
         query: ALL_TOKENS,
         variables: {
@@ -470,7 +468,6 @@ export function useGlobalData() {
       updateAllTokensInUniswap(allTokens)
     }
     if (!data && ethPrice) {
-      console.log(data)
       fetchData()
     }
   }, [ethPrice, update, data, updateAllPairsInUniswap, updateAllTokensInUniswap])
