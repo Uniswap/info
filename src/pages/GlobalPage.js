@@ -20,7 +20,7 @@ import TokenLogo from '../components/TokenLogo'
 import Panel from '../components/Panel'
 import { useAllTokenData } from '../contexts/TokenData'
 import UniPrice from '../components/UniPrice'
-import { ButtonFaded } from '../components/ButtonStyled'
+import { ButtonLight } from '../components/ButtonStyled'
 
 const PageWrapper = styled.div`
   display: flex;
@@ -178,9 +178,9 @@ function GlobalPage({ history }) {
           <TYPE.main fontSize={'1.125rem'}>Overall Stats</TYPE.main>
           <RowFixed>
             {isAddress(accountValue) && (
-              <ButtonFaded style={{ marginRight: '1rem' }} onClick={() => history.push('/account/' + accountValue)}>
+              <ButtonLight style={{ marginRight: '1rem' }} onClick={() => history.push('/account/' + accountValue)}>
                 See Details
-              </ButtonFaded>
+              </ButtonLight>
             )}
             <Wrapper>
               <Input

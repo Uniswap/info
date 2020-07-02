@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import { Area, XAxis, YAxis, ResponsiveContainer, Tooltip, AreaChart } from 'recharts'
+import { Area, XAxis, YAxis, ResponsiveContainer, Tooltip, AreaChart, CartesianGrid } from 'recharts'
 import { AutoRow, RowBetween } from '../Row'
 
 import { toK, toNiceDate, toNiceDateYear, formattedNum } from '../../helpers'
@@ -25,7 +25,7 @@ const CHART_VIEW = {
   LIQUIDITY: 'Liquidity'
 }
 
-const UserChart = ({ account }) => {
+const UserChart = ({ account, setAnimatedVal, animatedVal, positionValue }) => {
   const [chartFilter, setChartFilter] = useState(CHART_VIEW.LIQUIDITY)
 
   const chartData = useUserLiquidityHistory(account)
@@ -95,19 +95,30 @@ const UserChart = ({ account }) => {
       )}
       {chartFilter === CHART_VIEW.LIQUIDITY && chartData && (
         <ResponsiveContainer aspect={below1080 ? 60 / 32 : below600 ? 60 / 42 : 60 / 16}>
-          <AreaChart margin={{ top: 0, right: 10, bottom: 6, left: 0 }} barCategoryGap={1} data={chartData}>
+          <AreaChart
+            onMouseMove={e => {
+              if (e?.activePayload?.[0]?.value && animatedVal !== e?.activePayload?.[0]?.value) {
+                setAnimatedVal(e.activePayload[0].value)
+              }
+            }}
+            onMouseLeave={() => setAnimatedVal(positionValue)}
+            margin={{ top: 0, right: 10, bottom: 6, left: 0 }}
+            barCategoryGap={1}
+            data={chartData}
+          >
             <defs>
               <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor={'#ff007a'} stopOpacity={0.35} />
                 <stop offset="95%" stopColor={'#ff007a'} stopOpacity={0} />
               </linearGradient>
             </defs>
+            <CartesianGrid stroke="#DFE1E9" />
             <XAxis
               tickLine={false}
               axisLine={false}
               interval="preserveEnd"
               tickMargin={16}
-              minTickGap={120}
+              minTickGap={0}
               tickFormatter={tick => toNiceDate(tick)}
               dataKey="date"
               tick={{ fill: 'black' }}
@@ -121,7 +132,7 @@ const UserChart = ({ account }) => {
               axisLine={false}
               tickLine={false}
               interval="preserveEnd"
-              minTickGap={80}
+              minTickGap={0}
               yAxisId={0}
               tick={{ fill: 'black' }}
             />

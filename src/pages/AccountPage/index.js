@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import 'feather-icons'
 import styled from 'styled-components'
 import { useUserTransactions, useUserPositions } from '../../contexts/User'
@@ -6,12 +6,13 @@ import TxnList from '../../components/TxnList'
 import Panel from '../../components/Panel'
 import { useUserTotalSwappedUSD } from './hooks'
 import PositionList from '../../components/PositionList'
-import { formattedNum } from '../../helpers'
-import { AutoRow } from '../../components/Row'
+import { formattedNum, formattedPercent } from '../../helpers'
+import { AutoRow, RowFixed } from '../../components/Row'
 import { Text } from 'rebass'
 import { AutoColumn } from '../../components/Column'
 import { calculateTotalLiquidity } from './utils'
 import UserChart from '../../components/UserChart'
+import AnimatedNumber from 'animated-number-react'
 
 const PageWrapper = styled.div`
   display: flex;
@@ -65,6 +66,17 @@ function AccountPage({ account }) {
   const transactionCount = transactions?.swaps?.length + transactions?.burns?.length + transactions?.mints?.length
   const positions = useUserPositions(account)
 
+  const positionValue = calculateTotalLiquidity(positions)
+  const [animatedVal, setAnimatedVal] = useState(positionValue)
+
+  useEffect(() => {
+    if (positionValue) {
+      setAnimatedVal(positionValue)
+    }
+  }, [positionValue])
+
+  const formatValue = value => formattedNum(value, true)
+
   return (
     <PageWrapper>
       <ThemedBackground />
@@ -82,40 +94,74 @@ function AccountPage({ account }) {
       </Header>
 
       <Panel>
-        <AutoColumn gap="34px">
-          <Text fontSize={24} fontWeight={600}>
+        <AutoColumn gap="24px">
+          <Text fontSize={20} fontWeight={600}>
             LP Stats
           </Text>
           <AutoRow gap="20px">
             <AutoColumn gap="8px">
-              <Text fontSize={36} fontWeight={600}>
-                {formattedNum(calculateTotalLiquidity(positions), true)}
-              </Text>
+              <RowFixed>
+                <Text fontSize={28} fontWeight={600} mr={'10px'} width={'100px'}>
+                  <AnimatedNumber value={animatedVal} formatValue={formatValue} duration={500} />
+                </Text>
+                <Text>{formattedPercent(0.2)}</Text>
+              </RowFixed>
               <Text fontSize={16}>Liquidity Value</Text>
+            </AutoColumn>
+            <AutoColumn gap="8px">
+              <RowFixed>
+                <Text fontSize={28} fontWeight={600} mr={'10px'}>
+                  $676.32
+                </Text>
+                <Text>{formattedPercent(10.2)}</Text>
+              </RowFixed>
+              <Text fontSize={16}>Net Return (dummy val)</Text>
+            </AutoColumn>
+            <AutoColumn gap="8px">
+              <RowFixed>
+                <Text fontSize={28} fontWeight={600} mr={'10px'}>
+                  $430.33
+                </Text>
+                <Text>{formattedPercent(6.11)}</Text>
+              </RowFixed>
+              <Text fontSize={16}>Return vs Market (dummy val)</Text>
             </AutoColumn>
           </AutoRow>
         </AutoColumn>
       </Panel>
       <Panel style={{ margin: '40px 0' }}>
-        <UserChart account={account} />
+        <UserChart
+          account={account}
+          setAnimatedVal={setAnimatedVal}
+          animatedVal={animatedVal}
+          positionValue={positionValue}
+        />
       </Panel>
       <div style={{ marginTop: '40px' }}>
         <AutoRow gap="20px">
           <AutoColumn gap="8px">
             <Text fontSize={24} fontWeight={600}>
-              {formattedNum(parseFloat(totalSwappedUSD), true)}
+              {totalSwappedUSD ? (
+                <AnimatedNumber value={parseFloat(totalSwappedUSD)} formatValue={formatValue} duration={500} />
+              ) : (
+                '-'
+              )}
             </Text>
             <Text fontSize={16}>Total Value Swapped</Text>
           </AutoColumn>
           <AutoColumn gap="8px">
             <Text fontSize={24} fontWeight={600}>
-              {formattedNum(parseFloat(totalSwappedUSD * 0.003), true)}
+              {totalSwappedUSD ? (
+                <AnimatedNumber value={parseFloat(totalSwappedUSD * 0.003)} formatValue={formatValue} duration={500} />
+              ) : (
+                '-'
+              )}
             </Text>
             <Text fontSize={16}>Total Fees Paid</Text>
           </AutoColumn>
           <AutoColumn gap="8px">
             <Text fontSize={24} fontWeight={600}>
-              {!!transactionCount ? transactionCount : 0}
+              {transactionCount ? <AnimatedNumber value={transactionCount} duration={500} /> : '-'}
             </Text>
             <Text fontSize={16}>Total Transactions</Text>
           </AutoColumn>
@@ -129,7 +175,6 @@ function AccountPage({ account }) {
           <PositionList positions={positions} />
         </Panel>
       </AutoColumn>
-
       <AutoColumn gap="16px" style={{ marginTop: '40px' }}>
         <Text fontSize={24} fontWeight={600}>
           Transactions
