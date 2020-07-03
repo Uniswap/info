@@ -4,7 +4,7 @@ import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { useTimeframe } from './Application'
 import { timeframeOptions } from '../constants'
-import { getPercentChange, getBlockFromTimestamp, get2DayPercentChange } from '../helpers'
+import { getPercentChange, getBlockFromTimestamp, getBlocksFromTimestamps, get2DayPercentChange } from '../helpers'
 import { GLOBAL_DATA, GLOBAL_TXNS, GLOBAL_CHART, ETH_PRICE, ALL_PAIRS, ALL_TOKENS, PAIR_CHART } from '../apollo/queries'
 import weekOfYear from 'dayjs/plugin/weekOfYear'
 import { getV1Data } from './V1Data'
@@ -171,8 +171,13 @@ async function getGlobalData(ethPrice) {
     const utcCurrentTime = dayjs()
     const utcOneDayBack = utcCurrentTime.subtract(1, 'day').unix()
     const utcTwoDaysBack = utcCurrentTime.subtract(2, 'day').unix()
-    let oneDayBlock = await getBlockFromTimestamp(utcOneDayBack)
-    let twoDayBlock = await getBlockFromTimestamp(utcTwoDaysBack)
+    /**
+     * @dev This is an example of fetching multiple blocks with one query
+     * @dev Slightly faster vvvvv
+     */
+    // let oneDayBlock = await getBlockFromTimestamp(utcOneDayBack)
+    // let twoDayBlock = await getBlockFromTimestamp(utcTwoDaysBack)
+    let [oneDayBlock, twoDayBlock] = await getBlocksFromTimestamps([utcOneDayBack, utcTwoDaysBack])
 
     let result = await client.query({
       query: GLOBAL_DATA(),
