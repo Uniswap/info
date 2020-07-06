@@ -374,7 +374,6 @@ const getTokenChartData = async tokenAddress => {
   } catch (e) {
     console.log(e)
   }
-  console.log(data)
   return data
 }
 

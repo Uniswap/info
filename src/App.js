@@ -14,6 +14,7 @@ import Link from './components/Link'
 import { useMedia } from 'react-use'
 import { useGlobalData, useGlobalChartData } from './contexts/GlobalData'
 import { isAddress } from './helpers'
+import { OVERVIEW_TOKEN_BLACKLIST, OVERVIEW_PAIR_BLACKLIST } from './constants'
 
 const AppWrapper = styled.div`
   position: relative;
@@ -92,7 +93,10 @@ function App() {
                 strict
                 path="/token/:tokenAddress"
                 render={({ match }) => {
-                  if (isAddress(match.params.tokenAddress.toLowerCase())) {
+                  if (
+                    isAddress(match.params.tokenAddress.toLowerCase()) &&
+                    !OVERVIEW_TOKEN_BLACKLIST.includes(match.params.tokenAddress.toLowerCase())
+                  ) {
                     return (
                       <>
                         <NavHeaderUpdated token={match.params.tokenAddress.toLowerCase()} />
@@ -109,7 +113,10 @@ function App() {
                 strict
                 path="/pair/:pairAddress"
                 render={({ match }) => {
-                  if (isAddress(match.params.pairAddress.toLowerCase())) {
+                  if (
+                    isAddress(match.params.pairAddress.toLowerCase()) &&
+                    !OVERVIEW_PAIR_BLACKLIST.includes(match.params.pairAddress.toLowerCase())
+                  ) {
                     return (
                       <>
                         <NavHeaderUpdated pair={match.params.pairAddress.toLowerCase()} />

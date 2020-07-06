@@ -13,6 +13,7 @@ import { formattedNum, getPoolLink, getSwapLink } from '../../helpers'
 import DoubleTokenLogo from '../DoubleLogo'
 import { ButtonLight, ButtonDark } from '../ButtonStyled'
 import { withRouter } from 'react-router-dom'
+import { OVERVIEW_PAIR_BLACKLIST } from '../../constants'
 
 dayjs.extend(utc)
 
@@ -212,7 +213,8 @@ function PairList({ pairs, color, history }) {
       .slice(ITEMS_PER_PAGE * (page - 1), page * ITEMS_PER_PAGE)
       .map((pairAddress, index) => {
         return (
-          pairAddress && (
+          pairAddress &&
+          !OVERVIEW_PAIR_BLACKLIST.includes(pairAddress) && (
             <div key={index}>
               <ListItem key={index} index={(page - 1) * 10 + index + 1} pairAddress={pairAddress} />
               <Divider />

@@ -10,20 +10,12 @@ export const timeframeOptions = {
   ALL_TIME: 'All time'
 }
 
-export const OVERVIEW_WHITELIST = [
-  '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2', //WETH
-  '0x6b175474e89094c44da98b954eedeac495271d0f', // dai
-  '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', // usdc
-  '0xdac17f958d2ee523a2206206994597c13d831ec7', // usdt
-  '0x0000000000085d4780b73119b644ae5ecd22b376', //tusd
-  '0x5d3a536e4d6dbd6114cc1ead35777bab948e3643', //cdai
-  '0x39aa39c021dfbae8fac545936693ac917d5e7563', // cusdc
-  '0x86fadb80d8d2cff3c3680819e4da99c10232ba0f' // EBASE
-]
-
-// temp until tracked global liquidity
+// hide from overview list
 export const OVERVIEW_TOKEN_BLACKLIST = [
   '0x495c7f3a713870f68f8b418b355c085dfdc412c3',
   '0xc3761eb917cd790b30dad99f6cc5b4ff93c4f9ea',
-  '0xe31debd7abff90b06bca21010dd860d8701fd901'
+  '0xe31debd7abff90b06bca21010dd860d8701fd901',
+  '0x1b76d0364e803fb94c1d5ca9faf55f05ee494731'
 ]
+
+export const OVERVIEW_PAIR_BLACKLIST = ['0x7cdb719aa9d079da0be147495a197bd39be6e7c9']
