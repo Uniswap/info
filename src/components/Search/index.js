@@ -11,7 +11,7 @@ import { useAllPairData, usePairData } from '../../contexts/PairData'
 import DoubleTokenLogo from '../DoubleLogo'
 import { useMedia } from 'react-use'
 import { useAllPairsInUniswap, useAllTokensInUniswap } from '../../contexts/GlobalData'
-import { OVERVIEW_TOKEN_BLACKLIST } from '../../constants'
+import { OVERVIEW_TOKEN_BLACKLIST, OVERVIEW_PAIR_BLACKLIST } from '../../constants'
 
 const Wrapper = styled.div`
   display: flex;
@@ -166,6 +166,9 @@ export const Search = ({ small = false }) => {
             return 1
           })
           .filter(token => {
+            if (OVERVIEW_TOKEN_BLACKLIST.includes(token.id)) {
+              return false
+            }
             const regexMatches = Object.keys(token).map(tokenEntryKey => {
               const isAddress = value.slice(0, 2) === '0x'
               if (tokenEntryKey === 'id' && isAddress) {
@@ -202,6 +205,9 @@ export const Search = ({ small = false }) => {
             return 0
           })
           .filter(pair => {
+            if (OVERVIEW_PAIR_BLACKLIST.includes(pair.id)) {
+              return false
+            }
             if (value && value.includes(' ')) {
               const pairA = value.split(' ')[0]?.toUpperCase()
               const pairB = value.split(' ')[1]?.toUpperCase()
