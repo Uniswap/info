@@ -29,7 +29,7 @@ const StyledWarningIcon = styled(AlertTriangle)`
   stroke: red;
 `
 
-export default function Warning({ show, setShow, address }) {
+export default function Warning({ type, show, setShow, address }) {
   const below800 = useMedia('(max-width: 800px)')
 
   const textContent = below800 ? (
@@ -72,7 +72,7 @@ export default function Warning({ show, setShow, address }) {
                 href={'https://etherscan.io/address/' + address}
                 target="_blank"
               >
-                View contract on etherscan
+                View {type === 'token' ? 'token' : 'pair'} contract on etherscan
               </Link>
             </Hover>
             <RowBetween style={{ marginTop: '20px' }}>
@@ -92,7 +92,7 @@ export default function Warning({ show, setShow, address }) {
                 href={'https://etherscan.io/address/' + address}
                 target="_blank"
               >
-                View contract on etherscan
+                View {type === 'token' ? 'token' : 'pair'} contract on etherscan
               </Link>
             </Hover>
             <ButtonDark color={'#f82d3a'} style={{ minWidth: '140px' }} onClick={() => setShow(false)}>
