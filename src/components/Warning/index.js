@@ -1,11 +1,10 @@
-import React, { useState } from 'react'
+import React from 'react'
 import 'feather-icons'
 import styled from 'styled-components'
 import { Text } from 'rebass'
 import { AlertTriangle } from 'react-feather'
 import { RowBetween, RowFixed } from '../Row'
 import { ButtonDark } from '../ButtonStyled'
-import { useMedia } from 'react-use'
 import { AutoColumn } from '../Column'
 
 const WarningWrapper = styled.div`
@@ -18,6 +17,7 @@ const WarningWrapper = styled.div`
   max-width: 1000px;
   display: ${({ show }) => !show && 'none'};
   margin-bottom: 40px;
+  position: relative;
 `
 
 const StyledWarningIcon = styled(AlertTriangle)`
@@ -26,46 +26,28 @@ const StyledWarningIcon = styled(AlertTriangle)`
   stroke: red;
 `
 
-export default function Warning({ type }) {
-  const [showWarning, setShowWarning] = useState(true)
-
-  const below700 = useMedia('(max-width: 700px)')
-
-  const warningText =
-    type === 'pair'
-      ? 'Anyone can create and and name any ERC20 token. Do your own research before interacting with this pair.'
-      : 'Anyone can create and and name any ERC20 token. Do your own research before interacting with this token.'
-
-  return below700 ? (
-    <WarningWrapper show={showWarning}>
+export default function Warning({ show, setShow }) {
+  return (
+    <WarningWrapper show={show}>
       <AutoColumn gap="10px">
         <RowFixed>
           <StyledWarningIcon />
         </RowFixed>
         <Text fontWeight={500} lineHeight={'145.23%'}>
-          {warningText}
+          Anyone can create and name any ERC20 token on Ethereum, including creating fake versions of existing tokens
+          and tokens that claim to represent projects that do not have a token.
         </Text>
-        <RowBetween style={{ marginTop: '10px' }}>
+        <Text fontWeight={500} lineHeight={'145.23%'}>
+          Similar to Etherscan, this site automatically tracks analytics for all ERC20 tokens independent of token
+          integrity. Please do your own research before interacting with any ERC20 token.
+        </Text>
+        <RowBetween>
           <div />
-          <ButtonDark color={'#f82d3a'} style={{ minWidth: '140px' }} onClick={() => setShowWarning(false)}>
+          <ButtonDark color={'#f82d3a'} style={{ minWidth: '140px' }} onClick={() => setShow(false)}>
             I understand
           </ButtonDark>
         </RowBetween>
       </AutoColumn>
-    </WarningWrapper>
-  ) : (
-    <WarningWrapper show={showWarning}>
-      <RowBetween>
-        <RowFixed>
-          <StyledWarningIcon />
-          <Text ml={'8px'} fontWeight={500}>
-            {warningText}
-          </Text>
-        </RowFixed>
-        <ButtonDark ml={'.5rem'} color={'#f82d3a'} style={{ minWidth: '140px' }} onClick={() => setShowWarning(false)}>
-          I understand
-        </ButtonDark>
-      </RowBetween>
     </WarningWrapper>
   )
 }
