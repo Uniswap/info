@@ -119,7 +119,7 @@ const HoverSpan = styled.span`
 `
 
 const WarningGrouping = styled.div`
-  opacity: ${({ disabled }) => disabled && '0.7'};
+  opacity: ${({ disabled }) => disabled && '0.4'};
   pointer-events: ${({ disabled }) => disabled && 'none'};
 `
 
@@ -188,7 +188,7 @@ function PairPage({ pairAddress, history }) {
   return (
     <PageWrapper>
       <ThemedBackground backgroundColor={transparentize(0.6, backgroundColor)} />
-      <Warning type={'pair'} show={showWarning} setShow={setShowWarning} />
+      <Warning type={'pair'} show={showWarning} setShow={setShowWarning} address={pairAddress} />
       <WarningGrouping disabled={showWarning}>
         <RowBetween mt={20} style={{ flexWrap: 'wrap' }}>
           <RowFixed style={{ flexWrap: 'wrap' }}>

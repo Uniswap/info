@@ -103,7 +103,7 @@ const TokenDetailsLayout = styled.div`
 `
 
 const WarningGrouping = styled.div`
-  opacity: ${({ disabled }) => disabled && '0.7'};
+  opacity: ${({ disabled }) => disabled && '0.4'};
   pointer-events: ${({ disabled }) => disabled && 'none'};
 `
 
@@ -159,7 +159,7 @@ function TokenPage({ address, history }) {
   return (
     <PageWrapper>
       <ThemedBackground backgroundColor={transparentize(0.6, backgroundColor)} />
-      <Warning type={'token'} show={showWarning} setShow={setShowWarning} />
+      <Warning type={'token'} show={showWarning} setShow={setShowWarning} address={address} />
       <WarningGrouping disabled={showWarning}>
         <RowBetween mt={20} style={{ flexWrap: 'wrap' }}>
           <RowFixed style={{ flexWrap: 'wrap' }}>
