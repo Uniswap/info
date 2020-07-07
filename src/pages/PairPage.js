@@ -27,6 +27,7 @@ import { Hover } from '../components'
 import { useEthPrice } from '../contexts/GlobalData'
 import Warning from '../components/Warning'
 import { useShowWarningOnPath } from '../contexts/Application'
+import { SURPRESS_WARNINGS } from '../constants'
 
 const PageWrapper = styled.div`
   display: flex;
@@ -188,8 +189,15 @@ function PairPage({ pairAddress, history }) {
   return (
     <PageWrapper>
       <ThemedBackground backgroundColor={transparentize(0.6, backgroundColor)} />
-      <Warning type={'pair'} show={showWarning} setShow={setShowWarning} address={pairAddress} />
-      <WarningGrouping disabled={showWarning}>
+      <Warning
+        type={'pair'}
+        show={showWarning && !(SURPRESS_WARNINGS.includes(token0?.id) && SURPRESS_WARNINGS.includes(token1?.id))}
+        setShow={setShowWarning}
+        address={pairAddress}
+      />
+      <WarningGrouping
+        disabled={showWarning && !(SURPRESS_WARNINGS.includes(token0?.id) && SURPRESS_WARNINGS.includes(token1?.id))}
+      >
         <RowBetween mt={20} style={{ flexWrap: 'wrap' }}>
           <RowFixed style={{ flexWrap: 'wrap' }}>
             <RowFixed mb={20}>

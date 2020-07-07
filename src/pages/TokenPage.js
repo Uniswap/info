@@ -27,6 +27,7 @@ import { useDataForList } from '../contexts/PairData'
 import { useEffect } from 'react'
 import Warning from '../components/Warning'
 import { useShowWarningOnPath } from '../contexts/Application'
+import { SURPRESS_WARNINGS } from '../constants'
 
 const PageWrapper = styled.div`
   display: flex;
@@ -159,8 +160,13 @@ function TokenPage({ address, history }) {
   return (
     <PageWrapper>
       <ThemedBackground backgroundColor={transparentize(0.6, backgroundColor)} />
-      <Warning type={'token'} show={showWarning} setShow={setShowWarning} address={address} />
-      <WarningGrouping disabled={showWarning}>
+      <Warning
+        type={'token'}
+        show={showWarning && !SURPRESS_WARNINGS.includes(address)}
+        setShow={setShowWarning}
+        address={address}
+      />
+      <WarningGrouping disabled={showWarning && !SURPRESS_WARNINGS.includes(address)}>
         <RowBetween mt={20} style={{ flexWrap: 'wrap' }}>
           <RowFixed style={{ flexWrap: 'wrap' }}>
             <RowFixed mb={20} style={{ alignItems: 'baseline' }}>
