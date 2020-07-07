@@ -24,6 +24,7 @@ import { useMedia } from 'react-use'
 import { transparentize } from 'polished'
 import { useDataForList } from '../contexts/PairData'
 import { useEffect } from 'react'
+import Warning from '../components/Warning'
 
 const PageWrapper = styled.div`
   display: flex;
@@ -148,6 +149,7 @@ function TokenPage({ address }) {
   return (
     <PageWrapper>
       <ThemedBackground backgroundColor={transparentize(0.6, backgroundColor)} />
+      <Warning type={'token'} />
       <RowBetween mt={20} style={{ flexWrap: 'wrap' }}>
         <RowFixed style={{ flexWrap: 'wrap' }}>
           <RowFixed mb={20} style={{ alignItems: 'baseline' }}>

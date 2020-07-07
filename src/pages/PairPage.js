@@ -25,6 +25,7 @@ import { transparentize } from 'polished'
 import TokenLogo from '../components/TokenLogo'
 import { Hover } from '../components'
 import { useEthPrice } from '../contexts/GlobalData'
+import Warning from '../components/Warning'
 
 const PageWrapper = styled.div`
   display: flex;
@@ -179,6 +180,7 @@ function PairPage({ pairAddress, history }) {
   return (
     <PageWrapper>
       <ThemedBackground backgroundColor={transparentize(0.6, backgroundColor)} />
+      <Warning type={'pair'} />
       <RowBetween mt={20} style={{ flexWrap: 'wrap' }}>
         <RowFixed style={{ flexWrap: 'wrap' }}>
           <RowFixed mb={20}>
