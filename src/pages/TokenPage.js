@@ -1,5 +1,6 @@
-import React, { useState } from 'react'
+import React from 'react'
 import 'feather-icons'
+import { withRouter } from 'react-router-dom'
 import { Text } from 'rebass'
 import styled from 'styled-components'
 
@@ -25,6 +26,7 @@ import { transparentize } from 'polished'
 import { useDataForList } from '../contexts/PairData'
 import { useEffect } from 'react'
 import Warning from '../components/Warning'
+import { useShowWarningOnPath } from '../contexts/Application'
 
 const PageWrapper = styled.div`
   display: flex;
@@ -43,7 +45,7 @@ const PageWrapper = styled.div`
   }
 
   & > * {
-    width: 100%;
+    width: 90%;
     max-width: 1240px;
   }
 `
@@ -105,7 +107,7 @@ const WarningGrouping = styled.div`
   pointer-events: ${({ disabled }) => disabled && 'none'};
 `
 
-function TokenPage({ address }) {
+function TokenPage({ address, history }) {
   const {
     id,
     name,
@@ -152,7 +154,7 @@ function TokenPage({ address }) {
   const below1080 = useMedia('(max-width: 1080px)')
   const below600 = useMedia('(max-width: 600px)')
 
-  const [showWarning, setShowWarning] = useState(true)
+  const [showWarning, setShowWarning] = useShowWarningOnPath(history.location.pathname)
 
   return (
     <PageWrapper>
@@ -339,4 +341,4 @@ function TokenPage({ address }) {
   )
 }
 
-export default TokenPage
+export default withRouter(TokenPage)

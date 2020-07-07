@@ -26,6 +26,7 @@ import TokenLogo from '../components/TokenLogo'
 import { Hover } from '../components'
 import { useEthPrice } from '../contexts/GlobalData'
 import Warning from '../components/Warning'
+import { useShowWarningOnPath } from '../contexts/Application'
 
 const PageWrapper = styled.div`
   display: flex;
@@ -43,7 +44,7 @@ const PageWrapper = styled.div`
   }
 
   & > * {
-    width: 100%;
+    width: 90%;
     max-width: 1240px;
   }
 `
@@ -182,7 +183,7 @@ function PairPage({ pairAddress, history }) {
   const below1080 = useMedia('(max-width: 1080px)')
   const below600 = useMedia('(max-width: 600px)')
 
-  const [showWarning, setShowWarning] = useState(true)
+  const [showWarning, setShowWarning] = useShowWarningOnPath(history.location.pathname)
 
   return (
     <PageWrapper>
