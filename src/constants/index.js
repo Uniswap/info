@@ -18,7 +18,7 @@ export const OVERVIEW_TOKEN_BLACKLIST = [
   '0x1b76d0364e803fb94c1d5ca9faf55f05ee494731'
 ]
 
-export const OVERVIEW_PAIR_BLACKLIST = ['0x7cdb719aa9d079da0be147495a197bd39be6e7c9']
+export const OVERVIEW_PAIR_BLACKLIST = []
 
 export const SURPRESS_WARNINGS = [
   '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
