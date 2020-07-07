@@ -14,8 +14,8 @@ export const timeframeOptions = {
 export const OVERVIEW_TOKEN_BLACKLIST = [
   '0x495c7f3a713870f68f8b418b355c085dfdc412c3',
   '0xc3761eb917cd790b30dad99f6cc5b4ff93c4f9ea',
-  '0xe31debd7abff90b06bca21010dd860d8701fd901',
-  '0x1b76d0364e803fb94c1d5ca9faf55f05ee494731'
+  '0xe31debd7abff90b06bca21010dd860d8701fd901'
+  // '0x1b76d0364e803fb94c1d5ca9faf55f05ee494731'
 ]
 
 export const OVERVIEW_PAIR_BLACKLIST = []
