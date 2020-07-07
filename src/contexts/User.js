@@ -211,18 +211,20 @@ export function useUserLiquidityHistory(account) {
       /**
        * 1. get all snapshots
        * 2. starting with t0, increment days until now
-       * 3. for each day, grab latest snapshots for each pair
+       * 3. for each day, grab latest LP snapshots for each pair
        * 4. for each of those, grab day data for that pair on that date
        * 5. calculate USD val for each one, then aggregate
        */
       let dayIndex = parseInt(startDateTimestamp / 86400) // get unique day bucket unix
       const currentDayIndex = parseInt(dayjs.utc().unix() / 86400)
+      // sort snapshots in order
       let sortedPositions = history.sort((a, b) => {
         if (parseInt(a.timestamp) > parseInt(b.timestamp)) {
           return 1
         }
         return -1
       })
+      // if UI start time is > first position time - bump start index to this time
       if (parseInt(sortedPositions[0].timestamp) > dayIndex) {
         dayIndex = parseInt(parseInt(sortedPositions[0].timestamp) / 86400)
       }
@@ -233,6 +235,9 @@ export function useUserLiquidityHistory(account) {
         let timestampCeiling = dayIndex * 86400 + 86400
         let liquiditySumUSD = 0
         let pairTopValues = await getTopPairDayDatas(timestampCeiling, history)
+        /**
+         * for the current day, make sure only 1 unique pairdaydata per pair in list
+         */
         let removeDuplicates = {}
         pairTopValues.map(pairData => {
           if (
@@ -248,12 +253,12 @@ export function useUserLiquidityHistory(account) {
         Object.keys(removeDuplicates).map(pairAddress => {
           return (liquiditySumUSD = liquiditySumUSD + removeDuplicates[pairAddress].value)
         })
-
         dayData.date = parseInt(dayIndex) * 86400
         dayData.valueUSD = liquiditySumUSD
         formattedHistory.push(dayData)
         dayIndex = dayIndex + 1
       }
+
       setFormattedHistory(formattedHistory)
     }
     if (history) {

@@ -190,7 +190,7 @@ export const PAIR_CHART = gql`
 
 export const PAIR_DAY_DATA = gql`
   query pairDayDatas($pairAddress: Bytes!, $date: Int!) {
-    pairDayDatas(first: 1, where: { pairAddress: $pairAddress, date_lt: $date }) {
+    pairDayDatas(first: 1, orderBy: date, orderDirection: desc, where: { pairAddress: $pairAddress, date_lt: $date }) {
       id
       date
       dailyVolumeToken0
