@@ -522,7 +522,6 @@ export function Updater() {
     async function getData() {
       // get top pairs for overview list
       let topPairs = await getTopPairData(ethPrice)
-
       topPairs && updateTopPairs(topPairs)
     }
     ethPrice && getData()
