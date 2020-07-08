@@ -259,7 +259,12 @@ const getTopPairData = async ethPrice => {
     let [oneDayResult, twoDayResult, oneWeekResult] = await Promise.all(
       [oneDayBlock, twoDayBlock, oneWeekBlock].map(async block => {
         let result = client.query({
-          query: PAIRS_DYNAMIC_BULK(block, current.data.pairs),
+          query: PAIRS_DYNAMIC_BULK(
+            block,
+            current.data.pairs.map(pair => {
+              return pair.id
+            })
+          ),
           fetchPolicy: 'cache-first'
         })
         return result
