@@ -84,6 +84,10 @@ const ChartWrapper = styled.div`
   height: 100%;
 `
 
+const TopPanel = styled(Panel)`
+  height: 100px;
+`
+
 const LIST_VIEW = {
   TOKENS: 'tokens',
   PAIRS: 'pairs'
@@ -193,7 +197,7 @@ function GlobalPage() {
       )}
       {!below1080 && ( // desktop
         <TopGroup style={{ marginTop: '1.5rem' }}>
-          <Panel
+          <TopPanel
             hover={true}
             onMouseEnter={() => {
               setShowPriceCard(true)
@@ -217,8 +221,8 @@ function GlobalPage() {
                 {formattedPercent(ethPriceChange)}
               </RowBetween>
             </AutoColumn>
-          </Panel>
-          <Panel>
+          </TopPanel>
+          <TopPanel>
             <AutoColumn gap="20px">
               <RowBetween>
                 <TYPE.main>Total Liquidity</TYPE.main>
@@ -231,8 +235,8 @@ function GlobalPage() {
                 <TYPE.main fontSize={14}>{liquidityChange && liquidityChange}</TYPE.main>
               </RowBetween>
             </AutoColumn>
-          </Panel>
-          <Panel>
+          </TopPanel>
+          <TopPanel>
             <AutoColumn gap="20px">
               <RowBetween>
                 <TYPE.main>Volume (24hrs)</TYPE.main>
@@ -245,8 +249,8 @@ function GlobalPage() {
                 <TYPE.main fontSize={14}>{volumeChange}</TYPE.main>
               </RowBetween>
             </AutoColumn>
-          </Panel>
-          <Panel>
+          </TopPanel>
+          <TopPanel>
             <AutoColumn gap="20px">
               <RowBetween>
                 <TYPE.main>Transactions (24hrs)</TYPE.main>
@@ -259,7 +263,7 @@ function GlobalPage() {
                 <TYPE.main fontSize={14}>{txnChangeFormatted && txnChangeFormatted}</TYPE.main>
               </RowBetween>
             </AutoColumn>
-          </Panel>
+          </TopPanel>
         </TopGroup>
       )}
 
@@ -304,7 +308,11 @@ function GlobalPage() {
       </ListOptions>
 
       <Panel style={{ marginTop: '6px' }}>
-        {listView === LIST_VIEW.PAIRS ? <PairList pairs={allPairs} /> : <TopTokenList tokens={allTokens} />}
+        {listView === LIST_VIEW.PAIRS ? (
+          <PairList pairs={allPairs} disbaleLinks={true} />
+        ) : (
+          <TopTokenList tokens={allTokens} />
+        )}
       </Panel>
 
       <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '2rem' }}>
