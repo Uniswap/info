@@ -142,6 +142,7 @@ function TokenPage({ address, history }) {
   const priceChange = priceChangeUSD ? formattedPercent(priceChangeUSD) : ''
 
   // volume
+
   const volume = oneDayVolumeUSD ? formattedNum(oneDayVolumeUSD, true) : oneDayVolumeUSD === 0 ? '$0' : ''
   const volumeChange = formattedPercent(volumeChangeUSD)
 

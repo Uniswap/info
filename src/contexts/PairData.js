@@ -1,15 +1,7 @@
 import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect, useState } from 'react'
 
 import { client } from '../apollo/client'
-import {
-  PAIR_DATA,
-  PAIR_CHART,
-  TOKEN_TXNS,
-  PAIRS_DYNAMIC,
-  PAIRS_CURRENT,
-  PAIRS_BULK,
-  PAIRS_DYNAMIC_BULK
-} from '../apollo/queries'
+import { PAIR_DATA, PAIR_CHART, TOKEN_TXNS, PAIRS_CURRENT, PAIRS_BULK, PAIRS_DYNAMIC_BULK } from '../apollo/queries'
 
 import { useEthPrice } from './GlobalData'
 
@@ -267,7 +259,7 @@ const getTopPairData = async ethPrice => {
     let [oneDayResult, twoDayResult, oneWeekResult] = await Promise.all(
       [oneDayBlock, twoDayBlock, oneWeekBlock].map(async block => {
         let result = client.query({
-          query: PAIRS_DYNAMIC(block),
+          query: PAIRS_DYNAMIC_BULK(block, current.data.pairs),
           fetchPolicy: 'cache-first'
         })
         return result
@@ -300,6 +292,22 @@ const getTopPairData = async ethPrice => {
           oneDayHistory?.volumeUSD ?? 0,
           twoDayHistory?.volumeUSD ?? 0
         )
+
+        // catch the case where token wasnt in top list in previous days
+        // if (!oneDayHistory) {
+        //   let oneDayResult = await client.query({
+        //     query: PAIR_DATA(pair.id, oneDayBlock),
+        //     fetchPolicy: 'cache-first'
+        //   })
+        //   oneDayHistory = oneDayResult
+        // }
+        // if (!oneWeekHistory) {
+        //   let oneWeekResult = await client.query({
+        //     query: PAIR_DATA(pair.id, oneWeekBlock),
+        //     fetchPolicy: 'cache-first'
+        //   })
+        //   oneWeekHistory = oneWeekResult
+        // }
 
         const oneWeekVolumeUSD = parseFloat(oneWeekData ? data?.volumeUSD - oneWeekHistory?.volumeUSD : data.volumeUSD)
         const [oneDayVolumeETH, volumeChangeETH] = get2DayPercentChange(

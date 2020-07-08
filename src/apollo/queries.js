@@ -323,6 +323,7 @@ export const PAIRS_DYNAMIC_BULK = (block, pairs) => {
       reserveUSD
       trackedReserveETH
       volumeUSD
+      
     }
   }
   `
