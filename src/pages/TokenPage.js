@@ -26,8 +26,8 @@ import { transparentize } from 'polished'
 import { useDataForList } from '../contexts/PairData'
 import { useEffect } from 'react'
 import Warning from '../components/Warning'
-import { useShowWarningOnPath } from '../contexts/Application'
 import { SURPRESS_WARNINGS } from '../constants'
+import { usePathDismissed } from '../contexts/LocalStorage'
 
 const PageWrapper = styled.div`
   display: flex;
@@ -155,18 +155,18 @@ function TokenPage({ address, history }) {
   const below1080 = useMedia('(max-width: 1080px)')
   const below600 = useMedia('(max-width: 600px)')
 
-  const [showWarning, setShowWarning] = useShowWarningOnPath(history.location.pathname)
+  const [dismissed, markAsDismissed] = usePathDismissed(history.location.pathname)
 
   return (
     <PageWrapper>
       <ThemedBackground backgroundColor={transparentize(0.6, backgroundColor)} />
       <Warning
         type={'token'}
-        show={showWarning && !SURPRESS_WARNINGS.includes(address)}
-        setShow={setShowWarning}
+        show={!dismissed && !SURPRESS_WARNINGS.includes(address)}
+        setShow={markAsDismissed}
         address={address}
       />
-      <WarningGrouping disabled={showWarning && !SURPRESS_WARNINGS.includes(address)}>
+      <WarningGrouping disabled={!dismissed && !SURPRESS_WARNINGS.includes(address)}>
         <RowBetween mt={20} style={{ flexWrap: 'wrap' }}>
           <RowFixed style={{ flexWrap: 'wrap' }}>
             <RowFixed mb={20} style={{ alignItems: 'baseline' }}>
