@@ -19,6 +19,7 @@ import TokenLogo from '../components/TokenLogo'
 import Panel from '../components/Panel'
 import { useAllTokenData } from '../contexts/TokenData'
 import UniPrice from '../components/UniPrice'
+import { CustomLink } from '../components/Link'
 
 const PageWrapper = styled.div`
   display: flex;
@@ -282,30 +283,35 @@ function GlobalPage() {
         </GridRow>
       )}
 
-      <ListOptions gap="10px" style={{ marginTop: '2rem', marginBottom: '.5rem' }}>
-        <Hover>
-          <TYPE.main
-            onClick={() => {
-              setListView(LIST_VIEW.PAIRS)
-            }}
-            fontSize={'1.125rem'}
-            color={listView === LIST_VIEW.TOKENS ? '#aeaeae' : 'black'}
-          >
-            Pairs
-          </TYPE.main>
-        </Hover>
-        <Hover>
-          <TYPE.main
-            onClick={() => {
-              setListView(LIST_VIEW.TOKENS)
-            }}
-            fontSize={'1.125rem'}
-            color={listView === LIST_VIEW.PAIRS ? '#aeaeae' : 'black'}
-          >
-            Tokens
-          </TYPE.main>
-        </Hover>
-      </ListOptions>
+      <RowBetween style={{ marginTop: '2rem', marginBottom: '.5rem' }}>
+        <ListOptions gap="10px">
+          <Hover>
+            <TYPE.main
+              onClick={() => {
+                setListView(LIST_VIEW.PAIRS)
+              }}
+              fontSize={'1.125rem'}
+              color={listView === LIST_VIEW.TOKENS ? '#aeaeae' : 'black'}
+            >
+              Pairs
+            </TYPE.main>
+          </Hover>
+          <Hover>
+            <TYPE.main
+              onClick={() => {
+                setListView(LIST_VIEW.TOKENS)
+              }}
+              fontSize={'1.125rem'}
+              color={listView === LIST_VIEW.PAIRS ? '#aeaeae' : 'black'}
+            >
+              Tokens
+            </TYPE.main>
+          </Hover>
+        </ListOptions>
+        <CustomLink style={{ width: '110px' }} to={listView === LIST_VIEW.PAIRS ? '/all-pairs' : 'all-tokens'}>
+          See Expanded
+        </CustomLink>
+      </RowBetween>
 
       <Panel style={{ marginTop: '6px' }}>
         {listView === LIST_VIEW.PAIRS ? (
