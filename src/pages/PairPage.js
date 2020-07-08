@@ -26,8 +26,8 @@ import TokenLogo from '../components/TokenLogo'
 import { Hover } from '../components'
 import { useEthPrice } from '../contexts/GlobalData'
 import Warning from '../components/Warning'
-import { useShowWarningOnPath } from '../contexts/Application'
 import { SURPRESS_WARNINGS } from '../constants'
+import { usePathDismissed } from '../contexts/LocalStorage'
 
 const PageWrapper = styled.div`
   display: flex;
@@ -184,19 +184,19 @@ function PairPage({ pairAddress, history }) {
   const below1080 = useMedia('(max-width: 1080px)')
   const below600 = useMedia('(max-width: 600px)')
 
-  const [showWarning, setShowWarning] = useShowWarningOnPath(history.location.pathname)
+  const [dismissed, markAsDismissed] = usePathDismissed(history.location.pathname)
 
   return (
     <PageWrapper>
       <ThemedBackground backgroundColor={transparentize(0.6, backgroundColor)} />
       <Warning
         type={'pair'}
-        show={showWarning && !(SURPRESS_WARNINGS.includes(token0?.id) && SURPRESS_WARNINGS.includes(token1?.id))}
-        setShow={setShowWarning}
+        show={!dismissed && !(SURPRESS_WARNINGS.includes(token0?.id) && SURPRESS_WARNINGS.includes(token1?.id))}
+        setShow={markAsDismissed}
         address={pairAddress}
       />
       <WarningGrouping
-        disabled={showWarning && !(SURPRESS_WARNINGS.includes(token0?.id) && SURPRESS_WARNINGS.includes(token1?.id))}
+        disabled={!dismissed && !(SURPRESS_WARNINGS.includes(token0?.id) && SURPRESS_WARNINGS.includes(token1?.id))}
       >
         <RowBetween mt={20} style={{ flexWrap: 'wrap' }}>
           <RowFixed style={{ flexWrap: 'wrap' }}>
