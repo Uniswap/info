@@ -117,7 +117,7 @@ const FIELD_TO_VALUE = {
   [SORT_FIELD.FEES]: 'oneDayVolumeUSD'
 }
 
-function PairList({ pairs, color, history, disbaleLinks }) {
+function PairList({ pairs, color, history, disbaleLinks, maxItems = 10 }) {
   const below600 = useMedia('(max-width: 600px)')
   const below740 = useMedia('(max-width: 740px)')
   const below1080 = useMedia('(max-width: 1080px)')
@@ -125,7 +125,7 @@ function PairList({ pairs, color, history, disbaleLinks }) {
   // pagination
   const [page, setPage] = useState(1)
   const [maxPage, setMaxPage] = useState(1)
-  const ITEMS_PER_PAGE = 10
+  const ITEMS_PER_PAGE = maxItems
 
   // sorting
   const [sortDirection, setSortDirection] = useState(true)
@@ -144,7 +144,7 @@ function PairList({ pairs, color, history, disbaleLinks }) {
       }
       setMaxPage(Math.floor(Object.keys(pairs).length / ITEMS_PER_PAGE) + extraPages)
     }
-  }, [pairs])
+  }, [ITEMS_PER_PAGE, pairs])
 
   const ListItem = ({ pairAddress, index }) => {
     const pairData = pairs[pairAddress]
