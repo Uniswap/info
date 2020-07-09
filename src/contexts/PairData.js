@@ -138,9 +138,18 @@ export default function Provider({ children }) {
 
 async function getBulkPairData(pairList, ethPrice) {
   const utcCurrentTime = dayjs()
-  const utcOneDayBack = utcCurrentTime.subtract(1, 'day').unix()
-  const utcTwoDaysBack = utcCurrentTime.subtract(2, 'day').unix()
-  const utcOneWeekBack = utcCurrentTime.subtract(1, 'week').unix()
+  const utcOneDayBack = utcCurrentTime
+    .subtract(1, 'day')
+    .startOf('minute')
+    .unix()
+  const utcTwoDaysBack = utcCurrentTime
+    .subtract(2, 'day')
+    .startOf('minute')
+    .unix()
+  const utcOneWeekBack = utcCurrentTime
+    .subtract(1, 'week')
+    .startOf('minute')
+    .unix()
   let oneDayBlock = await getBlockFromTimestamp(utcOneDayBack)
   let twoDayBlock = await getBlockFromTimestamp(utcTwoDaysBack)
   let oneWeekBlock = await getBlockFromTimestamp(utcOneWeekBack)
@@ -243,9 +252,18 @@ async function getBulkPairData(pairList, ethPrice) {
 
 const getTopPairData = async ethPrice => {
   const utcCurrentTime = dayjs()
-  const utcOneDayBack = utcCurrentTime.subtract(1, 'day').unix()
-  const utcTwoDaysBack = utcCurrentTime.subtract(2, 'day').unix()
-  const utcOneWeekBack = utcCurrentTime.subtract(1, 'week').unix()
+  const utcOneDayBack = utcCurrentTime
+    .subtract(1, 'day')
+    .startOf('minute')
+    .unix()
+  const utcTwoDaysBack = utcCurrentTime
+    .subtract(2, 'day')
+    .startOf('minute')
+    .unix()
+  const utcOneWeekBack = utcCurrentTime
+    .subtract(1, 'week')
+    .startOf('minute')
+    .unix()
   let oneDayBlock = await getBlockFromTimestamp(utcOneDayBack)
   let twoDayBlock = await getBlockFromTimestamp(utcTwoDaysBack)
   let oneWeekBlock = await getBlockFromTimestamp(utcOneWeekBack)
@@ -370,9 +388,18 @@ const getPairData = async (address, ethPrice) => {
   let twoDayData = []
 
   const utcCurrentTime = dayjs()
-  const utcOneDayBack = utcCurrentTime.subtract(1, 'day').unix()
-  const utcTwoDaysBack = utcCurrentTime.subtract(2, 'day').unix()
-  const utcOneWeekBack = utcCurrentTime.subtract(1, 'week').unix()
+  const utcOneDayBack = utcCurrentTime
+    .subtract(1, 'day')
+    .startOf('minute')
+    .unix()
+  const utcTwoDaysBack = utcCurrentTime
+    .subtract(2, 'day')
+    .startOf('minute')
+    .unix()
+  const utcOneWeekBack = utcCurrentTime
+    .subtract(1, 'week')
+    .startOf('minute')
+    .unix()
   let oneDayBlock = await getBlockFromTimestamp(utcOneDayBack)
   let twoDayBlock = await getBlockFromTimestamp(utcTwoDaysBack)
   let oneWeekBlock = await getBlockFromTimestamp(utcOneWeekBack)
@@ -472,7 +499,7 @@ const getPairTransactions = async pairAddress => {
 const getPairChartData = async pairAddress => {
   let data = []
   const utcEndTime = dayjs.utc()
-  let utcStartTime = utcEndTime.subtract(1, 'year')
+  let utcStartTime = utcEndTime.subtract(1, 'year').startOf('minute')
   let startTime = utcStartTime.unix() - 1
 
   try {

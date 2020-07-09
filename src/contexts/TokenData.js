@@ -217,8 +217,14 @@ const getTopTokens = async (ethPrice, ethPriceOld) => {
 
 const getTokenData = async (address, ethPrice, ethPriceOld) => {
   const utcCurrentTime = dayjs()
-  const utcOneDayBack = utcCurrentTime.subtract(1, 'day').unix()
-  const utcTwoDaysBack = utcCurrentTime.subtract(2, 'day').unix()
+  const utcOneDayBack = utcCurrentTime
+    .subtract(1, 'day')
+    .startOf('minute')
+    .unix()
+  const utcTwoDaysBack = utcCurrentTime
+    .subtract(2, 'day')
+    .startOf('minute')
+    .unix()
   let oneDayBlock = await getBlockFromTimestamp(utcOneDayBack)
   let twoDayBlock = await getBlockFromTimestamp(utcTwoDaysBack)
 
@@ -313,7 +319,7 @@ const getTokenChartData = async tokenAddress => {
   let data = []
   const utcEndTime = dayjs.utc()
   let utcStartTime = utcEndTime.subtract(1, 'year')
-  let startTime = utcStartTime.unix() - 1
+  let startTime = utcStartTime.startOf('minute').unix() - 1
 
   try {
     let result = await client.query({
@@ -350,7 +356,7 @@ const getTokenChartData = async tokenAddress => {
     let latestPriceUSD = data[0] && data[0].priceUSD
     let latestPairDatas = data[0] && data[0].mostLiquidPairs
     let index = 1
-    while (timestamp < utcEndTime.unix() - oneDay) {
+    while (timestamp < utcEndTime.startOf('minute').unix() - oneDay) {
       const nextDay = timestamp + oneDay
       let currentDayIndex = (nextDay / oneDay).toFixed(0)
       if (!dayIndexSet.has(currentDayIndex)) {
