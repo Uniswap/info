@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import 'feather-icons'
 import { withRouter } from 'react-router-dom'
 import { Text } from 'rebass'
@@ -158,6 +158,18 @@ function TokenPage({ address, history }) {
 
   const [dismissed, markAsDismissed] = usePathDismissed(history.location.pathname)
 
+  const [manualLiquidity, setManualLiquidity] = useState(0)
+  useEffect(() => {
+    let calculated = 0
+    for (let pairAddress in fetchedPairsList) {
+      const pair = fetchedPairsList[pairAddress]
+      calculated = calculated + parseFloat(pair.reserveUSD ?? 0)
+    }
+    setManualLiquidity(calculated / 2)
+  }, [fetchedPairsList])
+
+  const useManualLiquidity = parseFloat(totalLiquidityUSD / manualLiquidity) < 0.5
+
   return (
     <PageWrapper>
       <ThemedBackground backgroundColor={transparentize(0.6, backgroundColor)} />
@@ -236,7 +248,7 @@ function TokenPage({ address, history }) {
                   </RowBetween>
                   <RowBetween align="flex-end">
                     <TYPE.main fontSize={'2rem'} lineHeight={1} fontWeight={600}>
-                      {liquidity}
+                      {useManualLiquidity ? formattedNum(manualLiquidity, true) : liquidity}
                     </TYPE.main>
                     <TYPE.main>{liquidityChange}</TYPE.main>
                   </RowBetween>

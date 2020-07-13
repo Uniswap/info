@@ -122,8 +122,6 @@ function PairList({ pairs, color, history, disbaleLinks, maxItems = 10 }) {
   const below740 = useMedia('(max-width: 740px)')
   const below1080 = useMedia('(max-width: 1080px)')
 
-  console.log(pairs)
-
   // pagination
   const [page, setPage] = useState(1)
   const [maxPage, setMaxPage] = useState(1)
