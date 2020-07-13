@@ -287,7 +287,11 @@ function TokenPage({ address, history }) {
             }}
             p={20}
           >
-            {address ? <PairList color={backgroundColor} address={address} pairs={fetchedPairsList} /> : <Loader />}
+            {address && fetchedPairsList ? (
+              <PairList color={backgroundColor} address={address} pairs={fetchedPairsList} />
+            ) : (
+              <Loader />
+            )}
           </Panel>
           <RowBetween mt={40} mb={'1rem'}>
             <TYPE.main fontSize={'1.125rem'}>Transactions</TYPE.main> <div />

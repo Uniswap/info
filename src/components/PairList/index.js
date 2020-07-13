@@ -122,6 +122,8 @@ function PairList({ pairs, color, history, disbaleLinks, maxItems = 10 }) {
   const below740 = useMedia('(max-width: 740px)')
   const below1080 = useMedia('(max-width: 1080px)')
 
+  console.log(pairs)
+
   // pagination
   const [page, setPage] = useState(1)
   const [maxPage, setMaxPage] = useState(1)
@@ -150,7 +152,7 @@ function PairList({ pairs, color, history, disbaleLinks, maxItems = 10 }) {
     const pairData = pairs[pairAddress]
 
     if (pairData && pairData.token0 && pairData.token1) {
-      const liquidity = formattedNum(pairData.trackedReserveUSD, true)
+      const liquidity = formattedNum(pairData.reserveUSD, true)
       const volume = formattedNum(pairData.oneDayVolumeUSD, true)
 
       if (pairData.token0.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
