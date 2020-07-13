@@ -31,7 +31,12 @@ export const V1_DATA_QUERY = gql`
 
 export const GET_BLOCK = gql`
   query blocks($timestampFrom: Int!, $timestampTo: Int!) {
-    blocks(first: 1, orderBy: timestamp, orderDirection: asc, where: { timestamp_gt: $timestampFrom, timestamp_lt: $timestampTo }) {
+    blocks(
+      first: 1
+      orderBy: timestamp
+      orderDirection: asc
+      where: { timestamp_gt: $timestampFrom, timestamp_lt: $timestampTo }
+    ) {
       id
       number
       timestamp
@@ -39,25 +44,29 @@ export const GET_BLOCK = gql`
   }
 `
 
-export const GET_BLOCKS = (timestamps) => {
-  let queryString = "query blocks {"
-  queryString += timestamps.map(timestamp => `t${timestamp}:blocks(first: 1, orderBy: timestamp, orderDirection: asc, where: { timestamp_gt: ${timestamp}, timestamp_lt: ${timestamp + 600} }) {
+export const GET_BLOCKS = timestamps => {
+  let queryString = 'query blocks {'
+  queryString += timestamps.map(
+    timestamp => `t${timestamp}:blocks(first: 1, orderBy: timestamp, orderDirection: asc, where: { timestamp_gt: ${timestamp}, timestamp_lt: ${timestamp +
+      600} }) {
       number
-    }`)
-  queryString += "}"
+    }`
+  )
+  queryString += '}'
   return gql(queryString)
 }
 
 export const SHARE_VALUE = (pairAddress, blocks) => {
-  let queryString = "query blocks {"
-  queryString += blocks.map(block => `t${block.timestamp}:pair(id:"${pairAddress}", block: { number: ${block.number} }) { 
+  let queryString = 'query blocks {'
+  queryString += blocks.map(
+    block => `t${block.timestamp}:pair(id:"${pairAddress}", block: { number: ${block.number} }) { 
     reserveUSD
     totalSupply 
-  }`)
-  queryString += "}"
+  }`
+  )
+  queryString += '}'
   return gql(queryString)
 }
-
 
 export const ETH_PRICE = block => {
   const queryString = block

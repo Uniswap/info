@@ -16,7 +16,13 @@ import { useEthPrice } from './GlobalData'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 
-import { getPercentChange, get2DayPercentChange, getBlockFromTimestamp, isAddress, getShareValueOverTime } from '../helpers'
+import {
+  getPercentChange,
+  get2DayPercentChange,
+  getBlockFromTimestamp,
+  isAddress,
+  getShareValueOverTime
+} from '../helpers'
 
 const UPDATE = 'UPDATE'
 const UPDATE_PAIR_TXNS = 'UPDATE_PAIR_TXNS'
@@ -595,9 +601,6 @@ export function usePairData(pairAddress) {
 
   useEffect(() => {
     async function fetchData() {
-      let shareData = await getShareValueOverTime(pairAddress)
-      console.log("Example", shareData)
-
       if (!pairData && pairAddress) {
         let data = await getPairData(pairAddress, ethPrice)
         update(pairAddress, data)

@@ -171,12 +171,6 @@ async function getGlobalData(ethPrice) {
     const utcCurrentTime = dayjs()
     const utcOneDayBack = utcCurrentTime.subtract(1, 'day').unix()
     const utcTwoDaysBack = utcCurrentTime.subtract(2, 'day').unix()
-    /**
-     * @dev This is an example of fetching multiple blocks with one query
-     * @dev Slightly faster vvvvv
-     */
-    // let oneDayBlock = await getBlockFromTimestamp(utcOneDayBack)
-    // let twoDayBlock = await getBlockFromTimestamp(utcTwoDaysBack)
     let [oneDayBlock, twoDayBlock] = await getBlocksFromTimestamps([utcOneDayBack, utcTwoDaysBack])
 
     let result = await client.query({
@@ -185,13 +179,13 @@ async function getGlobalData(ethPrice) {
     })
     data = result.data.uniswapFactories[0]
     let oneDayResult = await client.query({
-      query: GLOBAL_DATA(oneDayBlock),
+      query: GLOBAL_DATA(oneDayBlock?.number),
       fetchPolicy: 'cache-first'
     })
     oneDayData = oneDayResult.data.uniswapFactories[0]
 
     let twoDayResult = await client.query({
-      query: GLOBAL_DATA(twoDayBlock),
+      query: GLOBAL_DATA(twoDayBlock?.number),
       fetchPolicy: 'cache-first'
     })
     twoDayData = twoDayResult.data.uniswapFactories[0]
