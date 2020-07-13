@@ -3,8 +3,8 @@ import { BigNumber } from 'bignumber.js'
 import dayjs from 'dayjs'
 import { ethers } from 'ethers'
 import utc from 'dayjs/plugin/utc'
-import { blockClient } from '../apollo/client'
-import { GET_BLOCK } from '../apollo/queries'
+import { client, blockClient } from '../apollo/client'
+import { GET_BLOCK, GET_BLOCKS, SHARE_VALUE } from '../apollo/queries'
 import { Text } from 'rebass'
 import _Decimal from 'decimal.js-light'
 import toFormat from 'toformat'
@@ -50,19 +50,94 @@ export const toWeeklyDate = date => {
   return dayjs.utc(wkStart).format('MMM DD') + ' - ' + dayjs.utc(wkEnd).format('MMM DD')
 }
 
+/**
+ * @notice Fetches first block after a given timestamp
+ * @dev Query speed is optimized by limiting to a 600-second period
+ * @param {Int} timestamp in seconds
+ */
 export async function getBlockFromTimestamp(timestamp) {
-  try {
-    let result = await blockClient.query({
-      query: GET_BLOCK,
-      variables: {
-        timestamp: timestamp
-      },
-      fetchPolicy: 'cache-first'
-    })
-    return result?.data?.blocks?.[0]?.number
-  } catch (e) {
-    return 0
+  let result = await blockClient.query({
+    query: GET_BLOCK,
+    variables: {
+      timestampFrom: timestamp,
+      timestampTo: timestamp + 600
+    },
+    fetchPolicy: 'cache-first'
+  })
+  return result?.data?.blocks?.[0]?.number
+}
+
+/**
+ * @notice Fetches block objects for an array of timestamps.
+ * @dev blocks are returned in chronological order (ASC) regardless of input.
+ * @dev blocks are returned at string representations of Int
+ * @dev timestamps are returns as they were provided; not the block time.
+ * @param {Array} timestamps
+ */
+export async function getBlocksFromTimestamps(timestamps) {
+  let result = await blockClient.query({
+    query: GET_BLOCKS(timestamps),
+    fetchPolicy: 'cache-first'
+  })
+  let blocks = []
+  if (result.data) {
+    for (var t in result.data) {
+      blocks.push({
+        timestamp: t.split('t')[1],
+        number: result.data[t][0]['number']
+      })
+    }
   }
+  return blocks
+}
+
+/**
+ * @notice Example query using time travel queries
+ * @dev TODO - handle scenario where blocks are not available for a timestamps (e.g. current time)
+ * @param {String} pairAddress
+ * @param {Array} timestamps
+ */
+export async function getShareValueOverTime(pairAddress, timestamps) {
+  console.log(timestamps)
+  if (!timestamps) {
+    const utcCurrentTime = dayjs()
+    const utcSevenDaysBack = utcCurrentTime.subtract(8, 'day').unix()
+    timestamps = getTimestampRange(utcSevenDaysBack, 86400, 7)
+  }
+
+  const blocks = await getBlocksFromTimestamps(timestamps)
+  let result = await client.query({
+    query: SHARE_VALUE(pairAddress, blocks),
+    fetchPolicy: 'cache-first'
+  })
+
+  let values = []
+  for (var row in result?.data) {
+    let timestamp = row.split('t')[1]
+    let sharePriceUsd = parseFloat(result.data[row].reserveUSD) / parseFloat(result.data[row].totalSupply)
+
+    values.push({
+      timestamp,
+      sharePriceUsd,
+      roiUsd: values && values[0] ? sharePriceUsd / values[0]['sharePriceUsd'] : 1
+    })
+  }
+  return values
+}
+
+/**
+ * @notice Creates an evenly-spaced array of timestamps
+ * @dev Periods include a start and end timestamp. For example, n periods are defined by n+1 timestamps.
+ * @param {Int} timestamp_from in seconds
+ * @param {Int} period_length in seconds
+ * @param {Int} periods
+ */
+export function getTimestampRange(timestamp_from, period_length, periods) {
+  let timestamps = []
+  for (let i = 0; i <= periods; i++) {
+    timestamps.push(timestamp_from + i * period_length)
+  }
+  return timestamps
 }
 
 export const toNiceDateYear = date => dayjs.utc(dayjs.unix(date)).format('MMMM DD, YYYY')
