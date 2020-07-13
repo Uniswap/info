@@ -510,7 +510,7 @@ export function useGlobalChartData() {
         utcStartTime = utcEndTime.subtract(1, 'year').startOf('year')
         break
     }
-    let startTime = utcStartTime.startOf('minute').unix() - 1
+    let startTime = utcStartTime.startOf('hour').unix() - 1
 
     if ((activeWindow && startTime < oldestDateFetch) || !oldestDateFetch) {
       setOldestDateFetched(startTime)
