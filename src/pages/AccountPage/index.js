@@ -82,10 +82,21 @@ function AccountPage({ account }) {
   const netReturn = positions?.reduce(function(total, position) {
     return total + position.netReturn
   }, 0)
+
   const assetReturn = positions?.reduce(function(total, position) {
     return total + position.assetReturn
   }, 0)
   const uniswapReturn = netReturn - assetReturn
+
+  const aggregateNetReturnPercentChange = positions?.reduce(function(total, position) {
+    return total + position.netPercentChange
+  }, 0)
+  const averageNetPercentChange = aggregateNetReturnPercentChange / positions?.length
+
+  const aggregateAssetReturnPercentChange = positions?.reduce(function(total, position) {
+    return total + position.assetPercentChange
+  }, 0)
+  const averageAssetPercentChange = aggregateAssetReturnPercentChange / positions?.length
 
   return (
     <PageWrapper>
@@ -126,7 +137,7 @@ function AccountPage({ account }) {
                 <Text fontSize={28} fontWeight={600} mr={'10px'}>
                   {formattedNum(assetReturn, true)}
                 </Text>
-                <Text>{formattedPercent(10.2)}</Text>
+                <Text>{formattedPercent(averageAssetPercentChange)}</Text>
               </RowFixed>
               <Text fontSize={16}>Asset Return</Text>
             </AutoColumn>
@@ -135,7 +146,7 @@ function AccountPage({ account }) {
                 <Text fontSize={28} fontWeight={600} mr={'10px'}>
                   {formattedNum(uniswapReturn, true)}
                 </Text>
-                <Text>{formattedPercent(6.11)}</Text>
+                <Text>{formattedPercent(averageNetPercentChange - averageAssetPercentChange)}</Text>
               </RowFixed>
               <Text fontSize={16}>Uniswap Return</Text>
             </AutoColumn>
@@ -144,13 +155,21 @@ function AccountPage({ account }) {
                 <Text fontSize={28} fontWeight={600} mr={'10px'}>
                   {formattedNum(netReturn, true)}
                 </Text>
-                <Text>{formattedPercent(6.11)}</Text>
+                <Text>{formattedPercent(averageNetPercentChange)}</Text>
               </RowFixed>
               <Text fontSize={16}>Combined Return</Text>
             </AutoColumn>
           </AutoRow>
         </AutoColumn>
       </Panel>
+      <AutoColumn gap="16px" style={{ marginTop: '40px' }}>
+        <Text fontSize={24} fontWeight={600}>
+          Positions
+        </Text>
+        <Panel>
+          <PositionList positions={positions} />
+        </Panel>
+      </AutoColumn>
       <Panel style={{ margin: '40px 0' }}>
         <UserChart
           account={account}
@@ -189,14 +208,7 @@ function AccountPage({ account }) {
           </AutoColumn>
         </AutoRow>
       </div>
-      <AutoColumn gap="16px" style={{ marginTop: '40px' }}>
-        <Text fontSize={24} fontWeight={600}>
-          Pools
-        </Text>
-        <Panel>
-          <PositionList positions={positions} />
-        </Panel>
-      </AutoColumn>
+
       <AutoColumn gap="16px" style={{ marginTop: '40px' }}>
         <Text fontSize={24} fontWeight={600}>
           Transactions
