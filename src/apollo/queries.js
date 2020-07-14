@@ -114,6 +114,12 @@ export const USER_HISTORY__PER_PAIR = gql`
         id
         reserveUSD
         totalSupply
+        token0 {
+          id
+        }
+        token1 {
+          id
+        }
       }
     }
   }

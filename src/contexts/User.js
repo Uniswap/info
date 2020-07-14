@@ -301,7 +301,12 @@ export function useUserLiquidityHistory(account) {
   return formattedHistory
 }
 
-export async function getPairAssetReturnForUser(user, pair, ethPrice) {
+export const priceOverrides = [
+  '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', // USDC
+  '0x6b175474e89094c44da98b954eedeac495271d0f' // DAI
+]
+
+export async function getReturns(user, pair, ethPrice) {
   const {
     data: { liquidityPositionSnapshots: history }
   } = await client.query({
@@ -347,6 +352,39 @@ export async function getPairAssetReturnForUser(user, pair, ethPrice) {
     let positionT1 = history[index + 1] || {}
     if (parseInt(index) === history.length - 1) {
       positionT1 = currentPosition
+    }
+
+    if (positionT0.timestamp < 1589747086) {
+      if (priceOverrides.includes(positionT0.pair.token0.id)) {
+        positionT0.token0PriceUSD = 1
+      }
+      if (priceOverrides.includes(positionT0.pair.token1.id)) {
+        positionT0.token1PriceUSD = 1
+      }
+
+      // WETH price
+      if (positionT0.pair.token0.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
+        positionT0.token0PriceUSD = 203
+      }
+      if (positionT0.pair.token1.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
+        positionT0.token1PriceUSD = 203
+      }
+    }
+
+    if (positionT1.timestamp < 1589747086) {
+      if (priceOverrides.includes(positionT1.pair.token0.id)) {
+        positionT1.token0PriceUSD = 1
+      }
+      if (priceOverrides.includes(positionT1.pair.token1.id)) {
+        positionT1.token1PriceUSD = 1
+      }
+      // WETH price
+      if (positionT1.pair.token0.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
+        positionT1.token0PriceUSD = 203
+      }
+      if (positionT1.pair.token1.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
+        positionT1.token1PriceUSD = 203
+      }
     }
 
     // get starting amounts of token0 and token1 deposited by LP
@@ -427,7 +465,7 @@ export function useUserPositions(account) {
         if (result?.data?.liquidityPositions) {
           let formattedPositions = await Promise.all(
             result?.data?.liquidityPositions.map(async positionData => {
-              const returnData = await getPairAssetReturnForUser(account, positionData.pair, ethPrice)
+              const returnData = await getReturns(account, positionData.pair, ethPrice)
               return {
                 ...positionData,
                 assetReturn: returnData.asset.return,

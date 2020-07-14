@@ -162,14 +162,6 @@ function AccountPage({ account }) {
           </AutoRow>
         </AutoColumn>
       </Panel>
-      <AutoColumn gap="16px" style={{ marginTop: '40px' }}>
-        <Text fontSize={24} fontWeight={600}>
-          Positions
-        </Text>
-        <Panel>
-          <PositionList positions={positions} />
-        </Panel>
-      </AutoColumn>
       <Panel style={{ margin: '40px 0' }}>
         <UserChart
           account={account}
@@ -178,6 +170,14 @@ function AccountPage({ account }) {
           positionValue={positionValue}
         />
       </Panel>
+      <AutoColumn gap="16px" style={{ marginTop: '40px' }}>
+        <Text fontSize={24} fontWeight={600}>
+          Positions
+        </Text>
+        <Panel>
+          <PositionList positions={positions} />
+        </Panel>
+      </AutoColumn>
       <div style={{ marginTop: '40px' }}>
         <AutoRow gap="20px">
           <AutoColumn gap="8px">
