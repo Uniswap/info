@@ -12,6 +12,7 @@ import { timeframeOptions } from '../constants'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { useEthPrice } from './GlobalData'
+import { position } from 'polished'
 
 dayjs.extend(utc)
 
@@ -346,12 +347,27 @@ export async function getReturns(user, pair, ethPrice) {
         parseFloat(positionT0.reserveUSD)
   }
 
+  if (pair.id === '0xa478c2975ab1ea89e8196811f51a7b7ade33eb11') {
+    console.log(history)
+    console.log('-------')
+  }
+
   for (const index in history) {
+    if (pair.id === '0xa478c2975ab1ea89e8196811f51a7b7ade33eb11') {
+      console.log(index)
+      console.log(parseInt(index) === history.length - 1)
+    }
     // compare to current values
     let positionT0 = history[index]
     let positionT1 = history[index + 1] || {}
-    if (parseInt(index) === history.length - 1) {
+    if (index === history.length - 1) {
       positionT1 = currentPosition
+    }
+
+    if (pair.id === '0xa478c2975ab1ea89e8196811f51a7b7ade33eb11') {
+      console.log(positionT0)
+      console.log(positionT1)
+      console.log('-------')
     }
 
     if (positionT0.timestamp < 1589747086) {

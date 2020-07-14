@@ -215,7 +215,7 @@ export const toSignificant = (number, significantDigits) => {
   return updated.toFormat(updated.decimalPlaces(), { groupSeparator: '' })
 }
 
-export const formattedNum = (number, usd = false) => {
+export const formattedNum = (number, usd = false, acceptNegatives = false) => {
   if (isNaN(number) || number === '' || number === undefined) {
     return usd ? '$0' : 0
   }
@@ -232,6 +232,11 @@ export const formattedNum = (number, usd = false) => {
     return 0
   }
   if (num < 0.0001) {
+    if (acceptNegatives) {
+      return usd
+        ? '$' + Number(parseFloat(num).toFixed(0)).toLocaleString()
+        : '' + Number(parseFloat(num).toFixed(0)).toLocaleString()
+    }
     return usd ? '< $0.0001' : '< 0.0001'
   }
 

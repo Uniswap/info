@@ -145,13 +145,13 @@ function PositionList({ positions }) {
           </DataText>
           <DataText area="ownership">{rawPercent(poolOwnership)}</DataText>
           <DataText area="market">
-            {formattedNum(position?.assetReturn, true)} ({formattedPercent(position?.assetPercentChange)})
+            {formattedNum(position?.assetReturn, true, true)} ({formattedPercent(position?.assetPercentChange)})
           </DataText>
           <DataText area="return">
-            {formattedNum(position?.uniswapReturn, true)} ({formattedPercent(position?.uniswapPercentChange)})
+            {formattedNum(position?.uniswapReturn, true, true)} ({formattedPercent(position?.uniswapPercentChange)})
           </DataText>
           <DataText area="combined">
-            {formattedNum(position?.netReturn, true)} ({formattedPercent(position?.netPercentChange)})
+            {formattedNum(position?.netReturn, true, true)} ({formattedPercent(position?.netPercentChange)})
           </DataText>
           <DataText area="value">{formattedNum(valueUSD, true)}</DataText>
           <DataText area="manage" color="#FF007A">
