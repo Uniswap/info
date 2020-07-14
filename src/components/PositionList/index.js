@@ -58,8 +58,8 @@ const DashGrid = styled.div`
   }
 
   @media screen and (min-width: 1200px) {
-    grid-template-columns: 3fr 1fr 1fr 1fr 0.7fr 1fr;
-    grid-template-areas: ' name ownership market return value manage ';
+    grid-template-columns: 2fr 1fr 1fr 1fr 1fr 0.5fr 0.5fr;
+    grid-template-areas: ' name ownership market return combinded value manage ';
   }
 `
 
@@ -96,7 +96,7 @@ const SORT_FIELD = {
 //   [SORT_FIELD.LIQ]: 'trackedReserveETH' // sort with tracked volume only
 // }
 
-function PositionList({ positions, history }) {
+function PositionList({ positions }) {
   const below600 = useMedia('(max-width: 600px)')
   const below740 = useMedia('(max-width: 740px)')
   const below1080 = useMedia('(max-width: 1080px)')
@@ -145,11 +145,13 @@ function PositionList({ positions, history }) {
           </DataText>
           <DataText area="ownership">{rawPercent(poolOwnership)}</DataText>
           <DataText area="market">
-            {`-$312.22 `} ({formattedPercent(-2.34)})
+            {formattedNum(position?.assetReturn, true)} ({formattedPercent(position?.assetPercentChange)})
           </DataText>
           <DataText area="return">
-            {' '}
-            {`$22.39 `} ({formattedPercent(7.33)})
+            {formattedNum(position?.uniswapReturn, true)} ({formattedPercent(position?.uniswapPercentChange)})
+          </DataText>
+          <DataText area="combined">
+            {formattedNum(position?.netReturn, true)} ({formattedPercent(position?.netPercentChange)})
           </DataText>
           <DataText area="value">{formattedNum(valueUSD, true)}</DataText>
           <DataText area="manage" color="#FF007A">
@@ -205,7 +207,7 @@ function PositionList({ positions, history }) {
               setSortDirection(sortedColumn !== SORT_FIELD.VOL ? true : !sortDirection)
             }}
           >
-            Return Vs. HODL
+            Asset Return
             {sortedColumn === SORT_FIELD.VOL ? (!sortDirection ? '↑' : '↓') : ''}
           </ClickableText>
         </Flex>
@@ -213,6 +215,19 @@ function PositionList({ positions, history }) {
           <Flex alignItems="center" justifyContent="flexEnd">
             <ClickableText
               area="return"
+              onClick={e => {
+                setSortedColumn(SORT_FIELD.VOL_7DAYS)
+                setSortDirection(sortedColumn !== SORT_FIELD.VOL_7DAYS ? true : !sortDirection)
+              }}
+            >
+              Uniswap Return {sortedColumn === SORT_FIELD.VOL_7DAYS ? (!sortDirection ? '↑' : '↓') : ''}
+            </ClickableText>
+          </Flex>
+        )}
+        {!below1080 && (
+          <Flex alignItems="center" justifyContent="flexEnd">
+            <ClickableText
+              area="combined"
               onClick={e => {
                 setSortedColumn(SORT_FIELD.VOL_7DAYS)
                 setSortDirection(sortedColumn !== SORT_FIELD.VOL_7DAYS ? true : !sortDirection)

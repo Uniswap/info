@@ -7,12 +7,13 @@ import Panel from '../../components/Panel'
 import { useUserTotalSwappedUSD } from './hooks'
 import PositionList from '../../components/PositionList'
 import { formattedNum, formattedPercent } from '../../helpers'
-import { AutoRow, RowFixed } from '../../components/Row'
+import { AutoRow, RowFixed, RowBetween } from '../../components/Row'
 import { Text } from 'rebass'
 import { AutoColumn } from '../../components/Column'
 import { calculateTotalLiquidity } from './utils'
 import UserChart from '../../components/UserChart'
 import AnimatedNumber from 'animated-number-react'
+import Search from '../../components/Search'
 
 const PageWrapper = styled.div`
   display: flex;
@@ -75,22 +76,34 @@ function AccountPage({ account }) {
     }
   }, [positionValue])
 
+  // used for animation formatting
   const formatValue = value => formattedNum(value, true)
+
+  const netReturn = positions?.reduce(function(total, position) {
+    return total + position.netReturn
+  }, 0)
+  const assetReturn = positions?.reduce(function(total, position) {
+    return total + position.assetReturn
+  }, 0)
+  const uniswapReturn = netReturn - assetReturn
 
   return (
     <PageWrapper>
       <ThemedBackground />
       <Header>
-        <AutoRow gap="10px">
-          <Text fontSize={32} fontWeight={600}>
-            Account
-          </Text>
-          <AccountWrapper>
-            <Text fontSize={20} fontWeight={600}>
-              {account?.slice(0, 6) + '...' + account?.slice(38, 42)}
+        <RowBetween>
+          <AutoRow gap="10px">
+            <Text fontSize={32} fontWeight={600}>
+              Account
             </Text>
-          </AccountWrapper>
-        </AutoRow>
+            <AccountWrapper>
+              <Text fontSize={20} fontWeight={600}>
+                {account?.slice(0, 6) + '...' + account?.slice(38, 42)}
+              </Text>
+            </AccountWrapper>
+          </AutoRow>
+          <Search small={true} />
+        </RowBetween>
       </Header>
 
       <Panel>
@@ -111,20 +124,29 @@ function AccountPage({ account }) {
             <AutoColumn gap="8px">
               <RowFixed>
                 <Text fontSize={28} fontWeight={600} mr={'10px'}>
-                  $676.32
+                  {formattedNum(assetReturn, true)}
                 </Text>
                 <Text>{formattedPercent(10.2)}</Text>
               </RowFixed>
-              <Text fontSize={16}>Net Return (dummy val)</Text>
+              <Text fontSize={16}>Asset Return</Text>
             </AutoColumn>
             <AutoColumn gap="8px">
               <RowFixed>
                 <Text fontSize={28} fontWeight={600} mr={'10px'}>
-                  $430.33
+                  {formattedNum(uniswapReturn, true)}
                 </Text>
                 <Text>{formattedPercent(6.11)}</Text>
               </RowFixed>
-              <Text fontSize={16}>Return vs Market (dummy val)</Text>
+              <Text fontSize={16}>Uniswap Return</Text>
+            </AutoColumn>
+            <AutoColumn gap="8px">
+              <RowFixed>
+                <Text fontSize={28} fontWeight={600} mr={'10px'}>
+                  {formattedNum(netReturn, true)}
+                </Text>
+                <Text>{formattedPercent(6.11)}</Text>
+              </RowFixed>
+              <Text fontSize={16}>Combined Return</Text>
             </AutoColumn>
           </AutoRow>
         </AutoColumn>

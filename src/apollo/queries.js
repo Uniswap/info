@@ -99,6 +99,26 @@ export const USER = (block, account) => {
   return gql(queryString)
 }
 
+export const USER_HISTORY__PER_PAIR = gql`
+  query snapshots($user: Bytes!, $pair: Bytes!) {
+    liquidityPositionSnapshots(where: { user: $user, pair: $pair }, orderBy: timestamp, orderDirection: asc) {
+      timestamp
+      reserveUSD
+      liquidityTokenBalance
+      liquidityTokenTotalSupply
+      reserve0
+      reserve1
+      token0PriceUSD
+      token1PriceUSD
+      pair {
+        id
+        reserveUSD
+        totalSupply
+      }
+    }
+  }
+`
+
 export const USER_HISTORY = gql`
   query snapshots($user: Bytes!) {
     liquidityPositionSnapshots(where: { user: $user }) {
@@ -117,16 +137,19 @@ export const USER_POSITIONS = gql`
   query liquidityPositions($user: Bytes!) {
     liquidityPositions(where: { user: $user }) {
       pair {
+        id
         reserve0
         reserve1
         reserveUSD
         token0 {
           id
           symbol
+          derivedETH
         }
         token1 {
           id
           symbol
+          derivedETH
         }
         totalSupply
       }

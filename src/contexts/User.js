@@ -1,20 +1,29 @@
 import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect, useState } from 'react'
 import { client } from '../apollo/client'
-import { USER_TRANSACTIONS, USER_POSITIONS, USER_HISTORY, PAIR_DAY_DATA } from '../apollo/queries'
+import {
+  USER_TRANSACTIONS,
+  USER_POSITIONS,
+  USER_HISTORY,
+  PAIR_DAY_DATA,
+  USER_HISTORY__PER_PAIR
+} from '../apollo/queries'
 import { useTimeframe } from './Application'
 import { timeframeOptions } from '../constants'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
+import { useEthPrice } from './GlobalData'
 
 dayjs.extend(utc)
 
 const UPDATE_TRANSACTIONS = 'UPDATE_TRANSACTIONS'
 const UPDATE_POSITIONS = 'UPDATE_POSITIONS '
 const UPDATE_USER_POSITION_HISTORY = 'UPDATE_USER_POSITION_HISTORY'
+const UPDATE_USER_PAIR_HODLS_RETURNS = 'UPDATE_USER_PAIR_HODLS_RETURNS'
 
 const TRANSACTIONS_KEY = 'TRANSACTIONS_KEY'
 const POSITIONS_KEY = 'POSITIONS_KEY'
 const USER_POSITION_HISTORY_KEY = 'USER_POSITION_HISTORY_KEY'
+const USER_PAIR_HODLS_RETURNS_KEY = 'USER_PAIR_HODLS_RETURNS_KEY'
 
 const UserContext = createContext()
 
@@ -47,6 +56,22 @@ function reducer(state, { type, payload }) {
       return {
         ...state,
         [account]: { ...state?.[account], [USER_POSITION_HISTORY_KEY]: historyData }
+      }
+    }
+
+    case UPDATE_USER_PAIR_HODLS_RETURNS: {
+      const { account, hodlData } = payload
+      let added = {}
+      hodlData &&
+        hodlData.map(pairData => {
+          return (added[pairData.pairAddress] = pairData)
+        })
+      return {
+        ...state,
+        [account]: {
+          ...state?.[account],
+          [USER_PAIR_HODLS_RETURNS_KEY]: { ...state?.[account]?.USER_PAIR_HODLS_RETURNS_KEY, ...added }
+        }
       }
     }
 
@@ -91,14 +116,22 @@ export default function Provider({ children }) {
     })
   }, [])
 
+  const updateUserHodlReturns = useCallback((account, hodlData) => {
+    dispatch({
+      type: UPDATE_USER_PAIR_HODLS_RETURNS,
+      payload: {
+        account,
+        hodlData
+      }
+    })
+  }, [])
+
   return (
     <UserContext.Provider
-      value={useMemo(() => [state, { updateTransactions, updatePositions, updateUserPositionHistory }], [
-        state,
-        updateTransactions,
-        updatePositions,
-        updateUserPositionHistory
-      ])}
+      value={useMemo(
+        () => [state, { updateTransactions, updatePositions, updateUserPositionHistory, updateUserHodlReturns }],
+        [state, updateTransactions, updatePositions, updateUserPositionHistory, updateUserHodlReturns]
+      )}
     >
       {children}
     </UserContext.Provider>
@@ -268,9 +301,119 @@ export function useUserLiquidityHistory(account) {
   return formattedHistory
 }
 
+export async function getPairAssetReturnForUser(user, pair, ethPrice) {
+  const {
+    data: { liquidityPositionSnapshots: history }
+  } = await client.query({
+    query: USER_HISTORY__PER_PAIR,
+    variables: {
+      user,
+      pair: pair.id
+    }
+  })
+
+  // asset return
+  let assetReturn = 0
+  let assetPercentChange = 0
+
+  // net return
+  let netReturn = 0
+  let netPercentChange = 0
+
+  // get data about the current position
+  const currentPosition = {
+    liquidityTokenBalance: history[history.length - 1].liquidityTokenBalance,
+    liquidityTokenTotalSupply: pair.totalSupply,
+    reserve0: pair.reserve0,
+    reserve1: pair.reserve1,
+    reserveUSD: pair.reserveUSD,
+    token0PriceUSD: pair.token0.derivedETH * ethPrice,
+    token1PriceUSD: pair.token1.derivedETH * ethPrice
+  }
+
+  // calculate the total USD amount provided to use for weighting
+  let totalAmountProvidedUSD = 0
+  for (const index in history) {
+    let positionT0 = history[index]
+    totalAmountProvidedUSD =
+      totalAmountProvidedUSD +
+      (parseFloat(positionT0.liquidityTokenBalance) / parseFloat(positionT0.liquidityTokenTotalSupply)) *
+        parseFloat(positionT0.reserveUSD)
+  }
+
+  for (const index in history) {
+    // compare to current values
+    let positionT0 = history[index]
+    let positionT1 = history[index + 1] || {}
+    if (parseInt(index) === history.length - 1) {
+      positionT1 = currentPosition
+    }
+
+    // get starting amounts of token0 and token1 deposited by LP
+    const token0_amount =
+      (parseFloat(positionT0.liquidityTokenBalance) / parseFloat(positionT0.liquidityTokenTotalSupply)) *
+      parseFloat(positionT0.reserve0)
+    const token1_amount =
+      (parseFloat(positionT0.liquidityTokenBalance) / parseFloat(positionT0.liquidityTokenTotalSupply)) *
+      parseFloat(positionT0.reserve1)
+
+    // calculate USD value at t0 and t1 using initial token deposit amounts for asset return
+    const assetValueT0 = token0_amount * positionT0.token0PriceUSD + token1_amount * positionT0.token1PriceUSD
+    const assetValueT1 = token0_amount * positionT1.token0PriceUSD + token1_amount * positionT1.token1PriceUSD
+
+    // calculate value delta based on  prices_t1 - prices_t0 * token_amounts
+    const assetValueChange = assetValueT1 - assetValueT0
+    assetReturn = assetReturn ? assetReturn + assetValueChange : assetValueChange
+
+    // get net value change for combined data
+    const netValueT0 =
+      (parseFloat(positionT0.liquidityTokenBalance) / parseFloat(positionT0.liquidityTokenTotalSupply)) *
+      parseFloat(positionT0.reserveUSD)
+    const netValueT1 =
+      (parseFloat(positionT1.liquidityTokenBalance) / parseFloat(positionT1.liquidityTokenTotalSupply)) *
+      parseFloat(positionT1.reserveUSD)
+    netReturn = netReturn ? netReturn + netValueT1 - netValueT0 : netValueT1 - netValueT0
+
+    // calculate the weight of this interval based on position ratio to total supplied
+    const weight =
+      ((parseFloat(positionT0.liquidityTokenBalance) / parseFloat(positionT0.liquidityTokenTotalSupply)) *
+        parseFloat(positionT0.reserveUSD)) /
+      totalAmountProvidedUSD
+
+    // calculate the weighted percent changes for each metric
+    const weightedAssetChange = ((weight * assetValueChange) / assetValueT0) * 100
+    const wieghtedNetChange = ((weight * (netValueT1 - netValueT0)) / netValueT0) * 100
+
+    // update the global percent changes
+    assetPercentChange = assetPercentChange ? assetPercentChange + weightedAssetChange : weightedAssetChange
+    netPercentChange = netPercentChange ? netPercentChange + wieghtedNetChange : wieghtedNetChange
+  }
+
+  // uniswap specific return
+  let uniswapReturn = netReturn - assetReturn
+  let uniswapPercentChange = netPercentChange - assetPercentChange
+
+  return {
+    asset: {
+      return: assetReturn,
+      percent: assetPercentChange
+    },
+    net: {
+      return: netReturn,
+      percent: netPercentChange
+    },
+    uniswap: {
+      return: uniswapReturn,
+      percent: uniswapPercentChange
+    }
+  }
+}
+
 export function useUserPositions(account) {
-  const [state, { updatePositions }] = useUserContext()
+  const [state, { updatePositions, updateUserHodlReturns }] = useUserContext()
   const positions = state?.[account]?.[POSITIONS_KEY]
+  const [ethPrice] = useEthPrice()
+
   useEffect(() => {
     async function fetchData(account) {
       try {
@@ -282,16 +425,30 @@ export function useUserPositions(account) {
           fetchPolicy: 'no-cache'
         })
         if (result?.data?.liquidityPositions) {
-          updatePositions(account, result?.data?.liquidityPositions)
+          let formattedPositions = await Promise.all(
+            result?.data?.liquidityPositions.map(async positionData => {
+              const returnData = await getPairAssetReturnForUser(account, positionData.pair, ethPrice)
+              return {
+                ...positionData,
+                assetReturn: returnData.asset.return,
+                assetPercentChange: returnData.asset.percent,
+                netReturn: returnData.net.return,
+                netPercentChange: returnData.net.percent,
+                uniswapReturn: returnData.uniswap.return,
+                uniswapPercentChange: returnData.uniswap.percent
+              }
+            })
+          )
+          updatePositions(account, formattedPositions)
         }
       } catch (e) {
         console.log(e)
       }
     }
-    if (!positions && account) {
+    if (!positions && account && ethPrice) {
       fetchData(account)
     }
-  }, [account, positions, updatePositions])
+  }, [account, positions, updatePositions, updateUserHodlReturns, ethPrice])
 
   return positions
 }

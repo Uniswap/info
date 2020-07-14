@@ -267,16 +267,12 @@ export function rawPercent(percentRaw) {
 export function formattedPercent(percent) {
   percent = parseFloat(percent)
   if (!percent || percent === 0) {
-    return (
-      <Text fontWeight={500} fontSize={'1rem'}>
-        0%
-      </Text>
-    )
+    return <Text fontWeight={500}>0%</Text>
   }
 
   if (percent < 0.0001 && percent > 0) {
     return (
-      <Text fontWeight={500} fontSize={'1rem'} color="green">
+      <Text fontWeight={500} color="green">
         {'< 0.0001%'}
       </Text>
     )
@@ -284,7 +280,7 @@ export function formattedPercent(percent) {
 
   if (percent < 0 && percent > -0.0001) {
     return (
-      <Text fontWeight={500} fontSize={'1rem'} color="red">
+      <Text fontWeight={500} color="red">
         {'< 0.0001%'}
       </Text>
     )
