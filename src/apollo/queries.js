@@ -14,14 +14,6 @@ export const UNISWAP_GLOBALS_QUERY = gql`
   }
 `
 
-export const V1_TOP_PAIRS = gql`
-  query exchanges {
-    exchanges(first: 200, orderBy: ethBalance, orderDirection: desc) {
-      ethBalance
-    }
-  }
-`
-
 export const UNISWAP_GLOBALS_24HOURS_AGO_QUERY = gql`
   query uniswapHistoricalDatas($date: Int!) {
     uniswapHistoricalDatas(where: { timestamp_lt: $date }, first: 1, orderBy: timestamp, orderDirection: desc) {
