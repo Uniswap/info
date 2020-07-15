@@ -260,6 +260,29 @@ export const PAIR_DAY_DATA = gql`
   }
 `
 
+export const PAIR_DAY_DATA_BULK = (pairs, startTimestamp) => {
+  let pairsString = `[`
+  pairs.map(pair => {
+    return (pairsString += `"${pair}"`)
+  })
+  pairsString += ']'
+  const queryString = `
+    query days {
+      pairDayDatas(first: 1000, orderBy: date, orderDirection: asc, where: { pairAddress_in: ${pairsString}, date_gt: ${startTimestamp} }) {
+        id
+        pairAddress
+        date
+        dailyVolumeToken0
+        dailyVolumeToken1
+        dailyVolumeUSD
+        totalSupply
+        reserveUSD
+      }
+    } 
+`
+  return gql(queryString)
+}
+
 export const GLOBAL_CHART = gql`
   query uniswapDayDatas($startTime: Int!) {
     uniswapDayDatas(where: { date_gt: $startTime }, orderBy: date, orderDirection: asc) {

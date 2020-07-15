@@ -4,15 +4,14 @@ import {
   USER_TRANSACTIONS,
   USER_POSITIONS,
   USER_HISTORY,
-  PAIR_DAY_DATA,
-  USER_HISTORY__PER_PAIR
+  USER_HISTORY__PER_PAIR,
+  PAIR_DAY_DATA_BULK
 } from '../apollo/queries'
 import { useTimeframe } from './Application'
 import { timeframeOptions } from '../constants'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { useEthPrice } from './GlobalData'
-import { position } from 'polished'
 
 dayjs.extend(utc)
 
@@ -220,77 +219,97 @@ export function useUserLiquidityHistory(account) {
     }
   }, [account, startDateTimestamp, history, updateUserPositionHistory])
 
-  const getTopPairDayDatas = useCallback(async (timestampCeiling, history) => {
-    let filtered = await history.map(async position => {
-      if (parseInt(position.timestamp) < timestampCeiling) {
-        let result = await client.query({
-          query: PAIR_DAY_DATA,
-          variables: {
-            pairAddress: position.pair.id,
-            date: parseInt(position.timestamp)
-          },
-          fetchPolicy: 'cache-first'
-        })
-        let reserveUSD = parseFloat(result?.data?.pairDayDatas?.[0]?.reserveUSD)
-        let totalSupply = parseFloat(result?.data?.pairDayDatas?.[0]?.totalSupply)
-        const value = (reserveUSD * parseFloat(position.liquidityTokenBalance)) / parseFloat(totalSupply)
-        return { pairAddress: position.pair.id, timestamp: position.timestamp, value }
-      } else return false
-    })
-    return Promise.all(filtered)
-  }, [])
-
   useEffect(() => {
     async function fetchData() {
-      /**
-       * 1. get all snapshots
-       * 2. starting with t0, increment days until now
-       * 3. for each day, grab latest LP snapshots for each pair
-       * 4. for each of those, grab day data for that pair on that date
-       * 5. calculate USD val for each one, then aggregate
-       */
       let dayIndex = parseInt(startDateTimestamp / 86400) // get unique day bucket unix
       const currentDayIndex = parseInt(dayjs.utc().unix() / 86400)
       // sort snapshots in order
       let sortedPositions = history.sort((a, b) => {
-        if (parseInt(a.timestamp) > parseInt(b.timestamp)) {
-          return 1
-        }
-        return -1
+        return parseInt(a.timestamp) > parseInt(b.timestamp) ? 1 : -1
       })
       // if UI start time is > first position time - bump start index to this time
       if (parseInt(sortedPositions[0].timestamp) > dayIndex) {
         dayIndex = parseInt(parseInt(sortedPositions[0].timestamp) / 86400)
       }
 
-      let formattedHistory = []
+      const dayTimestamps = []
+      // get date timestamps for all days in view
       while (dayIndex < currentDayIndex) {
-        let dayData = {}
-        let timestampCeiling = dayIndex * 86400 + 86400
-        let liquiditySumUSD = 0
-        let pairTopValues = await getTopPairDayDatas(timestampCeiling, history)
-        /**
-         * for the current day, make sure only 1 unique pairdaydata per pair in list
-         */
-        let removeDuplicates = {}
-        pairTopValues.map(pairData => {
-          if (
-            pairData &&
-            ((removeDuplicates[pairData.pairAddress] &&
-              removeDuplicates[pairData.pairAddress].timestamp < pairData.timestamp) ||
-              !removeDuplicates[pairData.pairAddress])
-          ) {
-            removeDuplicates[pairData.pairAddress] = pairData
-          }
-          return true
-        })
-        Object.keys(removeDuplicates).map(pairAddress => {
-          return (liquiditySumUSD = liquiditySumUSD + removeDuplicates[pairAddress].value)
-        })
-        dayData.date = parseInt(dayIndex) * 86400
-        dayData.valueUSD = liquiditySumUSD
-        formattedHistory.push(dayData)
+        dayTimestamps.push(parseInt(dayIndex) * 86400)
         dayIndex = dayIndex + 1
+      }
+
+      const pairs = history.reduce((pairList, position) => {
+        return [...pairList, position.pair.id]
+      }, [])
+
+      // get all day datas where date is in this list, and pair is in pair list
+      let {
+        data: { pairDayDatas }
+      } = await client.query({
+        query: PAIR_DAY_DATA_BULK(pairs, startDateTimestamp)
+      })
+
+      const formattedHistory = []
+
+      // map of current pair => ownership %
+      const ownershipPerPair = {}
+      for (const index in dayTimestamps) {
+        const dayTimestamp = dayTimestamps[index]
+        const timestampCeiling = dayTimestamp + 86400
+
+        // cycle through relevant positions and update ownership for any that we need to
+        const relevantPositions = history.filter(snapshot => {
+          return snapshot.timestamp < timestampCeiling && snapshot.timestamp > dayTimestamp
+        })
+        for (const index in relevantPositions) {
+          const position = relevantPositions[index]
+          // case where pair not added yet
+          if (!ownershipPerPair[position.pair.id]) {
+            ownershipPerPair[position.pair.id] = {
+              lpTokenBalance: position.liquidityTokenBalance,
+              timestamp: position.timestamp
+            }
+          }
+          // case where more recent timestamp is found for pair
+          if (ownershipPerPair[position.pair.id] && ownershipPerPair[position.pair.id].timestamp < position.timestamp) {
+            ownershipPerPair[position.pair.id] = {
+              lpTokenBalance: position.liquidityTokenBalance,
+              timestamp: position.timestamp
+            }
+          }
+        }
+
+        const relavantDayDatas = Object.keys(ownershipPerPair).map(pairAddress => {
+          // find last day data after timestamp update
+          const dayDatasForThisPair = pairDayDatas.filter(dayData => {
+            return dayData.pairAddress === pairAddress
+          })
+          // find the most recent reference to pair liquidity data
+          let mostRecent = dayDatasForThisPair[0]
+          for (const index in dayDatasForThisPair) {
+            const dayData = dayDatasForThisPair[index]
+            if (dayData.date < dayTimestamp && dayData.date > mostRecent.date) {
+              mostRecent = dayData
+            }
+          }
+          return mostRecent
+        })
+
+        // now cycle through pair day datas, for each one find usd value = ownership[address] * reserveUSD
+        const dailyUSD = relavantDayDatas.reduce((totalUSD, dayData) => {
+          return (totalUSD =
+            totalUSD +
+            (ownershipPerPair[dayData.pairAddress]
+              ? (parseFloat(ownershipPerPair[dayData.pairAddress].lpTokenBalance) / parseFloat(dayData.totalSupply)) *
+                parseFloat(dayData.reserveUSD)
+              : 0))
+        }, 0)
+
+        formattedHistory.push({
+          date: dayTimestamp,
+          valueUSD: dailyUSD
+        })
       }
 
       setFormattedHistory(formattedHistory)
@@ -298,7 +317,8 @@ export function useUserLiquidityHistory(account) {
     if (history) {
       fetchData()
     }
-  }, [getTopPairDayDatas, history, startDateTimestamp])
+  }, [history, startDateTimestamp])
+
   return formattedHistory
 }
 
@@ -347,29 +367,22 @@ export async function getReturns(user, pair, ethPrice) {
         parseFloat(positionT0.reserveUSD)
   }
 
-  if (pair.id === '0xa478c2975ab1ea89e8196811f51a7b7ade33eb11') {
-    console.log(history)
-    console.log('-------')
-  }
+  // if (pair.id === '0xa478c2975ab1ea89e8196811f51a7b7ade33eb11') {
+  //   console.log(history)
+  //   console.log('-------')
+  // }
 
   for (const index in history) {
-    if (pair.id === '0xa478c2975ab1ea89e8196811f51a7b7ade33eb11') {
-      console.log(index)
-      console.log(parseInt(index) === history.length - 1)
-    }
-    // compare to current values
+    // get positions at both bounds of the window
     let positionT0 = history[index]
-    let positionT1 = history[index + 1] || {}
-    if (index === history.length - 1) {
+    let positionT1 = history[parseInt(index) + 1] || {}
+
+    // if at last index in history - use current data as end of window
+    if (parseInt(index) === history.length - 1) {
       positionT1 = currentPosition
     }
 
-    if (pair.id === '0xa478c2975ab1ea89e8196811f51a7b7ade33eb11') {
-      console.log(positionT0)
-      console.log(positionT1)
-      console.log('-------')
-    }
-
+    // hard code prices before launch to get better results for stablecoins and WETH
     if (positionT0.timestamp < 1589747086) {
       if (priceOverrides.includes(positionT0.pair.token0.id)) {
         positionT0.token0PriceUSD = 1
@@ -386,7 +399,6 @@ export async function getReturns(user, pair, ethPrice) {
         positionT0.token1PriceUSD = 203
       }
     }
-
     if (positionT1.timestamp < 1589747086) {
       if (priceOverrides.includes(positionT1.pair.token0.id)) {
         positionT1.token0PriceUSD = 1
@@ -403,36 +415,33 @@ export async function getReturns(user, pair, ethPrice) {
       }
     }
 
+    // calculate ownership at ends of window, for end of window we need original LP token balance / new total supply
+    const t0Ownership = parseFloat(positionT0.liquidityTokenBalance) / parseFloat(positionT0.liquidityTokenTotalSupply)
+    const t1Ownership = parseFloat(positionT0.liquidityTokenBalance) / parseFloat(positionT1.liquidityTokenTotalSupply)
+
     // get starting amounts of token0 and token1 deposited by LP
-    const token0_amount =
-      (parseFloat(positionT0.liquidityTokenBalance) / parseFloat(positionT0.liquidityTokenTotalSupply)) *
-      parseFloat(positionT0.reserve0)
-    const token1_amount =
-      (parseFloat(positionT0.liquidityTokenBalance) / parseFloat(positionT0.liquidityTokenTotalSupply)) *
-      parseFloat(positionT0.reserve1)
+    const token0_amount_t0 = t0Ownership * parseFloat(positionT0.reserve0)
+    const token1_amount_t0 = t0Ownership * parseFloat(positionT0.reserve1)
 
     // calculate USD value at t0 and t1 using initial token deposit amounts for asset return
-    const assetValueT0 = token0_amount * positionT0.token0PriceUSD + token1_amount * positionT0.token1PriceUSD
-    const assetValueT1 = token0_amount * positionT1.token0PriceUSD + token1_amount * positionT1.token1PriceUSD
+    const assetValueT0 =
+      token0_amount_t0 * parseFloat(positionT0.token0PriceUSD) +
+      token1_amount_t0 * parseFloat(positionT0.token1PriceUSD)
+    const assetValueT1 =
+      token0_amount_t0 * parseFloat(positionT1.token0PriceUSD) +
+      token1_amount_t0 * parseFloat(positionT1.token1PriceUSD)
 
     // calculate value delta based on  prices_t1 - prices_t0 * token_amounts
     const assetValueChange = assetValueT1 - assetValueT0
     assetReturn = assetReturn ? assetReturn + assetValueChange : assetValueChange
 
     // get net value change for combined data
-    const netValueT0 =
-      (parseFloat(positionT0.liquidityTokenBalance) / parseFloat(positionT0.liquidityTokenTotalSupply)) *
-      parseFloat(positionT0.reserveUSD)
-    const netValueT1 =
-      (parseFloat(positionT1.liquidityTokenBalance) / parseFloat(positionT1.liquidityTokenTotalSupply)) *
-      parseFloat(positionT1.reserveUSD)
+    const netValueT0 = t0Ownership * parseFloat(positionT0.reserveUSD)
+    const netValueT1 = t1Ownership * parseFloat(positionT1.reserveUSD)
     netReturn = netReturn ? netReturn + netValueT1 - netValueT0 : netValueT1 - netValueT0
 
     // calculate the weight of this interval based on position ratio to total supplied
-    const weight =
-      ((parseFloat(positionT0.liquidityTokenBalance) / parseFloat(positionT0.liquidityTokenTotalSupply)) *
-        parseFloat(positionT0.reserveUSD)) /
-      totalAmountProvidedUSD
+    const weight = (t0Ownership * parseFloat(positionT0.reserveUSD)) / totalAmountProvidedUSD
 
     // calculate the weighted percent changes for each metric
     const weightedAssetChange = ((weight * assetValueChange) / assetValueT0) * 100

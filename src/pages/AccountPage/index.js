@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import 'feather-icons'
 import styled from 'styled-components'
 import { useUserTransactions, useUserPositions } from '../../contexts/User'
 import TxnList from '../../components/TxnList'
 import Panel from '../../components/Panel'
-import { useUserTotalSwappedUSD } from './hooks'
 import PositionList from '../../components/PositionList'
 import { formattedNum, formattedPercent } from '../../helpers'
 import { AutoRow, RowFixed, RowBetween } from '../../components/Row'
@@ -62,10 +61,18 @@ const Header = styled.div`
 `
 
 function AccountPage({ account }) {
-  let transactions = useUserTransactions(account)
-  let totalSwappedUSD = useUserTotalSwappedUSD(account)
-  const transactionCount = transactions?.swaps?.length + transactions?.burns?.length + transactions?.mints?.length
+  const transactions = useUserTransactions(account)
   const positions = useUserPositions(account)
+
+  let totalSwappedUSD = useMemo(() => {
+    return transactions?.swaps
+      ? transactions?.swaps.reduce((total, swap) => {
+          return total + parseFloat(swap.amountUSD)
+        }, 0)
+      : 0
+  }, [transactions])
+
+  const transactionCount = transactions?.swaps?.length + transactions?.burns?.length + transactions?.mints?.length
 
   const positionValue = calculateTotalLiquidity(positions)
   const [animatedVal, setAnimatedVal] = useState(positionValue)
@@ -135,7 +142,7 @@ function AccountPage({ account }) {
             <AutoColumn gap="8px">
               <RowFixed>
                 <Text fontSize={28} fontWeight={600} mr={'10px'}>
-                  {formattedNum(assetReturn, true)}
+                  {formattedNum(assetReturn, true, true)}
                 </Text>
                 <Text>{formattedPercent(averageAssetPercentChange)}</Text>
               </RowFixed>
@@ -144,7 +151,7 @@ function AccountPage({ account }) {
             <AutoColumn gap="8px">
               <RowFixed>
                 <Text fontSize={28} fontWeight={600} mr={'10px'}>
-                  {formattedNum(uniswapReturn, true)}
+                  {formattedNum(uniswapReturn, true, true)}
                 </Text>
                 <Text>{formattedPercent(averageNetPercentChange - averageAssetPercentChange)}</Text>
               </RowFixed>
@@ -153,7 +160,7 @@ function AccountPage({ account }) {
             <AutoColumn gap="8px">
               <RowFixed>
                 <Text fontSize={28} fontWeight={600} mr={'10px'}>
-                  {formattedNum(netReturn, true)}
+                  {formattedNum(netReturn, true, true)}
                 </Text>
                 <Text>{formattedPercent(averageNetPercentChange)}</Text>
               </RowFixed>
