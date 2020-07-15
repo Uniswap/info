@@ -4,7 +4,7 @@ import utc from 'dayjs/plugin/utc'
 import { get2DayPercentChange, getPercentChange } from '../helpers'
 import { v1Client } from '../apollo/client'
 import { useEthPrice } from './GlobalData'
-import { UNISWAP_GLOBALS_QUERY, UNISWAP_GLOBALS_24HOURS_AGO_QUERY, V1_TOP_PAIRS } from '../apollo/queries'
+import { UNISWAP_GLOBALS_QUERY, UNISWAP_GLOBALS_24HOURS_AGO_QUERY } from '../apollo/queries'
 
 export function useV1Data() {
   dayjs.extend(utc)
@@ -72,23 +72,6 @@ export function useV1Data() {
           data48HoursAgo.liquidityEth = resultTwoDays.data.uniswapHistoricalDatas[0].totalLiquidityInEth
           data48HoursAgo.liquidityUsd = resultTwoDays.data.uniswapHistoricalDatas[0].totalLiquidityUSD
           data48HoursAgo.txCount = resultTwoDays.data.uniswapHistoricalDatas[0].txCount
-        }
-      } catch (err) {
-        console.log('error: ', err)
-      }
-
-      try {
-        let resultTopPairs = await v1Client.query({
-          query: V1_TOP_PAIRS,
-          fetchPolicy: 'cache-first'
-        })
-        if (resultTopPairs) {
-          // set two day data
-          let totalETH = 0
-          resultTopPairs.data.exchanges.map(exchange => {
-            return (totalETH = totalETH + parseFloat(exchange.ethBalance) * 2)
-          })
-          data.liquidityUsd = totalETH * ethPrice
         }
       } catch (err) {
         console.log('error: ', err)

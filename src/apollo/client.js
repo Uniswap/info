@@ -16,7 +16,7 @@ export const client = new ApolloClient({
 
 export const v1Client = new ApolloClient({
   link: new HttpLink({
-    uri: 'https://api.thegraph.com/subgraphs/name/graphprotocol/uniswap'
+    uri: 'https://api.thegraph.com/subgraphs/name/ianlapham/uniswap'
   }),
   cache: new InMemoryCache()
 })
