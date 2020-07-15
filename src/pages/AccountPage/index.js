@@ -4,7 +4,6 @@ import styled from 'styled-components'
 import { useUserTransactions, useUserPositions } from '../../contexts/User'
 import TxnList from '../../components/TxnList'
 import Panel from '../../components/Panel'
-import PositionList from '../../components/PositionList'
 import { formattedNum, formattedPercent } from '../../helpers'
 import { AutoRow, RowFixed, RowBetween } from '../../components/Row'
 import { Text } from 'rebass'
@@ -13,6 +12,7 @@ import { calculateTotalLiquidity } from './utils'
 import UserChart from '../../components/UserChart'
 import AnimatedNumber from 'animated-number-react'
 import Search from '../../components/Search'
+import PositionListExpanded from '../../components/PositionListExpanded'
 
 const PageWrapper = styled.div`
   display: flex;
@@ -105,6 +105,27 @@ function AccountPage({ account }) {
   }, 0)
   const averageAssetPercentChange = aggregateAssetReturnPercentChange / positions?.length
 
+  const [costBasis, setCostBasis] = useState()
+
+  useEffect(() => {
+    let cbTotal = 0
+    if (transactions?.mints) {
+      cbTotal =
+        cbTotal +
+        transactions.mints.reduce((total, mint) => {
+          return total + parseFloat(mint.amountUSD)
+        }, 0)
+    }
+    if (transactions?.burns) {
+      cbTotal =
+        cbTotal -
+        transactions.burns.reduce((total, burn) => {
+          return total + parseFloat(burn.amountUSD)
+        }, 0)
+    }
+    setCostBasis(cbTotal)
+  }, [transactions])
+
   return (
     <PageWrapper>
       <ThemedBackground />
@@ -166,6 +187,14 @@ function AccountPage({ account }) {
               </RowFixed>
               <Text fontSize={16}>Combined Return</Text>
             </AutoColumn>
+            <AutoColumn gap="8px">
+              <RowFixed>
+                <Text fontSize={28} fontWeight={600} mr={'10px'}>
+                  {formattedNum(costBasis, true, true)}
+                </Text>
+              </RowFixed>
+              <Text fontSize={16}>Cost Basis</Text>
+            </AutoColumn>
           </AutoRow>
         </AutoColumn>
       </Panel>
@@ -182,8 +211,11 @@ function AccountPage({ account }) {
           Positions
         </Text>
         <Panel>
-          <PositionList positions={positions} />
+          <PositionListExpanded positions={positions} transactions={transactions} />
         </Panel>
+        {/* <Panel>
+          <PositionList positions={positions} />
+        </Panel> */}
       </AutoColumn>
       <div style={{ marginTop: '40px' }}>
         <AutoRow gap="20px">

@@ -314,7 +314,7 @@ export function useUserLiquidityHistory(account) {
 
       setFormattedHistory(formattedHistory)
     }
-    if (history) {
+    if (history && startDateTimestamp) {
       fetchData()
     }
   }, [history, startDateTimestamp])

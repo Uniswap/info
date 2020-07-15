@@ -173,6 +173,7 @@ export const USER_TRANSACTIONS = gql`
         timestamp
       }
       pair {
+        id
         token0 {
           id
           symbol
@@ -195,6 +196,7 @@ export const USER_TRANSACTIONS = gql`
         timestamp
       }
       pair {
+        id
         token0 {
           symbol
         }
