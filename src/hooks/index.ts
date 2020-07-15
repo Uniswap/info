@@ -55,6 +55,31 @@ export function useCopyClipboard(timeout = 500) {
   return [isCopied, staticCopy]
 }
 
+export function useKeyPress(targetKey: string) {
+  const [keyPressed, setKeyPressed] = useState(false)
+
+  const downHandler = useRef(undefined)
+  downHandler.current = ({ key }) => {
+    if (key === targetKey) setKeyPressed(true)
+  }
+
+  const upHandler = useRef(undefined)
+  upHandler.current = ({ key }) => {
+    if (key === targetKey) setKeyPressed(false)
+  }
+
+  useEffect(() => {
+    window.addEventListener('keydown', downHandler.current)
+    window.addEventListener('keyup', upHandler.current)
+    return () => {
+      window.removeEventListener('keydown', downHandler.current)
+      window.removeEventListener('keyup', upHandler.current)
+    }
+  }, [])
+
+  return keyPressed
+}
+
 export const useOutsideClick = (ref, ref2, callback) => {
   const handleClick = e => {
     if (ref.current && ref.current && !ref2.current) {
