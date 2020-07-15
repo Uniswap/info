@@ -142,7 +142,7 @@ const CustomLink = styled(Link)`
 `
 
 // @TODO rework into virtualized list
-function OverviewList({ currencyUnit, setCalculatedLiquidityETH, setCalculatedLiquidityUSD, history }) {
+function OverviewList({ currencyUnit, history }) {
   const [exchanges, setExchanges] = useState([])
 
   const [filteredTxs, SetFilteredTxs] = useState([])
@@ -172,20 +172,6 @@ function OverviewList({ currencyUnit, setCalculatedLiquidityETH, setCalculatedLi
   }
 
   const [sortedColumn, setSortedColumn] = useState(SORT_FIELD.LIQUIDITY)
-
-  // hot fix until subraph with change sycns
-  useEffect(() => {
-    if (exchanges && exchanges.length === 200) {
-      let totalETH = 0
-      let totalUSD = 0
-      exchanges.map(exchange => {
-        totalETH = totalETH + parseFloat(exchange.ethBalance) * 2
-        return (totalUSD = totalUSD + exchange.ethBalance * 2 * exchange.price * exchange.priceUSD)
-      })
-      setCalculatedLiquidityETH(totalETH)
-      setCalculatedLiquidityUSD(totalUSD)
-    }
-  })
 
   function getPercentChangeColor(change) {
     if (change === 0) {

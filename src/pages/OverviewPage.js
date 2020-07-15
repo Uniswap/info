@@ -19,7 +19,7 @@ const SmallText = styled.span`
 
 const ThemedBackground = styled(Box)`
   position: absolute;
-  height: 365px;
+  height: 411px;
   z-index: -1;
   top: 0;
   width: 100vw;
@@ -155,7 +155,6 @@ const FloatRight = styled.div`
 `
 
 export const OverviewPage = function({
-  exchangeAddress,
   uniswapHistory,
   currencyUnit,
   globalData,
@@ -169,10 +168,6 @@ export const OverviewPage = function({
   const [chartOption, setChartOption] = useState('liquidity')
 
   const belowSmall = useMedia('(max-width: 40em)')
-
-  // hot fix until subgraph with fix is synced
-  const [calculatedLiquidityETH, setCalculatedLiquidityETH] = useState()
-  const [calculatedLiquidityUSD, setCalculatedLiquidityUSD] = useState()
 
   return (
     <div style={{ marginTop: '0px' }}>
@@ -212,10 +207,10 @@ export const OverviewPage = function({
                 topLeft={<Hint color="textLight">Total Liquidity</Hint>}
                 bottomLeft={
                   <Text fontSize={24} lineHeight={1} fontWeight={500}>
-                    {calculatedLiquidityUSD
+                    {globalData
                       ? currencyUnit !== 'USD'
-                        ? 'Ξ ' + formattedNum(calculatedLiquidityETH)
-                        : '$' + formattedNum(calculatedLiquidityUSD, true)
+                        ? 'Ξ ' + formattedNum(globalData.liquidityEth)
+                        : '$' + formattedNum(globalData.liquidityUsd, true)
                       : '-'}
                     {currencyUnit === 'USD' ? '' : <SmallText> ETH</SmallText>}
                   </Text>
@@ -233,7 +228,7 @@ export const OverviewPage = function({
                 }
               />
             </TopPanel>
-            <TopPanel rounded bg="white" color="white" style={{ gridArea: 'shares' }} p={24}>
+            <TopPanel rounded color="white" style={{ gridArea: 'shares' }} p={24}>
               <FourByFour
                 topLeft={<Hint color="textLight">Transactions (24hrs)</Hint>}
                 bottomLeft={
@@ -314,11 +309,7 @@ export const OverviewPage = function({
               </Box>
             </ChartWrapper>
             <Panel rounded bg="white" area="transactions">
-              <OverviewList
-                currencyUnit={currencyUnit}
-                setCalculatedLiquidityETH={setCalculatedLiquidityETH}
-                setCalculatedLiquidityUSD={setCalculatedLiquidityUSD}
-              />
+              <OverviewList currencyUnit={currencyUnit} />
             </Panel>
           </OverviewDashboard>
         </DashboardWrapper>
