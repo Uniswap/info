@@ -23,10 +23,9 @@ const Header = styled.div`
 `
 
 const CombinedWrapper = styled(RowFixed)`
-/* border: 1px solid ${({ theme }) => theme.primary2} */
-border-radius: 16px;
-padding: .25rem 0.25rem .25rem .75rem ;
-justify-content: flex-end;
+  border-radius: 16px;
+  padding: 0.25rem 0.25rem 0.25rem 0.75rem;
+  justify-content: flex-end;
 `
 
 const CombinedData = styled.div`

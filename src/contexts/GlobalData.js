@@ -230,7 +230,6 @@ async function getGlobalData(ethPrice) {
 
       const v1Data = await getV1Data()
       data.v1Data = v1Data
-      data.v1Data.totalLiquidityUSD = v1Data.totalETH * ethPrice
     }
   } catch (e) {
     console.log(e)
