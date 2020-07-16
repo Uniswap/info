@@ -94,7 +94,7 @@ const UserChart = ({ account, setAnimatedVal, animatedVal, positionValue }) => {
         </RowBetween>
       )}
       {chartFilter === CHART_VIEW.LIQUIDITY && chartData && (
-        <ResponsiveContainer aspect={below1080 ? 60 / 32 : below600 ? 60 / 42 : 60 / 30}>
+        <ResponsiveContainer aspect={below1080 ? 60 / 32 : below600 ? 60 / 42 : 60 / 26}>
           <AreaChart
             onMouseMove={e => {
               if (e?.activePayload?.[0]?.value && animatedVal !== e?.activePayload?.[0]?.value) {
