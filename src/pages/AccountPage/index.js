@@ -27,7 +27,7 @@ const PageWrapper = styled.div`
   overflow: scroll;
   & > * {
     width: 100%;
-    max-width: 1040px;
+    max-width: 1140px;
   }
 
   @media screen and (max-width: 1080px) {
