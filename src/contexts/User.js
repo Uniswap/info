@@ -367,11 +367,6 @@ export async function getReturns(user, pair, ethPrice) {
         parseFloat(positionT0.reserveUSD)
   }
 
-  // if (pair.id === '0xa478c2975ab1ea89e8196811f51a7b7ade33eb11') {
-  //   console.log(history)
-  //   console.log('-------')
-  // }
-
   for (const index in history) {
     // get positions at both bounds of the window
     let positionT0 = history[index]
@@ -423,13 +418,33 @@ export async function getReturns(user, pair, ethPrice) {
     const token0_amount_t0 = t0Ownership * parseFloat(positionT0.reserve0)
     const token1_amount_t0 = t0Ownership * parseFloat(positionT0.reserve1)
 
+    // get current token values
+    const token0_amount_t1 = t1Ownership * parseFloat(positionT1.reserve0)
+    const token1_amount_t1 = t1Ownership * parseFloat(positionT1.reserve1)
+
+    // calculate squares to find imp loss and fee differences
+    const sqrK_t0 = Math.sqrt(token0_amount_t0 * token1_amount_t0)
+    const token0_amount_no_fees = sqrK_t0 * Math.sqrt(positionT1.token1PriceUSD)
+    const token1_amount_no_fees = sqrK_t0 / Math.sqrt(positionT1.token1PriceUSD)
+    const no_fees_usd =
+      token0_amount_no_fees * positionT1.token0PriceUSD + token1_amount_no_fees * positionT1.token1PriceUSD
+
+    const difference_fees_token0 = token0_amount_t1 - token0_amount_no_fees
+    const difference_fees_token1 = token1_amount_t1 - token1_amount_no_fees
+    const difference_fees_usd =
+      difference_fees_token0 * positionT1.token0PriceUSD + difference_fees_token1 * positionT1.token1PriceUSD
+
     // calculate USD value at t0 and t1 using initial token deposit amounts for asset return
     const assetValueT0 =
       token0_amount_t0 * parseFloat(positionT0.token0PriceUSD) +
       token1_amount_t0 * parseFloat(positionT0.token1PriceUSD)
+
     const assetValueT1 =
       token0_amount_t0 * parseFloat(positionT1.token0PriceUSD) +
       token1_amount_t0 * parseFloat(positionT1.token1PriceUSD)
+
+    const imp_loss_usd = no_fees_usd - assetValueT1
+    const uniswap_return = difference_fees_usd + imp_loss_usd
 
     // calculate value delta based on  prices_t1 - prices_t0 * token_amounts
     const assetValueChange = assetValueT1 - assetValueT0

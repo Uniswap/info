@@ -5,11 +5,14 @@ import LocalLoader from '../LocalLoader'
 import utc from 'dayjs/plugin/utc'
 import { Box, Flex, Text } from 'rebass'
 import styled from 'styled-components'
-import { CustomLink } from '../Link'
+import Link from '../Link'
 import { Divider } from '../../components'
 import DoubleTokenLogo from '../DoubleLogo'
 import { withRouter } from 'react-router-dom'
 import { formattedNum, rawPercent, formattedPercent } from '../../helpers'
+import { AutoColumn } from '../Column'
+import { useEthPrice } from '../../contexts/GlobalData'
+import { RowFixed } from '../Row'
 
 dayjs.extend(utc)
 
@@ -40,11 +43,8 @@ const DashGrid = styled.div`
   grid-gap: 1em;
   grid-template-columns: 100px 1fr 1fr;
   grid-template-areas: 'name usd ownership';
-
-  :hover {
-    cursor: ${({ focus }) => focus && 'pointer'};
-    background-color: ${({ focus, theme }) => focus && theme.bg3};
-  }
+  align-items: flex-start;
+  padding: 20px 0;
 
   > * {
     justify-content: flex-end;
@@ -58,8 +58,8 @@ const DashGrid = styled.div`
   }
 
   @media screen and (min-width: 1200px) {
-    grid-template-columns: 2fr 1fr 1fr 1fr 1fr 0.5fr 0.5fr;
-    grid-template-areas: ' name ownership market return combinded value manage ';
+    grid-template-columns: 35px 1.5fr 1fr 1fr 1fr 1fr 1fr;
+    grid-template-areas: 'number name ownership market return combinded value';
   }
 `
 
@@ -97,7 +97,6 @@ const SORT_FIELD = {
 // }
 
 function PositionList({ positions }) {
-  const below600 = useMedia('(max-width: 600px)')
   const below740 = useMedia('(max-width: 740px)')
   const below1080 = useMedia('(max-width: 1080px)')
 
@@ -125,37 +124,116 @@ function PositionList({ positions }) {
     }
   }, [positions])
 
+  const [ethPrice] = useEthPrice()
+
   const ListItem = ({ position, index }) => {
     if (position) {
       const poolOwnership = position.liquidityTokenBalance / position.pair.totalSupply
       const valueUSD = poolOwnership * position.pair.reserveUSD
       return (
-        <DashGrid style={{ height: '60px' }} focus={true}>
-          <DataText area="name" fontWeight="500">
-            {!below600 && <div style={{ marginRight: '20px' }}>{index}</div>}
-            <DoubleTokenLogo
-              size={below600 ? 16 : 20}
-              a0={position.pair.token0.id}
-              a1={position.pair.token1.id}
-              margin={!below740}
-            />
-            <CustomLink style={{ marginLeft: '20px', whiteSpace: 'nowrap' }} to={'/pair/'}>
-              {position.pair.token0.symbol + '-' + position.pair.token1.symbol}
-            </CustomLink>
+        <DashGrid focus={true}>
+          <DataText area="number">{index}</DataText>
+          <DataText area="name" fontWeight="500" justifyContent="flex-start" alignItems="flex-start">
+            <AutoColumn gap="8px" justify="flex-start" align="flex-start">
+              <DoubleTokenLogo size={16} a0={position.pair.token0.id} a1={position.pair.token1.id} margin={!below740} />
+            </AutoColumn>
+            <AutoColumn gap="8px" justify="flex-start" style={{ marginLeft: '20px' }}>
+              <Text style={{ whiteSpace: 'nowrap' }} to={'/pair/'}>
+                {position.pair.token0.symbol + '-' + position.pair.token1.symbol}
+              </Text>
+              <AutoColumn gap="8px" justify="flex-start">
+                <Link>Add</Link>
+                <Link>Remove</Link>
+              </AutoColumn>
+            </AutoColumn>
           </DataText>
           <DataText area="ownership">{rawPercent(poolOwnership)}</DataText>
           <DataText area="market">
-            {formattedNum(position?.assetReturn, true, true)} ({formattedPercent(position?.assetPercentChange)})
+            <AutoColumn gap="12px">
+              <Text fontWeight={500}>
+                <RowFixed>
+                  {formattedNum(position?.assetReturn, true, true)} ({formattedPercent(position?.assetPercentChange)})
+                </RowFixed>
+              </Text>
+              <AutoColumn gap="4px" justify="flex-end">
+                <Text fontSize="12px">
+                  {parseFloat(position.pair.token0.derivedETH)
+                    ? formattedNum(position?.assetReturn / (parseFloat(position.pair.token0.derivedETH) * ethPrice) / 2)
+                    : 0}{' '}
+                  {position.pair.token0.symbol}
+                </Text>
+                <Text fontSize="12px">
+                  {parseFloat(position.pair.token1.derivedETH)
+                    ? formattedNum(position?.assetReturn / (parseFloat(position.pair.token1.derivedETH) * ethPrice) / 2)
+                    : 0}{' '}
+                  {position.pair.token1.symbol}
+                </Text>
+              </AutoColumn>
+            </AutoColumn>
           </DataText>
           <DataText area="return">
-            {formattedNum(position?.uniswapReturn, true, true)} ({formattedPercent(position?.uniswapPercentChange)})
+            <AutoColumn gap="12px">
+              <Text fontWeight={500}>
+                <RowFixed>
+                  {formattedNum(position?.uniswapReturn, true, true)} (
+                  {formattedPercent(position?.uniswapPercentChange)})
+                </RowFixed>
+              </Text>
+              <AutoColumn gap="4px" justify="flex-end">
+                <Text fontSize="12px">
+                  {parseFloat(position.pair.token0.derivedETH)
+                    ? formattedNum(
+                        position?.uniswapReturn / (parseFloat(position.pair.token0.derivedETH) * ethPrice) / 2
+                      )
+                    : 0}{' '}
+                  {position.pair.token0.symbol}
+                </Text>
+                <Text fontSize="12px">
+                  {parseFloat(position.pair.token1.derivedETH)
+                    ? formattedNum(
+                        position?.uniswapReturn / (parseFloat(position.pair.token1.derivedETH) * ethPrice) / 2
+                      )
+                    : 0}{' '}
+                  {position.pair.token1.symbol}
+                </Text>
+              </AutoColumn>
+            </AutoColumn>
           </DataText>
           <DataText area="combined">
-            {formattedNum(position?.netReturn, true, true)} ({formattedPercent(position?.netPercentChange)})
+            <AutoColumn gap="12px">
+              <Text fontWeight={500}>
+                <RowFixed>
+                  {formattedNum(position?.netReturn, true, true)} ({formattedPercent(position?.netPercentChange)})
+                </RowFixed>
+              </Text>
+              <AutoColumn gap="4px" justify="flex-end">
+                <Text fontSize="12px">
+                  {parseFloat(position.pair.token0.derivedETH)
+                    ? formattedNum(position?.netReturn / (parseFloat(position.pair.token0.derivedETH) * ethPrice) / 2)
+                    : 0}{' '}
+                  {position.pair.token0.symbol}
+                </Text>
+                <Text fontSize="12px">
+                  {parseFloat(position.pair.token1.derivedETH)
+                    ? formattedNum(position?.netReturn / (parseFloat(position.pair.token1.derivedETH) * ethPrice) / 2)
+                    : 0}{' '}
+                  {position.pair.token1.symbol}
+                </Text>
+              </AutoColumn>
+            </AutoColumn>
           </DataText>
-          <DataText area="value">{formattedNum(valueUSD, true)}</DataText>
-          <DataText area="manage" color="#FF007A">
-            Manage
+          <DataText area="value">
+            <AutoColumn gap="12px" justify="flex-end">
+              <Text fontWeight={500}>{formattedNum(valueUSD, true)}</Text>
+              <AutoColumn gap="4px" justify="flex-end">
+                <Text fontSize="12px">
+                  {formattedNum(poolOwnership * parseFloat(position.pair.reserve0))} {position.pair.token0.symbol}
+                </Text>
+                <Text fontSize="12px">
+                  {formattedNum(poolOwnership * parseFloat(position.pair.reserve1))} {position.pair.token1.symbol}
+                </Text>
+              </AutoColumn>
+            </AutoColumn>
           </DataText>
         </DashGrid>
       )
@@ -182,8 +260,13 @@ function PositionList({ positions }) {
 
   return (
     <ListWrapper>
-      <DashGrid center={true} style={{ height: 'fit-content', padding: '0 0 1rem 0' }}>
-        <Flex alignItems="center" justifyContent="flexStart">
+      <DashGrid center={true} style={{ height: 'fit-content', padding: 0 }}>
+        <Flex alignItems="flex-start" justifyContent="flexStart">
+          <Text area="number" fontWeight="500">
+            #
+          </Text>
+        </Flex>
+        <Flex alignItems="flex-start" justifyContent="flex-start">
           <Text area="name" fontWeight="500">
             Name
           </Text>

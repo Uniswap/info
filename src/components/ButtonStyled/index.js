@@ -1,8 +1,9 @@
 import React from 'react'
 import { Button as RebassButton } from 'rebass/styled-components'
 import styled from 'styled-components'
-import { Plus } from 'react-feather'
+import { Plus, ChevronDown } from 'react-feather'
 import { darken, transparentize } from 'polished'
+import { RowBetween } from '../Row'
 
 const Base = styled(RebassButton)`
   padding: 8px 12px;
@@ -72,6 +73,17 @@ export const ButtonLight = styled(Base)`
       color ? transparentize(0.8, color) : transparentize(0.8, theme.primary1)};
   }
 `
+
+export function ButtonDropdown({ disabled = false, children, ...rest }) {
+  return (
+    <Base {...rest} disabled={disabled}>
+      <RowBetween>
+        <div style={{ display: 'flex', alignItems: 'center' }}>{children}</div>
+        <ChevronDown size={24} fill="black" />
+      </RowBetween>
+    </Base>
+  )
+}
 
 export const ButtonDark = styled(Base)`
   background-color: ${({ color, theme }) => (color ? color : theme.primary1)};

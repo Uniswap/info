@@ -14,7 +14,7 @@ import { useUserLiquidityHistory } from '../../contexts/User'
 
 const ChartWrapper = styled.div`
   height: 100%;
-  min-height: 300px;
+  min-height: 390px;
 
   @media screen and (max-width: 600px) {
     min-height: 200px;
@@ -94,7 +94,7 @@ const UserChart = ({ account, setAnimatedVal, animatedVal, positionValue }) => {
         </RowBetween>
       )}
       {chartFilter === CHART_VIEW.LIQUIDITY && chartData && (
-        <ResponsiveContainer aspect={below1080 ? 60 / 32 : below600 ? 60 / 42 : 60 / 16}>
+        <ResponsiveContainer aspect={below1080 ? 60 / 32 : below600 ? 60 / 42 : 60 / 30}>
           <AreaChart
             onMouseMove={e => {
               if (e?.activePayload?.[0]?.value && animatedVal !== e?.activePayload?.[0]?.value) {
@@ -132,7 +132,7 @@ const UserChart = ({ account, setAnimatedVal, animatedVal, positionValue }) => {
               axisLine={false}
               tickLine={false}
               interval="preserveEnd"
-              minTickGap={0}
+              minTickGap={6}
               yAxisId={0}
               tick={{ fill: 'black' }}
             />

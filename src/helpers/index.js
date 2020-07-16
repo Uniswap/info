@@ -269,7 +269,7 @@ export function rawPercent(percentRaw) {
   return percent.toFixed(0) + '%'
 }
 
-export function formattedPercent(percent) {
+export function formattedPercent(percent, useBrackets = false) {
   percent = parseFloat(percent)
   if (!percent || percent === 0) {
     return <Text fontWeight={500}>0%</Text>

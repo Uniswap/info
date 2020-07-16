@@ -28,7 +28,7 @@ const UniIcon = styled(Link)`
   }
 `
 
-export default function Title({ token, pair }) {
+export default function Title({ token, pair, account }) {
   const history = useHistory()
 
   const { name, symbol } = useTokenData(token)
@@ -41,6 +41,14 @@ export default function Title({ token, pair }) {
   function getName() {
     if (below1080) {
       return ''
+    }
+
+    if (account) {
+      return (
+        <div>
+          <span style={{ fontWeight: 400, verticalAlign: '-webkit-baseline-middle' }}> → Account → Overview </span>
+        </div>
+      )
     }
 
     if (symbol0 && symbol1) {
