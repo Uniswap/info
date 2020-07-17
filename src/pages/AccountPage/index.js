@@ -17,6 +17,8 @@ import { useMedia } from 'react-use'
 import Loader from '../../components/Loader'
 import { ButtonDropdown } from '../../components/ButtonStyled'
 import { Hover } from '../../components'
+import AnimatedNumber from 'animated-number-react'
+
 import DoubleTokenLogo from '../../components/DoubleLogo'
 
 const PageWrapper = styled.div`
@@ -152,7 +154,7 @@ function AccountPage({ account }) {
   }, [positionValue])
 
   // used for animation formatting
-  // const formatValue = value => formattedNum(value, true)
+  const formatValue = value => formattedNum(value, true)
 
   const netReturn = positions?.reduce(function(total, position) {
     return total + position.netReturn
@@ -287,7 +289,7 @@ function AccountPage({ account }) {
                 </RowBetween>
                 <RowBetween align="flex-end">
                   <TYPE.main fontSize={'24px'} lineHeight={1} fontWeight={600}>
-                    {formattedNum(animatedVal, true)}
+                    <AnimatedNumber value={animatedVal} formatValue={formatValue} duration={200} />
                   </TYPE.main>
                   <TYPE.main></TYPE.main>
                 </RowBetween>
