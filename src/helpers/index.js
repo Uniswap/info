@@ -114,13 +114,31 @@ export async function getShareValueOverTime(pairAddress, timestamps) {
   for (var row in result?.data) {
     let timestamp = row.split('t')[1]
     let sharePriceUsd = parseFloat(result.data[row].reserveUSD) / parseFloat(result.data[row].totalSupply)
-
-    values.push({
-      timestamp,
-      sharePriceUsd,
-      roiUsd: values && values[0] ? sharePriceUsd / values[0]['sharePriceUsd'] : 1
-    })
+    if (timestamp) {
+      values.push({
+        timestamp,
+        sharePriceUsd,
+        totalSupply: result.data[row].totalSupply,
+        reserve0: result.data[row].reserve0,
+        reserve1: result.data[row].reserve1,
+        reserveUSD: result.data[row].reserveUSD,
+        token0DerivedETH: result.data[row].token0.derivedETH,
+        token1DerivedETH: result.data[row].token1.derivedETH,
+        roiUsd: values && values[0] ? sharePriceUsd / values[0]['sharePriceUsd'] : 1
+      })
+    }
   }
+
+  // add eth prices
+  let index = 0
+  for (var brow in result?.data) {
+    let timestamp = brow.split('b')[1]
+    if (timestamp) {
+      values[index].ethPrice = result.data[brow].ethPrice
+      index += 1
+    }
+  }
+
   return values
 }
 

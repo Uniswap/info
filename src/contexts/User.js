@@ -12,6 +12,7 @@ import { timeframeOptions } from '../constants'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { useEthPrice } from './GlobalData'
+import { getShareValueOverTime } from '../helpers'
 
 dayjs.extend(utc)
 
@@ -164,6 +165,199 @@ export function useUserTransactions(account) {
   }, [account, transactions, updateTransactions])
 
   return transactions || {}
+}
+
+export function useReturnsPerPairHistory(position, account) {
+  const [state, { updateUserPositionHistory }] = useUserContext()
+  const history = state?.[account]?.[USER_POSITION_HISTORY_KEY]
+
+  const pairSnapshots =
+    history &&
+    position &&
+    history.filter(currentPosition => {
+      return currentPosition.pair.id === position.pair.id
+    })
+
+  // formatetd array to return for chart data
+  const [formattedHistory, setFormattedHistory] = useState()
+
+  const [startDateTimestamp, setStartDateTimestamp] = useState()
+  const [activeWindow] = useTimeframe()
+
+  const pairAddress = position?.pair?.id
+
+  // monitor the old date fetched
+  useEffect(() => {
+    const utcEndTime = dayjs.utc()
+    // based on window, get starttime
+    let utcStartTime
+    switch (activeWindow) {
+      case timeframeOptions.WEEK:
+        utcStartTime = utcEndTime.subtract(1, 'week').startOf('day')
+        break
+      case timeframeOptions.ALL_TIME:
+        utcStartTime = utcEndTime.subtract(1, 'year')
+        break
+      default:
+        utcStartTime = utcEndTime.subtract(1, 'year').startOf('year')
+        break
+    }
+    let startTime = utcStartTime.unix() - 1
+    if ((activeWindow && startTime < startDateTimestamp) || !startDateTimestamp) {
+      setStartDateTimestamp(startTime)
+    }
+  }, [activeWindow, startDateTimestamp])
+
+  useEffect(() => {
+    async function fetchData() {
+      let dayIndex = parseInt(startDateTimestamp / 86400) // get unique day bucket unix
+      const currentDayIndex = parseInt(dayjs.utc().unix() / 86400)
+      // sort snapshots in order
+      let sortedPositions = history.sort((a, b) => {
+        return parseInt(a.timestamp) > parseInt(b.timestamp) ? 1 : -1
+      })
+      // if UI start time is > first position time - bump start index to this time
+      if (parseInt(sortedPositions[0].timestamp) > dayIndex) {
+        dayIndex = parseInt(parseInt(sortedPositions[0].timestamp) / 86400)
+      }
+
+      const dayTimestamps = []
+      // get date timestamps for all days in view
+      while (dayIndex < currentDayIndex) {
+        dayTimestamps.push(parseInt(dayIndex) * 86400)
+        dayIndex = dayIndex + 1
+      }
+
+      const shareValues = await getShareValueOverTime(pairAddress, dayTimestamps)
+
+      const formattedHistory = []
+
+      // map of current pair => ownership %
+      let returns = {
+        lastUpdated: pairSnapshots[0].timestamp,
+        liquidityTokenBalance: parseFloat(pairSnapshots[0].liquidityTokenBalance),
+        totalSupply: parseFloat(pairSnapshots[0].liquidityTokenTotalSupply),
+        reserve0: parseFloat(pairSnapshots[0].reserve0),
+        reserve1: parseFloat(pairSnapshots[0].reserve1),
+        reserveUSD: parseFloat(pairSnapshots[0].reserveUSD),
+        token0PriceUSD: parseFloat(pairSnapshots[0].token0PriceUSD),
+        token1PriceUSD: parseFloat(pairSnapshots[0].token1PriceUSD),
+        assetReturn: 0,
+        uniswapReturn: 0,
+        netReturn: 0
+      }
+
+      for (const index in dayTimestamps) {
+        const dayTimestamp = dayTimestamps[index]
+        const timestampCeiling = dayTimestamp + 86400
+
+        const shareValue = shareValues[index]
+
+        const positionT0 = returns
+        let positionT1 = shareValue
+
+        positionT1.token0PriceUSD = parseFloat(positionT1.ethPrice) * parseFloat(positionT1.token0DerivedETH)
+        positionT1.token1PriceUSD = parseFloat(positionT1.ethPrice) * parseFloat(positionT1.token1DerivedETH)
+
+        // get position changes on this day
+        const positionChanges = pairSnapshots?.filter(snapshot => {
+          return snapshot.timestamp < timestampCeiling && snapshot.timestamp > dayTimestamp
+        })
+
+        let needsUpdate = false
+        // find latest change, and use that as end of window for today
+        for (const index in positionChanges) {
+          const positionChange = positionChanges[index]
+          // case where more recent timestamp is found for pair
+          if (returns.lastUpdated < positionChange.timestamp) {
+            returns.lastUpdated = positionChange.timestamp
+            positionT1 = positionChange
+            positionT1.totalSupply = positionChange.liquidityTokenTotalSupply
+            needsUpdate = true
+            console.log('found ti')
+          }
+        }
+
+        // calculate ownership at ends of window, for end of window we need original LP token balance / new total supply
+        const t0Ownership = parseFloat(positionT0.liquidityTokenBalance) / parseFloat(positionT0.totalSupply)
+        const t1Ownership = parseFloat(positionT0.liquidityTokenBalance) / parseFloat(positionT1.totalSupply)
+
+        // get starting amounts of token0 and token1 deposited by LP
+        const token0_amount_t0 = t0Ownership * parseFloat(positionT0.reserve0)
+        const token1_amount_t0 = t0Ownership * parseFloat(positionT0.reserve1)
+
+        // get current token values
+        const token0_amount_t1 = t1Ownership * parseFloat(positionT1.reserve0)
+        const token1_amount_t1 = t1Ownership * parseFloat(positionT1.reserve1)
+
+        // calculate squares to find imp loss and fee differences
+        const sqrK_t0 = Math.sqrt(token0_amount_t0 * token1_amount_t0)
+        const token0_amount_no_fees = sqrK_t0 * Math.sqrt(positionT1.token1PriceUSD)
+        const token1_amount_no_fees = sqrK_t0 / Math.sqrt(positionT1.token1PriceUSD)
+        const no_fees_usd =
+          token0_amount_no_fees * positionT1.token0PriceUSD + token1_amount_no_fees * positionT1.token1PriceUSD
+
+        const difference_fees_token0 = token0_amount_t1 - token0_amount_no_fees
+        const difference_fees_token1 = token1_amount_t1 - token1_amount_no_fees
+        const difference_fees_usd =
+          difference_fees_token0 * positionT1.token0PriceUSD + difference_fees_token1 * positionT1.token1PriceUSD
+
+        // calculate USD value at t0 and t1 using initial token deposit amounts for asset return
+        const assetValueT0 =
+          token0_amount_t0 * parseFloat(positionT0.token0PriceUSD) +
+          token1_amount_t0 * parseFloat(positionT0.token1PriceUSD)
+
+        const assetValueT1 =
+          token0_amount_t0 * parseFloat(positionT1.token0PriceUSD) +
+          token1_amount_t0 * parseFloat(positionT1.token1PriceUSD)
+
+        const imp_loss_usd = no_fees_usd - assetValueT1
+        const uniswap_return = difference_fees_usd + imp_loss_usd
+
+        // calculate value delta based on  prices_t1 - prices_t0 * token_amounts
+        const assetReturn = assetValueT1 - assetValueT0
+
+        // get net value change for combined data
+        const netValueT0 = t0Ownership * parseFloat(positionT0.reserveUSD)
+        const netValueT1 = t1Ownership * parseFloat(positionT1.reserveUSD)
+
+        if (needsUpdate) {
+          returns.netReturn = returns.netReturn + netValueT1 - netValueT0
+          returns.assetReturn = returns.assetReturn + assetReturn
+          returns.uniswapReturn = returns.uniswapReturn + uniswap_return
+        }
+
+        const localNetReturn = returns.netReturn + netValueT1 - netValueT0
+        const localAssetReturn = returns.assetReturn + assetReturn
+        const localUnsiwapReturn = returns.uniswapReturn + uniswap_return
+
+        // calculate the weight of this interval based on position ratio to total supplied
+        // const weight = (t0Ownership * parseFloat(positionT0.reserveUSD)) / totalAmountProvidedUSD
+
+        // // calculate the weighted percent changes for each metric
+        // const weightedAssetChange = ((weight * assetValueChange) / assetValueT0) * 100
+        // const wieghtedNetChange = ((weight * (netValueT1 - netValueT0)) / netValueT0) * 100
+
+        // update the global percent changes
+        // assetPercentChange = assetPercentChange ? assetPercentChange + weightedAssetChange : weightedAssetChange
+        // netPercentChange = netPercentChange ? netPercentChange + wieghtedNetChange : wieghtedNetChange
+
+        formattedHistory.push({
+          date: dayTimestamp,
+          netReturn: localNetReturn,
+          assetReturn: localAssetReturn,
+          uniswapReturn: localUnsiwapReturn
+        })
+      }
+
+      setFormattedHistory(formattedHistory)
+    }
+    if (history && startDateTimestamp && pairSnapshots && !formattedHistory) {
+      fetchData()
+    }
+  }, [history, startDateTimestamp, pairSnapshots, formattedHistory, pairAddress])
+
+  return formattedHistory
 }
 
 export function useUserLiquidityHistory(account) {
@@ -326,6 +520,11 @@ export const priceOverrides = [
   '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', // USDC
   '0x6b175474e89094c44da98b954eedeac495271d0f' // DAI
 ]
+
+/**
+ *
+ *
+ */
 
 export async function getReturns(user, pair, ethPrice) {
   const {

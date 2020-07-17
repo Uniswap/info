@@ -60,10 +60,29 @@ export const SHARE_VALUE = (pairAddress, blocks) => {
   let queryString = 'query blocks {'
   queryString += blocks.map(
     block => `t${block.timestamp}:pair(id:"${pairAddress}", block: { number: ${block.number} }) { 
+    reserve0
+    reserve1
     reserveUSD
     totalSupply 
-  }`
+    token0{
+      derivedETH
+    }
+    token1{
+      derivedETH
+    }
+  }
+  `
   )
+
+  queryString += ','
+
+  queryString += blocks.map(
+    block => `b${block.timestamp}: bundle(id:"1", block: { number: ${block.number} }) { 
+    ethPrice
+  }
+  `
+  )
+
   queryString += '}'
   return gql(queryString)
 }
@@ -132,8 +151,15 @@ export const USER_HISTORY = gql`
       reserveUSD
       liquidityTokenBalance
       liquidityTokenTotalSupply
+      reserve0
+      reserve1
+      token0PriceUSD
+      token1PriceUSD
       pair {
         id
+        reserve0
+        reserve1
+        reserveUSD
       }
     }
   }

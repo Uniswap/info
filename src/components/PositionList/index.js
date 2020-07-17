@@ -158,13 +158,21 @@ function PositionList({ positions }) {
               <AutoColumn gap="4px" justify="flex-end">
                 <Text fontSize="12px">
                   {parseFloat(position.pair.token0.derivedETH)
-                    ? formattedNum(position?.assetReturn / (parseFloat(position.pair.token0.derivedETH) * ethPrice) / 2)
+                    ? formattedNum(
+                        position?.assetReturn / (parseFloat(position.pair.token0.derivedETH) * ethPrice) / 2,
+                        false,
+                        true
+                      )
                     : 0}{' '}
                   {position.pair.token0.symbol}
                 </Text>
                 <Text fontSize="12px">
                   {parseFloat(position.pair.token1.derivedETH)
-                    ? formattedNum(position?.assetReturn / (parseFloat(position.pair.token1.derivedETH) * ethPrice) / 2)
+                    ? formattedNum(
+                        position?.assetReturn / (parseFloat(position.pair.token1.derivedETH) * ethPrice) / 2,
+                        false,
+                        true
+                      )
                     : 0}{' '}
                   {position.pair.token1.symbol}
                 </Text>
@@ -183,7 +191,9 @@ function PositionList({ positions }) {
                 <Text fontSize="12px">
                   {parseFloat(position.pair.token0.derivedETH)
                     ? formattedNum(
-                        position?.uniswapReturn / (parseFloat(position.pair.token0.derivedETH) * ethPrice) / 2
+                        position?.uniswapReturn / (parseFloat(position.pair.token0.derivedETH) * ethPrice) / 2,
+                        false,
+                        true
                       )
                     : 0}{' '}
                   {position.pair.token0.symbol}
@@ -191,7 +201,9 @@ function PositionList({ positions }) {
                 <Text fontSize="12px">
                   {parseFloat(position.pair.token1.derivedETH)
                     ? formattedNum(
-                        position?.uniswapReturn / (parseFloat(position.pair.token1.derivedETH) * ethPrice) / 2
+                        position?.uniswapReturn / (parseFloat(position.pair.token1.derivedETH) * ethPrice) / 2,
+                        false,
+                        true
                       )
                     : 0}{' '}
                   {position.pair.token1.symbol}
@@ -209,13 +221,21 @@ function PositionList({ positions }) {
               <AutoColumn gap="4px" justify="flex-end">
                 <Text fontSize="12px">
                   {parseFloat(position.pair.token0.derivedETH)
-                    ? formattedNum(position?.netReturn / (parseFloat(position.pair.token0.derivedETH) * ethPrice) / 2)
+                    ? formattedNum(
+                        position?.netReturn / (parseFloat(position.pair.token0.derivedETH) * ethPrice) / 2,
+                        false,
+                        true
+                      )
                     : 0}{' '}
                   {position.pair.token0.symbol}
                 </Text>
                 <Text fontSize="12px">
                   {parseFloat(position.pair.token1.derivedETH)
-                    ? formattedNum(position?.netReturn / (parseFloat(position.pair.token1.derivedETH) * ethPrice) / 2)
+                    ? formattedNum(
+                        position?.netReturn / (parseFloat(position.pair.token1.derivedETH) * ethPrice) / 2,
+                        false,
+                        true
+                      )
                     : 0}{' '}
                   {position.pair.token1.symbol}
                 </Text>

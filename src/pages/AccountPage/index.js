@@ -10,12 +10,14 @@ import { Text } from 'rebass'
 import { AutoColumn } from '../../components/Column'
 import { calculateTotalLiquidity } from './utils'
 import UserChart from '../../components/UserChart'
+import PairReturnsChart from '../../components/PairReturnsChart'
 import PositionList from '../../components/PositionList'
 import { TYPE } from '../../Theme'
 import { useMedia } from 'react-use'
 import Loader from '../../components/Loader'
 import { ButtonDropdown } from '../../components/ButtonStyled'
 import { Hover } from '../../components'
+import DoubleTokenLogo from '../../components/DoubleLogo'
 
 const PageWrapper = styled.div`
   display: flex;
@@ -100,6 +102,23 @@ const PanelWrapper = styled.div`
   }
 `
 
+const DropdownWrapper = styled.div`
+  position: relative;
+`
+
+const Flyout = styled.div`
+  position: absolute;
+  top: 36px;
+  left: 0;
+  width: calc(100% - 40px);
+  background-color: white;
+  z-index: 999;
+  border-bottom-right-radius: 10px;
+  border-bottom-left-radius: 10px;
+  padding: 20px;
+  box-shadow: 0px 15px 10px -15px #111;
+`
+
 const LIST_VIEW = {
   POSITIONS: 'POSITIONS',
   TRANSACTIONS: 'TRANSACTIONS',
@@ -156,6 +175,8 @@ function AccountPage({ account }) {
 
   const [costBasis, setCostBasis] = useState()
 
+  const [activePosition, setActivePosition] = useState()
+
   useEffect(() => {
     let cbTotal = 0
     if (transactions?.mints) {
@@ -177,6 +198,8 @@ function AccountPage({ account }) {
 
   const below1080 = useMedia('(max-width: 1080px)')
 
+  const [showDropdown, setShowDropdown] = useState(false)
+
   return (
     <PageWrapper>
       <ThemedBackground />
@@ -194,11 +217,65 @@ function AccountPage({ account }) {
       </Header>
       <DashboardWrapper>
         <PanelWrapper>
-          <ButtonDropdown width="100%" style={{ backgroundColor: 'rgba(255, 255, 255, 0.4)' }}>
-            <Text fontSize="20px" color="black" fontWeight={500}>
-              Overview
-            </Text>
-          </ButtonDropdown>
+          <DropdownWrapper>
+            <ButtonDropdown
+              width="100%"
+              style={{ backgroundColor: 'rgba(255, 255, 255, 0.4)' }}
+              onClick={() => setShowDropdown(!showDropdown)}
+            >
+              {!activePosition && (
+                <Text fontSize="20px" color="black" fontWeight={500}>
+                  Overview
+                </Text>
+              )}
+              {activePosition && (
+                <RowFixed>
+                  <DoubleTokenLogo a0={activePosition.pair.token0.id} a1={activePosition.pair.token1.id} />
+                  <Text fontWeight={500} color="black" ml={'16px'}>
+                    {activePosition.pair.token0.symbol}-{activePosition.pair.token1.symbol} Pair Data
+                  </Text>
+                </RowFixed>
+              )}
+            </ButtonDropdown>
+
+            {showDropdown && (
+              <Flyout>
+                <AutoColumn gap="10px">
+                  {positions?.map(p => {
+                    return (
+                      p.pair.id !== activePosition?.pair.id && (
+                        <Hover>
+                          <RowFixed
+                            onClick={() => {
+                              setActivePosition(p)
+                              setShowDropdown(false)
+                            }}
+                          >
+                            <DoubleTokenLogo a0={p.pair.token0.id} a1={p.pair.token1.id} />
+                            <Text fontWeight={500} color="black" ml={'16px'}>
+                              {p.pair.token0.symbol}-{p.pair.token1.symbol}
+                            </Text>
+                          </RowFixed>
+                        </Hover>
+                      )
+                    )
+                  })}
+                  {activePosition && (
+                    <RowFixed
+                      onClick={() => {
+                        setActivePosition()
+                        setShowDropdown(false)
+                      }}
+                    >
+                      <Text fontWeight={500} color="black" ml={'16px'}>
+                        Account Overview
+                      </Text>
+                    </RowFixed>
+                  )}
+                </AutoColumn>
+              </Flyout>
+            )}
+          </DropdownWrapper>
           <Panel style={{ height: '100%' }}>
             <AutoColumn gap="40px">
               <AutoColumn gap="10px">
@@ -266,12 +343,23 @@ function AccountPage({ account }) {
             </AutoColumn>
           </Panel>
           <Panel style={{ gridColumn: below1080 ? '1' : '2/4', gridRow: below1080 ? '' : '1/6' }}>
-            <UserChart
-              account={account}
-              setAnimatedVal={setAnimatedVal}
-              animatedVal={animatedVal}
-              positionValue={positionValue}
-            />
+            {activePosition ? (
+              <PairReturnsChart
+                account={account}
+                setAnimatedVal={setAnimatedVal}
+                animatedVal={animatedVal}
+                positionValue={positionValue}
+                position={activePosition}
+              />
+            ) : (
+              <UserChart
+                account={account}
+                setAnimatedVal={setAnimatedVal}
+                animatedVal={animatedVal}
+                positionValue={positionValue}
+                position={activePosition}
+              />
+            )}
           </Panel>
         </PanelWrapper>
         <AutoColumn gap="16px">
