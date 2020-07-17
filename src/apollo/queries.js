@@ -459,6 +459,7 @@ export const PAIR_DATA = (pairAddress, block) => {
         reserve0
         reserve1
         reserveUSD
+        totalSupply
         trackedReserveETH
         reserveETH
         volumeUSD
@@ -487,6 +488,7 @@ export const PAIR_DATA = (pairAddress, block) => {
         reserve0
         reserve1
         reserveUSD
+        totalSupply
         trackedReserveETH
         volumeUSD
       }
@@ -509,6 +511,7 @@ export const PAIRS_DYNAMIC_BULK = (block, pairs) => {
       reserveUSD
       trackedReserveETH
       volumeUSD
+      totalSupply
     }
   }
   `
@@ -537,6 +540,7 @@ export const PAIRS_BULK = gql`
       token0Price
       token1Price
       reserveUSD
+      totalSupply
       trackedReserveETH
       volumeUSD
       createdAtBlockNumber
@@ -589,6 +593,7 @@ export const PAIRS_CURRENT = gql`
         name
         derivedETH
       }
+      totalSupply
       reserve0
       reserve1
       trackedReserveETH

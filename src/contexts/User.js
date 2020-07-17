@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect, useState } from 'react'
+import { usePairData } from './PairData'
 import { client } from '../apollo/client'
 import {
   USER_TRANSACTIONS,
@@ -168,7 +169,7 @@ export function useUserTransactions(account) {
 }
 
 export function useReturnsPerPairHistory(position, account) {
-  const [state, { updateUserPositionHistory }] = useUserContext()
+  const [state] = useUserContext()
   const history = state?.[account]?.[USER_POSITION_HISTORY_KEY]
 
   const pairSnapshots =
@@ -185,6 +186,9 @@ export function useReturnsPerPairHistory(position, account) {
   const [activeWindow] = useTimeframe()
 
   const pairAddress = position?.pair?.id
+
+  const currentPairData = usePairData(pairAddress)
+  const currentETHPrice = useEthPrice()
 
   // monitor the old date fetched
   useEffect(() => {
@@ -223,7 +227,7 @@ export function useReturnsPerPairHistory(position, account) {
 
       const dayTimestamps = []
       // get date timestamps for all days in view
-      while (dayIndex < currentDayIndex) {
+      while (dayIndex <= currentDayIndex) {
         dayTimestamps.push(parseInt(dayIndex) * 86400)
         dayIndex = dayIndex + 1
       }
@@ -244,7 +248,10 @@ export function useReturnsPerPairHistory(position, account) {
         token1PriceUSD: parseFloat(pairSnapshots[0].token1PriceUSD),
         assetReturn: 0,
         uniswapReturn: 0,
-        netReturn: 0
+        netReturn: 0,
+        assetChange: 0,
+        uniswapChange: 0,
+        netChange: 0
       }
 
       for (const index in dayTimestamps) {
@@ -255,6 +262,16 @@ export function useReturnsPerPairHistory(position, account) {
 
         const positionT0 = returns
         let positionT1 = shareValue
+
+        // if today , use latest data
+        if (parseInt(index) === dayTimestamps.length - 1) {
+          positionT1 = currentPairData
+          positionT1.timestamp = shareValue.timestamp
+          positionT1.ethPrice = currentETHPrice
+          positionT1.token0DerivedETH = currentPairData.token0.derivedETH
+          positionT1.token1DerivedETH = currentPairData.token1.derivedETH
+          positionT1.totalSupply = currentPairData.totalSupply
+        }
 
         positionT1.token0PriceUSD = parseFloat(positionT1.ethPrice) * parseFloat(positionT1.token0DerivedETH)
         positionT1.token1PriceUSD = parseFloat(positionT1.ethPrice) * parseFloat(positionT1.token1DerivedETH)
@@ -274,7 +291,6 @@ export function useReturnsPerPairHistory(position, account) {
             positionT1 = positionChange
             positionT1.totalSupply = positionChange.liquidityTokenTotalSupply
             needsUpdate = true
-            console.log('found ti')
           }
         }
 
@@ -321,41 +337,53 @@ export function useReturnsPerPairHistory(position, account) {
         const netValueT0 = t0Ownership * parseFloat(positionT0.reserveUSD)
         const netValueT1 = t1Ownership * parseFloat(positionT1.reserveUSD)
 
+        // account for profits or loss because position actually changed here
         if (needsUpdate) {
           returns.netReturn = returns.netReturn + netValueT1 - netValueT0
           returns.assetReturn = returns.assetReturn + assetReturn
           returns.uniswapReturn = returns.uniswapReturn + uniswap_return
+          returns.netChange = returns.netChange + ((netValueT1 - netValueT0) / netValueT0) * 100
+          returns.assetChange = returns.assetChange + (assetReturn / assetValueT0) * 100
         }
 
         const localNetReturn = returns.netReturn + netValueT1 - netValueT0
         const localAssetReturn = returns.assetReturn + assetReturn
         const localUnsiwapReturn = returns.uniswapReturn + uniswap_return
 
-        // calculate the weight of this interval based on position ratio to total supplied
-        // const weight = (t0Ownership * parseFloat(positionT0.reserveUSD)) / totalAmountProvidedUSD
+        // calculate the weighted percent changes for each metric
+        const localAssetChange = (assetReturn / assetValueT0) * 100
+        const localNetChange = ((netValueT1 - netValueT0) / netValueT0) * 100
+        const localUniswapChange = localNetChange - localAssetChange
 
-        // // calculate the weighted percent changes for each metric
-        // const weightedAssetChange = ((weight * assetValueChange) / assetValueT0) * 100
-        // const wieghtedNetChange = ((weight * (netValueT1 - netValueT0)) / netValueT0) * 100
-
-        // update the global percent changes
-        // assetPercentChange = assetPercentChange ? assetPercentChange + weightedAssetChange : weightedAssetChange
-        // netPercentChange = netPercentChange ? netPercentChange + wieghtedNetChange : wieghtedNetChange
+        const currentLiquidityValue =
+          parseFloat(positionT0.liquidityTokenBalance) * parseFloat(positionT1.sharePriceUsd)
 
         formattedHistory.push({
           date: dayTimestamp,
+          usdValue: currentLiquidityValue,
           netReturn: localNetReturn,
           assetReturn: localAssetReturn,
-          uniswapReturn: localUnsiwapReturn
+          uniswapReturn: localUnsiwapReturn,
+          netChange: localNetChange,
+          assetChange: localAssetChange,
+          uniswapChange: localUniswapChange
         })
       }
 
       setFormattedHistory(formattedHistory)
     }
-    if (history && startDateTimestamp && pairSnapshots && !formattedHistory) {
+    if (
+      history &&
+      startDateTimestamp &&
+      pairSnapshots &&
+      !formattedHistory &&
+      currentPairData &&
+      pairAddress &&
+      currentETHPrice
+    ) {
       fetchData()
     }
-  }, [history, startDateTimestamp, pairSnapshots, formattedHistory, pairAddress])
+  }, [history, startDateTimestamp, pairSnapshots, formattedHistory, pairAddress, currentPairData, currentETHPrice])
 
   return formattedHistory
 }
@@ -617,21 +645,21 @@ export async function getReturns(user, pair, ethPrice) {
     const token0_amount_t0 = t0Ownership * parseFloat(positionT0.reserve0)
     const token1_amount_t0 = t0Ownership * parseFloat(positionT0.reserve1)
 
-    // get current token values
-    const token0_amount_t1 = t1Ownership * parseFloat(positionT1.reserve0)
-    const token1_amount_t1 = t1Ownership * parseFloat(positionT1.reserve1)
+    // // get current token values
+    // const token0_amount_t1 = t1Ownership * parseFloat(positionT1.reserve0)
+    // const token1_amount_t1 = t1Ownership * parseFloat(positionT1.reserve1)
 
-    // calculate squares to find imp loss and fee differences
-    const sqrK_t0 = Math.sqrt(token0_amount_t0 * token1_amount_t0)
-    const token0_amount_no_fees = sqrK_t0 * Math.sqrt(positionT1.token1PriceUSD)
-    const token1_amount_no_fees = sqrK_t0 / Math.sqrt(positionT1.token1PriceUSD)
-    const no_fees_usd =
-      token0_amount_no_fees * positionT1.token0PriceUSD + token1_amount_no_fees * positionT1.token1PriceUSD
+    // // calculate squares to find imp loss and fee differences
+    // const sqrK_t0 = Math.sqrt(token0_amount_t0 * token1_amount_t0)
+    // const token0_amount_no_fees = sqrK_t0 * Math.sqrt(positionT1.token1PriceUSD)
+    // const token1_amount_no_fees = sqrK_t0 / Math.sqrt(positionT1.token1PriceUSD)
+    // const no_fees_usd =
+    //   token0_amount_no_fees * positionT1.token0PriceUSD + token1_amount_no_fees * positionT1.token1PriceUSD
 
-    const difference_fees_token0 = token0_amount_t1 - token0_amount_no_fees
-    const difference_fees_token1 = token1_amount_t1 - token1_amount_no_fees
-    const difference_fees_usd =
-      difference_fees_token0 * positionT1.token0PriceUSD + difference_fees_token1 * positionT1.token1PriceUSD
+    // const difference_fees_token0 = token0_amount_t1 - token0_amount_no_fees
+    // const difference_fees_token1 = token1_amount_t1 - token1_amount_no_fees
+    // const difference_fees_usd =
+    //   difference_fees_token0 * positionT1.token0PriceUSD + difference_fees_token1 * positionT1.token1PriceUSD
 
     // calculate USD value at t0 and t1 using initial token deposit amounts for asset return
     const assetValueT0 =
@@ -642,8 +670,8 @@ export async function getReturns(user, pair, ethPrice) {
       token0_amount_t0 * parseFloat(positionT1.token0PriceUSD) +
       token1_amount_t0 * parseFloat(positionT1.token1PriceUSD)
 
-    const imp_loss_usd = no_fees_usd - assetValueT1
-    const uniswap_return = difference_fees_usd + imp_loss_usd
+    // const imp_loss_usd = no_fees_usd - assetValueT1
+    // const uniswap_return = difference_fees_usd + imp_loss_usd
 
     // calculate value delta based on  prices_t1 - prices_t0 * token_amounts
     const assetValueChange = assetValueT1 - assetValueT0

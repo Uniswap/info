@@ -127,6 +127,10 @@ const LIST_VIEW = {
   STATS: 'STATS'
 }
 
+// used for animation number formatting
+const formatValue = value => formattedNum(value, true, true)
+const formatAnimatedPercent = percent => formattedPercent(percent)
+
 function AccountPage({ account }) {
   const transactions = useUserTransactions(account)
   const positions = useUserPositions(account)
@@ -139,68 +143,51 @@ function AccountPage({ account }) {
       : 0
   }, [transactions])
 
-  // settings for list view
+  // settings for list view and dropdowns
+  const [showDropdown, setShowDropdown] = useState(false)
   const [listView, setListView] = useState(LIST_VIEW.POSITIONS)
+  const below1080 = useMedia('(max-width: 1080px)')
+  const [activePosition, setActivePosition] = useState()
 
-  const transactionCount = transactions?.swaps?.length + transactions?.burns?.length + transactions?.mints?.length
-
+  // get derived totals
   const positionValue = calculateTotalLiquidity(positions)
-  const [animatedVal, setAnimatedVal] = useState(positionValue)
-
-  useEffect(() => {
-    if (positionValue) {
-      setAnimatedVal(positionValue)
-    }
-  }, [positionValue])
-
-  // used for animation formatting
-  const formatValue = value => formattedNum(value, true)
-
+  const transactionCount = transactions?.swaps?.length + transactions?.burns?.length + transactions?.mints?.length
   const netReturn = positions?.reduce(function(total, position) {
     return total + position.netReturn
   }, 0)
-
   const assetReturn = positions?.reduce(function(total, position) {
     return total + position.assetReturn
   }, 0)
-  const uniswapReturn = netReturn - assetReturn
-
-  const aggregateNetReturnPercentChange = positions?.reduce(function(total, position) {
+  const netChange = positions?.reduce(function(total, position) {
     return total + position.netPercentChange
   }, 0)
-  const averageNetPercentChange = aggregateNetReturnPercentChange / positions?.length
-
-  const aggregateAssetReturnPercentChange = positions?.reduce(function(total, position) {
+  const averageNetChange = netChange / positions?.length
+  const assetChange = positions?.reduce(function(total, position) {
     return total + position.assetPercentChange
   }, 0)
-  const averageAssetPercentChange = aggregateAssetReturnPercentChange / positions?.length
+  const averageAssetChange = assetChange / positions?.length
 
-  const [costBasis, setCostBasis] = useState()
+  // animated dollar values
+  const [animatedNetReturn, setAnimatedNetReturn] = useState()
+  const [animatedAssetReturn, setAnimatedAssetReturn] = useState()
+  const [animatedUniswapReturn, setAnimatedUniswapReturn] = useState() // derive from net and asset
+  const [animatedPositionValue, setAnimatedPositionVal] = useState()
 
-  const [activePosition, setActivePosition] = useState()
+  // animated percent values
+  const [animatedNetChange, setAnimatedNetChange] = useState()
+  const [animatedAssetChange, setAnimatedAssetChange] = useState()
+  const [animatedUniswapChange, setAnimatedUniswapChange] = useState()
 
+  // reset aggregate values if they change
   useEffect(() => {
-    let cbTotal = 0
-    if (transactions?.mints) {
-      cbTotal =
-        cbTotal +
-        transactions.mints.reduce((total, mint) => {
-          return total + parseFloat(mint.amountUSD)
-        }, 0)
-    }
-    if (transactions?.burns) {
-      cbTotal =
-        cbTotal -
-        transactions.burns.reduce((total, burn) => {
-          return total + parseFloat(burn.amountUSD)
-        }, 0)
-    }
-    setCostBasis(cbTotal)
-  }, [transactions])
-
-  const below1080 = useMedia('(max-width: 1080px)')
-
-  const [showDropdown, setShowDropdown] = useState(false)
+    positionValue && setAnimatedPositionVal(positionValue)
+    netReturn && setAnimatedNetReturn(netReturn)
+    averageNetChange && setAnimatedNetChange(averageNetChange)
+    averageAssetChange && setAnimatedAssetChange(averageAssetChange)
+    assetReturn && setAnimatedAssetReturn(assetReturn)
+    netReturn && assetReturn && setAnimatedUniswapReturn(netReturn - assetReturn)
+    averageNetChange && averageAssetChange && setAnimatedUniswapChange(averageNetChange - averageAssetChange)
+  }, [assetReturn, averageAssetChange, averageNetChange, netReturn, positionValue])
 
   return (
     <PageWrapper>
@@ -243,10 +230,10 @@ function AccountPage({ account }) {
             {showDropdown && (
               <Flyout>
                 <AutoColumn gap="10px">
-                  {positions?.map(p => {
+                  {positions?.map((p, i) => {
                     return (
                       p.pair.id !== activePosition?.pair.id && (
-                        <Hover>
+                        <Hover key={i}>
                           <RowFixed
                             onClick={() => {
                               setActivePosition(p)
@@ -289,7 +276,7 @@ function AccountPage({ account }) {
                 </RowBetween>
                 <RowBetween align="flex-end">
                   <TYPE.main fontSize={'24px'} lineHeight={1} fontWeight={600}>
-                    <AnimatedNumber value={animatedVal} formatValue={formatValue} duration={200} />
+                    <AnimatedNumber value={animatedPositionValue} formatValue={formatValue} duration={200} />
                   </TYPE.main>
                   <TYPE.main></TYPE.main>
                 </RowBetween>
@@ -303,10 +290,10 @@ function AccountPage({ account }) {
                 </RowBetween>
                 <RowFixed align="flex-end">
                   <TYPE.main fontSize={'24px'} lineHeight={1} fontWeight={600}>
-                    {formattedNum(netReturn, true, true)}
+                    <AnimatedNumber value={animatedNetReturn} formatValue={formatValue} duration={200} />
                   </TYPE.main>
                   <TYPE.main fontSize="18px" ml="8px">
-                    {formattedPercent(averageNetPercentChange)}
+                    <AnimatedNumber value={animatedNetChange} formatValue={formatAnimatedPercent} duration={200} />
                   </TYPE.main>
                 </RowFixed>
               </AutoColumn>
@@ -319,10 +306,10 @@ function AccountPage({ account }) {
                 </RowBetween>
                 <RowFixed align="flex-end">
                   <TYPE.main fontSize={'24px'} lineHeight={1} fontWeight={600}>
-                    {formattedNum(uniswapReturn, true, true)}
+                    <AnimatedNumber value={animatedUniswapReturn} formatValue={formatValue} duration={200} />
                   </TYPE.main>
                   <TYPE.main fontSize="18px" ml="8px">
-                    {formattedPercent(averageNetPercentChange - averageAssetPercentChange)}
+                    <AnimatedNumber value={animatedUniswapChange} formatValue={formatAnimatedPercent} duration={200} />
                   </TYPE.main>
                 </RowFixed>
               </AutoColumn>
@@ -335,10 +322,10 @@ function AccountPage({ account }) {
                 </RowBetween>
                 <RowFixed align="flex-end">
                   <TYPE.main fontSize={'24px'} lineHeight={1} fontWeight={600}>
-                    {formattedNum(assetReturn, true, true)}
+                    <AnimatedNumber value={animatedAssetReturn} formatValue={formatValue} duration={200} />
                   </TYPE.main>
                   <TYPE.main fontSize="18px" ml="8px">
-                    {formattedPercent(averageAssetPercentChange)}
+                    <AnimatedNumber value={animatedAssetChange} formatValue={formatAnimatedPercent} duration={200} />
                   </TYPE.main>
                 </RowFixed>
               </AutoColumn>
@@ -348,16 +335,27 @@ function AccountPage({ account }) {
             {activePosition ? (
               <PairReturnsChart
                 account={account}
-                setAnimatedVal={setAnimatedVal}
-                animatedVal={animatedVal}
-                positionValue={positionValue}
+                baseNetReturn={netReturn}
+                baseAssetReturn={assetReturn}
+                baseUniswapReturn={netReturn - assetReturn}
+                baseAssetChange={averageAssetChange}
+                baseNetChange={averageNetChange}
+                baseUniswapChange={averageNetChange - averageAssetChange}
+                setAnimatedAssetReturn={setAnimatedAssetReturn}
+                setAnimatedNetReturn={setAnimatedNetReturn}
+                setAnimatedUniswapReturn={setAnimatedUniswapReturn}
+                setAnimatedAssetChange={setAnimatedAssetChange}
+                setAnimatedNetChange={setAnimatedNetChange}
+                setAnimatedUniswapChange={setAnimatedUniswapChange}
                 position={activePosition}
+                setAnimatedPositionVal={setAnimatedPositionVal}
+                positionValue={positionValue}
               />
             ) : (
               <UserChart
                 account={account}
-                setAnimatedVal={setAnimatedVal}
-                animatedVal={animatedVal}
+                setAnimatedVal={setAnimatedPositionVal}
+                animatedVal={animatedPositionValue}
                 positionValue={positionValue}
                 position={activePosition}
               />

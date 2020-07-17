@@ -1,16 +1,16 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import { Area, XAxis, YAxis, ResponsiveContainer, Tooltip, AreaChart, CartesianGrid, LineChart, Line } from 'recharts'
+import { XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid, ComposedChart, Line, Area, Bar } from 'recharts'
 import { AutoRow, RowBetween } from '../Row'
 
-import { toK, toNiceDate, toNiceDateYear, formattedNum } from '../../helpers'
+import { toK, toNiceDate, toNiceDateYear } from '../../helpers'
 import { OptionButton } from '../ButtonStyled'
-import { darken } from 'polished'
 import { useMedia } from 'react-use'
 import { timeframeOptions } from '../../constants'
 import dayjs from 'dayjs'
 import DropdownSelect from '../DropdownSelect'
 import { useUserLiquidityHistory, useReturnsPerPairHistory } from '../../contexts/User'
+import { Text } from 'rebass'
 
 const ChartWrapper = styled.div`
   height: 100%;
@@ -25,7 +25,24 @@ const CHART_VIEW = {
   LIQUIDITY: 'Liquidity'
 }
 
-const PairReturnsChart = ({ account, setAnimatedVal, animatedVal, positionValue, position }) => {
+const PairReturnsChart = ({
+  account,
+  baseNetReturn,
+  baseAssetReturn,
+  baseUniswapReturn,
+  setAnimatedNetReturn,
+  setAnimatedAssetReturn,
+  setAnimatedUniswapReturn,
+  setAnimatedAssetChange,
+  setAnimatedNetChange,
+  setAnimatedUniswapChange,
+  baseAssetChange,
+  baseNetChange,
+  baseUniswapChange,
+  setAnimatedPositionVal,
+  positionValue,
+  position
+}) => {
   const [chartFilter, setChartFilter] = useState(CHART_VIEW.LIQUIDITY)
 
   const chartData = useUserLiquidityHistory(account)
@@ -97,13 +114,27 @@ const PairReturnsChart = ({ account, setAnimatedVal, animatedVal, positionValue,
       )}
       {chartFilter === CHART_VIEW.LIQUIDITY && chartData && (
         <ResponsiveContainer aspect={below1080 ? 60 / 32 : below600 ? 60 / 42 : 60 / 26}>
-          <LineChart
+          <ComposedChart
             onMouseMove={e => {
-              if (e?.activePayload?.[0]?.value && animatedVal !== e?.activePayload?.[0]?.value) {
-                setAnimatedVal(e.activePayload[0].value)
+              if (e?.activePayload?.[0]?.value) {
+                setAnimatedPositionVal(e.activePayload[0].value)
+                setAnimatedAssetReturn(e.activePayload[1].value)
+                setAnimatedUniswapReturn(e.activePayload[2].value)
+                setAnimatedNetReturn(e.activePayload[3].value)
+                setAnimatedAssetChange(e.activePayload[4].value)
+                setAnimatedUniswapChange(e.activePayload[5].value)
+                setAnimatedNetChange(e.activePayload[6].value)
               }
             }}
-            onMouseLeave={() => setAnimatedVal(positionValue)}
+            onMouseLeave={() => {
+              setAnimatedPositionVal(positionValue)
+              setAnimatedNetReturn(baseNetReturn)
+              setAnimatedAssetReturn(baseAssetReturn)
+              setAnimatedUniswapReturn(baseUniswapReturn)
+              setAnimatedAssetChange(baseAssetChange)
+              setAnimatedNetChange(baseNetChange)
+              setAnimatedUniswapChange(baseUniswapChange)
+            }}
             margin={{ top: 0, right: 10, bottom: 6, left: 0 }}
             barCategoryGap={1}
             data={data}
@@ -132,9 +163,20 @@ const PairReturnsChart = ({ account, setAnimatedVal, animatedVal, positionValue,
               yAxisId={0}
               tick={{ fill: 'black' }}
             />
+            <YAxis
+              type="number"
+              orientation="right"
+              tickFormatter={tick => '$' + toK(tick)}
+              axisLine={false}
+              tickLine={false}
+              interval="preserveEnd"
+              minTickGap={6}
+              yAxisId={1}
+              tick={{ fill: 'black' }}
+            />
             <Tooltip
               cursor={true}
-              formatter={val => formattedNum(val, true, true)}
+              formatter={val => null}
               labelFormatter={label => toNiceDateYear(label)}
               labelStyle={{ paddingTop: 4 }}
               contentStyle={{
@@ -143,12 +185,17 @@ const PairReturnsChart = ({ account, setAnimatedVal, animatedVal, positionValue,
                 borderColor: '#ff007a',
                 color: 'black'
               }}
+              content={val => <Text>{toNiceDateYear(val.label)}</Text>}
               wrapperStyle={{ top: -70, left: -10 }}
             />
+            <Bar type="monotone" dataKey="usdValue" fill="rgba(0,0,0,0.05)" yAxisId={1} />
             <Line type="monotone" dataKey="assetReturn" stroke="#82ca9d" />
             <Line type="monotone" dataKey="uniswapReturn" stroke="blue" />
             <Line type="monotone" dataKey="netReturn" stroke="purple" />
-          </LineChart>
+            <Line dataKey="assetChange" stroke="transparent" />
+            <Line dataKey="uniswapChange" stroke="transparent" />
+            <Line dataKey="netChange" stroke="transparent" />
+          </ComposedChart>
         </ResponsiveContainer>
       )}
     </ChartWrapper>
