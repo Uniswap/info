@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import { XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid, ComposedChart, Line, Area, Bar } from 'recharts'
+import { XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid, ComposedChart, Line, Bar } from 'recharts'
 import { AutoRow, RowBetween } from '../Row'
 
 import { toK, toNiceDate, toNiceDateYear } from '../../helpers'

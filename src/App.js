@@ -11,7 +11,6 @@ import NavHeader from './components/NavHeader'
 import LocalLoader from './components/LocalLoader'
 import { useGlobalData, useGlobalChartData } from './contexts/GlobalData'
 import { isAddress } from './helpers'
-import AccountPage from './pages/AccountPage'
 
 const AppWrapper = styled.div`
   position: relative;
@@ -67,23 +66,6 @@ function App() {
                       <>
                         <NavHeaderUpdated pair={match.params.pairAddress.toLowerCase()} />
                         <PairPage pairAddress={match.params.pairAddress.toLowerCase()} />
-                      </>
-                    )
-                  } else {
-                    return <Redirect to="/home" />
-                  }
-                }}
-              />
-              <Route
-                exacts
-                strict
-                path="/account/:accountAddress"
-                render={({ match }) => {
-                  if (isAddress(match.params.accountAddress.toLowerCase())) {
-                    return (
-                      <>
-                        <NavHeaderUpdated account={match.params.accountAddress.toLowerCase()} />
-                        <AccountPage account={match.params.accountAddress.toLowerCase()} />
                       </>
                     )
                   } else {

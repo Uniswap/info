@@ -4,14 +4,14 @@ import 'feather-icons'
 import { Box } from 'rebass'
 import styled from 'styled-components'
 
-import { AutoRow, RowBetween, RowFixed } from '../components/Row'
+import { AutoRow, RowBetween } from '../components/Row'
 import { AutoColumn } from '../components/Column'
 import PairList from '../components/PairList'
 import TopTokenList from '../components/TokenList'
 import TxnList from '../components/TxnList'
 import GlobalChart from '../components/GlobalChart'
 import { Hover, TYPE } from '../Theme'
-import { formattedNum, formattedPercent, isAddress } from '../helpers'
+import { formattedNum, formattedPercent } from '../helpers'
 import { useGlobalData, useEthPrice, useGlobalTransactions } from '../contexts/GlobalData'
 import { useAllPairData } from '../contexts/PairData'
 import { Search } from '../components/Search'
@@ -20,7 +20,6 @@ import TokenLogo from '../components/TokenLogo'
 import Panel from '../components/Panel'
 import { useAllTokenData } from '../contexts/TokenData'
 import UniPrice from '../components/UniPrice'
-import { ButtonLight } from '../components/ButtonStyled'
 
 const PageWrapper = styled.div`
   display: flex;
@@ -86,47 +85,6 @@ const ChartWrapper = styled.div`
   height: 100%;
 `
 
-const Wrapper = styled.div`
-  display: flex;
-  position: relative;
-  flex-direction: row;
-  align-items: center;
-  justify-content: flex-end;
-  width: 300px;
-  padding: 8px 16px;
-  border-radius: 12px;
-  background: ${({ theme }) => theme.advancedBG};
-  ${({ small }) =>
-    !small &&
-    ` box-shadow: 0 2.8px 2.8px -9px rgba(0, 0, 0, 0.008), 0 6.7px 6.7px -9px rgba(0, 0, 0, 0.012),
-    0 12.5px 12.6px -9px rgba(0, 0, 0, 0.015), 0 22.3px 22.6px -9px rgba(0, 0, 0, 0.018),
-    0 41.8px 42.2px -9px rgba(0, 0, 0, 0.022), 0 100px 101px -9px rgba(0, 0, 0, 0.03);`};
-`
-
-const Input = styled.input`
-  position: relative;
-  display: flex;
-  align-items: center;
-  width: 100%;
-  white-space: nowrap;
-  background: none;
-  border: none;
-  outline: none;
-  color: ${({ theme }) => theme.textColor};
-  font-size: 16px;
-
-  ::placeholder {
-    color: ${({ theme }) => theme.text3};
-    font-size: 16px;
-  }
-
-  @media screen and (max-width: 640px) {
-    ::placeholder {
-      font-size: 1rem;
-    }
-  }
-`
-
 const LIST_VIEW = {
   TOKENS: 'tokens',
   PAIRS: 'pairs'
@@ -167,32 +125,11 @@ function GlobalPage({ history }) {
 
   const [showPriceCard, setShowPriceCard] = useState(false)
 
-  const [accountValue, setAccountValue] = useState()
-
   return (
     <PageWrapper>
       <ThemedBackground />
       <Search small={!!below600} />
-      {!below1080 && (
-        <RowBetween style={{ marginTop: '3rem' }}>
-          <TYPE.main fontSize={'1.125rem'}>Overall Stats</TYPE.main>
-          <RowFixed>
-            {isAddress(accountValue) && (
-              <ButtonLight style={{ marginRight: '1rem' }} onClick={() => history.push('/account/' + accountValue)}>
-                See Details
-              </ButtonLight>
-            )}
-            <Wrapper>
-              <Input
-                placeholder="Paste account address..."
-                onChange={e => {
-                  setAccountValue(e.target.value)
-                }}
-              />
-            </Wrapper>
-          </RowFixed>
-        </RowBetween>
-      )}
+
       {below1080 && ( // mobile card
         <Box mb={20}>
           <Box mb={20} mt={'1.5rem'}>
