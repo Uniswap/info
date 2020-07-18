@@ -13,8 +13,9 @@ import Link from '../Link'
 
 const Header = styled.div`
   width: calc(100% - 80px);
-  padding: 32px 40px;
-  max-width: 1240px;
+  padding: 20px 40px;
+  background-color: rgba(255, 255, 255, 0.3);
+  margin-bottom: 20px;
 
   @media screen and (max-width: 640px) {
     width: calc(100% - 40px);
@@ -24,7 +25,6 @@ const Header = styled.div`
 
 const CombinedWrapper = styled(RowFixed)`
   border-radius: 16px;
-  padding: 0.25rem 0.25rem 0.25rem 0.75rem;
   justify-content: flex-end;
 `
 
@@ -34,8 +34,8 @@ const CombinedData = styled.div`
   font-size: 1rem;
 `
 
-export default function NavHeader({ token, pair }) {
-  const isHome = !token && !pair
+export default function NavHeader({ token, pair, account }) {
+  const isHome = !token && !pair && !account
 
   const below1024 = useMedia('(max-width: 1024px)')
   const below600 = useMedia('(max-width: 600px)')
@@ -59,7 +59,7 @@ export default function NavHeader({ token, pair }) {
   ) : (
     <Header>
       <RowBetween>
-        <Title token={token} pair={pair} />
+        <Title token={token} pair={pair} account={account} />
         <RowFixed>
           {!isHome && (
             <div style={{ width: '370px' }}>
@@ -80,7 +80,9 @@ export default function NavHeader({ token, pair }) {
                 </>
               )}
               <Link href="https://migrate.uniswap.info" target="_blank">
-                <ButtonDark style={{ minWidth: 'initial' }}>View combined {below1024 && 'data'} ↗</ButtonDark>
+                <ButtonDark style={{ minWidth: 'initial', height: '36px' }}>
+                  View combined {below1024 && 'data'} ↗
+                </ButtonDark>
               </Link>
             </CombinedWrapper>
           )}

@@ -2467,6 +2467,13 @@ amdefine@>=0.2.0:
   resolved "https://registry.yarnpkg.com/amdefine/-/amdefine-1.0.1.tgz#4a5282ac164729e93619bcfd3ad151f817ce91f5"
   integrity sha1-SlKCrBZHKek2Gbz9OtFR+BfOkfU=
 
+animated-number-react@^0.1.1:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/animated-number-react/-/animated-number-react-0.1.1.tgz#3107c1e23ec63b823e78308ccf2bd556eccfada7"
+  integrity sha512-gJPO6vqgsCPUp5a5PpEULE60yHaK2g3KFLTiwbNEeCBl3T2juhqvldHwCRaFjfL8T6SLwl94KmEEFajFk5koTg==
+  dependencies:
+    prop-types "^15.6.1"
+
 animated@^0.2.2:
   version "0.2.2"
   resolved "https://registry.yarnpkg.com/animated/-/animated-0.2.2.tgz#04af7846ad0b9b8d1f0472cc53d82b8efeb4a751"

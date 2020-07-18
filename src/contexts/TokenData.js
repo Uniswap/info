@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect } from 'react'
 
 import { client } from '../apollo/client'
-import { TOKEN_DATA, TOKEN_TXNS, TOKEN_CHART, TOKENS_CURRENT, TOKENS_DYNAMIC } from '../apollo/queries'
+import { TOKEN_DATA, FILTERED_TRANSACTIONS, TOKEN_CHART, TOKENS_CURRENT, TOKENS_DYNAMIC } from '../apollo/queries'
 
 import { useEthPrice } from './GlobalData'
 
@@ -14,6 +14,9 @@ const UPDATE = 'UPDATE'
 const UPDATE_TOKEN_TXNS = 'UPDATE_TOKEN_TXNS'
 const UPDATE_CHART_DATA = 'UPDATE_CHART_DATA'
 const UPDATE_TOP_TOKENS = ' UPDATE_TOP_TOKENS'
+const UPDATE_ALL_PAIRS = 'UPDATE_ALL_PAIRS'
+
+const TOKEN_PAIRS_KEY = 'TOKEN_PAIRS_KEY'
 
 dayjs.extend(utc)
 
@@ -68,6 +71,16 @@ function reducer(state, { type, payload }) {
         }
       }
     }
+    case UPDATE_ALL_PAIRS: {
+      const { address, allPairs } = payload
+      return {
+        ...state,
+        [address]: {
+          ...state?.[address],
+          [TOKEN_PAIRS_KEY]: allPairs
+        }
+      }
+    }
     default: {
       throw Error(`Unexpected action type in DataContext reducer: '${type}'.`)
     }
@@ -109,14 +122,22 @@ export default function Provider({ children }) {
     })
   }, [])
 
+  const updateAllPairs = useCallback((address, allPairs) => {
+    dispatch({
+      type: UPDATE_ALL_PAIRS,
+      payload: { address, allPairs }
+    })
+  }, [])
+
   return (
     <TokenDataContext.Provider
-      value={useMemo(() => [state, { update, updateTokenTxns, updateChartData, updateTopTokens }], [
+      value={useMemo(() => [state, { update, updateTokenTxns, updateChartData, updateTopTokens, updateAllPairs }], [
         state,
         update,
         updateTokenTxns,
         updateChartData,
-        updateTopTokens
+        updateTopTokens,
+        updateAllPairs
       ])}
     >
       {children}
@@ -301,9 +322,8 @@ const getTokenTransactions = async (tokenAddress, allPairsFormatted) => {
   const transactions = {}
   try {
     let result = await client.query({
-      query: TOKEN_TXNS,
+      query: FILTERED_TRANSACTIONS,
       variables: {
-        tokenAddr: tokenAddress,
         allPairs: allPairsFormatted
       },
       fetchPolicy: 'cache-first'
@@ -315,6 +335,19 @@ const getTokenTransactions = async (tokenAddress, allPairsFormatted) => {
     console.log(e)
   }
   return transactions
+}
+
+const getTokenPairs = async tokenAddress => {
+  try {
+    // fetch all current and historical data
+    let result = await client.query({
+      query: TOKEN_DATA(tokenAddress),
+      fetchPolicy: 'cache-first'
+    })
+    return result.data?.['pairs0'].concat(result.data?.['pairs1'])
+  } catch (e) {
+    console.log(e)
+  }
 }
 
 const getTokenChartData = async tokenAddress => {
@@ -421,8 +454,8 @@ export function useTokenTransactions(tokenAddress) {
 
   const allPairsFormatted =
     state[tokenAddress] &&
-    state[tokenAddress].allPairs &&
-    state[tokenAddress].allPairs.map(pair => {
+    state[tokenAddress].TOKEN_PAIRS_KEY &&
+    state[tokenAddress].TOKEN_PAIRS_KEY.map(pair => {
       return pair.id
     })
 
@@ -436,7 +469,24 @@ export function useTokenTransactions(tokenAddress) {
     checkForTxns()
   }, [tokenTxns, tokenAddress, updateTokenTxns, allPairsFormatted])
 
-  return tokenTxns
+  return tokenTxns || []
+}
+
+export function useTokenPairs(tokenAddress) {
+  const [state, { updateAllPairs }] = useTokenDataContext()
+  const tokenPairs = state?.[tokenAddress]?.[TOKEN_PAIRS_KEY]
+
+  useEffect(() => {
+    async function fetchData() {
+      let allPairs = await getTokenPairs(tokenAddress)
+      updateAllPairs(tokenAddress, allPairs)
+    }
+    if (!tokenPairs && isAddress(tokenAddress)) {
+      fetchData()
+    }
+  }, [tokenAddress, tokenPairs, updateAllPairs])
+
+  return tokenPairs || []
 }
 
 export function useTokenChartData(tokenAddress) {

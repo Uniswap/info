@@ -9,9 +9,6 @@ import TokenPage from './pages/TokenPage'
 import PairPage from './pages/PairPage'
 import NavHeader from './components/NavHeader'
 import LocalLoader from './components/LocalLoader'
-import { AutoColumn } from './components/Column'
-import Link from './components/Link'
-import { useMedia } from 'react-use'
 import { useGlobalData, useGlobalChartData } from './contexts/GlobalData'
 import { isAddress } from './helpers'
 import { OVERVIEW_TOKEN_BLACKLIST, OVERVIEW_PAIR_BLACKLIST } from './constants'
@@ -30,26 +27,8 @@ const AppWrapper = styled.div`
   justify-content: flex-start;
 `
 
-const MigrateBanner = styled(AutoColumn)`
-  width: 100%;
-  padding: 12px 0;
-  display: flex;
-  justify-content: center;
-  background-color: rgba(255, 255, 255, 0.3);
-  color: ${({ theme }) => theme.text1};
-  font-weight: 500;
-  text-align: center;
-  z-index: 10;
-  a {
-    color: ${({ theme }) => theme.text1};
-  }
-`
-
 function App() {
   const NavHeaderUpdated = withRouter(props => <NavHeader default {...props} />)
-
-  const below750 = useMedia('(max-width: 750px)')
-  const below490 = useMedia('(max-width: 490px)')
 
   const globalData = useGlobalData()
   const globalChartData = useGlobalChartData()
@@ -57,33 +36,6 @@ function App() {
   return (
     <ApolloProvider client={client}>
       <AppWrapper>
-        <MigrateBanner>
-          {below490 ? (
-            <>
-              <Link href="https://v1.uniswap.info/" target="_blank">
-                <b>V1 Analytics ↗</b>
-              </Link>
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-              <Link href="https://migrate.uniswap.info/" target="_blank">
-                <b>Combined Analytics ↗</b>
-              </Link>
-            </>
-          ) : below750 ? (
-            <>
-              <b>This site is for Uniswap V2 only.</b>&nbsp;For V1 analytics&nbsp;
-              <Link href="https://v1.uniswap.info/" target="_blank">
-                <b>click here ↗</b>
-              </Link>
-            </>
-          ) : (
-            <>
-              <b>This site displays analytics for Uniswap V2 only.</b>&nbsp; To see Uniswap V1 analytics&nbsp;
-              <Link href="https://v1.uniswap.info/" target="_blank">
-                <b>click here ↗</b>
-              </Link>
-            </>
-          )}
-        </MigrateBanner>
         {globalData &&
         Object.keys(globalData).length > 0 &&
         globalChartData &&

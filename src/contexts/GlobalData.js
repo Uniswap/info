@@ -4,7 +4,7 @@ import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { useTimeframe } from './Application'
 import { timeframeOptions } from '../constants'
-import { getPercentChange, getBlockFromTimestamp, get2DayPercentChange } from '../helpers'
+import { getPercentChange, getBlockFromTimestamp, getBlocksFromTimestamps, get2DayPercentChange } from '../helpers'
 import { GLOBAL_DATA, GLOBAL_TXNS, GLOBAL_CHART, ETH_PRICE, ALL_PAIRS, ALL_TOKENS, PAIR_CHART } from '../apollo/queries'
 import weekOfYear from 'dayjs/plugin/weekOfYear'
 import { getV1Data } from './V1Data'
@@ -177,8 +177,7 @@ async function getGlobalData(ethPrice) {
       .subtract(2, 'day')
       .startOf('minute')
       .unix()
-    let oneDayBlock = await getBlockFromTimestamp(utcOneDayBack)
-    let twoDayBlock = await getBlockFromTimestamp(utcTwoDaysBack)
+    let [oneDayBlock, twoDayBlock] = await getBlocksFromTimestamps([utcOneDayBack, utcTwoDaysBack])
 
     let result = await client.query({
       query: GLOBAL_DATA(),
@@ -186,13 +185,13 @@ async function getGlobalData(ethPrice) {
     })
     data = result.data.uniswapFactories[0]
     let oneDayResult = await client.query({
-      query: GLOBAL_DATA(oneDayBlock),
+      query: GLOBAL_DATA(oneDayBlock?.number),
       fetchPolicy: 'cache-first'
     })
     oneDayData = oneDayResult.data.uniswapFactories[0]
 
     let twoDayResult = await client.query({
-      query: GLOBAL_DATA(twoDayBlock),
+      query: GLOBAL_DATA(twoDayBlock?.number),
       fetchPolicy: 'cache-first'
     })
     twoDayData = twoDayResult.data.uniswapFactories[0]
@@ -336,7 +335,6 @@ const getChartData = async oldestDateToFetch => {
   } catch (e) {
     console.log(e)
   }
-
   return [data, weeklyData]
 }
 
@@ -468,18 +466,18 @@ export function useGlobalData() {
 
   useEffect(() => {
     async function fetchData() {
-      if (!data && ethPrice) {
-        let globalData = await getGlobalData(ethPrice)
-        globalData && update(globalData)
+      let globalData = await getGlobalData(ethPrice)
+      globalData && update(globalData)
 
-        let allPairs = await getAllPairsOnUniswap()
-        updateAllPairsInUniswap(allPairs)
+      let allPairs = await getAllPairsOnUniswap()
+      updateAllPairsInUniswap(allPairs)
 
-        let allTokens = await getAllTokensOnUniswap()
-        updateAllTokensInUniswap(allTokens)
-      }
+      let allTokens = await getAllTokensOnUniswap()
+      updateAllTokensInUniswap(allTokens)
     }
-    fetchData()
+    if (!data && ethPrice) {
+      fetchData()
+    }
   }, [ethPrice, update, data, updateAllPairsInUniswap, updateAllTokensInUniswap])
 
   return data || {}

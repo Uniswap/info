@@ -19,7 +19,7 @@ const Wrapper = styled.div`
   flex-direction: row;
   align-items: center;
   justify-content: flex-end;
-  padding: ${({ small }) => (!small ? '12px' : '12px 16px')};
+  padding: ${({ small }) => (!small ? '12px' : '8px 16px')};
   border-radius: 12px;
   background: ${({ theme }) => theme.advancedBG};
   border-bottom-right-radius: ${({ open }) => (open ? '0px' : '12px')};
@@ -310,10 +310,9 @@ export const Search = ({ small = false }) => {
   return (
     <div
       style={{
-        height: '40px',
+        height: '36px',
         zIndex: '30',
-        position: 'relative',
-        width: '100%'
+        position: 'relative'
       }}
     >
       <Wrapper open={showMenu} shadow={true} small={small}>

@@ -7,8 +7,8 @@ import Link from './Link'
 import { urls } from '../helpers'
 
 const Divider = styled(Box)`
-  max-height: 1px;
-  background-color: rgba(43, 43, 43, 0.05);
+  height: 1px;
+  background-color: rgba(43, 43, 43, 0.035);
 `
 
 const Hint = ({ children, ...rest }) => (

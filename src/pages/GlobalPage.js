@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { withRouter } from 'react-router-dom'
 import 'feather-icons'
 import { Box } from 'rebass'
 import styled from 'styled-components'
@@ -19,7 +20,6 @@ import TokenLogo from '../components/TokenLogo'
 import Panel from '../components/Panel'
 import { useAllTokenData } from '../contexts/TokenData'
 import UniPrice from '../components/UniPrice'
-import { CustomLink } from '../components/Link'
 
 const PageWrapper = styled.div`
   display: flex;
@@ -94,7 +94,7 @@ const LIST_VIEW = {
   PAIRS: 'pairs'
 }
 
-function GlobalPage() {
+function GlobalPage({ history }) {
   const [listView, setListView] = useState(LIST_VIEW.PAIRS)
 
   const {
@@ -136,11 +136,6 @@ function GlobalPage() {
     <PageWrapper>
       <ThemedBackground />
       <Search small={!!below600} />
-      {!below1080 && (
-        <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
-          Overall Stats
-        </TYPE.main>
-      )}
       {below1080 && ( // mobile card
         <Box mb={20}>
           <Box mb={20} mt={'1.5rem'}>
@@ -197,7 +192,7 @@ function GlobalPage() {
         </Box>
       )}
       {!below1080 && ( // desktop
-        <TopGroup style={{ marginTop: '1.5rem' }}>
+        <TopGroup style={{ marginTop: '3.5rem' }}>
           <TopPanel
             hover={true}
             onMouseEnter={() => {
@@ -223,7 +218,7 @@ function GlobalPage() {
               </RowBetween>
             </AutoColumn>
           </TopPanel>
-          <TopPanel>
+          <Panel>
             <AutoColumn gap="20px">
               <RowBetween>
                 <TYPE.main>Total Liquidity</TYPE.main>
@@ -236,8 +231,8 @@ function GlobalPage() {
                 <TYPE.main fontSize={14}>{liquidityChange && liquidityChange}</TYPE.main>
               </RowBetween>
             </AutoColumn>
-          </TopPanel>
-          <TopPanel>
+          </Panel>
+          <Panel>
             <AutoColumn gap="20px">
               <RowBetween>
                 <TYPE.main>Volume (24hrs)</TYPE.main>
@@ -250,8 +245,8 @@ function GlobalPage() {
                 <TYPE.main fontSize={14}>{volumeChange}</TYPE.main>
               </RowBetween>
             </AutoColumn>
-          </TopPanel>
-          <TopPanel>
+          </Panel>
+          <Panel>
             <AutoColumn gap="20px">
               <RowBetween>
                 <TYPE.main>Transactions (24hrs)</TYPE.main>
@@ -264,7 +259,7 @@ function GlobalPage() {
                 <TYPE.main fontSize={14}>{txnChangeFormatted && txnChangeFormatted}</TYPE.main>
               </RowBetween>
             </AutoColumn>
-          </TopPanel>
+          </Panel>
         </TopGroup>
       )}
 
@@ -283,42 +278,33 @@ function GlobalPage() {
         </GridRow>
       )}
 
-      <RowBetween style={{ marginTop: '2rem', marginBottom: '.5rem' }}>
-        <ListOptions gap="10px">
-          <Hover>
-            <TYPE.main
-              onClick={() => {
-                setListView(LIST_VIEW.PAIRS)
-              }}
-              fontSize={'1.125rem'}
-              color={listView === LIST_VIEW.TOKENS ? '#aeaeae' : 'black'}
-            >
-              Pairs
-            </TYPE.main>
-          </Hover>
-          <Hover>
-            <TYPE.main
-              onClick={() => {
-                setListView(LIST_VIEW.TOKENS)
-              }}
-              fontSize={'1.125rem'}
-              color={listView === LIST_VIEW.PAIRS ? '#aeaeae' : 'black'}
-            >
-              Tokens
-            </TYPE.main>
-          </Hover>
-        </ListOptions>
-        <CustomLink style={{ width: '110px' }} to={listView === LIST_VIEW.PAIRS ? '/all-pairs' : 'all-tokens'}>
-          See Expanded
-        </CustomLink>
-      </RowBetween>
+      <ListOptions gap="10px" style={{ marginTop: '2rem', marginBottom: '.5rem' }}>
+        <Hover>
+          <TYPE.main
+            onClick={() => {
+              setListView(LIST_VIEW.PAIRS)
+            }}
+            fontSize={'1.125rem'}
+            color={listView === LIST_VIEW.TOKENS ? '#aeaeae' : 'black'}
+          >
+            Pairs
+          </TYPE.main>
+        </Hover>
+        <Hover>
+          <TYPE.main
+            onClick={() => {
+              setListView(LIST_VIEW.TOKENS)
+            }}
+            fontSize={'1.125rem'}
+            color={listView === LIST_VIEW.PAIRS ? '#aeaeae' : 'black'}
+          >
+            Tokens
+          </TYPE.main>
+        </Hover>
+      </ListOptions>
 
       <Panel style={{ marginTop: '6px' }}>
-        {listView === LIST_VIEW.PAIRS ? (
-          <PairList pairs={allPairs} disbaleLinks={true} />
-        ) : (
-          <TopTokenList tokens={allTokens} />
-        )}
+        {listView === LIST_VIEW.PAIRS ? <PairList pairs={allPairs} /> : <TopTokenList tokens={allTokens} />}
       </Panel>
 
       <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '2rem' }}>
@@ -331,4 +317,4 @@ function GlobalPage() {
   )
 }
 
-export default GlobalPage
+export default withRouter(GlobalPage)

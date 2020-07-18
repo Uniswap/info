@@ -17,7 +17,7 @@ import TokenChart from '../components/TokenChart'
 
 import { formattedNum, formattedPercent, getPoolLink, getSwapLink } from '../helpers'
 
-import { useTokenData, useTokenTransactions } from '../contexts/TokenData'
+import { useTokenData, useTokenTransactions, useTokenPairs } from '../contexts/TokenData'
 import { TYPE, ThemedBackground } from '../Theme'
 import { useColor } from '../hooks'
 import CopyHelper from '../components/Copy'
@@ -114,7 +114,6 @@ function TokenPage({ address, history }) {
     name,
     symbol,
     priceUSD,
-    allPairs,
     oneDayVolumeUSD,
     totalLiquidityUSD,
     volumeChangeUSD,
@@ -130,6 +129,8 @@ function TokenPage({ address, history }) {
 
   // detect color from token
   const backgroundColor = useColor(id, symbol)
+
+  const allPairs = useTokenPairs(address)
 
   // pairs to show in pair list
   const fetchedPairsList = useDataForList(allPairs)
