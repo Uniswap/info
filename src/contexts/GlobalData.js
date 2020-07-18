@@ -169,8 +169,14 @@ async function getGlobalData(ethPrice) {
   let twoDayData = {}
   try {
     const utcCurrentTime = dayjs()
-    const utcOneDayBack = utcCurrentTime.subtract(1, 'day').unix()
-    const utcTwoDaysBack = utcCurrentTime.subtract(2, 'day').unix()
+    const utcOneDayBack = utcCurrentTime
+      .subtract(1, 'day')
+      .startOf('minute')
+      .unix()
+    const utcTwoDaysBack = utcCurrentTime
+      .subtract(2, 'day')
+      .startOf('minute')
+      .unix()
     let [oneDayBlock, twoDayBlock] = await getBlocksFromTimestamps([utcOneDayBack, utcTwoDaysBack])
 
     let result = await client.query({
@@ -223,7 +229,6 @@ async function getGlobalData(ethPrice) {
 
       const v1Data = await getV1Data()
       data.v1Data = v1Data
-      data.v1Data.totalLiquidityUSD = v1Data.totalETH * ethPrice
     }
   } catch (e) {
     console.log(e)
@@ -372,7 +377,10 @@ const getGlobalTransactions = async () => {
 
 const getEthPrice = async () => {
   const utcCurrentTime = dayjs()
-  const utcOneDayBack = utcCurrentTime.subtract(1, 'day').unix()
+  const utcOneDayBack = utcCurrentTime
+    .subtract(1, 'day')
+    .startOf('minute')
+    .unix()
 
   let ethPrice = 0
   let ethPriceOneDay = 0
@@ -499,7 +507,7 @@ export function useGlobalChartData() {
         utcStartTime = utcEndTime.subtract(1, 'year').startOf('year')
         break
     }
-    let startTime = utcStartTime.unix() - 1
+    let startTime = utcStartTime.startOf('hour').unix() - 1
 
     if ((activeWindow && startTime < oldestDateFetch) || !oldestDateFetch) {
       setOldestDateFetched(startTime)

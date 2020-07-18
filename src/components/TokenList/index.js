@@ -122,11 +122,11 @@ const SORT_FIELD = {
 }
 
 // @TODO rework into virtualized list
-function TopTokenList({ tokens, history }) {
+function TopTokenList({ tokens, history, itemMax = 10 }) {
   // page state
   const [page, setPage] = useState(1)
   const [maxPage, setMaxPage] = useState(1)
-  const ITEMS_PER_PAGE = 10
+  const ITEMS_PER_PAGE = itemMax
 
   // sorting
   const [sortDirection, setSortDirection] = useState(true)
@@ -154,7 +154,7 @@ function TopTokenList({ tokens, history }) {
       }
       setMaxPage(Math.floor(formattedTokens.length / ITEMS_PER_PAGE) + extraPages)
     }
-  }, [tokens, formattedTokens])
+  }, [tokens, formattedTokens, ITEMS_PER_PAGE])
 
   const filteredList =
     formattedTokens &&

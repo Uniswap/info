@@ -5,7 +5,6 @@ import {
   PAIR_DATA,
   PAIR_CHART,
   FILTERED_TRANSACTIONS,
-  PAIRS_DYNAMIC,
   PAIRS_CURRENT,
   PAIRS_BULK,
   PAIRS_DYNAMIC_BULK
@@ -146,9 +145,18 @@ export default function Provider({ children }) {
 
 async function getBulkPairData(pairList, ethPrice) {
   const utcCurrentTime = dayjs()
-  const utcOneDayBack = utcCurrentTime.subtract(1, 'day').unix()
-  const utcTwoDaysBack = utcCurrentTime.subtract(2, 'day').unix()
-  const utcOneWeekBack = utcCurrentTime.subtract(1, 'week').unix()
+  const utcOneDayBack = utcCurrentTime
+    .subtract(1, 'day')
+    .startOf('minute')
+    .unix()
+  const utcTwoDaysBack = utcCurrentTime
+    .subtract(2, 'day')
+    .startOf('minute')
+    .unix()
+  const utcOneWeekBack = utcCurrentTime
+    .subtract(1, 'week')
+    .startOf('minute')
+    .unix()
   let oneDayBlock = await getBlockFromTimestamp(utcOneDayBack)
   let twoDayBlock = await getBlockFromTimestamp(utcTwoDaysBack)
   let oneWeekBlock = await getBlockFromTimestamp(utcOneWeekBack)
@@ -251,9 +259,18 @@ async function getBulkPairData(pairList, ethPrice) {
 
 const getTopPairData = async ethPrice => {
   const utcCurrentTime = dayjs()
-  const utcOneDayBack = utcCurrentTime.subtract(1, 'day').unix()
-  const utcTwoDaysBack = utcCurrentTime.subtract(2, 'day').unix()
-  const utcOneWeekBack = utcCurrentTime.subtract(1, 'week').unix()
+  const utcOneDayBack = utcCurrentTime
+    .subtract(1, 'day')
+    .startOf('minute')
+    .unix()
+  const utcTwoDaysBack = utcCurrentTime
+    .subtract(2, 'day')
+    .startOf('minute')
+    .unix()
+  const utcOneWeekBack = utcCurrentTime
+    .subtract(1, 'week')
+    .startOf('minute')
+    .unix()
   let oneDayBlock = await getBlockFromTimestamp(utcOneDayBack)
   let twoDayBlock = await getBlockFromTimestamp(utcTwoDaysBack)
   let oneWeekBlock = await getBlockFromTimestamp(utcOneWeekBack)
@@ -267,7 +284,12 @@ const getTopPairData = async ethPrice => {
     let [oneDayResult, twoDayResult, oneWeekResult] = await Promise.all(
       [oneDayBlock, twoDayBlock, oneWeekBlock].map(async block => {
         let result = client.query({
-          query: PAIRS_DYNAMIC(block),
+          query: PAIRS_DYNAMIC_BULK(
+            block,
+            current.data.pairs.map(pair => {
+              return pair.id
+            })
+          ),
           fetchPolicy: 'cache-first'
         })
         return result
@@ -300,6 +322,22 @@ const getTopPairData = async ethPrice => {
           oneDayHistory?.volumeUSD ?? 0,
           twoDayHistory?.volumeUSD ?? 0
         )
+
+        // catch the case where token wasnt in top list in previous days
+        // if (!oneDayHistory) {
+        //   let oneDayResult = await client.query({
+        //     query: PAIR_DATA(pair.id, oneDayBlock),
+        //     fetchPolicy: 'cache-first'
+        //   })
+        //   oneDayHistory = oneDayResult
+        // }
+        // if (!oneWeekHistory) {
+        //   let oneWeekResult = await client.query({
+        //     query: PAIR_DATA(pair.id, oneWeekBlock),
+        //     fetchPolicy: 'cache-first'
+        //   })
+        //   oneWeekHistory = oneWeekResult
+        // }
 
         const oneWeekVolumeUSD = parseFloat(oneWeekData ? data?.volumeUSD - oneWeekHistory?.volumeUSD : data.volumeUSD)
         const [oneDayVolumeETH, volumeChangeETH] = get2DayPercentChange(
@@ -357,9 +395,18 @@ const getPairData = async (address, ethPrice) => {
   let twoDayData = []
 
   const utcCurrentTime = dayjs()
-  const utcOneDayBack = utcCurrentTime.subtract(1, 'day').unix()
-  const utcTwoDaysBack = utcCurrentTime.subtract(2, 'day').unix()
-  const utcOneWeekBack = utcCurrentTime.subtract(1, 'week').unix()
+  const utcOneDayBack = utcCurrentTime
+    .subtract(1, 'day')
+    .startOf('minute')
+    .unix()
+  const utcTwoDaysBack = utcCurrentTime
+    .subtract(2, 'day')
+    .startOf('minute')
+    .unix()
+  const utcOneWeekBack = utcCurrentTime
+    .subtract(1, 'week')
+    .startOf('minute')
+    .unix()
   let oneDayBlock = await getBlockFromTimestamp(utcOneDayBack)
   let twoDayBlock = await getBlockFromTimestamp(utcTwoDaysBack)
   let oneWeekBlock = await getBlockFromTimestamp(utcOneWeekBack)
@@ -459,7 +506,7 @@ const getPairTransactions = async pairAddress => {
 const getPairChartData = async pairAddress => {
   let data = []
   const utcEndTime = dayjs.utc()
-  let utcStartTime = utcEndTime.subtract(1, 'year')
+  let utcStartTime = utcEndTime.subtract(1, 'year').startOf('minute')
   let startTime = utcStartTime.unix() - 1
 
   try {

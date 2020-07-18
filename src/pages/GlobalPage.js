@@ -85,6 +85,10 @@ const ChartWrapper = styled.div`
   height: 100%;
 `
 
+const TopPanel = styled(Panel)`
+  height: 100px;
+`
+
 const LIST_VIEW = {
   TOKENS: 'tokens',
   PAIRS: 'pairs'
@@ -107,7 +111,10 @@ function GlobalPage({ history }) {
   const allPairs = useAllPairData()
   const allTokens = useAllTokenData()
 
-  const [ethPrice] = useEthPrice()
+  const [ethPrice, ethPriceOld] = useEthPrice()
+
+  const ethPriceChange = (parseFloat(ethPrice - ethPriceOld) / parseFloat(ethPriceOld)) * 100
+
   const formattedEthPrice = ethPrice ? formattedNum(ethPrice, true) : '-'
 
   const liquidity = totalLiquidityUSD ? formattedNum(totalLiquidityUSD, true) : '-'
@@ -129,7 +136,6 @@ function GlobalPage({ history }) {
     <PageWrapper>
       <ThemedBackground />
       <Search small={!!below600} />
-
       {below1080 && ( // mobile card
         <Box mb={20}>
           <Box mb={20} mt={'1.5rem'}>
@@ -186,8 +192,8 @@ function GlobalPage({ history }) {
         </Box>
       )}
       {!below1080 && ( // desktop
-        <TopGroup style={{ marginTop: '1.5rem' }}>
-          <Panel
+        <TopGroup style={{ marginTop: '3.5rem' }}>
+          <TopPanel
             hover={true}
             onMouseEnter={() => {
               setShowPriceCard(true)
@@ -200,7 +206,7 @@ function GlobalPage({ history }) {
             <AutoColumn gap="20px">
               <RowBetween>
                 <TYPE.main>Uniswap ETH price</TYPE.main>
-                <div />
+                <TokenLogo address={'0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'} />
               </RowBetween>
               <RowBetween align="flex-end">
                 {formattedEthPrice && (
@@ -208,10 +214,10 @@ function GlobalPage({ history }) {
                     {formattedEthPrice}
                   </TYPE.main>
                 )}
-                <TokenLogo address={'0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'} />
+                {formattedPercent(ethPriceChange)}
               </RowBetween>
             </AutoColumn>
-          </Panel>
+          </TopPanel>
           <Panel>
             <AutoColumn gap="20px">
               <RowBetween>

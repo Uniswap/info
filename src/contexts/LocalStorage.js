@@ -5,10 +5,11 @@ const UNISWAP = 'UNISWAP'
 const VERSION = 'VERSION'
 const CURRENT_VERSION = 0
 const LAST_SAVED = 'LAST_SAVED'
+const DISMISSED_PATHS = 'DISMISSED_PATHS'
 
 const DARK_MODE = 'DARK_MODE'
 
-const UPDATABLE_KEYS = [DARK_MODE]
+const UPDATABLE_KEYS = [DARK_MODE, DISMISSED_PATHS]
 
 const UPDATE_KEY = 'UPDATE_KEY'
 
@@ -40,7 +41,8 @@ function reducer(state, { type, payload }) {
 function init() {
   const defaultLocalStorage = {
     [VERSION]: CURRENT_VERSION,
-    [DARK_MODE]: false
+    [DARK_MODE]: false,
+    [DISMISSED_PATHS]: {}
   }
 
   try {
@@ -82,16 +84,25 @@ export function Updater() {
 
 export function useDarkModeManager() {
   const [state, { updateKey }] = useLocalStorageContext()
-
   let isDarkMode = state[DARK_MODE]
-
   const toggleDarkMode = useCallback(
     value => {
       updateKey(DARK_MODE, value === false || value === true ? value : !isDarkMode)
     },
     [updateKey, isDarkMode]
   )
-
   // return [state[DARK_MODE], toggleDarkMode]
   return [false, toggleDarkMode]
+}
+
+export function usePathDismissed(path) {
+  const [state, { updateKey }] = useLocalStorageContext()
+  const pathDismissed = state?.[DISMISSED_PATHS]?.[path]
+  function dismiss() {
+    let newPaths = state?.[DISMISSED_PATHS]
+    newPaths[path] = true
+    updateKey(DISMISSED_PATHS, newPaths)
+  }
+
+  return [pathDismissed, dismiss]
 }
