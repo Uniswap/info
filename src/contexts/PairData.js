@@ -192,198 +192,85 @@ async function getBulkPairData(pairList, ethPrice) {
       return { ...obj, [cur.id]: cur }
     }, {})
 
-    return (
+    let pairData = await Promise.all(
       current &&
-      current.data.pairs.map(pair => {
-        let data = pair
-        let oneDayHistory = oneDayData?.[pair.id]
-        let twoDayHistory = twoDayData?.[pair.id]
-        let oneWeekHistory = oneWeekData?.[pair.id]
+        current.data.pairs.map(async pair => {
+          let data = pair
+          let oneDayHistory = oneDayData?.[pair.id]
+          let twoDayHistory = twoDayData?.[pair.id]
+          let oneWeekHistory = oneWeekData?.[pair.id]
 
-        const [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentChange(
-          data?.volumeUSD,
-          oneDayHistory?.volumeUSD ?? 0,
-          twoDayHistory?.volumeUSD ?? 0
-        )
-
-        const oneWeekVolumeUSD = parseFloat(oneWeekData ? data?.volumeUSD - oneWeekHistory?.volumeUSD : data.volumeUSD)
-        const [oneDayVolumeETH, volumeChangeETH] = get2DayPercentChange(
-          data.tradeVolumeETH,
-          oneDayHistory?.tradeVolumeETH ?? 0,
-          twoDayHistory?.tradeVolumeETH ?? 0
-        )
-        const [oneDayTxns, txnChange] = get2DayPercentChange(
-          data.txCount,
-          oneDayHistory?.txCount ?? 0,
-          twoDayHistory?.txCount ?? 0
-        )
-
-        const liquidityChangeUSD = getPercentChange(data.reserveUSD, oneDayHistory?.reserveUSD)
-        const liquidityChangeETH = getPercentChange(data.reserveUSD, oneDayHistory?.reserveUSD)
-        data.reserveUSD = data.reserveETH ? data.reserveETH * ethPrice : data.reserveUSD
-        data.trackedReserveUSD = parseFloat(pair.trackedReserveETH) * ethPrice
-        data.oneDayVolumeUSD = oneDayVolumeUSD
-        data.oneDayVolumeETH = oneDayVolumeETH
-        data.oneWeekVolumeUSD = oneWeekVolumeUSD
-        data.volumeChangeUSD = volumeChangeUSD
-        data.volumeChangeETH = volumeChangeETH
-        data.liquidityChangeUSD = liquidityChangeUSD
-        data.liquidityChangeETH = liquidityChangeETH
-        data.oneDayTxns = oneDayTxns
-        data.txnChange = txnChange
-        // new tokens
-        if (!oneDayHistory && data) {
-          data.oneDayVolumeUSD = data.volumeUSD
-          data.oneDayVolumeETH = data.tradeVolume * data.derivedETH
-        }
-        if (!oneWeekHistory && data) {
-          data.oneWeekVolumeUSD = data.volumeUSD
-        }
-        if (data?.token0?.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
-          data.token0.name = 'ETH (Wrapped)'
-          data.token0.symbol = 'ETH'
-        }
-
-        if (data?.token1?.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
-          data.token1.name = 'ETH (Wrapped)'
-          data.token1.symbol = 'ETH'
-        }
-
-        return data
-      })
-    )
-  } catch (e) {
-    console.log(e)
-  }
-}
-
-const getTopPairData = async ethPrice => {
-  const utcCurrentTime = dayjs()
-  const utcOneDayBack = utcCurrentTime
-    .subtract(1, 'day')
-    .startOf('minute')
-    .unix()
-  const utcTwoDaysBack = utcCurrentTime
-    .subtract(2, 'day')
-    .startOf('minute')
-    .unix()
-  const utcOneWeekBack = utcCurrentTime
-    .subtract(1, 'week')
-    .startOf('minute')
-    .unix()
-  let oneDayBlock = await getBlockFromTimestamp(utcOneDayBack)
-  let twoDayBlock = await getBlockFromTimestamp(utcTwoDaysBack)
-  let oneWeekBlock = await getBlockFromTimestamp(utcOneWeekBack)
-
-  try {
-    let current = await client.query({
-      query: PAIRS_CURRENT,
-      fetchPolicy: 'cache-first'
-    })
-
-    let [oneDayResult, twoDayResult, oneWeekResult] = await Promise.all(
-      [oneDayBlock, twoDayBlock, oneWeekBlock].map(async block => {
-        let result = client.query({
-          query: PAIRS_DYNAMIC_BULK(
-            block,
-            current.data.pairs.map(pair => {
-              return pair.id
+          // catch the case where token wasnt in top list in previous days
+          if (!oneDayHistory) {
+            let oneDayResult = await client.query({
+              query: PAIR_DATA(pair.id, oneDayBlock),
+              fetchPolicy: 'cache-first'
             })
-          ),
-          fetchPolicy: 'cache-first'
+            oneDayHistory = oneDayResult
+          }
+          if (!oneWeekHistory) {
+            let oneWeekResult = await client.query({
+              query: PAIR_DATA(pair.id, oneWeekBlock),
+              fetchPolicy: 'cache-first'
+            })
+            oneWeekHistory = oneWeekResult
+          }
+
+          const [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentChange(
+            data?.volumeUSD,
+            oneDayHistory?.volumeUSD ?? 0,
+            twoDayHistory?.volumeUSD ?? 0
+          )
+
+          const oneWeekVolumeUSD = parseFloat(
+            oneWeekData ? data?.volumeUSD - oneWeekHistory?.volumeUSD : data.volumeUSD
+          )
+          const [oneDayVolumeETH, volumeChangeETH] = get2DayPercentChange(
+            data.tradeVolumeETH,
+            oneDayHistory?.tradeVolumeETH ?? 0,
+            twoDayHistory?.tradeVolumeETH ?? 0
+          )
+          const [oneDayTxns, txnChange] = get2DayPercentChange(
+            data.txCount,
+            oneDayHistory?.txCount ?? 0,
+            twoDayHistory?.txCount ?? 0
+          )
+
+          const liquidityChangeUSD = getPercentChange(data.reserveUSD, oneDayHistory?.reserveUSD)
+          const liquidityChangeETH = getPercentChange(data.reserveUSD, oneDayHistory?.reserveUSD)
+          data.reserveUSD = data.reserveETH ? data.reserveETH * ethPrice : data.reserveUSD
+          data.trackedReserveUSD = parseFloat(pair.trackedReserveETH) * ethPrice
+          data.oneDayVolumeUSD = oneDayVolumeUSD
+          data.oneDayVolumeETH = oneDayVolumeETH
+          data.oneWeekVolumeUSD = oneWeekVolumeUSD
+          data.volumeChangeUSD = volumeChangeUSD
+          data.volumeChangeETH = volumeChangeETH
+          data.liquidityChangeUSD = liquidityChangeUSD
+          data.liquidityChangeETH = liquidityChangeETH
+          data.oneDayTxns = oneDayTxns
+          data.txnChange = txnChange
+          // new tokens
+          if (!oneDayHistory && data) {
+            data.oneDayVolumeUSD = data.volumeUSD
+            data.oneDayVolumeETH = data.tradeVolume * data.derivedETH
+          }
+          if (!oneWeekHistory && data) {
+            data.oneWeekVolumeUSD = data.volumeUSD
+          }
+          if (data?.token0?.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
+            data.token0.name = 'Ether (Wrapped)'
+            data.token0.symbol = 'ETH'
+          }
+
+          if (data?.token1?.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
+            data.token1.name = 'Ether (Wrapped)'
+            data.token1.symbol = 'ETH'
+          }
+
+          return data
         })
-        return result
-      })
     )
-
-    let oneDayData = oneDayResult?.data?.pairs.reduce((obj, cur, i) => {
-      return { ...obj, [cur.id]: cur }
-    }, {})
-
-    let twoDayData = twoDayResult?.data?.pairs.reduce((obj, cur, i) => {
-      return { ...obj, [cur.id]: cur }
-    }, {})
-
-    let oneWeekData = oneWeekResult?.data?.pairs.reduce((obj, cur, i) => {
-      return { ...obj, [cur.id]: cur }
-    }, {})
-
-    // now loop through current exchanges
-    return (
-      current &&
-      current.data.pairs.map(pair => {
-        let data = pair
-        let oneDayHistory = oneDayData?.[pair.id]
-        let twoDayHistory = twoDayData?.[pair.id]
-        let oneWeekHistory = oneWeekData?.[pair.id]
-
-        const [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentChange(
-          data?.volumeUSD,
-          oneDayHistory?.volumeUSD ?? 0,
-          twoDayHistory?.volumeUSD ?? 0
-        )
-
-        // catch the case where token wasnt in top list in previous days
-        // if (!oneDayHistory) {
-        //   let oneDayResult = await client.query({
-        //     query: PAIR_DATA(pair.id, oneDayBlock),
-        //     fetchPolicy: 'cache-first'
-        //   })
-        //   oneDayHistory = oneDayResult
-        // }
-        // if (!oneWeekHistory) {
-        //   let oneWeekResult = await client.query({
-        //     query: PAIR_DATA(pair.id, oneWeekBlock),
-        //     fetchPolicy: 'cache-first'
-        //   })
-        //   oneWeekHistory = oneWeekResult
-        // }
-
-        const oneWeekVolumeUSD = parseFloat(oneWeekData ? data?.volumeUSD - oneWeekHistory?.volumeUSD : data.volumeUSD)
-        const [oneDayVolumeETH, volumeChangeETH] = get2DayPercentChange(
-          data.tradeVolumeETH,
-          oneDayHistory?.tradeVolumeETH ?? 0,
-          twoDayHistory?.tradeVolumeETH ?? 0
-        )
-        const [oneDayTxns, txnChange] = get2DayPercentChange(
-          data.txCount,
-          oneDayHistory?.txCount ?? 0,
-          twoDayHistory?.txCount ?? 0
-        )
-        const liquidityChangeUSD = getPercentChange(data.reserveUSD, oneDayHistory?.reserveUSD)
-        const liquidityChangeETH = getPercentChange(data.reserveUSD, oneDayHistory?.reserveUSD)
-        data.reserveUSD = data.reserveETH ? data.reserveETH * ethPrice : data.reserveUSD
-        data.trackedReserveUSD = data.trackedReserveETH * ethPrice
-        data.oneDayVolumeUSD = oneDayVolumeUSD
-        data.oneDayVolumeETH = oneDayVolumeETH
-        data.oneWeekVolumeUSD = oneWeekVolumeUSD
-        data.volumeChangeUSD = volumeChangeUSD
-        data.volumeChangeETH = volumeChangeETH
-        data.liquidityChangeUSD = liquidityChangeUSD
-        data.liquidityChangeETH = liquidityChangeETH
-        data.oneDayTxns = oneDayTxns
-        data.txnChange = txnChange
-        // new tokens
-        if (!oneDayHistory && data) {
-          data.oneDayVolumeUSD = data.volumeUSD
-          data.oneDayVolumeETH = data.tradeVolume * data.derivedETH
-        }
-        if (!oneWeekHistory && data) {
-          data.oneWeekVolumeUSD = data.volumeUSD
-        }
-
-        if (data?.token0?.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
-          data.token0.name = 'ETH (Wrapped)'
-          data.token0.symbol = 'ETH'
-        }
-
-        if (data?.token1?.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
-          data.token1.name = 'ETH (Wrapped)'
-          data.token1.symbol = 'ETH'
-        }
-        return data
-      })
-    )
+    return pairData
   } catch (e) {
     console.log(e)
   }
@@ -567,8 +454,21 @@ export function Updater() {
 
   useEffect(() => {
     async function getData() {
-      // get top pairs for overview list
-      let topPairs = await getTopPairData(ethPrice)
+      // get top pairs by reserves
+      let {
+        data: { pairs }
+      } = await client.query({
+        query: PAIRS_CURRENT,
+        fetchPolicy: 'cache-first'
+      })
+
+      // format as array of addresses
+      const formattedPairs = pairs.map(pair => {
+        return pair.id
+      })
+
+      // get data for every pair in list
+      let topPairs = await getBulkPairData(formattedPairs, ethPrice)
       topPairs && updateTopPairs(topPairs)
     }
     ethPrice && getData()
