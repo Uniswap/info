@@ -143,7 +143,6 @@ function TokenPage({ address, history }) {
   const priceChange = priceChangeUSD ? formattedPercent(priceChangeUSD) : ''
 
   // volume
-
   const volume = oneDayVolumeUSD ? formattedNum(oneDayVolumeUSD, true) : oneDayVolumeUSD === 0 ? '$0' : ''
   const volumeChange = formattedPercent(volumeChangeUSD)
 
@@ -224,7 +223,7 @@ function TokenPage({ address, history }) {
             )}
 
             <PanelWrapper style={{ marginTop: '1.5rem' }}>
-              {below1080 && (
+              {below1080 && price && (
                 <Panel>
                   <AutoColumn gap="20px">
                     <RowBetween>
