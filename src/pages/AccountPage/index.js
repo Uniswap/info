@@ -4,7 +4,7 @@ import styled from 'styled-components'
 import { useUserTransactions, useUserPositions } from '../../contexts/User'
 import TxnList from '../../components/TxnList'
 import Panel from '../../components/Panel'
-import { formattedNum, formattedPercent } from '../../helpers'
+import { formattedNum } from '../../helpers'
 import { AutoRow, RowFixed, RowBetween } from '../../components/Row'
 import { Text } from 'rebass'
 import { AutoColumn } from '../../components/Column'
@@ -129,7 +129,7 @@ const LIST_VIEW = {
 
 // used for animation number formatting
 const formatValue = value => formattedNum(value, true, true)
-const formatAnimatedPercent = percent => formattedPercent(percent)
+// const formatAnimatedPercent = percent => formattedPercent(percent)
 
 function AccountPage({ account }) {
   const transactions = useUserTransactions(account)
@@ -149,45 +149,42 @@ function AccountPage({ account }) {
   const below1080 = useMedia('(max-width: 1080px)')
   const [activePosition, setActivePosition] = useState()
 
+  // get data for user stats
+  const transactionCount = transactions?.swaps?.length + transactions?.burns?.length + transactions?.mints?.length
+
   // get derived totals
   const positionValue = calculateTotalLiquidity(positions)
-  const transactionCount = transactions?.swaps?.length + transactions?.burns?.length + transactions?.mints?.length
+
+  const netHodl = positions?.reduce(function(total, position) {
+    return total + position.hodl.sum
+  }, 0)
+
+  const hodlReturn = positions?.reduce(function(total, position) {
+    return total + position.hodl.return
+  }, 0)
+
+  const netUniswapReturn = positions?.reduce(function(total, position) {
+    return total + position.uniswap.return
+  }, 0)
+  const netPrincipal = positions?.reduce(function(total, position) {
+    return total + position.principal.usd
+  }, 0)
+
   const netReturn = positions?.reduce(function(total, position) {
-    return total + position.netReturn
+    return total + position.net.return
   }, 0)
-  const assetReturn = positions?.reduce(function(total, position) {
-    return total + position.assetReturn
-  }, 0)
-  const netChange = positions?.reduce(function(total, position) {
-    return total + position.netPercentChange
-  }, 0)
-  const averageNetChange = netChange / positions?.length
-  const assetChange = positions?.reduce(function(total, position) {
-    return total + position.assetPercentChange
-  }, 0)
-  const averageAssetChange = assetChange / positions?.length
 
   // animated dollar values
-  const [animatedNetReturn, setAnimatedNetReturn] = useState()
-  const [animatedAssetReturn, setAnimatedAssetReturn] = useState()
+  const [animatedHodlSum, setAnimatedHodlSum] = useState()
   const [animatedUniswapReturn, setAnimatedUniswapReturn] = useState() // derive from net and asset
   const [animatedPositionValue, setAnimatedPositionVal] = useState()
-
-  // animated percent values
-  const [animatedNetChange, setAnimatedNetChange] = useState()
-  const [animatedAssetChange, setAnimatedAssetChange] = useState()
-  const [animatedUniswapChange, setAnimatedUniswapChange] = useState()
 
   // reset aggregate values if they change
   useEffect(() => {
     positionValue && setAnimatedPositionVal(positionValue)
-    netReturn && setAnimatedNetReturn(netReturn)
-    averageNetChange && setAnimatedNetChange(averageNetChange)
-    averageAssetChange && setAnimatedAssetChange(averageAssetChange)
-    assetReturn && setAnimatedAssetReturn(assetReturn)
-    netReturn && assetReturn && setAnimatedUniswapReturn(netReturn - assetReturn)
-    averageNetChange && averageAssetChange && setAnimatedUniswapChange(averageNetChange - averageAssetChange)
-  }, [assetReturn, averageAssetChange, averageNetChange, netReturn, positionValue])
+    netHodl && setAnimatedHodlSum(netHodl)
+    netUniswapReturn && setAnimatedUniswapReturn(netUniswapReturn)
+  }, [netHodl, positionValue, netUniswapReturn])
 
   return (
     <PageWrapper>
@@ -270,30 +267,55 @@ function AccountPage({ account }) {
               <AutoColumn gap="10px">
                 <RowBetween>
                   <TYPE.main fontSize={'16px'} fontWeight={400} color="#888D9B">
-                    Total Supplied Liquidity
-                  </TYPE.main>
-                  <div />
-                </RowBetween>
-                <RowBetween align="flex-end">
-                  <TYPE.main fontSize={'24px'} lineHeight={1} fontWeight={600}>
-                    <AnimatedNumber value={animatedPositionValue} formatValue={formatValue} duration={200} />
-                  </TYPE.main>
-                  <TYPE.main></TYPE.main>
-                </RowBetween>
-              </AutoColumn>
-              <AutoColumn gap="10px">
-                <RowBetween>
-                  <TYPE.main fontSize={'16px'} fontWeight={400} color="#888D9B">
-                    Net USD Return
+                    Uniswap Performance (Total Supplied)
                   </TYPE.main>
                   <div />
                 </RowBetween>
                 <RowFixed align="flex-end">
                   <TYPE.main fontSize={'24px'} lineHeight={1} fontWeight={600}>
-                    <AnimatedNumber value={animatedNetReturn} formatValue={formatValue} duration={200} />
+                    <AnimatedNumber value={animatedPositionValue} formatValue={formatValue} duration={200} />
                   </TYPE.main>
-                  <TYPE.main fontSize="18px" ml="8px">
-                    <AnimatedNumber value={animatedNetChange} formatValue={formatAnimatedPercent} duration={200} />
+                  <TYPE.main
+                    fontSize="14px"
+                    ml="8px"
+                    color={netReturn ? (netReturn > 0 ? 'green' : netReturn === 0 ? 'black' : 'red') : 'black'}
+                  >
+                    {netReturn ? (netReturn > 0 ? '+' : netReturn === 0 ? '' : '-') : ''}
+                    <AnimatedNumber value={netReturn} formatValue={formatValue} duration={200} />
+                  </TYPE.main>
+                </RowFixed>
+              </AutoColumn>
+              <AutoColumn gap="10px">
+                <RowBetween>
+                  <TYPE.main fontSize={'16px'} fontWeight={400} color="#888D9B">
+                    HODL Performance
+                  </TYPE.main>
+                  <div />
+                </RowBetween>
+                <RowFixed align="flex-end">
+                  <TYPE.main fontSize={'24px'} lineHeight={1} fontWeight={600}>
+                    <AnimatedNumber value={animatedHodlSum} formatValue={formatValue} duration={200} />
+                  </TYPE.main>
+                  <TYPE.main
+                    fontSize="14px"
+                    ml="8px"
+                    color={hodlReturn ? (hodlReturn > 0 ? 'green' : hodlReturn === 0 ? 'black' : 'red') : 'black'}
+                  >
+                    {hodlReturn ? (hodlReturn > 0 ? '+' : hodlReturn === 0 ? '' : '-') : ''}
+                    <AnimatedNumber value={hodlReturn} formatValue={formatValue} duration={200} />
+                  </TYPE.main>
+                </RowFixed>
+              </AutoColumn>
+              <AutoColumn gap="10px">
+                <RowBetween>
+                  <TYPE.main fontSize={'16px'} fontWeight={400} color="#888D9B">
+                    Principal (Cost Basis)
+                  </TYPE.main>
+                  <div />
+                </RowBetween>
+                <RowFixed align="flex-end">
+                  <TYPE.main fontSize={'24px'} lineHeight={1} fontWeight={600}>
+                    <AnimatedNumber value={netPrincipal} formatValue={formatValue} duration={200} />
                   </TYPE.main>
                 </RowFixed>
               </AutoColumn>
@@ -305,27 +327,20 @@ function AccountPage({ account }) {
                   <div />
                 </RowBetween>
                 <RowFixed align="flex-end">
-                  <TYPE.main fontSize={'24px'} lineHeight={1} fontWeight={600}>
+                  <TYPE.main
+                    fontSize={'24px'}
+                    lineHeight={1}
+                    fontWeight={600}
+                    color={animatedUniswapReturn > 0 ? 'green' : animatedUniswapReturn === 0 ? 'black' : 'red'}
+                  >
+                    {animatedUniswapReturn
+                      ? animatedUniswapReturn > 0
+                        ? '+'
+                        : animatedUniswapReturn === 0
+                        ? ''
+                        : '-'
+                      : ''}
                     <AnimatedNumber value={animatedUniswapReturn} formatValue={formatValue} duration={200} />
-                  </TYPE.main>
-                  <TYPE.main fontSize="18px" ml="8px">
-                    <AnimatedNumber value={animatedUniswapChange} formatValue={formatAnimatedPercent} duration={200} />
-                  </TYPE.main>
-                </RowFixed>
-              </AutoColumn>
-              <AutoColumn gap="10px">
-                <RowBetween>
-                  <TYPE.main fontSize={'16px'} fontWeight={400} color="#888D9B">
-                    Asset Return
-                  </TYPE.main>
-                  <div />
-                </RowBetween>
-                <RowFixed align="flex-end">
-                  <TYPE.main fontSize={'24px'} lineHeight={1} fontWeight={600}>
-                    <AnimatedNumber value={animatedAssetReturn} formatValue={formatValue} duration={200} />
-                  </TYPE.main>
-                  <TYPE.main fontSize="18px" ml="8px">
-                    <AnimatedNumber value={animatedAssetChange} formatValue={formatAnimatedPercent} duration={200} />
                   </TYPE.main>
                 </RowFixed>
               </AutoColumn>
@@ -335,18 +350,6 @@ function AccountPage({ account }) {
             {activePosition ? (
               <PairReturnsChart
                 account={account}
-                baseNetReturn={netReturn}
-                baseAssetReturn={assetReturn}
-                baseUniswapReturn={netReturn - assetReturn}
-                baseAssetChange={averageAssetChange}
-                baseNetChange={averageNetChange}
-                baseUniswapChange={averageNetChange - averageAssetChange}
-                setAnimatedAssetReturn={setAnimatedAssetReturn}
-                setAnimatedNetReturn={setAnimatedNetReturn}
-                setAnimatedUniswapReturn={setAnimatedUniswapReturn}
-                setAnimatedAssetChange={setAnimatedAssetChange}
-                setAnimatedNetChange={setAnimatedNetChange}
-                setAnimatedUniswapChange={setAnimatedUniswapChange}
                 position={activePosition}
                 setAnimatedPositionVal={setAnimatedPositionVal}
                 positionValue={positionValue}

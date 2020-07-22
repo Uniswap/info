@@ -1,5 +1,9 @@
-import React, { createContext, useContext, useReducer, useMemo, useCallback } from 'react'
+import React, { createContext, useContext, useReducer, useMemo, useCallback, useState, useEffect } from 'react'
 import { timeframeOptions } from '../constants'
+
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
+dayjs.extend(utc)
 
 const UPDATE = 'UPDATE'
 const UPDATE_TIMEFRAME = 'UPDATE_TIMEFRAME'
@@ -85,4 +89,29 @@ export function useTimeframe() {
   const [state, { updateTimeframe }] = useApplicationContext()
   const activeTimeframe = state?.[TIME_KEY]
   return [activeTimeframe, updateTimeframe]
+}
+
+export function useStartTimestamp() {
+  const [activeWindow] = useTimeframe()
+  const [startDateTimestamp, setStartDateTimestamp] = useState()
+
+  // monitor the old date fetched
+  useEffect(() => {
+    // based on window, get starttime
+    let startTime =
+      dayjs
+        .utc()
+        .subtract(
+          1,
+          activeWindow === timeframeOptions.week ? 'week' : activeWindow === timeframeOptions.ALL_TIME ? 'year' : 'year'
+        )
+        .startOf('day')
+        .unix() - 1
+    // if we find a new start time less than the current startrtime - update oldest pooint to fetch
+    if ((activeWindow && startTime < startDateTimestamp) || !startDateTimestamp) {
+      setStartDateTimestamp(startTime)
+    }
+  }, [activeWindow, startDateTimestamp])
+
+  return startDateTimestamp
 }

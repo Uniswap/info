@@ -1,19 +1,14 @@
 import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect, useState } from 'react'
 import { usePairData } from './PairData'
 import { client } from '../apollo/client'
-import {
-  USER_TRANSACTIONS,
-  USER_POSITIONS,
-  USER_HISTORY,
-  USER_HISTORY__PER_PAIR,
-  PAIR_DAY_DATA_BULK
-} from '../apollo/queries'
-import { useTimeframe } from './Application'
+import { USER_TRANSACTIONS, USER_POSITIONS, USER_HISTORY, PAIR_DAY_DATA_BULK } from '../apollo/queries'
+import { useTimeframe, useStartTimestamp } from './Application'
 import { timeframeOptions } from '../constants'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { useEthPrice } from './GlobalData'
 import { getShareValueOverTime } from '../helpers'
+import { getLPReturnsOnPair } from '../helpers/returns'
 
 dayjs.extend(utc)
 
@@ -169,9 +164,14 @@ export function useUserTransactions(account) {
 }
 
 export function useReturnsPerPairHistory(position, account) {
+  const pairAddress = position?.pair?.id
   const [state] = useUserContext()
-  const history = state?.[account]?.[USER_POSITION_HISTORY_KEY]
 
+  // get oldest date of data to fetch
+  const startDateTimestamp = useStartTimestamp()
+
+  // get users adds and removes on this pair
+  const history = state?.[account]?.[USER_POSITION_HISTORY_KEY]
   const pairSnapshots =
     history &&
     position &&
@@ -179,38 +179,12 @@ export function useReturnsPerPairHistory(position, account) {
       return currentPosition.pair.id === position.pair.id
     })
 
-  // formatetd array to return for chart data
-  const [formattedHistory, setFormattedHistory] = useState()
-
-  const [startDateTimestamp, setStartDateTimestamp] = useState()
-  const [activeWindow] = useTimeframe()
-
-  const pairAddress = position?.pair?.id
-
+  // get data needed for calculations
   const currentPairData = usePairData(pairAddress)
   const currentETHPrice = useEthPrice()
 
-  // monitor the old date fetched
-  useEffect(() => {
-    const utcEndTime = dayjs.utc()
-    // based on window, get starttime
-    let utcStartTime
-    switch (activeWindow) {
-      case timeframeOptions.WEEK:
-        utcStartTime = utcEndTime.subtract(1, 'week').startOf('day')
-        break
-      case timeframeOptions.ALL_TIME:
-        utcStartTime = utcEndTime.subtract(1, 'year')
-        break
-      default:
-        utcStartTime = utcEndTime.subtract(1, 'year').startOf('year')
-        break
-    }
-    let startTime = utcStartTime.unix() - 1
-    if ((activeWindow && startTime < startDateTimestamp) || !startDateTimestamp) {
-      setStartDateTimestamp(startTime)
-    }
-  }, [activeWindow, startDateTimestamp])
+  // formatetd array to return for chart data
+  const [formattedHistory, setFormattedHistory] = useState()
 
   useEffect(() => {
     async function fetchData() {
@@ -544,176 +518,6 @@ export function useUserLiquidityHistory(account) {
   return formattedHistory
 }
 
-export const priceOverrides = [
-  '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', // USDC
-  '0x6b175474e89094c44da98b954eedeac495271d0f' // DAI
-]
-
-/**
- *
- *
- */
-
-export async function getReturns(user, pair, ethPrice) {
-  const {
-    data: { liquidityPositionSnapshots: history }
-  } = await client.query({
-    query: USER_HISTORY__PER_PAIR,
-    variables: {
-      user,
-      pair: pair.id
-    }
-  })
-
-  // asset return
-  let assetReturn = 0
-  let assetPercentChange = 0
-
-  // net return
-  let netReturn = 0
-  let netPercentChange = 0
-
-  // get data about the current position
-  const currentPosition = {
-    liquidityTokenBalance: history[history.length - 1].liquidityTokenBalance,
-    liquidityTokenTotalSupply: pair.totalSupply,
-    reserve0: pair.reserve0,
-    reserve1: pair.reserve1,
-    reserveUSD: pair.reserveUSD,
-    token0PriceUSD: pair.token0.derivedETH * ethPrice,
-    token1PriceUSD: pair.token1.derivedETH * ethPrice
-  }
-
-  // calculate the total USD amount provided to use for weighting
-  let totalAmountProvidedUSD = 0
-  for (const index in history) {
-    let positionT0 = history[index]
-    totalAmountProvidedUSD =
-      totalAmountProvidedUSD +
-      (parseFloat(positionT0.liquidityTokenBalance) / parseFloat(positionT0.liquidityTokenTotalSupply)) *
-        parseFloat(positionT0.reserveUSD)
-  }
-
-  for (const index in history) {
-    // get positions at both bounds of the window
-    let positionT0 = history[index]
-    let positionT1 = history[parseInt(index) + 1] || {}
-
-    // if at last index in history - use current data as end of window
-    if (parseInt(index) === history.length - 1) {
-      positionT1 = currentPosition
-    }
-
-    // hard code prices before launch to get better results for stablecoins and WETH
-    if (positionT0.timestamp < 1589747086) {
-      if (priceOverrides.includes(positionT0.pair.token0.id)) {
-        positionT0.token0PriceUSD = 1
-      }
-      if (priceOverrides.includes(positionT0.pair.token1.id)) {
-        positionT0.token1PriceUSD = 1
-      }
-
-      // WETH price
-      if (positionT0.pair.token0.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
-        positionT0.token0PriceUSD = 203
-      }
-      if (positionT0.pair.token1.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
-        positionT0.token1PriceUSD = 203
-      }
-    }
-    if (positionT1.timestamp < 1589747086) {
-      if (priceOverrides.includes(positionT1.pair.token0.id)) {
-        positionT1.token0PriceUSD = 1
-      }
-      if (priceOverrides.includes(positionT1.pair.token1.id)) {
-        positionT1.token1PriceUSD = 1
-      }
-      // WETH price
-      if (positionT1.pair.token0.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
-        positionT1.token0PriceUSD = 203
-      }
-      if (positionT1.pair.token1.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
-        positionT1.token1PriceUSD = 203
-      }
-    }
-
-    // calculate ownership at ends of window, for end of window we need original LP token balance / new total supply
-    const t0Ownership = parseFloat(positionT0.liquidityTokenBalance) / parseFloat(positionT0.liquidityTokenTotalSupply)
-    const t1Ownership = parseFloat(positionT0.liquidityTokenBalance) / parseFloat(positionT1.liquidityTokenTotalSupply)
-
-    // get starting amounts of token0 and token1 deposited by LP
-    const token0_amount_t0 = t0Ownership * parseFloat(positionT0.reserve0)
-    const token1_amount_t0 = t0Ownership * parseFloat(positionT0.reserve1)
-
-    // // get current token values
-    // const token0_amount_t1 = t1Ownership * parseFloat(positionT1.reserve0)
-    // const token1_amount_t1 = t1Ownership * parseFloat(positionT1.reserve1)
-
-    // // calculate squares to find imp loss and fee differences
-    // const sqrK_t0 = Math.sqrt(token0_amount_t0 * token1_amount_t0)
-    // const token0_amount_no_fees = sqrK_t0 * Math.sqrt(positionT1.token1PriceUSD)
-    // const token1_amount_no_fees = sqrK_t0 / Math.sqrt(positionT1.token1PriceUSD)
-    // const no_fees_usd =
-    //   token0_amount_no_fees * positionT1.token0PriceUSD + token1_amount_no_fees * positionT1.token1PriceUSD
-
-    // const difference_fees_token0 = token0_amount_t1 - token0_amount_no_fees
-    // const difference_fees_token1 = token1_amount_t1 - token1_amount_no_fees
-    // const difference_fees_usd =
-    //   difference_fees_token0 * positionT1.token0PriceUSD + difference_fees_token1 * positionT1.token1PriceUSD
-
-    // calculate USD value at t0 and t1 using initial token deposit amounts for asset return
-    const assetValueT0 =
-      token0_amount_t0 * parseFloat(positionT0.token0PriceUSD) +
-      token1_amount_t0 * parseFloat(positionT0.token1PriceUSD)
-
-    const assetValueT1 =
-      token0_amount_t0 * parseFloat(positionT1.token0PriceUSD) +
-      token1_amount_t0 * parseFloat(positionT1.token1PriceUSD)
-
-    // const imp_loss_usd = no_fees_usd - assetValueT1
-    // const uniswap_return = difference_fees_usd + imp_loss_usd
-
-    // calculate value delta based on  prices_t1 - prices_t0 * token_amounts
-    const assetValueChange = assetValueT1 - assetValueT0
-    assetReturn = assetReturn ? assetReturn + assetValueChange : assetValueChange
-
-    // get net value change for combined data
-    const netValueT0 = t0Ownership * parseFloat(positionT0.reserveUSD)
-    const netValueT1 = t1Ownership * parseFloat(positionT1.reserveUSD)
-    netReturn = netReturn ? netReturn + netValueT1 - netValueT0 : netValueT1 - netValueT0
-
-    // calculate the weight of this interval based on position ratio to total supplied
-    const weight = (t0Ownership * parseFloat(positionT0.reserveUSD)) / totalAmountProvidedUSD
-
-    // calculate the weighted percent changes for each metric
-    const weightedAssetChange = ((weight * assetValueChange) / assetValueT0) * 100
-    const wieghtedNetChange = ((weight * (netValueT1 - netValueT0)) / netValueT0) * 100
-
-    // update the global percent changes
-    assetPercentChange = assetPercentChange ? assetPercentChange + weightedAssetChange : weightedAssetChange
-    netPercentChange = netPercentChange ? netPercentChange + wieghtedNetChange : wieghtedNetChange
-  }
-
-  // uniswap specific return
-  let uniswapReturn = netReturn - assetReturn
-  let uniswapPercentChange = netPercentChange - assetPercentChange
-
-  return {
-    asset: {
-      return: assetReturn,
-      percent: assetPercentChange
-    },
-    net: {
-      return: netReturn,
-      percent: netPercentChange
-    },
-    uniswap: {
-      return: uniswapReturn,
-      percent: uniswapPercentChange
-    }
-  }
-}
-
 export function useUserPositions(account) {
   const [state, { updatePositions, updateUserHodlReturns }] = useUserContext()
   const positions = state?.[account]?.[POSITIONS_KEY]
@@ -732,15 +536,10 @@ export function useUserPositions(account) {
         if (result?.data?.liquidityPositions) {
           let formattedPositions = await Promise.all(
             result?.data?.liquidityPositions.map(async positionData => {
-              const returnData = await getReturns(account, positionData.pair, ethPrice)
+              const returnData = await getLPReturnsOnPair(account, positionData.pair, ethPrice)
               return {
                 ...positionData,
-                assetReturn: returnData.asset.return,
-                assetPercentChange: returnData.asset.percent,
-                netReturn: returnData.net.return,
-                netPercentChange: returnData.net.percent,
-                uniswapReturn: returnData.uniswap.return,
-                uniswapPercentChange: returnData.uniswap.percent
+                ...returnData
               }
             })
           )

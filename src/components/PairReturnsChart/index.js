@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import { XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid, ComposedChart, Line, Area, Bar } from 'recharts'
+import { XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid, ComposedChart, Line, Bar } from 'recharts'
 import { AutoRow, RowBetween } from '../Row'
 
 import { toK, toNiceDate, toNiceDateYear } from '../../helpers'
@@ -25,24 +25,7 @@ const CHART_VIEW = {
   LIQUIDITY: 'Liquidity'
 }
 
-const PairReturnsChart = ({
-  account,
-  baseNetReturn,
-  baseAssetReturn,
-  baseUniswapReturn,
-  setAnimatedNetReturn,
-  setAnimatedAssetReturn,
-  setAnimatedUniswapReturn,
-  setAnimatedAssetChange,
-  setAnimatedNetChange,
-  setAnimatedUniswapChange,
-  baseAssetChange,
-  baseNetChange,
-  baseUniswapChange,
-  setAnimatedPositionVal,
-  positionValue,
-  position
-}) => {
+const PairReturnsChart = ({ account, setAnimatedPositionVal, positionValue, position }) => {
   const [chartFilter, setChartFilter] = useState(CHART_VIEW.LIQUIDITY)
 
   const chartData = useUserLiquidityHistory(account)
@@ -118,22 +101,10 @@ const PairReturnsChart = ({
             onMouseMove={e => {
               if (e?.activePayload?.[0]?.value) {
                 setAnimatedPositionVal(e.activePayload[0].value)
-                setAnimatedAssetReturn(e.activePayload[1].value)
-                setAnimatedUniswapReturn(e.activePayload[2].value)
-                setAnimatedNetReturn(e.activePayload[3].value)
-                setAnimatedAssetChange(e.activePayload[4].value)
-                setAnimatedUniswapChange(e.activePayload[5].value)
-                setAnimatedNetChange(e.activePayload[6].value)
               }
             }}
             onMouseLeave={() => {
               setAnimatedPositionVal(positionValue)
-              setAnimatedNetReturn(baseNetReturn)
-              setAnimatedAssetReturn(baseAssetReturn)
-              setAnimatedUniswapReturn(baseUniswapReturn)
-              setAnimatedAssetChange(baseAssetChange)
-              setAnimatedNetChange(baseNetChange)
-              setAnimatedUniswapChange(baseUniswapChange)
             }}
             margin={{ top: 0, right: 10, bottom: 6, left: 0 }}
             barCategoryGap={1}
