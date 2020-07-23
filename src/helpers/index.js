@@ -124,7 +124,10 @@ export async function getShareValueOverTime(pairAddress, timestamps) {
         reserveUSD: result.data[row].reserveUSD,
         token0DerivedETH: result.data[row].token0.derivedETH,
         token1DerivedETH: result.data[row].token1.derivedETH,
-        roiUsd: values && values[0] ? sharePriceUsd / values[0]['sharePriceUsd'] : 1
+        roiUsd: values && values[0] ? sharePriceUsd / values[0]['sharePriceUsd'] : 1,
+        ethPrice: 0,
+        token0PriceUSD: 0,
+        token1PriceUSD: 0
       })
     }
   }
@@ -135,6 +138,8 @@ export async function getShareValueOverTime(pairAddress, timestamps) {
     let timestamp = brow.split('b')[1]
     if (timestamp) {
       values[index].ethPrice = result.data[brow].ethPrice
+      values[index].token0PriceUSD = result.data[brow].ethPrice * values[index].token0DerivedETH
+      values[index].token1PriceUSD = result.data[brow].ethPrice * values[index].token1DerivedETH
       index += 1
     }
   }
@@ -249,12 +254,7 @@ export const formattedNum = (number, usd = false, acceptNegatives = false) => {
     }
     return 0
   }
-  if (num < 0.0001) {
-    if (acceptNegatives) {
-      return usd
-        ? '$' + Number(parseFloat(num).toFixed(4)).toLocaleString()
-        : '' + Number(parseFloat(num).toFixed(4)).toLocaleString()
-    }
+  if (num < 0.0001 && num > 0) {
     return usd ? '< $0.0001' : '< 0.0001'
   }
 

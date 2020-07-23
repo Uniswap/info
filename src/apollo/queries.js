@@ -124,11 +124,29 @@ export const USER_MINTS_BUNRS_PER_PAIR = gql`
       amountUSD
       amount0
       amount1
+      timestamp
+      pair {
+        token0 {
+          id
+        }
+        token1 {
+          id
+        }
+      }
     }
     burns(where: { sender: $user, pair: $pair }) {
       amountUSD
       amount0
       amount1
+      timestamp
+      pair {
+        token0 {
+          id
+        }
+        token1 {
+          id
+        }
+      }
     }
   }
 `

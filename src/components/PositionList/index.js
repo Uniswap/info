@@ -129,6 +129,7 @@ function PositionList({ positions }) {
   const ListItem = ({ position, index }) => {
     const poolOwnership = position.liquidityTokenBalance / position.pair.totalSupply
     const valueUSD = poolOwnership * position.pair.reserveUSD
+
     return (
       <DashGrid focus={true}>
         <DataText area="number">{index}</DataText>
@@ -182,7 +183,7 @@ function PositionList({ positions }) {
         </DataText>
         <DataText area="uniswap">
           <AutoColumn gap="12px" justify="flex-end">
-            <Text fontWeight={500}>{formattedNum(valueUSD, true)}</Text>
+            <Text fontWeight={500}>{formattedNum(valueUSD, true, true)}</Text>
             <AutoColumn gap="4px" justify="flex-end">
               <Text fontSize="12px">
                 {formattedNum(poolOwnership * parseFloat(position.pair.reserve0))} {position.pair.token0.symbol}
@@ -239,6 +240,9 @@ function PositionList({ positions }) {
         return 1
       })
       .slice(ITEMS_PER_PAGE * (page - 1), page * ITEMS_PER_PAGE)
+      .filter(id => {
+        return positions[id].liquidityTokenBalance > 0
+      })
       .map((id, index) => {
         return (
           <div key={index}>

@@ -25,7 +25,7 @@ const CHART_VIEW = {
   LIQUIDITY: 'Liquidity'
 }
 
-const UserChart = ({ account, setAnimatedVal, animatedVal, positionValue }) => {
+const UserChart = ({ account }) => {
   const [chartFilter, setChartFilter] = useState(CHART_VIEW.LIQUIDITY)
 
   const chartData = useUserLiquidityHistory(account)
@@ -95,17 +95,7 @@ const UserChart = ({ account, setAnimatedVal, animatedVal, positionValue }) => {
       )}
       {chartFilter === CHART_VIEW.LIQUIDITY && chartData && (
         <ResponsiveContainer aspect={below1080 ? 60 / 32 : below600 ? 60 / 42 : 60 / 26}>
-          <AreaChart
-            onMouseMove={e => {
-              if (e?.activePayload?.[0]?.value && animatedVal !== e?.activePayload?.[0]?.value) {
-                setAnimatedVal(e.activePayload[0].value)
-              }
-            }}
-            onMouseLeave={() => setAnimatedVal(positionValue)}
-            margin={{ top: 0, right: 10, bottom: 6, left: 0 }}
-            barCategoryGap={1}
-            data={chartData}
-          >
+          <AreaChart margin={{ top: 0, right: 10, bottom: 6, left: 0 }} barCategoryGap={1} data={chartData}>
             <defs>
               <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor={'#ff007a'} stopOpacity={0.35} />

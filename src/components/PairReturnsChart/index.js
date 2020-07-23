@@ -7,10 +7,9 @@ import { toK, toNiceDate, toNiceDateYear } from '../../helpers'
 import { OptionButton } from '../ButtonStyled'
 import { useMedia } from 'react-use'
 import { timeframeOptions } from '../../constants'
-import dayjs from 'dayjs'
 import DropdownSelect from '../DropdownSelect'
 import { useUserLiquidityHistory, useReturnsPerPairHistory } from '../../contexts/User'
-import { Text } from 'rebass'
+import { useStartTimestamp } from '../../contexts/Application'
 
 const ChartWrapper = styled.div`
   height: 100%;
@@ -25,7 +24,7 @@ const CHART_VIEW = {
   LIQUIDITY: 'Liquidity'
 }
 
-const PairReturnsChart = ({ account, setAnimatedPositionVal, positionValue, position }) => {
+const PairReturnsChart = ({ account, position }) => {
   const [chartFilter, setChartFilter] = useState(CHART_VIEW.LIQUIDITY)
 
   const chartData = useUserLiquidityHistory(account)
@@ -37,29 +36,9 @@ const PairReturnsChart = ({ account, setAnimatedPositionVal, positionValue, posi
   const below1080 = useMedia('(max-width: 1080px)')
   const below600 = useMedia('(max-width: 600px)')
 
-  // find start time based on required time window, update domain
-  const utcEndTime = dayjs.utc()
   // based on window, get starttime
-  let utcStartTime
-  switch (timeWindow) {
-    case timeframeOptions.WEEK:
-      utcStartTime =
-        utcEndTime
-          .subtract(1, 'week')
-          .startOf('day')
-          .unix() - 1
-      break
-    case timeframeOptions.ALL_TIME:
-      utcStartTime = utcEndTime.subtract(1, 'year').unix() - 1
-      break
-    default:
-      utcStartTime =
-        utcEndTime
-          .subtract(1, 'year')
-          .startOf('year')
-          .unix() - 1
-      break
-  }
+  let utcStartTime = useStartTimestamp()
+
   const domain = [dataMin => (dataMin > utcStartTime ? dataMin : utcStartTime), 'dataMax']
 
   return (
@@ -97,19 +76,7 @@ const PairReturnsChart = ({ account, setAnimatedPositionVal, positionValue, posi
       )}
       {chartFilter === CHART_VIEW.LIQUIDITY && chartData && (
         <ResponsiveContainer aspect={below1080 ? 60 / 32 : below600 ? 60 / 42 : 60 / 26}>
-          <ComposedChart
-            onMouseMove={e => {
-              if (e?.activePayload?.[0]?.value) {
-                setAnimatedPositionVal(e.activePayload[0].value)
-              }
-            }}
-            onMouseLeave={() => {
-              setAnimatedPositionVal(positionValue)
-            }}
-            margin={{ top: 0, right: 10, bottom: 6, left: 0 }}
-            barCategoryGap={1}
-            data={data}
-          >
+          <ComposedChart margin={{ top: 0, right: 10, bottom: 6, left: 0 }} barCategoryGap={1} data={data}>
             <CartesianGrid stroke="#DFE1E9" />
             <XAxis
               tickLine={false}
@@ -147,7 +114,7 @@ const PairReturnsChart = ({ account, setAnimatedPositionVal, positionValue, posi
             />
             <Tooltip
               cursor={true}
-              formatter={val => null}
+              // formatter={val => null}
               labelFormatter={label => toNiceDateYear(label)}
               labelStyle={{ paddingTop: 4 }}
               contentStyle={{
@@ -156,16 +123,15 @@ const PairReturnsChart = ({ account, setAnimatedPositionVal, positionValue, posi
                 borderColor: '#ff007a',
                 color: 'black'
               }}
-              content={val => <Text>{toNiceDateYear(val.label)}</Text>}
+              // content={val => <Text>{toNiceDateYear(val.label)}</Text>}
               wrapperStyle={{ top: -70, left: -10 }}
             />
             <Bar type="monotone" dataKey="usdValue" fill="rgba(0,0,0,0.05)" yAxisId={1} />
             <Line type="monotone" dataKey="assetReturn" stroke="#82ca9d" />
             <Line type="monotone" dataKey="uniswapReturn" stroke="blue" />
             <Line type="monotone" dataKey="netReturn" stroke="purple" />
-            <Line dataKey="assetChange" stroke="transparent" />
-            <Line dataKey="uniswapChange" stroke="transparent" />
-            <Line dataKey="netChange" stroke="transparent" />
+            <Line dataKey="fees" stroke="orange" />
+            <Line dataKey="impLoss" stroke="black" />
           </ComposedChart>
         </ResponsiveContainer>
       )}

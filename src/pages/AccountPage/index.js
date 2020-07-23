@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useMemo } from 'react'
 import 'feather-icons'
 import styled from 'styled-components'
 import { useUserTransactions, useUserPositions } from '../../contexts/User'
@@ -17,8 +17,6 @@ import { useMedia } from 'react-use'
 import Loader from '../../components/Loader'
 import { ButtonDropdown } from '../../components/ButtonStyled'
 import { Hover } from '../../components'
-import AnimatedNumber from 'animated-number-react'
-
 import DoubleTokenLogo from '../../components/DoubleLogo'
 
 const PageWrapper = styled.div`
@@ -127,10 +125,6 @@ const LIST_VIEW = {
   STATS: 'STATS'
 }
 
-// used for animation number formatting
-const formatValue = value => formattedNum(value, true, true)
-// const formatAnimatedPercent = percent => formattedPercent(percent)
-
 function AccountPage({ account }) {
   const transactions = useUserTransactions(account)
   const positions = useUserPositions(account)
@@ -164,8 +158,9 @@ function AccountPage({ account }) {
   }, 0)
 
   const netUniswapReturn = positions?.reduce(function(total, position) {
-    return total + position.uniswap.return
+    return total + position.uniswap.return ?? 0
   }, 0)
+
   const netPrincipal = positions?.reduce(function(total, position) {
     return total + position.principal.usd
   }, 0)
@@ -173,18 +168,6 @@ function AccountPage({ account }) {
   const netReturn = positions?.reduce(function(total, position) {
     return total + position.net.return
   }, 0)
-
-  // animated dollar values
-  const [animatedHodlSum, setAnimatedHodlSum] = useState()
-  const [animatedUniswapReturn, setAnimatedUniswapReturn] = useState() // derive from net and asset
-  const [animatedPositionValue, setAnimatedPositionVal] = useState()
-
-  // reset aggregate values if they change
-  useEffect(() => {
-    positionValue && setAnimatedPositionVal(positionValue)
-    netHodl && setAnimatedHodlSum(netHodl)
-    netUniswapReturn && setAnimatedUniswapReturn(netUniswapReturn)
-  }, [netHodl, positionValue, netUniswapReturn])
 
   return (
     <PageWrapper>
@@ -273,7 +256,7 @@ function AccountPage({ account }) {
                 </RowBetween>
                 <RowFixed align="flex-end">
                   <TYPE.main fontSize={'24px'} lineHeight={1} fontWeight={600}>
-                    <AnimatedNumber value={animatedPositionValue} formatValue={formatValue} duration={200} />
+                    {formattedNum(positionValue, true)}
                   </TYPE.main>
                   <TYPE.main
                     fontSize="14px"
@@ -281,7 +264,7 @@ function AccountPage({ account }) {
                     color={netReturn ? (netReturn > 0 ? 'green' : netReturn === 0 ? 'black' : 'red') : 'black'}
                   >
                     {netReturn ? (netReturn > 0 ? '+' : netReturn === 0 ? '' : '-') : ''}
-                    <AnimatedNumber value={netReturn} formatValue={formatValue} duration={200} />
+                    {formattedNum(netReturn, true, true)}
                   </TYPE.main>
                 </RowFixed>
               </AutoColumn>
@@ -294,7 +277,7 @@ function AccountPage({ account }) {
                 </RowBetween>
                 <RowFixed align="flex-end">
                   <TYPE.main fontSize={'24px'} lineHeight={1} fontWeight={600}>
-                    <AnimatedNumber value={animatedHodlSum} formatValue={formatValue} duration={200} />
+                    {formattedNum(netHodl, true, true)}
                   </TYPE.main>
                   <TYPE.main
                     fontSize="14px"
@@ -302,7 +285,7 @@ function AccountPage({ account }) {
                     color={hodlReturn ? (hodlReturn > 0 ? 'green' : hodlReturn === 0 ? 'black' : 'red') : 'black'}
                   >
                     {hodlReturn ? (hodlReturn > 0 ? '+' : hodlReturn === 0 ? '' : '-') : ''}
-                    <AnimatedNumber value={hodlReturn} formatValue={formatValue} duration={200} />
+                    {formattedNum(hodlReturn, true, true)}
                   </TYPE.main>
                 </RowFixed>
               </AutoColumn>
@@ -315,7 +298,7 @@ function AccountPage({ account }) {
                 </RowBetween>
                 <RowFixed align="flex-end">
                   <TYPE.main fontSize={'24px'} lineHeight={1} fontWeight={600}>
-                    <AnimatedNumber value={netPrincipal} formatValue={formatValue} duration={200} />
+                    {formattedNum(netPrincipal, true, true)}
                   </TYPE.main>
                 </RowFixed>
               </AutoColumn>
@@ -331,16 +314,10 @@ function AccountPage({ account }) {
                     fontSize={'24px'}
                     lineHeight={1}
                     fontWeight={600}
-                    color={animatedUniswapReturn > 0 ? 'green' : animatedUniswapReturn === 0 ? 'black' : 'red'}
+                    color={netUniswapReturn > 0 ? 'green' : netUniswapReturn === 0 ? 'black' : 'red'}
                   >
-                    {animatedUniswapReturn
-                      ? animatedUniswapReturn > 0
-                        ? '+'
-                        : animatedUniswapReturn === 0
-                        ? ''
-                        : '-'
-                      : ''}
-                    <AnimatedNumber value={animatedUniswapReturn} formatValue={formatValue} duration={200} />
+                    {netUniswapReturn ? (netUniswapReturn > 0 ? '+' : netUniswapReturn === 0 ? '' : '-') : ''}
+                    {formattedNum(netUniswapReturn, true, true)}
                   </TYPE.main>
                 </RowFixed>
               </AutoColumn>
@@ -348,20 +325,9 @@ function AccountPage({ account }) {
           </Panel>
           <Panel style={{ gridColumn: below1080 ? '1' : '2/4', gridRow: below1080 ? '' : '1/6' }}>
             {activePosition ? (
-              <PairReturnsChart
-                account={account}
-                position={activePosition}
-                setAnimatedPositionVal={setAnimatedPositionVal}
-                positionValue={positionValue}
-              />
+              <PairReturnsChart account={account} position={activePosition} />
             ) : (
-              <UserChart
-                account={account}
-                setAnimatedVal={setAnimatedPositionVal}
-                animatedVal={animatedPositionValue}
-                positionValue={positionValue}
-                position={activePosition}
-              />
+              <UserChart account={account} position={activePosition} />
             )}
           </Panel>
         </PanelWrapper>
