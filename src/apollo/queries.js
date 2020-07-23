@@ -193,6 +193,12 @@ export const USER_HISTORY = gql`
         reserve0
         reserve1
         reserveUSD
+        token0 {
+          id
+        }
+        token1 {
+          id
+        }
       }
     }
   }
@@ -219,6 +225,9 @@ export const USER_POSITIONS = gql`
         totalSupply
       }
       liquidityTokenBalance
+      historicalSnapshots {
+        id
+      }
     }
   }
 `

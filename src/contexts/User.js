@@ -384,13 +384,17 @@ export function useUserPositions(account) {
         })
         if (result?.data?.liquidityPositions) {
           let formattedPositions = await Promise.all(
-            result?.data?.liquidityPositions.map(async positionData => {
-              const returnData = await getLPReturnsOnPair(account, positionData.pair, ethPrice)
-              return {
-                ...positionData,
-                ...returnData
-              }
-            })
+            result?.data?.liquidityPositions
+              .filter(position => {
+                return position.historicalSnapshots?.length > 0 // catch edge cases - check on this
+              })
+              .map(async positionData => {
+                const returnData = await getLPReturnsOnPair(account, positionData.pair, ethPrice)
+                return {
+                  ...positionData,
+                  ...returnData
+                }
+              })
           )
           updatePositions(account, formattedPositions)
         }

@@ -18,6 +18,7 @@ interface ReturnMetrics {
 
 // used to calculate returns within a given window bounded by two positions
 interface Position {
+  pair: any
   liquidityTokenBalance: number
   liquidityTokenTotalSupply: number
   reserve0: number
@@ -118,6 +119,7 @@ export async function getLPReturnsOnPair(user: string, pair, ethPrice: number) {
 
   // get data about the current position
   const currentPosition: Position = {
+    pair,
     liquidityTokenBalance: history[history.length - 1].liquidityTokenBalance,
     liquidityTokenTotalSupply: pair.totalSupply,
     reserve0: pair.reserve0,
@@ -129,12 +131,10 @@ export async function getLPReturnsOnPair(user: string, pair, ethPrice: number) {
 
   for (const index in history) {
     // get positions at both bounds of the window
-    let positionT0 = formatPricesForEarlyTimestamps(history[index])
-    let positionT1 = formatPricesForEarlyTimestamps(
-      parseInt(index) === history.length - 1 ? currentPosition : history[parseInt(index) + 1]
-    )
+    let positionT0 = history[index]
+    let positionT1 = parseInt(index) === history.length - 1 ? currentPosition : history[parseInt(index) + 1]
 
-    let results = getMetricsForPositionWindow(positionT0, positionT1, pair.id)
+    let results = getMetricsForPositionWindow(positionT0, positionT1)
     hodlReturn = hodlReturn + results.hodleReturn
     netReturn = netReturn + results.netReturn
 
@@ -160,7 +160,10 @@ export async function getLPReturnsOnPair(user: string, pair, ethPrice: number) {
  * @param positionT0 // users liquidity info and token rates at beginning of window
  * @param positionT1 // '' at the end of the window
  */
-export function getMetricsForPositionWindow(positionT0: Position, positionT1: Position, pair = null): ReturnMetrics {
+export function getMetricsForPositionWindow(positionT0: Position, positionT1: Position): ReturnMetrics {
+  positionT0 = formatPricesForEarlyTimestamps(positionT0)
+  positionT1 = formatPricesForEarlyTimestamps(positionT1)
+
   // calculate ownership at ends of window, for end of window we need original LP token balance / new total supply
   const t0Ownership = positionT0.liquidityTokenBalance / positionT0.liquidityTokenTotalSupply
   const t1Ownership = positionT0.liquidityTokenBalance / positionT1.liquidityTokenTotalSupply
@@ -237,6 +240,7 @@ export async function getReturnsHistoryPerLPPerPair(
 
   // keep track of up to date metrics as we parse each day
   let returns = {
+    pair: currentPairData,
     lastUpdated: sortedPositions[0].timestamp,
     liquidityTokenBalance: parseFloat(sortedPositions[0].liquidityTokenBalance),
     liquidityTokenTotalSupply: parseFloat(sortedPositions[0].liquidityTokenTotalSupply),
@@ -261,6 +265,7 @@ export async function getReturnsHistoryPerLPPerPair(
 
     const positionT0: Position = returns
     let positionT1: Position = {
+      pair: currentPairData,
       liquidityTokenBalance: returns.liquidityTokenBalance,
       liquidityTokenTotalSupply: shareValue.totalSupply,
       reserve0: shareValue.reserve0,
@@ -294,6 +299,7 @@ export async function getReturnsHistoryPerLPPerPair(
         needsUpdate = true
       }
     }
+
     const calculatedReturns = getMetricsForPositionWindow(positionT0, positionT1)
 
     // account for profits or loss because position actually changed here
