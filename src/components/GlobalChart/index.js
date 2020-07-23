@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react'
 import { Area, XAxis, YAxis, ResponsiveContainer, Tooltip, AreaChart, BarChart, Bar } from 'recharts'
 import Row, { RowBetween } from '../Row'
-import { toK, toNiceDate, toWeeklyDate, toNiceDateYear } from '../../helpers'
+import { toK, toNiceDate, toWeeklyDate, toNiceDateYear, formattedNum, formattedPercent } from '../../helpers'
 import { OptionButton } from '../ButtonStyled'
 import { useMedia } from 'react-use'
 import { useTimeframe } from '../../contexts/Application'
@@ -32,7 +32,12 @@ const GlobalChart = ({ display }) => {
   const [localWindow, setLocalWindow] = useState(globalWindow)
 
   // global historical data
-  const [chartData, weeklyData] = useGlobalChartData()
+  const [chartData, weeklyData, oneDayVolumeUSD, volumeChangeUSD] = useGlobalChartData()
+
+  const volume = oneDayVolumeUSD ? formattedNum(oneDayVolumeUSD, true) : '$96,013,098'
+  const volumeChange = volumeChangeUSD ? formattedPercent(volumeChangeUSD) : '-8.85%'
+
+  console.log(volume)
 
   // switch between voluem and liquidity on larger screens
   function toggleView() {
@@ -105,50 +110,56 @@ const GlobalChart = ({ display }) => {
           />
         </RowBetween>
       ) : (
-        <RowBetween marginBottom={'10px'}>
-          <Row>
+        <>
+          <RowBetween marginBottom={'1rem'}>
+            <TYPE.light>{chartView}</TYPE.light>
             <OptionButton
-              style={{ marginRight: '10px', paddingLeft: '0px' }}
+              style={{ margin: '0px', padding: '0px' }}
               active={chartView === CHART_VIEW.LIQUIDITY}
               onClick={!display ? toggleView : () => {}}
               disabled={!!display}
             >
-              <TYPE.main>{chartView}</TYPE.main>
+              <Row justify="flex-end">
+                {chartView === CHART_VIEW.VOLUME && (
+                  <OptionButton
+                    style={{ marginRight: '0px' }}
+                    active={volumeWindow === VOLUME_WINDOW.DAYS}
+                    onClick={() => setVolumeWindow(VOLUME_WINDOW.DAYS)}
+                  >
+                    <TYPE.pink faded={volumeWindow === VOLUME_WINDOW.WEEKLY}>Daily</TYPE.pink>
+                  </OptionButton>
+                )}
+                {chartView === CHART_VIEW.VOLUME && (
+                  <OptionButton
+                    active={volumeWindow === VOLUME_WINDOW.WEEKLY}
+                    onClick={() => setVolumeWindow(VOLUME_WINDOW.WEEKLY)}
+                  >
+                    <TYPE.pink faded={volumeWindow === VOLUME_WINDOW.DAYS}>Weekly</TYPE.pink>
+                  </OptionButton>
+                )}
+                <OptionButton
+                  style={{ marginRight: '0px', marginLeft: '20px' }}
+                  active={localWindow === timeframeOptions.WEEK}
+                  onClick={() => setLocalWindow(timeframeOptions.WEEK)}
+                >
+                  1 Week
+                </OptionButton>
+                <OptionButton
+                  active={localWindow === timeframeOptions.ALL_TIME}
+                  onClick={() => setLocalWindow(timeframeOptions.ALL_TIME)}
+                >
+                  All Time
+                </OptionButton>
+              </Row>
             </OptionButton>
+          </RowBetween>
+          <Row>
+            <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600} mr={2}>
+              {volume}
+            </TYPE.main>
+            <TYPE.main fontSize={14}>{volumeChange}</TYPE.main>
           </Row>
-          <Row justify="flex-end">
-            {chartView === CHART_VIEW.VOLUME && (
-              <OptionButton
-                style={{ marginRight: '0px' }}
-                active={volumeWindow === VOLUME_WINDOW.DAYS}
-                onClick={() => setVolumeWindow(VOLUME_WINDOW.DAYS)}
-              >
-                <TYPE.pink faded={volumeWindow === VOLUME_WINDOW.WEEKLY}>Daily</TYPE.pink>
-              </OptionButton>
-            )}
-            {chartView === CHART_VIEW.VOLUME && (
-              <OptionButton
-                active={volumeWindow === VOLUME_WINDOW.WEEKLY}
-                onClick={() => setVolumeWindow(VOLUME_WINDOW.WEEKLY)}
-              >
-                <TYPE.pink faded={volumeWindow === VOLUME_WINDOW.DAYS}>Weekly</TYPE.pink>
-              </OptionButton>
-            )}
-            <OptionButton
-              style={{ marginRight: '0px', marginLeft: '20px' }}
-              active={localWindow === timeframeOptions.WEEK}
-              onClick={() => setLocalWindow(timeframeOptions.WEEK)}
-            >
-              1 Week
-            </OptionButton>
-            <OptionButton
-              active={localWindow === timeframeOptions.ALL_TIME}
-              onClick={() => setLocalWindow(timeframeOptions.ALL_TIME)}
-            >
-              All Time
-            </OptionButton>
-          </Row>
-        </RowBetween>
+        </>
       )}
       {chartData && chartView === CHART_VIEW.LIQUIDITY && (
         <ResponsiveContainer aspect={below1080 ? 60 / 28 : 60 / 28}>

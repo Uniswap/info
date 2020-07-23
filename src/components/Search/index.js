@@ -21,14 +21,14 @@ const Wrapper = styled.div`
   justify-content: flex-end;
   padding: ${({ small }) => (!small ? '12px' : '8px 16px')};
   border-radius: 12px;
-  background: ${({ theme }) => theme.advancedBG};
+  background: ${({ theme }) => theme.bg2};
   border-bottom-right-radius: ${({ open }) => (open ? '0px' : '12px')};
   border-bottom-left-radius: ${({ open }) => (open ? '0px' : '12px')};
-  ${({ small }) =>
+  /* ${({ small }) =>
     !small &&
     ` box-shadow: 0 2.8px 2.8px -9px rgba(0, 0, 0, 0.008), 0 6.7px 6.7px -9px rgba(0, 0, 0, 0.012),
     0 12.5px 12.6px -9px rgba(0, 0, 0, 0.015), 0 22.3px 22.6px -9px rgba(0, 0, 0, 0.018),
-    0 41.8px 42.2px -9px rgba(0, 0, 0, 0.022), 0 100px 101px -9px rgba(0, 0, 0, 0.03);`};
+    0 41.8px 42.2px -9px rgba(0, 0, 0, 0.022), 0 100px 101px -9px rgba(0, 0, 0, 0.03);`}; */
 `
 const Input = styled.input`
   position: relative;
@@ -308,7 +308,6 @@ export const Search = ({ small = false }) => {
       }}
     >
       <Wrapper open={showMenu} shadow={true} small={small}>
-        <SearchIconLarge />
         <Input
           large={!small}
           type={'text'}
@@ -332,6 +331,7 @@ export const Search = ({ small = false }) => {
             toggleMenu(true)
           }}
         />
+        <SearchIconLarge />
       </Wrapper>
       <Menu hide={!showMenu} ref={menuRef}>
         <FilterSection>

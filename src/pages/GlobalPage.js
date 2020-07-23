@@ -1,10 +1,10 @@
-import React, { useState } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { withRouter } from 'react-router-dom'
-import 'feather-icons'
+import { TrendingUp, PieChart, Disc, List } from 'react-feather'
 import { Box } from 'rebass'
 import styled from 'styled-components'
 
-import { AutoRow, RowBetween, RowFixed } from '../components/Row'
+import { AutoRow, RowBetween } from '../components/Row'
 import { AutoColumn } from '../components/Column'
 import PairList from '../components/PairList'
 import TopTokenList from '../components/TokenList'
@@ -16,10 +16,8 @@ import { useGlobalData, useEthPrice, useGlobalTransactions } from '../contexts/G
 import { useAllPairData } from '../contexts/PairData'
 import { Search } from '../components/Search'
 import { useMedia } from 'react-use'
-import TokenLogo from '../components/TokenLogo'
 import Panel from '../components/Panel'
 import { useAllTokenData } from '../contexts/TokenData'
-import UniPrice from '../components/UniPrice'
 import { ButtonLight } from '../components/ButtonStyled'
 
 const PageWrapper = styled.div`
@@ -28,31 +26,31 @@ const PageWrapper = styled.div`
   align-items: center;
   justify-content: center;
   padding-bottom: 100px;
-  width: calc(100% - 20px);
-  overflow: scroll;
-  & > * {
-    width: 100%;
-    max-width: 1240px;
-  }
-
+  max-width: 1440px;
+  display: grid;
+  justify-content: start;
+  align-items: start;
+  grid-template-columns: 180px 1fr 256px;
+  grid-gap: 24px;
+  padding: 0 24px;
   @media screen and (max-width: 1080px) {
     width: calc(100% - 40px);
     padding: 0 20px;
   }
 `
 
-const ThemedBackground = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 200vh;
-  max-width: 100vw;
-  z-index: -1;
+// const ThemedBackground = styled.div`
+//   position: absolute;
+//   top: 0;
+//   left: 0;
+//   right: 0;
+//   height: 200vh;
+//   max-width: 100vw;
+//   z-index: -1;
 
-  transform: translateY(-70vh);
-  background: ${({ theme }) => theme.background};
-`
+//   transform: translateY(-70vh);
+//   /* background: ${({ theme }) => theme.background}; */
+// `
 
 const ListOptions = styled(AutoRow)`
   height: 40px;
@@ -82,6 +80,25 @@ const TopGroup = styled.div`
   align-items: start;
 `
 
+const SubNav = styled.ul`
+  list-style: none;
+  position: sticky;
+  top: 8rem;
+  padding: 0px;
+  margin-top: 0px;
+`
+const SubNavEl = styled.li`
+  list-style: none;
+  display: flex;
+  margin-bottom: 1rem;
+  width: 100%;
+  font-weight: ${({ isActive }) => (isActive ? 600 : 500)};
+
+  :hover {
+    cursor: pointer;
+  }
+`
+
 const ChartWrapper = styled.div`
   height: 100%;
 `
@@ -92,15 +109,10 @@ const Wrapper = styled.div`
   flex-direction: row;
   align-items: center;
   justify-content: flex-end;
-  width: 300px;
+  width: 180px;
   padding: 8px 16px;
   border-radius: 12px;
-  background: ${({ theme }) => theme.advancedBG};
-  ${({ small }) =>
-    !small &&
-    ` box-shadow: 0 2.8px 2.8px -9px rgba(0, 0, 0, 0.008), 0 6.7px 6.7px -9px rgba(0, 0, 0, 0.012),
-    0 12.5px 12.6px -9px rgba(0, 0, 0, 0.015), 0 22.3px 22.6px -9px rgba(0, 0, 0, 0.018),
-    0 41.8px 42.2px -9px rgba(0, 0, 0, 0.022), 0 100px 101px -9px rgba(0, 0, 0, 0.03);`};
+  background: ${({ theme }) => theme.bg2};
 `
 
 const Input = styled.input`
@@ -113,6 +125,7 @@ const Input = styled.input`
   border: none;
   outline: none;
   color: ${({ theme }) => theme.textColor};
+  background-color: ${({ theme }) => theme.bg2};
   font-size: 16px;
 
   ::placeholder {
@@ -134,6 +147,7 @@ const LIST_VIEW = {
 
 function GlobalPage({ history }) {
   const [listView, setListView] = useState(LIST_VIEW.PAIRS)
+  const [active, setActive] = useState(null)
 
   const {
     totalLiquidityUSD,
@@ -165,211 +179,161 @@ function GlobalPage({ history }) {
   const below1080 = useMedia('(max-width: 1080px)')
   const below600 = useMedia('(max-width: 600px)')
 
-  const [showPriceCard, setShowPriceCard] = useState(false)
-
   const [accountValue, setAccountValue] = useState()
+
+  const OverviewRef = useRef()
+  const PairsRef = useRef()
+  const TokensRef = useRef()
+  const TransactionsRef = useRef()
+
+  useEffect(() => {
+    setActive(OverviewRef)
+  }, [])
+
+  const handleScroll = ref => {
+    setActive(ref.current)
+    document.querySelector('body').scrollTo({
+      behavior: 'smooth',
+      top: ref.current.offsetTop - 120
+    })
+  }
 
   return (
     <PageWrapper>
-      <ThemedBackground />
-      <Search small={!!below600} />
-      {!below1080 && (
-        <RowBetween style={{ marginTop: '3rem' }}>
-          <TYPE.main fontSize={'1.125rem'}>Overall Stats</TYPE.main>
-          <RowFixed>
-            {isAddress(accountValue) && (
-              <ButtonLight style={{ marginRight: '1rem' }} onClick={() => history.push('/account/' + accountValue)}>
-                See Details
-              </ButtonLight>
-            )}
-            <Wrapper>
-              <Input
-                placeholder="Paste account address..."
-                onChange={e => {
-                  setAccountValue(e.target.value)
-                }}
-              />
-            </Wrapper>
-          </RowFixed>
-        </RowBetween>
-      )}
-      {below1080 && ( // mobile card
+      <SubNav>
+        <SubNavEl onClick={() => handleScroll(OverviewRef)} isActive={active === OverviewRef}>
+          <TrendingUp size={20} style={{ marginRight: '1rem' }} />
+          <TYPE.main>Overview</TYPE.main>
+        </SubNavEl>
+        <SubNavEl onClick={() => handleScroll(PairsRef)} isActive={active === OverviewRef}>
+          <PieChart size={20} style={{ marginRight: '1rem' }} />
+          <TYPE.main>Top Pairs</TYPE.main>
+        </SubNavEl>
+        <SubNavEl onClick={() => handleScroll(TokensRef)} isActive={active === OverviewRef}>
+          <Disc size={20} style={{ marginRight: '1rem' }} />
+          <TYPE.main>Top Tokens</TYPE.main>
+        </SubNavEl>
+        <SubNavEl onClick={() => handleScroll(TransactionsRef)} isActive={active === OverviewRef}>
+          <List size={20} style={{ marginRight: '1rem' }} />
+          <TYPE.main>Transactions</TYPE.main>
+        </SubNavEl>
+      </SubNav>
+      <div>
         <Box mb={20}>
-          <Box mb={20} mt={'1.5rem'}>
-            <Panel>
-              <Box>
-                <AutoColumn gap="40px">
-                  <AutoColumn gap="20px">
-                    <RowBetween>
-                      <TYPE.main>Volume (24hrs)</TYPE.main>
-                      <div />
-                    </RowBetween>
-                    <RowBetween align="flex-end">
-                      <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
-                        {volume}
-                      </TYPE.main>
-                      <TYPE.main fontSize={12}>{volumeChange}</TYPE.main>
-                    </RowBetween>
+          <Search small={!!below600} />
+        </Box>
+        <span ref={OverviewRef}></span>
+        {below1080 && ( // mobile card
+          <Box mb={20}>
+            <Box mb={20} mt={'1.5rem'}>
+              <Panel>
+                <Box>
+                  <AutoColumn gap="40px">
+                    <AutoColumn gap="20px">
+                      <RowBetween>
+                        <TYPE.main>Volume (24hrs)</TYPE.main>
+                        <div />
+                      </RowBetween>
+                      <RowBetween align="flex-end">
+                        <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
+                          {volume}
+                        </TYPE.main>
+                        <TYPE.main fontSize={12}>{volumeChange}</TYPE.main>
+                      </RowBetween>
+                    </AutoColumn>
+                    <AutoColumn gap="20px">
+                      <RowBetween>
+                        <TYPE.main>Total Liquidity</TYPE.main>
+                        <div />
+                      </RowBetween>
+                      <RowBetween align="flex-end">
+                        <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
+                          {liquidity && liquidity}
+                        </TYPE.main>
+                        <TYPE.main fontSize={12}>{liquidityChange && liquidityChange}</TYPE.main>
+                      </RowBetween>
+                    </AutoColumn>
                   </AutoColumn>
-                  <AutoColumn gap="20px">
-                    <RowBetween>
-                      <TYPE.main>Total Liquidity</TYPE.main>
-                      <div />
-                    </RowBetween>
-                    <RowBetween align="flex-end">
-                      <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
-                        {liquidity && liquidity}
-                      </TYPE.main>
-                      <TYPE.main fontSize={12}>{liquidityChange && liquidityChange}</TYPE.main>
-                    </RowBetween>
-                  </AutoColumn>
-                  <AutoColumn gap="20px">
-                    <RowBetween>
-                      <TYPE.main>Transactions (24hrs)</TYPE.main>
-                      <div />
-                    </RowBetween>
-                    <RowBetween align="flex-end">
-                      <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
-                        {!!oneDayTxns ? oneDayTxns : '-'}
-                      </TYPE.main>
-                      <TYPE.main fontSize={12}>{txnChangeFormatted && txnChangeFormatted}</TYPE.main>
-                    </RowBetween>
-                  </AutoColumn>
-                </AutoColumn>
-              </Box>
-            </Panel>
+                </Box>
+              </Panel>
+            </Box>
+            <Box>
+              <Panel>
+                <ChartWrapper area="fill" rounded>
+                  <GlobalChart />
+                </ChartWrapper>
+              </Panel>
+            </Box>
           </Box>
-          <Box>
-            <Panel>
+        )}
+
+        {!below1080 && (
+          <GridRow style={{ marginTop: '6px' }}>
+            <Panel style={{ height: '100%', minHeight: '300px' }}>
               <ChartWrapper area="fill" rounded>
-                <GlobalChart />
+                <GlobalChart display="liquidity" />
               </ChartWrapper>
             </Panel>
-          </Box>
-        </Box>
-      )}
-      {!below1080 && ( // desktop
-        <TopGroup style={{ marginTop: '1.5rem' }}>
-          <Panel
-            hover={true}
-            onMouseEnter={() => {
-              setShowPriceCard(true)
-            }}
-            onMouseLeave={() => {
-              setShowPriceCard(false)
-            }}
-          >
-            {showPriceCard && <UniPrice />}
-            <AutoColumn gap="20px">
-              <RowBetween>
-                <TYPE.main>Uniswap ETH price</TYPE.main>
-                <div />
-              </RowBetween>
-              <RowBetween align="flex-end">
-                {formattedEthPrice && (
-                  <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
-                    {formattedEthPrice}
-                  </TYPE.main>
-                )}
-                <TokenLogo address={'0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'} />
-              </RowBetween>
-            </AutoColumn>
-          </Panel>
-          <Panel>
-            <AutoColumn gap="20px">
-              <RowBetween>
-                <TYPE.main>Total Liquidity</TYPE.main>
-                <div />
-              </RowBetween>
-              <RowBetween align="flex-end">
-                <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
-                  {liquidity && liquidity}
-                </TYPE.main>
-                <TYPE.main fontSize={14}>{liquidityChange && liquidityChange}</TYPE.main>
-              </RowBetween>
-            </AutoColumn>
-          </Panel>
-          <Panel>
-            <AutoColumn gap="20px">
-              <RowBetween>
-                <TYPE.main>Volume (24hrs)</TYPE.main>
-                <div />
-              </RowBetween>
-              <RowBetween align="flex-end">
-                <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
-                  {volume}
-                </TYPE.main>
-                <TYPE.main fontSize={14}>{volumeChange}</TYPE.main>
-              </RowBetween>
-            </AutoColumn>
-          </Panel>
-          <Panel>
-            <AutoColumn gap="20px">
-              <RowBetween>
-                <TYPE.main>Transactions (24hrs)</TYPE.main>
-                <div />
-              </RowBetween>
-              <RowBetween align="flex-end">
-                <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
-                  {oneDayTxns}
-                </TYPE.main>
-                <TYPE.main fontSize={14}>{txnChangeFormatted && txnChangeFormatted}</TYPE.main>
-              </RowBetween>
-            </AutoColumn>
-          </Panel>
-        </TopGroup>
-      )}
+            <Panel style={{ height: '100%' }}>
+              <ChartWrapper area="fill" rounded>
+                <GlobalChart display="volume" />
+              </ChartWrapper>
+            </Panel>
+          </GridRow>
+        )}
+
+        <ListOptions ref={PairsRef} gap="10px" style={{ marginTop: '2rem', marginBottom: '.5rem' }}>
+          <TYPE.main fontSize={'1.125rem'}>Top Pairs</TYPE.main>
+        </ListOptions>
+
+        <Panel style={{ marginTop: '6px' }}>
+          <PairList pairs={allPairs} />
+        </Panel>
+
+        <ListOptions ref={TokensRef} gap="10px" style={{ marginTop: '2rem', marginBottom: '.5rem' }}>
+          <TYPE.main fontSize={'1.125rem'}>Top Tokens</TYPE.main>
+        </ListOptions>
+
+        <Panel style={{ marginTop: '6px' }}>
+          <TopTokenList tokens={allTokens} />
+        </Panel>
+
+        <span ref={TransactionsRef}>
+          <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '2rem' }}>
+            Transactions
+          </TYPE.main>
+        </span>
+        <Panel style={{ margin: '1rem 0' }}>
+          <TxnList transactions={transactions} />
+        </Panel>
+      </div>
 
       {!below1080 && (
-        <GridRow style={{ marginTop: '6px' }}>
-          <Panel style={{ height: '100%', minHeight: '300px' }}>
-            <ChartWrapper area="fill" rounded>
-              <GlobalChart display="liquidity" />
-            </ChartWrapper>
-          </Panel>
-          <Panel style={{ height: '100%' }}>
-            <ChartWrapper area="fill" rounded>
-              <GlobalChart display="volume" />
-            </ChartWrapper>
-          </Panel>
-        </GridRow>
+        <Panel>
+          <AutoColumn gap={'12px'}>
+            <TYPE.main>Wallet Analytics</TYPE.main>
+            <TYPE.small>Input an address to view liqudiity provider statistics.</TYPE.small>
+            <AutoRow>
+              <Wrapper>
+                <Input
+                  placeholder="0x.."
+                  onChange={e => {
+                    setAccountValue(e.target.value)
+                  }}
+                />
+              </Wrapper>
+            </AutoRow>
+
+            <ButtonLight
+              style={{ marginRight: '1rem' }}
+              disabled={isAddress(accountValue)}
+              onClick={() => history.push('/account/' + accountValue)}
+            >
+              Load Account Details
+            </ButtonLight>
+          </AutoColumn>
+        </Panel>
       )}
-
-      <ListOptions gap="10px" style={{ marginTop: '2rem', marginBottom: '.5rem' }}>
-        <Hover>
-          <TYPE.main
-            onClick={() => {
-              setListView(LIST_VIEW.PAIRS)
-            }}
-            fontSize={'1.125rem'}
-            color={listView === LIST_VIEW.TOKENS ? '#aeaeae' : 'black'}
-          >
-            Pairs
-          </TYPE.main>
-        </Hover>
-        <Hover>
-          <TYPE.main
-            onClick={() => {
-              setListView(LIST_VIEW.TOKENS)
-            }}
-            fontSize={'1.125rem'}
-            color={listView === LIST_VIEW.PAIRS ? '#aeaeae' : 'black'}
-          >
-            Tokens
-          </TYPE.main>
-        </Hover>
-      </ListOptions>
-
-      <Panel style={{ marginTop: '6px' }}>
-        {listView === LIST_VIEW.PAIRS ? <PairList pairs={allPairs} /> : <TopTokenList tokens={allTokens} />}
-      </Panel>
-
-      <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '2rem' }}>
-        Transactions
-      </TYPE.main>
-      <Panel style={{ margin: '1rem 0' }}>
-        <TxnList transactions={transactions} />
-      </Panel>
     </PageWrapper>
   )
 }

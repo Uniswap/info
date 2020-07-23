@@ -77,6 +77,10 @@ export const TYPE = {
     return <TextWrapper fontWeight={500} color={'text1'} {...props} />
   },
 
+  small(props) {
+    return <TextWrapper fontWeight={500} fontSize={11} color={'text1'} {...props} />
+  },
+
   header(props) {
     return <TextWrapper fontWeight={600} color={'text1'} {...props} />
   },
@@ -164,7 +168,7 @@ export const GlobalStyle = createGlobalStyle`
     font-size: 1rem;
     font-variant: none;
     color: 'black';
-    background-color: ${({ theme }) => theme.backgroundColor};
+    /* background-color: ${({ theme }) => theme.backgroundColor}; */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
