@@ -11,7 +11,7 @@ import TopTokenList from '../components/TokenList'
 import TxnList from '../components/TxnList'
 import GlobalChart from '../components/GlobalChart'
 import { Hover, TYPE } from '../Theme'
-import { formattedNum, formattedPercent, isAddress } from '../helpers'
+import { formattedNum, formattedPercent, isAddress } from '../utils'
 import { useGlobalData, useEthPrice, useGlobalTransactions } from '../contexts/GlobalData'
 import { useAllPairData } from '../contexts/PairData'
 import { Search } from '../components/Search'
@@ -140,6 +140,8 @@ const Input = styled.input`
   }
 `
 
+const TopPanel = styled(Panel)``
+
 const LIST_VIEW = {
   TOKENS: 'tokens',
   PAIRS: 'pairs'
@@ -163,7 +165,10 @@ function GlobalPage({ history }) {
   const allPairs = useAllPairData()
   const allTokens = useAllTokenData()
 
-  const [ethPrice] = useEthPrice()
+  const [ethPrice, ethPriceOld] = useEthPrice()
+
+  const ethPriceChange = (parseFloat(ethPrice - ethPriceOld) / parseFloat(ethPriceOld)) * 100
+
   const formattedEthPrice = ethPrice ? formattedNum(ethPrice, true) : '-'
 
   const liquidity = totalLiquidityUSD ? formattedNum(totalLiquidityUSD, true) : '-'

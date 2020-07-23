@@ -104,7 +104,10 @@ export async function getShareValueOverTime(pairAddress, timestamps) {
     timestamps = getTimestampRange(utcSevenDaysBack, 86400, 7)
   }
 
+  // get blocks based on timestamps
   const blocks = await getBlocksFromTimestamps(timestamps)
+
+  // get historical share values with time travel queries
   let result = await client.query({
     query: SHARE_VALUE(pairAddress, blocks),
     fetchPolicy: 'cache-first'
@@ -113,7 +116,7 @@ export async function getShareValueOverTime(pairAddress, timestamps) {
   let values = []
   for (var row in result?.data) {
     let timestamp = row.split('t')[1]
-    let sharePriceUsd = parseFloat(result.data[row].reserveUSD) / parseFloat(result.data[row].totalSupply)
+    let sharePriceUsd = parseFloat(result.data[row]?.reserveUSD) / parseFloat(result.data[row]?.totalSupply)
     if (timestamp) {
       values.push({
         timestamp,
@@ -338,7 +341,8 @@ export const get2DayPercentChange = (valueNow, value24HoursAgo, value48HoursAgo)
 }
 
 export const getPercentChange = (valueNow, value24HoursAgo) => {
-  const adjustedPercentChange = ((valueNow - value24HoursAgo) / value24HoursAgo) * 100
+  const adjustedPercentChange =
+    ((parseFloat(valueNow) - parseFloat(value24HoursAgo)) / parseFloat(value24HoursAgo)) * 100
   if (isNaN(adjustedPercentChange) || !isFinite(adjustedPercentChange)) {
     return 0
   }

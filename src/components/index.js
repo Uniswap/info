@@ -4,7 +4,7 @@ import { Text, Box } from 'rebass'
 
 import Link from './Link'
 
-import { urls } from '../helpers'
+import { urls } from '../utils'
 
 const Divider = styled(Box)`
   height: 1px;

@@ -4,11 +4,10 @@ import styled from 'styled-components'
 import { useUserTransactions, useUserPositions } from '../../contexts/User'
 import TxnList from '../../components/TxnList'
 import Panel from '../../components/Panel'
-import { formattedNum } from '../../helpers'
+import { formattedNum } from '../../utils'
 import { AutoRow, RowFixed, RowBetween } from '../../components/Row'
 import { Text } from 'rebass'
 import { AutoColumn } from '../../components/Column'
-import { calculateTotalLiquidity } from './utils'
 import UserChart from '../../components/UserChart'
 import PairReturnsChart from '../../components/PairReturnsChart'
 import PositionList from '../../components/PositionList'
@@ -126,16 +125,9 @@ const LIST_VIEW = {
 }
 
 function AccountPage({ account }) {
+  // get data for this account
   const transactions = useUserTransactions(account)
   const positions = useUserPositions(account)
-
-  let totalSwappedUSD = useMemo(() => {
-    return transactions?.swaps
-      ? transactions?.swaps.reduce((total, swap) => {
-          return total + parseFloat(swap.amountUSD)
-        }, 0)
-      : 0
-  }, [transactions])
 
   // settings for list view and dropdowns
   const [showDropdown, setShowDropdown] = useState(false)
@@ -147,25 +139,45 @@ function AccountPage({ account }) {
   const transactionCount = transactions?.swaps?.length + transactions?.burns?.length + transactions?.mints?.length
 
   // get derived totals
-  const positionValue = calculateTotalLiquidity(positions)
+  let totalSwappedUSD = useMemo(() => {
+    return transactions?.swaps
+      ? transactions?.swaps.reduce((total, swap) => {
+          return total + parseFloat(swap.amountUSD)
+        }, 0)
+      : 0
+  }, [transactions])
 
-  const netHodl = positions?.reduce(function(total, position) {
+  const positionValue = useMemo(() => {
+    return positions
+      ? positions.reduce((total, position) => {
+          return (
+            total +
+            (parseFloat(position?.liquidityTokenBalance) / parseFloat(position?.pair?.totalSupply)) *
+              position?.pair?.reserveUSD
+          )
+        }, 0)
+      : 0
+  }, [positions])
+
+  const dynamicPositions = activePosition ? [activePosition] : positions
+
+  const netHodl = dynamicPositions?.reduce(function(total, position) {
     return total + position.hodl.sum
   }, 0)
 
-  const hodlReturn = positions?.reduce(function(total, position) {
+  const hodlReturn = dynamicPositions?.reduce(function(total, position) {
     return total + position.hodl.return
   }, 0)
 
-  const netUniswapReturn = positions?.reduce(function(total, position) {
+  const netUniswapReturn = dynamicPositions?.reduce(function(total, position) {
     return total + position.uniswap.return ?? 0
   }, 0)
 
-  const netPrincipal = positions?.reduce(function(total, position) {
+  const netPrincipal = dynamicPositions?.reduce(function(total, position) {
     return total + position.principal.usd
   }, 0)
 
-  const netReturn = positions?.reduce(function(total, position) {
+  const netReturn = dynamicPositions?.reduce(function(total, position) {
     return total + position.net.return
   }, 0)
 
@@ -250,7 +262,7 @@ function AccountPage({ account }) {
               <AutoColumn gap="10px">
                 <RowBetween>
                   <TYPE.main fontSize={'16px'} fontWeight={400} color="#888D9B">
-                    Uniswap Performance (Total Supplied)
+                    Uniswap Performance (Current Value)
                   </TYPE.main>
                   <div />
                 </RowBetween>

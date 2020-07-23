@@ -4,7 +4,7 @@ import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { useTimeframe } from './Application'
 import { timeframeOptions } from '../constants'
-import { getPercentChange, getBlockFromTimestamp, getBlocksFromTimestamps, get2DayPercentChange } from '../helpers'
+import { getPercentChange, getBlockFromTimestamp, getBlocksFromTimestamps, get2DayPercentChange } from '../utils'
 import { GLOBAL_DATA, GLOBAL_TXNS, GLOBAL_CHART, ETH_PRICE, ALL_PAIRS, ALL_TOKENS, PAIR_CHART } from '../apollo/queries'
 import weekOfYear from 'dayjs/plugin/weekOfYear'
 import { getV1Data } from './V1Data'
@@ -163,7 +163,7 @@ export default function Provider({ children }) {
   )
 }
 
-async function getGlobalData(ethPrice) {
+async function getGlobalData(ethPrice, oldEthPrice) {
   let data = {}
   let oneDayData = {}
   let twoDayData = {}
@@ -210,20 +210,21 @@ async function getGlobalData(ethPrice) {
       )
 
       data.totalLiquidityUSD = data.totalLiquidityETH * ethPrice
-      const liquidityChangeUSD = getPercentChange(data.totalLiquidityETH, oneDayData.totalLiquidityETH)
-      const liquidityChangeETH = getPercentChange(data.totalLiquidityETH, oneDayData.totalLiquidityETH)
+
+      const liquidityChangeUSD = getPercentChange(
+        data.totalLiquidityETH * ethPrice,
+        oneDayData.totalLiquidityETH * oldEthPrice
+      )
       data.oneDayVolumeUSD = oneDayVolumeUSD
       data.volumeChangeUSD = volumeChangeUSD
       data.oneDayVolumeETH = oneDayVolumeETH
       data.volumeChangeETH = volumeChangeETH
       data.liquidityChangeUSD = liquidityChangeUSD
-      data.liquidityChangeETH = liquidityChangeETH
       data.oneDayTxns = oneDayTxns
       data.txnChange = txnChange
 
       const v1Data = await getV1Data()
       data.v1Data = v1Data
-      data.v1Data.totalLiquidityUSD = v1Data.totalETH * ethPrice
     }
   } catch (e) {
     console.log(e)
@@ -372,7 +373,10 @@ const getGlobalTransactions = async () => {
 
 const getEthPrice = async () => {
   const utcCurrentTime = dayjs()
-  const utcOneDayBack = utcCurrentTime.subtract(1, 'day').unix()
+  const utcOneDayBack = utcCurrentTime
+    .subtract(1, 'day')
+    .startOf('minute')
+    .unix()
 
   let ethPrice = 0
   let ethPriceOneDay = 0
@@ -452,13 +456,13 @@ async function getAllTokensOnUniswap() {
 
 export function useGlobalData() {
   const [state, { update, updateAllPairsInUniswap, updateAllTokensInUniswap }] = useGlobalDataContext()
-  const [ethPrice] = useEthPrice()
+  const [ethPrice, oldEthPrice] = useEthPrice()
 
   const data = state?.globalData
 
   useEffect(() => {
     async function fetchData() {
-      let globalData = await getGlobalData(ethPrice)
+      let globalData = await getGlobalData(ethPrice, oldEthPrice)
       globalData && update(globalData)
 
       let allPairs = await getAllPairsOnUniswap()
@@ -467,10 +471,10 @@ export function useGlobalData() {
       let allTokens = await getAllTokensOnUniswap()
       updateAllTokensInUniswap(allTokens)
     }
-    if (!data && ethPrice) {
+    if (!data && ethPrice && oldEthPrice) {
       fetchData()
     }
-  }, [ethPrice, update, data, updateAllPairsInUniswap, updateAllTokensInUniswap])
+  }, [ethPrice, oldEthPrice, update, data, updateAllPairsInUniswap, updateAllTokensInUniswap])
 
   return data || {}
 }
@@ -499,7 +503,7 @@ export function useGlobalChartData() {
         utcStartTime = utcEndTime.subtract(1, 'year').startOf('year')
         break
     }
-    let startTime = utcStartTime.unix() - 1
+    let startTime = utcStartTime.startOf('hour').unix() - 1
 
     if ((activeWindow && startTime < oldestDateFetch) || !oldestDateFetch) {
       setOldestDateFetched(startTime)

@@ -9,10 +9,11 @@ import styled from 'styled-components'
 import Link, { CustomLink } from '../Link'
 import { Divider } from '../../components'
 
-import { formattedNum, getPoolLink, getSwapLink } from '../../helpers'
+import { formattedNum, getPoolLink, getSwapLink } from '../../utils'
 import DoubleTokenLogo from '../DoubleLogo'
 import { ButtonLight, ButtonDark } from '../ButtonStyled'
 import { withRouter } from 'react-router-dom'
+import { OVERVIEW_PAIR_BLACKLIST } from '../../constants'
 
 dayjs.extend(utc)
 
@@ -61,17 +62,17 @@ const DashGrid = styled.div`
   }
 
   @media screen and (min-width: 740px) {
-    grid-template-columns: 1.5fr 1fr 1fr 300px;
+    grid-template-columns: 1.5fr 1fr 1fr ${({ disbaleLinks }) => (disbaleLinks ? '160px' : '300px')};
     grid-template-areas: ' name liq vol pool ';
   }
 
   @media screen and (min-width: 1080px) {
-    grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr 300px;
+    grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr ${({ disbaleLinks }) => (disbaleLinks ? '160px' : '300px')};
     grid-template-areas: ' name liq vol volWeek fees pool ';
   }
 
   @media screen and (min-width: 1200px) {
-    grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr 300px;
+    grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr ${({ disbaleLinks }) => (disbaleLinks ? '160px' : '300px')};
     grid-template-areas: ' name liq vol volWeek fees pool';
   }
 `
@@ -116,7 +117,7 @@ const FIELD_TO_VALUE = {
   [SORT_FIELD.FEES]: 'oneDayVolumeUSD'
 }
 
-function PairList({ pairs, color, history }) {
+function PairList({ pairs, color, history, disbaleLinks, maxItems = 10 }) {
   const below600 = useMedia('(max-width: 600px)')
   const below740 = useMedia('(max-width: 740px)')
   const below1080 = useMedia('(max-width: 1080px)')
@@ -124,7 +125,7 @@ function PairList({ pairs, color, history }) {
   // pagination
   const [page, setPage] = useState(1)
   const [maxPage, setMaxPage] = useState(1)
-  const ITEMS_PER_PAGE = 10
+  const ITEMS_PER_PAGE = maxItems
 
   // sorting
   const [sortDirection, setSortDirection] = useState(true)
@@ -143,13 +144,13 @@ function PairList({ pairs, color, history }) {
       }
       setMaxPage(Math.floor(Object.keys(pairs).length / ITEMS_PER_PAGE) + extraPages)
     }
-  }, [pairs])
+  }, [ITEMS_PER_PAGE, pairs])
 
   const ListItem = ({ pairAddress, index }) => {
     const pairData = pairs[pairAddress]
 
     if (pairData && pairData.token0 && pairData.token1) {
-      const liquidity = formattedNum(pairData.trackedReserveUSD, true)
+      const liquidity = formattedNum(pairData.reserveUSD, true)
       const volume = formattedNum(pairData.oneDayVolumeUSD, true)
 
       if (pairData.token0.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
@@ -163,7 +164,12 @@ function PairList({ pairs, color, history }) {
       }
 
       return (
-        <DashGrid style={{ height: '60px' }} focus={true} onClick={() => history.push('/pair/' + pairAddress)}>
+        <DashGrid
+          style={{ height: '60px' }}
+          disbaleLinks={disbaleLinks}
+          focus={true}
+          onClick={() => history.push('/pair/' + pairAddress)}
+        >
           <DataText area="name" fontWeight="500">
             {!below600 && <div style={{ marginRight: '20px' }}>{index}</div>}
             <DoubleTokenLogo
@@ -180,18 +186,25 @@ function PairList({ pairs, color, history }) {
           <DataText area="vol">{volume}</DataText>
           {!below1080 && <DataText area="volWeek">{formattedNum(pairData.oneWeekVolumeUSD, true)}</DataText>}
           {!below1080 && <DataText area="fees">{formattedNum(pairData.oneDayVolumeUSD * 0.003, true)}</DataText>}
-          {!below740 && (
-            <Flex area="pool" justifyContent="flex-end" alignItems="center">
-              <Link color={color} external href={getPoolLink(pairData.token0?.id, pairData.token1?.id)}>
-                <ButtonLight color={color} style={{ marginRight: '10px' }}>
-                  + Add Liquidity
-                </ButtonLight>
-              </Link>
-              <Link color={'white'} external href={getSwapLink(pairData.token0?.id, pairData.token1?.id)}>
-                <ButtonDark color={color}>Trade</ButtonDark>
-              </Link>
-            </Flex>
-          )}
+          {!below740 &&
+            (disbaleLinks ? (
+              <Flex area="pool" justifyContent="flex-end" alignItems="center">
+                <CustomLink color={'white'} to={'/pair/' + pairAddress}>
+                  <ButtonDark color={color}>View</ButtonDark>
+                </CustomLink>
+              </Flex>
+            ) : (
+              <Flex area="pool" justifyContent="flex-end" alignItems="center">
+                <Link color={color} external href={getPoolLink(pairData.token0?.id, pairData.token1?.id)}>
+                  <ButtonLight color={color} style={{ marginRight: '10px' }}>
+                    + Add Liquidity
+                  </ButtonLight>
+                </Link>
+                <Link color={'white'} external href={getSwapLink(pairData.token0?.id, pairData.token1?.id)}>
+                  <ButtonDark color={color}>Trade</ButtonDark>
+                </Link>
+              </Flex>
+            ))}
         </DashGrid>
       )
     } else {
@@ -212,7 +225,8 @@ function PairList({ pairs, color, history }) {
       .slice(ITEMS_PER_PAGE * (page - 1), page * ITEMS_PER_PAGE)
       .map((pairAddress, index) => {
         return (
-          pairAddress && (
+          pairAddress &&
+          !OVERVIEW_PAIR_BLACKLIST.includes(pairAddress) && (
             <div key={index}>
               <ListItem key={index} index={(page - 1) * 10 + index + 1} pairAddress={pairAddress} />
               <Divider />
@@ -223,7 +237,7 @@ function PairList({ pairs, color, history }) {
 
   return (
     <ListWrapper>
-      <DashGrid center={true} style={{ height: 'fit-content', padding: '0 0 1rem 0' }}>
+      <DashGrid center={true} disbaleLinks={disbaleLinks} style={{ height: 'fit-content', padding: '0 0 1rem 0' }}>
         <Flex alignItems="center" justifyContent="flexStart">
           <Text area="name" fontWeight="500">
             Name

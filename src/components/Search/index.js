@@ -11,7 +11,7 @@ import { useAllPairData, usePairData } from '../../contexts/PairData'
 import DoubleTokenLogo from '../DoubleLogo'
 import { useMedia } from 'react-use'
 import { useAllPairsInUniswap, useAllTokensInUniswap } from '../../contexts/GlobalData'
-import { OVERVIEW_TOKEN_BLACKLIST } from '../../constants'
+import { OVERVIEW_TOKEN_BLACKLIST, OVERVIEW_PAIR_BLACKLIST } from '../../constants'
 
 const Wrapper = styled.div`
   display: flex;
@@ -140,7 +140,9 @@ export const Search = ({ small = false }) => {
     }
   }, [value])
 
-  const escapeStringRegexp = string => string
+  function escapeRegExp(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') // $& means the whole matched string
+  }
 
   const filteredTokenList = useMemo(() => {
     return allTokens
@@ -166,16 +168,19 @@ export const Search = ({ small = false }) => {
             return 1
           })
           .filter(token => {
+            if (OVERVIEW_TOKEN_BLACKLIST.includes(token.id)) {
+              return false
+            }
             const regexMatches = Object.keys(token).map(tokenEntryKey => {
               const isAddress = value.slice(0, 2) === '0x'
               if (tokenEntryKey === 'id' && isAddress) {
-                return token[tokenEntryKey].match(new RegExp(escapeStringRegexp(value), 'i'))
+                return token[tokenEntryKey].match(new RegExp(escapeRegExp(value), 'i'))
               }
               if (tokenEntryKey === 'symbol' && !isAddress) {
-                return token[tokenEntryKey].match(new RegExp(escapeStringRegexp(value), 'i'))
+                return token[tokenEntryKey].match(new RegExp(escapeRegExp(value), 'i'))
               }
               if (tokenEntryKey === 'name' && !isAddress) {
-                return token[tokenEntryKey].match(new RegExp(escapeStringRegexp(value), 'i'))
+                return token[tokenEntryKey].match(new RegExp(escapeRegExp(value), 'i'))
               }
               return false
             })
@@ -202,6 +207,9 @@ export const Search = ({ small = false }) => {
             return 0
           })
           .filter(pair => {
+            if (OVERVIEW_PAIR_BLACKLIST.includes(pair.id)) {
+              return false
+            }
             if (value && value.includes(' ')) {
               const pairA = value.split(' ')[0]?.toUpperCase()
               const pairB = value.split(' ')[1]?.toUpperCase()
@@ -221,18 +229,18 @@ export const Search = ({ small = false }) => {
             const regexMatches = Object.keys(pair).map(field => {
               const isAddress = value.slice(0, 2) === '0x'
               if (field === 'id' && isAddress) {
-                return pair[field].match(new RegExp(escapeStringRegexp(value), 'i'))
+                return pair[field].match(new RegExp(escapeRegExp(value), 'i'))
               }
               if (field === 'token0') {
                 return (
-                  pair[field].symbol.match(new RegExp(escapeStringRegexp(value), 'i')) ||
-                  pair[field].name.match(new RegExp(escapeStringRegexp(value), 'i'))
+                  pair[field].symbol.match(new RegExp(escapeRegExp(value), 'i')) ||
+                  pair[field].name.match(new RegExp(escapeRegExp(value), 'i'))
                 )
               }
               if (field === 'token1') {
                 return (
-                  pair[field].symbol.match(new RegExp(escapeStringRegexp(value), 'i')) ||
-                  pair[field].name.match(new RegExp(escapeStringRegexp(value), 'i'))
+                  pair[field].symbol.match(new RegExp(escapeRegExp(value), 'i')) ||
+                  pair[field].name.match(new RegExp(escapeRegExp(value), 'i'))
                 )
               }
               return false

@@ -8,7 +8,7 @@ import { useEthPrice } from './GlobalData'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 
-import { get2DayPercentChange, getPercentChange, getBlockFromTimestamp, isAddress } from '../helpers'
+import { get2DayPercentChange, getPercentChange, getBlockFromTimestamp, isAddress } from '../utils'
 
 const UPDATE = 'UPDATE'
 const UPDATE_TOKEN_TXNS = 'UPDATE_TOKEN_TXNS'
@@ -198,20 +198,22 @@ const getTopTokens = async (ethPrice, ethPriceOld) => {
           twoDayHistory?.txCount ?? 0
         )
 
+        const currentLiquidityUSD = data?.totalLiquidity * ethPrice * data?.derivedETH
+        const oldLiquidityUSD = oneDayHistory?.totalLiquidity * ethPriceOld * oneDayHistory?.derivedETH
+
         // percent changes
         const priceChangeUSD = getPercentChange(
           data?.derivedETH * ethPrice,
           oneDayHistory?.derivedETH ? oneDayHistory?.derivedETH * ethPriceOld : 0
         )
-        const liquidityChangeUSD = getPercentChange(data?.totalLiquidityUSD, oneDayHistory?.totalLiquidityUSD ?? 0)
 
         // set data
         data.priceUSD = data?.derivedETH * ethPrice
-        data.totalLiquidityUSD = data?.totalLiquidity * ethPrice * data?.derivedETH
+        data.totalLiquidityUSD = currentLiquidityUSD
         data.oneDayVolumeUSD = oneDayVolumeUSD
         data.volumeChangeUSD = volumeChangeUSD
         data.priceChangeUSD = priceChangeUSD
-        data.liquidityChangeUSD = liquidityChangeUSD
+        data.liquidityChangeUSD = getPercentChange(currentLiquidityUSD ?? 0, oldLiquidityUSD ?? 0)
         data.oneDayTxns = oneDayTxns
         data.txnChange = txnChange
 
@@ -223,7 +225,7 @@ const getTopTokens = async (ethPrice, ethPriceOld) => {
         }
 
         if (data.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
-          data.name = 'ETH (Wrapped)'
+          data.name = 'Ether (Wrapped)'
           data.symbol = 'ETH'
         }
         return data
@@ -238,8 +240,14 @@ const getTopTokens = async (ethPrice, ethPriceOld) => {
 
 const getTokenData = async (address, ethPrice, ethPriceOld) => {
   const utcCurrentTime = dayjs()
-  const utcOneDayBack = utcCurrentTime.subtract(1, 'day').unix()
-  const utcTwoDaysBack = utcCurrentTime.subtract(2, 'day').unix()
+  const utcOneDayBack = utcCurrentTime
+    .subtract(1, 'day')
+    .startOf('minute')
+    .unix()
+  const utcTwoDaysBack = utcCurrentTime
+    .subtract(2, 'day')
+    .startOf('minute')
+    .unix()
   let oneDayBlock = await getBlockFromTimestamp(utcOneDayBack)
   let twoDayBlock = await getBlockFromTimestamp(utcTwoDaysBack)
 
@@ -346,7 +354,7 @@ const getTokenChartData = async tokenAddress => {
   let data = []
   const utcEndTime = dayjs.utc()
   let utcStartTime = utcEndTime.subtract(1, 'year')
-  let startTime = utcStartTime.unix() - 1
+  let startTime = utcStartTime.startOf('minute').unix() - 1
 
   try {
     let result = await client.query({
@@ -383,7 +391,7 @@ const getTokenChartData = async tokenAddress => {
     let latestPriceUSD = data[0] && data[0].priceUSD
     let latestPairDatas = data[0] && data[0].mostLiquidPairs
     let index = 1
-    while (timestamp < utcEndTime.unix() - oneDay) {
+    while (timestamp < utcEndTime.startOf('minute').unix() - oneDay) {
       const nextDay = timestamp + oneDay
       let currentDayIndex = (nextDay / oneDay).toFixed(0)
       if (!dayIndexSet.has(currentDayIndex)) {

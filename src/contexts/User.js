@@ -7,19 +7,19 @@ import { timeframeOptions } from '../constants'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { useEthPrice } from './GlobalData'
-import { getLPReturnsOnPair, getReturnsHistoryPerLPPerPair } from '../helpers/returns'
+import { getLPReturnsOnPair, getReturnsHistoryPerLPPerPair } from '../utils/returns'
 
 dayjs.extend(utc)
 
 const UPDATE_TRANSACTIONS = 'UPDATE_TRANSACTIONS'
 const UPDATE_POSITIONS = 'UPDATE_POSITIONS '
 const UPDATE_USER_POSITION_HISTORY = 'UPDATE_USER_POSITION_HISTORY'
-const UPDATE_USER_PAIR_HODLS_RETURNS = 'UPDATE_USER_PAIR_HODLS_RETURNS'
+const UPDATE_USER_PAIR_RETURNS = 'UPDATE_USER_PAIR_RETURNS'
 
 const TRANSACTIONS_KEY = 'TRANSACTIONS_KEY'
 const POSITIONS_KEY = 'POSITIONS_KEY'
 const USER_POSITION_HISTORY_KEY = 'USER_POSITION_HISTORY_KEY'
-const USER_PAIR_HODLS_RETURNS_KEY = 'USER_PAIR_HODLS_RETURNS_KEY'
+const USER_PAIR_RETURNS_KEY = 'USER_PAIR_RETURNS_KEY'
 
 const UserContext = createContext()
 
@@ -55,18 +55,16 @@ function reducer(state, { type, payload }) {
       }
     }
 
-    case UPDATE_USER_PAIR_HODLS_RETURNS: {
-      const { account, hodlData } = payload
-      let added = {}
-      hodlData &&
-        hodlData.map(pairData => {
-          return (added[pairData.pairAddress] = pairData)
-        })
+    case UPDATE_USER_PAIR_RETURNS: {
+      const { account, pairAddress, data } = payload
       return {
         ...state,
         [account]: {
           ...state?.[account],
-          [USER_PAIR_HODLS_RETURNS_KEY]: { ...state?.[account]?.USER_PAIR_HODLS_RETURNS_KEY, ...added }
+          [USER_PAIR_RETURNS_KEY]: {
+            ...state?.[account]?.[USER_PAIR_RETURNS_KEY],
+            [pairAddress]: data
+          }
         }
       }
     }
@@ -112,12 +110,13 @@ export default function Provider({ children }) {
     })
   }, [])
 
-  const updateUserHodlReturns = useCallback((account, hodlData) => {
+  const updateUserPairReturns = useCallback((account, pairAddress, data) => {
     dispatch({
-      type: UPDATE_USER_PAIR_HODLS_RETURNS,
+      type: UPDATE_USER_PAIR_RETURNS,
       payload: {
         account,
-        hodlData
+        pairAddress,
+        data
       }
     })
   }, [])
@@ -125,8 +124,8 @@ export default function Provider({ children }) {
   return (
     <UserContext.Provider
       value={useMemo(
-        () => [state, { updateTransactions, updatePositions, updateUserPositionHistory, updateUserHodlReturns }],
-        [state, updateTransactions, updatePositions, updateUserPositionHistory, updateUserHodlReturns]
+        () => [state, { updateTransactions, updatePositions, updateUserPositionHistory, updateUserPairReturns }],
+        [state, updateTransactions, updatePositions, updateUserPositionHistory, updateUserPairReturns]
       )}
     >
       {children}
@@ -164,7 +163,7 @@ export function useUserTransactions(account) {
 
 export function useReturnsPerPairHistory(position, account) {
   const pairAddress = position?.pair?.id
-  const [state] = useUserContext()
+  const [state, { updateUserPairReturns }] = useUserContext()
 
   // get oldest date of data to fetch
   const startDateTimestamp = useStartTimestamp()
@@ -183,7 +182,7 @@ export function useReturnsPerPairHistory(position, account) {
   const [currentETHPrice] = useEthPrice()
 
   // formatetd array to return for chart data
-  const [formattedHistory, setFormattedHistory] = useState()
+  const formattedHistory = state?.[account]?.[USER_PAIR_RETURNS_KEY]?.[pairAddress]
 
   useEffect(() => {
     async function fetchData() {
@@ -193,10 +192,10 @@ export function useReturnsPerPairHistory(position, account) {
         pairSnapshots,
         currentETHPrice
       )
-      setFormattedHistory(fetchedData)
+      updateUserPairReturns(account, pairAddress, fetchedData)
     }
     if (
-      history &&
+      account &&
       startDateTimestamp &&
       pairSnapshots &&
       !formattedHistory &&
@@ -206,7 +205,17 @@ export function useReturnsPerPairHistory(position, account) {
     ) {
       fetchData()
     }
-  }, [history, startDateTimestamp, pairSnapshots, formattedHistory, pairAddress, currentPairData, currentETHPrice])
+  }, [
+    account,
+    startDateTimestamp,
+    pairSnapshots,
+    formattedHistory,
+    pairAddress,
+    currentPairData,
+    currentETHPrice,
+    updateUserPairReturns,
+    position.pair.id
+  ])
 
   return formattedHistory
 }
@@ -368,7 +377,7 @@ export function useUserLiquidityHistory(account) {
 }
 
 export function useUserPositions(account) {
-  const [state, { updatePositions, updateUserHodlReturns }] = useUserContext()
+  const [state, { updatePositions }] = useUserContext()
   const positions = state?.[account]?.[POSITIONS_KEY]
   const [ethPrice] = useEthPrice()
 
@@ -405,7 +414,7 @@ export function useUserPositions(account) {
     if (!positions && account && ethPrice) {
       fetchData(account)
     }
-  }, [account, positions, updatePositions, updateUserHodlReturns, ethPrice])
+  }, [account, positions, updatePositions, ethPrice])
 
   return positions
 }

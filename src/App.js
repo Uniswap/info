@@ -10,8 +10,10 @@ import PairPage from './pages/PairPage'
 import NavHeader from './components/NavHeader'
 import LocalLoader from './components/LocalLoader'
 import { useGlobalData, useGlobalChartData } from './contexts/GlobalData'
-import { isAddress } from './helpers'
+import { isAddress } from './utils'
 import AccountPage from './pages/AccountPage'
+import AllTokensPage from './pages/AllTokensPage'
+import AllPairsPage from './pages/AllPairsPage'
 
 const AppWrapper = styled.div`
   position: relative;
@@ -94,6 +96,14 @@ function App() {
               <Route path="/home">
                 <NavHeaderUpdated />
                 <GlobalPage />
+              </Route>
+              <Route path="/all-tokens">
+                <NavHeaderUpdated />
+                <AllTokensPage />
+              </Route>
+              <Route path="/all-pairs">
+                <NavHeaderUpdated />
+                <AllPairsPage />
               </Route>
               <Redirect to="/home" />
             </Switch>
