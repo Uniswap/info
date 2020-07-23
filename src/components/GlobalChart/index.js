@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react'
 import { Area, XAxis, YAxis, ResponsiveContainer, Tooltip, AreaChart, BarChart, Bar } from 'recharts'
 import Row, { RowBetween } from '../Row'
-import { toK, toNiceDate, toWeeklyDate, toNiceDateYear, formattedNum, formattedPercent } from '../../helpers'
+import { toK, toNiceDate, toWeeklyDate, toNiceDateYear, formattedNum, formattedPercent } from '../../utils'
 import { OptionButton } from '../ButtonStyled'
 import { useMedia } from 'react-use'
 import { useTimeframe } from '../../contexts/Application'

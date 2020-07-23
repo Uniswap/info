@@ -7,10 +7,9 @@ import { RowFixed, RowBetween } from '../Row'
 import { AutoColumn } from '../Column'
 import { useMedia } from 'react-use'
 import { useGlobalData, useEthPrice, useGlobalTransactions } from '../../contexts/GlobalData'
-import { formattedNum, formattedPercent, isAddress } from '../../helpers'
+import { formattedNum, formattedPercent, isAddress, toK } from '../../utils'
 import UniPrice from '../UniPrice'
 
-import { toK } from '../../helpers'
 import { ButtonDark } from '../ButtonStyled'
 import Link from '../Link'
 
