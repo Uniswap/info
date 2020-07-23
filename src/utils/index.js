@@ -341,7 +341,8 @@ export const get2DayPercentChange = (valueNow, value24HoursAgo, value48HoursAgo)
 }
 
 export const getPercentChange = (valueNow, value24HoursAgo) => {
-  const adjustedPercentChange = ((valueNow - value24HoursAgo) / value24HoursAgo) * 100
+  const adjustedPercentChange =
+    ((parseFloat(valueNow) - parseFloat(value24HoursAgo)) / parseFloat(value24HoursAgo)) * 100
   if (isNaN(adjustedPercentChange) || !isFinite(adjustedPercentChange)) {
     return 0
   }

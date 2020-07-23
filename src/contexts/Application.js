@@ -33,6 +33,7 @@ function reducer(state, { type, payload }) {
         TIME_KEY: newTimeFrame
       }
     }
+
     default: {
       throw Error(`Unexpected action type in DataContext reducer: '${type}'.`)
     }

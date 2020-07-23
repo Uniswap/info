@@ -59,7 +59,6 @@ const PairReturnsChart = ({ account, position }) => {
           .unix() - 1
       break
   }
-
   const domain = [dataMin => (dataMin > utcStartTime ? dataMin : utcStartTime), 'dataMax']
 
   return (
