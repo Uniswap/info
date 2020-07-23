@@ -14,7 +14,7 @@ import { ButtonLight, ButtonDark } from '../components/ButtonStyled'
 import TxnList from '../components/TxnList'
 import TokenChart from '../components/TokenChart'
 
-import { formattedNum, formattedPercent, getPoolLink, getSwapLink } from '../helpers'
+import { formattedNum, formattedPercent, getPoolLink, getSwapLink } from '../utils'
 
 import { useTokenData, useTokenTransactions, useTokenPairs } from '../contexts/TokenData'
 import { TYPE, ThemedBackground } from '../Theme'

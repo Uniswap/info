@@ -137,7 +137,6 @@ export async function getLPReturnsOnPair(user: string, pair, ethPrice: number) {
     let results = getMetricsForPositionWindow(positionT0, positionT1)
     hodlReturn = hodlReturn + results.hodleReturn
     netReturn = netReturn + results.netReturn
-
     uniswapReturn = uniswapReturn + results.uniswapReturn
   }
 
@@ -177,7 +176,7 @@ export function getMetricsForPositionWindow(positionT0: Position, positionT1: Po
   const token1_amount_t1 = t1Ownership * positionT1.reserve1
 
   // calculate squares to find imp loss and fee differences
-  const sqrK_t0 = Math.sqrt(positionT1.token1PriceUSD)
+  const sqrK_t0 = Math.sqrt(token0_amount_t0 * token1_amount_t0)
   const token0_amount_no_fees = positionT1.token1PriceUSD ? sqrK_t0 * Math.sqrt(positionT1.token1PriceUSD) : 0
   const token1_amount_no_fees = Number(positionT1.token1PriceUSD) ? sqrK_t0 / Math.sqrt(positionT1.token1PriceUSD) : 0
   const no_fees_usd =
@@ -193,7 +192,6 @@ export function getMetricsForPositionWindow(positionT0: Position, positionT1: Po
   const assetValueT1 = token0_amount_t0 * positionT1.token0PriceUSD + token1_amount_t0 * positionT1.token1PriceUSD
 
   const imp_loss_usd = no_fees_usd - assetValueT1
-
   const uniswap_return = difference_fees_usd + imp_loss_usd
 
   // get net value change for combined data
@@ -234,6 +232,8 @@ export async function getReturnsHistoryPerLPPerPair(
     dayTimestamps.push(dayIndex * 86400)
     dayIndex = dayIndex + 1
   }
+
+  console.log(currentPairData)
 
   const shareValues = await getShareValueOverTime(currentPairData.id, dayTimestamps)
   const formattedHistory = []

@@ -59,28 +59,30 @@ export const GET_BLOCKS = timestamps => {
 export const SHARE_VALUE = (pairAddress, blocks) => {
   let queryString = 'query blocks {'
   queryString += blocks.map(
-    block => `t${block.timestamp}:pair(id:"${pairAddress}", block: { number: ${block.number} }) { 
-    reserve0
-    reserve1
-    reserveUSD
-    totalSupply 
-    token0{
-      derivedETH
-    }
-    token1{
-      derivedETH
-    }
-  }
-  `
+    block => `
+      t${block.timestamp}:pair(id:"${pairAddress}", block: { number: ${block.number} }) { 
+        reserve0
+        reserve1
+        reserveUSD
+        totalSupply 
+        token0{
+          derivedETH
+        }
+        token1{
+          derivedETH
+        }
+      }
+    `
   )
 
   queryString += ','
 
   queryString += blocks.map(
-    block => `b${block.timestamp}: bundle(id:"1", block: { number: ${block.number} }) { 
-    ethPrice
-  }
-  `
+    block => `
+      b${block.timestamp}: bundle(id:"1", block: { number: ${block.number} }) { 
+        ethPrice
+      }
+    `
   )
 
   queryString += '}'
@@ -505,6 +507,7 @@ export const PAIR_DATA = (pairAddress, block) => {
         trackedReserveETH
         reserveETH
         volumeUSD
+        createdAtTimestamp
       }
     }`
     : ` query pairs {
@@ -533,6 +536,7 @@ export const PAIR_DATA = (pairAddress, block) => {
         totalSupply
         trackedReserveETH
         volumeUSD
+        createdAtTimestamp
       }
     }`
 
@@ -554,6 +558,7 @@ export const PAIRS_DYNAMIC_BULK = (block, pairs) => {
       trackedReserveETH
       volumeUSD
       totalSupply
+      createdAtTimestamp
     }
   }
   `
@@ -586,6 +591,7 @@ export const PAIRS_BULK = gql`
       trackedReserveETH
       volumeUSD
       createdAtBlockNumber
+      createdAtTimestamp
     }
   }
 `

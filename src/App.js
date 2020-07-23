@@ -10,7 +10,7 @@ import PairPage from './pages/PairPage'
 import NavHeader from './components/NavHeader'
 import LocalLoader from './components/LocalLoader'
 import { useGlobalData, useGlobalChartData } from './contexts/GlobalData'
-import { isAddress } from './helpers'
+import { isAddress } from './utils'
 import AccountPage from './pages/AccountPage'
 
 const AppWrapper = styled.div`

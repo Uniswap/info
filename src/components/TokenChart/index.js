@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import { Area, XAxis, YAxis, ResponsiveContainer, Tooltip, AreaChart, BarChart, Bar } from 'recharts'
 import { AutoRow, RowBetween } from '../Row'
 
-import { toK, toNiceDate, toNiceDateYear, formattedNum } from '../../helpers'
+import { toK, toNiceDate, toNiceDateYear, formattedNum } from '../../utils'
 import { OptionButton } from '../ButtonStyled'
 import { darken } from 'polished'
 import { useMedia } from 'react-use'

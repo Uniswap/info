@@ -8,7 +8,7 @@ import { useEthPrice } from './GlobalData'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 
-import { get2DayPercentChange, getPercentChange, getBlockFromTimestamp, isAddress } from '../helpers'
+import { get2DayPercentChange, getPercentChange, getBlockFromTimestamp, isAddress } from '../utils'
 
 const UPDATE = 'UPDATE'
 const UPDATE_TOKEN_TXNS = 'UPDATE_TOKEN_TXNS'

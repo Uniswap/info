@@ -9,7 +9,7 @@ import styled from 'styled-components'
 import Link, { CustomLink } from '../Link'
 import { Divider } from '../../components'
 
-import { formattedNum, getPoolLink, getSwapLink } from '../../helpers'
+import { formattedNum, getPoolLink, getSwapLink } from '../../utils'
 import DoubleTokenLogo from '../DoubleLogo'
 import { ButtonLight, ButtonDark } from '../ButtonStyled'
 import { withRouter } from 'react-router-dom'

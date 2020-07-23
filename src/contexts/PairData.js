@@ -16,7 +16,7 @@ import { useEthPrice } from './GlobalData'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 
-import { getPercentChange, get2DayPercentChange, getBlockFromTimestamp, isAddress } from '../helpers'
+import { getPercentChange, get2DayPercentChange, getBlockFromTimestamp, isAddress } from '../utils'
 
 const UPDATE = 'UPDATE'
 const UPDATE_PAIR_TXNS = 'UPDATE_PAIR_TXNS'

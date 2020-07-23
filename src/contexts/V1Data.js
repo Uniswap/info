@@ -1,7 +1,7 @@
 import { v1Client } from '../apollo/client'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
-import { getPercentChange, get2DayPercentChange } from '../helpers'
+import { getPercentChange, get2DayPercentChange } from '../utils'
 import { V1_DATA_QUERY } from '../apollo/queries'
 import weekOfYear from 'dayjs/plugin/weekOfYear'
 

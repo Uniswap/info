@@ -7,7 +7,7 @@ import { RowFixed, RowBetween } from '../Row'
 import { AutoColumn } from '../Column'
 import { useMedia } from 'react-use'
 import { useGlobalData } from '../../contexts/GlobalData'
-import { toK } from '../../helpers'
+import { toK } from '../../utils'
 import { ButtonDark } from '../ButtonStyled'
 import Link from '../Link'
 
