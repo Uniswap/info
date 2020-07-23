@@ -163,7 +163,7 @@ export default function Provider({ children }) {
   )
 }
 
-async function getGlobalData(ethPrice) {
+async function getGlobalData(ethPrice, oldEthPrice) {
   let data = {}
   let oneDayData = {}
   let twoDayData = {}
@@ -216,14 +216,16 @@ async function getGlobalData(ethPrice) {
       )
 
       data.totalLiquidityUSD = data.totalLiquidityETH * ethPrice
-      const liquidityChangeUSD = getPercentChange(data.totalLiquidityETH, oneDayData.totalLiquidityETH)
-      const liquidityChangeETH = getPercentChange(data.totalLiquidityETH, oneDayData.totalLiquidityETH)
+
+      const liquidityChangeUSD = getPercentChange(
+        data.totalLiquidityETH * ethPrice,
+        oneDayData.totalLiquidityETH * oldEthPrice
+      )
       data.oneDayVolumeUSD = oneDayVolumeUSD
       data.volumeChangeUSD = volumeChangeUSD
       data.oneDayVolumeETH = oneDayVolumeETH
       data.volumeChangeETH = volumeChangeETH
       data.liquidityChangeUSD = liquidityChangeUSD
-      data.liquidityChangeETH = liquidityChangeETH
       data.oneDayTxns = oneDayTxns
       data.txnChange = txnChange
 
@@ -460,13 +462,13 @@ async function getAllTokensOnUniswap() {
 
 export function useGlobalData() {
   const [state, { update, updateAllPairsInUniswap, updateAllTokensInUniswap }] = useGlobalDataContext()
-  const [ethPrice] = useEthPrice()
+  const [ethPrice, oldEthPrice] = useEthPrice()
 
   const data = state?.globalData
 
   useEffect(() => {
     async function fetchData() {
-      let globalData = await getGlobalData(ethPrice)
+      let globalData = await getGlobalData(ethPrice, oldEthPrice)
       globalData && update(globalData)
 
       let allPairs = await getAllPairsOnUniswap()
@@ -475,10 +477,10 @@ export function useGlobalData() {
       let allTokens = await getAllTokensOnUniswap()
       updateAllTokensInUniswap(allTokens)
     }
-    if (!data && ethPrice) {
+    if (!data && ethPrice && oldEthPrice) {
       fetchData()
     }
-  }, [ethPrice, update, data, updateAllPairsInUniswap, updateAllTokensInUniswap])
+  }, [ethPrice, oldEthPrice, update, data, updateAllPairsInUniswap, updateAllTokensInUniswap])
 
   return data || {}
 }

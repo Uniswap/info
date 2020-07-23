@@ -237,7 +237,6 @@ async function getBulkPairData(pairList, ethPrice) {
           )
 
           const liquidityChangeUSD = getPercentChange(data.reserveUSD, oneDayHistory?.reserveUSD)
-          const liquidityChangeETH = getPercentChange(data.reserveUSD, oneDayHistory?.reserveUSD)
           data.reserveUSD = data.reserveETH ? data.reserveETH * ethPrice : data.reserveUSD
           data.trackedReserveUSD = parseFloat(pair.trackedReserveETH) * ethPrice
           data.oneDayVolumeUSD = oneDayVolumeUSD
@@ -246,7 +245,6 @@ async function getBulkPairData(pairList, ethPrice) {
           data.volumeChangeUSD = volumeChangeUSD
           data.volumeChangeETH = volumeChangeETH
           data.liquidityChangeUSD = liquidityChangeUSD
-          data.liquidityChangeETH = liquidityChangeETH
           data.oneDayTxns = oneDayTxns
           data.txnChange = txnChange
           // new tokens
