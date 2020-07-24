@@ -50,7 +50,7 @@ const ListOptions = styled(AutoRow)`
 
 const ThemedBackground = styled.div`
   position: absolute;
-  top: 0;
+  top: 240px;
   left: 0;
   right: 0;
   height: 200vh;
