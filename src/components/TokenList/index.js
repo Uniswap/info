@@ -176,7 +176,7 @@ function TopTokenList({ tokens, history, itemMax = 10 }) {
       return ''
     }
     return (
-      <DashGrid style={{ height: '60px' }} focus={true} onClick={() => history.push('/token/' + item.id)}>
+      <DashGrid style={{ height: '48px' }} focus={true} onClick={() => history.push('/token/' + item.id)}>
         <DataText area="name" fontWeight="500">
           <Row>
             {!below680 && <div style={{ marginRight: '1rem' }}>{index}</div>}

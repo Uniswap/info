@@ -30,23 +30,21 @@ import Warning from '../components/Warning'
 import { SURPRESS_WARNINGS } from '../constants'
 import { usePathDismissed } from '../contexts/LocalStorage'
 
-import { TrendingUp, PieChart, Disc, List } from 'react-feather'
+import { TrendingUp, Info, List } from 'react-feather'
 
 const PageWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  /* padding-bottom: 100px; */
-  /* width: calc(100% - 80px); */
-  /* padding: 0 40px; */
-  /* padding-bottom: 80px; */
+
   display: grid;
   justify-content: start;
   align-items: start;
   grid-template-columns: 180px 1fr 256px;
   grid-gap: 24px;
   padding: 0 24px;
+  padding-bottom: 80px;
 
   @media screen and (max-width: 640px) {
     width: calc(100% - 40px);
@@ -217,9 +215,8 @@ function PairPage({ pairAddress, history }) {
   const [dismissed, markAsDismissed] = usePathDismissed(history.location.pathname)
 
   const OverviewRef = useRef()
-  const PairsRef = useRef()
-  const TokensRef = useRef()
   const TransactionsRef = useRef()
+  const InfoRef = useRef()
 
   useEffect(() => {
     setActive(OverviewRef)
@@ -235,23 +232,19 @@ function PairPage({ pairAddress, history }) {
 
   return (
     <PageWrapper>
-      {/* <ThemedBackground backgroundColor={transparentize(0.6, backgroundColor)} /> */}
+      <ThemedBackground backgroundColor={transparentize(0.9, backgroundColor)} />
       <SubNav>
         <SubNavEl onClick={() => handleScroll(OverviewRef)} isActive={active === OverviewRef}>
           <TrendingUp size={20} style={{ marginRight: '1rem' }} />
           <TYPE.main>Overview</TYPE.main>
         </SubNavEl>
-        <SubNavEl onClick={() => handleScroll(PairsRef)} isActive={active === OverviewRef}>
-          <PieChart size={20} style={{ marginRight: '1rem' }} />
-          <TYPE.main>Top Pairs</TYPE.main>
-        </SubNavEl>
-        <SubNavEl onClick={() => handleScroll(TokensRef)} isActive={active === OverviewRef}>
-          <Disc size={20} style={{ marginRight: '1rem' }} />
-          <TYPE.main>Top Tokens</TYPE.main>
-        </SubNavEl>
-        <SubNavEl onClick={() => handleScroll(TransactionsRef)} isActive={active === OverviewRef}>
+        <SubNavEl onClick={() => handleScroll(TransactionsRef)} isActive={active === TransactionsRef}>
           <List size={20} style={{ marginRight: '1rem' }} />
           <TYPE.main>Transactions</TYPE.main>
+        </SubNavEl>
+        <SubNavEl onClick={() => handleScroll(InfoRef)} isActive={active === InfoRef}>
+          <Info size={20} style={{ marginRight: '1rem' }} />
+          <TYPE.main>Info</TYPE.main>
         </SubNavEl>
       </SubNav>
       <div>
@@ -264,13 +257,13 @@ function PairPage({ pairAddress, history }) {
         <WarningGrouping
           disabled={!dismissed && !(SURPRESS_WARNINGS.includes(token0?.id) && SURPRESS_WARNINGS.includes(token1?.id))}
         >
-          <RowBetween mt={20} style={{ flexWrap: 'wrap' }}>
+          <RowBetween ref={OverviewRef} mt={20} style={{ flexWrap: 'wrap' }}>
             <RowFixed style={{ flexWrap: 'wrap' }}>
               <RowFixed mb={20}>
                 {token0 && token1 && (
                   <DoubleTokenLogo a0={token0?.id || ''} a1={token1?.id || ''} size={32} margin={true} />
                 )}{' '}
-                <Text fontSize={'2rem'} fontWeight={600} style={{ margin: '0 1rem' }}>
+                <Text fontSize={'1.5rem'} fontWeight={600} style={{ margin: '0 1rem' }}>
                   {token0 && token1 ? (
                     <>
                       <HoverSpan onClick={() => history.push(`/token/${token0?.id}`)}>{token0.symbol}</HoverSpan>
@@ -327,7 +320,7 @@ function PairPage({ pairAddress, history }) {
           <DashboardWrapper>
             <>
               {!below1080 && (
-                <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '2rem' }}>
+                <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '1.5rem' }}>
                   Pair Stats
                 </TYPE.main>
               )}
@@ -339,7 +332,7 @@ function PairPage({ pairAddress, history }) {
                       <div />
                     </RowBetween>
                     <RowBetween align="flex-end">
-                      <TYPE.main fontSize={'2rem'} lineHeight={1} fontWeight={600}>
+                      <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
                         {liquidity}
                       </TYPE.main>
                       <TYPE.main>{liquidityChange}</TYPE.main>
@@ -353,7 +346,7 @@ function PairPage({ pairAddress, history }) {
                       <div />
                     </RowBetween>
                     <RowBetween align="flex-end">
-                      <TYPE.main fontSize={'2rem'} lineHeight={1} fontWeight={600}>
+                      <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
                         {volume}
                       </TYPE.main>
                       <TYPE.main>{volumeChange}</TYPE.main>
@@ -367,7 +360,7 @@ function PairPage({ pairAddress, history }) {
                       <div />
                     </RowBetween>
                     <RowBetween align="flex-end">
-                      <TYPE.main fontSize={'2rem'} lineHeight={1} fontWeight={600}>
+                      <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
                         {oneDayVolumeUSD
                           ? formattedNum(oneDayVolumeUSD * 0.003, true)
                           : oneDayVolumeUSD === 0
@@ -385,7 +378,7 @@ function PairPage({ pairAddress, history }) {
                       <div />
                     </RowBetween>
                     <RowBetween align="flex-end">
-                      <TYPE.main fontSize={'2rem'} lineHeight={1} fontWeight={600}>
+                      <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
                         {oneDayTxns ?? '-'}
                       </TYPE.main>
                       <TYPE.main>{txnChangeFormatted}</TYPE.main>
@@ -420,7 +413,7 @@ function PairPage({ pairAddress, history }) {
                   <PairChart address={pairAddress} color={backgroundColor} />
                 </Panel>
               </PanelWrapper>
-              <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
+              <TYPE.main ref={TransactionsRef} fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
                 Transactions
               </TYPE.main>{' '}
               <Panel
@@ -431,7 +424,7 @@ function PairPage({ pairAddress, history }) {
               >
                 {transactions ? <TxnList transactions={transactions} /> : <Loader />}
               </Panel>
-              <RowBetween style={{ marginTop: '3rem' }}>
+              <RowBetween ref={InfoRef} style={{ marginTop: '3rem' }}>
                 <TYPE.main fontSize={'1.125rem'}>Pair Information</TYPE.main>{' '}
               </RowBetween>
               <Panel
@@ -445,7 +438,7 @@ function PairPage({ pairAddress, history }) {
                 <TokenDetailsLayout>
                   <Column>
                     <TYPE.main>Pair Name</TYPE.main>
-                    <Text style={{ marginTop: '.5rem' }} fontSize={24} fontWeight="500">
+                    <Text style={{ marginTop: '.5rem' }} fontSize={16} fontWeight="500">
                       {token0 && token1 ? token0.symbol + '-' + token1.symbol : ''}
                     </Text>
                   </Column>
@@ -453,7 +446,7 @@ function PairPage({ pairAddress, history }) {
                   <Column>
                     <TYPE.main>Pair Address</TYPE.main>
                     <AutoRow align="flex-end">
-                      <Text style={{ marginTop: '.5rem' }} fontSize={24} fontWeight="500">
+                      <Text style={{ marginTop: '.5rem' }} fontSize={16} fontWeight="500">
                         {pairAddress.slice(0, 6) + '...' + pairAddress.slice(38, 42)}
                       </Text>
                       <CopyHelper toCopy={pairAddress} />
@@ -462,7 +455,7 @@ function PairPage({ pairAddress, history }) {
                   <Column>
                     <TYPE.main>{token0 && token0.symbol + ' Address'}</TYPE.main>
                     <AutoRow align="flex-end">
-                      <Text style={{ marginTop: '.5rem' }} fontSize={24} fontWeight="500">
+                      <Text style={{ marginTop: '.5rem' }} fontSize={16} fontWeight="500">
                         {token0 && token0.id.slice(0, 6) + '...' + token0.id.slice(38, 42)}
                       </Text>
                       <CopyHelper toCopy={token0?.id} />
@@ -471,7 +464,7 @@ function PairPage({ pairAddress, history }) {
                   <Column>
                     <TYPE.main>{token1 && token1.symbol + ' Address'}</TYPE.main>
                     <AutoRow align="flex-end">
-                      <Text style={{ marginTop: '.5rem' }} fontSize={24} fontWeight="500">
+                      <Text style={{ marginTop: '.5rem' }} fontSize={16} fontWeight="500">
                         {token1 && token1.id.slice(0, 6) + '...' + token1.id.slice(38, 42)}
                       </Text>
                       <CopyHelper toCopy={token1?.id} />
