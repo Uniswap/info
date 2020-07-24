@@ -208,6 +208,13 @@ async function getBulkPairData(pairList, ethPrice) {
             })
             oneDayHistory = oneDayResult
           }
+          if (!twoDayHistory) {
+            let twoDayResult = await client.query({
+              query: PAIR_DATA(pair.id, twoDayBlock),
+              fetchPolicy: 'cache-first'
+            })
+            twoDayHistory = twoDayResult
+          }
           if (!oneWeekHistory) {
             let oneWeekResult = await client.query({
               query: PAIR_DATA(pair.id, oneWeekBlock),
