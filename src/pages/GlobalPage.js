@@ -37,6 +37,7 @@ const PageWrapper = styled.div`
     width: calc(100% - 40px);
     padding: 0 20px;
   }
+  /* background: ${({ theme }) => theme.background}; */
 `
 
 // const ThemedBackground = styled.div`
@@ -83,7 +84,7 @@ const TopGroup = styled.div`
 const SubNav = styled.ul`
   list-style: none;
   position: sticky;
-  top: 8rem;
+  top: 8.5rem;
   padding: 0px;
   margin-top: 0px;
 `
@@ -103,9 +104,16 @@ const ChartWrapper = styled.div`
   height: 100%;
 `
 
+const SideBar = styled.span`
+  display: grid;
+  grid-gap: 24px;
+  position: sticky;
+  top: 8.5rem;
+`
+
 const Wrapper = styled.div`
   display: flex;
-  position: relative;
+  /* position: relative; */
   flex-direction: row;
   align-items: center;
   justify-content: flex-end;
@@ -291,7 +299,7 @@ function GlobalPage({ history }) {
           <TYPE.main fontSize={'1.125rem'}>Top Pairs</TYPE.main>
         </ListOptions>
 
-        <Panel style={{ marginTop: '6px' }}>
+        <Panel style={{ marginTop: '6px', padding: '1.125rem 0 ' }}>
           <PairList pairs={allPairs} />
         </Panel>
 
@@ -299,7 +307,7 @@ function GlobalPage({ history }) {
           <TYPE.main fontSize={'1.125rem'}>Top Tokens</TYPE.main>
         </ListOptions>
 
-        <Panel style={{ marginTop: '6px' }}>
+        <Panel style={{ marginTop: '6px', padding: '1.125rem 0 ' }}>
           <TopTokenList tokens={allTokens} />
         </Panel>
 
@@ -314,30 +322,34 @@ function GlobalPage({ history }) {
       </div>
 
       {!below1080 && (
-        <Panel>
-          <AutoColumn gap={'12px'}>
-            <TYPE.main>Wallet Analytics</TYPE.main>
-            <TYPE.small>Input an address to view liqudiity provider statistics.</TYPE.small>
-            <AutoRow>
-              <Wrapper>
-                <Input
-                  placeholder="0x.."
-                  onChange={e => {
-                    setAccountValue(e.target.value)
-                  }}
-                />
-              </Wrapper>
-            </AutoRow>
+        <SideBar>
+          <Panel>
+            <AutoColumn gap={'12px'}>
+              <TYPE.main>Wallet Analytics</TYPE.main>
+              <TYPE.small>Input an address to view liqudiity provider statistics.</TYPE.small>
+              <AutoRow>
+                <Wrapper>
+                  <Input
+                    placeholder="0x.."
+                    onChange={e => {
+                      setAccountValue(e.target.value)
+                    }}
+                  />
+                </Wrapper>
+              </AutoRow>
 
-            <ButtonLight
-              style={{ marginRight: '1rem' }}
-              disabled={isAddress(accountValue)}
-              onClick={() => history.push('/account/' + accountValue)}
-            >
-              Load Account Details
-            </ButtonLight>
-          </AutoColumn>
-        </Panel>
+              <ButtonLight style={{ marginRight: '1rem' }} onClick={() => history.push('/account/' + accountValue)}>
+                Load Account Details
+              </ButtonLight>
+            </AutoColumn>
+          </Panel>
+          <Panel>
+            <AutoColumn gap={'12px'}>
+              <TYPE.main>Pinned </TYPE.main>
+              <TYPE.small>Pin pairs or tokens to add them to the hompage.</TYPE.small>
+            </AutoColumn>
+          </Panel>
+        </SideBar>
       )}
     </PageWrapper>
   )

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { withRouter } from 'react-router-dom'
 import 'feather-icons'
 import styled from 'styled-components'
@@ -13,6 +13,7 @@ import PairChart from '../components/PairChart'
 import Link from '../components/Link'
 import TxnList from '../components/TxnList'
 import Loader from '../components/Loader'
+import WalletPreview from '../components/WalletPreview'
 
 import { formattedNum, formattedPercent, getPoolLink, getSwapLink } from '../utils'
 import { useColor } from '../hooks'
@@ -29,25 +30,33 @@ import Warning from '../components/Warning'
 import { SURPRESS_WARNINGS } from '../constants'
 import { usePathDismissed } from '../contexts/LocalStorage'
 
+import { TrendingUp, PieChart, Disc, List } from 'react-feather'
+
 const PageWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding-bottom: 100px;
-  width: calc(100% - 80px);
-  padding: 0 40px;
-  padding-bottom: 80px;
+  /* padding-bottom: 100px; */
+  /* width: calc(100% - 80px); */
+  /* padding: 0 40px; */
+  /* padding-bottom: 80px; */
+  display: grid;
+  justify-content: start;
+  align-items: start;
+  grid-template-columns: 180px 1fr 256px;
+  grid-gap: 24px;
+  padding: 0 24px;
 
   @media screen and (max-width: 640px) {
     width: calc(100% - 40px);
     padding: 0 20px;
   }
 
-  & > * {
+  /* & > * {
     width: 90%;
     max-width: 1240px;
-  }
+  } */
 `
 
 const DashboardWrapper = styled.div`
@@ -124,6 +133,25 @@ const WarningGrouping = styled.div`
   pointer-events: ${({ disabled }) => disabled && 'none'};
 `
 
+const SubNav = styled.ul`
+  list-style: none;
+  position: sticky;
+  top: 8.5rem;
+  padding: 0px;
+  margin-top: 0px;
+`
+const SubNavEl = styled.li`
+  list-style: none;
+  display: flex;
+  margin-bottom: 1rem;
+  width: 100%;
+  font-weight: ${({ isActive }) => (isActive ? 600 : 500)};
+
+  :hover {
+    cursor: pointer;
+  }
+`
+
 function PairPage({ pairAddress, history }) {
   const {
     token0,
@@ -138,6 +166,8 @@ function PairPage({ pairAddress, history }) {
     oneDayTxns,
     txnChange
   } = usePairData(pairAddress)
+
+  const [active, setActive] = useState(null)
 
   useEffect(() => {
     document.querySelector('body').scrollTo(0, 0)
@@ -186,241 +216,279 @@ function PairPage({ pairAddress, history }) {
 
   const [dismissed, markAsDismissed] = usePathDismissed(history.location.pathname)
 
+  const OverviewRef = useRef()
+  const PairsRef = useRef()
+  const TokensRef = useRef()
+  const TransactionsRef = useRef()
+
+  useEffect(() => {
+    setActive(OverviewRef)
+  }, [])
+
+  const handleScroll = ref => {
+    setActive(ref.current)
+    document.querySelector('body').scrollTo({
+      behavior: 'smooth',
+      top: ref.current.offsetTop - 120
+    })
+  }
+
   return (
     <PageWrapper>
-      <ThemedBackground backgroundColor={transparentize(0.6, backgroundColor)} />
-      <Warning
-        type={'pair'}
-        show={!dismissed && !(SURPRESS_WARNINGS.includes(token0?.id) && SURPRESS_WARNINGS.includes(token1?.id))}
-        setShow={markAsDismissed}
-        address={pairAddress}
-      />
-      <WarningGrouping
-        disabled={!dismissed && !(SURPRESS_WARNINGS.includes(token0?.id) && SURPRESS_WARNINGS.includes(token1?.id))}
-      >
-        <RowBetween mt={20} style={{ flexWrap: 'wrap' }}>
-          <RowFixed style={{ flexWrap: 'wrap' }}>
-            <RowFixed mb={20}>
-              {token0 && token1 && (
-                <DoubleTokenLogo a0={token0?.id || ''} a1={token1?.id || ''} size={32} margin={true} />
-              )}{' '}
-              <Text fontSize={'2rem'} fontWeight={600} style={{ margin: '0 1rem' }}>
-                {token0 && token1 ? (
-                  <>
-                    <HoverSpan onClick={() => history.push(`/token/${token0?.id}`)}>{token0.symbol}</HoverSpan>
-                    <span>-</span>
-                    <HoverSpan onClick={() => history.push(`/token/${token1?.id}`)}>{token1.symbol}</HoverSpan> Pair
-                  </>
-                ) : (
-                  ''
-                )}
-              </Text>{' '}
+      {/* <ThemedBackground backgroundColor={transparentize(0.6, backgroundColor)} /> */}
+      <SubNav>
+        <SubNavEl onClick={() => handleScroll(OverviewRef)} isActive={active === OverviewRef}>
+          <TrendingUp size={20} style={{ marginRight: '1rem' }} />
+          <TYPE.main>Overview</TYPE.main>
+        </SubNavEl>
+        <SubNavEl onClick={() => handleScroll(PairsRef)} isActive={active === OverviewRef}>
+          <PieChart size={20} style={{ marginRight: '1rem' }} />
+          <TYPE.main>Top Pairs</TYPE.main>
+        </SubNavEl>
+        <SubNavEl onClick={() => handleScroll(TokensRef)} isActive={active === OverviewRef}>
+          <Disc size={20} style={{ marginRight: '1rem' }} />
+          <TYPE.main>Top Tokens</TYPE.main>
+        </SubNavEl>
+        <SubNavEl onClick={() => handleScroll(TransactionsRef)} isActive={active === OverviewRef}>
+          <List size={20} style={{ marginRight: '1rem' }} />
+          <TYPE.main>Transactions</TYPE.main>
+        </SubNavEl>
+      </SubNav>
+      <div>
+        <Warning
+          type={'pair'}
+          show={!dismissed && !(SURPRESS_WARNINGS.includes(token0?.id) && SURPRESS_WARNINGS.includes(token1?.id))}
+          setShow={markAsDismissed}
+          address={pairAddress}
+        />
+        <WarningGrouping
+          disabled={!dismissed && !(SURPRESS_WARNINGS.includes(token0?.id) && SURPRESS_WARNINGS.includes(token1?.id))}
+        >
+          <RowBetween mt={20} style={{ flexWrap: 'wrap' }}>
+            <RowFixed style={{ flexWrap: 'wrap' }}>
+              <RowFixed mb={20}>
+                {token0 && token1 && (
+                  <DoubleTokenLogo a0={token0?.id || ''} a1={token1?.id || ''} size={32} margin={true} />
+                )}{' '}
+                <Text fontSize={'2rem'} fontWeight={600} style={{ margin: '0 1rem' }}>
+                  {token0 && token1 ? (
+                    <>
+                      <HoverSpan onClick={() => history.push(`/token/${token0?.id}`)}>{token0.symbol}</HoverSpan>
+                      <span>-</span>
+                      <HoverSpan onClick={() => history.push(`/token/${token1?.id}`)}>{token1.symbol}</HoverSpan> Pair
+                    </>
+                  ) : (
+                    ''
+                  )}
+                </Text>{' '}
+              </RowFixed>
             </RowFixed>
-          </RowFixed>
-          <RowFixed
-            mb={20}
-            ml={below600 ? '0' : '2.5rem'}
-            style={{ flexDirection: below1080 ? 'row-reverse' : 'initial' }}
-          >
-            <Link external href={getPoolLink(token0?.id, token1?.id)}>
-              <ButtonLight color={backgroundColor}>+ Add Liquidity</ButtonLight>
-            </Link>
-            <Link external href={getSwapLink(token0?.id, token1?.id)}>
-              <ButtonDark ml={'.5rem'} mr={below1080 && '.5rem'} color={backgroundColor}>
-                Trade
-              </ButtonDark>
-            </Link>
-          </RowFixed>
-        </RowBetween>
-        <AutoRow gap="6px">
-          <FixedPanel onClick={() => history.push(`/token/${token0?.id}`)}>
-            <RowFixed>
-              <TokenLogo address={token0?.id} size={'16px'} />
-              <TYPE.main fontSize={'16px'} lineHeight={1} fontWeight={500} ml={'4px'}>
-                {token0 && token1
-                  ? `1 ${token0?.symbol} = ${token0Rate} ${token1?.symbol} ${
-                      parseFloat(token0?.derivedETH) ? '(' + token0USD + ')' : ''
-                    }`
-                  : '-'}
-              </TYPE.main>
-            </RowFixed>
-          </FixedPanel>
-          <FixedPanel onClick={() => history.push(`/token/${token1?.id}`)}>
-            <RowFixed>
-              <TokenLogo address={token1?.id} size={'16px'} />
-              <TYPE.main fontSize={'16px'} lineHeight={1} fontWeight={500} ml={'4px'}>
-                {token0 && token1
-                  ? `1 ${token1?.symbol} = ${token1Rate} ${token0?.symbol}  ${
-                      parseFloat(token1?.derivedETH) ? '(' + token1USD + ')' : ''
-                    }`
-                  : '-'}
-              </TYPE.main>
-            </RowFixed>
-          </FixedPanel>
-        </AutoRow>
-        <DashboardWrapper>
-          <>
-            {!below1080 && (
-              <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '2rem' }}>
-                Pair Stats
-              </TYPE.main>
-            )}
-            <PanelWrapper style={{ marginTop: '1.5rem' }}>
-              <Panel style={{ height: '100%' }}>
-                <AutoColumn gap="20px">
-                  <RowBetween>
-                    <TYPE.main>Total Liquidity {!usingTracked ? '(Untracked)' : ''}</TYPE.main>
-                    <div />
-                  </RowBetween>
-                  <RowBetween align="flex-end">
-                    <TYPE.main fontSize={'2rem'} lineHeight={1} fontWeight={600}>
-                      {liquidity}
-                    </TYPE.main>
-                    <TYPE.main>{liquidityChange}</TYPE.main>
-                  </RowBetween>
-                </AutoColumn>
-              </Panel>
-              <Panel style={{ height: '100%' }}>
-                <AutoColumn gap="20px">
-                  <RowBetween>
-                    <TYPE.main>Volume (24hrs)</TYPE.main>
-                    <div />
-                  </RowBetween>
-                  <RowBetween align="flex-end">
-                    <TYPE.main fontSize={'2rem'} lineHeight={1} fontWeight={600}>
-                      {volume}
-                    </TYPE.main>
-                    <TYPE.main>{volumeChange}</TYPE.main>
-                  </RowBetween>
-                </AutoColumn>
-              </Panel>
-              <Panel style={{ height: '100%' }}>
-                <AutoColumn gap="20px">
-                  <RowBetween>
-                    <TYPE.main>Fees (24hrs)</TYPE.main>
-                    <div />
-                  </RowBetween>
-                  <RowBetween align="flex-end">
-                    <TYPE.main fontSize={'2rem'} lineHeight={1} fontWeight={600}>
-                      {oneDayVolumeUSD
-                        ? formattedNum(oneDayVolumeUSD * 0.003, true)
-                        : oneDayVolumeUSD === 0
-                        ? '$0'
-                        : '-'}
-                    </TYPE.main>
-                    <TYPE.main>{volumeChange}</TYPE.main>
-                  </RowBetween>
-                </AutoColumn>
-              </Panel>
-              <Panel style={{ height: '100%' }}>
-                <AutoColumn gap="20px">
-                  <RowBetween>
-                    <TYPE.main>Transactions (24hrs)</TYPE.main>
-                    <div />
-                  </RowBetween>
-                  <RowBetween align="flex-end">
-                    <TYPE.main fontSize={'2rem'} lineHeight={1} fontWeight={600}>
-                      {oneDayTxns ?? '-'}
-                    </TYPE.main>
-                    <TYPE.main>{txnChangeFormatted}</TYPE.main>
-                  </RowBetween>
-                </AutoColumn>
-              </Panel>
-              <Panel style={{ height: '100%' }}>
-                <AutoColumn gap="20px">
-                  <RowBetween>
-                    <TYPE.main>Pooled Tokens</TYPE.main>
-                    <div />
-                  </RowBetween>
-                  <Hover onClick={() => history.push(`/token/${token0?.id}`)} fade={true}>
-                    <AutoRow gap="4px">
-                      <TokenLogo address={token0?.id} />
-                      <TYPE.main fontSize={20} lineHeight={1} fontWeight={500}>
-                        {reserve0 ? formattedNum(reserve0) : ''} {token0?.symbol ?? ''}
-                      </TYPE.main>
-                    </AutoRow>
-                  </Hover>
-                  <Hover onClick={() => history.push(`/token/${token1?.id}`)} fade={true}>
-                    <AutoRow gap="4px">
-                      <TokenLogo address={token1?.id} />
-                      <TYPE.main fontSize={20} lineHeight={1} fontWeight={500}>
-                        {reserve1 ? formattedNum(reserve1) : ''} {token1?.symbol ?? ''}
-                      </TYPE.main>
-                    </AutoRow>
-                  </Hover>
-                </AutoColumn>
-              </Panel>
-              <Panel style={{ gridColumn: below1080 ? '1' : '2/4', gridRow: below1080 ? '' : '1/6' }}>
-                <PairChart address={pairAddress} color={backgroundColor} />
-              </Panel>
-            </PanelWrapper>
-            <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
-              Transactions
-            </TYPE.main>{' '}
-            <Panel
-              style={{
-                border: '1px solid rgba(43, 43, 43, 0.05)',
-                marginTop: '1.5rem'
-              }}
+            <RowFixed
+              mb={20}
+              ml={below600 ? '0' : '2.5rem'}
+              style={{ flexDirection: below1080 ? 'row-reverse' : 'initial' }}
             >
-              {transactions ? <TxnList transactions={transactions} /> : <Loader />}
-            </Panel>
-            <RowBetween style={{ marginTop: '3rem' }}>
-              <TYPE.main fontSize={'1.125rem'}>Pair Information</TYPE.main>{' '}
-            </RowBetween>
-            <Panel
-              rounded
-              style={{
-                border: '1px solid rgba(43, 43, 43, 0.05)',
-                marginTop: '1.5rem'
-              }}
-              p={20}
-            >
-              <TokenDetailsLayout>
-                <Column>
-                  <TYPE.main>Pair Name</TYPE.main>
-                  <Text style={{ marginTop: '.5rem' }} fontSize={24} fontWeight="500">
-                    {token0 && token1 ? token0.symbol + '-' + token1.symbol : ''}
-                  </Text>
-                </Column>
+              <Link external href={getPoolLink(token0?.id, token1?.id)}>
+                <ButtonLight color={backgroundColor}>+ Add Liquidity</ButtonLight>
+              </Link>
+              <Link external href={getSwapLink(token0?.id, token1?.id)}>
+                <ButtonDark ml={'.5rem'} mr={below1080 && '.5rem'} color={backgroundColor}>
+                  Trade
+                </ButtonDark>
+              </Link>
+            </RowFixed>
+          </RowBetween>
+          <AutoRow gap="6px">
+            <FixedPanel onClick={() => history.push(`/token/${token0?.id}`)}>
+              <RowFixed>
+                <TokenLogo address={token0?.id} size={'16px'} />
+                <TYPE.main fontSize={'16px'} lineHeight={1} fontWeight={500} ml={'4px'}>
+                  {token0 && token1
+                    ? `1 ${token0?.symbol} = ${token0Rate} ${token1?.symbol} ${
+                        parseFloat(token0?.derivedETH) ? '(' + token0USD + ')' : ''
+                      }`
+                    : '-'}
+                </TYPE.main>
+              </RowFixed>
+            </FixedPanel>
+            <FixedPanel onClick={() => history.push(`/token/${token1?.id}`)}>
+              <RowFixed>
+                <TokenLogo address={token1?.id} size={'16px'} />
+                <TYPE.main fontSize={'16px'} lineHeight={1} fontWeight={500} ml={'4px'}>
+                  {token0 && token1
+                    ? `1 ${token1?.symbol} = ${token1Rate} ${token0?.symbol}  ${
+                        parseFloat(token1?.derivedETH) ? '(' + token1USD + ')' : ''
+                      }`
+                    : '-'}
+                </TYPE.main>
+              </RowFixed>
+            </FixedPanel>
+          </AutoRow>
+          <DashboardWrapper>
+            <>
+              {!below1080 && (
+                <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '2rem' }}>
+                  Pair Stats
+                </TYPE.main>
+              )}
+              <PanelWrapper style={{ marginTop: '1.5rem' }}>
+                <Panel style={{ height: '100%' }}>
+                  <AutoColumn gap="20px">
+                    <RowBetween>
+                      <TYPE.main>Total Liquidity {!usingTracked ? '(Untracked)' : ''}</TYPE.main>
+                      <div />
+                    </RowBetween>
+                    <RowBetween align="flex-end">
+                      <TYPE.main fontSize={'2rem'} lineHeight={1} fontWeight={600}>
+                        {liquidity}
+                      </TYPE.main>
+                      <TYPE.main>{liquidityChange}</TYPE.main>
+                    </RowBetween>
+                  </AutoColumn>
+                </Panel>
+                <Panel style={{ height: '100%' }}>
+                  <AutoColumn gap="20px">
+                    <RowBetween>
+                      <TYPE.main>Volume (24hrs)</TYPE.main>
+                      <div />
+                    </RowBetween>
+                    <RowBetween align="flex-end">
+                      <TYPE.main fontSize={'2rem'} lineHeight={1} fontWeight={600}>
+                        {volume}
+                      </TYPE.main>
+                      <TYPE.main>{volumeChange}</TYPE.main>
+                    </RowBetween>
+                  </AutoColumn>
+                </Panel>
+                <Panel style={{ height: '100%' }}>
+                  <AutoColumn gap="20px">
+                    <RowBetween>
+                      <TYPE.main>Fees (24hrs)</TYPE.main>
+                      <div />
+                    </RowBetween>
+                    <RowBetween align="flex-end">
+                      <TYPE.main fontSize={'2rem'} lineHeight={1} fontWeight={600}>
+                        {oneDayVolumeUSD
+                          ? formattedNum(oneDayVolumeUSD * 0.003, true)
+                          : oneDayVolumeUSD === 0
+                          ? '$0'
+                          : '-'}
+                      </TYPE.main>
+                      <TYPE.main>{volumeChange}</TYPE.main>
+                    </RowBetween>
+                  </AutoColumn>
+                </Panel>
+                <Panel style={{ height: '100%' }}>
+                  <AutoColumn gap="20px">
+                    <RowBetween>
+                      <TYPE.main>Transactions (24hrs)</TYPE.main>
+                      <div />
+                    </RowBetween>
+                    <RowBetween align="flex-end">
+                      <TYPE.main fontSize={'2rem'} lineHeight={1} fontWeight={600}>
+                        {oneDayTxns ?? '-'}
+                      </TYPE.main>
+                      <TYPE.main>{txnChangeFormatted}</TYPE.main>
+                    </RowBetween>
+                  </AutoColumn>
+                </Panel>
+                <Panel style={{ height: '100%' }}>
+                  <AutoColumn gap="20px">
+                    <RowBetween>
+                      <TYPE.main>Pooled Tokens</TYPE.main>
+                      <div />
+                    </RowBetween>
+                    <Hover onClick={() => history.push(`/token/${token0?.id}`)} fade={true}>
+                      <AutoRow gap="4px">
+                        <TokenLogo address={token0?.id} />
+                        <TYPE.main fontSize={20} lineHeight={1} fontWeight={500}>
+                          {reserve0 ? formattedNum(reserve0) : ''} {token0?.symbol ?? ''}
+                        </TYPE.main>
+                      </AutoRow>
+                    </Hover>
+                    <Hover onClick={() => history.push(`/token/${token1?.id}`)} fade={true}>
+                      <AutoRow gap="4px">
+                        <TokenLogo address={token1?.id} />
+                        <TYPE.main fontSize={20} lineHeight={1} fontWeight={500}>
+                          {reserve1 ? formattedNum(reserve1) : ''} {token1?.symbol ?? ''}
+                        </TYPE.main>
+                      </AutoRow>
+                    </Hover>
+                  </AutoColumn>
+                </Panel>
+                <Panel style={{ gridColumn: below1080 ? '1' : '2/4', gridRow: below1080 ? '' : '1/6' }}>
+                  <PairChart address={pairAddress} color={backgroundColor} />
+                </Panel>
+              </PanelWrapper>
+              <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
+                Transactions
+              </TYPE.main>{' '}
+              <Panel
+                style={{
+                  border: '1px solid rgba(43, 43, 43, 0.05)',
+                  marginTop: '1.5rem'
+                }}
+              >
+                {transactions ? <TxnList transactions={transactions} /> : <Loader />}
+              </Panel>
+              <RowBetween style={{ marginTop: '3rem' }}>
+                <TYPE.main fontSize={'1.125rem'}>Pair Information</TYPE.main>{' '}
+              </RowBetween>
+              <Panel
+                rounded
+                style={{
+                  border: '1px solid rgba(43, 43, 43, 0.05)',
+                  marginTop: '1.5rem'
+                }}
+                p={20}
+              >
+                <TokenDetailsLayout>
+                  <Column>
+                    <TYPE.main>Pair Name</TYPE.main>
+                    <Text style={{ marginTop: '.5rem' }} fontSize={24} fontWeight="500">
+                      {token0 && token1 ? token0.symbol + '-' + token1.symbol : ''}
+                    </Text>
+                  </Column>
 
-                <Column>
-                  <TYPE.main>Pair Address</TYPE.main>
-                  <AutoRow align="flex-end">
-                    <Text style={{ marginTop: '.5rem' }} fontSize={24} fontWeight="500">
-                      {pairAddress.slice(0, 6) + '...' + pairAddress.slice(38, 42)}
-                    </Text>
-                    <CopyHelper toCopy={pairAddress} />
-                  </AutoRow>
-                </Column>
-                <Column>
-                  <TYPE.main>{token0 && token0.symbol + ' Address'}</TYPE.main>
-                  <AutoRow align="flex-end">
-                    <Text style={{ marginTop: '.5rem' }} fontSize={24} fontWeight="500">
-                      {token0 && token0.id.slice(0, 6) + '...' + token0.id.slice(38, 42)}
-                    </Text>
-                    <CopyHelper toCopy={token0?.id} />
-                  </AutoRow>
-                </Column>
-                <Column>
-                  <TYPE.main>{token1 && token1.symbol + ' Address'}</TYPE.main>
-                  <AutoRow align="flex-end">
-                    <Text style={{ marginTop: '.5rem' }} fontSize={24} fontWeight="500">
-                      {token1 && token1.id.slice(0, 6) + '...' + token1.id.slice(38, 42)}
-                    </Text>
-                    <CopyHelper toCopy={token1?.id} />
-                  </AutoRow>
-                </Column>
-                <ButtonLight color={backgroundColor}>
-                  <Link color={backgroundColor} external href={'https://etherscan.io/address/' + pairAddress}>
-                    View on Etherscan ↗
-                  </Link>
-                </ButtonLight>
-              </TokenDetailsLayout>
-            </Panel>
-          </>
-        </DashboardWrapper>
-      </WarningGrouping>
+                  <Column>
+                    <TYPE.main>Pair Address</TYPE.main>
+                    <AutoRow align="flex-end">
+                      <Text style={{ marginTop: '.5rem' }} fontSize={24} fontWeight="500">
+                        {pairAddress.slice(0, 6) + '...' + pairAddress.slice(38, 42)}
+                      </Text>
+                      <CopyHelper toCopy={pairAddress} />
+                    </AutoRow>
+                  </Column>
+                  <Column>
+                    <TYPE.main>{token0 && token0.symbol + ' Address'}</TYPE.main>
+                    <AutoRow align="flex-end">
+                      <Text style={{ marginTop: '.5rem' }} fontSize={24} fontWeight="500">
+                        {token0 && token0.id.slice(0, 6) + '...' + token0.id.slice(38, 42)}
+                      </Text>
+                      <CopyHelper toCopy={token0?.id} />
+                    </AutoRow>
+                  </Column>
+                  <Column>
+                    <TYPE.main>{token1 && token1.symbol + ' Address'}</TYPE.main>
+                    <AutoRow align="flex-end">
+                      <Text style={{ marginTop: '.5rem' }} fontSize={24} fontWeight="500">
+                        {token1 && token1.id.slice(0, 6) + '...' + token1.id.slice(38, 42)}
+                      </Text>
+                      <CopyHelper toCopy={token1?.id} />
+                    </AutoRow>
+                  </Column>
+                  <ButtonLight color={backgroundColor}>
+                    <Link color={backgroundColor} external href={'https://etherscan.io/address/' + pairAddress}>
+                      View on Etherscan ↗
+                    </Link>
+                  </ButtonLight>
+                </TokenDetailsLayout>
+              </Panel>
+            </>
+          </DashboardWrapper>
+        </WarningGrouping>
+      </div>
+      <WalletPreview />
     </PageWrapper>
   )
 }

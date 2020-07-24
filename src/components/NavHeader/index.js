@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import styled from 'styled-components'
+import styled, { keyframes } from 'styled-components'
 
 import Title from '../Title'
 import Search from '../Search'
@@ -8,6 +8,8 @@ import { AutoColumn } from '../Column'
 import { useMedia } from 'react-use'
 import { useGlobalData, useEthPrice, useGlobalTransactions } from '../../contexts/GlobalData'
 import { formattedNum, formattedPercent, isAddress, toK } from '../../utils'
+import { TYPE } from '../../Theme'
+
 import UniPrice from '../UniPrice'
 
 import { ButtonDark } from '../ButtonStyled'
@@ -22,6 +24,8 @@ const Header = styled.div`
   position: sticky;
   top: 0;
   z-index: 99;
+  /* box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.01), 0px 4px 8px rgba(0, 0, 0, 0.01), 0px 16px 24px rgba(0, 0, 0, 0.01),
+    0px 24px 32px rgba(0, 0, 0, 0.01); */
 
   /* @media screen and (max-width: 640px) {
     width: calc(100% - 40px);
@@ -41,6 +45,45 @@ const HeaderText = styled.div`
   font-weight: 500;
   display: inline-box;
   display: -webkit-inline-box;
+`
+
+const Polling = styled.div`
+  position: fixed;
+  display: flex;
+  align-items: center;
+  left: 0;
+  bottom: 0;
+  padding: 1rem;
+`
+const PollingDot = styled.div`
+  width: 8px;
+  height: 8px;
+  margin-right: 0.5rem;
+  border-radius: 50%;
+  background-color: ${({ theme }) => theme.green1};
+`
+
+const rotate360 = keyframes`
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+`
+
+const Spinner = styled.div`
+  animation: ${rotate360} 1s linear infinite;
+  transform: translateZ(0);
+
+  border-top: 0.5px solid grey;
+  border-right: 0.5px solid grey;
+  border-bottom: 0.5px solid grey;
+  border-left: 1px solid black;
+  background: transparent;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
 `
 
 export default function NavHeader({ token, pair, account }) {
@@ -79,6 +122,13 @@ export default function NavHeader({ token, pair, account }) {
     </Header>
   ) : (
     <Header>
+      <Polling>
+        {/* <Spinner /> */}
+        <PollingDot />
+        <TYPE.small>
+          Last Updated 2s ago <a href="">(refresh)</a>
+        </TYPE.small>
+      </Polling>
       <RowBetween style={{ padding: '0.5rem 1rem', backgroundColor: '#f7f8fa', borderBottom: '1px solid #edeef2' }}>
         <RowFixed>
           <HeaderText
@@ -102,7 +152,7 @@ export default function NavHeader({ token, pair, account }) {
             Pairs: <b>{volume}</b>
           </HeaderText>
           <HeaderText>
-            24H Transactions: <b>{oneDayTxns}</b> {txnChangeFormatted && txnChangeFormatted}
+            Transactions (24H): <b>{oneDayTxns}</b>&nbsp;{txnChangeFormatted && txnChangeFormatted}
           </HeaderText>
         </RowFixed>
 

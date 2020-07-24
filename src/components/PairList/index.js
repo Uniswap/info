@@ -44,10 +44,11 @@ const DashGrid = styled.div`
   grid-gap: 1em;
   grid-template-columns: 100px 1fr 1fr;
   grid-template-areas: 'name liq vol';
+  padding: 0 1.125rem;
 
   :hover {
     cursor: ${({ focus }) => focus && 'pointer'};
-    background-color: ${({ focus, theme }) => focus && theme.bg3};
+    background-color: ${({ focus, theme }) => focus && theme.bg2};
   }
 
   > * {
@@ -62,18 +63,18 @@ const DashGrid = styled.div`
   }
 
   @media screen and (min-width: 740px) {
-    grid-template-columns: 1.5fr 1fr 1fr ${({ disbaleLinks }) => (disbaleLinks ? '160px' : '300px')};
+    grid-template-columns: 1.5fr 1fr 1fr};
     grid-template-areas: ' name liq vol pool ';
   }
 
   @media screen and (min-width: 1080px) {
-    grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr ${({ disbaleLinks }) => (disbaleLinks ? '160px' : '300px')};
-    grid-template-areas: ' name liq vol volWeek fees pool ';
+    grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr ;
+    grid-template-areas: ' name liq vol volWeek fees APY ';
   }
 
   @media screen and (min-width: 1200px) {
-    grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr ${({ disbaleLinks }) => (disbaleLinks ? '160px' : '300px')};
-    grid-template-areas: ' name liq vol volWeek fees pool';
+    grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr;
+    grid-template-areas: ' name liq vol volWeek fees APY';
   }
 `
 
@@ -114,7 +115,8 @@ const FIELD_TO_VALUE = {
   [SORT_FIELD.VOL]: 'oneDayVolumeUSD',
   [SORT_FIELD.TXNS]: 'oneDayTxns',
   [SORT_FIELD.VOL_7DAYS]: 'oneWeekVolumeUSD',
-  [SORT_FIELD.FEES]: 'oneDayVolumeUSD'
+  [SORT_FIELD.FEES]: 'oneDayVolumeUSD',
+  [SORT_FIELD.APY]: 'oneDayVolumeUSD'
 }
 
 function PairList({ pairs, color, history, disbaleLinks, maxItems = 10 }) {
@@ -186,25 +188,7 @@ function PairList({ pairs, color, history, disbaleLinks, maxItems = 10 }) {
           <DataText area="vol">{volume}</DataText>
           {!below1080 && <DataText area="volWeek">{formattedNum(pairData.oneWeekVolumeUSD, true)}</DataText>}
           {!below1080 && <DataText area="fees">{formattedNum(pairData.oneDayVolumeUSD * 0.003, true)}</DataText>}
-          {!below740 &&
-            (disbaleLinks ? (
-              <Flex area="pool" justifyContent="flex-end" alignItems="center">
-                <CustomLink color={'white'} to={'/pair/' + pairAddress}>
-                  <ButtonDark color={color}>View</ButtonDark>
-                </CustomLink>
-              </Flex>
-            ) : (
-              <Flex area="pool" justifyContent="flex-end" alignItems="center">
-                <Link color={color} external href={getPoolLink(pairData.token0?.id, pairData.token1?.id)}>
-                  <ButtonLight color={color} style={{ marginRight: '10px' }}>
-                    + Add Liquidity
-                  </ButtonLight>
-                </Link>
-                <Link color={'white'} external href={getSwapLink(pairData.token0?.id, pairData.token1?.id)}>
-                  <ButtonDark color={color}>Trade</ButtonDark>
-                </Link>
-              </Flex>
-            ))}
+          {!below1080 && <DataText area="APY">{formattedNum(pairData.oneDayVolumeUSD * 0.003, true)}</DataText>}
         </DashGrid>
       )
     } else {
@@ -237,7 +221,11 @@ function PairList({ pairs, color, history, disbaleLinks, maxItems = 10 }) {
 
   return (
     <ListWrapper>
-      <DashGrid center={true} disbaleLinks={disbaleLinks} style={{ height: 'fit-content', padding: '0 0 1rem 0' }}>
+      <DashGrid
+        center={true}
+        disbaleLinks={disbaleLinks}
+        style={{ height: 'fit-content', padding: '0 1.125rem 1rem 1.125rem' }}
+      >
         <Flex alignItems="center" justifyContent="flexStart">
           <Text area="name" fontWeight="500">
             Name
@@ -294,7 +282,7 @@ function PairList({ pairs, color, history, disbaleLinks, maxItems = 10 }) {
         )}
         {!below740 && (
           <Flex alignItems="center" justifyContent="center">
-            <Text area="pool"></Text>
+            <Text area="pool">30d APY</Text>
           </Flex>
         )}
       </DashGrid>
