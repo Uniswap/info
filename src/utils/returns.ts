@@ -207,33 +207,36 @@ export function getMetricsForPositionWindow(positionT0: Position, positionT1: Po
   }
 }
 
-export async function getReturnsHistoryPerLPPerPair(
-  startDateTimestamp,
-  currentPairData,
-  pairSnapshots,
-  currentETHPrice
-) {
+/**
+ * formats data for historical chart for an LPs position in 1 pair over time
+ * @param startDateTimestamp // day to start tracking at
+ * @param currentPairData // current stat of the pair
+ * @param pairSnapshots // history of entries and exits for lp on this pair
+ * @param currentETHPrice // current price of eth used for usd conversions
+ */
+export async function getHistoricalPairReturns(startDateTimestamp, currentPairData, pairSnapshots, currentETHPrice) {
+  // catch case where data not puplated yet
+  if (!currentPairData.createdAtTimestamp) {
+    return null
+  }
+
   let dayIndex: number = Math.round(startDateTimestamp / 86400) // get unique day bucket unix
   const currentDayIndex: number = Math.round(dayjs.utc().unix() / 86400)
-
-  // sort snapshots in order
   let sortedPositions = pairSnapshots.sort((a, b) => {
     return parseInt(a.timestamp) > parseInt(b.timestamp) ? 1 : -1
   })
-
-  // if UI start time is < first position time - bump start index to position date
-  if (sortedPositions[0].timestamp > dayIndex) {
+  if (sortedPositions[0].timestamp > startDateTimestamp) {
     dayIndex = Math.round(sortedPositions[0].timestamp / 86400)
   }
 
   const dayTimestamps = []
-  // get date timestamps for all days in view
   while (dayIndex < currentDayIndex) {
-    dayTimestamps.push(dayIndex * 86400)
+    // only account for days where this pair existed
+    if (dayIndex * 86400 > parseInt(currentPairData.createdAtTimestamp)) {
+      dayTimestamps.push(dayIndex * 86400)
+    }
     dayIndex = dayIndex + 1
   }
-
-  console.log(currentPairData)
 
   const shareValues = await getShareValueOverTime(currentPairData.id, dayTimestamps)
   const formattedHistory = []
@@ -296,10 +299,11 @@ export async function getReturnsHistoryPerLPPerPair(
       if (returns.lastUpdated < positionChange.timestamp) {
         returns.lastUpdated = positionChange.timestamp
         positionT1 = positionChange
-        needsUpdate = true
+        needsUpdate = true // position has changes - update the global metrics
       }
     }
 
+    // get the rteurns for this current window
     const calculatedReturns = getMetricsForPositionWindow(positionT0, positionT1)
 
     // account for profits or loss because position actually changed here

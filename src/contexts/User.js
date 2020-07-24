@@ -7,7 +7,7 @@ import { timeframeOptions } from '../constants'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { useEthPrice } from './GlobalData'
-import { getLPReturnsOnPair, getReturnsHistoryPerLPPerPair } from '../utils/returns'
+import { getLPReturnsOnPair, getHistoricalPairReturns } from '../utils/returns'
 
 dayjs.extend(utc)
 
@@ -186,7 +186,7 @@ export function useReturnsPerPairHistory(position, account) {
 
   useEffect(() => {
     async function fetchData() {
-      let fetchedData = await getReturnsHistoryPerLPPerPair(
+      let fetchedData = await getHistoricalPairReturns(
         startDateTimestamp,
         currentPairData,
         pairSnapshots,

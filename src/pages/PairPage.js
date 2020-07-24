@@ -14,7 +14,7 @@ import Link from '../components/Link'
 import TxnList from '../components/TxnList'
 import Loader from '../components/Loader'
 
-import { formattedNum, formattedPercent, getPoolLink, getSwapLink, getShareValueOverTime } from '../utils'
+import { formattedNum, formattedPercent, getPoolLink, getSwapLink } from '../utils'
 import { useColor } from '../hooks'
 import { usePairData, usePairTransactions } from '../contexts/PairData'
 import { ThemedBackground, TYPE } from '../Theme'
@@ -142,14 +142,6 @@ function PairPage({ pairAddress, history }) {
   useEffect(() => {
     document.querySelector('body').scrollTo(0, 0)
   }, [])
-
-  useEffect(() => {
-    async function fetchData() {
-      let shareData = await getShareValueOverTime(pairAddress)
-      console.log('Example', shareData)
-    }
-    fetchData()
-  }, [pairAddress])
 
   const transactions = usePairTransactions(pairAddress)
   const backgroundColor = useColor(pairAddress)

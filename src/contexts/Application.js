@@ -109,9 +109,7 @@ export function useStartTimestamp() {
         .startOf('day')
         .unix() - 1
     // if we find a new start time less than the current startrtime - update oldest pooint to fetch
-    if ((activeWindow && startTime < startDateTimestamp) || !startDateTimestamp) {
-      setStartDateTimestamp(startTime)
-    }
+    setStartDateTimestamp(startTime)
   }, [activeWindow, startDateTimestamp])
 
   return startDateTimestamp

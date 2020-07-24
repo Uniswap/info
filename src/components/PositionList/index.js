@@ -9,7 +9,7 @@ import Link from '../Link'
 import { Divider } from '../../components'
 import DoubleTokenLogo from '../DoubleLogo'
 import { withRouter } from 'react-router-dom'
-import { formattedNum } from '../../utils'
+import { formattedNum, getPoolLink } from '../../utils'
 import { AutoColumn } from '../Column'
 import { useEthPrice } from '../../contexts/GlobalData'
 import { RowFixed } from '../Row'
@@ -41,8 +41,8 @@ const List = styled(Box)`
 const DashGrid = styled.div`
   display: grid;
   grid-gap: 1em;
-  grid-template-columns: 100px 1fr 1fr;
-  grid-template-areas: 'name usd ownership';
+  grid-template-columns: 5px 0.5fr 1fr 1fr;
+  grid-template-areas: 'number name uniswap return';
   align-items: flex-start;
   padding: 20px 0;
 
@@ -89,12 +89,11 @@ const DataText = styled(Flex)`
 `
 
 const SORT_FIELD = {
-  LIQ: 0
+  PRINCIPAL: 'PRINCIPAL',
+  HODL: 'HODL',
+  VALUE: 'VALUE',
+  UNISWAP_RETURN: 'UNISWAP_RETURN'
 }
-
-// const FIELD_TO_VALUE = {
-//   [SORT_FIELD.LIQ]: 'trackedReserveETH' // sort with tracked volume only
-// }
 
 function PositionList({ positions }) {
   const below740 = useMedia('(max-width: 740px)')
@@ -107,7 +106,7 @@ function PositionList({ positions }) {
 
   // sorting
   const [sortDirection, setSortDirection] = useState(true)
-  const [sortedColumn, setSortedColumn] = useState(SORT_FIELD.LIQ)
+  const [sortedColumn, setSortedColumn] = useState(SORT_FIELD.VALUE)
 
   useEffect(() => {
     setMaxPage(1) // edit this to do modular
@@ -142,8 +141,12 @@ function PositionList({ positions }) {
               {position.pair.token0.symbol + '-' + position.pair.token1.symbol}
             </Text>
             <AutoColumn gap="8px" justify="flex-start">
-              <Link>Add</Link>
-              <Link>Remove</Link>
+              <Link external href={getPoolLink(position.pair.token0.id, position.pair.token1.id)}>
+                Add
+              </Link>
+              <Link external href={getPoolLink(position.pair.token0.id, position.pair.token1.id, true)}>
+                Remove
+              </Link>
             </AutoColumn>
           </AutoColumn>
         </DataText>
@@ -235,18 +238,32 @@ function PositionList({ positions }) {
 
   const positionsSorted =
     positions &&
-    Object.keys(positions)
-      .sort((addressA, addressB) => {
+    positions
+      .filter(position => {
+        return position.liquidityTokenBalance > 0
+      })
+      .sort((p0, p1) => {
+        if (sortedColumn === SORT_FIELD.PRINCIPAL) {
+          return p0?.principal?.usd > p1?.principal?.usd ? (sortDirection ? -1 : 1) : sortDirection ? 1 : -1
+        }
+        if (sortedColumn === SORT_FIELD.HODL) {
+          return p0?.hodl?.sum > p1?.hodl?.sum ? (sortDirection ? -1 : 1) : sortDirection ? 1 : -1
+        }
+        if (sortedColumn === SORT_FIELD.UNISWAP_RETURN) {
+          return p0?.uniswap?.return > p1?.uniswap?.return ? (sortDirection ? -1 : 1) : sortDirection ? 1 : -1
+        }
+        if (sortedColumn === SORT_FIELD.VALUE) {
+          const bal0 = (p0.liquidityTokenBalance / p0.pair.totalSupply) * p0.pair.reserveUSD
+          const bal1 = (p1.liquidityTokenBalance / p1.pair.totalSupply) * p1.pair.reserveUSD
+          return bal0 > bal1 ? (sortDirection ? -1 : 1) : sortDirection ? 1 : -1
+        }
         return 1
       })
       .slice(ITEMS_PER_PAGE * (page - 1), page * ITEMS_PER_PAGE)
-      .filter(id => {
-        return positions[id].liquidityTokenBalance > 0
-      })
-      .map((id, index) => {
+      .map((position, index) => {
         return (
           <div key={index}>
-            <ListItem key={index} index={(page - 1) * 10 + index + 1} position={positions[id]} />
+            <ListItem key={index} index={(page - 1) * 10 + index + 1} position={position} />
             <Divider />
           </div>
         )
@@ -269,12 +286,12 @@ function PositionList({ positions }) {
           <ClickableText
             area="principal"
             onClick={e => {
-              setSortedColumn(SORT_FIELD.VOL)
-              setSortDirection(sortedColumn !== SORT_FIELD.VOL ? true : !sortDirection)
+              setSortedColumn(SORT_FIELD.PRINCIPAL)
+              setSortDirection(sortedColumn !== SORT_FIELD.PRINCIPAL ? true : !sortDirection)
             }}
           >
             Principal (Cost Basis)
-            {sortedColumn === SORT_FIELD.VOL ? (!sortDirection ? '↑' : '↓') : ''}
+            {sortedColumn === SORT_FIELD.PRINCIPAL ? (!sortDirection ? '↑' : '↓') : ''}
           </ClickableText>
         </Flex>
         {!below1080 && (
@@ -282,11 +299,11 @@ function PositionList({ positions }) {
             <ClickableText
               area="hodl"
               onClick={e => {
-                setSortedColumn(SORT_FIELD.VOL_7DAYS)
-                setSortDirection(sortedColumn !== SORT_FIELD.VOL_7DAYS ? true : !sortDirection)
+                setSortedColumn(SORT_FIELD.HODL)
+                setSortDirection(sortedColumn !== SORT_FIELD.HODL ? true : !sortDirection)
               }}
             >
-              HODL Performance {sortedColumn === SORT_FIELD.VOL_7DAYS ? (!sortDirection ? '↑' : '↓') : ''}
+              HODL Performance {sortedColumn === SORT_FIELD.HODL ? (!sortDirection ? '↑' : '↓') : ''}
             </ClickableText>
           </Flex>
         )}
@@ -295,11 +312,11 @@ function PositionList({ positions }) {
             <ClickableText
               area="uniswap"
               onClick={e => {
-                setSortedColumn(SORT_FIELD.VOL_7DAYS)
-                setSortDirection(sortedColumn !== SORT_FIELD.VOL_7DAYS ? true : !sortDirection)
+                setSortedColumn(SORT_FIELD.VALUE)
+                setSortDirection(sortedColumn !== SORT_FIELD.VALUE ? true : !sortDirection)
               }}
             >
-              Uniswap Performance {sortedColumn === SORT_FIELD.VOL_7DAYS ? (!sortDirection ? '↑' : '↓') : ''}
+              Uniswap Performance {sortedColumn === SORT_FIELD.VALUE ? (!sortDirection ? '↑' : '↓') : ''}
             </ClickableText>
           </Flex>
         )}
@@ -307,12 +324,12 @@ function PositionList({ positions }) {
           <Flex alignItems="center" justifyContent="flexEnd">
             <ClickableText
               area="return"
-              onClick={e => {
-                setSortedColumn(SORT_FIELD.FEES)
-                setSortDirection(sortedColumn !== SORT_FIELD.FEES ? true : !sortDirection)
+              onClick={() => {
+                setSortedColumn(SORT_FIELD.UNISWAP_RETURN)
+                setSortDirection(sortedColumn !== SORT_FIELD.UNISWAP_RETURN ? true : !sortDirection)
               }}
             >
-              Uniswap Return {sortedColumn === SORT_FIELD.FEES ? (!sortDirection ? '↑' : '↓') : ''}
+              Uniswap Return {sortedColumn === SORT_FIELD.UNISWAP_RETURN ? (!sortDirection ? '↑' : '↓') : ''}
             </ClickableText>
           </Flex>
         )}

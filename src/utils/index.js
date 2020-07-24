@@ -15,15 +15,19 @@ BigNumber.set({ EXPONENTIAL_AT: 50 })
 
 dayjs.extend(utc)
 
-export function getPoolLink(token0Address, token1Address = null) {
+export function getPoolLink(token0Address, token1Address = null, remove = false) {
   if (!token1Address) {
-    return `https://uniswap.exchange/add/${token0Address}-${
-      token0Address === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
-        ? 'ETH'
-        : '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
-    }`
+    return (
+      `https://uniswap.exchange/` +
+      (remove ? `remove` : `add`) +
+      `/${token0Address}-${
+        token0Address === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
+          ? 'ETH'
+          : '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
+      }`
+    )
   } else {
-    return `https://uniswap.exchange/add/${token0Address}-${token1Address}`
+    return `https://uniswap.exchange/` + (remove ? `remove` : `add`) + `/${token0Address}-${token1Address}`
   }
 }
 
