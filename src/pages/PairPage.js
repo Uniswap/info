@@ -18,11 +18,10 @@ import WalletPreview from '../components/WalletPreview'
 import { formattedNum, formattedPercent, getPoolLink, getSwapLink } from '../utils'
 import { useColor } from '../hooks'
 import { usePairData, usePairTransactions } from '../contexts/PairData'
-import { ThemedBackground, TYPE } from '../Theme'
+import { TYPE } from '../Theme'
 import CopyHelper from '../components/Copy'
 import { useMedia } from 'react-use'
 import DoubleTokenLogo from '../components/DoubleLogo'
-import { transparentize } from 'polished'
 import TokenLogo from '../components/TokenLogo'
 import { Hover } from '../components'
 import { useEthPrice } from '../contexts/GlobalData'
@@ -37,10 +36,6 @@ const PageWrapper = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  /* padding-bottom: 100px; */
-  /* width: calc(100% - 80px); */
-  /* padding: 0 40px; */
-  /* padding-bottom: 80px; */
   display: grid;
   justify-content: start;
   align-items: start;
@@ -52,11 +47,6 @@ const PageWrapper = styled.div`
     width: calc(100% - 40px);
     padding: 0 20px;
   }
-
-  /* & > * {
-    width: 90%;
-    max-width: 1240px;
-  } */
 `
 
 const DashboardWrapper = styled.div`
@@ -167,8 +157,6 @@ function PairPage({ pairAddress, history }) {
     txnChange
   } = usePairData(pairAddress)
 
-  const [active, setActive] = useState(null)
-
   useEffect(() => {
     document.querySelector('body').scrollTo(0, 0)
   }, [])
@@ -221,6 +209,8 @@ function PairPage({ pairAddress, history }) {
   const TokensRef = useRef()
   const TransactionsRef = useRef()
 
+  const [active, setActive] = useState(null)
+
   useEffect(() => {
     setActive(OverviewRef)
   }, [])
@@ -235,7 +225,6 @@ function PairPage({ pairAddress, history }) {
 
   return (
     <PageWrapper>
-      {/* <ThemedBackground backgroundColor={transparentize(0.6, backgroundColor)} /> */}
       <SubNav>
         <SubNavEl onClick={() => handleScroll(OverviewRef)} isActive={active === OverviewRef}>
           <TrendingUp size={20} style={{ marginRight: '1rem' }} />
@@ -264,7 +253,7 @@ function PairPage({ pairAddress, history }) {
         <WarningGrouping
           disabled={!dismissed && !(SURPRESS_WARNINGS.includes(token0?.id) && SURPRESS_WARNINGS.includes(token1?.id))}
         >
-          <RowBetween mt={20} style={{ flexWrap: 'wrap' }}>
+          <RowBetween style={{ flexWrap: 'wrap' }}>
             <RowFixed style={{ flexWrap: 'wrap' }}>
               <RowFixed mb={20}>
                 {token0 && token1 && (

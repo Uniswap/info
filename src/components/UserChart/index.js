@@ -10,6 +10,7 @@ import { useMedia } from 'react-use'
 import { timeframeOptions } from '../../constants'
 import dayjs from 'dayjs'
 import DropdownSelect from '../DropdownSelect'
+import { Text } from 'rebass'
 import { useUserLiquidityHistory } from '../../contexts/User'
 
 const ChartWrapper = styled.div`
@@ -47,6 +48,13 @@ const UserChart = ({ account }) => {
           .startOf('day')
           .unix() - 1
       break
+    case timeframeOptions.MONTH:
+      utcStartTime =
+        utcEndTime
+          .subtract(1, 'month')
+          .startOf('day')
+          .unix() - 1
+      break
     case timeframeOptions.ALL_TIME:
       utcStartTime = utcEndTime.subtract(1, 'year').unix() - 1
       break
@@ -70,25 +78,26 @@ const UserChart = ({ account }) => {
       ) : (
         <RowBetween mb={40}>
           <AutoRow gap="10px">
-            <OptionButton
-              active={chartFilter === CHART_VIEW.LIQUIDITY}
-              onClick={() => setChartFilter(CHART_VIEW.LIQUIDITY)}
-            >
-              Liquidity
-            </OptionButton>
+            <Text>Liquidity Value</Text>
           </AutoRow>
-          <AutoRow justify="flex-end" gap="10px">
+          <AutoRow justify="flex-end" gap="4px">
+            <OptionButton
+              active={timeWindow === timeframeOptions.MONTH}
+              onClick={() => setTimeWindow(timeframeOptions.MONTH)}
+            >
+              1M
+            </OptionButton>
             <OptionButton
               active={timeWindow === timeframeOptions.WEEK}
               onClick={() => setTimeWindow(timeframeOptions.WEEK)}
             >
-              1 Week
+              1W
             </OptionButton>
             <OptionButton
               active={timeWindow === timeframeOptions.ALL_TIME}
               onClick={() => setTimeWindow(timeframeOptions.ALL_TIME)}
             >
-              All Time
+              All
             </OptionButton>
           </AutoRow>
         </RowBetween>
@@ -102,7 +111,7 @@ const UserChart = ({ account }) => {
                 <stop offset="95%" stopColor={'#ff007a'} stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid stroke="#DFE1E9" />
+            {/* <CartesianGrid stroke="#DFE1E9" /> */}
             <XAxis
               tickLine={false}
               axisLine={false}

@@ -58,8 +58,8 @@ const DashGrid = styled.div`
   }
 
   @media screen and (min-width: 1200px) {
-    grid-template-columns: 35px 1.5fr 1fr 1fr 1fr 1fr;
-    grid-template-areas: 'number name principal hodl uniswap return';
+    grid-template-columns: 35px 2.5fr 1fr 1fr;
+    grid-template-areas: 'number name uniswap return';
   }
 `
 
@@ -89,8 +89,6 @@ const DataText = styled(Flex)`
 `
 
 const SORT_FIELD = {
-  PRINCIPAL: 'PRINCIPAL',
-  HODL: 'HODL',
   VALUE: 'VALUE',
   UNISWAP_RETURN: 'UNISWAP_RETURN'
 }
@@ -150,40 +148,6 @@ function PositionList({ positions }) {
             </AutoColumn>
           </AutoColumn>
         </DataText>
-        <DataText area="principal">
-          <AutoColumn gap="12px" justify="flex-end">
-            <Text fontWeight={500}>
-              <RowFixed>{formattedNum(position?.principal.usd, true, true)}</RowFixed>
-            </Text>
-            <AutoColumn gap="4px" justify="flex-end">
-              <Text fontSize="12px">
-                {position?.principal.amount0 ? formattedNum(position?.principal.amount0, false, true) : 0}{' '}
-                {position.pair.token0.symbol}
-              </Text>
-              <Text fontSize="12px">
-                {position?.principal.amount1 ? formattedNum(position?.principal.amount1, false, true) : 0}{' '}
-                {position.pair.token1.symbol}
-              </Text>
-            </AutoColumn>
-          </AutoColumn>
-        </DataText>
-        <DataText area="hodl">
-          <AutoColumn gap="12px" justify="flex-end">
-            <Text fontWeight={500}>
-              <RowFixed>{formattedNum(position?.hodl.sum, true, true)}</RowFixed>
-            </Text>
-            <AutoColumn gap="4px" justify="flex-end">
-              <Text fontSize="12px">
-                {position?.principal.amount0 ? formattedNum(position?.principal.amount0, false, true) : 0}{' '}
-                {position.pair.token0.symbol}
-              </Text>
-              <Text fontSize="12px">
-                {position?.principal.amount1 ? formattedNum(position?.principal.amount1, false, true) : 0}{' '}
-                {position.pair.token1.symbol}
-              </Text>
-            </AutoColumn>
-          </AutoColumn>
-        </DataText>
         <DataText area="uniswap">
           <AutoColumn gap="12px" justify="flex-end">
             <Text fontWeight={500}>{formattedNum(valueUSD, true, true)}</Text>
@@ -199,14 +163,8 @@ function PositionList({ positions }) {
         </DataText>
         <DataText area="return">
           <AutoColumn gap="12px" justify="flex-end">
-            <Text
-              fontWeight={500}
-              color={position?.uniswap.return > 0 ? 'green' : position?.uniswap.return === 0 ? 'black' : 'red'}
-            >
-              <RowFixed>
-                {position?.uniswap.return > 0 ? '+' : position?.uniswap.return === 0 ? '' : '-'}
-                {formattedNum(position?.uniswap.return, true, true)}
-              </RowFixed>
+            <Text fontWeight={500} color={'green'}>
+              <RowFixed>{formattedNum(position?.fees.sum, true, true)}</RowFixed>
             </Text>
             <AutoColumn gap="4px" justify="flex-end">
               <Text fontSize="12px">
@@ -222,7 +180,7 @@ function PositionList({ positions }) {
               <Text fontSize="12px">
                 {parseFloat(position.pair.token1.derivedETH)
                   ? formattedNum(
-                      position?.uniswap.return / (parseFloat(position.pair.token1.derivedETH) * ethPrice) / 2,
+                      position?.fees.sum / (parseFloat(position.pair.token1.derivedETH) * ethPrice) / 2,
                       false,
                       true
                     )
@@ -271,7 +229,7 @@ function PositionList({ positions }) {
 
   return (
     <ListWrapper>
-      <DashGrid center={true} style={{ height: 'fit-content', padding: 0 }}>
+      <DashGrid center={true} style={{ height: '32px', padding: 0 }}>
         <Flex alignItems="flex-start" justifyContent="flexStart">
           <Text area="number" fontWeight="500">
             #
@@ -282,31 +240,6 @@ function PositionList({ positions }) {
             Name
           </Text>
         </Flex>
-        <Flex alignItems="center">
-          <ClickableText
-            area="principal"
-            onClick={e => {
-              setSortedColumn(SORT_FIELD.PRINCIPAL)
-              setSortDirection(sortedColumn !== SORT_FIELD.PRINCIPAL ? true : !sortDirection)
-            }}
-          >
-            Principal (Cost Basis)
-            {sortedColumn === SORT_FIELD.PRINCIPAL ? (!sortDirection ? '↑' : '↓') : ''}
-          </ClickableText>
-        </Flex>
-        {!below1080 && (
-          <Flex alignItems="center" justifyContent="flexEnd">
-            <ClickableText
-              area="hodl"
-              onClick={e => {
-                setSortedColumn(SORT_FIELD.HODL)
-                setSortDirection(sortedColumn !== SORT_FIELD.HODL ? true : !sortDirection)
-              }}
-            >
-              HODL Performance {sortedColumn === SORT_FIELD.HODL ? (!sortDirection ? '↑' : '↓') : ''}
-            </ClickableText>
-          </Flex>
-        )}
         {!below1080 && (
           <Flex alignItems="center" justifyContent="flexEnd">
             <ClickableText
@@ -316,7 +249,7 @@ function PositionList({ positions }) {
                 setSortDirection(sortedColumn !== SORT_FIELD.VALUE ? true : !sortDirection)
               }}
             >
-              Uniswap Performance {sortedColumn === SORT_FIELD.VALUE ? (!sortDirection ? '↑' : '↓') : ''}
+              Liquidity Value {sortedColumn === SORT_FIELD.VALUE ? (!sortDirection ? '↑' : '↓') : ''}
             </ClickableText>
           </Flex>
         )}
@@ -329,11 +262,10 @@ function PositionList({ positions }) {
                 setSortDirection(sortedColumn !== SORT_FIELD.UNISWAP_RETURN ? true : !sortDirection)
               }}
             >
-              Uniswap Return {sortedColumn === SORT_FIELD.UNISWAP_RETURN ? (!sortDirection ? '↑' : '↓') : ''}
+              Total Fees Earned {sortedColumn === SORT_FIELD.UNISWAP_RETURN ? (!sortDirection ? '↑' : '↓') : ''}
             </ClickableText>
           </Flex>
         )}
-        <ClickableText area="manage" color="#FF007A"></ClickableText>
       </DashGrid>
       <Divider />
       <List p={0}>{!positionsSorted ? <LocalLoader /> : positionsSorted}</List>

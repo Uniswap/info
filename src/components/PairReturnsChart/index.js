@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import { XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid, ComposedChart, Line, Bar } from 'recharts'
+import { XAxis, YAxis, ResponsiveContainer, Tooltip, ComposedChart, Line, Bar } from 'recharts'
 import { AutoRow, RowBetween } from '../Row'
 
-import { toK, toNiceDate, toNiceDateYear } from '../../utils'
+import { toK, toNiceDate, toNiceDateYear, formattedNum } from '../../utils'
 import { OptionButton } from '../ButtonStyled'
 import { useMedia } from 'react-use'
 import { timeframeOptions } from '../../constants'
@@ -11,6 +11,8 @@ import DropdownSelect from '../DropdownSelect'
 import { useReturnsPerPairHistory } from '../../contexts/User'
 import { useTimeframe } from '../../contexts/Application'
 import dayjs from 'dayjs'
+import { Text } from 'rebass'
+import LocalLoader from '../LocalLoader'
 
 const ChartWrapper = styled.div`
   height: 100%;
@@ -48,6 +50,13 @@ const PairReturnsChart = ({ account, position }) => {
           .startOf('day')
           .unix() - 1
       break
+    case timeframeOptions.MONTH:
+      utcStartTime =
+        utcEndTime
+          .subtract(1, 'month')
+          .startOf('day')
+          .unix() - 1
+      break
     case timeframeOptions.ALL_TIME:
       utcStartTime = utcEndTime.subtract(1, 'year').unix() - 1
       break
@@ -71,87 +80,89 @@ const PairReturnsChart = ({ account, position }) => {
       ) : (
         <RowBetween mb={40}>
           <AutoRow gap="10px">
-            <OptionButton
-              active={chartFilter === CHART_VIEW.LIQUIDITY}
-              onClick={() => setChartFilter(CHART_VIEW.LIQUIDITY)}
-            >
-              Liquidity
-            </OptionButton>
+            <Text>Liquidity Value + Fees</Text>
           </AutoRow>
-          <AutoRow justify="flex-end" gap="10px">
+          <AutoRow justify="flex-end" gap="4px">
+            <OptionButton
+              active={timeWindow === timeframeOptions.MONTH}
+              onClick={() => setTimeWindow(timeframeOptions.MONTH)}
+            >
+              1M
+            </OptionButton>
             <OptionButton
               active={timeWindow === timeframeOptions.WEEK}
               onClick={() => setTimeWindow(timeframeOptions.WEEK)}
             >
-              1 Week
+              1W
             </OptionButton>
+
             <OptionButton
               active={timeWindow === timeframeOptions.ALL_TIME}
               onClick={() => setTimeWindow(timeframeOptions.ALL_TIME)}
             >
-              All Time
+              All
             </OptionButton>
           </AutoRow>
         </RowBetween>
       )}
       <ResponsiveContainer aspect={below1080 ? 60 / 32 : below600 ? 60 / 42 : 60 / 26}>
-        <ComposedChart margin={{ top: 0, right: 10, bottom: 6, left: 0 }} barCategoryGap={1} data={data}>
-          <CartesianGrid stroke="#DFE1E9" />
-          <XAxis
-            tickLine={false}
-            axisLine={false}
-            interval="preserveEnd"
-            tickMargin={16}
-            minTickGap={0}
-            tickFormatter={tick => toNiceDate(tick)}
-            dataKey="date"
-            tick={{ fill: 'black' }}
-            type={'number'}
-            domain={domain}
-          />
-          <YAxis
-            type="number"
-            orientation="left"
-            tickFormatter={tick => '$' + toK(tick)}
-            axisLine={false}
-            tickLine={false}
-            interval="preserveEnd"
-            minTickGap={6}
-            yAxisId={0}
-            tick={{ fill: 'black' }}
-          />
-          <YAxis
-            type="number"
-            orientation="right"
-            tickFormatter={tick => '$' + toK(tick)}
-            axisLine={false}
-            tickLine={false}
-            interval="preserveEnd"
-            minTickGap={6}
-            yAxisId={1}
-            tick={{ fill: 'black' }}
-          />
-          <Tooltip
-            cursor={true}
-            // formatter={val => null}
-            labelFormatter={label => toNiceDateYear(label)}
-            labelStyle={{ paddingTop: 4 }}
-            contentStyle={{
-              padding: '10px 14px',
-              borderRadius: 10,
-              borderColor: '#ff007a',
-              color: 'black'
-            }}
-            // content={val => <Text>{toNiceDateYear(val.label)}</Text>}
-            wrapperStyle={{ top: -70, left: -10 }}
-          />
-          <Bar type="monotone" dataKey="usdValue" fill="rgba(0,0,0,0.05)" yAxisId={1} />
-          <Line type="monotone" dataKey="assetReturn" stroke="#82ca9d" />
-          <Line type="monotone" dataKey="uniswapReturn" stroke="blue" />
-          <Line type="monotone" dataKey="netReturn" stroke="purple" />
-          <Line dataKey="fees" stroke="orange" />
-          <Line dataKey="impLoss" stroke="black" />
-        </ComposedChart>
+        {data ? (
+          <ComposedChart margin={{ top: 0, right: 10, bottom: 6, left: 0 }} barCategoryGap={1} data={data}>
+            <XAxis
+              tickLine={false}
+              axisLine={false}
+              interval="preserveEnd"
+              tickMargin={16}
+              minTickGap={0}
+              tickFormatter={tick => toNiceDate(tick)}
+              dataKey="date"
+              tick={{ fill: 'black' }}
+              type={'number'}
+              domain={domain}
+            />
+            <YAxis
+              type="number"
+              orientation="left"
+              tickFormatter={tick => '$' + toK(tick)}
+              axisLine={false}
+              tickLine={false}
+              interval="preserveEnd"
+              minTickGap={6}
+              yAxisId={0}
+              tick={{ fill: 'black' }}
+            />
+            <YAxis
+              type="number"
+              orientation="right"
+              tickFormatter={tick => '$' + toK(tick)}
+              axisLine={false}
+              tickLine={false}
+              interval="preserveEnd"
+              minTickGap={6}
+              yAxisId={1}
+              tick={{ fill: 'black' }}
+            />
+            <Tooltip
+              cursor={true}
+              formatter={val => formattedNum(val, true)}
+              labelFormatter={label => toNiceDateYear(label)}
+              labelStyle={{ paddingTop: 4, color: '#6A6A6A', paddingBottom: '6px' }}
+              contentStyle={{
+                padding: '10px 14px',
+                borderRadius: 10,
+                color: 'black'
+              }}
+              itemStyle={{
+                color: 'black'
+              }}
+              wrapperStyle={{ top: -70, left: -10 }}
+            />
+            <Bar type="monotone" dataKey="usdValue" fill="rgba(0,0,0,0.05)" yAxisId={1} name={'Liquidity Value'} />
+            <Line dataKey="fees" stroke="black" dot={false} name={'Fees Earned'} />
+          </ComposedChart>
+        ) : (
+          <LocalLoader />
+        )}
       </ResponsiveContainer>
     </ChartWrapper>
   )

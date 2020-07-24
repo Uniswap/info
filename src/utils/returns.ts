@@ -105,6 +105,7 @@ export async function getLPReturnsOnPair(user: string, pair, ethPrice: number) {
   let hodlReturn = 0
   let netReturn = 0
   let uniswapReturn = 0
+  let fees = 0
 
   // get snapshots of position changes on this pair for this user
   const {
@@ -138,6 +139,7 @@ export async function getLPReturnsOnPair(user: string, pair, ethPrice: number) {
     hodlReturn = hodlReturn + results.hodleReturn
     netReturn = netReturn + results.netReturn
     uniswapReturn = uniswapReturn + results.uniswapReturn
+    fees = fees + results.fees
   }
 
   return {
@@ -151,6 +153,9 @@ export async function getLPReturnsOnPair(user: string, pair, ethPrice: number) {
     },
     uniswap: {
       return: uniswapReturn
+    },
+    fees: {
+      sum: fees
     }
   }
 }
