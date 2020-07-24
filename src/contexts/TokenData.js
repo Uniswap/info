@@ -176,61 +176,81 @@ const getTopTokens = async (ethPrice, ethPriceOld) => {
       return { ...obj, [cur.id]: cur }
     }, {})
 
-    return (
+    let bulkResults = await Promise.all(
       current &&
-      oneDayData &&
-      twoDayData &&
-      current?.data?.tokens.map(token => {
-        let data = token
+        oneDayData &&
+        twoDayData &&
+        current?.data?.tokens.map(async token => {
+          let data = token
 
-        let oneDayHistory = oneDayData?.[token.id]
-        let twoDayHistory = twoDayData?.[token.id]
+          let oneDayHistory = oneDayData?.[token.id]
+          let twoDayHistory = twoDayData?.[token.id]
 
-        // calculate percentage changes and daily changes
-        const [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentChange(
-          data.tradeVolumeUSD,
-          oneDayHistory?.tradeVolumeUSD ?? 0,
-          twoDayHistory?.tradeVolumeUSD ?? 0
-        )
-        const [oneDayTxns, txnChange] = get2DayPercentChange(
-          data.txCount,
-          oneDayHistory?.txCount ?? 0,
-          twoDayHistory?.txCount ?? 0
-        )
+          // catch the case where token wasnt in top list in previous days
+          if (!oneDayHistory) {
+            let oneDayResult = await client.query({
+              query: TOKEN_DATA(token.id, oneDayBlock),
+              fetchPolicy: 'cache-first'
+            })
+            oneDayHistory = oneDayResult.data.tokens[0]
+          }
+          if (!twoDayHistory) {
+            let twoDayResult = await client.query({
+              query: TOKEN_DATA(token.id, twoDayBlock),
+              fetchPolicy: 'cache-first'
+            })
+            twoDayHistory = twoDayResult.data.tokens[0]
+          }
 
-        const currentLiquidityUSD = data?.totalLiquidity * ethPrice * data?.derivedETH
-        const oldLiquidityUSD = oneDayHistory?.totalLiquidity * ethPriceOld * oneDayHistory?.derivedETH
+          // calculate percentage changes and daily changes
+          const [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentChange(
+            data.tradeVolumeUSD,
+            oneDayHistory?.tradeVolumeUSD ?? 0,
+            twoDayHistory?.tradeVolumeUSD ?? 0
+          )
 
-        // percent changes
-        const priceChangeUSD = getPercentChange(
-          data?.derivedETH * ethPrice,
-          oneDayHistory?.derivedETH ? oneDayHistory?.derivedETH * ethPriceOld : 0
-        )
+          const [oneDayTxns, txnChange] = get2DayPercentChange(
+            data.txCount,
+            oneDayHistory?.txCount ?? 0,
+            twoDayHistory?.txCount ?? 0
+          )
 
-        // set data
-        data.priceUSD = data?.derivedETH * ethPrice
-        data.totalLiquidityUSD = currentLiquidityUSD
-        data.oneDayVolumeUSD = oneDayVolumeUSD
-        data.volumeChangeUSD = volumeChangeUSD
-        data.priceChangeUSD = priceChangeUSD
-        data.liquidityChangeUSD = getPercentChange(currentLiquidityUSD ?? 0, oldLiquidityUSD ?? 0)
-        data.oneDayTxns = oneDayTxns
-        data.txnChange = txnChange
+          const currentLiquidityUSD = data?.totalLiquidity * ethPrice * data?.derivedETH
+          const oldLiquidityUSD = oneDayHistory?.totalLiquidity * ethPriceOld * oneDayHistory?.derivedETH
 
-        // new tokens
-        if (!oneDayHistory && data) {
-          data.oneDayVolumeUSD = data.tradeVolumeUSD
-          data.oneDayVolumeETH = data.tradeVolume * data.derivedETH
-          data.oneDayTxns = data.txCount
-        }
+          // percent changes
+          const priceChangeUSD = getPercentChange(
+            data?.derivedETH * ethPrice,
+            oneDayHistory?.derivedETH ? oneDayHistory?.derivedETH * ethPriceOld : 0
+          )
 
-        if (data.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
-          data.name = 'Ether (Wrapped)'
-          data.symbol = 'ETH'
-        }
-        return data
-      })
+          // set data
+          data.priceUSD = data?.derivedETH * ethPrice
+          data.totalLiquidityUSD = currentLiquidityUSD
+          data.oneDayVolumeUSD = oneDayVolumeUSD
+          data.volumeChangeUSD = volumeChangeUSD
+          data.priceChangeUSD = priceChangeUSD
+          data.liquidityChangeUSD = getPercentChange(currentLiquidityUSD ?? 0, oldLiquidityUSD ?? 0)
+          data.oneDayTxns = oneDayTxns
+          data.txnChange = txnChange
+
+          // new tokens
+          if (!oneDayHistory && data) {
+            data.oneDayVolumeUSD = data.tradeVolumeUSD
+            data.oneDayVolumeETH = data.tradeVolume * data.derivedETH
+            data.oneDayTxns = data.txCount
+          }
+
+          if (data.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
+            data.name = 'Ether (Wrapped)'
+            data.symbol = 'ETH'
+          }
+
+          return data
+        })
     )
+
+    return bulkResults
 
     // calculate percentage changes and daily changes
   } catch (e) {
@@ -278,18 +298,38 @@ const getTokenData = async (address, ethPrice, ethPriceOld) => {
     })
     twoDayData = twoDayResult.data.tokens[0]
 
+    // catch the case where token wasnt in top list in previous days
+    if (!oneDayData) {
+      let oneDayResult = await client.query({
+        query: TOKEN_DATA(address, oneDayBlock),
+        fetchPolicy: 'cache-first'
+      })
+      oneDayData = oneDayResult.data.tokens[0]
+    }
+    if (!twoDayData) {
+      let twoDayResult = await client.query({
+        query: TOKEN_DATA(address, twoDayBlock),
+        fetchPolicy: 'cache-first'
+      })
+      twoDayData = twoDayResult.data.tokens[0]
+    }
+
     // calculate percentage changes and daily changes
     const [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentChange(
       data.tradeVolumeUSD,
-      oneDayData?.tradeVolumeUSD,
-      twoDayData?.tradeVolumeUSD
+      oneDayData?.tradeVolumeUSD ?? 0,
+      twoDayData?.tradeVolumeUSD ?? 0
     )
 
     // calculate percentage changes and daily changes
-    const [oneDayTxns, txnChange] = get2DayPercentChange(data.txCount, oneDayData?.txCount, twoDayData?.txCount)
+    const [oneDayTxns, txnChange] = get2DayPercentChange(
+      data.txCount,
+      oneDayData?.txCount ?? 0,
+      twoDayData?.txCount ?? 0
+    )
 
-    const priceChangeUSD = getPercentChange(data?.derivedETH * ethPrice, oneDayData?.derivedETH * ethPriceOld)
-    const liquidityChangeUSD = getPercentChange(data?.totalLiquidityUSD, oneDayData?.totalLiquidityUSD)
+    const priceChangeUSD = getPercentChange(data?.derivedETH * ethPrice, oneDayData?.derivedETH ?? 0 * ethPriceOld)
+    const liquidityChangeUSD = getPercentChange(data?.totalLiquidityUSD, oneDayData?.totalLiquidityUSD ?? 0)
 
     // set data
     data.priceUSD = data?.derivedETH * ethPrice
@@ -318,7 +358,7 @@ const getTokenData = async (address, ethPrice, ethPriceOld) => {
   return data
 }
 
-const getTokenTransactions = async (tokenAddress, allPairsFormatted) => {
+const getTokenTransactions = async allPairsFormatted => {
   const transactions = {}
   try {
     let result = await client.query({
@@ -462,7 +502,7 @@ export function useTokenTransactions(tokenAddress) {
   useEffect(() => {
     async function checkForTxns() {
       if (!tokenTxns && allPairsFormatted) {
-        let transactions = await getTokenTransactions(tokenAddress, allPairsFormatted)
+        let transactions = await getTokenTransactions(allPairsFormatted)
         updateTokenTxns(tokenAddress, transactions)
       }
     }
