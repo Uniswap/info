@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
 
 import Title from '../Title'
@@ -6,21 +6,27 @@ import Search from '../Search'
 import { RowFixed, RowBetween } from '../Row'
 import { AutoColumn } from '../Column'
 import { useMedia } from 'react-use'
-import { useGlobalData } from '../../contexts/GlobalData'
-import { toK } from '../../utils'
+import { useGlobalData, useEthPrice, useGlobalTransactions } from '../../contexts/GlobalData'
+import { formattedNum, formattedPercent, isAddress, toK } from '../../utils'
+import UniPrice from '../UniPrice'
+
 import { ButtonDark } from '../ButtonStyled'
 import Link from '../Link'
 
 const Header = styled.div`
-  width: calc(100% - 80px);
-  padding: 20px 40px;
-  background-color: rgba(255, 255, 255, 0.3);
-  margin-bottom: 20px;
+  /* width: calc(100% - 80px); */
+  /* padding: 20px 40px; */
+  width: 100%;
+  background-color: ${({ theme }) => theme.bg1};
+  margin-bottom: 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 99;
 
-  @media screen and (max-width: 640px) {
+  /* @media screen and (max-width: 640px) {
     width: calc(100% - 40px);
     padding: 32px 20px;
-  }
+  } */
 `
 
 const CombinedWrapper = styled(RowFixed)`
@@ -28,10 +34,13 @@ const CombinedWrapper = styled(RowFixed)`
   justify-content: flex-end;
 `
 
-const CombinedData = styled.div`
-  color: ${({ theme }) => theme.primary1};
+const HeaderText = styled.div`
+  /* color: ${({ theme }) => theme.primary1}; */
   margin-right: 0.75rem;
-  font-size: 1rem;
+  font-size: 0.825rem;
+  font-weight: 500;
+  display: inline-box;
+  display: -webkit-inline-box;
 `
 
 export default function NavHeader({ token, pair, account }) {
@@ -40,7 +49,20 @@ export default function NavHeader({ token, pair, account }) {
   const below1024 = useMedia('(max-width: 1024px)')
   const below600 = useMedia('(max-width: 600px)')
 
-  const { totalLiquidityUSD, oneDayVolumeUSD, v1Data } = useGlobalData()
+  const [showPriceCard, setShowPriceCard] = useState(false)
+
+  const {
+    totalLiquidityUSD,
+    oneDayVolumeUSD,
+    volumeChangeUSD,
+    liquidityChangeUSD,
+    oneDayTxns,
+    v1Data,
+    txnChange
+  } = useGlobalData()
+  const [ethPrice] = useEthPrice()
+  const formattedEthPrice = ethPrice ? formattedNum(ethPrice, true) : '-'
+  let txnChangeFormatted = txnChange ? formattedPercent(txnChange) : '-'
 
   const liquidity =
     totalLiquidityUSD && v1Data?.totalLiquidityUSD
@@ -48,7 +70,6 @@ export default function NavHeader({ token, pair, account }) {
       : ''
   const volume =
     oneDayVolumeUSD && v1Data?.dailyVolumeUSD ? '$' + toK(oneDayVolumeUSD + v1Data?.dailyVolumeUSD, true) : ''
-
   return below600 ? (
     <Header>
       <AutoColumn gap="20px">
@@ -58,7 +79,57 @@ export default function NavHeader({ token, pair, account }) {
     </Header>
   ) : (
     <Header>
-      <RowBetween>
+      <RowBetween style={{ padding: '0.5rem 1rem', backgroundColor: '#f7f8fa', borderBottom: '1px solid #edeef2' }}>
+        <RowFixed>
+          <HeaderText
+            onMouseEnter={() => {
+              setShowPriceCard(true)
+            }}
+            onMouseLeave={() => {
+              setShowPriceCard(false)
+            }}
+          >
+            ETH Price: <b>{formattedEthPrice}</b>
+            {showPriceCard && <UniPrice />}
+          </HeaderText>
+          <HeaderText>
+            Combined Liquidity: <b>{liquidity}</b>
+          </HeaderText>
+          <HeaderText>
+            Combined Volume: <b>{volume}</b>
+          </HeaderText>
+          <HeaderText>
+            Pairs: <b>{volume}</b>
+          </HeaderText>
+          <HeaderText>
+            24H Transactions: <b>{oneDayTxns}</b> {txnChangeFormatted && txnChangeFormatted}
+          </HeaderText>
+        </RowFixed>
+
+        <RowFixed style={{}}>
+          <HeaderText>
+            <Link href="https://migrate.uniswap.info" target="_blank">
+              V1 Analytics
+            </Link>
+          </HeaderText>
+          <HeaderText>
+            <Link href="https://migrate.uniswap.info" target="_blank">
+              Docs
+            </Link>
+          </HeaderText>
+          <HeaderText>
+            <Link href="https://migrate.uniswap.info" target="_blank">
+              Discord
+            </Link>
+          </HeaderText>
+          <HeaderText>
+            <Link href="https://twitter.com/UniswapProtocol" target="_blank">
+              Twitter
+            </Link>
+          </HeaderText>
+        </RowFixed>
+      </RowBetween>
+      <RowBetween style={{ padding: '1rem 1rem', borderBottom: '1px solid #edeef2' }}>
         <Title token={token} pair={pair} account={account} />
         <RowFixed>
           {!isHome && (
@@ -71,18 +142,14 @@ export default function NavHeader({ token, pair, account }) {
             <CombinedWrapper>
               {!below1024 && (
                 <>
-                  <CombinedData>
-                    Combined Liquidity: <b>{liquidity}</b>
-                  </CombinedData>
-                  <CombinedData>
-                    Combined Vol: <b>{volume}</b>
-                  </CombinedData>
+                  <HeaderText>Protocol Stats</HeaderText>
+                  <HeaderText>Tokens</HeaderText>
+                  <HeaderText>Pairs</HeaderText>
+                  <HeaderText>Transactions</HeaderText>
                 </>
               )}
               <Link href="https://migrate.uniswap.info" target="_blank">
-                <ButtonDark style={{ minWidth: 'initial', height: '36px' }}>
-                  View combined {below1024 && 'data'} ↗
-                </ButtonDark>
+                <ButtonDark style={{ minWidth: 'initial' }}>Launch App</ButtonDark>
               </Link>
             </CombinedWrapper>
           )}

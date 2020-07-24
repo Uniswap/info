@@ -26,7 +26,7 @@ const Panel = styled(RebassBox)`
   flex-direction: column;
   justify-content: flex-start;
   border-radius: 12px;
-  border: 1px solid transparent;
+  border: 1px solid ${({ theme }) => theme.bg3};
 
   :hover {
       cursor: ${({ hover }) => hover && 'pointer'};
