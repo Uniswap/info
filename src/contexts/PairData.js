@@ -483,7 +483,7 @@ export function useDataForList(pairList) {
   const [ethPrice] = useEthPrice()
 
   const [stale, setStale] = useState(false)
-  const [fetched, setFetched] = useState()
+  const [fetched, setFetched] = useState([])
 
   // reset
   useEffect(() => {
@@ -524,7 +524,7 @@ export function useDataForList(pairList) {
   let formattedFetch =
     fetched &&
     fetched.reduce((obj, cur) => {
-      return { ...obj, [cur.id]: cur }
+      return { ...obj, [cur?.id]: cur }
     }, {})
 
   return formattedFetch

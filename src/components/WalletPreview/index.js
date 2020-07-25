@@ -1,20 +1,18 @@
 import React, { useState } from 'react'
 import { withRouter } from 'react-router-dom'
-
 import styled from 'styled-components'
-
-import { AutoRow } from '../Row'
+import { AutoRow, RowBetween } from '../Row'
 import { AutoColumn } from '../Column'
-
-import { Hover, TYPE } from '../../Theme'
-import { useAllPairData } from '../../contexts/PairData'
+import { TYPE } from '../../Theme'
 import Panel from '../Panel'
-import { useAllTokenData } from '../../contexts/TokenData'
-import { ButtonLight } from '../ButtonStyled'
+import { ButtonLight, ButtonFaded } from '../ButtonStyled'
+import { useSavedAccounts } from '../../contexts/LocalStorage'
+import { isAddress } from '../../utils'
+import { X } from 'react-feather'
+import { Hover } from '..'
 
 const Wrapper = styled.div`
   display: flex;
-  /* position: relative; */
   flex-direction: row;
   align-items: center;
   justify-content: flex-end;
@@ -52,27 +50,59 @@ const Input = styled.input`
 function WalletPreview({ history }) {
   const [accountValue, setAccountValue] = useState()
 
-  return (
-    <Panel>
-      <AutoColumn gap={'12px'}>
-        <TYPE.main>Wallet Analytics</TYPE.main>
-        <TYPE.small>Input an address to view liqudiity provider statistics.</TYPE.small>
-        <AutoRow>
-          <Wrapper>
-            <Input
-              placeholder="0x.."
-              onChange={e => {
-                setAccountValue(e.target.value)
-              }}
-            />
-          </Wrapper>
-        </AutoRow>
+  const [savedAccounts, addAccount, removeAccount] = useSavedAccounts()
 
-        <ButtonLight style={{ marginRight: '1rem' }} onClick={() => history.push('/account/' + accountValue)}>
-          Load Account Details
-        </ButtonLight>
-      </AutoColumn>
-    </Panel>
+  function handleAccountSearch() {
+    if (isAddress(accountValue)) {
+      history.push('/account/' + accountValue)
+      if (!savedAccounts.includes(accountValue)) {
+        addAccount(accountValue)
+      }
+    }
+  }
+
+  return (
+    <AutoColumn gap="1rem">
+      <Panel>
+        <AutoColumn gap={'12px'}>
+          <TYPE.main>Wallet Analytics</TYPE.main>
+          <TYPE.small>Input an address to view liqudiity provider statistics.</TYPE.small>
+          <AutoRow>
+            <Wrapper>
+              <Input
+                placeholder="0x.."
+                onChange={e => {
+                  setAccountValue(e.target.value)
+                }}
+              />
+            </Wrapper>
+          </AutoRow>
+
+          <ButtonLight onClick={handleAccountSearch}>Load Account Details</ButtonLight>
+        </AutoColumn>
+      </Panel>
+      <Panel>
+        <AutoColumn gap={'12px'}>
+          <TYPE.main>Pinned Accounts </TYPE.main>
+          {savedAccounts?.length > 0 ? (
+            savedAccounts.map(account => {
+              return (
+                <RowBetween key={account}>
+                  <ButtonFaded onClick={() => history.push('/account/' + account)}>
+                    <TYPE.header>{account?.slice(0, 6) + '...' + account?.slice(38, 42)}</TYPE.header>
+                  </ButtonFaded>
+                  <Hover onClick={() => removeAccount(account)}>
+                    <X size={16} />
+                  </Hover>
+                </RowBetween>
+              )
+            })
+          ) : (
+            <TYPE.small>Pinned accounts will appear here.</TYPE.small>
+          )}
+        </AutoColumn>
+      </Panel>
+    </AutoColumn>
   )
 }
 

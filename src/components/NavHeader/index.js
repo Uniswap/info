@@ -1,13 +1,13 @@
 import React, { useState } from 'react'
-import styled, { keyframes } from 'styled-components'
+import styled from 'styled-components'
 
 import Title from '../Title'
 import Search from '../Search'
 import { RowFixed, RowBetween } from '../Row'
 import { AutoColumn } from '../Column'
 import { useMedia } from 'react-use'
-import { useGlobalData, useEthPrice, useGlobalTransactions } from '../../contexts/GlobalData'
-import { formattedNum, formattedPercent, isAddress, toK } from '../../utils'
+import { useGlobalData, useEthPrice } from '../../contexts/GlobalData'
+import { formattedNum, formattedPercent, toK } from '../../utils'
 import { TYPE } from '../../Theme'
 
 import UniPrice from '../UniPrice'
@@ -16,21 +16,12 @@ import { ButtonDark } from '../ButtonStyled'
 import Link from '../Link'
 
 const Header = styled.div`
-  /* width: calc(100% - 80px); */
-  /* padding: 20px 40px; */
   width: 100%;
   background-color: ${({ theme }) => theme.bg1};
   margin-bottom: 2rem;
   position: sticky;
   top: 0;
   z-index: 99;
-  /* box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.01), 0px 4px 8px rgba(0, 0, 0, 0.01), 0px 16px 24px rgba(0, 0, 0, 0.01),
-    0px 24px 32px rgba(0, 0, 0, 0.01); */
-
-  /* @media screen and (max-width: 640px) {
-    width: calc(100% - 40px);
-    padding: 32px 20px;
-  } */
 `
 
 const CombinedWrapper = styled(RowFixed)`
@@ -39,7 +30,6 @@ const CombinedWrapper = styled(RowFixed)`
 `
 
 const HeaderText = styled.div`
-  /* color: ${({ theme }) => theme.primary1}; */
   margin-right: 0.75rem;
   font-size: 0.825rem;
   font-weight: 500;
@@ -63,29 +53,6 @@ const PollingDot = styled.div`
   background-color: ${({ theme }) => theme.green1};
 `
 
-const rotate360 = keyframes`
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-`
-
-const Spinner = styled.div`
-  animation: ${rotate360} 1s linear infinite;
-  transform: translateZ(0);
-
-  border-top: 0.5px solid grey;
-  border-right: 0.5px solid grey;
-  border-bottom: 0.5px solid grey;
-  border-left: 1px solid black;
-  background: transparent;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-`
-
 export default function NavHeader({ token, pair, account }) {
   const isHome = !token && !pair && !account
 
@@ -94,15 +61,7 @@ export default function NavHeader({ token, pair, account }) {
 
   const [showPriceCard, setShowPriceCard] = useState(false)
 
-  const {
-    totalLiquidityUSD,
-    oneDayVolumeUSD,
-    volumeChangeUSD,
-    liquidityChangeUSD,
-    oneDayTxns,
-    v1Data,
-    txnChange
-  } = useGlobalData()
+  const { totalLiquidityUSD, oneDayVolumeUSD, oneDayTxns, v1Data, txnChange } = useGlobalData()
   const [ethPrice] = useEthPrice()
   const formattedEthPrice = ethPrice ? formattedNum(ethPrice, true) : '-'
   let txnChangeFormatted = txnChange ? formattedPercent(txnChange) : '-'
@@ -126,7 +85,7 @@ export default function NavHeader({ token, pair, account }) {
         {/* <Spinner /> */}
         <PollingDot />
         <TYPE.small>
-          Last Updated 2s ago <a href="">(refresh)</a>
+          Last Updated 2s ago <a href="/">(refresh)</a>
         </TYPE.small>
       </Polling>
       <RowBetween style={{ padding: '0.5rem 1rem', backgroundColor: '#f7f8fa', borderBottom: '1px solid #edeef2' }}>

@@ -23,13 +23,14 @@ import CopyHelper from '../components/Copy'
 import { useMedia } from 'react-use'
 import DoubleTokenLogo from '../components/DoubleLogo'
 import TokenLogo from '../components/TokenLogo'
-import { Hover } from '../components'
+import { Hover, SideBar } from '../components'
 import { useEthPrice } from '../contexts/GlobalData'
 import Warning from '../components/Warning'
 import { SURPRESS_WARNINGS } from '../constants'
-import { usePathDismissed } from '../contexts/LocalStorage'
+import { usePathDismissed, useSavedPairs } from '../contexts/LocalStorage'
 
-import { TrendingUp, PieChart, Disc, List } from 'react-feather'
+import { TrendingUp, PieChart, List, PlusCircle } from 'react-feather'
+import PinnedData from '../components/PinnedData'
 
 const PageWrapper = styled.div`
   display: flex;
@@ -42,6 +43,8 @@ const PageWrapper = styled.div`
   grid-template-columns: 180px 1fr 256px;
   grid-gap: 24px;
   padding: 0 24px;
+  max-width: 1440px;
+  padding-bottom: 100px;
 
   @media screen and (max-width: 640px) {
     width: calc(100% - 40px);
@@ -205,8 +208,7 @@ function PairPage({ pairAddress, history }) {
   const [dismissed, markAsDismissed] = usePathDismissed(history.location.pathname)
 
   const OverviewRef = useRef()
-  const PairsRef = useRef()
-  const TokensRef = useRef()
+  const DataRef = useRef()
   const TransactionsRef = useRef()
 
   const [active, setActive] = useState(null)
@@ -223,6 +225,8 @@ function PairPage({ pairAddress, history }) {
     })
   }
 
+  const [savedPairs, addPair] = useSavedPairs()
+
   return (
     <PageWrapper>
       <SubNav>
@@ -230,18 +234,15 @@ function PairPage({ pairAddress, history }) {
           <TrendingUp size={20} style={{ marginRight: '1rem' }} />
           <TYPE.main>Overview</TYPE.main>
         </SubNavEl>
-        <SubNavEl onClick={() => handleScroll(PairsRef)} isActive={active === OverviewRef}>
-          <PieChart size={20} style={{ marginRight: '1rem' }} />
-          <TYPE.main>Top Pairs</TYPE.main>
-        </SubNavEl>
-        <SubNavEl onClick={() => handleScroll(TokensRef)} isActive={active === OverviewRef}>
-          <Disc size={20} style={{ marginRight: '1rem' }} />
-          <TYPE.main>Top Tokens</TYPE.main>
-        </SubNavEl>
-        <SubNavEl onClick={() => handleScroll(TransactionsRef)} isActive={active === OverviewRef}>
+        <SubNavEl onClick={() => handleScroll(TransactionsRef)} isActive={active === TransactionsRef}>
           <List size={20} style={{ marginRight: '1rem' }} />
           <TYPE.main>Transactions</TYPE.main>
         </SubNavEl>
+        <SubNavEl onClick={() => handleScroll(DataRef)} isActive={active === DataRef}>
+          <PieChart size={20} style={{ marginRight: '1rem' }} />
+          <TYPE.main>Pair Data</TYPE.main>
+        </SubNavEl>
+        <PinnedData />
       </SubNav>
       <div>
         <Warning
@@ -253,13 +254,13 @@ function PairPage({ pairAddress, history }) {
         <WarningGrouping
           disabled={!dismissed && !(SURPRESS_WARNINGS.includes(token0?.id) && SURPRESS_WARNINGS.includes(token1?.id))}
         >
-          <RowBetween style={{ flexWrap: 'wrap' }}>
+          <RowBetween style={{ flexWrap: 'wrap' }} ref={OverviewRef}>
             <RowFixed style={{ flexWrap: 'wrap' }}>
               <RowFixed mb={20}>
                 {token0 && token1 && (
                   <DoubleTokenLogo a0={token0?.id || ''} a1={token1?.id || ''} size={32} margin={true} />
                 )}{' '}
-                <Text fontSize={'2rem'} fontWeight={600} style={{ margin: '0 1rem' }}>
+                <Text fontSize={'1.5rem'} fontWeight={600} style={{ margin: '0 1rem' }}>
                   {token0 && token1 ? (
                     <>
                       <HoverSpan onClick={() => history.push(`/token/${token0?.id}`)}>{token0.symbol}</HoverSpan>
@@ -277,6 +278,11 @@ function PairPage({ pairAddress, history }) {
               ml={below600 ? '0' : '2.5rem'}
               style={{ flexDirection: below1080 ? 'row-reverse' : 'initial' }}
             >
+              {!!!savedPairs[pairAddress] && (
+                <Hover onClick={() => addPair(pairAddress, token0.id, token1.id, token0.symbol, token1.symbol)}>
+                  <PlusCircle style={{ marginRight: '0.5rem' }} />
+                </Hover>
+              )}
               <Link external href={getPoolLink(token0?.id, token1?.id)}>
                 <ButtonLight color={backgroundColor}>+ Add Liquidity</ButtonLight>
               </Link>
@@ -316,7 +322,7 @@ function PairPage({ pairAddress, history }) {
           <DashboardWrapper>
             <>
               {!below1080 && (
-                <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '2rem' }}>
+                <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '1.5rem' }}>
                   Pair Stats
                 </TYPE.main>
               )}
@@ -328,7 +334,7 @@ function PairPage({ pairAddress, history }) {
                       <div />
                     </RowBetween>
                     <RowBetween align="flex-end">
-                      <TYPE.main fontSize={'2rem'} lineHeight={1} fontWeight={600}>
+                      <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
                         {liquidity}
                       </TYPE.main>
                       <TYPE.main>{liquidityChange}</TYPE.main>
@@ -342,7 +348,7 @@ function PairPage({ pairAddress, history }) {
                       <div />
                     </RowBetween>
                     <RowBetween align="flex-end">
-                      <TYPE.main fontSize={'2rem'} lineHeight={1} fontWeight={600}>
+                      <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
                         {volume}
                       </TYPE.main>
                       <TYPE.main>{volumeChange}</TYPE.main>
@@ -356,7 +362,7 @@ function PairPage({ pairAddress, history }) {
                       <div />
                     </RowBetween>
                     <RowBetween align="flex-end">
-                      <TYPE.main fontSize={'2rem'} lineHeight={1} fontWeight={600}>
+                      <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
                         {oneDayVolumeUSD
                           ? formattedNum(oneDayVolumeUSD * 0.003, true)
                           : oneDayVolumeUSD === 0
@@ -374,7 +380,7 @@ function PairPage({ pairAddress, history }) {
                       <div />
                     </RowBetween>
                     <RowBetween align="flex-end">
-                      <TYPE.main fontSize={'2rem'} lineHeight={1} fontWeight={600}>
+                      <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
                         {oneDayTxns ?? '-'}
                       </TYPE.main>
                       <TYPE.main>{txnChangeFormatted}</TYPE.main>
@@ -417,10 +423,11 @@ function PairPage({ pairAddress, history }) {
                   border: '1px solid rgba(43, 43, 43, 0.05)',
                   marginTop: '1.5rem'
                 }}
+                ref={TransactionsRef}
               >
                 {transactions ? <TxnList transactions={transactions} /> : <Loader />}
               </Panel>
-              <RowBetween style={{ marginTop: '3rem' }}>
+              <RowBetween style={{ marginTop: '3rem' }} ref={DataRef}>
                 <TYPE.main fontSize={'1.125rem'}>Pair Information</TYPE.main>{' '}
               </RowBetween>
               <Panel
@@ -477,7 +484,9 @@ function PairPage({ pairAddress, history }) {
           </DashboardWrapper>
         </WarningGrouping>
       </div>
-      <WalletPreview />
+      <SideBar>
+        <WalletPreview />
+      </SideBar>
     </PageWrapper>
   )
 }

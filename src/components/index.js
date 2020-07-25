@@ -45,4 +45,30 @@ const EmptyCard = styled.div`
   height: ${({ height }) => height && height};
 `
 
+export const SideBar = styled.span`
+  display: grid;
+  grid-gap: 24px;
+  position: sticky;
+  top: 8.5rem;
+`
+
+export const SubNav = styled.ul`
+  list-style: none;
+  position: sticky;
+  top: 8.5rem;
+  padding: 0px;
+  margin-top: 0px;
+`
+export const SubNavEl = styled.li`
+  list-style: none;
+  display: flex;
+  margin-bottom: 1rem;
+  width: 100%;
+  font-weight: ${({ isActive }) => (isActive ? 600 : 500)};
+
+  :hover {
+    cursor: pointer;
+  }
+`
+
 export { Hint, Divider, Address, EmptyCard }

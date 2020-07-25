@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import 'feather-icons'
 import { withRouter } from 'react-router-dom'
 import { Text } from 'rebass'
@@ -18,16 +18,19 @@ import TokenChart from '../components/TokenChart'
 import { formattedNum, formattedPercent, getPoolLink, getSwapLink } from '../utils'
 
 import { useTokenData, useTokenTransactions, useTokenPairs } from '../contexts/TokenData'
-import { TYPE, ThemedBackground } from '../Theme'
+import { TYPE } from '../Theme'
 import { useColor } from '../hooks'
 import CopyHelper from '../components/Copy'
 import { useMedia } from 'react-use'
-import { transparentize } from 'polished'
 import { useDataForList } from '../contexts/PairData'
 import { useEffect } from 'react'
 import Warning from '../components/Warning'
 import { SURPRESS_WARNINGS } from '../constants'
-import { usePathDismissed } from '../contexts/LocalStorage'
+import { usePathDismissed, useSavedTokens } from '../contexts/LocalStorage'
+import { Hover, SubNav, SubNavEl } from '../components'
+import { PlusCircle, TrendingUp, List, PieChart, Trello } from 'react-feather'
+import PinnedData from '../components/PinnedData'
+import WalletPreview from '../components/WalletPreview'
 
 const PageWrapper = styled.div`
   display: flex;
@@ -35,19 +38,18 @@ const PageWrapper = styled.div`
   align-items: center;
   justify-content: center;
   padding-bottom: 100px;
-  width: calc(100% - 80px);
-  padding: 0 40px;
+  max-width: 1440px;
+  display: grid;
+  justify-content: start;
+  align-items: start;
+  grid-template-columns: 180px 1fr 256px;
+  grid-gap: 24px;
+  padding: 0 24px;
+  padding-bottom: 100px;
 
-  padding-bottom: 80px;
-
-  @media screen and (max-width: 640px) {
+  @media screen and (max-width: 1080px) {
     width: calc(100% - 40px);
     padding: 0 20px;
-  }
-
-  & > * {
-    width: 90%;
-    max-width: 1240px;
   }
 `
 
@@ -170,9 +172,48 @@ function TokenPage({ address, history }) {
 
   const useManualLiquidity = parseFloat(totalLiquidityUSD / manualLiquidity) < 0.5
 
+  const [savedTokens, addToken] = useSavedTokens()
+
+  const [active, setActive] = useState(null)
+
+  const OverviewRef = useRef()
+  const PairsRef = useRef()
+  const TransactionsRef = useRef()
+  const DataRef = useRef()
+
+  useEffect(() => {
+    setActive(OverviewRef)
+  }, [])
+
+  const handleScroll = ref => {
+    setActive(ref.current)
+    document.querySelector('body').scrollTo({
+      behavior: 'smooth',
+      top: ref.current.offsetTop - 120
+    })
+  }
+
   return (
     <PageWrapper>
-      <ThemedBackground backgroundColor={transparentize(0.6, backgroundColor)} />
+      <SubNav>
+        <SubNavEl onClick={() => handleScroll(OverviewRef)} isActive={active === OverviewRef}>
+          <TrendingUp size={20} style={{ marginRight: '1rem' }} />
+          <TYPE.main>Overview</TYPE.main>
+        </SubNavEl>
+        <SubNavEl onClick={() => handleScroll(PairsRef)} isActive={active === PairsRef}>
+          <PieChart size={20} style={{ marginRight: '1rem' }} />
+          <TYPE.main>Pairs</TYPE.main>
+        </SubNavEl>
+        <SubNavEl onClick={() => handleScroll(TransactionsRef)} isActive={active === TransactionsRef}>
+          <List size={20} style={{ marginRight: '1rem' }} />
+          <TYPE.main>Transactions</TYPE.main>
+        </SubNavEl>
+        <SubNavEl onClick={() => handleScroll(DataRef)} isActive={active === DataRef}>
+          <Trello size={20} style={{ marginRight: '1rem' }} />
+          <TYPE.main>Token Info</TYPE.main>
+        </SubNavEl>
+        <PinnedData />
+      </SubNav>
       <Warning
         type={'token'}
         show={!dismissed && !SURPRESS_WARNINGS.includes(address)}
@@ -180,16 +221,16 @@ function TokenPage({ address, history }) {
         address={address}
       />
       <WarningGrouping disabled={!dismissed && !SURPRESS_WARNINGS.includes(address)}>
-        <RowBetween mt={20} style={{ flexWrap: 'wrap' }}>
+        <RowBetween style={{ flexWrap: 'wrap' }} ref={OverviewRef}>
           <RowFixed style={{ flexWrap: 'wrap' }}>
             <RowFixed mb={20} style={{ alignItems: 'baseline' }}>
               <TokenLogo address={address} size="32px" style={{ alignSelf: 'center' }} />
-              <Text fontSize={'2rem'} fontWeight={600} style={{ margin: '0 1rem' }}>
+              <Text fontSize={'1.5rem'} fontWeight={600} style={{ margin: '0 1rem' }}>
                 {name ? name + ' ' : ''} {symbol ? '(' + symbol + ')' : ''}
               </Text>{' '}
               {!below1080 && (
                 <>
-                  <Text fontSize={'2rem'} fontWeight={500} style={{ marginRight: '1rem' }}>
+                  <Text fontSize={'1.5rem'} fontWeight={500} style={{ marginRight: '1rem' }}>
                     {price}
                   </Text>
                   {priceChange}
@@ -203,6 +244,11 @@ function TokenPage({ address, history }) {
               ml={below600 ? '0' : '2.5rem'}
               style={{ flexDirection: below1080 ? 'row-reverse' : 'initial' }}
             >
+              {!!!savedTokens[address] && (
+                <Hover onClick={() => addToken(address, symbol)}>
+                  <PlusCircle style={{ marginRight: '0.5rem' }} />
+                </Hover>
+              )}
               <Link href={getPoolLink(address)} target="_blank">
                 <ButtonLight color={backgroundColor}>+ Add Liquidity</ButtonLight>
               </Link>
@@ -232,7 +278,7 @@ function TokenPage({ address, history }) {
                     </RowBetween>
                     <RowBetween align="flex-end">
                       {' '}
-                      <TYPE.main fontSize={'2rem'} lineHeight={1} fontWeight={600}>
+                      <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
                         {price}
                       </TYPE.main>
                       <TYPE.main>{priceChange}</TYPE.main>
@@ -247,7 +293,7 @@ function TokenPage({ address, history }) {
                     <div />
                   </RowBetween>
                   <RowBetween align="flex-end">
-                    <TYPE.main fontSize={'2rem'} lineHeight={1} fontWeight={600}>
+                    <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
                       {useManualLiquidity ? formattedNum(manualLiquidity, true) : liquidity}
                     </TYPE.main>
                     <TYPE.main>{liquidityChange}</TYPE.main>
@@ -261,7 +307,7 @@ function TokenPage({ address, history }) {
                     <div />
                   </RowBetween>
                   <RowBetween align="flex-end">
-                    <TYPE.main fontSize={'2rem'} lineHeight={1} fontWeight={600}>
+                    <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
                       {volume}
                     </TYPE.main>
                     <TYPE.main>{volumeChange}</TYPE.main>
@@ -276,7 +322,7 @@ function TokenPage({ address, history }) {
                     <div />
                   </RowBetween>
                   <RowBetween align="flex-end">
-                    <TYPE.main fontSize={'2rem'} lineHeight={1} fontWeight={600}>
+                    <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
                       {oneDayTxns}
                     </TYPE.main>
                     <TYPE.main>{txnChangeFormatted}</TYPE.main>
@@ -297,6 +343,7 @@ function TokenPage({ address, history }) {
               border: '1px solid rgba(43, 43, 43, 0.05)',
               marginTop: '1.5rem'
             }}
+            ref={PairsRef}
             p={20}
           >
             {address && fetchedPairsList ? (
@@ -305,7 +352,7 @@ function TokenPage({ address, history }) {
               <Loader />
             )}
           </Panel>
-          <RowBetween mt={40} mb={'1rem'}>
+          <RowBetween mt={40} mb={'1rem'} ref={TransactionsRef}>
             <TYPE.main fontSize={'1.125rem'}>Transactions</TYPE.main> <div />
           </RowBetween>
           <Panel
@@ -317,7 +364,7 @@ function TokenPage({ address, history }) {
             {transactions ? <TxnList color={backgroundColor} transactions={transactions} /> : <Loader />}
           </Panel>
           <>
-            <RowBetween style={{ marginTop: '3rem' }}>
+            <RowBetween style={{ marginTop: '3rem' }} ref={DataRef}>
               <TYPE.main fontSize={'1.125rem'}>Token Information</TYPE.main>{' '}
             </RowBetween>
             <Panel
@@ -360,6 +407,7 @@ function TokenPage({ address, history }) {
           </>
         </DashboardWrapper>
       </WarningGrouping>
+      <WalletPreview />
     </PageWrapper>
   )
 }

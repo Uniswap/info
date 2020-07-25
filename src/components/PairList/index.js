@@ -6,12 +6,11 @@ import utc from 'dayjs/plugin/utc'
 import { Box, Flex, Text } from 'rebass'
 import styled from 'styled-components'
 
-import Link, { CustomLink } from '../Link'
+import { CustomLink } from '../Link'
 import { Divider } from '../../components'
 
-import { formattedNum, getPoolLink, getSwapLink } from '../../utils'
+import { formattedNum } from '../../utils'
 import DoubleTokenLogo from '../DoubleLogo'
-import { ButtonLight, ButtonDark } from '../ButtonStyled'
 import { withRouter } from 'react-router-dom'
 import { OVERVIEW_PAIR_BLACKLIST } from '../../constants'
 

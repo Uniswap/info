@@ -16,8 +16,10 @@ import Loader from '../../components/Loader'
 import { ButtonDropdown } from '../../components/ButtonStyled'
 import { Hover } from '../../components'
 import DoubleTokenLogo from '../../components/DoubleLogo'
-import { TrendingUp, PieChart, Disc, List, Activity } from 'react-feather'
+import { TrendingUp, PieChart, Activity } from 'react-feather'
 import WalletPreview from '../../components/WalletPreview'
+import { SideBar, SubNav, SubNavEl } from '../../components/index'
+import PinnedData from '../../components/PinnedData'
 
 const PageWrapper = styled.div`
   display: flex;
@@ -31,6 +33,7 @@ const PageWrapper = styled.div`
   grid-gap: 24px;
   padding: 0 24px;
   width: calc(100% - 48px);
+  max-width: 1440px;
 
   @media screen and (max-width: 640px) {
     width: calc(100% - 40px);
@@ -65,25 +68,6 @@ const Header = styled.div`
 
 const DashboardWrapper = styled.div`
   width: 100%;
-`
-
-const SubNav = styled.ul`
-  list-style: none;
-  position: sticky;
-  top: 8.5rem;
-  padding: 0px;
-  margin-top: 0px;
-`
-const SubNavEl = styled.li`
-  list-style: none;
-  display: flex;
-  margin-bottom: 1rem;
-  width: 100%;
-  font-weight: ${({ isActive }) => (isActive ? 600 : 500)};
-
-  :hover {
-    cursor: pointer;
-  }
 `
 
 const DropdownWrapper = styled.div`
@@ -168,9 +152,7 @@ function AccountPage({ account }) {
   }, 0)
 
   const OverviewRef = useRef()
-  const PairsRef = useRef()
-  const TokensRef = useRef()
-  const TransactionsRef = useRef()
+  const StatsRef = useRef()
 
   const [active, setActive] = useState(null)
 
@@ -193,21 +175,14 @@ function AccountPage({ account }) {
           <TrendingUp size={20} style={{ marginRight: '1rem' }} />
           <TYPE.main>Overview</TYPE.main>
         </SubNavEl>
-        <SubNavEl onClick={() => handleScroll(PairsRef)} isActive={active === OverviewRef}>
+        <SubNavEl onClick={() => handleScroll(StatsRef)} isActive={active === OverviewRef}>
           <PieChart size={20} style={{ marginRight: '1rem' }} />
-          <TYPE.main>Top Pairs</TYPE.main>
+          <TYPE.main>Account Stats</TYPE.main>
         </SubNavEl>
-        <SubNavEl onClick={() => handleScroll(TokensRef)} isActive={active === OverviewRef}>
-          <Disc size={20} style={{ marginRight: '1rem' }} />
-          <TYPE.main>Top Tokens</TYPE.main>
-        </SubNavEl>
-        <SubNavEl onClick={() => handleScroll(TransactionsRef)} isActive={active === OverviewRef}>
-          <List size={20} style={{ marginRight: '1rem' }} />
-          <TYPE.main>Transactions</TYPE.main>
-        </SubNavEl>
+        <PinnedData />
       </SubNav>
       <CenterWrapper>
-        <Header>
+        <Header ref={OverviewRef}>
           <RowBetween>
             <Text fontSize={24} fontWeight={600}>
               Liquidity Provider Info
@@ -247,24 +222,28 @@ function AccountPage({ account }) {
             {showDropdown && (
               <Flyout>
                 <AutoColumn gap="0px">
-                  {positions?.map((p, i) => {
-                    return (
-                      p.pair.id !== activePosition?.pair.id && (
-                        <MenuRow
-                          onClick={() => {
-                            setActivePosition(p)
-                            setShowDropdown(false)
-                          }}
-                          key={i}
-                        >
-                          <DoubleTokenLogo a0={p.pair.token0.id} a1={p.pair.token1.id} size={16} />
-                          <Text fontWeight={400} color="black" ml={'16px'} fontSize="16px">
-                            {p.pair.token0.symbol}-{p.pair.token1.symbol} Position
-                          </Text>
-                        </MenuRow>
+                  {positions
+                    ?.filter(p => {
+                      return p.liquidityTokenBalance > 0
+                    })
+                    .map((p, i) => {
+                      return (
+                        p.pair.id !== activePosition?.pair.id && (
+                          <MenuRow
+                            onClick={() => {
+                              setActivePosition(p)
+                              setShowDropdown(false)
+                            }}
+                            key={i}
+                          >
+                            <DoubleTokenLogo a0={p.pair.token0.id} a1={p.pair.token1.id} size={16} />
+                            <Text fontWeight={400} color="black" ml={'16px'} fontSize="16px">
+                              {p.pair.token0.symbol}-{p.pair.token1.symbol} Position
+                            </Text>
+                          </MenuRow>
+                        )
                       )
-                    )
-                  })}
+                    })}
                   {activePosition && (
                     <MenuRow
                       onClick={() => {
@@ -321,7 +300,7 @@ function AccountPage({ account }) {
               <UserChart account={account} position={activePosition} />
             )}
           </Panel>
-          <AutoColumn gap="16px">
+          <AutoColumn gap="16px" ref={StatsRef}>
             <ListOptions gap="10px" style={{ marginTop: '1rem' }}>
               <Hover>
                 <TYPE.main
@@ -400,7 +379,9 @@ function AccountPage({ account }) {
           </Panel>
         </DashboardWrapper>
       </CenterWrapper>
-      <WalletPreview />
+      <SideBar>
+        <WalletPreview />
+      </SideBar>
     </PageWrapper>
   )
 }

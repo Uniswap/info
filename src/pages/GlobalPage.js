@@ -10,15 +10,17 @@ import PairList from '../components/PairList'
 import TopTokenList from '../components/TokenList'
 import TxnList from '../components/TxnList'
 import GlobalChart from '../components/GlobalChart'
-import { Hover, TYPE } from '../Theme'
-import { formattedNum, formattedPercent, isAddress } from '../utils'
-import { useGlobalData, useEthPrice, useGlobalTransactions } from '../contexts/GlobalData'
+import { formattedNum, formattedPercent } from '../utils'
+import { useGlobalData, useGlobalTransactions } from '../contexts/GlobalData'
 import { useAllPairData } from '../contexts/PairData'
 import { Search } from '../components/Search'
 import { useMedia } from 'react-use'
 import Panel from '../components/Panel'
 import { useAllTokenData } from '../contexts/TokenData'
-import { ButtonLight } from '../components/ButtonStyled'
+import { TYPE } from '../Theme'
+import WalletPreview from '../components/WalletPreview'
+import { SideBar, SubNav, SubNavEl } from '../components/index'
+import PinnedData from '../components/PinnedData'
 
 const PageWrapper = styled.div`
   display: flex;
@@ -37,21 +39,7 @@ const PageWrapper = styled.div`
     width: calc(100% - 40px);
     padding: 0 20px;
   }
-  /* background: ${({ theme }) => theme.background}; */
 `
-
-// const ThemedBackground = styled.div`
-//   position: absolute;
-//   top: 0;
-//   left: 0;
-//   right: 0;
-//   height: 200vh;
-//   max-width: 100vw;
-//   z-index: -1;
-
-//   transform: translateY(-70vh);
-//   /* background: ${({ theme }) => theme.background}; */
-// `
 
 const ListOptions = styled(AutoRow)`
   height: 40px;
@@ -73,131 +61,34 @@ const GridRow = styled.div`
   justify-content: center;
 `
 
-const TopGroup = styled.div`
-  grid-template-columns: 1fr 1fr 1fr 1fr;
-  column-gap: 6px;
-  display: inline-grid;
-  width: 100%;
-  align-items: start;
-`
-
-const SubNav = styled.ul`
-  list-style: none;
-  position: sticky;
-  top: 8.5rem;
-  padding: 0px;
-  margin-top: 0px;
-`
-const SubNavEl = styled.li`
-  list-style: none;
-  display: flex;
-  margin-bottom: 1rem;
-  width: 100%;
-  font-weight: ${({ isActive }) => (isActive ? 600 : 500)};
-
-  :hover {
-    cursor: pointer;
-  }
-`
-
 const ChartWrapper = styled.div`
   height: 100%;
 `
 
-const SideBar = styled.span`
-  display: grid;
-  grid-gap: 24px;
-  position: sticky;
-  top: 8.5rem;
-`
-
-const Wrapper = styled.div`
-  display: flex;
-  /* position: relative; */
-  flex-direction: row;
-  align-items: center;
-  justify-content: flex-end;
-  width: 180px;
-  padding: 8px 16px;
-  border-radius: 12px;
-  background: ${({ theme }) => theme.bg2};
-`
-
-const Input = styled.input`
-  position: relative;
-  display: flex;
-  align-items: center;
-  width: 100%;
-  white-space: nowrap;
-  background: none;
-  border: none;
-  outline: none;
-  color: ${({ theme }) => theme.textColor};
-  background-color: ${({ theme }) => theme.bg2};
-  font-size: 16px;
-
-  ::placeholder {
-    color: ${({ theme }) => theme.text3};
-    font-size: 16px;
-  }
-
-  @media screen and (max-width: 640px) {
-    ::placeholder {
-      font-size: 1rem;
-    }
-  }
-`
-
-const TopPanel = styled(Panel)``
-
-const LIST_VIEW = {
-  TOKENS: 'tokens',
-  PAIRS: 'pairs'
-}
-
-function GlobalPage({ history }) {
-  const [listView, setListView] = useState(LIST_VIEW.PAIRS)
-  const [active, setActive] = useState(null)
-
-  const {
-    totalLiquidityUSD,
-    oneDayVolumeUSD,
-    volumeChangeUSD,
-    liquidityChangeUSD,
-    oneDayTxns,
-    txnChange
-  } = useGlobalData()
+function GlobalPage() {
+  const { totalLiquidityUSD, oneDayVolumeUSD, volumeChangeUSD, liquidityChangeUSD } = useGlobalData()
 
   const transactions = useGlobalTransactions()
 
   const allPairs = useAllPairData()
   const allTokens = useAllTokenData()
 
-  const [ethPrice, ethPriceOld] = useEthPrice()
-
-  const ethPriceChange = (parseFloat(ethPrice - ethPriceOld) / parseFloat(ethPriceOld)) * 100
-
-  const formattedEthPrice = ethPrice ? formattedNum(ethPrice, true) : '-'
-
   const liquidity = totalLiquidityUSD ? formattedNum(totalLiquidityUSD, true) : '-'
-
   const liquidityChange = liquidityChangeUSD ? formattedPercent(liquidityChangeUSD) : '-'
 
   const volume = oneDayVolumeUSD ? formattedNum(oneDayVolumeUSD, true) : '-'
 
   const volumeChange = volumeChangeUSD ? formattedPercent(volumeChangeUSD) : '-'
 
-  let txnChangeFormatted = txnChange ? formattedPercent(txnChange) : '-'
-
   const below1080 = useMedia('(max-width: 1080px)')
   const below600 = useMedia('(max-width: 600px)')
-
-  const [accountValue, setAccountValue] = useState()
 
   const OverviewRef = useRef()
   const PairsRef = useRef()
   const TokensRef = useRef()
   const TransactionsRef = useRef()
+
+  const [active, setActive] = useState(null)
 
   useEffect(() => {
     setActive(OverviewRef)
@@ -230,6 +121,7 @@ function GlobalPage({ history }) {
           <List size={20} style={{ marginRight: '1rem' }} />
           <TYPE.main>Transactions</TYPE.main>
         </SubNavEl>
+        <PinnedData />
       </SubNav>
       <div>
         <Box mb={20}>
@@ -320,35 +212,9 @@ function GlobalPage({ history }) {
           <TxnList transactions={transactions} />
         </Panel>
       </div>
-
       {!below1080 && (
         <SideBar>
-          <Panel>
-            <AutoColumn gap={'12px'}>
-              <TYPE.main>Wallet Analytics</TYPE.main>
-              <TYPE.small>Input an address to view liqudiity provider statistics.</TYPE.small>
-              <AutoRow>
-                <Wrapper>
-                  <Input
-                    placeholder="0x.."
-                    onChange={e => {
-                      setAccountValue(e.target.value)
-                    }}
-                  />
-                </Wrapper>
-              </AutoRow>
-
-              <ButtonLight style={{ marginRight: '1rem' }} onClick={() => history.push('/account/' + accountValue)}>
-                Load Account Details
-              </ButtonLight>
-            </AutoColumn>
-          </Panel>
-          <Panel>
-            <AutoColumn gap={'12px'}>
-              <TYPE.main>Pinned </TYPE.main>
-              <TYPE.small>Pin pairs or tokens to add them to the hompage.</TYPE.small>
-            </AutoColumn>
-          </Panel>
+          <WalletPreview />
         </SideBar>
       )}
     </PageWrapper>

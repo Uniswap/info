@@ -8,7 +8,7 @@ import { useTimeframe } from '../../contexts/Application'
 import DropdownSelect from '../DropdownSelect'
 import { timeframeOptions } from '../../constants'
 import { TYPE } from '../../Theme'
-import { useGlobalChartData } from '../../contexts/GlobalData'
+import { useGlobalChartData, useGlobalData } from '../../contexts/GlobalData'
 import dayjs from 'dayjs'
 import styled from 'styled-components'
 import { ChevronDown as Arrow } from 'react-feather'
@@ -75,24 +75,16 @@ const GlobalChart = ({ display }) => {
   const [localWindow, setLocalWindow] = useState(globalWindow)
 
   // global historical data
-  const [chartData, weeklyData, oneDayVolumeUSD, volumeChangeUSD] = useGlobalChartData()
-  const [showLiqDropdown, toggleLiqDropdown] = useState(false)
+  const [chartData, weeklyData] = useGlobalChartData()
+  const { totalLiquidityUSD, oneDayVolumeUSD, volumeChangeUSD, liquidityChangeUSD } = useGlobalData()
   const [showVolDropdown, toggleVolDropdown] = useState(false)
   const [showVolTimeDropdown, toggleVolTimeDropdown] = useState(false)
 
-  const volume = oneDayVolumeUSD ? formattedNum(oneDayVolumeUSD, true) : '$96,013,098'
-  const volumeChange = volumeChangeUSD ? formattedPercent(volumeChangeUSD) : '-8.85%'
+  const volume = oneDayVolumeUSD ? formattedNum(oneDayVolumeUSD, true) : ''
+  const volumeChange = volumeChangeUSD ? formattedPercent(volumeChangeUSD) : ''
 
-  console.log(volume)
-
-  // switch between voluem and liquidity on larger screens
-  function toggleView() {
-    if (chartView === CHART_VIEW.VOLUME) {
-      setChartView(CHART_VIEW.LIQUIDITY)
-    } else {
-      setChartView(CHART_VIEW.VOLUME)
-    }
-  }
+  const liquidity = totalLiquidityUSD ? formattedNum(totalLiquidityUSD, true) : '-'
+  const liquidityChange = liquidityChangeUSD ? formattedPercent(liquidityChangeUSD) : '-'
 
   let utcEndTime = dayjs.utc()
   useEffect(() => {
@@ -159,12 +151,6 @@ const GlobalChart = ({ display }) => {
         <>
           <RowBetween marginBottom={'1rem'}>
             <TYPE.light>{chartView}</TYPE.light>
-            {/* <OptionButton
-              style={{ margin: '0px', padding: '0px' }}
-              active={chartView === CHART_VIEW.LIQUIDITY}
-              onClick={!display ? toggleView : () => {}}
-              disabled={!!display}
-            > */}
             <RowFixed>
               {chartView === CHART_VIEW.VOLUME && (
                 <Select style={{ marginRight: '1rem' }}>
@@ -219,14 +205,12 @@ const GlobalChart = ({ display }) => {
                 )}
               </Select>
             </RowFixed>
-
-            {/* </OptionButton> */}
           </RowBetween>
           <Row>
             <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={500} mr={2}>
-              {volume}
+              {chartView === CHART_VIEW.LIQUIDITY ? liquidity : volume}
             </TYPE.main>
-            <TYPE.main fontSize={14}>{volumeChange}</TYPE.main>
+            <TYPE.main fontSize={14}>{chartView === CHART_VIEW.LIQUIDITY ? liquidityChange : volumeChange}</TYPE.main>
           </Row>
         </>
       )}
