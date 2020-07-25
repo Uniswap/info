@@ -210,6 +210,7 @@ function PairPage({ pairAddress, history }) {
   const OverviewRef = useRef()
   const DataRef = useRef()
   const TransactionsRef = useRef()
+  const InfoRef = useRef()
 
   const [active, setActive] = useState(null)
 
@@ -415,7 +416,7 @@ function PairPage({ pairAddress, history }) {
                   <PairChart address={pairAddress} color={backgroundColor} />
                 </Panel>
               </PanelWrapper>
-              <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
+              <TYPE.main ref={TransactionsRef} fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
                 Transactions
               </TYPE.main>{' '}
               <Panel
@@ -441,7 +442,7 @@ function PairPage({ pairAddress, history }) {
                 <TokenDetailsLayout>
                   <Column>
                     <TYPE.main>Pair Name</TYPE.main>
-                    <Text style={{ marginTop: '.5rem' }} fontSize={24} fontWeight="500">
+                    <Text style={{ marginTop: '.5rem' }} fontSize={16} fontWeight="500">
                       {token0 && token1 ? token0.symbol + '-' + token1.symbol : ''}
                     </Text>
                   </Column>
@@ -449,7 +450,7 @@ function PairPage({ pairAddress, history }) {
                   <Column>
                     <TYPE.main>Pair Address</TYPE.main>
                     <AutoRow align="flex-end">
-                      <Text style={{ marginTop: '.5rem' }} fontSize={24} fontWeight="500">
+                      <Text style={{ marginTop: '.5rem' }} fontSize={16} fontWeight="500">
                         {pairAddress.slice(0, 6) + '...' + pairAddress.slice(38, 42)}
                       </Text>
                       <CopyHelper toCopy={pairAddress} />
@@ -458,7 +459,7 @@ function PairPage({ pairAddress, history }) {
                   <Column>
                     <TYPE.main>{token0 && token0.symbol + ' Address'}</TYPE.main>
                     <AutoRow align="flex-end">
-                      <Text style={{ marginTop: '.5rem' }} fontSize={24} fontWeight="500">
+                      <Text style={{ marginTop: '.5rem' }} fontSize={16} fontWeight="500">
                         {token0 && token0.id.slice(0, 6) + '...' + token0.id.slice(38, 42)}
                       </Text>
                       <CopyHelper toCopy={token0?.id} />
@@ -467,7 +468,7 @@ function PairPage({ pairAddress, history }) {
                   <Column>
                     <TYPE.main>{token1 && token1.symbol + ' Address'}</TYPE.main>
                     <AutoRow align="flex-end">
-                      <Text style={{ marginTop: '.5rem' }} fontSize={24} fontWeight="500">
+                      <Text style={{ marginTop: '.5rem' }} fontSize={16} fontWeight="500">
                         {token1 && token1.id.slice(0, 6) + '...' + token1.id.slice(38, 42)}
                       </Text>
                       <CopyHelper toCopy={token1?.id} />

@@ -35,6 +35,8 @@ const PageWrapper = styled.div`
   grid-template-columns: 180px 1fr 256px;
   grid-gap: 24px;
   padding: 0 24px;
+  padding-bottom: 80px;
+
   @media screen and (max-width: 1080px) {
     width: calc(100% - 40px);
     padding: 0 20px;

@@ -166,7 +166,7 @@ function PairList({ pairs, color, history, disbaleLinks, maxItems = 10 }) {
 
       return (
         <DashGrid
-          style={{ height: '60px' }}
+          style={{ height: '48px' }}
           disbaleLinks={disbaleLinks}
           focus={true}
           onClick={() => history.push('/pair/' + pairAddress)}
