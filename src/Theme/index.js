@@ -164,6 +164,21 @@ export const GlobalStyle = createGlobalStyle`
     }
   }
 
+  
+.three-line-legend {
+	width: 96px;
+	height: 70px;
+	position: absolute;
+	padding: 8px;
+	font-size: 12px;
+	color: '#20262E';
+	background-color: rgba(255, 255, 255, 0.23);
+	text-align: left;
+	z-index: 1000;
+	pointer-events: none;
+}
+
+
   html {
     font-size: 1rem;
     font-variant: none;

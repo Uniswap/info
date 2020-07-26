@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react'
+import React, { useState, useMemo, useEffect, useRef } from 'react'
 import { Area, XAxis, YAxis, ResponsiveContainer, Tooltip, AreaChart, BarChart, Bar } from 'recharts'
 import Row, { RowBetween, RowFixed } from '../Row'
 import { toK, toNiceDate, toWeeklyDate, toNiceDateYear, formattedNum, formattedPercent } from '../../utils'
@@ -12,6 +12,8 @@ import { useGlobalChartData, useGlobalData } from '../../contexts/GlobalData'
 import dayjs from 'dayjs'
 import styled from 'styled-components'
 import { ChevronDown as Arrow } from 'react-feather'
+import CustomChart from '../CustomChartVolume'
+import CustomChartArea from '../CustomChartArea'
 
 const CHART_VIEW = {
   VOLUME: 'Volume',
@@ -32,7 +34,6 @@ const Select = styled.div`
 
   width: fit-content;
   height: 24px;
-  /* border-radius: 20px; */
   font-weight: 400;
   font-size: 14px;
   color: ${({ theme }) => theme.text3};
@@ -150,7 +151,7 @@ const GlobalChart = ({ display }) => {
       ) : (
         <>
           <RowBetween marginBottom={'1rem'}>
-            <TYPE.light>{chartView}</TYPE.light>
+            <div />
             <RowFixed>
               {chartView === CHART_VIEW.VOLUME && (
                 <Select style={{ marginRight: '1rem' }}>
@@ -206,139 +207,23 @@ const GlobalChart = ({ display }) => {
               </Select>
             </RowFixed>
           </RowBetween>
-          <Row>
+          {/* <Row>
             <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={500} mr={2}>
               {chartView === CHART_VIEW.LIQUIDITY ? liquidity : volume}
             </TYPE.main>
             <TYPE.main fontSize={14}>{chartView === CHART_VIEW.LIQUIDITY ? liquidityChange : volumeChange}</TYPE.main>
-          </Row>
+          </Row> */}
         </>
       )}
+
       {chartData && chartView === CHART_VIEW.LIQUIDITY && (
         <ResponsiveContainer aspect={below1080 ? 60 / 28 : 60 / 28}>
-          <AreaChart margin={{ top: 20, right: 0, bottom: 6, left: 0 }} barCategoryGap={1} data={chartData}>
-            <Area
-              key={'other'}
-              dataKey={'totalLiquidityUSD'}
-              stackId="2"
-              strokeWidth={1}
-              stroke={'#ff007a'}
-              dot={false}
-              type="monotone"
-              name={'Liquidity'}
-              yAxisId={0}
-              opacity={'1'}
-              isAnimationActive={false}
-              fill="#ff007a80"
-            />
-            <XAxis
-              tickLine={true}
-              axisLine={true}
-              interval="preserveEnd"
-              tickMargin={16}
-              minTickGap={50}
-              tickFormatter={tick => toNiceDate(tick)}
-              dataKey="date"
-              // mirror={true}
-              tick={{ fill: 'black' }}
-              padding={{ right: 0, bottom: 0 }}
-              type={'number'}
-              domain={domain}
-            />
-            <YAxis
-              type="number"
-              orientation="right"
-              tickFormatter={tick => '$' + toK(tick)}
-              axisLine={true}
-              tickLine={true}
-              interval="preserveEnd"
-              minTickGap={50}
-              yAxisId={0}
-              // mirror={true}
-              padding={{ top: 0, bottom: 0 }}
-              tick={{ fill: 'black' }}
-              hide={below600}
-              contentStyle={{
-                zIndex: '100'
-              }}
-            />
-            <Tooltip
-              cursor={{ stroke: 'white', strokeWidth: 1 }}
-              formatter={val => '$' + toK(val, true)}
-              labelFormatter={label => toNiceDateYear(label)}
-              labelStyle={{ paddingTop: 4 }}
-              contentStyle={{
-                padding: '10px 14px',
-                borderRadius: 10,
-                borderColor: '#ff007a80',
-                color: 'black'
-              }}
-              wrapperStyle={{ top: -70, left: -10 }}
-            />
-          </AreaChart>
+          <CustomChartArea data={chartDataFiltered} base={totalLiquidityUSD} baseChange={liquidityChangeUSD} />
         </ResponsiveContainer>
       )}
       {chartData && chartView === CHART_VIEW.VOLUME && (
         <ResponsiveContainer aspect={60 / 28}>
-          <BarChart
-            margin={{ top: 20, right: 0, bottom: 6, left: 0 }}
-            data={volumeWindow === VOLUME_WINDOW.DAYS ? chartDataFiltered : weeklyData}
-            barCategoryGap={0}
-          >
-            <XAxis
-              tickLine={false}
-              axisLine={true}
-              interval="preserveStartEnd"
-              tickMargin={14}
-              tickFormatter={tick =>
-                volumeWindow === VOLUME_WINDOW.WEEKLY ? toWeeklyDate(tick - 1) : toNiceDate(tick)
-              }
-              dataKey="date"
-              tick={{ fill: 'black' }}
-              padding={{ right: 0, bottom: 0 }}
-              allowDataOverflow={true}
-              minTickGap={80}
-            />
-
-            <YAxis
-              axisLine={true}
-              tickFormatter={tick => '$' + toK(tick, true, true)}
-              tickLine={true}
-              interval="preserveEnd"
-              minTickGap={20}
-              padding={{ top: 0, bottom: 0, left: 20 }}
-              yAxisId={0}
-              tick={{ fill: 'black' }}
-              domain={[0, 'dataMax']}
-              orientation={'right'}
-            />
-            <Tooltip
-              cursor={{ fill: '#ff007a', opacity: 0.1 }}
-              formatter={val => '$' + toK(val, true)}
-              labelFormatter={label =>
-                volumeWindow === VOLUME_WINDOW.WEEKLY ? toWeeklyDate(label - 1) : toNiceDateYear(label)
-              }
-              labelStyle={{ paddingTop: 4 }}
-              contentStyle={{
-                padding: '10px 14px',
-                borderRadius: 10,
-                borderColor: '#ff007a80',
-                color: 'black'
-              }}
-              wrapperStyle={{ top: -70, left: -10 }}
-            />
-            <Bar
-              type="monotone"
-              name={'Volume'}
-              dataKey={volumeWindow === VOLUME_WINDOW.DAYS ? 'dailyVolumeUSD' : 'weeklyVolumeUSD'}
-              fill="#ff007a"
-              opacity={'0.5'}
-              yAxisId={0}
-              strokeWidth={2}
-              stroke={'#ff007a'}
-              isAnimationActive={false}
-            />
-          </BarChart>
+          <CustomChart data={chartDataFiltered} base={oneDayVolumeUSD} baseChange={volumeChangeUSD} />
         </ResponsiveContainer>
       )}
     </>
