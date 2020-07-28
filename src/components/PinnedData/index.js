@@ -11,6 +11,19 @@ import { X, Bookmark, ChevronRight } from 'react-feather'
 import { Hover } from '..'
 import TokenLogo from '../TokenLogo'
 
+const RightColumn = styled(AutoColumn)`
+  position: sticky;
+  top: 3rem;
+  padding: 1.25rem;
+  /* border-left: 1px solid ${({ theme }) => theme.bg3}; */
+  border: 1px solid ${({ theme }) => theme.bg3};
+  border-top-left-radius: 12px;
+  border-bottom-left-radius: 12px;
+  margin-top: 1rem;
+  /* border-bottom-left-radius: ${({ open }) => (open ? '12' : '12px')};
+  border-bottom: ${({ open, theme }) => (open ? '' : '1px solid' + theme.bg3)}; */
+`
+
 const Wrapper = styled.div`
   display: flex;
   flex-direction: row;
@@ -49,9 +62,9 @@ const Input = styled.input`
 `
 
 const SavedButton = styled(RowBetween)`
-  padding-bottom: 20px;
+  padding-bottom: ${({ theme, open }) => open && '20px'};
   border-bottom: ${({ theme, open }) => open && '1px solid' + theme.bg3};
-  margin-bottom: 2rem;
+  margin-bottom: ${({ theme, open }) => open && '2rem'};
 
   :hover {
     cursor: pointer;
@@ -77,15 +90,17 @@ function PinnedData({ history, open, setSavedOpen }) {
   }
 
   return !open ? (
-    <SavedButton open={open} onClick={() => setSavedOpen(true)}>
-      <Bookmark />
-      <TYPE.main ml={'4px'}>Saved</TYPE.main>
-    </SavedButton>
+    <RightColumn open={open}>
+      <SavedButton open={open} onClick={() => setSavedOpen(true)}>
+        <Bookmark size={16} />
+        {/* <TYPE.main ml={'4px'}>Saved</TYPE.main> */}
+      </SavedButton>
+    </RightColumn>
   ) : (
-    <AutoColumn gap="1rem">
+    <RightColumn gap="1rem" open={open}>
       <SavedButton onClick={() => setSavedOpen(false)} open={open}>
         <RowFixed>
-          <Bookmark />
+          <Bookmark size={16} />
           <TYPE.main ml={'4px'}>Saved</TYPE.main>
         </RowFixed>
         <ChevronRight />
@@ -183,7 +198,7 @@ function PinnedData({ history, open, setSavedOpen }) {
           )}
         </AutoColumn>
       </AutoColumn>
-    </AutoColumn>
+    </RightColumn>
   )
 }
 

@@ -6,19 +6,21 @@ import { TYPE } from '../../Theme'
 import { AutoColumn } from '../Column'
 import Title from '../Title'
 
+import { CustomLink } from '../Link'
+
 export const SubNav = styled.ul`
   list-style: none;
   position: sticky;
-  top: 0;
-  padding: 24px;
-  padding-top: 0rem;
-  height: 100%;
+  top: 2rem;
+  padding: 36px;
   margin-top: 0;
+  display: grid;
+  grid-auto-rows: 1fr;
+  grid-gap: 16px;
 `
-export const SubNavEl = styled.li`
+export const SubNavEl = styled(CustomLink)`
   list-style: none;
   display: flex;
-  margin-bottom: 2rem;
   width: 100%;
   font-weight: ${({ isActive }) => (isActive ? 600 : 500)};
   :hover {
@@ -52,27 +54,27 @@ function SideNav() {
 
   return (
     <SubNav>
-      <AutoColumn>
+      <AutoColumn gap={'24px'}>
         <Title />
-        <SubNavEl
-          onClick={() => handleScroll(OverviewRef)}
-          isActive={active === OverviewRef}
-          style={{ marginTop: '2rem' }}
-        >
+        <SubNavEl to="/" style={{ margintop: '1rem' }}>
           <TrendingUp size={20} style={{ marginRight: '1rem' }} />
-          <TYPE.main>Overview</TYPE.main>
+          <TYPE.main>Home</TYPE.main>
         </SubNavEl>
-        <SubNavEl onClick={() => handleScroll(PairsRef)} isActive={active === OverviewRef}>
+        <SubNavEl to="/pairs">
           <PieChart size={20} style={{ marginRight: '1rem' }} />
-          <TYPE.main>Top Pairs</TYPE.main>
+          <TYPE.main>Pairs</TYPE.main>
         </SubNavEl>
-        <SubNavEl onClick={() => handleScroll(TokensRef)} isActive={active === OverviewRef}>
+        <SubNavEl to="/tokens">
           <Disc size={20} style={{ marginRight: '1rem' }} />
-          <TYPE.main>Top Tokens</TYPE.main>
+          <TYPE.main>Tokens</TYPE.main>
         </SubNavEl>
-        <SubNavEl onClick={() => handleScroll(TransactionsRef)} isActive={active === OverviewRef}>
+        <SubNavEl to="/transactions">
           <List size={20} style={{ marginRight: '1rem' }} />
           <TYPE.main>Transactions</TYPE.main>
+        </SubNavEl>
+        <SubNavEl to="/accounts">
+          <List size={20} style={{ marginRight: '1rem' }} />
+          <TYPE.main>Accounts</TYPE.main>
         </SubNavEl>
       </AutoColumn>
     </SubNav>

@@ -88,7 +88,7 @@ const DataText = styled(Flex)`
   text-align: center;
 
   & > * {
-    font-size: 1em;
+    font-size: 14px;
   }
 
   @media screen and (max-width: 600px) {

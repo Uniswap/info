@@ -24,9 +24,7 @@ const PageWrapper = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 100px 2rem;
-  padding-top: 280px;
-  width: calc(100% - 64px);
+  /* width: calc(100% - 64px); */
 
   @media screen and (max-width: 1180px) {
     width: calc(100% - 40px);
@@ -53,12 +51,12 @@ const ListOptions = styled(AutoRow)`
 `
 
 const GridRow = styled.div`
-  display: inline-grid;
+  display: grid;
   width: 100%;
-  grid-template-columns: 50% 50%;
+  grid-template-columns: 1fr 1fr;
   column-gap: 6px;
   align-items: start;
-  justify-content: center;
+  justify-content: space-between;
 `
 
 const ChartWrapper = styled.div`
@@ -66,14 +64,14 @@ const ChartWrapper = styled.div`
 `
 
 const FixedMenu = styled.div`
-  position: fixed;
-  top: 0px;
-  width: calc(100% - 422px);
-  margin-top: 30px;
-  padding-top: 58px;
-  z-index: 9999;
-  max-width: 1440px;
+  width: 100%;
+  z-index: 99;
+  position: sticky;
+  top: -6rem;
+  padding-top: 1.5rem;
   background-color: white;
+  border-bottom: 1px solid ${({ theme }) => theme.bg3};
+  margin-bottom: 2rem;
 `
 
 function GlobalPage() {
@@ -102,33 +100,34 @@ function GlobalPage() {
   }, [])
 
   const handleScroll = ref => {
+    console.log(ref.current)
     setActive(ref.current)
-    document.querySelector('body').scrollTo({
+    window.scrollTo({
       behavior: 'smooth',
-      top: ref.current.offsetTop - 180
+      top: ref.current.offsetTop - 130
     })
   }
 
   return (
     <PageWrapper>
       <FixedMenu>
-        <AutoColumn gap="40px" style={{ padding: '0 40px' }}>
+        <AutoColumn gap="40px">
           <Search />
           <RowBetween>
             <TYPE.largeHeader>Uniswap Protocol Analytics</TYPE.largeHeader>
             <div />
           </RowBetween>
           <AutoRow gap="1rem" style={{ marginBottom: '1rem' }}>
-            <TYPE.main fontSize={'1.125rem'} onClick={() => handleScroll(OverviewRef)}>
-              Overview
+            <TYPE.main fontSize={'.825rem'} onClick={() => handleScroll(OverviewRef)}>
+              Charts
             </TYPE.main>
-            <TYPE.main fontSize={'1.125rem'} onClick={() => handleScroll(PairsRef)}>
+            <TYPE.main fontSize={'.825rem'} onClick={() => handleScroll(PairsRef)}>
               Top Pairs
             </TYPE.main>
-            <TYPE.main fontSize={'1.125rem'} onClick={() => handleScroll(TokensRef)}>
+            <TYPE.main fontSize={'.825rem'} onClick={() => handleScroll(TokensRef)}>
               Top Tokens
             </TYPE.main>
-            <TYPE.main fontSize={'1.125rem'} onClick={() => handleScroll(TransactionsRef)}>
+            <TYPE.main fontSize={'.825rem'} onClick={() => handleScroll(TransactionsRef)}>
               Transactions
             </TYPE.main>
           </AutoRow>
@@ -139,7 +138,7 @@ function GlobalPage() {
         <Box mb={20}>
           <Panel>
             <Box>
-              <AutoColumn gap="40px">
+              <AutoColumn gap="36px">
                 <AutoColumn gap="20px">
                   <RowBetween>
                     <TYPE.main>Volume (24hrs)</TYPE.main>
@@ -194,7 +193,7 @@ function GlobalPage() {
       )}
       <ListOptions ref={PairsRef} gap="10px" style={{ marginTop: '2rem', marginBottom: '.5rem' }}>
         <RowBetween>
-          <TYPE.main fontSize={'1.125rem'}>Top Pairs</TYPE.main>
+          <TYPE.main fontSize={'1rem'}>Top Pairs</TYPE.main>
           <CustomLink to={'/all-pairs'}>See All</CustomLink>
         </RowBetween>
       </ListOptions>

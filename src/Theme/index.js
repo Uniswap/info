@@ -74,7 +74,7 @@ const TextWrapper = styled(Text)`
 
 export const TYPE = {
   main(props) {
-    return <TextWrapper fontWeight={500} color={'text1'} {...props} />
+    return <TextWrapper fontWeight={500} fontSize={14} color={'text1'} {...props} />
   },
 
   small(props) {
@@ -156,7 +156,7 @@ export const GlobalStyle = createGlobalStyle`
     padding: 0;
     width: 100%;
     height: 100%;
-    overflow: auto;
+    /* overflow: auto; */
     font-size: 14px;    
   }
 
@@ -205,7 +205,7 @@ export const GlobalStyle = createGlobalStyle`
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-    overflow: auto;
+    /* overflow: auto; */
     height: 100%;
   }
 `

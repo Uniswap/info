@@ -105,7 +105,7 @@ const DataText = styled(Flex)`
   text-align: right;
 
   & > * {
-    font-size: 1em;
+    font-size: 14px;
   }
 `
 

@@ -20,47 +20,27 @@ import PinnedData from './components/PinnedData'
 const AppWrapper = styled.div`
   position: relative;
   width: 100%;
-  max-width: 100vw;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
 `
 const ContentWrapper = styled.div`
-  height: 100%;
+  display: grid;
+  grid-template-columns: ${({ open }) => (open ? '220px 1fr 220px' : '220px 1fr 80px')};
+  grid-gap: 2rem;
 `
 
 const Left = styled.div`
-  width: 200px;
-  top: 0px;
-  padding-top: 80px;
-  bottom: 0px;
-  position: fixed;
-  height: 100%;
-  left: 0;
   border-right: 1px solid ${({ theme }) => theme.bg3};
+  display: block;
+  
+  /* background-color: ${({ theme }) => theme.bg2}; */
 `
 
 const Right = styled.div`
-  width:  ${({ open }) => (open ? '148px' : '80px')};
-  top: 80px;
-  bottom: 0px;
-  position: fixed;
-  height: ${({ open }) => (open ? '100%' : '20px')}
-  right: 0;
-  padding: 2rem;
-  border-left: 1px solid ${({ theme }) => theme.bg3};
-  border-top: 1px solid ${({ theme }) => theme.bg3};
-  border-top-left-radius: 25px;
-  border-bottom-left-radius: ${({ open }) => (open ? '0' : '25px')}
-  border-bottom: ${({ open, theme }) => (open ? '' : '1px solid' + theme.bg3)}
+  width: ${({ open }) => (open ? '220px' : '80px')};
+  height: ${({ open }) => (open ? '100%' : '20px')};
 `
 
 const Center = styled.div`
-  height: 100%
-  margin: 0px 200px;
-  margin-right: 220px;
+  height: 100%;
 `
 
 function App() {
@@ -134,11 +114,11 @@ function App() {
 
               <Route path="/home">
                 <NavHeaderUpdated />
-                <ContentWrapper>
+                <ContentWrapper open={savedOpen}>
                   <Left>
                     <SideNav />
                   </Left>
-                  <Center>
+                  <Center id="center">
                     <GlobalPage />
                   </Center>
                   <Right open={savedOpen}>
