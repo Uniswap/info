@@ -63,11 +63,6 @@ const DashGrid = styled.div`
     grid-template-columns: 180px 1fr 1fr 1fr;
     grid-template-areas: 'name symbol liq vol ';
 
-    :hover {
-      cursor: ${({ focus }) => focus && 'pointer'};
-      background-color: ${({ focus, theme }) => focus && theme.bg2};
-    }
-
     > * {
       justify-content: flex-end;
       width: 100%;
@@ -176,7 +171,7 @@ function TopTokenList({ tokens, history, itemMax = 10 }) {
       return ''
     }
     return (
-      <DashGrid style={{ height: '48px' }} focus={true} onClick={() => history.push('/token/' + item.id)}>
+      <DashGrid style={{ height: '48px' }} focus={true}>
         <DataText area="name" fontWeight="500">
           <Row>
             {!below680 && <div style={{ marginRight: '1rem' }}>{index}</div>}

@@ -45,10 +45,6 @@ const DashGrid = styled.div`
   grid-template-areas: 'name liq vol';
   padding: 0 1.125rem;
 
-  :hover {
-    cursor: ${({ focus }) => focus && 'pointer'};
-    background-color: ${({ focus, theme }) => focus && theme.bg2};
-  }
 
   > * {
     justify-content: flex-end;
@@ -164,12 +160,7 @@ function PairList({ pairs, color, history, disbaleLinks, maxItems = 10 }) {
       }
 
       return (
-        <DashGrid
-          style={{ height: '48px' }}
-          disbaleLinks={disbaleLinks}
-          focus={true}
-          onClick={() => history.push('/pair/' + pairAddress)}
-        >
+        <DashGrid style={{ height: '48px' }} disbaleLinks={disbaleLinks} focus={true}>
           <DataText area="name" fontWeight="500">
             {!below600 && <div style={{ marginRight: '20px' }}>{index}</div>}
             <DoubleTokenLogo
