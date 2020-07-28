@@ -109,8 +109,6 @@ function GlobalPage() {
     })
   }
 
-  console.log(active)
-
   return (
     <PageWrapper>
       {!below800 && (

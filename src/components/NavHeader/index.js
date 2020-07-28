@@ -62,6 +62,7 @@ const SearchContainer = styled.div`
 export default function NavHeader({ token, pair, account }) {
   const isHome = !token && !pair && !account
 
+  const below1280 = useMedia('(max-width: 1280px)')
   const below1180 = useMedia('(max-width: 1180px)')
   const below1024 = useMedia('(max-width: 1024px)')
   const below600 = useMedia('(max-width: 600px)')
@@ -82,6 +83,8 @@ export default function NavHeader({ token, pair, account }) {
     oneDayVolumeUSD && v1Data?.dailyVolumeUSD ? '$' + toK(oneDayVolumeUSD + v1Data?.dailyVolumeUSD, true) : ''
 
   const seconds = useSessionStart()
+
+  const oneDayFees = oneDayVolumeUSD ? formattedNum(oneDayVolumeUSD * 0.003, true) : ''
 
   return below600 ? (
     <Header style={{ paddingBottom: '1rem', borderBottom: '1px solid #edeef2' }}>
@@ -133,6 +136,11 @@ export default function NavHeader({ token, pair, account }) {
           {!below1180 && (
             <HeaderText>
               Transactions (24H): <b>{oneDayTxns}</b>&nbsp;{txnChangeFormatted && txnChangeFormatted}
+            </HeaderText>
+          )}
+          {!below1280 && (
+            <HeaderText>
+              Fees (24H): <b>{oneDayFees}</b>&nbsp;
             </HeaderText>
           )}
         </RowFixed>
