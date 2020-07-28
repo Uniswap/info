@@ -12,7 +12,7 @@ export const SubNav = styled.ul`
   list-style: none;
   position: sticky;
   top: 2rem;
-  padding: 36px;
+  padding: 32px;
   margin-top: 0;
   display: grid;
   grid-auto-rows: 1fr;
