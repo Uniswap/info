@@ -14,6 +14,7 @@ import UniPrice from '../UniPrice'
 
 import { ButtonDark } from '../ButtonStyled'
 import Link from '../Link'
+import { useSessionStart } from '../../contexts/Application'
 
 const Header = styled.div`
   width: 100%;
@@ -21,7 +22,7 @@ const Header = styled.div`
   margin-bottom: 2rem;
   position: sticky;
   top: 0;
-  z-index: 99;
+  z-index: 9999;
 `
 
 const CombinedWrapper = styled(RowFixed)`
@@ -52,16 +53,23 @@ const PollingDot = styled.div`
   border-radius: 50%;
   background-color: ${({ theme }) => theme.green1};
 `
+const SearchContainer = styled.div`
+  @media screen and (max-width: 640px) {
+    padding: 0 20px;
+  }
+`
 
 export default function NavHeader({ token, pair, account }) {
   const isHome = !token && !pair && !account
 
+  const below1180 = useMedia('(max-width: 1180px)')
   const below1024 = useMedia('(max-width: 1024px)')
   const below600 = useMedia('(max-width: 600px)')
+  const below816 = useMedia('(max-width: 816px)')
 
   const [showPriceCard, setShowPriceCard] = useState(false)
 
-  const { totalLiquidityUSD, oneDayVolumeUSD, oneDayTxns, v1Data, txnChange } = useGlobalData()
+  const { totalLiquidityUSD, oneDayVolumeUSD, oneDayTxns, v1Data, txnChange, pairCount } = useGlobalData()
   const [ethPrice] = useEthPrice()
   const formattedEthPrice = ethPrice ? formattedNum(ethPrice, true) : '-'
   let txnChangeFormatted = txnChange ? formattedPercent(txnChange) : '-'
@@ -72,20 +80,26 @@ export default function NavHeader({ token, pair, account }) {
       : ''
   const volume =
     oneDayVolumeUSD && v1Data?.dailyVolumeUSD ? '$' + toK(oneDayVolumeUSD + v1Data?.dailyVolumeUSD, true) : ''
+
+  const seconds = useSessionStart()
+
   return below600 ? (
-    <Header>
+    <Header style={{ paddingBottom: '1rem', borderBottom: '1px solid #edeef2' }}>
       <AutoColumn gap="20px">
         <Title token={token} pair={pair} />
-        {!isHome && <Search small={true} />}
+        {!isHome && (
+          <SearchContainer>
+            <Search small={true} />
+          </SearchContainer>
+        )}
       </AutoColumn>
     </Header>
   ) : (
     <Header>
       <Polling>
-        {/* <Spinner /> */}
         <PollingDot />
         <TYPE.small>
-          Last Updated 2s ago <a href="/">(refresh)</a>
+          Last Updated {!!seconds ? seconds + 's' : '-'} ago <a href="/">(refresh)</a>
         </TYPE.small>
       </Polling>
       <RowBetween style={{ padding: '0.5rem 1rem', backgroundColor: '#f7f8fa', borderBottom: '1px solid #edeef2' }}>
@@ -101,18 +115,26 @@ export default function NavHeader({ token, pair, account }) {
             ETH Price: <b>{formattedEthPrice}</b>
             {showPriceCard && <UniPrice />}
           </HeaderText>
-          <HeaderText>
-            Combined Liquidity: <b>{liquidity}</b>
-          </HeaderText>
-          <HeaderText>
-            Combined Volume: <b>{volume}</b>
-          </HeaderText>
-          <HeaderText>
-            Pairs: <b>{volume}</b>
-          </HeaderText>
-          <HeaderText>
-            Transactions (24H): <b>{oneDayTxns}</b>&nbsp;{txnChangeFormatted && txnChangeFormatted}
-          </HeaderText>
+          {!below816 && (
+            <HeaderText>
+              Combined Liquidity: <b>{liquidity}</b>
+            </HeaderText>
+          )}
+          {!below816 && (
+            <HeaderText>
+              Combined Volume: <b>{volume}</b>
+            </HeaderText>
+          )}
+          {!below1024 && (
+            <HeaderText>
+              Pairs: <b>{pairCount}</b>
+            </HeaderText>
+          )}
+          {!below1180 && (
+            <HeaderText>
+              Transactions (24H): <b>{oneDayTxns}</b>&nbsp;{txnChangeFormatted && txnChangeFormatted}
+            </HeaderText>
+          )}
         </RowFixed>
 
         <RowFixed style={{}}>
@@ -143,20 +165,11 @@ export default function NavHeader({ token, pair, account }) {
         <RowFixed>
           {!isHome && (
             <div style={{ width: '370px' }}>
-              {' '}
               <Search small={true} />
             </div>
           )}
           {isHome && (
             <CombinedWrapper>
-              {!below1024 && (
-                <>
-                  <HeaderText>Protocol Stats</HeaderText>
-                  <HeaderText>Tokens</HeaderText>
-                  <HeaderText>Pairs</HeaderText>
-                  <HeaderText>Transactions</HeaderText>
-                </>
-              )}
               <Link href="https://migrate.uniswap.info" target="_blank">
                 <ButtonDark style={{ minWidth: 'initial' }}>Launch App</ButtonDark>
               </Link>

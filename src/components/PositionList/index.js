@@ -61,6 +61,11 @@ const DashGrid = styled.div`
     grid-template-columns: 35px 2.5fr 1fr 1fr;
     grid-template-areas: 'number name uniswap return';
   }
+
+  @media screen and (max-width: 740px) {
+    grid-template-columns: 2.5fr 1fr 1fr;
+    grid-template-areas: 'name uniswap return';
+  }
 `
 
 const ListWrapper = styled.div``
@@ -95,7 +100,6 @@ const SORT_FIELD = {
 
 function PositionList({ positions }) {
   const below740 = useMedia('(max-width: 740px)')
-  const below1080 = useMedia('(max-width: 1080px)')
 
   // pagination
   const [page, setPage] = useState(1)
@@ -129,7 +133,7 @@ function PositionList({ positions }) {
 
     return (
       <DashGrid focus={true}>
-        <DataText area="number">{index}</DataText>
+        {!below740 && <DataText area="number">{index}</DataText>}
         <DataText area="name" fontWeight="500" justifyContent="flex-start" alignItems="flex-start">
           <AutoColumn gap="8px" justify="flex-start" align="flex-start">
             <DoubleTokenLogo size={16} a0={position.pair.token0.id} a1={position.pair.token1.id} margin={!below740} />
@@ -230,42 +234,42 @@ function PositionList({ positions }) {
   return (
     <ListWrapper>
       <DashGrid center={true} style={{ height: '32px', padding: 0 }}>
-        <Flex alignItems="flex-start" justifyContent="flexStart">
-          <Text area="number" fontWeight="500">
-            #
-          </Text>
-        </Flex>
+        {!below740 && (
+          <Flex alignItems="flex-start" justifyContent="flexStart">
+            <Text area="number" fontWeight="500">
+              #
+            </Text>
+          </Flex>
+        )}
         <Flex alignItems="flex-start" justifyContent="flex-start">
           <Text area="name" fontWeight="500">
             Name
           </Text>
         </Flex>
-        {!below1080 && (
-          <Flex alignItems="center" justifyContent="flexEnd">
-            <ClickableText
-              area="uniswap"
-              onClick={e => {
-                setSortedColumn(SORT_FIELD.VALUE)
-                setSortDirection(sortedColumn !== SORT_FIELD.VALUE ? true : !sortDirection)
-              }}
-            >
-              Liquidity Value {sortedColumn === SORT_FIELD.VALUE ? (!sortDirection ? '↑' : '↓') : ''}
-            </ClickableText>
-          </Flex>
-        )}
-        {!below1080 && (
-          <Flex alignItems="center" justifyContent="flexEnd">
-            <ClickableText
-              area="return"
-              onClick={() => {
-                setSortedColumn(SORT_FIELD.UNISWAP_RETURN)
-                setSortDirection(sortedColumn !== SORT_FIELD.UNISWAP_RETURN ? true : !sortDirection)
-              }}
-            >
-              Total Fees Earned {sortedColumn === SORT_FIELD.UNISWAP_RETURN ? (!sortDirection ? '↑' : '↓') : ''}
-            </ClickableText>
-          </Flex>
-        )}
+        <Flex alignItems="center" justifyContent="flexEnd">
+          <ClickableText
+            area="uniswap"
+            onClick={e => {
+              setSortedColumn(SORT_FIELD.VALUE)
+              setSortDirection(sortedColumn !== SORT_FIELD.VALUE ? true : !sortDirection)
+            }}
+          >
+            {below740 ? 'Value' : 'Liquidity Value'}{' '}
+            {sortedColumn === SORT_FIELD.VALUE ? (!sortDirection ? '↑' : '↓') : ''}
+          </ClickableText>
+        </Flex>
+        <Flex alignItems="center" justifyContent="flexEnd">
+          <ClickableText
+            area="return"
+            onClick={() => {
+              setSortedColumn(SORT_FIELD.UNISWAP_RETURN)
+              setSortDirection(sortedColumn !== SORT_FIELD.UNISWAP_RETURN ? true : !sortDirection)
+            }}
+          >
+            {below740 ? 'Fees' : 'Total Fees Earned'}{' '}
+            {sortedColumn === SORT_FIELD.UNISWAP_RETURN ? (!sortDirection ? '↑' : '↓') : ''}
+          </ClickableText>
+        </Flex>
       </DashGrid>
       <Divider />
       <List p={0}>{!positionsSorted ? <LocalLoader /> : positionsSorted}</List>

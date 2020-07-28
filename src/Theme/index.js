@@ -166,16 +166,31 @@ export const GlobalStyle = createGlobalStyle`
 
   
 .three-line-legend {
-	width: 96px;
+	width: 100%;
 	height: 70px;
 	position: absolute;
 	padding: 8px;
 	font-size: 12px;
-	color: '#20262E';
+	color: #20262E;
 	background-color: rgba(255, 255, 255, 0.23);
 	text-align: left;
-	z-index: 1000;
-	pointer-events: none;
+	z-index: 10;
+  pointer-events: none;
+}
+
+@media screen and (max-width: 800px) {
+  .three-line-legend {
+    display: none !important;
+  }
+}
+
+.tv-lightweight-charts{
+  width: 100% !important;
+  
+
+  & > * {
+    width: 100% !important;
+  }
 }
 
 
@@ -183,7 +198,6 @@ export const GlobalStyle = createGlobalStyle`
     font-size: 1rem;
     font-variant: none;
     color: 'black';
-    /* background-color: ${({ theme }) => theme.backgroundColor}; */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0);

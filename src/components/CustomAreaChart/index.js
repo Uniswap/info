@@ -3,25 +3,28 @@ import React, { useState, useEffect, useRef } from 'react'
 import { createChart } from 'lightweight-charts'
 import dayjs from 'dayjs'
 import { formattedNum } from '../../utils'
+import { useMedia } from 'react-use'
 
-const CustomChartArea = ({ data, base, baseChange }) => {
+const CustomAreaChart = ({ data, base, baseChange, title, field }) => {
   const ref = useRef()
 
   var width = 400
   var height = 300
+
+  const below1180 = useMedia('(max-width: 1180px)')
+  const below800 = useMedia('(max-width: 800px)')
 
   const [chartCreated, setChartCreated] = useState(false)
 
   const formattedData = data?.map(entry => {
     return {
       time: dayjs.unix(entry.date).format('YYYY-MM-DD'),
-      value: parseFloat(entry.totalLiquidityUSD)
+      value: parseFloat(entry[field])
     }
   })
 
   useEffect(() => {
     if (!chartCreated && formattedData) {
-      setChartCreated(true)
       var chart = createChart(ref.current, {
         width: width,
         height: height,
@@ -82,13 +85,17 @@ const CustomChartArea = ({ data, base, baseChange }) => {
 
       function setLastBarText() {
         var dateStr =
-          formattedData[formattedData.length - 1].time.year +
+          dayjs()
+            .year()
+            .toString() +
           ' - ' +
-          formattedData[formattedData.length - 1].time.month +
+          (dayjs().month() + 1).toString() +
           ' - ' +
-          formattedData[formattedData.length - 1].time.day
+          dayjs()
+            .date()
+            .toString()
         toolTip.innerHTML =
-          '<div style="font-size: 16px; margin: 4px 0px; color: #20262E;">Liquidity</div>' +
+          `<div style="font-size: 16px; margin: 4px 0px; color: #20262E;">${title}</div>` +
           '<div style="font-size: 22px; margin: 4px 0px; color: #20262E">' +
           formattedNum(base, true) +
           `<span style="margin-left: 10px; font-size: 16px; color: green;">${formattedPercentChange}</span>` +
@@ -113,7 +120,7 @@ const CustomChartArea = ({ data, base, baseChange }) => {
           var price = param.seriesPrices.get(series)
 
           toolTip.innerHTML =
-            '<div style="font-size: 16px; margin: 4px 0px; color: #20262E; ">Liquidity </div>' +
+            `<div style="font-size: 16px; margin: 4px 0px; color: #20262E;">${title}</div>` +
             '<div style="font-size: 22px; margin: 4px 0px; color: #20262E">' +
             formattedNum(price, true) +
             '</div>' +
@@ -122,10 +129,23 @@ const CustomChartArea = ({ data, base, baseChange }) => {
             '</div>'
         }
       })
+
+      setChartCreated(chart)
     }
-  }, [base, baseChange, chartCreated, data, formattedData, height, width])
+  }, [base, baseChange, chartCreated, data, formattedData, height, title, width])
+
+  // responsiveness
+
+  useEffect(() => {
+    if (below1180) {
+      chartCreated && chartCreated.resize(320, height)
+    }
+    if (below800) {
+      chartCreated && chartCreated.resize(800, height)
+    }
+  })
 
   return <div ref={ref} />
 }
 
-export default CustomChartArea
+export default CustomAreaChart

@@ -68,12 +68,12 @@ const DashGrid = styled.div`
 
   @media screen and (min-width: 1080px) {
     grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr ;
-    grid-template-areas: ' name liq vol volWeek fees APY ';
+    grid-template-areas: ' name liq vol volWeek fees ';
   }
 
   @media screen and (min-width: 1200px) {
     grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr;
-    grid-template-areas: ' name liq vol volWeek fees APY';
+    grid-template-areas: ' name liq vol volWeek fees';
   }
 `
 
@@ -114,8 +114,7 @@ const FIELD_TO_VALUE = {
   [SORT_FIELD.VOL]: 'oneDayVolumeUSD',
   [SORT_FIELD.TXNS]: 'oneDayTxns',
   [SORT_FIELD.VOL_7DAYS]: 'oneWeekVolumeUSD',
-  [SORT_FIELD.FEES]: 'oneDayVolumeUSD',
-  [SORT_FIELD.APY]: 'oneDayVolumeUSD'
+  [SORT_FIELD.FEES]: 'oneDayVolumeUSD'
 }
 
 function PairList({ pairs, color, history, disbaleLinks, maxItems = 10 }) {
@@ -187,7 +186,6 @@ function PairList({ pairs, color, history, disbaleLinks, maxItems = 10 }) {
           <DataText area="vol">{volume}</DataText>
           {!below1080 && <DataText area="volWeek">{formattedNum(pairData.oneWeekVolumeUSD, true)}</DataText>}
           {!below1080 && <DataText area="fees">{formattedNum(pairData.oneDayVolumeUSD * 0.003, true)}</DataText>}
-          {!below1080 && <DataText area="APY">{formattedNum(pairData.oneDayVolumeUSD * 0.003, true)}</DataText>}
         </DashGrid>
       )
     } else {
@@ -277,11 +275,6 @@ function PairList({ pairs, color, history, disbaleLinks, maxItems = 10 }) {
             >
               Fees (24hr) {sortedColumn === SORT_FIELD.FEES ? (!sortDirection ? '↑' : '↓') : ''}
             </ClickableText>
-          </Flex>
-        )}
-        {!below740 && (
-          <Flex alignItems="center" justifyContent="center">
-            <Text area="pool">30d APY</Text>
           </Flex>
         )}
       </DashGrid>

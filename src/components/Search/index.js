@@ -24,11 +24,7 @@ const Wrapper = styled.div`
   background: ${({ theme }) => theme.bg2};
   border-bottom-right-radius: ${({ open }) => (open ? '0px' : '12px')};
   border-bottom-left-radius: ${({ open }) => (open ? '0px' : '12px')};
-  /* ${({ small }) =>
-    !small &&
-    ` box-shadow: 0 2.8px 2.8px -9px rgba(0, 0, 0, 0.008), 0 6.7px 6.7px -9px rgba(0, 0, 0, 0.012),
-    0 12.5px 12.6px -9px rgba(0, 0, 0, 0.015), 0 22.3px 22.6px -9px rgba(0, 0, 0, 0.018),
-    0 41.8px 42.2px -9px rgba(0, 0, 0, 0.022), 0 100px 101px -9px rgba(0, 0, 0, 0.03);`}; */
+  z-index: 9999;
 `
 const Input = styled.input`
   position: relative;
@@ -64,7 +60,7 @@ const SearchIconLarge = styled(SearchIcon)`
 const Menu = styled.div`
   display: flex;
   flex-direction: column;
-  z-index: 10;
+  z-index: 9999;
   width: 100%;
   top: 50px;
   max-height: 540px;

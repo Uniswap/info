@@ -43,8 +43,21 @@ const PageWrapper = styled.div`
   grid-template-columns: 180px 1fr 256px;
   grid-gap: 24px;
   padding: 0 24px;
+  width: calc(100% - 48px);
   max-width: 1440px;
   padding-bottom: 100px;
+
+  @media screen and (max-width: 1280px) {
+    grid-template-columns: 180px 1fr 200px;
+  }
+
+  @media screen and (max-width: 1180px) {
+    grid-template-columns: 180px 1fr;
+  }
+
+  @media screen and (max-width: 800px) {
+    grid-template-columns: 1fr;
+  }
 
   @media screen and (max-width: 640px) {
     width: calc(100% - 40px);
@@ -202,7 +215,9 @@ function PairPage({ pairAddress, history }) {
   // txn percentage change
   const txnChangeFormatted = formattedPercent(txnChange)
 
+  const below1180 = useMedia('(max-width: 1180px)')
   const below1080 = useMedia('(max-width: 1080px)')
+  const below800 = useMedia('(max-width: 800px)')
   const below600 = useMedia('(max-width: 600px)')
 
   const [dismissed, markAsDismissed] = usePathDismissed(history.location.pathname)
@@ -210,7 +225,6 @@ function PairPage({ pairAddress, history }) {
   const OverviewRef = useRef()
   const DataRef = useRef()
   const TransactionsRef = useRef()
-  const InfoRef = useRef()
 
   const [active, setActive] = useState(null)
 
@@ -230,21 +244,23 @@ function PairPage({ pairAddress, history }) {
 
   return (
     <PageWrapper>
-      <SubNav>
-        <SubNavEl onClick={() => handleScroll(OverviewRef)} isActive={active === OverviewRef}>
-          <TrendingUp size={20} style={{ marginRight: '1rem' }} />
-          <TYPE.main>Overview</TYPE.main>
-        </SubNavEl>
-        <SubNavEl onClick={() => handleScroll(TransactionsRef)} isActive={active === TransactionsRef}>
-          <List size={20} style={{ marginRight: '1rem' }} />
-          <TYPE.main>Transactions</TYPE.main>
-        </SubNavEl>
-        <SubNavEl onClick={() => handleScroll(DataRef)} isActive={active === DataRef}>
-          <PieChart size={20} style={{ marginRight: '1rem' }} />
-          <TYPE.main>Pair Data</TYPE.main>
-        </SubNavEl>
-        <PinnedData />
-      </SubNav>
+      {!below800 && (
+        <SubNav>
+          <SubNavEl onClick={() => handleScroll(OverviewRef)} isActive={active === OverviewRef}>
+            <TrendingUp size={20} style={{ marginRight: '1rem' }} />
+            <TYPE.main>Overview</TYPE.main>
+          </SubNavEl>
+          <SubNavEl onClick={() => handleScroll(TransactionsRef)} isActive={active === TransactionsRef}>
+            <List size={20} style={{ marginRight: '1rem' }} />
+            <TYPE.main>Transactions</TYPE.main>
+          </SubNavEl>
+          <SubNavEl onClick={() => handleScroll(DataRef)} isActive={active === DataRef}>
+            <PieChart size={20} style={{ marginRight: '1rem' }} />
+            <TYPE.main>Pair Data</TYPE.main>
+          </SubNavEl>
+          <PinnedData />
+        </SubNav>
+      )}
       <div>
         <Warning
           type={'pair'}
@@ -416,7 +432,8 @@ function PairPage({ pairAddress, history }) {
                   <PairChart address={pairAddress} color={backgroundColor} />
                 </Panel>
               </PanelWrapper>
-              <TYPE.main ref={TransactionsRef} fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
+              <span ref={TransactionsRef} />
+              <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
                 Transactions
               </TYPE.main>{' '}
               <Panel
@@ -485,9 +502,11 @@ function PairPage({ pairAddress, history }) {
           </DashboardWrapper>
         </WarningGrouping>
       </div>
-      <SideBar>
-        <WalletPreview />
-      </SideBar>
+      {!below1180 && (
+        <SideBar>
+          <WalletPreview />
+        </SideBar>
+      )}
     </PageWrapper>
   )
 }

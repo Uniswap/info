@@ -390,6 +390,7 @@ export const GLOBAL_DATA = block => {
         totalLiquidityUSD
         totalLiquidityETH
         txCount
+        pairCount
       }
     }`
     : `query uniswapFactories {
@@ -401,6 +402,7 @@ export const GLOBAL_DATA = block => {
         totalLiquidityUSD
         totalLiquidityETH
         txCount
+        pairCount
       }
     }`
 

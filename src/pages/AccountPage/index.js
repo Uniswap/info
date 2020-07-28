@@ -35,6 +35,14 @@ const PageWrapper = styled.div`
   width: calc(100% - 48px);
   max-width: 1440px;
 
+  @media screen and (max-width: 1080px) {
+    grid-template-columns: 180px 1fr;
+  }
+
+  @media screen and (max-width: 800px) {
+    grid-template-columns: 1fr;
+  }
+
   @media screen and (max-width: 640px) {
     width: calc(100% - 40px);
     padding: 0 20px;
@@ -102,6 +110,15 @@ const MenuRow = styled(Row)`
   }
 `
 
+const PanelWrapper = styled.div`
+  grid-template-columns: 1fr;
+  grid-template-rows: max-content;
+  gap: 6px;
+  display: inline-grid;
+  width: 100%;
+  align-items: start;
+`
+
 const CenterWrapper = styled.div``
 
 const LIST_VIEW = {
@@ -118,8 +135,11 @@ function AccountPage({ account }) {
   // settings for list view and dropdowns
   const [showDropdown, setShowDropdown] = useState(false)
   const [listView, setListView] = useState(LIST_VIEW.POSITIONS)
-  const below1080 = useMedia('(max-width: 1080px)')
   const [activePosition, setActivePosition] = useState()
+
+  const below1080 = useMedia('(max-width: 1080px)')
+  const below800 = useMedia('(max-width: 800px)')
+  const below600 = useMedia('(max-width: 600px)')
 
   // get data for user stats
   const transactionCount = transactions?.swaps?.length + transactions?.burns?.length + transactions?.mints?.length
@@ -170,17 +190,19 @@ function AccountPage({ account }) {
 
   return (
     <PageWrapper>
-      <SubNav>
-        <SubNavEl onClick={() => handleScroll(OverviewRef)} isActive={active === OverviewRef}>
-          <TrendingUp size={20} style={{ marginRight: '1rem' }} />
-          <TYPE.main>Overview</TYPE.main>
-        </SubNavEl>
-        <SubNavEl onClick={() => handleScroll(StatsRef)} isActive={active === OverviewRef}>
-          <PieChart size={20} style={{ marginRight: '1rem' }} />
-          <TYPE.main>Account Stats</TYPE.main>
-        </SubNavEl>
-        <PinnedData />
-      </SubNav>
+      {!below800 && (
+        <SubNav>
+          <SubNavEl onClick={() => handleScroll(OverviewRef)} isActive={active === OverviewRef}>
+            <TrendingUp size={20} style={{ marginRight: '1rem' }} />
+            <TYPE.main>Overview</TYPE.main>
+          </SubNavEl>
+          <SubNavEl onClick={() => handleScroll(StatsRef)} isActive={active === OverviewRef}>
+            <PieChart size={20} style={{ marginRight: '1rem' }} />
+            <TYPE.main>Account Stats</TYPE.main>
+          </SubNavEl>
+          <PinnedData />
+        </SubNav>
+      )}
       <CenterWrapper>
         <Header ref={OverviewRef}>
           <RowBetween>
@@ -293,21 +315,23 @@ function AccountPage({ account }) {
               </AutoColumn>
             </AutoRow>
           </Panel>
-          <Panel style={{ gridColumn: below1080 ? '1' : '2/4', gridRow: below1080 ? '' : '1/6' }}>
-            {activePosition ? (
-              <PairReturnsChart account={account} position={activePosition} />
-            ) : (
-              <UserChart account={account} position={activePosition} />
-            )}
-          </Panel>
+          <PanelWrapper>
+            <Panel style={{ gridColumn: '1' }}>
+              {activePosition ? (
+                <PairReturnsChart account={account} position={activePosition} />
+              ) : (
+                <UserChart account={account} position={activePosition} />
+              )}
+            </Panel>
+          </PanelWrapper>
           <AutoColumn gap="16px" ref={StatsRef}>
-            <ListOptions gap="10px" style={{ marginTop: '1rem' }}>
+            <ListOptions gap="10px" style={{ marginTop: '2rem' }}>
               <Hover>
                 <TYPE.main
                   onClick={() => {
                     setListView(LIST_VIEW.POSITIONS)
                   }}
-                  fontSize={'1.125rem'}
+                  fontSize={below600 ? '14px' : '1.125rem'}
                   color={listView !== LIST_VIEW.POSITIONS ? '#aeaeae' : 'black'}
                 >
                   Positions
@@ -318,7 +342,7 @@ function AccountPage({ account }) {
                   onClick={() => {
                     setListView(LIST_VIEW.TRANSACTIONS)
                   }}
-                  fontSize={'1.125rem'}
+                  fontSize={below600 ? '14px' : '1.125rem'}
                   color={listView !== LIST_VIEW.TRANSACTIONS ? '#aeaeae' : 'black'}
                 >
                   Transactions
@@ -329,7 +353,7 @@ function AccountPage({ account }) {
                   onClick={() => {
                     setListView(LIST_VIEW.STATS)
                   }}
-                  fontSize={'1.125rem'}
+                  fontSize={below600 ? '14px' : '1.125rem'}
                   color={listView !== LIST_VIEW.STATS ? '#aeaeae' : 'black'}
                 >
                   Account Stats
@@ -379,9 +403,11 @@ function AccountPage({ account }) {
           </Panel>
         </DashboardWrapper>
       </CenterWrapper>
-      <SideBar>
-        <WalletPreview />
-      </SideBar>
+      {!below1080 && (
+        <SideBar>
+          <WalletPreview />
+        </SideBar>
+      )}
     </PageWrapper>
   )
 }

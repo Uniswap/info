@@ -39,6 +39,7 @@
     "react-iframe": "^1.8.0",
     "react-parallax": "^2.2.4",
     "react-popper": "^2.2.3",
+    "react-resize-observer": "^1.1.1",
     "react-router-dom": "^5.1.2",
     "react-scripts": "^3.1.1",
     "react-scroll": "^1.8.0",

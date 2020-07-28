@@ -7,9 +7,11 @@ dayjs.extend(utc)
 
 const UPDATE = 'UPDATE'
 const UPDATE_TIMEFRAME = 'UPDATE_TIMEFRAME'
+const UPDATE_SESSION_START = 'UPDATE_SESSION_START'
 
 const TIME_KEY = 'TIME_KEY'
 const CURRENCY = 'CURRENCY'
+const SESSION_START = 'SESSION_START'
 
 const ApplicationContext = createContext()
 
@@ -31,6 +33,13 @@ function reducer(state, { type, payload }) {
       return {
         ...state,
         TIME_KEY: newTimeFrame
+      }
+    }
+    case UPDATE_SESSION_START: {
+      const { timestamp } = payload
+      return {
+        ...state,
+        SESSION_START: timestamp
       }
     }
 
@@ -65,9 +74,23 @@ export default function Provider({ children }) {
     })
   }, [])
 
+  const updateSessionStart = useCallback(timestamp => {
+    dispatch({
+      type: UPDATE_SESSION_START,
+      payload: {
+        timestamp
+      }
+    })
+  }, [])
+
   return (
     <ApplicationContext.Provider
-      value={useMemo(() => [state, { update, updateTimeframe }], [state, update, updateTimeframe])}
+      value={useMemo(() => [state, { update, updateSessionStart, updateTimeframe }], [
+        state,
+        update,
+        updateTimeframe,
+        updateSessionStart
+      ])}
     >
       {children}
     </ApplicationContext.Provider>
@@ -113,4 +136,28 @@ export function useStartTimestamp() {
   }, [activeWindow, startDateTimestamp])
 
   return startDateTimestamp
+}
+
+export function useSessionStart() {
+  const [state, { updateSessionStart }] = useApplicationContext()
+  const sessionStart = state?.[SESSION_START]
+
+  useEffect(() => {
+    if (!sessionStart) {
+      updateSessionStart(Date.now())
+    }
+  })
+
+  const [seconds, setSeconds] = useState(0)
+
+  useEffect(() => {
+    let interval = null
+    interval = setInterval(() => {
+      setSeconds(Date.now() - sessionStart ?? Date.now())
+    }, 1000)
+
+    return () => clearInterval(interval)
+  }, [seconds, sessionStart])
+
+  return parseInt(seconds / 1000)
 }

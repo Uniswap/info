@@ -27,7 +27,7 @@ import { useEffect } from 'react'
 import Warning from '../components/Warning'
 import { SURPRESS_WARNINGS } from '../constants'
 import { usePathDismissed, useSavedTokens } from '../contexts/LocalStorage'
-import { Hover, SubNav, SubNavEl } from '../components'
+import { Hover, SubNav, SubNavEl, SideBar } from '../components'
 import { PlusCircle, TrendingUp, List, PieChart, Trello } from 'react-feather'
 import PinnedData from '../components/PinnedData'
 import WalletPreview from '../components/WalletPreview'
@@ -47,7 +47,19 @@ const PageWrapper = styled.div`
   padding: 0 24px;
   padding-bottom: 100px;
 
-  @media screen and (max-width: 1080px) {
+  @media screen and (max-width: 1280px) {
+    grid-template-columns: 180px 1fr 200px;
+  }
+
+  @media screen and (max-width: 1180px) {
+    grid-template-columns: 180px 1fr;
+  }
+
+  @media screen and (max-width: 800px) {
+    grid-template-columns: 1fr;
+  }
+
+  @media screen and (max-width: 640px) {
     width: calc(100% - 40px);
     padding: 0 20px;
   }
@@ -155,7 +167,9 @@ function TokenPage({ address, history }) {
   // transactions
   const txnChangeFormatted = formattedPercent(txnChange)
 
+  const below1180 = useMedia('(max-width: 1180px)')
   const below1080 = useMedia('(max-width: 1080px)')
+  const below800 = useMedia('(max-width: 800px)')
   const below600 = useMedia('(max-width: 600px)')
 
   const [dismissed, markAsDismissed] = usePathDismissed(history.location.pathname)
@@ -195,25 +209,27 @@ function TokenPage({ address, history }) {
 
   return (
     <PageWrapper>
-      <SubNav>
-        <SubNavEl onClick={() => handleScroll(OverviewRef)} isActive={active === OverviewRef}>
-          <TrendingUp size={20} style={{ marginRight: '1rem' }} />
-          <TYPE.main>Overview</TYPE.main>
-        </SubNavEl>
-        <SubNavEl onClick={() => handleScroll(PairsRef)} isActive={active === PairsRef}>
-          <PieChart size={20} style={{ marginRight: '1rem' }} />
-          <TYPE.main>Pairs</TYPE.main>
-        </SubNavEl>
-        <SubNavEl onClick={() => handleScroll(TransactionsRef)} isActive={active === TransactionsRef}>
-          <List size={20} style={{ marginRight: '1rem' }} />
-          <TYPE.main>Transactions</TYPE.main>
-        </SubNavEl>
-        <SubNavEl onClick={() => handleScroll(DataRef)} isActive={active === DataRef}>
-          <Trello size={20} style={{ marginRight: '1rem' }} />
-          <TYPE.main>Token Info</TYPE.main>
-        </SubNavEl>
-        <PinnedData />
-      </SubNav>
+      {!below800 && (
+        <SubNav>
+          <SubNavEl onClick={() => handleScroll(OverviewRef)} isActive={active === OverviewRef}>
+            <TrendingUp size={20} style={{ marginRight: '1rem' }} />
+            <TYPE.main>Overview</TYPE.main>
+          </SubNavEl>
+          <SubNavEl onClick={() => handleScroll(PairsRef)} isActive={active === PairsRef}>
+            <PieChart size={20} style={{ marginRight: '1rem' }} />
+            <TYPE.main>Pairs</TYPE.main>
+          </SubNavEl>
+          <SubNavEl onClick={() => handleScroll(TransactionsRef)} isActive={active === TransactionsRef}>
+            <List size={20} style={{ marginRight: '1rem' }} />
+            <TYPE.main>Transactions</TYPE.main>
+          </SubNavEl>
+          <SubNavEl onClick={() => handleScroll(DataRef)} isActive={active === DataRef}>
+            <Trello size={20} style={{ marginRight: '1rem' }} />
+            <TYPE.main>Token Info</TYPE.main>
+          </SubNavEl>
+          <PinnedData />
+        </SubNav>
+      )}
       <Warning
         type={'token'}
         show={!dismissed && !SURPRESS_WARNINGS.includes(address)}
@@ -239,12 +255,8 @@ function TokenPage({ address, history }) {
             </RowFixed>
           </RowFixed>
           <span>
-            <RowFixed
-              mb={20}
-              ml={below600 ? '0' : '2.5rem'}
-              style={{ flexDirection: below1080 ? 'row-reverse' : 'initial' }}
-            >
-              {!!!savedTokens[address] && (
+            <RowFixed mb={20} ml={below600 ? '0' : '2.5rem'}>
+              {!!!savedTokens[address] && !below800 && (
                 <Hover onClick={() => addToken(address, symbol)}>
                   <PlusCircle style={{ marginRight: '0.5rem' }} />
                 </Hover>
@@ -407,7 +419,11 @@ function TokenPage({ address, history }) {
           </>
         </DashboardWrapper>
       </WarningGrouping>
-      <WalletPreview />
+      {!below1180 && (
+        <SideBar>
+          <WalletPreview />
+        </SideBar>
+      )}
     </PageWrapper>
   )
 }

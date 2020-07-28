@@ -223,7 +223,7 @@ async function getBulkPairData(pairList, ethPrice) {
           )
 
           const oneWeekVolumeUSD = parseFloat(
-            oneWeekData ? data?.volumeUSD - oneWeekHistory?.volumeUSD : data.volumeUSD
+            oneWeekHistory?.volumeUSD ? data?.volumeUSD - oneWeekHistory?.volumeUSD : data.volumeUSD
           )
           const [oneDayVolumeETH, volumeChangeETH] = get2DayPercentChange(
             data.tradeVolumeETH,

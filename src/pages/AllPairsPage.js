@@ -28,19 +28,6 @@ const PageWrapper = styled.div`
   }
 `
 
-const ThemedBackground = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 200vh;
-  max-width: 100vw;
-  z-index: -1;
-
-  transform: translateY(-70vh);
-  background: ${({ theme }) => theme.background};
-`
-
 function AllPairsPage() {
   const allPairs = useAllPairData()
   const below1080 = useMedia('(max-width: 1080px)')
@@ -48,7 +35,6 @@ function AllPairsPage() {
 
   return (
     <PageWrapper>
-      <ThemedBackground />
       <Search small={!!below600} />
       {!below1080 && (
         <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '3rem', marginBottom: '1rem' }}>

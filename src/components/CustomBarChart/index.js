@@ -3,7 +3,7 @@ import { createChart } from 'lightweight-charts'
 import dayjs from 'dayjs'
 import { formattedNum } from '../../utils'
 
-const CustomChart = ({ data, base, baseChange }) => {
+const CustomBarChart = ({ data, base, baseChange, field, title }) => {
   const ref = useRef()
 
   var width = 400
@@ -14,7 +14,7 @@ const CustomChart = ({ data, base, baseChange }) => {
   const formattedData = data?.map(entry => {
     return {
       time: dayjs.unix(entry.date).format('YYYY-MM-DD'),
-      value: parseFloat(entry.dailyVolumeUSD)
+      value: parseFloat(entry[field])
     }
   })
 
@@ -26,7 +26,7 @@ const CustomChart = ({ data, base, baseChange }) => {
         height: height,
         rightPriceScale: {
           scaleMargins: {
-            top: 0.35,
+            top: 0.75,
             bottom: 0.2
           },
           borderVisible: false
@@ -65,7 +65,7 @@ const CustomChart = ({ data, base, baseChange }) => {
         },
         priceScaleId: '',
         scaleMargins: {
-          top: 0.1,
+          top: 0.32,
           bottom: 0
         }
       })
@@ -86,13 +86,17 @@ const CustomChart = ({ data, base, baseChange }) => {
 
       function setLastBarText() {
         var dateStr =
-          formattedData[formattedData.length - 1].time.year +
+          dayjs()
+            .year()
+            .toString() +
           ' - ' +
-          formattedData[formattedData.length - 1].time.month +
+          (dayjs().month() + 1).toString() +
           ' - ' +
-          formattedData[formattedData.length - 1].time.day
+          dayjs()
+            .date()
+            .toString()
         toolTip.innerHTML =
-          '<div style="font-size: 16px; margin: 4px 0px; color: #20262E;">Liquidity</div>' +
+          `<div style="font-size: 16px; margin: 4px 0px; color: #20262E;">${title}</div>` +
           '<div style="font-size: 22px; margin: 4px 0px; color: #20262E">' +
           formattedNum(base, true) +
           `<span style="margin-left: 10px; font-size: 16px; color: green;">${formattedPercentChange}</span>` +
@@ -113,11 +117,11 @@ const CustomChart = ({ data, base, baseChange }) => {
         ) {
           setLastBarText()
         } else {
-          let dateStr = param.time.year + ' - ' + param.time.month + ' - ' + param.time.day
+          let dateStr = param.time.year + ' - ' + param.time.month + ' - ' + (param.time.day + 1)
           var price = param.seriesPrices.get(series)
 
           toolTip.innerHTML =
-            '<div style="font-size: 16px; margin: 4px 0px; color: #20262E">Volume</div>' +
+            `<div style="font-size: 16px; margin: 4px 0px; color: #20262E;">${title}</div>` +
             '<div style="font-size: 22px; margin: 4px 0px; color: #20262E">' +
             formattedNum(price, true) +
             '</div>' +
@@ -127,9 +131,9 @@ const CustomChart = ({ data, base, baseChange }) => {
         }
       })
     }
-  }, [chartCreated, data, formattedData, height, width])
+  }, [base, baseChange, chartCreated, data, formattedData, height, title, width])
 
   return <div ref={ref} />
 }
 
-export default CustomChart
+export default CustomBarChart

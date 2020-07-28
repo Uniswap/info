@@ -15,8 +15,7 @@ import { Text } from 'rebass'
 import LocalLoader from '../LocalLoader'
 
 const ChartWrapper = styled.div`
-  height: 100%;
-  min-height: 390px;
+  max-height: 390px;
 
   @media screen and (max-width: 600px) {
     min-height: 200px;

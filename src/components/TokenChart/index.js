@@ -3,12 +3,11 @@ import styled from 'styled-components'
 import { Area, XAxis, YAxis, ResponsiveContainer, Tooltip, AreaChart, BarChart, Bar } from 'recharts'
 import { AutoRow, RowBetween } from '../Row'
 
-import { toK, toNiceDate, toNiceDateYear, formattedNum } from '../../utils'
+import { toK, toNiceDate, toNiceDateYear, formattedNum, getTimeframe } from '../../utils'
 import { OptionButton } from '../ButtonStyled'
 import { darken } from 'polished'
 import { useMedia } from 'react-use'
 import { timeframeOptions } from '../../constants'
-import dayjs from 'dayjs'
 import { useTokenChartData } from '../../contexts/TokenData'
 import DropdownSelect from '../DropdownSelect'
 
@@ -37,30 +36,10 @@ const TokenChart = ({ address, color }) => {
   const below1080 = useMedia('(max-width: 1080px)')
   const below600 = useMedia('(max-width: 600px)')
 
-  // find start time based on required time window, update domain
-  const utcEndTime = dayjs.utc()
-  // based on window, get starttime
-  let utcStartTime
-  switch (timeWindow) {
-    case timeframeOptions.WEEK:
-      utcStartTime =
-        utcEndTime
-          .subtract(1, 'week')
-          .startOf('day')
-          .unix() - 1
-      break
-    case timeframeOptions.ALL_TIME:
-      utcStartTime = utcEndTime.subtract(1, 'year').unix() - 1
-      break
-    default:
-      utcStartTime =
-        utcEndTime
-          .subtract(1, 'year')
-          .startOf('year')
-          .unix() - 1
-      break
-  }
+  let utcStartTime = getTimeframe(timeWindow)
   const domain = [dataMin => (dataMin > utcStartTime ? dataMin : utcStartTime), 'dataMax']
+
+  const aspect = below1080 ? 60 / 32 : below600 ? 60 / 42 : 60 / 28
 
   return (
     <ChartWrapper>
@@ -85,24 +64,30 @@ const TokenChart = ({ address, color }) => {
               Price
             </OptionButton>
           </AutoRow>
-          <AutoRow justify="flex-end" gap="10px">
+          <AutoRow justify="flex-end" gap="6px">
+            <OptionButton
+              active={timeWindow === timeframeOptions.MONTH}
+              onClick={() => setTimeWindow(timeframeOptions.MONTH)}
+            >
+              1M
+            </OptionButton>
             <OptionButton
               active={timeWindow === timeframeOptions.WEEK}
               onClick={() => setTimeWindow(timeframeOptions.WEEK)}
             >
-              1 Week
+              1W
             </OptionButton>
             <OptionButton
               active={timeWindow === timeframeOptions.ALL_TIME}
               onClick={() => setTimeWindow(timeframeOptions.ALL_TIME)}
             >
-              All Time
+              All
             </OptionButton>
           </AutoRow>
         </RowBetween>
       )}
       {chartFilter === CHART_VIEW.LIQUIDITY && chartData && (
-        <ResponsiveContainer aspect={below1080 ? 60 / 32 : below600 ? 60 / 42 : 60 / 16}>
+        <ResponsiveContainer aspect={aspect}>
           <AreaChart margin={{ top: 0, right: 10, bottom: 6, left: 0 }} barCategoryGap={1} data={chartData}>
             <defs>
               <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
@@ -162,7 +147,7 @@ const TokenChart = ({ address, color }) => {
         </ResponsiveContainer>
       )}
       {chartFilter === CHART_VIEW.PRICE && chartData && (
-        <ResponsiveContainer aspect={below1080 ? 60 / 32 : 60 / 16}>
+        <ResponsiveContainer aspect={aspect}>
           <AreaChart margin={{ top: 0, right: 10, bottom: 6, left: 0 }} barCategoryGap={1} data={chartData}>
             <defs>
               <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
@@ -222,7 +207,7 @@ const TokenChart = ({ address, color }) => {
         </ResponsiveContainer>
       )}
       {chartFilter === CHART_VIEW.VOLUME && (
-        <ResponsiveContainer aspect={below1080 ? 60 / 32 : 60 / 16}>
+        <ResponsiveContainer aspect={aspect}>
           <BarChart margin={{ top: 0, right: 10, bottom: 6, left: 10 }} barCategoryGap={1} data={chartData}>
             <XAxis
               tickLine={false}
