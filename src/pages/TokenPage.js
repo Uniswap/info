@@ -30,7 +30,7 @@ import { usePathDismissed, useSavedTokens } from '../contexts/LocalStorage'
 import { Hover, SubNav, SubNavEl, SideBar } from '../components'
 import { PlusCircle, TrendingUp, List, PieChart, Trello } from 'react-feather'
 import PinnedData from '../components/PinnedData'
-import WalletPreview from '../components/WalletPreview'
+import WalletPreview from '../components/PinnedData'
 
 const PageWrapper = styled.div`
   display: flex;

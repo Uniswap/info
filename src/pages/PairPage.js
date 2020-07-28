@@ -13,7 +13,7 @@ import PairChart from '../components/PairChart'
 import Link from '../components/Link'
 import TxnList from '../components/TxnList'
 import Loader from '../components/Loader'
-import WalletPreview from '../components/WalletPreview'
+import WalletPreview from '../components/PinnedData'
 
 import { formattedNum, formattedPercent, getPoolLink, getSwapLink } from '../utils'
 import { useColor } from '../hooks'

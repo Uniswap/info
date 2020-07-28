@@ -85,6 +85,10 @@ export const TYPE = {
     return <TextWrapper fontWeight={600} color={'text1'} {...props} />
   },
 
+  largeHeader(props) {
+    return <TextWrapper fontWeight={600} color={'text1'} fontSize={'24px'} {...props} />
+  },
+
   light(props) {
     return <TextWrapper fontWeight={400} color={'text3'} fontSize={14} {...props} />
   },

@@ -49,7 +49,7 @@ export const SideBar = styled.span`
   display: grid;
   grid-gap: 24px;
   position: sticky;
-  top: 8.5rem;
+  top: 4rem;
 `
 
 export const SubNav = styled.ul`

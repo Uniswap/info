@@ -8,10 +8,9 @@ import styled from 'styled-components'
 
 import { CustomLink } from '../Link'
 import { Divider } from '../../components'
-
+import { withRouter } from 'react-router-dom'
 import { formattedNum } from '../../utils'
 import DoubleTokenLogo from '../DoubleLogo'
-import { withRouter } from 'react-router-dom'
 import { OVERVIEW_PAIR_BLACKLIST } from '../../constants'
 
 dayjs.extend(utc)

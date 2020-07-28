@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
 import { ApolloProvider } from 'react-apollo'
 import { client } from './apollo/client'
@@ -14,6 +14,8 @@ import { isAddress } from './utils'
 import AccountPage from './pages/AccountPage'
 import AllTokensPage from './pages/AllTokensPage'
 import AllPairsPage from './pages/AllPairsPage'
+import SideNav from './components/SideNav'
+import PinnedData from './components/PinnedData'
 
 const AppWrapper = styled.div`
   position: relative;
@@ -25,9 +27,46 @@ const AppWrapper = styled.div`
   align-items: center;
   justify-content: flex-start;
 `
+const ContentWrapper = styled.div`
+  height: 100%;
+`
+
+const Left = styled.div`
+  width: 200px;
+  top: 0px;
+  padding-top: 80px;
+  bottom: 0px;
+  position: fixed;
+  height: 100%;
+  left: 0;
+  border-right: 1px solid ${({ theme }) => theme.bg3};
+`
+
+const Right = styled.div`
+  width:  ${({ open }) => (open ? '148px' : '80px')};
+  top: 80px;
+  bottom: 0px;
+  position: fixed;
+  height: ${({ open }) => (open ? '100%' : '20px')}
+  right: 0;
+  padding: 2rem;
+  border-left: 1px solid ${({ theme }) => theme.bg3};
+  border-top: 1px solid ${({ theme }) => theme.bg3};
+  border-top-left-radius: 25px;
+  border-bottom-left-radius: ${({ open }) => (open ? '0' : '25px')}
+  border-bottom: ${({ open, theme }) => (open ? '' : '1px solid' + theme.bg3)}
+`
+
+const Center = styled.div`
+  height: 100%
+  margin: 0px 200px;
+  margin-right: 220px;
+`
 
 function App() {
   const NavHeaderUpdated = withRouter(props => <NavHeader default {...props} />)
+
+  const [savedOpen, setSavedOpen] = useState(true)
 
   const globalData = useGlobalData()
   const globalChartData = useGlobalChartData()
@@ -92,10 +131,22 @@ function App() {
                   }
                 }}
               />
+
               <Route path="/home">
                 <NavHeaderUpdated />
-                <GlobalPage />
+                <ContentWrapper>
+                  <Left>
+                    <SideNav />
+                  </Left>
+                  <Center>
+                    <GlobalPage />
+                  </Center>
+                  <Right open={savedOpen}>
+                    <PinnedData open={savedOpen} setSavedOpen={setSavedOpen} />
+                  </Right>
+                </ContentWrapper>
               </Route>
+
               <Route path="/all-tokens">
                 <NavHeaderUpdated />
                 <AllTokensPage />

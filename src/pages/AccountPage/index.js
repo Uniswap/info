@@ -17,7 +17,7 @@ import { ButtonDropdown } from '../../components/ButtonStyled'
 import { Hover } from '../../components'
 import DoubleTokenLogo from '../../components/DoubleLogo'
 import { TrendingUp, PieChart, Activity } from 'react-feather'
-import WalletPreview from '../../components/WalletPreview'
+import WalletPreview from '../../components/PinnedData'
 import { SideBar, SubNav, SubNavEl } from '../../components/index'
 import PinnedData from '../../components/PinnedData'
 

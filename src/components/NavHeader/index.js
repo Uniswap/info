@@ -12,22 +12,15 @@ import { TYPE } from '../../Theme'
 
 import UniPrice from '../UniPrice'
 
-import { ButtonDark } from '../ButtonStyled'
 import Link from '../Link'
 import { useSessionStart } from '../../contexts/Application'
 
 const Header = styled.div`
   width: 100%;
   background-color: ${({ theme }) => theme.bg1};
-  margin-bottom: 2rem;
   position: sticky;
   top: 0;
   z-index: 9999;
-`
-
-const CombinedWrapper = styled(RowFixed)`
-  border-radius: 16px;
-  justify-content: flex-end;
 `
 
 const HeaderText = styled.div`
@@ -166,23 +159,6 @@ export default function NavHeader({ token, pair, account }) {
               Twitter
             </Link>
           </HeaderText>
-        </RowFixed>
-      </RowBetween>
-      <RowBetween style={{ padding: '1rem 1rem', borderBottom: '1px solid #edeef2' }}>
-        <Title token={token} pair={pair} account={account} />
-        <RowFixed>
-          {!isHome && (
-            <div style={{ width: '370px' }}>
-              <Search small={true} />
-            </div>
-          )}
-          {isHome && (
-            <CombinedWrapper>
-              <Link href="https://migrate.uniswap.info" target="_blank">
-                <ButtonDark style={{ minWidth: 'initial' }}>Launch App</ButtonDark>
-              </Link>
-            </CombinedWrapper>
-          )}
         </RowFixed>
       </RowBetween>
     </Header>

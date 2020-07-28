@@ -82,7 +82,9 @@ const CustomBarChart = ({ data, base, baseChange, field, title }) => {
       toolTip.style.top = 3 + 'px'
 
       let percentChange = baseChange?.toFixed(2)
-      let formattedPercentChange = (percentChange > 0 ? '+' : '-') + percentChange + '%'
+      let formattedPercentChange = (percentChange > 0 ? '+' : '') + percentChange + '%'
+
+      let color = percentChange >= 0 ? 'green' : 'red'
 
       function setLastBarText() {
         var dateStr =
@@ -99,7 +101,7 @@ const CustomBarChart = ({ data, base, baseChange, field, title }) => {
           `<div style="font-size: 16px; margin: 4px 0px; color: #20262E;">${title}</div>` +
           '<div style="font-size: 22px; margin: 4px 0px; color: #20262E">' +
           formattedNum(base, true) +
-          `<span style="margin-left: 10px; font-size: 16px; color: green;">${formattedPercentChange}</span>` +
+          `<span style="margin-left: 10px; font-size: 16px; color: ${color};">${formattedPercentChange}</span>` +
           '</div>' +
           '<div>' +
           dateStr +
