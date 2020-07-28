@@ -17,7 +17,8 @@ import { useSessionStart } from '../../contexts/Application'
 
 const Header = styled.div`
   width: 100%;
-  background-color: ${({ theme }) => theme.bg1};
+  background-color: ${({ theme }) => theme.text1};
+  color: ${({ theme }) => theme.bg1};
   position: sticky;
   top: 0;
   z-index: 9999;
@@ -98,7 +99,7 @@ export default function NavHeader({ token, pair, account }) {
           Last Updated {!!seconds ? seconds + 's' : '-'} ago <a href="/">(refresh)</a>
         </TYPE.small>
       </Polling>
-      <RowBetween style={{ padding: '0.5rem 1rem', backgroundColor: '#f7f8fa', borderBottom: '1px solid #edeef2' }}>
+      <RowBetween style={{ padding: '0.5rem 1rem' }}>
         <RowFixed>
           <HeaderText
             onMouseEnter={() => {
