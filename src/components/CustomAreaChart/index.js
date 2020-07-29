@@ -3,16 +3,11 @@ import React, { useState, useEffect, useRef } from 'react'
 import { createChart } from 'lightweight-charts'
 import dayjs from 'dayjs'
 import { formattedNum } from '../../utils'
-import { useMedia } from 'react-use'
 
-const CustomAreaChart = ({ data, base, baseChange, title, field }) => {
+const CustomAreaChart = ({ data, base, baseChange, title, field, width }) => {
   const ref = useRef()
 
-  var width = 400
   var height = 300
-
-  const below1180 = useMedia('(max-width: 1180px)')
-  const below800 = useMedia('(max-width: 800px)')
 
   const [chartCreated, setChartCreated] = useState(false)
 
@@ -101,9 +96,7 @@ const CustomAreaChart = ({ data, base, baseChange, title, field }) => {
           formattedNum(base, true) +
           `<span style="margin-left: 10px; font-size: 16px; color: ${color};">${formattedPercentChange}</span>` +
           '</div>' +
-          '<div>' +
-          dateStr +
-          '</div>'
+          '<div>24HR</div>'
       }
       setLastBarText()
       chart.subscribeCrosshairMove(function(param) {
@@ -136,15 +129,12 @@ const CustomAreaChart = ({ data, base, baseChange, title, field }) => {
   }, [base, baseChange, chartCreated, data, formattedData, height, title, width])
 
   // responsiveness
-
   useEffect(() => {
-    if (below1180) {
-      chartCreated && chartCreated.resize(320, height)
+    if (width) {
+      chartCreated && chartCreated.resize(width, height)
+      chartCreated && chartCreated.timeScale().scrollToPosition(0)
     }
-    if (below800) {
-      chartCreated && chartCreated.resize(800, height)
-    }
-  })
+  }, [chartCreated, height, width])
 
   return <div ref={ref} />
 }

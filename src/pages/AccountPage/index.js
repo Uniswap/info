@@ -14,40 +14,10 @@ import { TYPE } from '../../Theme'
 import { useMedia } from 'react-use'
 import Loader from '../../components/Loader'
 import { ButtonDropdown } from '../../components/ButtonStyled'
-import { Hover } from '../../components'
+import { Hover, PageWrapper, FixedMenu, ContentWrapper } from '../../components'
 import DoubleTokenLogo from '../../components/DoubleLogo'
 import { TrendingUp, PieChart, Activity } from 'react-feather'
-import WalletPreview from '../../components/PinnedData'
-import { SideBar, SubNav, SubNavEl } from '../../components/index'
-import PinnedData from '../../components/PinnedData'
-
-const PageWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  display: grid;
-  justify-content: start;
-  align-items: start;
-  grid-template-columns: 180px 1fr 256px;
-  grid-gap: 24px;
-  padding: 0 24px;
-  width: calc(100% - 48px);
-  max-width: 1440px;
-
-  @media screen and (max-width: 1080px) {
-    grid-template-columns: 180px 1fr;
-  }
-
-  @media screen and (max-width: 800px) {
-    grid-template-columns: 1fr;
-  }
-
-  @media screen and (max-width: 640px) {
-    width: calc(100% - 40px);
-    padding: 0 20px;
-  }
-`
+import { SubNav, SubNavEl } from '../../components/index'
 
 const ListOptions = styled(AutoRow)`
   height: 40px;
@@ -70,9 +40,7 @@ const AccountWrapper = styled.div`
   color: ${({ theme }) => theme.primary1};
 `
 
-const Header = styled.div`
-  margin-bottom: 20px;
-`
+const Header = styled.div``
 
 const DashboardWrapper = styled.div`
   width: 100%;
@@ -119,8 +87,6 @@ const PanelWrapper = styled.div`
   align-items: start;
 `
 
-const CenterWrapper = styled.div``
-
 const LIST_VIEW = {
   POSITIONS: 'POSITIONS',
   TRANSACTIONS: 'TRANSACTIONS',
@@ -133,7 +99,6 @@ function AccountPage({ account }) {
   const positions = useUserPositions(account)
 
   const below1080 = useMedia('(max-width: 1080px)')
-  const below800 = useMedia('(max-width: 800px)')
   const below600 = useMedia('(max-width: 600px)')
 
   // get data for user stats
@@ -179,11 +144,15 @@ function AccountPage({ account }) {
 
   useEffect(() => {
     setActive(OverviewRef)
+    window.scrollTo({
+      behavior: 'smooth',
+      top: 0
+    })
   }, [])
 
   const handleScroll = ref => {
     setActive(ref.current)
-    document.querySelector('body').scrollTo({
+    window.scrollTo({
       behavior: 'smooth',
       top: ref.current.offsetTop - 120
     })
@@ -191,24 +160,11 @@ function AccountPage({ account }) {
 
   return (
     <PageWrapper>
-      {!below800 && (
-        <SubNav>
-          <SubNavEl onClick={() => handleScroll(OverviewRef)} isActive={active === OverviewRef}>
-            <TrendingUp size={20} style={{ marginRight: '1rem' }} />
-            <TYPE.main>Overview</TYPE.main>
-          </SubNavEl>
-          <SubNavEl onClick={() => handleScroll(StatsRef)} isActive={active === OverviewRef}>
-            <PieChart size={20} style={{ marginRight: '1rem' }} />
-            <TYPE.main>Account Stats</TYPE.main>
-          </SubNavEl>
-          <PinnedData />
-        </SubNav>
-      )}
-      <CenterWrapper>
+      <FixedMenu>
         <Header ref={OverviewRef}>
           <RowBetween>
             <Text fontSize={24} fontWeight={600}>
-              Liquidity Provider Info
+              Account Stats
             </Text>
             <AccountWrapper>
               <Text fontSize={20} fontWeight={600}>
@@ -217,6 +173,21 @@ function AccountPage({ account }) {
             </AccountWrapper>
           </RowBetween>
         </Header>
+      </FixedMenu>
+      <ContentWrapper>
+        {!below1080 && (
+          <SubNav>
+            <SubNavEl onClick={() => handleScroll(OverviewRef)} isActive={active === OverviewRef}>
+              <TrendingUp size={20} style={{ marginRight: '1rem' }} />
+              <TYPE.main>Overview</TYPE.main>
+            </SubNavEl>
+            <SubNavEl onClick={() => handleScroll(StatsRef)} isActive={active === OverviewRef}>
+              <PieChart size={20} style={{ marginRight: '1rem' }} />
+              <TYPE.main>Account Stats</TYPE.main>
+            </SubNavEl>
+          </SubNav>
+        )}
+
         <DashboardWrapper>
           {!hideLPContent && (
             <DropdownWrapper>
@@ -411,12 +382,7 @@ function AccountPage({ account }) {
             )}
           </Panel>
         </DashboardWrapper>
-      </CenterWrapper>
-      {!below1080 && (
-        <SideBar>
-          <WalletPreview />
-        </SideBar>
-      )}
+      </ContentWrapper>
     </PageWrapper>
   )
 }

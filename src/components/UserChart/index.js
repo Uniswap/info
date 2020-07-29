@@ -30,6 +30,8 @@ const UserChart = ({ account }) => {
 
   const domain = [dataMin => (dataMin > utcStartTime ? dataMin : utcStartTime), 'dataMax']
 
+  const aspect = below600 ? 60 / 42 : 60 / 16
+
   return (
     <ChartWrapper>
       {below600 ? (
@@ -64,7 +66,7 @@ const UserChart = ({ account }) => {
           </AutoRow>
         </RowBetween>
       )}
-      <ResponsiveContainer aspect={60 / 22} style={{ height: 'inherit' }}>
+      <ResponsiveContainer aspect={aspect} style={{ height: 'inherit' }}>
         <AreaChart margin={{ top: 0, right: 10, bottom: 6, left: 0 }} barCategoryGap={1} data={chartData}>
           <defs>
             <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
@@ -72,7 +74,6 @@ const UserChart = ({ account }) => {
               <stop offset="95%" stopColor={'#ff007a'} stopOpacity={0} />
             </linearGradient>
           </defs>
-          {/* <CartesianGrid stroke="#DFE1E9" /> */}
           <XAxis
             tickLine={false}
             axisLine={false}

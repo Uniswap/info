@@ -13,6 +13,12 @@ import { useMedia } from 'react-use'
 import { useAllPairsInUniswap, useAllTokensInUniswap } from '../../contexts/GlobalData'
 import { OVERVIEW_TOKEN_BLACKLIST, OVERVIEW_PAIR_BLACKLIST } from '../../constants'
 
+const Container = styled.div`
+  height: 36px;
+  z-index: 30;
+  position: relative;
+`
+
 const Wrapper = styled.div`
   display: flex;
   position: relative;
@@ -30,7 +36,6 @@ const Input = styled.input`
   position: relative;
   display: flex;
   align-items: center;
-  width: 100%;
   white-space: nowrap;
   background: none;
   border: none;
@@ -304,13 +309,7 @@ export const Search = ({ small = false }) => {
   })
 
   return (
-    <div
-      style={{
-        height: '36px',
-        zIndex: '30',
-        position: 'relative'
-      }}
-    >
+    <Container>
       <Wrapper open={showMenu} shadow={true} small={small}>
         <Input
           large={!small}
@@ -325,7 +324,7 @@ export const Search = ({ small = false }) => {
               ? 'Search pairs and tokens...'
               : small
               ? 'Search pairs and tokens...'
-              : 'Search or paste address to find Uniswap pairs and tokens...'
+              : 'Search Uniswap pairs and tokens...'
           }
           value={value}
           onChange={e => {
@@ -408,7 +407,7 @@ export const Search = ({ small = false }) => {
           </Heading>
         </div>
       </Menu>
-    </div>
+    </Container>
   )
 }
 

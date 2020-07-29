@@ -3,44 +3,13 @@ import 'feather-icons'
 import styled from 'styled-components'
 
 import { TYPE } from '../Theme'
-import { Search } from '../components/Search'
 import { AutoColumn } from '../components/Column'
 import { RowBetween, AutoRow } from '../components/Row'
 import { useSavedAccounts } from '../contexts/LocalStorage'
 import { ButtonFaded, ButtonLight } from '../components/ButtonStyled'
-import { Hover } from '../components'
+import { Hover, PageWrapper, FixedMenu } from '../components'
 import { X } from 'react-feather'
 import { isAddress } from '../utils'
-
-const PageWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding-bottom: 100px;
-  width: calc(100% - 20px);
-  overflow: scroll;
-  & > * {
-    width: 100%;
-    max-width: 1240px;
-  }
-
-  @media screen and (max-width: 1080px) {
-    width: calc(100% - 40px);
-    padding: 0 20px;
-  }
-`
-
-const FixedMenu = styled.div`
-  width: 100%;
-  z-index: 99;
-  position: sticky;
-  top: -6rem;
-  padding-top: 1.5rem;
-  background-color: white;
-  border-bottom: 1px solid ${({ theme }) => theme.bg3};
-  margin-bottom: 2rem;
-`
 
 const Input = styled.input`
   position: relative;
@@ -96,7 +65,6 @@ function AccountLookup({ history }) {
     <PageWrapper>
       <FixedMenu>
         <AutoColumn gap="40px">
-          <Search />
           <RowBetween>
             <TYPE.largeHeader>Account Lookup</TYPE.largeHeader>
             <div />

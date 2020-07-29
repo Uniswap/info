@@ -71,4 +71,36 @@ export const SubNavEl = styled.li`
   }
 `
 
+export const PageWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 100px;
+  max-width: 1440px;
+  padding: 0 24px;
+  padding-bottom: 80px;
+`
+
+export const ContentWrapper = styled.div`
+  display: grid;
+  justify-content: start;
+  align-items: start;
+  grid-template-columns: 180px 1fr;
+  grid-gap: 24px;
+
+  @media screen and (max-width: 1180px) {
+    grid-template-columns: 1fr;
+  }
+`
+
+export const FixedMenu = styled.div`
+  width: 100%;
+  z-index: 99;
+  position: sticky;
+  top: -6rem;
+  padding: 1.5rem 0;
+  background-color: white;
+  border-bottom: 1px solid ${({ theme }) => theme.bg3};
+  margin-bottom: 2rem;
+`
+
 export { Hint, Divider, Address, EmptyCard }

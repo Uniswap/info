@@ -14,9 +14,9 @@ import { isAddress } from './utils'
 import AccountPage from './pages/AccountPage'
 import AllTokensPage from './pages/AllTokensPage'
 import AllPairsPage from './pages/AllPairsPage'
-import SideNav from './components/SideNav'
 import PinnedData from './components/PinnedData'
 import AccountLookup from './pages/AccountLookup'
+import SubHeader from './components/SubHeader'
 
 const AppWrapper = styled.div`
   position: relative;
@@ -24,20 +24,23 @@ const AppWrapper = styled.div`
 `
 const ContentWrapper = styled.div`
   display: grid;
-  grid-template-columns: ${({ open }) => (open ? '220px 1fr 220px' : '220px 1fr 80px')};
-  grid-gap: 2rem;
-`
+  grid-template-columns: ${({ open }) => (open ? '1fr 220px' : '1fr 80px')};
+  grid-gap: 0rem;
 
-const Left = styled.div`
-  border-right: 1px solid ${({ theme }) => theme.bg3};
-  display: block;
-  
-  /* background-color: ${({ theme }) => theme.bg2}; */
+  @media screen and (max-width: 1080px) {
+    grid-template-columns: 1fr;
+  }
 `
 
 const Right = styled.div`
+  position: sticky;
+  top: 32px;
   width: ${({ open }) => (open ? '220px' : '80px')};
   height: ${({ open }) => (open ? '100%' : '20px')};
+
+  @media screen and (max-width: 1080px) {
+    display: none;
+  }
 `
 
 const Center = styled.div`
@@ -70,7 +73,15 @@ function App() {
                     return (
                       <>
                         <NavHeaderUpdated token={match.params.tokenAddress.toLowerCase()} />
-                        <TokenPage address={match.params.tokenAddress.toLowerCase()} />
+                        <ContentWrapper open={savedOpen}>
+                          <Center id="center">
+                            <SubHeader />
+                            <TokenPage address={match.params.tokenAddress.toLowerCase()} />
+                          </Center>
+                          <Right open={savedOpen}>
+                            <PinnedData open={savedOpen} setSavedOpen={setSavedOpen} />
+                          </Right>
+                        </ContentWrapper>
                       </>
                     )
                   } else {
@@ -87,7 +98,15 @@ function App() {
                     return (
                       <>
                         <NavHeaderUpdated pair={match.params.pairAddress.toLowerCase()} />
-                        <PairPage pairAddress={match.params.pairAddress.toLowerCase()} />
+                        <ContentWrapper open={savedOpen}>
+                          <Center id="center">
+                            <SubHeader />
+                            <PairPage pairAddress={match.params.pairAddress.toLowerCase()} />
+                          </Center>
+                          <Right open={savedOpen}>
+                            <PinnedData open={savedOpen} setSavedOpen={setSavedOpen} />
+                          </Right>
+                        </ContentWrapper>
                       </>
                     )
                   } else {
@@ -103,8 +122,16 @@ function App() {
                   if (isAddress(match.params.accountAddress.toLowerCase())) {
                     return (
                       <>
-                        <NavHeaderUpdated account={match.params.accountAddress.toLowerCase()} />
-                        <AccountPage account={match.params.accountAddress.toLowerCase()} />
+                        <NavHeaderUpdated />
+                        <ContentWrapper open={savedOpen}>
+                          <Center id="center">
+                            <SubHeader />
+                            <AccountPage account={match.params.accountAddress.toLowerCase()} />
+                          </Center>
+                          <Right open={savedOpen}>
+                            <PinnedData open={savedOpen} setSavedOpen={setSavedOpen} />
+                          </Right>
+                        </ContentWrapper>
                       </>
                     )
                   } else {
@@ -116,10 +143,8 @@ function App() {
               <Route path="/home">
                 <NavHeaderUpdated />
                 <ContentWrapper open={savedOpen}>
-                  <Left>
-                    <SideNav />
-                  </Left>
                   <Center id="center">
+                    <SubHeader />
                     <GlobalPage />
                   </Center>
                   <Right open={savedOpen}>
@@ -130,16 +155,43 @@ function App() {
 
               <Route path="/all-tokens">
                 <NavHeaderUpdated />
-                <AllTokensPage />
+                <ContentWrapper open={savedOpen}>
+                  <Center id="center">
+                    <SubHeader />
+                    <AllTokensPage />
+                  </Center>
+                  <Right open={savedOpen}>
+                    <PinnedData open={savedOpen} setSavedOpen={setSavedOpen} />
+                  </Right>
+                </ContentWrapper>
               </Route>
+
               <Route path="/all-pairs">
                 <NavHeaderUpdated />
-                <AllPairsPage />
+                <ContentWrapper open={savedOpen}>
+                  <Center id="center">
+                    <SubHeader />
+                    <AllPairsPage />
+                  </Center>
+                  <Right open={savedOpen}>
+                    <PinnedData open={savedOpen} setSavedOpen={setSavedOpen} />
+                  </Right>
+                </ContentWrapper>
               </Route>
+
               <Route path="/account-lookup">
                 <NavHeaderUpdated />
-                <AccountLookup />
+                <ContentWrapper open={savedOpen}>
+                  <Center id="center">
+                    <SubHeader />
+                    <AccountLookup />
+                  </Center>
+                  <Right open={savedOpen}>
+                    <PinnedData open={savedOpen} setSavedOpen={setSavedOpen} />
+                  </Right>
+                </ContentWrapper>
               </Route>
+
               <Redirect to="/home" />
             </Switch>
           </BrowserRouter>

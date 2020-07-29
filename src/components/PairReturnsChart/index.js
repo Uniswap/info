@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import styled from 'styled-components'
 import { XAxis, YAxis, ResponsiveContainer, Tooltip, ComposedChart, Line, Bar } from 'recharts'
 import { AutoRow, RowBetween } from '../Row'
@@ -22,18 +22,11 @@ const ChartWrapper = styled.div`
   }
 `
 
-const CHART_VIEW = {
-  LIQUIDITY: 'Liquidity'
-}
-
 const PairReturnsChart = ({ account, position }) => {
-  const [chartFilter, setChartFilter] = useState(CHART_VIEW.LIQUIDITY)
-
   const data = useReturnsPerPairHistory(position, account)
 
   const [timeWindow, setTimeWindow] = useTimeframe()
 
-  const below1080 = useMedia('(max-width: 1080px)')
   const below600 = useMedia('(max-width: 600px)')
 
   // based on window, get starttime
@@ -69,11 +62,12 @@ const PairReturnsChart = ({ account, position }) => {
   }
   const domain = [dataMin => (dataMin > utcStartTime ? dataMin : utcStartTime), 'dataMax']
 
+  const aspect = below600 ? 60 / 42 : 60 / 16
+
   return (
     <ChartWrapper>
       {below600 ? (
         <RowBetween mb={40}>
-          <DropdownSelect options={CHART_VIEW} active={chartFilter} setActive={setChartFilter} color={'#ff007a'} />
           <DropdownSelect options={timeframeOptions} active={timeWindow} setActive={setTimeWindow} color={'#ff007a'} />
         </RowBetween>
       ) : (
@@ -104,7 +98,7 @@ const PairReturnsChart = ({ account, position }) => {
           </AutoRow>
         </RowBetween>
       )}
-      <ResponsiveContainer aspect={below1080 ? 60 / 32 : below600 ? 60 / 42 : 60 / 26}>
+      <ResponsiveContainer aspect={aspect}>
         {data ? (
           <ComposedChart margin={{ top: 0, right: 10, bottom: 6, left: 0 }} barCategoryGap={1} data={data}>
             <XAxis

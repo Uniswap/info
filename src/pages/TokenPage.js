@@ -27,43 +27,8 @@ import { useEffect } from 'react'
 import Warning from '../components/Warning'
 import { SURPRESS_WARNINGS } from '../constants'
 import { usePathDismissed, useSavedTokens } from '../contexts/LocalStorage'
-import { Hover, SubNav, SubNavEl, SideBar } from '../components'
+import { Hover, SubNav, SubNavEl, PageWrapper, FixedMenu, ContentWrapper } from '../components'
 import { PlusCircle, TrendingUp, List, PieChart, Trello } from 'react-feather'
-import PinnedData from '../components/PinnedData'
-import WalletPreview from '../components/PinnedData'
-
-const PageWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding-bottom: 100px;
-  max-width: 1440px;
-  display: grid;
-  justify-content: start;
-  align-items: start;
-  grid-template-columns: 180px 1fr 256px;
-  grid-gap: 24px;
-  padding: 0 24px;
-  padding-bottom: 100px;
-
-  @media screen and (max-width: 1280px) {
-    grid-template-columns: 180px 1fr 200px;
-  }
-
-  @media screen and (max-width: 1180px) {
-    grid-template-columns: 180px 1fr;
-  }
-
-  @media screen and (max-width: 800px) {
-    grid-template-columns: 1fr;
-  }
-
-  @media screen and (max-width: 640px) {
-    width: calc(100% - 40px);
-    padding: 0 20px;
-  }
-`
 
 const DashboardWrapper = styled.div`
   width: 100%;
@@ -167,7 +132,6 @@ function TokenPage({ address, history }) {
   // transactions
   const txnChangeFormatted = formattedPercent(txnChange)
 
-  const below1180 = useMedia('(max-width: 1180px)')
   const below1080 = useMedia('(max-width: 1080px)')
   const below800 = useMedia('(max-width: 800px)')
   const below600 = useMedia('(max-width: 600px)')
@@ -197,49 +161,26 @@ function TokenPage({ address, history }) {
 
   useEffect(() => {
     setActive(OverviewRef)
+    window.scrollTo({
+      behavior: 'smooth',
+      top: 0
+    })
   }, [])
 
   const handleScroll = ref => {
     setActive(ref.current)
-    document.querySelector('body').scrollTo({
+    window.scrollTo({
       behavior: 'smooth',
-      top: ref.current.offsetTop - 120
+      top: ref.current.offsetTop - 130
     })
   }
 
   return (
     <PageWrapper>
-      {!below800 && (
-        <SubNav>
-          <SubNavEl onClick={() => handleScroll(OverviewRef)} isActive={active === OverviewRef}>
-            <TrendingUp size={20} style={{ marginRight: '1rem' }} />
-            <TYPE.main>Overview</TYPE.main>
-          </SubNavEl>
-          <SubNavEl onClick={() => handleScroll(PairsRef)} isActive={active === PairsRef}>
-            <PieChart size={20} style={{ marginRight: '1rem' }} />
-            <TYPE.main>Pairs</TYPE.main>
-          </SubNavEl>
-          <SubNavEl onClick={() => handleScroll(TransactionsRef)} isActive={active === TransactionsRef}>
-            <List size={20} style={{ marginRight: '1rem' }} />
-            <TYPE.main>Transactions</TYPE.main>
-          </SubNavEl>
-          <SubNavEl onClick={() => handleScroll(DataRef)} isActive={active === DataRef}>
-            <Trello size={20} style={{ marginRight: '1rem' }} />
-            <TYPE.main>Token Info</TYPE.main>
-          </SubNavEl>
-          <PinnedData />
-        </SubNav>
-      )}
-      <Warning
-        type={'token'}
-        show={!dismissed && !SURPRESS_WARNINGS.includes(address)}
-        setShow={markAsDismissed}
-        address={address}
-      />
-      <WarningGrouping disabled={!dismissed && !SURPRESS_WARNINGS.includes(address)}>
+      <FixedMenu>
         <RowBetween style={{ flexWrap: 'wrap' }} ref={OverviewRef}>
           <RowFixed style={{ flexWrap: 'wrap' }}>
-            <RowFixed mb={20} style={{ alignItems: 'baseline' }}>
+            <RowFixed style={{ alignItems: 'baseline' }}>
               <TokenLogo address={address} size="32px" style={{ alignSelf: 'center' }} />
               <Text fontSize={'1.5rem'} fontWeight={600} style={{ margin: '0 1rem' }}>
                 {name ? name + ' ' : ''} {symbol ? '(' + symbol + ')' : ''}
@@ -255,7 +196,7 @@ function TokenPage({ address, history }) {
             </RowFixed>
           </RowFixed>
           <span>
-            <RowFixed mb={20} ml={below600 ? '0' : '2.5rem'}>
+            <RowFixed ml={below600 ? '0' : '2.5rem'}>
               {!!!savedTokens[address] && !below800 && (
                 <Hover onClick={() => addToken(address, symbol)}>
                   <PlusCircle style={{ marginRight: '0.5rem' }} />
@@ -272,113 +213,110 @@ function TokenPage({ address, history }) {
             </RowFixed>
           </span>
         </RowBetween>
-        <DashboardWrapper>
-          <>
-            {!below1080 && (
-              <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '2rem' }}>
-                Token Stats
-              </TYPE.main>
-            )}
+      </FixedMenu>
+      <ContentWrapper>
+        {!below800 && (
+          <SubNav>
+            <SubNavEl onClick={() => handleScroll(OverviewRef)} isActive={active === OverviewRef}>
+              <TrendingUp size={20} style={{ marginRight: '1rem' }} />
+              <TYPE.main>Overview</TYPE.main>
+            </SubNavEl>
+            <SubNavEl onClick={() => handleScroll(PairsRef)} isActive={active === PairsRef}>
+              <PieChart size={20} style={{ marginRight: '1rem' }} />
+              <TYPE.main>Pairs</TYPE.main>
+            </SubNavEl>
+            <SubNavEl onClick={() => handleScroll(TransactionsRef)} isActive={active === TransactionsRef}>
+              <List size={20} style={{ marginRight: '1rem' }} />
+              <TYPE.main>Transactions</TYPE.main>
+            </SubNavEl>
+            <SubNavEl onClick={() => handleScroll(DataRef)} isActive={active === DataRef}>
+              <Trello size={20} style={{ marginRight: '1rem' }} />
+              <TYPE.main>Token Info</TYPE.main>
+            </SubNavEl>
+          </SubNav>
+        )}
+        <Warning
+          type={'token'}
+          show={!dismissed && !SURPRESS_WARNINGS.includes(address)}
+          setShow={markAsDismissed}
+          address={address}
+        />
+        <WarningGrouping disabled={!dismissed && !SURPRESS_WARNINGS.includes(address)}>
+          <DashboardWrapper>
+            <>
+              {!below1080 && <TYPE.main fontSize={'1.125rem'}>Token Stats</TYPE.main>}
 
-            <PanelWrapper style={{ marginTop: '1.5rem' }}>
-              {below1080 && price && (
+              <PanelWrapper style={{ marginTop: '1.5rem' }}>
+                {below1080 && price && (
+                  <Panel>
+                    <AutoColumn gap="20px">
+                      <RowBetween>
+                        <TYPE.main>Price</TYPE.main>
+                        <div />
+                      </RowBetween>
+                      <RowBetween align="flex-end">
+                        {' '}
+                        <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
+                          {price}
+                        </TYPE.main>
+                        <TYPE.main>{priceChange}</TYPE.main>
+                      </RowBetween>
+                    </AutoColumn>
+                  </Panel>
+                )}
                 <Panel>
                   <AutoColumn gap="20px">
                     <RowBetween>
-                      <TYPE.main>Price</TYPE.main>
+                      <TYPE.main>Total Liquidity</TYPE.main>
                       <div />
                     </RowBetween>
                     <RowBetween align="flex-end">
-                      {' '}
                       <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
-                        {price}
+                        {useManualLiquidity ? formattedNum(manualLiquidity, true) : liquidity}
                       </TYPE.main>
-                      <TYPE.main>{priceChange}</TYPE.main>
+                      <TYPE.main>{liquidityChange}</TYPE.main>
                     </RowBetween>
                   </AutoColumn>
                 </Panel>
-              )}
-              <Panel>
-                <AutoColumn gap="20px">
-                  <RowBetween>
-                    <TYPE.main>Total Liquidity</TYPE.main>
-                    <div />
-                  </RowBetween>
-                  <RowBetween align="flex-end">
-                    <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
-                      {useManualLiquidity ? formattedNum(manualLiquidity, true) : liquidity}
-                    </TYPE.main>
-                    <TYPE.main>{liquidityChange}</TYPE.main>
-                  </RowBetween>
-                </AutoColumn>
-              </Panel>
-              <Panel>
-                <AutoColumn gap="20px">
-                  <RowBetween>
-                    <TYPE.main>Volume (24hrs)</TYPE.main>
-                    <div />
-                  </RowBetween>
-                  <RowBetween align="flex-end">
-                    <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
-                      {volume}
-                    </TYPE.main>
-                    <TYPE.main>{volumeChange}</TYPE.main>
-                  </RowBetween>
-                </AutoColumn>
-              </Panel>
+                <Panel>
+                  <AutoColumn gap="20px">
+                    <RowBetween>
+                      <TYPE.main>Volume (24hrs)</TYPE.main>
+                      <div />
+                    </RowBetween>
+                    <RowBetween align="flex-end">
+                      <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
+                        {volume}
+                      </TYPE.main>
+                      <TYPE.main>{volumeChange}</TYPE.main>
+                    </RowBetween>
+                  </AutoColumn>
+                </Panel>
 
-              <Panel>
-                <AutoColumn gap="20px">
-                  <RowBetween>
-                    <TYPE.main>Transactions (24hrs)</TYPE.main>
-                    <div />
-                  </RowBetween>
-                  <RowBetween align="flex-end">
-                    <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
-                      {oneDayTxns}
-                    </TYPE.main>
-                    <TYPE.main>{txnChangeFormatted}</TYPE.main>
-                  </RowBetween>
-                </AutoColumn>
-              </Panel>
-              <Panel style={{ gridColumn: below1080 ? '1' : '2/4', gridRow: below1080 ? '' : '1/4' }}>
-                <TokenChart address={address} color={backgroundColor} />
-              </Panel>
-            </PanelWrapper>
-          </>
-          <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
-            Top Pairs
-          </TYPE.main>{' '}
-          <Panel
-            rounded
-            style={{
-              border: '1px solid rgba(43, 43, 43, 0.05)',
-              marginTop: '1.5rem'
-            }}
-            ref={PairsRef}
-            p={20}
-          >
-            {address && fetchedPairsList ? (
-              <PairList color={backgroundColor} address={address} pairs={fetchedPairsList} />
-            ) : (
-              <Loader />
-            )}
-          </Panel>
-          <RowBetween mt={40} mb={'1rem'} ref={TransactionsRef}>
-            <TYPE.main fontSize={'1.125rem'}>Transactions</TYPE.main> <div />
-          </RowBetween>
-          <Panel
-            rounded
-            style={{
-              border: '1px solid rgba(43, 43, 43, 0.05)'
-            }}
-          >
-            {transactions ? <TxnList color={backgroundColor} transactions={transactions} /> : <Loader />}
-          </Panel>
-          <>
-            <RowBetween style={{ marginTop: '3rem' }} ref={DataRef}>
-              <TYPE.main fontSize={'1.125rem'}>Token Information</TYPE.main>{' '}
-            </RowBetween>
+                <Panel>
+                  <AutoColumn gap="20px">
+                    <RowBetween>
+                      <TYPE.main>Transactions (24hrs)</TYPE.main>
+                      <div />
+                    </RowBetween>
+                    <RowBetween align="flex-end">
+                      <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
+                        {oneDayTxns}
+                      </TYPE.main>
+                      <TYPE.main>{txnChangeFormatted}</TYPE.main>
+                    </RowBetween>
+                  </AutoColumn>
+                </Panel>
+                <Panel style={{ gridColumn: below1080 ? '1' : '2/4', gridRow: below1080 ? '' : '1/4' }}>
+                  <TokenChart address={address} color={backgroundColor} />
+                </Panel>
+              </PanelWrapper>
+            </>
+            <span ref={PairsRef}>
+              <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
+                Top Pairs
+              </TYPE.main>
+            </span>
             <Panel
               rounded
               style={{
@@ -387,43 +325,68 @@ function TokenPage({ address, history }) {
               }}
               p={20}
             >
-              <TokenDetailsLayout>
-                <Column>
-                  <TYPE.main>Symbol</TYPE.main>
-                  <Text style={{ marginTop: '.5rem' }} fontSize={24} fontWeight="500">
-                    {symbol}
-                  </Text>
-                </Column>
-                <Column>
-                  <TYPE.main>Name</TYPE.main>
-                  <Text style={{ marginTop: '.5rem' }} fontSize={24} fontWeight="500">
-                    {name}
-                  </Text>
-                </Column>
-                <Column>
-                  <TYPE.main>Address</TYPE.main>
-                  <AutoRow align="flex-end">
-                    <Text style={{ marginTop: '.5rem' }} fontSize={24} fontWeight="500">
-                      {address.slice(0, 8) + '...' + address.slice(36, 42)}
-                    </Text>
-                    <CopyHelper toCopy={address} />
-                  </AutoRow>
-                </Column>
-                <ButtonLight color={backgroundColor}>
-                  <Link color={backgroundColor} external href={'https://etherscan.io/address/' + address}>
-                    View on Etherscan ↗
-                  </Link>
-                </ButtonLight>
-              </TokenDetailsLayout>
+              {address && fetchedPairsList ? (
+                <PairList color={backgroundColor} address={address} pairs={fetchedPairsList} />
+              ) : (
+                <Loader />
+              )}
             </Panel>
-          </>
-        </DashboardWrapper>
-      </WarningGrouping>
-      {!below1180 && (
-        <SideBar>
-          <WalletPreview />
-        </SideBar>
-      )}
+            <RowBetween mt={40} mb={'1rem'} ref={TransactionsRef}>
+              <TYPE.main fontSize={'1.125rem'}>Transactions</TYPE.main> <div />
+            </RowBetween>
+            <Panel
+              rounded
+              style={{
+                border: '1px solid rgba(43, 43, 43, 0.05)'
+              }}
+            >
+              {transactions ? <TxnList color={backgroundColor} transactions={transactions} /> : <Loader />}
+            </Panel>
+            <>
+              <RowBetween style={{ marginTop: '3rem' }} ref={DataRef}>
+                <TYPE.main fontSize={'1.125rem'}>Token Information</TYPE.main>{' '}
+              </RowBetween>
+              <Panel
+                rounded
+                style={{
+                  border: '1px solid rgba(43, 43, 43, 0.05)',
+                  marginTop: '1.5rem'
+                }}
+                p={20}
+              >
+                <TokenDetailsLayout>
+                  <Column>
+                    <TYPE.main>Symbol</TYPE.main>
+                    <Text style={{ marginTop: '.5rem' }} fontSize={24} fontWeight="500">
+                      {symbol}
+                    </Text>
+                  </Column>
+                  <Column>
+                    <TYPE.main>Name</TYPE.main>
+                    <Text style={{ marginTop: '.5rem' }} fontSize={24} fontWeight="500">
+                      {name}
+                    </Text>
+                  </Column>
+                  <Column>
+                    <TYPE.main>Address</TYPE.main>
+                    <AutoRow align="flex-end">
+                      <Text style={{ marginTop: '.5rem' }} fontSize={24} fontWeight="500">
+                        {address.slice(0, 8) + '...' + address.slice(36, 42)}
+                      </Text>
+                      <CopyHelper toCopy={address} />
+                    </AutoRow>
+                  </Column>
+                  <ButtonLight color={backgroundColor}>
+                    <Link color={backgroundColor} external href={'https://etherscan.io/address/' + address}>
+                      View on Etherscan ↗
+                    </Link>
+                  </ButtonLight>
+                </TokenDetailsLayout>
+              </Panel>
+            </>
+          </DashboardWrapper>
+        </WarningGrouping>
+      </ContentWrapper>
     </PageWrapper>
   )
 }

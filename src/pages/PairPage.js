@@ -6,6 +6,7 @@ import styled from 'styled-components'
 import { Text } from 'rebass'
 import Panel from '../components/Panel'
 
+import { PageWrapper, ContentWrapper, FixedMenu } from '../components/index'
 import { AutoRow, RowBetween, RowFixed } from '../components/Row'
 import Column, { AutoColumn } from '../components/Column'
 import { ButtonLight, ButtonDark } from '../components/ButtonStyled'
@@ -13,7 +14,6 @@ import PairChart from '../components/PairChart'
 import Link from '../components/Link'
 import TxnList from '../components/TxnList'
 import Loader from '../components/Loader'
-import WalletPreview from '../components/PinnedData'
 
 import { formattedNum, formattedPercent, getPoolLink, getSwapLink } from '../utils'
 import { useColor } from '../hooks'
@@ -23,47 +23,13 @@ import CopyHelper from '../components/Copy'
 import { useMedia } from 'react-use'
 import DoubleTokenLogo from '../components/DoubleLogo'
 import TokenLogo from '../components/TokenLogo'
-import { Hover, SideBar } from '../components'
+import { Hover } from '../components'
 import { useEthPrice } from '../contexts/GlobalData'
 import Warning from '../components/Warning'
 import { SURPRESS_WARNINGS } from '../constants'
 import { usePathDismissed, useSavedPairs } from '../contexts/LocalStorage'
 
 import { TrendingUp, PieChart, List, PlusCircle } from 'react-feather'
-import PinnedData from '../components/PinnedData'
-
-const PageWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  display: grid;
-  justify-content: start;
-  align-items: start;
-  grid-template-columns: 180px 1fr 256px;
-  grid-gap: 24px;
-  padding: 0 24px;
-  width: calc(100% - 48px);
-  max-width: 1440px;
-  padding-bottom: 100px;
-
-  @media screen and (max-width: 1280px) {
-    grid-template-columns: 180px 1fr 200px;
-  }
-
-  @media screen and (max-width: 1180px) {
-    grid-template-columns: 180px 1fr;
-  }
-
-  @media screen and (max-width: 800px) {
-    grid-template-columns: 1fr;
-  }
-
-  @media screen and (max-width: 640px) {
-    width: calc(100% - 40px);
-    padding: 0 20px;
-  }
-`
 
 const DashboardWrapper = styled.div`
   width: 100%;
@@ -95,7 +61,7 @@ const TokenDetailsLayout = styled.div`
   display: inline-grid;
   width: 100%;
   grid-template-columns: auto auto auto auto 1fr;
-  column-gap: 30px;
+  column-gap: 60px;
   align-items: start;
 
   &:last-child {
@@ -215,7 +181,6 @@ function PairPage({ pairAddress, history }) {
   // txn percentage change
   const txnChangeFormatted = formattedPercent(txnChange)
 
-  const below1180 = useMedia('(max-width: 1180px)')
   const below1080 = useMedia('(max-width: 1080px)')
   const below800 = useMedia('(max-width: 800px)')
   const below600 = useMedia('(max-width: 600px)')
@@ -230,13 +195,17 @@ function PairPage({ pairAddress, history }) {
 
   useEffect(() => {
     setActive(OverviewRef)
+    window.scrollTo({
+      behavior: 'smooth',
+      top: 0
+    })
   }, [])
 
   const handleScroll = ref => {
     setActive(ref.current)
-    document.querySelector('body').scrollTo({
+    window.scrollTo({
       behavior: 'smooth',
-      top: ref.current.offsetTop - 120
+      top: ref.current.offsetTop - 130
     })
   }
 
@@ -244,36 +213,12 @@ function PairPage({ pairAddress, history }) {
 
   return (
     <PageWrapper>
-      {!below800 && (
-        <SubNav>
-          <SubNavEl onClick={() => handleScroll(OverviewRef)} isActive={active === OverviewRef}>
-            <TrendingUp size={20} style={{ marginRight: '1rem' }} />
-            <TYPE.main>Overview</TYPE.main>
-          </SubNavEl>
-          <SubNavEl onClick={() => handleScroll(TransactionsRef)} isActive={active === TransactionsRef}>
-            <List size={20} style={{ marginRight: '1rem' }} />
-            <TYPE.main>Transactions</TYPE.main>
-          </SubNavEl>
-          <SubNavEl onClick={() => handleScroll(DataRef)} isActive={active === DataRef}>
-            <PieChart size={20} style={{ marginRight: '1rem' }} />
-            <TYPE.main>Pair Data</TYPE.main>
-          </SubNavEl>
-          <PinnedData />
-        </SubNav>
-      )}
-      <div>
-        <Warning
-          type={'pair'}
-          show={!dismissed && !(SURPRESS_WARNINGS.includes(token0?.id) && SURPRESS_WARNINGS.includes(token1?.id))}
-          setShow={markAsDismissed}
-          address={pairAddress}
-        />
-        <WarningGrouping
-          disabled={!dismissed && !(SURPRESS_WARNINGS.includes(token0?.id) && SURPRESS_WARNINGS.includes(token1?.id))}
-        >
-          <RowBetween style={{ flexWrap: 'wrap' }} ref={OverviewRef}>
+      <span ref={OverviewRef} />
+      <FixedMenu>
+        <AutoColumn gap="40px">
+          <RowBetween style={{ flexWrap: 'wrap' }}>
             <RowFixed style={{ flexWrap: 'wrap' }}>
-              <RowFixed mb={20}>
+              <RowFixed>
                 {token0 && token1 && (
                   <DoubleTokenLogo a0={token0?.id || ''} a1={token1?.id || ''} size={32} margin={true} />
                 )}{' '}
@@ -287,15 +232,15 @@ function PairPage({ pairAddress, history }) {
                   ) : (
                     ''
                   )}
-                </Text>{' '}
+                </Text>
               </RowFixed>
             </RowFixed>
             <RowFixed
-              mb={20}
               ml={below600 ? '0' : '2.5rem'}
+              mt={below1080 && '1rem'}
               style={{ flexDirection: below1080 ? 'row-reverse' : 'initial' }}
             >
-              {!!!savedPairs[pairAddress] && (
+              {!!!savedPairs[pairAddress] && !below1080 && (
                 <Hover onClick={() => addPair(pairAddress, token0.id, token1.id, token0.symbol, token1.symbol)}>
                   <PlusCircle style={{ marginRight: '0.5rem' }} />
                 </Hover>
@@ -304,12 +249,40 @@ function PairPage({ pairAddress, history }) {
                 <ButtonLight color={backgroundColor}>+ Add Liquidity</ButtonLight>
               </Link>
               <Link external href={getSwapLink(token0?.id, token1?.id)}>
-                <ButtonDark ml={'.5rem'} mr={below1080 && '.5rem'} color={backgroundColor}>
+                <ButtonDark ml={!below1080 && '.5rem'} mr={below1080 && '.5rem'} color={backgroundColor}>
                   Trade
                 </ButtonDark>
               </Link>
             </RowFixed>
           </RowBetween>
+        </AutoColumn>
+      </FixedMenu>
+      <ContentWrapper>
+        {!below800 && (
+          <SubNav>
+            <SubNavEl onClick={() => handleScroll(OverviewRef)} isActive={active === OverviewRef}>
+              <TrendingUp size={20} style={{ marginRight: '1rem' }} />
+              <TYPE.main>Overview</TYPE.main>
+            </SubNavEl>
+            <SubNavEl onClick={() => handleScroll(TransactionsRef)} isActive={active === TransactionsRef}>
+              <List size={20} style={{ marginRight: '1rem' }} />
+              <TYPE.main>Transactions</TYPE.main>
+            </SubNavEl>
+            <SubNavEl onClick={() => handleScroll(DataRef)} isActive={active === DataRef}>
+              <PieChart size={20} style={{ marginRight: '1rem' }} />
+              <TYPE.main>Pair Data</TYPE.main>
+            </SubNavEl>
+          </SubNav>
+        )}
+        <Warning
+          type={'pair'}
+          show={!dismissed && !(SURPRESS_WARNINGS.includes(token0?.id) && SURPRESS_WARNINGS.includes(token1?.id))}
+          setShow={markAsDismissed}
+          address={pairAddress}
+        />
+        <WarningGrouping
+          disabled={!dismissed && !(SURPRESS_WARNINGS.includes(token0?.id) && SURPRESS_WARNINGS.includes(token1?.id))}
+        >
           <AutoRow gap="6px">
             <FixedPanel onClick={() => history.push(`/token/${token0?.id}`)}>
               <RowFixed>
@@ -441,7 +414,6 @@ function PairPage({ pairAddress, history }) {
                   border: '1px solid rgba(43, 43, 43, 0.05)',
                   marginTop: '1.5rem'
                 }}
-                ref={TransactionsRef}
               >
                 {transactions ? <TxnList transactions={transactions} /> : <Loader />}
               </Panel>
@@ -463,7 +435,6 @@ function PairPage({ pairAddress, history }) {
                       {token0 && token1 ? token0.symbol + '-' + token1.symbol : ''}
                     </Text>
                   </Column>
-
                   <Column>
                     <TYPE.main>Pair Address</TYPE.main>
                     <AutoRow align="flex-end">
@@ -501,12 +472,7 @@ function PairPage({ pairAddress, history }) {
             </>
           </DashboardWrapper>
         </WarningGrouping>
-      </div>
-      {!below1180 && (
-        <SideBar>
-          <WalletPreview />
-        </SideBar>
-      )}
+      </ContentWrapper>
     </PageWrapper>
   )
 }

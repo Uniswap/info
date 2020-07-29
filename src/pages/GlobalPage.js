@@ -16,28 +16,10 @@ import Panel from '../components/Panel'
 import { useAllTokenData } from '../contexts/TokenData'
 import { TYPE } from '../Theme'
 import { formattedNum, formattedPercent } from '../utils'
-import { CustomLink } from '../components/Link'
-import Search from '../components/Search'
-
-const PageWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  /* width: calc(100% - 64px); */
-
-  @media screen and (max-width: 1180px) {
-    width: calc(100% - 40px);
-    padding: 0 20px;
-    grid-template-columns: 180px 1fr;
-  }
-
-  @media screen and (max-width: 800px) {
-    width: calc(100% - 40px);
-    padding: 0 20px;
-    grid-template-columns: 1fr;
-  }
-`
+import Link, { CustomLink } from '../components/Link'
+import { TrendingUp, PieChart, Disc, List } from 'react-feather'
+import { SubNav, SubNavEl, PageWrapper, FixedMenu, ContentWrapper } from '../components'
+import { ButtonDark } from '../components/ButtonStyled'
 
 const ListOptions = styled(AutoRow)`
   height: 40px;
@@ -59,27 +41,13 @@ const GridRow = styled.div`
   justify-content: space-between;
 `
 
-const ChartWrapper = styled.div`
-  height: 100%;
-`
-
-const FixedMenu = styled.div`
-  width: 100%;
-  z-index: 99;
-  position: sticky;
-  top: -6rem;
-  padding-top: 1.5rem;
-  background-color: white;
-  border-bottom: 1px solid ${({ theme }) => theme.bg3};
-  margin-bottom: 2rem;
-`
-
 function GlobalPage() {
   const transactions = useGlobalTransactions()
 
   const allPairs = useAllPairData()
   const allTokens = useAllTokenData()
 
+  const below1180 = useMedia('(max-width: 1180px)')
   const below800 = useMedia('(max-width: 800px)')
 
   const { totalLiquidityUSD, oneDayVolumeUSD, volumeChangeUSD, liquidityChangeUSD } = useGlobalData()
@@ -100,7 +68,6 @@ function GlobalPage() {
   }, [])
 
   const handleScroll = ref => {
-    console.log(ref.current)
     setActive(ref.current)
     window.scrollTo({
       behavior: 'smooth',
@@ -110,113 +77,118 @@ function GlobalPage() {
 
   return (
     <PageWrapper>
+      <div ref={OverviewRef} />
       <FixedMenu>
         <AutoColumn gap="40px">
-          <Search />
           <RowBetween>
-            <TYPE.largeHeader>Uniswap Protocol Analytics</TYPE.largeHeader>
-            <div />
+            <TYPE.largeHeader>Protocol Overview</TYPE.largeHeader>
+            <Link href="https://migrate.uniswap.info" target="_blank">
+              <ButtonDark style={{ minWidth: 'initial' }}>Launch App</ButtonDark>
+            </Link>
           </RowBetween>
-          <AutoRow gap="1rem" style={{ marginBottom: '1rem' }}>
-            <TYPE.main fontSize={'.825rem'} onClick={() => handleScroll(OverviewRef)}>
-              Charts
-            </TYPE.main>
-            <TYPE.main fontSize={'.825rem'} onClick={() => handleScroll(PairsRef)}>
-              Top Pairs
-            </TYPE.main>
-            <TYPE.main fontSize={'.825rem'} onClick={() => handleScroll(TokensRef)}>
-              Top Tokens
-            </TYPE.main>
-            <TYPE.main fontSize={'.825rem'} onClick={() => handleScroll(TransactionsRef)}>
-              Transactions
-            </TYPE.main>
-          </AutoRow>
         </AutoColumn>
       </FixedMenu>
-      <span ref={OverviewRef}></span>
-      {below800 && ( // mobile card
-        <Box mb={20}>
-          <Panel>
-            <Box>
-              <AutoColumn gap="36px">
-                <AutoColumn gap="20px">
-                  <RowBetween>
-                    <TYPE.main>Volume (24hrs)</TYPE.main>
-                    <div />
-                  </RowBetween>
-                  <RowBetween align="flex-end">
-                    <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
-                      {formattedNum(oneDayVolumeUSD, true)}
-                    </TYPE.main>
-                    <TYPE.main fontSize={12}>{formattedPercent(volumeChangeUSD)}</TYPE.main>
-                  </RowBetween>
-                </AutoColumn>
-                <AutoColumn gap="20px">
-                  <RowBetween>
-                    <TYPE.main>Total Liquidity</TYPE.main>
-                    <div />
-                  </RowBetween>
-                  <RowBetween align="flex-end">
-                    <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
-                      {formattedNum(totalLiquidityUSD, true)}
-                    </TYPE.main>
-                    <TYPE.main fontSize={12}>{formattedPercent(liquidityChangeUSD)}</TYPE.main>
-                  </RowBetween>
-                </AutoColumn>
-              </AutoColumn>
+      <ContentWrapper>
+        {!below1180 && (
+          <SubNav>
+            <SubNavEl onClick={() => handleScroll(OverviewRef)} isActive={active === OverviewRef}>
+              <TrendingUp size={20} style={{ marginRight: '1rem' }} />
+              <TYPE.main>Overview</TYPE.main>
+            </SubNavEl>
+            <SubNavEl onClick={() => handleScroll(PairsRef)} isActive={active === OverviewRef}>
+              <PieChart size={20} style={{ marginRight: '1rem' }} />
+              <TYPE.main>Top Pairs</TYPE.main>
+            </SubNavEl>
+            <SubNavEl onClick={() => handleScroll(TokensRef)} isActive={active === OverviewRef}>
+              <Disc size={20} style={{ marginRight: '1rem' }} />
+              <TYPE.main>Top Tokens</TYPE.main>
+            </SubNavEl>
+            <SubNavEl onClick={() => handleScroll(TransactionsRef)} isActive={active === OverviewRef}>
+              <List size={20} style={{ marginRight: '1rem' }} />
+              <TYPE.main>Transactions</TYPE.main>
+            </SubNavEl>
+          </SubNav>
+        )}
+        <div>
+          {below800 && ( // mobile card
+            <Box mb={20}>
+              <Panel>
+                <Box>
+                  <AutoColumn gap="36px">
+                    <AutoColumn gap="20px">
+                      <RowBetween>
+                        <TYPE.main>Volume (24hrs)</TYPE.main>
+                        <div />
+                      </RowBetween>
+                      <RowBetween align="flex-end">
+                        <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
+                          {formattedNum(oneDayVolumeUSD, true)}
+                        </TYPE.main>
+                        <TYPE.main fontSize={12}>{formattedPercent(volumeChangeUSD)}</TYPE.main>
+                      </RowBetween>
+                    </AutoColumn>
+                    <AutoColumn gap="20px">
+                      <RowBetween>
+                        <TYPE.main>Total Liquidity</TYPE.main>
+                        <div />
+                      </RowBetween>
+                      <RowBetween align="flex-end">
+                        <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
+                          {formattedNum(totalLiquidityUSD, true)}
+                        </TYPE.main>
+                        <TYPE.main fontSize={12}>{formattedPercent(liquidityChangeUSD)}</TYPE.main>
+                      </RowBetween>
+                    </AutoColumn>
+                  </AutoColumn>
+                </Box>
+              </Panel>
             </Box>
+          )}
+          {!below800 && (
+            <GridRow style={{ marginTop: '6px' }}>
+              <Panel style={{ height: '100%', minHeight: '300px' }}>
+                <GlobalChart display="liquidity" />
+              </Panel>
+              <Panel style={{ height: '100%' }}>
+                <GlobalChart display="volume" />
+              </Panel>
+            </GridRow>
+          )}
+          {below800 && (
+            <AutoColumn style={{ marginTop: '6px' }} gap="24px">
+              <Panel style={{ height: '100%', minHeight: '300px' }}>
+                <GlobalChart display="liquidity" />
+              </Panel>
+            </AutoColumn>
+          )}
+          <ListOptions ref={PairsRef} gap="10px" style={{ marginTop: '2rem', marginBottom: '.5rem' }}>
+            <RowBetween>
+              <TYPE.main fontSize={'1rem'}>Top Pairs</TYPE.main>
+              <CustomLink to={'/all-pairs'}>See All</CustomLink>
+            </RowBetween>
+          </ListOptions>
+          <Panel style={{ marginTop: '6px', padding: '1.125rem 0 ' }}>
+            <PairList pairs={allPairs} />
           </Panel>
-        </Box>
-      )}
-      {!below800 && (
-        <GridRow style={{ marginTop: '6px' }}>
-          <Panel style={{ height: '100%', minHeight: '300px' }}>
-            <ChartWrapper area="fill" rounded>
-              <GlobalChart display="liquidity" />
-            </ChartWrapper>
+          <ListOptions ref={TokensRef} gap="10px" style={{ marginTop: '2rem', marginBottom: '.5rem' }}>
+            <RowBetween>
+              <TYPE.main fontSize={'1.125rem'}>Top Tokens</TYPE.main>
+              <CustomLink to={'/all-tokens'}>See All</CustomLink>
+            </RowBetween>
+          </ListOptions>
+          <Panel style={{ marginTop: '6px', padding: '1.125rem 0 ' }}>
+            <TopTokenList tokens={allTokens} />
           </Panel>
-          <Panel style={{ height: '100%' }}>
-            <ChartWrapper area="fill" rounded>
-              <GlobalChart display="volume" />
-            </ChartWrapper>
+          <span ref={TransactionsRef}>
+            <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '2rem' }}>
+              Transactions
+            </TYPE.main>
+          </span>
+          <Panel style={{ margin: '1rem 0' }}>
+            <TxnList transactions={transactions} />
           </Panel>
-        </GridRow>
-      )}
-      {below800 && (
-        <AutoColumn style={{ marginTop: '6px' }} gap="24px">
-          <Panel style={{ height: '100%', minHeight: '300px' }}>
-            <ChartWrapper area="fill" rounded>
-              <GlobalChart display="liquidity" />
-            </ChartWrapper>
-          </Panel>
-        </AutoColumn>
-      )}
-      <ListOptions ref={PairsRef} gap="10px" style={{ marginTop: '2rem', marginBottom: '.5rem' }}>
-        <RowBetween>
-          <TYPE.main fontSize={'1rem'}>Top Pairs</TYPE.main>
-          <CustomLink to={'/all-pairs'}>See All</CustomLink>
-        </RowBetween>
-      </ListOptions>
-      <Panel style={{ marginTop: '6px', padding: '1.125rem 0 ' }}>
-        <PairList pairs={allPairs} />
-      </Panel>
-      <ListOptions ref={TokensRef} gap="10px" style={{ marginTop: '2rem', marginBottom: '.5rem' }}>
-        <RowBetween>
-          <TYPE.main fontSize={'1.125rem'}>Top Tokens</TYPE.main>
-          <CustomLink to={'/all-tokens'}>See All</CustomLink>
-        </RowBetween>
-      </ListOptions>
-      <Panel style={{ marginTop: '6px', padding: '1.125rem 0 ' }}>
-        <TopTokenList tokens={allTokens} />
-      </Panel>
-      <span ref={TransactionsRef}>
-        <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '2rem' }}>
-          Transactions
-        </TYPE.main>
-      </span>
-      <Panel style={{ margin: '1rem 0' }}>
-        <TxnList transactions={transactions} />
-      </Panel>
+        </div>
+      </ContentWrapper>
     </PageWrapper>
   )
 }

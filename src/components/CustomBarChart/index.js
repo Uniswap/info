@@ -3,10 +3,9 @@ import { createChart } from 'lightweight-charts'
 import dayjs from 'dayjs'
 import { formattedNum } from '../../utils'
 
-const CustomBarChart = ({ data, base, baseChange, field, title }) => {
+const CustomBarChart = ({ data, base, baseChange, field, title, width }) => {
   const ref = useRef()
 
-  var width = 400
   var height = 300
 
   const [chartCreated, setChartCreated] = useState(false)
@@ -20,7 +19,6 @@ const CustomBarChart = ({ data, base, baseChange, field, title }) => {
 
   useEffect(() => {
     if (!chartCreated && formattedData) {
-      setChartCreated(true)
       var chart = createChart(ref.current, {
         width: width,
         height: height,
@@ -103,9 +101,7 @@ const CustomBarChart = ({ data, base, baseChange, field, title }) => {
           formattedNum(base, true) +
           `<span style="margin-left: 10px; font-size: 16px; color: ${color};">${formattedPercentChange}</span>` +
           '</div>' +
-          '<div>' +
-          dateStr +
-          '</div>'
+          '<div>24HR</div>'
       }
       setLastBarText()
       chart.subscribeCrosshairMove(function(param) {
@@ -132,8 +128,17 @@ const CustomBarChart = ({ data, base, baseChange, field, title }) => {
             '</div>'
         }
       })
+
+      setChartCreated(chart)
     }
   }, [base, baseChange, chartCreated, data, formattedData, height, title, width])
+  // responsiveness
+  useEffect(() => {
+    if (width) {
+      chartCreated && chartCreated.resize(width, height)
+      chartCreated && chartCreated.timeScale().scrollToPosition(0)
+    }
+  }, [chartCreated, height, width])
 
   return <div ref={ref} />
 }

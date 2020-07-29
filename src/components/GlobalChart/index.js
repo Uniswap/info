@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react'
+import React, { useState, useMemo, useEffect, useRef } from 'react'
 import { ResponsiveContainer } from 'recharts'
 import { useTimeframe } from '../../contexts/Application'
 import { timeframeOptions } from '../../constants'
@@ -78,19 +78,38 @@ const GlobalChart = ({ display }) => {
   }, [dailyData, utcStartTime, volumeWindow, weeklyData])
   const below800 = useMedia('(max-width: 800px)')
 
+  const ref = useRef()
+
+  const isClient = typeof window === 'object'
+
+  const [width, setWidth] = useState(ref?.current?.container?.clientWidth)
+
+  // update the width on a window resize
+  useEffect(() => {
+    if (!isClient) {
+      return false
+    }
+    function handleResize() {
+      setWidth(ref?.current?.container?.clientWidth ?? width)
+    }
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [isClient, width]) // Empty array ensures that effect is only run on mount and unmount
+
   return chartDataFiltered ? (
     <>
       {below800 && (
         <DropdownSelect options={CHART_VIEW} active={chartView} setActive={setChartView} color={'#ff007a'} />
       )}
       {chartDataFiltered && chartView === CHART_VIEW.LIQUIDITY && (
-        <ResponsiveContainer aspect={60 / 28}>
+        <ResponsiveContainer aspect={60 / 28} ref={ref}>
           <CustomAreaChart
             data={chartDataFiltered}
             base={totalLiquidityUSD}
             baseChange={liquidityChangeUSD}
             title="Liquidity"
             field="totalLiquidityUSD"
+            width={width}
           />
         </ResponsiveContainer>
       )}
@@ -102,6 +121,7 @@ const GlobalChart = ({ display }) => {
             baseChange={volumeChangeUSD}
             title="Volume"
             field="dailyVolumeUSD"
+            width={width}
           />
         </ResponsiveContainer>
       )}

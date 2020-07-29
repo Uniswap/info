@@ -93,12 +93,14 @@ export default function NavHeader({ token, pair, account }) {
     </Header>
   ) : (
     <Header>
-      <Polling>
-        <PollingDot />
-        <TYPE.small>
-          Last Updated {!!seconds ? seconds + 's' : '-'} ago <a href="/">(refresh)</a>
-        </TYPE.small>
-      </Polling>
+      {!below1180 && (
+        <Polling>
+          <PollingDot />
+          <TYPE.small>
+            Last Updated {!!seconds ? seconds + 's' : '-'} ago <a href="/">(refresh)</a>
+          </TYPE.small>
+        </Polling>
+      )}
       <RowBetween style={{ padding: '0.5rem 1rem' }}>
         <RowFixed>
           <HeaderText
