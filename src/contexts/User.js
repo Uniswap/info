@@ -281,6 +281,11 @@ export function useUserLiquidityHistory(account) {
       let sortedPositions = history.sort((a, b) => {
         return parseInt(a.timestamp) > parseInt(b.timestamp) ? 1 : -1
       })
+
+      if (sortedPositions.length === 0) {
+        return []
+      }
+
       // if UI start time is > first position time - bump start index to this time
       if (parseInt(sortedPositions[0].timestamp) > dayIndex) {
         dayIndex = parseInt(parseInt(sortedPositions[0].timestamp) / 86400)

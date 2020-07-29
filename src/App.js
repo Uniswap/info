@@ -16,6 +16,7 @@ import AllTokensPage from './pages/AllTokensPage'
 import AllPairsPage from './pages/AllPairsPage'
 import SideNav from './components/SideNav'
 import PinnedData from './components/PinnedData'
+import AccountLookup from './pages/AccountLookup'
 
 const AppWrapper = styled.div`
   position: relative;
@@ -134,6 +135,10 @@ function App() {
               <Route path="/all-pairs">
                 <NavHeaderUpdated />
                 <AllPairsPage />
+              </Route>
+              <Route path="/account-lookup">
+                <NavHeaderUpdated />
+                <AccountLookup />
               </Route>
               <Redirect to="/home" />
             </Switch>

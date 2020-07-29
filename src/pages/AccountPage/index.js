@@ -132,11 +132,6 @@ function AccountPage({ account }) {
   const transactions = useUserTransactions(account)
   const positions = useUserPositions(account)
 
-  // settings for list view and dropdowns
-  const [showDropdown, setShowDropdown] = useState(false)
-  const [listView, setListView] = useState(LIST_VIEW.POSITIONS)
-  const [activePosition, setActivePosition] = useState()
-
   const below1080 = useMedia('(max-width: 1080px)')
   const below800 = useMedia('(max-width: 800px)')
   const below600 = useMedia('(max-width: 600px)')
@@ -164,6 +159,12 @@ function AccountPage({ account }) {
         }, 0)
       : 0
   }, [positions])
+
+  // settings for list view and dropdowns
+  const hideLPContent = positions && positions.length === 0
+  const [showDropdown, setShowDropdown] = useState(false)
+  const [listView, setListView] = useState(hideLPContent ? LIST_VIEW.TRANSACTIONS : LIST_VIEW.POSITIONS)
+  const [activePosition, setActivePosition] = useState()
 
   const dynamicPositions = activePosition ? [activePosition] : positions
 
@@ -217,126 +218,134 @@ function AccountPage({ account }) {
           </RowBetween>
         </Header>
         <DashboardWrapper>
-          <DropdownWrapper>
-            <ButtonDropdown
-              width="100%"
-              style={{ backgroundColor: 'rgba(255, 255, 255, 0.4)' }}
-              onClick={() => setShowDropdown(!showDropdown)}
-              open={showDropdown}
-            >
-              {!activePosition && (
-                <RowFixed>
-                  <Activity stroke="black" size={16} />
-                  <Text fontSize="16px" color="black" fontWeight={400} ml={'10px'}>
-                    All Positions
-                  </Text>
-                </RowFixed>
-              )}
-              {activePosition && (
-                <RowFixed>
-                  <DoubleTokenLogo a0={activePosition.pair.token0.id} a1={activePosition.pair.token1.id} size={16} />
-                  <Text fontWeight={400} color="black" ml={'16px'} fontSize="16px">
-                    {activePosition.pair.token0.symbol}-{activePosition.pair.token1.symbol} Position
-                  </Text>
-                </RowFixed>
-              )}
-            </ButtonDropdown>
-            {showDropdown && (
-              <Flyout>
-                <AutoColumn gap="0px">
-                  {positions
-                    ?.filter(p => {
-                      return p.liquidityTokenBalance > 0
-                    })
-                    .map((p, i) => {
-                      return (
-                        p.pair.id !== activePosition?.pair.id && (
-                          <MenuRow
-                            onClick={() => {
-                              setActivePosition(p)
-                              setShowDropdown(false)
-                            }}
-                            key={i}
-                          >
-                            <DoubleTokenLogo a0={p.pair.token0.id} a1={p.pair.token1.id} size={16} />
-                            <Text fontWeight={400} color="black" ml={'16px'} fontSize="16px">
-                              {p.pair.token0.symbol}-{p.pair.token1.symbol} Position
-                            </Text>
-                          </MenuRow>
+          {!hideLPContent && (
+            <DropdownWrapper>
+              <ButtonDropdown
+                width="100%"
+                style={{ backgroundColor: 'rgba(255, 255, 255, 0.4)' }}
+                onClick={() => setShowDropdown(!showDropdown)}
+                open={showDropdown}
+              >
+                {!activePosition && (
+                  <RowFixed>
+                    <Activity stroke="black" size={16} />
+                    <Text fontSize="16px" color="black" fontWeight={400} ml={'10px'}>
+                      All Positions
+                    </Text>
+                  </RowFixed>
+                )}
+                {activePosition && (
+                  <RowFixed>
+                    <DoubleTokenLogo a0={activePosition.pair.token0.id} a1={activePosition.pair.token1.id} size={16} />
+                    <Text fontWeight={400} color="black" ml={'16px'} fontSize="16px">
+                      {activePosition.pair.token0.symbol}-{activePosition.pair.token1.symbol} Position
+                    </Text>
+                  </RowFixed>
+                )}
+              </ButtonDropdown>
+              {showDropdown && (
+                <Flyout>
+                  <AutoColumn gap="0px">
+                    {positions
+                      ?.filter(p => {
+                        return p.liquidityTokenBalance > 0
+                      })
+                      .map((p, i) => {
+                        return (
+                          p.pair.id !== activePosition?.pair.id && (
+                            <MenuRow
+                              onClick={() => {
+                                setActivePosition(p)
+                                setShowDropdown(false)
+                              }}
+                              key={i}
+                            >
+                              <DoubleTokenLogo a0={p.pair.token0.id} a1={p.pair.token1.id} size={16} />
+                              <Text fontWeight={400} color="black" ml={'16px'} fontSize="16px">
+                                {p.pair.token0.symbol}-{p.pair.token1.symbol} Position
+                              </Text>
+                            </MenuRow>
+                          )
                         )
-                      )
-                    })}
-                  {activePosition && (
-                    <MenuRow
-                      onClick={() => {
-                        setActivePosition()
-                        setShowDropdown(false)
-                      }}
-                    >
-                      <RowFixed>
-                        <Activity stroke="black" size={16} />
-                        <Text fontSize="16px" color="black" fontWeight={400} ml={'10px'}>
-                          All Positions
-                        </Text>
-                      </RowFixed>
-                    </MenuRow>
-                  )}
-                </AutoColumn>
-              </Flyout>
-            )}
-          </DropdownWrapper>
-          <Panel style={{ height: '100%', marginBottom: '1rem' }}>
-            <AutoRow gap="20px">
-              <AutoColumn gap="10px">
-                <RowBetween>
-                  <TYPE.main fontSize={'16px'} fontWeight={400} color="#888D9B">
-                    Liquidity Value
-                  </TYPE.main>
-                  <div />
-                </RowBetween>
-                <RowFixed align="flex-end">
-                  <TYPE.main fontSize={'24px'} lineHeight={1} fontWeight={600}>
-                    {formattedNum(positionValue, true)}
-                  </TYPE.main>
-                </RowFixed>
-              </AutoColumn>
-              <AutoColumn gap="10px">
-                <RowBetween>
-                  <TYPE.main fontSize={'16px'} fontWeight={400} color="#888D9B">
-                    Total Fees Earned
-                  </TYPE.main>
-                  <div />
-                </RowBetween>
-                <RowFixed align="flex-end">
-                  <TYPE.main fontSize={'24px'} lineHeight={1} fontWeight={600} color="green">
-                    {formattedNum(aggregateFees, true, true)}
-                  </TYPE.main>
-                </RowFixed>
-              </AutoColumn>
-            </AutoRow>
-          </Panel>
-          <PanelWrapper>
-            <Panel style={{ gridColumn: '1' }}>
-              {activePosition ? (
-                <PairReturnsChart account={account} position={activePosition} />
-              ) : (
-                <UserChart account={account} position={activePosition} />
+                      })}
+                    {activePosition && (
+                      <MenuRow
+                        onClick={() => {
+                          setActivePosition()
+                          setShowDropdown(false)
+                        }}
+                      >
+                        <RowFixed>
+                          <Activity stroke="black" size={16} />
+                          <Text fontSize="16px" color="black" fontWeight={400} ml={'10px'}>
+                            All Positions
+                          </Text>
+                        </RowFixed>
+                      </MenuRow>
+                    )}
+                  </AutoColumn>
+                </Flyout>
               )}
+            </DropdownWrapper>
+          )}
+          {!hideLPContent && (
+            <Panel style={{ height: '100%', marginBottom: '1rem' }}>
+              <AutoRow gap="20px">
+                <AutoColumn gap="10px">
+                  <RowBetween>
+                    <TYPE.main fontSize={'16px'} fontWeight={400} color="#888D9B">
+                      Liquidity Value
+                    </TYPE.main>
+                    <div />
+                  </RowBetween>
+                  <RowFixed align="flex-end">
+                    <TYPE.main fontSize={'24px'} lineHeight={1} fontWeight={600}>
+                      {formattedNum(positionValue, true)}
+                    </TYPE.main>
+                  </RowFixed>
+                </AutoColumn>
+                <AutoColumn gap="10px">
+                  <RowBetween>
+                    <TYPE.main fontSize={'16px'} fontWeight={400} color="#888D9B">
+                      Total Fees Earned
+                    </TYPE.main>
+                    <div />
+                  </RowBetween>
+                  <RowFixed align="flex-end">
+                    <TYPE.main fontSize={'24px'} lineHeight={1} fontWeight={600} color="green">
+                      {formattedNum(aggregateFees, true, true)}
+                    </TYPE.main>
+                  </RowFixed>
+                </AutoColumn>
+              </AutoRow>
             </Panel>
-          </PanelWrapper>
+          )}
+          {!hideLPContent && (
+            <PanelWrapper>
+              <Panel style={{ gridColumn: '1' }}>
+                {activePosition ? (
+                  <PairReturnsChart account={account} position={activePosition} />
+                ) : (
+                  <UserChart account={account} position={activePosition} />
+                )}
+              </Panel>
+            </PanelWrapper>
+          )}
           <AutoColumn gap="16px" ref={StatsRef}>
             <ListOptions gap="10px" style={{ marginTop: '2rem' }}>
-              <Hover>
-                <TYPE.main
-                  onClick={() => {
-                    setListView(LIST_VIEW.POSITIONS)
-                  }}
-                  fontSize={below600 ? '14px' : '1.125rem'}
-                  color={listView !== LIST_VIEW.POSITIONS ? '#aeaeae' : 'black'}
-                >
-                  Positions
-                </TYPE.main>
-              </Hover>
+              {!hideLPContent && (
+                <Hover>
+                  <TYPE.main
+                    onClick={() => {
+                      setListView(LIST_VIEW.POSITIONS)
+                    }}
+                    fontSize={below600 ? '14px' : '1.125rem'}
+                    color={listView !== LIST_VIEW.POSITIONS ? '#aeaeae' : 'black'}
+                  >
+                    Positions
+                  </TYPE.main>
+                </Hover>
+              )}
               <Hover>
                 <TYPE.main
                   onClick={() => {

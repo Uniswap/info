@@ -72,7 +72,7 @@ function SideNav() {
           <List size={20} style={{ marginRight: '1rem' }} />
           <TYPE.main>Transactions</TYPE.main>
         </SubNavEl>
-        <SubNavEl to="/accounts">
+        <SubNavEl to="/account-lookup">
           <List size={20} style={{ marginRight: '1rem' }} />
           <TYPE.main>Accounts</TYPE.main>
         </SubNavEl>
