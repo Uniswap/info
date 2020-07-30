@@ -8,6 +8,8 @@ import { BasicLink } from '../Link'
 import { useMedia } from 'react-use'
 import { transparentize } from 'polished'
 
+import Logo from '../../assets/logo.svg'
+
 const Wrapper = styled.div`
   width: 100%;
   background-color: ${({ theme }) => transparentize(0.4, theme.bg1)};
