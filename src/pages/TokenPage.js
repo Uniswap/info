@@ -197,7 +197,7 @@ function TokenPage({ address, history }) {
             </RowFixed>
           </RowFixed>
           <span>
-            <RowFixed ml={below600 ? '0' : '2.5rem'}>
+            <RowFixed ml={below600 ? '0' : '2.5rem'} mt={below600 ? '2rem' : '0'}>
               {!!!savedTokens[address] && !below800 && (
                 <Hover onClick={() => addToken(address, symbol)}>
                   <PlusCircle style={{ marginRight: '0.5rem' }} />
@@ -215,6 +215,12 @@ function TokenPage({ address, history }) {
           </span>
         </RowBetween>
       </FixedMenu>
+      <Warning
+        type={'token'}
+        show={!dismissed && !SURPRESS_WARNINGS.includes(address)}
+        setShow={markAsDismissed}
+        address={address}
+      />
       <ContentWrapper>
         {!below1180 && (
           <SubNav>
@@ -236,18 +242,12 @@ function TokenPage({ address, history }) {
             </SubNavEl>
           </SubNav>
         )}
-        <Warning
-          type={'token'}
-          show={!dismissed && !SURPRESS_WARNINGS.includes(address)}
-          setShow={markAsDismissed}
-          address={address}
-        />
+
         <WarningGrouping disabled={!dismissed && !SURPRESS_WARNINGS.includes(address)}>
           <DashboardWrapper>
             <>
               {!below1080 && <TYPE.main fontSize={'1.125rem'}>Token Stats</TYPE.main>}
-
-              <PanelWrapper style={{ marginTop: '1.5rem' }}>
+              <PanelWrapper style={{ marginTop: below1080 ? '0' : '1.5rem' }}>
                 {below1080 && price && (
                   <Panel>
                     <AutoColumn gap="20px">
@@ -324,7 +324,6 @@ function TokenPage({ address, history }) {
                 border: '1px solid rgba(43, 43, 43, 0.05)',
                 marginTop: '1.5rem'
               }}
-              p={20}
             >
               {address && fetchedPairsList ? (
                 <PairList color={backgroundColor} address={address} pairs={fetchedPairsList} />

@@ -76,8 +76,17 @@ export const PageWrapper = styled.div`
   flex-direction: column;
   padding-bottom: 100px;
   max-width: 1440px;
-  padding: 0 24px;
   padding-bottom: 80px;
+
+  & > * {
+    padding: 0 24px;
+  }
+
+  @media screen and (max-width: 600px) {
+    & > * {
+      padding: 0 12px;
+    }
+  }
 `
 
 export const ContentWrapper = styled.div`
@@ -105,11 +114,10 @@ export const ContentWrapperLarge = styled.div`
 `
 
 export const FixedMenu = styled.div`
-  width: 100%;
   z-index: 99;
   position: sticky;
   top: -6rem;
-  padding: 1.5rem 0;
+  padding: 1.5rem 24px;
   background-color: white;
   border-bottom: 1px solid ${({ theme }) => theme.bg3};
   margin-bottom: 2rem;

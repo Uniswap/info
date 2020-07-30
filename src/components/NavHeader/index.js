@@ -79,7 +79,7 @@ export default function NavHeader() {
           </TYPE.small>
         </Polling>
       )}
-      <RowBetween style={{ padding: '0.5rem 1rem' }}>
+      <RowBetween style={{ padding: below816 ? '0.5rem' : '0.5rem 1rem' }}>
         <RowFixed>
           {!below400 && (
             <HeaderText
@@ -121,19 +121,19 @@ export default function NavHeader() {
           )}
         </RowFixed>
 
-        <RowFixed style={{}}>
+        <RowFixed>
           <HeaderText>
-            <Link href="https://migrate.uniswap.info" target="_blank">
+            <Link href="https://v1.uniswap.info" target="_blank">
               V1 Analytics
             </Link>
           </HeaderText>
           <HeaderText>
-            <Link href="https://migrate.uniswap.info" target="_blank">
+            <Link href="https://uniswap.org/docs/v2" target="_blank">
               Docs
             </Link>
           </HeaderText>
           <HeaderText>
-            <Link href="https://migrate.uniswap.info" target="_blank">
+            <Link href="https://discord.com/invite/XErMcTq" target="_blank">
               Discord
             </Link>
           </HeaderText>
