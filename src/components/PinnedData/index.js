@@ -14,7 +14,7 @@ import TokenLogo from '../TokenLogo'
 const RightColumn = styled.div`
   position: fixed;
   top: 3rem;
-  width: 180px;
+  width: ${({ open }) => (open ? '180px' : '40px')};
   right: 0;
   padding: 1.25rem;
   border: ${({ theme, open }) => !open && '1px solid' + theme.bg3};

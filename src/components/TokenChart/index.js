@@ -32,6 +32,14 @@ const CHART_VIEW = {
 const TokenChart = ({ address, color }) => {
   const [chartFilter, setChartFilter] = useState(CHART_VIEW.HOURLY)
 
+  // reset view on new address
+  const addressPrev = usePrevious(address)
+  useEffect(() => {
+    if (address !== addressPrev && addressPrev) {
+      setChartFilter(CHART_VIEW.LIQUIDITY)
+    }
+  }, [address, addressPrev])
+
   const chartData = useTokenChartData(address)
 
   const [timeWindow, setTimeWindow] = useState(timeframeOptions.WEEK)
@@ -60,14 +68,6 @@ const TokenChart = ({ address, color }) => {
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
   }, [isClient, width]) // Empty array ensures that effect is only run on mount and unmount
-
-  // reset view on new address
-  const addressPrev = usePrevious(address)
-  useEffect(() => {
-    if (address !== addressPrev) {
-      setChartFilter(CHART_VIEW.LIQUIDITY)
-    }
-  }, [address, addressPrev])
 
   return (
     <ChartWrapper>
