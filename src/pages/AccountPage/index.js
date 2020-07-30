@@ -175,19 +175,6 @@ function AccountPage({ account }) {
         </Header>
       </FixedMenu>
       <ContentWrapper>
-        {!below1080 && (
-          <SubNav>
-            <SubNavEl onClick={() => handleScroll(OverviewRef)} isActive={active === OverviewRef}>
-              <TrendingUp size={20} style={{ marginRight: '1rem' }} />
-              <TYPE.main>Overview</TYPE.main>
-            </SubNavEl>
-            <SubNavEl onClick={() => handleScroll(StatsRef)} isActive={active === OverviewRef}>
-              <PieChart size={20} style={{ marginRight: '1rem' }} />
-              <TYPE.main>Account Stats</TYPE.main>
-            </SubNavEl>
-          </SubNav>
-        )}
-
         <DashboardWrapper>
           {!hideLPContent && (
             <DropdownWrapper>
@@ -382,6 +369,18 @@ function AccountPage({ account }) {
             )}
           </Panel>
         </DashboardWrapper>
+        {!below1080 && (
+          <SubNav>
+            <SubNavEl onClick={() => handleScroll(OverviewRef)} isActive={active === OverviewRef}>
+              <TrendingUp size={20} style={{ marginRight: '1rem' }} />
+              <TYPE.main>Overview</TYPE.main>
+            </SubNavEl>
+            <SubNavEl onClick={() => handleScroll(StatsRef)} isActive={active === OverviewRef}>
+              <PieChart size={20} style={{ marginRight: '1rem' }} />
+              <TYPE.main>Account Stats</TYPE.main>
+            </SubNavEl>
+          </SubNav>
+        )}
       </ContentWrapper>
     </PageWrapper>
   )

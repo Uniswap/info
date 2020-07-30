@@ -30,7 +30,7 @@ const CandleStickChart = ({ data, width }) => {
         width: width,
         height: HEIGHT,
         layout: {
-          backgroundColor: 'white',
+          backgroundColor: 'transparent',
           textColor: 'black'
         },
         grid: {
@@ -69,6 +69,7 @@ const CandleStickChart = ({ data, width }) => {
       toolTip.style.display = 'block'
       toolTip.style.left = 3 + 'px'
       toolTip.style.top = 50 + 'px'
+      toolTip.style.backgroundColor = 'transparent'
 
       // get the title of the chart
       function setLastBarText() {

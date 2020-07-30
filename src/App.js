@@ -24,8 +24,8 @@ const AppWrapper = styled.div`
 `
 const ContentWrapper = styled.div`
   display: grid;
-  grid-template-columns: ${({ open }) => (open ? '1fr 220px' : '1fr 80px')};
-  grid-gap: 1rem;
+  /* grid-template-columns: ${({ open }) => (open ? '1fr 220px' : '1fr 80px')}; */
+  /* grid-gap: 1rem; */
 
   @media screen and (max-width: 1080px) {
     grid-template-columns: 1fr;
@@ -36,17 +36,12 @@ const ContentWrapper = styled.div`
 const Right = styled.div`
   position: fixed;
   right: 0;
-  top: 0rem;
+  bottom: 0rem;
   margin-top: 3rem;
-  width: ${({ open }) => (open ? '220px' : '80px')};
-  height: ${({ open }) => (open ? '100%' : '20px')};
+  z-index: 99;
+  width: 220px;
+  height: ${({ open }) => (open ? 'fit-content' : '64px')};
   border-top-left-radius: 25px;
-  background-color: transparent;
-
-  box-shadow: ${({ open }) =>
-    open
-      ? '0px 24px 32px rgba(0, 0, 0, 0.04), 0px 16px 24px rgba(0, 0, 0, 0.04), 0px 4px 8px rgba(0, 0, 0, 0.04), 0px 0px 1px rgba(0, 0, 0, 0.04);'
-      : 'none'};
 
   @media screen and (max-width: 1080px) {
     display: none;
@@ -83,9 +78,10 @@ function App() {
                     return (
                       <>
                         <NavHeaderUpdated token={match.params.tokenAddress.toLowerCase()} />
+                        <SubHeader />
+
                         <ContentWrapper open={savedOpen}>
                           <Center id="center">
-                            <SubHeader />
                             <TokenPage address={match.params.tokenAddress.toLowerCase()} />
                           </Center>
                           <Right open={savedOpen}>
@@ -108,9 +104,10 @@ function App() {
                     return (
                       <>
                         <NavHeaderUpdated pair={match.params.pairAddress.toLowerCase()} />
+                        <SubHeader />
+
                         <ContentWrapper open={savedOpen}>
                           <Center id="center">
-                            <SubHeader />
                             <PairPage pairAddress={match.params.pairAddress.toLowerCase()} />
                           </Center>
                           <Right open={savedOpen}>
@@ -133,9 +130,10 @@ function App() {
                     return (
                       <>
                         <NavHeaderUpdated />
+                        <SubHeader />
+
                         <ContentWrapper open={savedOpen}>
                           <Center id="center">
-                            <SubHeader />
                             <AccountPage account={match.params.accountAddress.toLowerCase()} />
                           </Center>
                           <Right open={savedOpen}>
@@ -152,9 +150,9 @@ function App() {
 
               <Route path="/home">
                 <NavHeaderUpdated />
+                <SubHeader />
                 <ContentWrapper open={savedOpen}>
                   <Center id="center">
-                    <SubHeader />
                     <GlobalPage />
                   </Center>
                   <Right open={savedOpen}>
@@ -165,9 +163,10 @@ function App() {
 
               <Route path="/all-tokens">
                 <NavHeaderUpdated />
+                <SubHeader />
+
                 <ContentWrapper open={savedOpen}>
                   <Center id="center">
-                    <SubHeader />
                     <AllTokensPage />
                   </Center>
                   <Right open={savedOpen} onClick={() => setSavedOpen(true)}>
@@ -178,9 +177,10 @@ function App() {
 
               <Route path="/all-pairs">
                 <NavHeaderUpdated />
+                <SubHeader />
+
                 <ContentWrapper open={savedOpen}>
                   <Center id="center">
-                    <SubHeader />
                     <AllPairsPage />
                   </Center>
                   <Right open={savedOpen}>
@@ -191,9 +191,10 @@ function App() {
 
               <Route path="/account-lookup">
                 <NavHeaderUpdated />
+                <SubHeader />
+
                 <ContentWrapper open={savedOpen}>
                   <Center id="center">
-                    <SubHeader />
                     <AccountLookup />
                   </Center>
                   <Right open={savedOpen}>

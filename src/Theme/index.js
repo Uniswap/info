@@ -65,7 +65,7 @@ const theme = (darkMode, color) => ({
   yellow2: '#F3841E',
   link: '#2172E5',
 
-  background: darkMode ? 'black' : `radial-gradient(50% 50% at 50% 50%, #ff007a30 0%, #F7F8FA 100%)`
+  background: darkMode ? 'black' : `radial-gradient(50% 50% at 50% 50%, #ff007a30 0%, #fff 100%)`
 })
 
 const TextWrapper = styled(Text)`
@@ -86,7 +86,7 @@ export const TYPE = {
   },
 
   largeHeader(props) {
-    return <TextWrapper fontWeight={600} color={'text1'} fontSize={'24px'} {...props} />
+    return <TextWrapper fontWeight={500} color={'text1'} fontSize={20} {...props} />
   },
 
   light(props) {

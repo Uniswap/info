@@ -123,22 +123,22 @@ export default function NavHeader() {
 
         <RowFixed style={{}}>
           <HeaderText>
-            <Link href="https://migrate.uniswap.info" target="_blank">
+            <Link style={{ color: 'white' }} href="https://migrate.uniswap.info" target="_blank">
               V1 Analytics
             </Link>
           </HeaderText>
           <HeaderText>
-            <Link href="https://migrate.uniswap.info" target="_blank">
+            <Link style={{ color: 'white' }} href="https://migrate.uniswap.info" target="_blank">
               Docs
             </Link>
           </HeaderText>
           <HeaderText>
-            <Link href="https://migrate.uniswap.info" target="_blank">
+            <Link style={{ color: 'white' }} href="https://migrate.uniswap.info" target="_blank">
               Discord
             </Link>
           </HeaderText>
           <HeaderText>
-            <Link href="https://twitter.com/UniswapProtocol" target="_blank">
+            <Link style={{ color: 'white' }} href="https://twitter.com/UniswapProtocol" target="_blank">
               Twitter
             </Link>
           </HeaderText>

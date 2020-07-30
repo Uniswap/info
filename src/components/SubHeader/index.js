@@ -6,16 +6,19 @@ import Title from '../Title'
 import Search from '../Search'
 import { BasicLink } from '../Link'
 import { useMedia } from 'react-use'
+import { transparentize } from 'polished'
 
 const Wrapper = styled.div`
-  width: calc(100% - 64px);
-  background-color: ${({ theme }) => theme.bg1};
+  width: 100%;
+  background-color: ${({ theme }) => transparentize(0.4, theme.bg1)};
+  backdrop-filter: blur(20px);
   color: ${({ theme }) => theme.text1};
-  padding: 1.5rem 2rem;
+  padding: 0.5rem 0.5rem 0.5rem 1rem;
   position: sticky;
   top: 32px;
   z-index: 9999;
   border-bottom: 1px solid ${({ theme }) => theme.bg3};
+  box-sizing: border-box;
 
   @media screen and (max-width: 800px) {
     grid-template-columns: 1fr;

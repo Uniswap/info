@@ -41,6 +41,19 @@ const GridRow = styled.div`
   justify-content: space-between;
 `
 
+const ThemedBackground = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 200vh;
+  max-width: 100vw;
+  z-index: -1;
+
+  transform: translateY(-70vh);
+  background: ${({ theme }) => theme.background};
+`
+
 function GlobalPage() {
   const transactions = useGlobalTransactions()
 
@@ -78,6 +91,7 @@ function GlobalPage() {
 
   return (
     <PageWrapper>
+      <ThemedBackground />
       <div ref={OverviewRef} />
       <FixedMenu>
         <AutoColumn gap="40px">
@@ -92,26 +106,6 @@ function GlobalPage() {
         </AutoColumn>
       </FixedMenu>
       <ContentWrapper>
-        {!below1180 && (
-          <SubNav>
-            <SubNavEl onClick={() => handleScroll(OverviewRef)} isActive={active === OverviewRef}>
-              <TrendingUp size={20} style={{ marginRight: '1rem' }} />
-              <TYPE.main>Overview</TYPE.main>
-            </SubNavEl>
-            <SubNavEl onClick={() => handleScroll(PairsRef)} isActive={active === OverviewRef}>
-              <PieChart size={20} style={{ marginRight: '1rem' }} />
-              <TYPE.main>Top Pairs</TYPE.main>
-            </SubNavEl>
-            <SubNavEl onClick={() => handleScroll(TokensRef)} isActive={active === OverviewRef}>
-              <Disc size={20} style={{ marginRight: '1rem' }} />
-              <TYPE.main>Top Tokens</TYPE.main>
-            </SubNavEl>
-            <SubNavEl onClick={() => handleScroll(TransactionsRef)} isActive={active === OverviewRef}>
-              <List size={20} style={{ marginRight: '1rem' }} />
-              <TYPE.main>Transactions</TYPE.main>
-            </SubNavEl>
-          </SubNav>
-        )}
         <div>
           {below800 && ( // mobile card
             <Box mb={20}>
@@ -148,14 +142,18 @@ function GlobalPage() {
             </Box>
           )}
           {!below800 && (
-            <GridRow style={{ marginTop: '6px' }}>
-              <Panel style={{ height: '100%', minHeight: '300px' }}>
-                <GlobalChart display="liquidity" />
-              </Panel>
-              <Panel style={{ height: '100%' }}>
-                <GlobalChart display="volume" />
-              </Panel>
-            </GridRow>
+            <>
+              <TYPE.main fontSize={'1.125rem'}>Statistics</TYPE.main>
+
+              <GridRow style={{ marginTop: '1rem' }}>
+                <Panel style={{ height: '100%', minHeight: '300px' }}>
+                  <GlobalChart display="liquidity" />
+                </Panel>
+                <Panel style={{ height: '100%' }}>
+                  <GlobalChart display="volume" />
+                </Panel>
+              </GridRow>
+            </>
           )}
           {below800 && (
             <AutoColumn style={{ marginTop: '6px' }} gap="24px">
@@ -191,6 +189,26 @@ function GlobalPage() {
             <TxnList transactions={transactions} />
           </Panel>
         </div>
+        {!below1180 && (
+          <SubNav>
+            <SubNavEl onClick={() => handleScroll(OverviewRef)} isActive={active === OverviewRef}>
+              <TrendingUp size={20} style={{ marginRight: '1rem' }} />
+              <TYPE.main>Overview</TYPE.main>
+            </SubNavEl>
+            <SubNavEl onClick={() => handleScroll(PairsRef)} isActive={active === OverviewRef}>
+              <PieChart size={20} style={{ marginRight: '1rem' }} />
+              <TYPE.main>Top Pairs</TYPE.main>
+            </SubNavEl>
+            <SubNavEl onClick={() => handleScroll(TokensRef)} isActive={active === OverviewRef}>
+              <Disc size={20} style={{ marginRight: '1rem' }} />
+              <TYPE.main>Top Tokens</TYPE.main>
+            </SubNavEl>
+            <SubNavEl onClick={() => handleScroll(TransactionsRef)} isActive={active === OverviewRef}>
+              <List size={20} style={{ marginRight: '1rem' }} />
+              <TYPE.main>Transactions</TYPE.main>
+            </SubNavEl>
+          </SubNav>
+        )}
       </ContentWrapper>
     </PageWrapper>
   )

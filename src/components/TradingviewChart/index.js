@@ -35,6 +35,9 @@ const TradingViewChart = ({ type = CHART_TYPES.BAR, data, base, baseChange, fiel
       var chart = createChart(ref.current, {
         width: width,
         height: HEIGHT,
+        layout: {
+          backgroundColor: 'transparent'
+        },
         rightPriceScale: {
           scaleMargins: {
             top: topScale,
@@ -47,11 +50,12 @@ const TradingViewChart = ({ type = CHART_TYPES.BAR, data, base, baseChange, fiel
         },
         grid: {
           horzLines: {
-            color: '#eee',
+            color: 'rgba(197, 203, 206, 0.5)',
             visible: false
           },
           vertLines: {
-            color: '#ffffff'
+            color: 'rgba(197, 203, 206, 0.5)',
+            visible: false
           }
         },
         crosshair: {
@@ -94,8 +98,9 @@ const TradingViewChart = ({ type = CHART_TYPES.BAR, data, base, baseChange, fiel
       toolTip.className = 'three-line-legend'
       ref.current.appendChild(toolTip)
       toolTip.style.display = 'block'
-      toolTip.style.left = 3 + 'px'
-      toolTip.style.top = 3 + 'px'
+      toolTip.style.left = 8 + 'px'
+      toolTip.style.top = 8 + 'px'
+      toolTip.style.backgroundColor = 'transparent'
 
       // format numbers
       let percentChange = baseChange?.toFixed(2)

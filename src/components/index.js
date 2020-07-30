@@ -1,6 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 import { Text, Box } from 'rebass'
+import { transparentize } from 'polished'
 
 import Link from './Link'
 
@@ -55,9 +56,9 @@ export const SideBar = styled.span`
 export const SubNav = styled.ul`
   list-style: none;
   position: sticky;
-  top: 8.5rem;
+  top: 11.25rem;
   padding: 0px;
-  margin-top: 0px;
+  margin-top: 3rem;
 `
 export const SubNavEl = styled.li`
   list-style: none;
@@ -75,8 +76,7 @@ export const PageWrapper = styled.div`
   display: flex;
   flex-direction: column;
   padding-bottom: 100px;
-  max-width: 1440px;
-  padding: 0 24px;
+  /* padding: 0 24px; */
   padding-bottom: 80px;
 `
 
@@ -84,11 +84,16 @@ export const ContentWrapper = styled.div`
   display: grid;
   justify-content: start;
   align-items: start;
-  grid-template-columns: 180px 1fr;
+  grid-template-columns: 1fr 180px;
   grid-gap: 24px;
-
+  max-width: 1440px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 2rem;
+  box-sizing: border-box;
   @media screen and (max-width: 1180px) {
     grid-template-columns: 1fr;
+    padding: 0 1rem;
   }
 `
 
@@ -96,11 +101,35 @@ export const ContentWrapperLarge = styled.div`
   display: grid;
   justify-content: start;
   align-items: start;
-  grid-template-columns: 180px 1fr;
+  grid-template-columns: 1fr 180px;
   grid-gap: 24px;
+  padding: 0 2rem;
+  margin: 0 auto;
+  box-sizing: border-box;
+  max-width: 1440px;
+  width: 100%;
 
   @media screen and (max-width: 1282px) {
     grid-template-columns: 1fr;
+    padding: 0 1rem;
+  }
+`
+
+export const FullWrapper = styled.div`
+  display: grid;
+  justify-content: start;
+  align-items: start;
+  grid-template-columns: 1fr;
+  grid-gap: 24px;
+  max-width: 1440px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 2rem;
+  box-sizing: border-box;
+
+  @media screen and (max-width: 1180px) {
+    grid-template-columns: 1fr;
+    padding: 0 1rem;
   }
 `
 
@@ -108,10 +137,12 @@ export const FixedMenu = styled.div`
   width: 100%;
   z-index: 99;
   position: sticky;
-  top: -6rem;
-  padding: 1.5rem 0;
-  background-color: white;
-  border-bottom: 1px solid ${({ theme }) => theme.bg3};
+  top: 5.25rem;
+  padding: 1rem;
+  box-sizing: border-box;
+  background-color: ${({ theme }) => transparentize(0.6, theme.bg1)};
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid ${({ theme }) => theme.bg2};
   margin-bottom: 2rem;
 `
 

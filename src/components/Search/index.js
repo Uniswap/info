@@ -13,6 +13,8 @@ import { useMedia } from 'react-use'
 import { useAllPairsInUniswap, useAllTokensInUniswap } from '../../contexts/GlobalData'
 import { OVERVIEW_TOKEN_BLACKLIST, OVERVIEW_PAIR_BLACKLIST } from '../../constants'
 
+import { transparentize } from 'polished'
+
 const Container = styled.div`
   height: 36px;
   z-index: 30;
@@ -27,7 +29,7 @@ const Wrapper = styled.div`
   justify-content: flex-end;
   padding: ${({ small }) => (!small ? '12px' : '8px 16px')};
   border-radius: 12px;
-  background: ${({ theme }) => theme.bg2};
+  background: ${({ theme }) => transparentize(0.2, theme.bg1)};
   border-bottom-right-radius: ${({ open }) => (open ? '0px' : '12px')};
   border-bottom-left-radius: ${({ open }) => (open ? '0px' : '12px')};
   z-index: 9999;
@@ -47,10 +49,10 @@ const Input = styled.input`
   outline: none;
   width: 100%;
   color: ${({ theme }) => theme.textColor};
-  font-size: ${({ large }) => (large ? '20px' : '16px')};
+  font-size: ${({ large }) => (large ? '20px' : '14px')};
 
   ::placeholder {
-    color: ${({ theme }) => theme.textColor};
+    color: ${({ theme }) => theme.bg5};
     font-size: 16px;
   }
 
@@ -343,9 +345,9 @@ export const Search = ({ small = false }) => {
         <SearchIconLarge />
       </Wrapper>
       <Menu hide={!showMenu} ref={menuRef}>
-        <FilterSection>
+        {/* <FilterSection>
           <Gray>Results</Gray>
-        </FilterSection>
+        </FilterSection> */}
 
         <Heading>
           <Gray>Pairs</Gray>

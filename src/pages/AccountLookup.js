@@ -7,7 +7,7 @@ import { AutoColumn } from '../components/Column'
 import { RowBetween, AutoRow } from '../components/Row'
 import { useSavedAccounts } from '../contexts/LocalStorage'
 import { ButtonFaded, ButtonLight } from '../components/ButtonStyled'
-import { Hover, PageWrapper, FixedMenu } from '../components'
+import { Hover, PageWrapper, FullWrapper, FixedMenu } from '../components'
 import { X } from 'react-feather'
 import { isAddress } from '../utils'
 
@@ -42,7 +42,7 @@ const Wrapper = styled.div`
   flex-direction: row;
   align-items: center;
   justify-content: flex-end;
-  width: 180px;
+  width: 100%;
   border-radius: 12px;
   background: ${({ theme }) => theme.bg2};
 `
@@ -71,40 +71,42 @@ function AccountLookup({ history }) {
           </RowBetween>
         </AutoColumn>
       </FixedMenu>
-      <AutoColumn gap="2rem">
-        <TYPE.main>Accounts</TYPE.main>
-        <AutoRow gap={'12px'}>
-          {savedAccounts?.length > 0 ? (
-            savedAccounts.map(account => {
-              return (
-                <RowBetween key={account}>
-                  <ButtonFaded onClick={() => history.push('/account/' + account)}>
-                    <TYPE.header>{account?.slice(0, 6) + '...' + account?.slice(38, 42)}</TYPE.header>
-                  </ButtonFaded>
-                  <Hover onClick={() => removeAccount(account)}>
-                    <X size={16} />
-                  </Hover>
-                </RowBetween>
-              )
-            })
-          ) : (
-            <TYPE.light>No pinned wallets</TYPE.light>
-          )}
-        </AutoRow>
-        <AutoRow>
-          <Wrapper>
-            <Input
-              placeholder="0x..."
-              onChange={e => {
-                setAccountValue(e.target.value)
-              }}
-            />
-          </Wrapper>
-        </AutoRow>
-        <ButtonLight onClick={handleAccountSearch} width="200px">
-          Load Account Details
-        </ButtonLight>
-      </AutoColumn>
+      <FullWrapper>
+        <AutoColumn gap="2rem">
+          <TYPE.main>Accounts</TYPE.main>
+          <AutoRow gap={'12px'}>
+            {savedAccounts?.length > 0 ? (
+              savedAccounts.map(account => {
+                return (
+                  <RowBetween key={account}>
+                    <ButtonFaded onClick={() => history.push('/account/' + account)}>
+                      <TYPE.header>{account?.slice(0, 6) + '...' + account?.slice(38, 42)}</TYPE.header>
+                    </ButtonFaded>
+                    <Hover onClick={() => removeAccount(account)}>
+                      <X size={16} />
+                    </Hover>
+                  </RowBetween>
+                )
+              })
+            ) : (
+              <TYPE.light>No pinned wallets</TYPE.light>
+            )}
+          </AutoRow>
+          <AutoRow>
+            <Wrapper>
+              <Input
+                placeholder="0x..."
+                onChange={e => {
+                  setAccountValue(e.target.value)
+                }}
+              />
+            </Wrapper>
+          </AutoRow>
+          <ButtonLight onClick={handleAccountSearch} width="200px">
+            Load Account Details
+          </ButtonLight>
+        </AutoColumn>
+      </FullWrapper>
     </PageWrapper>
   )
 }

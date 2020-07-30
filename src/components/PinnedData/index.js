@@ -7,19 +7,26 @@ import { TYPE } from '../../Theme'
 import { ButtonLight, ButtonFaded } from '../ButtonStyled'
 import { useSavedAccounts, useSavedPairs, useSavedTokens } from '../../contexts/LocalStorage'
 import { isAddress } from '../../utils'
-import { X, Bookmark, ChevronRight } from 'react-feather'
+import { X, Bookmark, ChevronDown } from 'react-feather'
 import { Hover } from '..'
 import TokenLogo from '../TokenLogo'
 
 const RightColumn = styled.div`
   position: fixed;
-  top: 3rem;
-  width: ${({ open }) => (open ? '180px' : '40px')};
+  /* width: ${({ open }) => (open ? '180px' : '40px')}; */
   right: 0;
+  bottom: 0px;
   padding: 1.25rem;
   border: ${({ theme, open }) => !open && '1px solid' + theme.bg3};
-  border-top-left-radius: 25px;
-  border-bottom-left-radius: 25px;
+  border-top-left-radius: 12px;
+  border-bottom-left-radius: 0px;
+  background-color: ${({ theme }) => theme.bg1};
+
+  box-shadow: ${({ open }) =>
+    open
+      ? '0px 24px 32px rgba(0, 0, 0, 0.04), 0px 16px 24px rgba(0, 0, 0, 0.04), 0px 4px 8px rgba(0, 0, 0, 0.04), 0px 0px 1px rgba(0, 0, 0, 0.04);'
+      : 'none'};
+
 
   :hover {
     cursor: pointer;
@@ -67,7 +74,7 @@ const Input = styled.input`
 const SavedButton = styled(RowBetween)`
   padding-bottom: ${({ theme, open }) => open && '20px'};
   border-bottom: ${({ theme, open }) => open && '1px solid' + theme.bg3};
-  margin-bottom: ${({ theme, open }) => open && '2rem'};
+  margin-bottom: ${({ theme, open }) => open && '1.25rem'};
 
   :hover {
     cursor: pointer;
@@ -95,7 +102,7 @@ function PinnedData({ history, open, setSavedOpen }) {
   return !open ? (
     <RightColumn open={open} onClick={() => setSavedOpen(true)}>
       <SavedButton open={open}>
-        <Bookmark size={16} />
+        <Bookmark size={20} />
       </SavedButton>
     </RightColumn>
   ) : (
@@ -105,7 +112,7 @@ function PinnedData({ history, open, setSavedOpen }) {
           <Bookmark size={16} />
           <TYPE.main ml={'4px'}>Saved</TYPE.main>
         </RowFixed>
-        <ChevronRight />
+        <ChevronDown />
       </SavedButton>
       <AutoColumn gap={'1rem'}>
         <TYPE.main>Accounts</TYPE.main>

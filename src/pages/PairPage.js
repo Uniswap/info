@@ -18,7 +18,8 @@ import Loader from '../components/Loader'
 import { formattedNum, formattedPercent, getPoolLink, getSwapLink } from '../utils'
 import { useColor } from '../hooks'
 import { usePairData, usePairTransactions } from '../contexts/PairData'
-import { TYPE } from '../Theme'
+import { TYPE, ThemedBackground } from '../Theme'
+import { transparentize } from 'polished'
 import CopyHelper from '../components/Copy'
 import { useMedia } from 'react-use'
 import DoubleTokenLogo from '../components/DoubleLogo'
@@ -108,9 +109,9 @@ const WarningGrouping = styled.div`
 const SubNav = styled.ul`
   list-style: none;
   position: sticky;
-  top: 8.5rem;
+  top: 11.25rem;
   padding: 0px;
-  margin-top: 0px;
+  margin-top: 3rem;
 `
 const SubNavEl = styled.li`
   list-style: none;
@@ -213,16 +214,18 @@ function PairPage({ pairAddress, history }) {
 
   return (
     <PageWrapper>
+      <ThemedBackground backgroundColor={transparentize(0.6, backgroundColor)} />
+
       <span ref={OverviewRef} />
       <FixedMenu>
         <AutoColumn gap="40px">
           <RowBetween style={{ flexWrap: 'wrap' }}>
-            <RowFixed style={{ flexWrap: 'wrap' }}>
+            <RowFixed style={{ flexWrap: 'wrap', minWidth: '100px' }}>
               <RowFixed>
                 {token0 && token1 && (
-                  <DoubleTokenLogo a0={token0?.id || ''} a1={token1?.id || ''} size={32} margin={true} />
+                  <DoubleTokenLogo a0={token0?.id || ''} a1={token1?.id || ''} size={24} margin={true} />
                 )}{' '}
-                <Text fontSize={'1.5rem'} fontWeight={600} style={{ margin: '0 1rem' }}>
+                <Text fontSize={'20px'} fontWeight={500} style={{ margin: '0 1rem' }}>
                   {token0 && token1 ? (
                     <>
                       <HoverSpan onClick={() => history.push(`/token/${token0?.id}`)}>{token0.symbol}</HoverSpan>
@@ -234,6 +237,32 @@ function PairPage({ pairAddress, history }) {
                   )}
                 </Text>
               </RowFixed>
+              <AutoRow gap="6px" style={{ width: 'fit-content' }}>
+                <FixedPanel onClick={() => history.push(`/token/${token0?.id}`)}>
+                  <RowFixed>
+                    <TokenLogo address={token0?.id} size={'16px'} />
+                    <TYPE.main fontSize={'16px'} lineHeight={1} fontWeight={500} ml={'4px'}>
+                      {token0 && token1
+                        ? `1 ${token0?.symbol} = ${token0Rate} ${token1?.symbol} ${
+                            parseFloat(token0?.derivedETH) ? '(' + token0USD + ')' : ''
+                          }`
+                        : '-'}
+                    </TYPE.main>
+                  </RowFixed>
+                </FixedPanel>
+                <FixedPanel onClick={() => history.push(`/token/${token1?.id}`)}>
+                  <RowFixed>
+                    <TokenLogo address={token1?.id} size={'16px'} />
+                    <TYPE.main fontSize={'16px'} lineHeight={1} fontWeight={500} ml={'4px'}>
+                      {token0 && token1
+                        ? `1 ${token1?.symbol} = ${token1Rate} ${token0?.symbol}  ${
+                            parseFloat(token1?.derivedETH) ? '(' + token1USD + ')' : ''
+                          }`
+                        : '-'}
+                    </TYPE.main>
+                  </RowFixed>
+                </FixedPanel>
+              </AutoRow>
             </RowFixed>
             <RowFixed
               ml={below600 ? '0' : '2.5rem'}
@@ -258,22 +287,6 @@ function PairPage({ pairAddress, history }) {
         </AutoColumn>
       </FixedMenu>
       <ContentWrapperLarge>
-        {!below1282 && (
-          <SubNav>
-            <SubNavEl onClick={() => handleScroll(OverviewRef)} isActive={active === OverviewRef}>
-              <TrendingUp size={20} style={{ marginRight: '1rem' }} />
-              <TYPE.main>Overview</TYPE.main>
-            </SubNavEl>
-            <SubNavEl onClick={() => handleScroll(TransactionsRef)} isActive={active === TransactionsRef}>
-              <List size={20} style={{ marginRight: '1rem' }} />
-              <TYPE.main>Transactions</TYPE.main>
-            </SubNavEl>
-            <SubNavEl onClick={() => handleScroll(DataRef)} isActive={active === DataRef}>
-              <PieChart size={20} style={{ marginRight: '1rem' }} />
-              <TYPE.main>Pair Data</TYPE.main>
-            </SubNavEl>
-          </SubNav>
-        )}
         <Warning
           type={'pair'}
           show={!dismissed && !(SURPRESS_WARNINGS.includes(token0?.id) && SURPRESS_WARNINGS.includes(token1?.id))}
@@ -283,39 +296,9 @@ function PairPage({ pairAddress, history }) {
         <WarningGrouping
           disabled={!dismissed && !(SURPRESS_WARNINGS.includes(token0?.id) && SURPRESS_WARNINGS.includes(token1?.id))}
         >
-          <AutoRow gap="6px">
-            <FixedPanel onClick={() => history.push(`/token/${token0?.id}`)}>
-              <RowFixed>
-                <TokenLogo address={token0?.id} size={'16px'} />
-                <TYPE.main fontSize={'16px'} lineHeight={1} fontWeight={500} ml={'4px'}>
-                  {token0 && token1
-                    ? `1 ${token0?.symbol} = ${token0Rate} ${token1?.symbol} ${
-                        parseFloat(token0?.derivedETH) ? '(' + token0USD + ')' : ''
-                      }`
-                    : '-'}
-                </TYPE.main>
-              </RowFixed>
-            </FixedPanel>
-            <FixedPanel onClick={() => history.push(`/token/${token1?.id}`)}>
-              <RowFixed>
-                <TokenLogo address={token1?.id} size={'16px'} />
-                <TYPE.main fontSize={'16px'} lineHeight={1} fontWeight={500} ml={'4px'}>
-                  {token0 && token1
-                    ? `1 ${token1?.symbol} = ${token1Rate} ${token0?.symbol}  ${
-                        parseFloat(token1?.derivedETH) ? '(' + token1USD + ')' : ''
-                      }`
-                    : '-'}
-                </TYPE.main>
-              </RowFixed>
-            </FixedPanel>
-          </AutoRow>
           <DashboardWrapper>
             <>
-              {!below1080 && (
-                <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '1.5rem' }}>
-                  Pair Stats
-                </TYPE.main>
-              )}
+              {!below1080 && <TYPE.main fontSize={'1.125rem'}>Pair Stats</TYPE.main>}
               <PanelWrapper style={{ marginTop: '1.5rem' }}>
                 <Panel style={{ height: '100%' }}>
                   <AutoColumn gap="20px">
@@ -472,6 +455,22 @@ function PairPage({ pairAddress, history }) {
             </>
           </DashboardWrapper>
         </WarningGrouping>
+        {!below1282 && (
+          <SubNav>
+            <SubNavEl onClick={() => handleScroll(OverviewRef)} isActive={active === OverviewRef}>
+              <TrendingUp size={20} style={{ marginRight: '1rem' }} />
+              <TYPE.main>Overview</TYPE.main>
+            </SubNavEl>
+            <SubNavEl onClick={() => handleScroll(TransactionsRef)} isActive={active === TransactionsRef}>
+              <List size={20} style={{ marginRight: '1rem' }} />
+              <TYPE.main>Transactions</TYPE.main>
+            </SubNavEl>
+            <SubNavEl onClick={() => handleScroll(DataRef)} isActive={active === DataRef}>
+              <PieChart size={20} style={{ marginRight: '1rem' }} />
+              <TYPE.main>Pair Data</TYPE.main>
+            </SubNavEl>
+          </SubNav>
+        )}
       </ContentWrapperLarge>
     </PageWrapper>
   )

@@ -15,6 +15,7 @@ import DropdownSelect from '../DropdownSelect'
 const ChartWrapper = styled.div`
   height: 100%;
   min-height: 448px;
+  max-height: 583px;
 
   @media screen and (max-width: 600px) {
     min-height: 200px;
@@ -48,7 +49,7 @@ const PairChart = ({ address, color }) => {
     )
   }
 
-  const aspect = below1080 ? 60 / 32 : 60 / 45
+  const aspect = below1080 ? 60 / 32 : 60 / 20
 
   return (
     <ChartWrapper>

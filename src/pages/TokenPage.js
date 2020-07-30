@@ -18,7 +18,8 @@ import TokenChart from '../components/TokenChart'
 import { formattedNum, formattedPercent, getPoolLink, getSwapLink } from '../utils'
 
 import { useTokenData, useTokenTransactions, useTokenPairs } from '../contexts/TokenData'
-import { TYPE } from '../Theme'
+import { TYPE, ThemedBackground } from '../Theme'
+import { transparentize } from 'polished'
 import { useColor } from '../hooks'
 import CopyHelper from '../components/Copy'
 import { useMedia } from 'react-use'
@@ -178,12 +179,14 @@ function TokenPage({ address, history }) {
 
   return (
     <PageWrapper>
+      <ThemedBackground backgroundColor={transparentize(0.4, backgroundColor)} />
+
       <FixedMenu>
         <RowBetween style={{ flexWrap: 'wrap' }} ref={OverviewRef}>
           <RowFixed style={{ flexWrap: 'wrap' }}>
             <RowFixed style={{ alignItems: 'baseline' }}>
-              <TokenLogo address={address} size="32px" style={{ alignSelf: 'center' }} />
-              <Text fontSize={'1.5rem'} fontWeight={600} style={{ margin: '0 1rem' }}>
+              <TokenLogo address={address} size="24px" style={{ alignSelf: 'center' }} />
+              <Text fontSize={'1.25rem'} fontWeight={500} style={{ margin: '0 1rem' }}>
                 {name ? name + ' ' : ''} {symbol ? '(' + symbol + ')' : ''}
               </Text>{' '}
               {!below1080 && (
@@ -216,26 +219,6 @@ function TokenPage({ address, history }) {
         </RowBetween>
       </FixedMenu>
       <ContentWrapper>
-        {!below1180 && (
-          <SubNav>
-            <SubNavEl onClick={() => handleScroll(OverviewRef)} isActive={active === OverviewRef}>
-              <TrendingUp size={20} style={{ marginRight: '1rem' }} />
-              <TYPE.main>Overview</TYPE.main>
-            </SubNavEl>
-            <SubNavEl onClick={() => handleScroll(PairsRef)} isActive={active === PairsRef}>
-              <PieChart size={20} style={{ marginRight: '1rem' }} />
-              <TYPE.main>Pairs</TYPE.main>
-            </SubNavEl>
-            <SubNavEl onClick={() => handleScroll(TransactionsRef)} isActive={active === TransactionsRef}>
-              <List size={20} style={{ marginRight: '1rem' }} />
-              <TYPE.main>Transactions</TYPE.main>
-            </SubNavEl>
-            <SubNavEl onClick={() => handleScroll(DataRef)} isActive={active === DataRef}>
-              <Trello size={20} style={{ marginRight: '1rem' }} />
-              <TYPE.main>Token Info</TYPE.main>
-            </SubNavEl>
-          </SubNav>
-        )}
         <Warning
           type={'token'}
           show={!dismissed && !SURPRESS_WARNINGS.includes(address)}
@@ -387,6 +370,26 @@ function TokenPage({ address, history }) {
             </>
           </DashboardWrapper>
         </WarningGrouping>
+        {!below1180 && (
+          <SubNav>
+            <SubNavEl onClick={() => handleScroll(OverviewRef)} isActive={active === OverviewRef}>
+              <TrendingUp size={20} style={{ marginRight: '1rem' }} />
+              <TYPE.main>Overview</TYPE.main>
+            </SubNavEl>
+            <SubNavEl onClick={() => handleScroll(PairsRef)} isActive={active === PairsRef}>
+              <PieChart size={20} style={{ marginRight: '1rem' }} />
+              <TYPE.main>Pairs</TYPE.main>
+            </SubNavEl>
+            <SubNavEl onClick={() => handleScroll(TransactionsRef)} isActive={active === TransactionsRef}>
+              <List size={20} style={{ marginRight: '1rem' }} />
+              <TYPE.main>Transactions</TYPE.main>
+            </SubNavEl>
+            <SubNavEl onClick={() => handleScroll(DataRef)} isActive={active === DataRef}>
+              <Trello size={20} style={{ marginRight: '1rem' }} />
+              <TYPE.main>Token Info</TYPE.main>
+            </SubNavEl>
+          </SubNav>
+        )}
       </ContentWrapper>
     </PageWrapper>
   )
