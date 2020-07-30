@@ -11,9 +11,10 @@ import { X, Bookmark, ChevronRight } from 'react-feather'
 import { Hover } from '..'
 import TokenLogo from '../TokenLogo'
 
-const RightColumn = styled(AutoColumn)`
+const RightColumn = styled.div`
   position: fixed;
   top: 3rem;
+  width: 180px;
   right: 0;
   padding: 1.25rem;
   border: ${({ theme, open }) => !open && '1px solid' + theme.bg3};
