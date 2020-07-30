@@ -286,13 +286,13 @@ function PairPage({ pairAddress, history }) {
           </RowBetween>
         </AutoColumn>
       </FixedMenu>
+      <Warning
+        type={'pair'}
+        show={!dismissed && !(SURPRESS_WARNINGS.includes(token0?.id) && SURPRESS_WARNINGS.includes(token1?.id))}
+        setShow={markAsDismissed}
+        address={pairAddress}
+      />
       <ContentWrapperLarge>
-        <Warning
-          type={'pair'}
-          show={!dismissed && !(SURPRESS_WARNINGS.includes(token0?.id) && SURPRESS_WARNINGS.includes(token1?.id))}
-          setShow={markAsDismissed}
-          address={pairAddress}
-        />
         <WarningGrouping
           disabled={!dismissed && !(SURPRESS_WARNINGS.includes(token0?.id) && SURPRESS_WARNINGS.includes(token1?.id))}
         >

@@ -16,7 +16,7 @@ import { OVERVIEW_TOKEN_BLACKLIST, OVERVIEW_PAIR_BLACKLIST } from '../../constan
 import { transparentize } from 'polished'
 
 const Container = styled.div`
-  height: 36px;
+  height: 38px;
   z-index: 30;
   position: relative;
 `
@@ -27,7 +27,7 @@ const Wrapper = styled.div`
   flex-direction: row;
   align-items: center;
   justify-content: flex-end;
-  padding: ${({ small }) => (!small ? '12px' : '8px 16px')};
+  padding: 8px 16px;
   border-radius: 12px;
   background: ${({ theme }) => transparentize(0.2, theme.bg1)};
   border-bottom-right-radius: ${({ open }) => (open ? '0px' : '12px')};
@@ -36,7 +36,7 @@ const Wrapper = styled.div`
   width: 300px;
 
   @media screen and (max-width: 600px) {
-    width: 100%;
+    width: 240px;
   }
 `
 const Input = styled.input`

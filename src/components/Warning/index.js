@@ -16,11 +16,16 @@ const WarningWrapper = styled.div`
   background: rgba(248, 45, 58, 0.05);
   padding: 1rem;
   color: #f82d3a;
-  width: 80% !important;
-  max-width: 1000px;
+  width: 90% !important;
+  margin-left: 5%;
   display: ${({ show }) => !show && 'none'};
   margin-bottom: 40px;
   position: relative;
+
+  @media screen and (max-width: 800px) {
+    width: 80% !important;
+    margin-left: 5%;
+  }
 `
 
 const StyledWarningIcon = styled(AlertTriangle)`

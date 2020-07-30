@@ -78,6 +78,16 @@ export const PageWrapper = styled.div`
   padding-bottom: 100px;
   /* padding: 0 24px; */
   padding-bottom: 80px;
+
+  & > * {
+    padding: 0 24px;
+  }
+
+  @media screen and (max-width: 600px) {
+    & > * {
+      padding: 0 12px;
+    }
+  }
 `
 
 export const ContentWrapper = styled.div`
@@ -134,7 +144,6 @@ export const FullWrapper = styled.div`
 `
 
 export const FixedMenu = styled.div`
-  width: 100%;
   z-index: 99;
   position: sticky;
   top: 5.25rem;
