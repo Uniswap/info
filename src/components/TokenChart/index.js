@@ -30,7 +30,7 @@ const CHART_VIEW = {
 }
 
 const TokenChart = ({ address, color }) => {
-  const [chartFilter, setChartFilter] = useState(CHART_VIEW.LIQUIDITY)
+  const [chartFilter, setChartFilter] = useState(CHART_VIEW.HOURLY)
 
   const chartData = useTokenChartData(address)
 
