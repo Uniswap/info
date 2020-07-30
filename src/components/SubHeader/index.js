@@ -63,9 +63,6 @@ function SubHeader({ history }) {
                 <BasicLink to="/all-tokens">
                   <Option activeText={history.location.pathname === '/all-tokens' ?? undefined}>Tokens</Option>
                 </BasicLink>
-                <BasicLink to="/account-lookup">
-                  <Option activeText={history.location.pathname === '/account-lookup' ?? undefined}>Accounts</Option>
-                </BasicLink>
               </AutoRow>
             )}
           </RowFixed>

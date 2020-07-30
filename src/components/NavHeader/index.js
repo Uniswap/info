@@ -53,17 +53,13 @@ export default function NavHeader() {
 
   const [showPriceCard, setShowPriceCard] = useState(false)
 
-  const { totalLiquidityUSD, oneDayVolumeUSD, oneDayTxns, v1Data, txnChange, pairCount } = useGlobalData()
+  const { oneDayVolumeUSD, oneDayTxns, v1Data, txnChange, pairCount } = useGlobalData()
   const [ethPrice] = useEthPrice()
   const formattedEthPrice = ethPrice ? formattedNum(ethPrice, true) : '-'
   let txnChangeFormatted = txnChange ? formattedPercent(txnChange) : '-'
 
-  const liquidity =
-    totalLiquidityUSD && v1Data?.totalLiquidityUSD
-      ? '$' + toK(parseFloat(totalLiquidityUSD) + parseFloat(v1Data?.totalLiquidityUSD), true)
-      : ''
-  const volume =
-    oneDayVolumeUSD && v1Data?.dailyVolumeUSD ? '$' + toK(oneDayVolumeUSD + v1Data?.dailyVolumeUSD, true) : ''
+  const liquidity = v1Data?.totalLiquidityUSD ? '$' + toK(parseFloat(v1Data?.totalLiquidityUSD), true) : ''
+  const volume = v1Data?.dailyVolumeUSD ? '$' + toK(v1Data?.dailyVolumeUSD, true) : ''
 
   const seconds = useSessionStart()
 
@@ -96,12 +92,12 @@ export default function NavHeader() {
           )}
           {!below816 && (
             <HeaderText>
-              Combined Liquidity: <b>{liquidity}</b>
+              V1 Liquidity: <b>{liquidity}</b>
             </HeaderText>
           )}
           {!below816 && (
             <HeaderText>
-              Combined Volume: <b>{volume}</b>
+              V1 Volume: <b>{volume}</b>
             </HeaderText>
           )}
           {!below1024 && (

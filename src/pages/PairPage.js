@@ -184,7 +184,7 @@ function PairPage({ pairAddress, history }) {
 
   const below1282 = useMedia('(max-width: 1282px)')
   const below1080 = useMedia('(max-width: 1080px)')
-  const below600 = useMedia('(max-width: 600px)')
+  const below900 = useMedia('(max-width: 900px)')
 
   const [dismissed, markAsDismissed] = usePathDismissed(history.location.pathname)
 
@@ -237,7 +237,7 @@ function PairPage({ pairAddress, history }) {
                   )}
                 </Text>
               </RowFixed>
-              <AutoRow gap="6px" style={{ width: 'fit-content' }}>
+              <AutoRow gap="6px" style={{ width: 'fit-content', marginTop: below900 ? '1rem' : '0' }}>
                 <FixedPanel onClick={() => history.push(`/token/${token0?.id}`)}>
                   <RowFixed>
                     <TokenLogo address={token0?.id} size={'16px'} />
@@ -265,7 +265,7 @@ function PairPage({ pairAddress, history }) {
               </AutoRow>
             </RowFixed>
             <RowFixed
-              ml={below600 ? '0' : '2.5rem'}
+              ml={below900 ? '0' : '2.5rem'}
               mt={below1080 && '1rem'}
               style={{ flexDirection: below1080 ? 'row-reverse' : 'initial' }}
             >

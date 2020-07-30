@@ -98,8 +98,8 @@ function GlobalPage() {
           <RowBetween>
             <TYPE.largeHeader>Protocol Overview</TYPE.largeHeader>
             {!below600 && (
-              <Link href="https://migrate.uniswap.info" target="_blank">
-                <ButtonDark style={{ minWidth: 'initial' }}>Launch App</ButtonDark>
+              <Link href="https://uniswap.org/" target="_blank">
+                <ButtonDark style={{ minWidth: 'initial' }}>Learn More</ButtonDark>
               </Link>
             )}
           </RowBetween>

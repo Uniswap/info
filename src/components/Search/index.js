@@ -105,11 +105,6 @@ const Heading = styled(Row)`
   display: ${({ hide = false }) => hide && 'none'};
 `
 
-const FilterSection = styled(Heading)`
-  z-index: 32;
-  background-color: #f7f8fa;
-`
-
 const Gray = styled.span`
   color: #888d9b;
 `

@@ -200,7 +200,7 @@ function TokenPage({ address, history }) {
             </RowFixed>
           </RowFixed>
           <span>
-            <RowFixed ml={below600 ? '0' : '2.5rem'} mt={below600 ? '2rem' : '0'}>
+            <RowFixed ml={below600 ? '0' : '2.5rem'} mt={below600 ? '1rem' : '0'}>
               {!!!savedTokens[address] && !below800 && (
                 <Hover onClick={() => addToken(address, symbol)}>
                   <PlusCircle style={{ marginRight: '0.5rem' }} />
