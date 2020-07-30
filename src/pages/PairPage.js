@@ -206,7 +206,7 @@ function PairPage({ pairAddress, history }) {
     setActive(ref.current)
     window.scrollTo({
       behavior: 'smooth',
-      top: ref.current.offsetTop - 130
+      top: ref.current.offsetTop - - 180
     })
   }
 
