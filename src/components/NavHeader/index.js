@@ -1,10 +1,6 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
-
-import Title from '../Title'
-import Search from '../Search'
 import { RowFixed, RowBetween } from '../Row'
-import { AutoColumn } from '../Column'
 import { useMedia } from 'react-use'
 import { useGlobalData, useEthPrice } from '../../contexts/GlobalData'
 import { formattedNum, formattedPercent, toK } from '../../utils'
@@ -47,19 +43,12 @@ const PollingDot = styled.div`
   border-radius: 50%;
   background-color: ${({ theme }) => theme.green1};
 `
-const SearchContainer = styled.div`
-  @media screen and (max-width: 640px) {
-    padding: 0 20px;
-  }
-`
 
-export default function NavHeader({ token, pair, account }) {
-  const isHome = !token && !pair && !account
-
-  const below1280 = useMedia('(max-width: 1280px)')
+export default function NavHeader() {
+  const below1295 = useMedia('(max-width: 1295px)')
   const below1180 = useMedia('(max-width: 1180px)')
   const below1024 = useMedia('(max-width: 1024px)')
-  const below600 = useMedia('(max-width: 600px)')
+  const below400 = useMedia('(max-width: 400px)')
   const below816 = useMedia('(max-width: 816px)')
 
   const [showPriceCard, setShowPriceCard] = useState(false)
@@ -80,18 +69,7 @@ export default function NavHeader({ token, pair, account }) {
 
   const oneDayFees = oneDayVolumeUSD ? formattedNum(oneDayVolumeUSD * 0.003, true) : ''
 
-  return below600 ? (
-    <Header style={{ paddingBottom: '1rem', borderBottom: '1px solid #edeef2' }}>
-      <AutoColumn gap="20px">
-        <Title token={token} pair={pair} />
-        {!isHome && (
-          <SearchContainer>
-            <Search small={true} />
-          </SearchContainer>
-        )}
-      </AutoColumn>
-    </Header>
-  ) : (
+  return (
     <Header>
       {!below1180 && (
         <Polling>
@@ -103,17 +81,19 @@ export default function NavHeader({ token, pair, account }) {
       )}
       <RowBetween style={{ padding: '0.5rem 1rem' }}>
         <RowFixed>
-          <HeaderText
-            onMouseEnter={() => {
-              setShowPriceCard(true)
-            }}
-            onMouseLeave={() => {
-              setShowPriceCard(false)
-            }}
-          >
-            ETH Price: <b>{formattedEthPrice}</b>
-            {showPriceCard && <UniPrice />}
-          </HeaderText>
+          {!below400 && (
+            <HeaderText
+              onMouseEnter={() => {
+                setShowPriceCard(true)
+              }}
+              onMouseLeave={() => {
+                setShowPriceCard(false)
+              }}
+            >
+              ETH Price: <b>{formattedEthPrice}</b>
+              {showPriceCard && <UniPrice />}
+            </HeaderText>
+          )}
           {!below816 && (
             <HeaderText>
               Combined Liquidity: <b>{liquidity}</b>
@@ -134,7 +114,7 @@ export default function NavHeader({ token, pair, account }) {
               Transactions (24H): <b>{oneDayTxns}</b>&nbsp;{txnChangeFormatted && txnChangeFormatted}
             </HeaderText>
           )}
-          {!below1280 && (
+          {!below1295 && (
             <HeaderText>
               Fees (24H): <b>{oneDayFees}</b>&nbsp;
             </HeaderText>

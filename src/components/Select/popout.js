@@ -78,7 +78,6 @@ export default class Popout extends Component {
 }
 
 // styled components
-
 const Wrapper = styled.div`
   @media only screen and (min-width: 768px) {
     max-width: 560px;

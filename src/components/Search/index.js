@@ -31,6 +31,11 @@ const Wrapper = styled.div`
   border-bottom-right-radius: ${({ open }) => (open ? '0px' : '12px')};
   border-bottom-left-radius: ${({ open }) => (open ? '0px' : '12px')};
   z-index: 9999;
+  width: 300px;
+
+  @media screen and (max-width: 600px) {
+    width: 100%;
+  }
 `
 const Input = styled.input`
   position: relative;
@@ -40,6 +45,7 @@ const Input = styled.input`
   background: none;
   border: none;
   outline: none;
+  width: 100%;
   color: ${({ theme }) => theme.textColor};
   font-size: ${({ large }) => (large ? '20px' : '16px')};
 

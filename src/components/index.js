@@ -92,6 +92,18 @@ export const ContentWrapper = styled.div`
   }
 `
 
+export const ContentWrapperLarge = styled.div`
+  display: grid;
+  justify-content: start;
+  align-items: start;
+  grid-template-columns: 180px 1fr;
+  grid-gap: 24px;
+
+  @media screen and (max-width: 1282px) {
+    grid-template-columns: 1fr;
+  }
+`
+
 export const FixedMenu = styled.div`
   width: 100%;
   z-index: 99;

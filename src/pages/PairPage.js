@@ -6,7 +6,7 @@ import styled from 'styled-components'
 import { Text } from 'rebass'
 import Panel from '../components/Panel'
 
-import { PageWrapper, ContentWrapper, FixedMenu } from '../components/index'
+import { PageWrapper, FixedMenu, ContentWrapperLarge } from '../components/index'
 import { AutoRow, RowBetween, RowFixed } from '../components/Row'
 import Column, { AutoColumn } from '../components/Column'
 import { ButtonLight, ButtonDark } from '../components/ButtonStyled'
@@ -181,8 +181,8 @@ function PairPage({ pairAddress, history }) {
   // txn percentage change
   const txnChangeFormatted = formattedPercent(txnChange)
 
+  const below1282 = useMedia('(max-width: 1282px)')
   const below1080 = useMedia('(max-width: 1080px)')
-  const below800 = useMedia('(max-width: 800px)')
   const below600 = useMedia('(max-width: 600px)')
 
   const [dismissed, markAsDismissed] = usePathDismissed(history.location.pathname)
@@ -257,8 +257,8 @@ function PairPage({ pairAddress, history }) {
           </RowBetween>
         </AutoColumn>
       </FixedMenu>
-      <ContentWrapper>
-        {!below800 && (
+      <ContentWrapperLarge>
+        {!below1282 && (
           <SubNav>
             <SubNavEl onClick={() => handleScroll(OverviewRef)} isActive={active === OverviewRef}>
               <TrendingUp size={20} style={{ marginRight: '1rem' }} />
@@ -472,7 +472,7 @@ function PairPage({ pairAddress, history }) {
             </>
           </DashboardWrapper>
         </WarningGrouping>
-      </ContentWrapper>
+      </ContentWrapperLarge>
     </PageWrapper>
   )
 }

@@ -49,6 +49,7 @@ function GlobalPage() {
 
   const below1180 = useMedia('(max-width: 1180px)')
   const below800 = useMedia('(max-width: 800px)')
+  const below600 = useMedia('(max-width: 600px)')
 
   const { totalLiquidityUSD, oneDayVolumeUSD, volumeChangeUSD, liquidityChangeUSD } = useGlobalData()
 
@@ -82,9 +83,11 @@ function GlobalPage() {
         <AutoColumn gap="40px">
           <RowBetween>
             <TYPE.largeHeader>Protocol Overview</TYPE.largeHeader>
-            <Link href="https://migrate.uniswap.info" target="_blank">
-              <ButtonDark style={{ minWidth: 'initial' }}>Launch App</ButtonDark>
-            </Link>
+            {!below600 && (
+              <Link href="https://migrate.uniswap.info" target="_blank">
+                <ButtonDark style={{ minWidth: 'initial' }}>Launch App</ButtonDark>
+              </Link>
+            )}
           </RowBetween>
         </AutoColumn>
       </FixedMenu>

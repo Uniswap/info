@@ -121,6 +121,7 @@ export async function getBlocksFromTimestamps(timestamps) {
     query: GET_BLOCKS(timestamps),
     fetchPolicy: 'cache-first'
   })
+
   let blocks = []
   if (result.data) {
     for (var t in result.data) {

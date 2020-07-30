@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import styled from 'styled-components'
 import { Area, XAxis, YAxis, ResponsiveContainer, Tooltip, AreaChart, BarChart, Bar } from 'recharts'
 import { AutoRow, RowBetween } from '../Row'
@@ -6,10 +6,12 @@ import { AutoRow, RowBetween } from '../Row'
 import { toK, toNiceDate, toNiceDateYear, formattedNum, getTimeframe } from '../../utils'
 import { OptionButton } from '../ButtonStyled'
 import { darken } from 'polished'
-import { useMedia } from 'react-use'
+import { useMedia, usePrevious } from 'react-use'
 import { timeframeOptions } from '../../constants'
-import { useTokenChartData } from '../../contexts/TokenData'
+import { useTokenChartData, useTokenHourlyData } from '../../contexts/TokenData'
 import DropdownSelect from '../DropdownSelect'
+import CandleStickChart from '../CandleChart'
+import LocalLoader from '../LocalLoader'
 
 const ChartWrapper = styled.div`
   height: 100%;
@@ -23,7 +25,8 @@ const ChartWrapper = styled.div`
 const CHART_VIEW = {
   VOLUME: 'Volume',
   LIQUIDITY: 'Liquidity',
-  PRICE: 'Price'
+  PRICE: 'Price',
+  HOURLY: 'Hourly'
 }
 
 const TokenChart = ({ address, color }) => {
@@ -31,7 +34,9 @@ const TokenChart = ({ address, color }) => {
 
   const chartData = useTokenChartData(address)
 
-  const [timeWindow, setTimeWindow] = useState(timeframeOptions.ALL_TIME)
+  const [timeWindow, setTimeWindow] = useState(timeframeOptions.WEEK)
+
+  const hourlyData = useTokenHourlyData(address, timeWindow)
 
   const below1080 = useMedia('(max-width: 1080px)')
   const below600 = useMedia('(max-width: 600px)')
@@ -40,6 +45,29 @@ const TokenChart = ({ address, color }) => {
   const domain = [dataMin => (dataMin > utcStartTime ? dataMin : utcStartTime), 'dataMax']
 
   const aspect = below1080 ? 60 / 32 : below600 ? 60 / 42 : 60 / 28
+
+  // update the width on a window resize
+  const ref = useRef()
+  const isClient = typeof window === 'object'
+  const [width, setWidth] = useState(ref?.current?.container?.clientWidth)
+  useEffect(() => {
+    if (!isClient) {
+      return false
+    }
+    function handleResize() {
+      setWidth(ref?.current?.container?.clientWidth ?? width)
+    }
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [isClient, width]) // Empty array ensures that effect is only run on mount and unmount
+
+  // reset view on new address
+  const addressPrev = usePrevious(address)
+  useEffect(() => {
+    if (address !== addressPrev) {
+      setChartFilter(CHART_VIEW.LIQUIDITY)
+    }
+  }, [address, addressPrev])
 
   return (
     <ChartWrapper>
@@ -50,7 +78,7 @@ const TokenChart = ({ address, color }) => {
         </RowBetween>
       ) : (
         <RowBetween mb={40}>
-          <AutoRow gap="10px">
+          <AutoRow gap="6px">
             <OptionButton
               active={chartFilter === CHART_VIEW.LIQUIDITY}
               onClick={() => setChartFilter(CHART_VIEW.LIQUIDITY)}
@@ -63,7 +91,11 @@ const TokenChart = ({ address, color }) => {
             <OptionButton active={chartFilter === CHART_VIEW.PRICE} onClick={() => setChartFilter(CHART_VIEW.PRICE)}>
               Price
             </OptionButton>
+            <OptionButton active={chartFilter === CHART_VIEW.HOURLY} onClick={() => setChartFilter(CHART_VIEW.HOURLY)}>
+              Hourly
+            </OptionButton>
           </AutoRow>
+
           <AutoRow justify="flex-end" gap="6px">
             <OptionButton
               active={timeWindow === timeframeOptions.MONTH}
@@ -206,6 +238,15 @@ const TokenChart = ({ address, color }) => {
           </AreaChart>
         </ResponsiveContainer>
       )}
+      {chartFilter === CHART_VIEW.HOURLY &&
+        (hourlyData ? (
+          <ResponsiveContainer aspect={aspect} ref={ref}>
+            <CandleStickChart data={hourlyData} width={width} address={address} />
+          </ResponsiveContainer>
+        ) : (
+          <LocalLoader />
+        ))}
+
       {chartFilter === CHART_VIEW.VOLUME && (
         <ResponsiveContainer aspect={aspect}>
           <BarChart margin={{ top: 0, right: 10, bottom: 6, left: 10 }} barCategoryGap={1} data={chartData}>

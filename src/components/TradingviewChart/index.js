@@ -3,13 +3,22 @@ import { createChart } from 'lightweight-charts'
 import dayjs from 'dayjs'
 import { formattedNum } from '../../utils'
 
-const CustomBarChart = ({ data, base, baseChange, field, title, width }) => {
+export const CHART_TYPES = {
+  BAR: 'BAR',
+  AREA: 'AREA'
+}
+
+// constant height for charts
+const HEIGHT = 300
+
+const TradingViewChart = ({ type = CHART_TYPES.BAR, data, base, baseChange, field, title, width }) => {
+  // reference for DOM element to create with chart
   const ref = useRef()
 
-  var height = 300
-
+  // pointer to the chart object
   const [chartCreated, setChartCreated] = useState(false)
 
+  // parese the data and format for tardingview consumption
   const formattedData = data?.map(entry => {
     return {
       time: dayjs.unix(entry.date).format('YYYY-MM-DD'),
@@ -17,14 +26,18 @@ const CustomBarChart = ({ data, base, baseChange, field, title, width }) => {
     }
   })
 
+  // adjust the scale based on the type of chart
+  const topScale = type === CHART_TYPES.AREA ? 0.32 : 0.2
+
+  // if no chart created yet, create one with options and add to DOM manually
   useEffect(() => {
     if (!chartCreated && formattedData) {
       var chart = createChart(ref.current, {
         width: width,
-        height: height,
+        height: HEIGHT,
         rightPriceScale: {
           scaleMargins: {
-            top: 0.75,
+            top: topScale,
             bottom: 0.2
           },
           borderVisible: false
@@ -56,45 +69,41 @@ const CustomBarChart = ({ data, base, baseChange, field, title, width }) => {
         }
       })
 
-      var series = chart.addHistogramSeries({
-        color: '#ff007a',
-        priceFormat: {
-          type: 'volume'
-        },
-        priceScaleId: '',
-        scaleMargins: {
-          top: 0.32,
-          bottom: 0
-        }
-      })
+      var series =
+        type === CHART_TYPES.BAR
+          ? chart.addHistogramSeries({
+              color: '#ff007a',
+              priceFormat: {
+                type: 'volume'
+              },
+              priceScaleId: '',
+              scaleMargins: {
+                top: 0.32,
+                bottom: 0
+              }
+            })
+          : chart.addAreaSeries({
+              topColor: '#ff007a',
+              bottomColor: 'rgba(255, 0, 122, 0)',
+              lineColor: '#ff007a',
+              lineWidth: 3
+            })
 
       series.setData(formattedData)
-
       var toolTip = document.createElement('div')
-
       toolTip.className = 'three-line-legend'
-
       ref.current.appendChild(toolTip)
       toolTip.style.display = 'block'
       toolTip.style.left = 3 + 'px'
       toolTip.style.top = 3 + 'px'
 
+      // format numbers
       let percentChange = baseChange?.toFixed(2)
       let formattedPercentChange = (percentChange > 0 ? '+' : '') + percentChange + '%'
-
       let color = percentChange >= 0 ? 'green' : 'red'
 
+      // get the title of the chart
       function setLastBarText() {
-        var dateStr =
-          dayjs()
-            .year()
-            .toString() +
-          ' - ' +
-          (dayjs().month() + 1).toString() +
-          ' - ' +
-          dayjs()
-            .date()
-            .toString()
         toolTip.innerHTML =
           `<div style="font-size: 16px; margin: 4px 0px; color: #20262E;">${title}</div>` +
           '<div style="font-size: 22px; margin: 4px 0px; color: #20262E">' +
@@ -104,6 +113,8 @@ const CustomBarChart = ({ data, base, baseChange, field, title, width }) => {
           '<div>24HR</div>'
       }
       setLastBarText()
+
+      // update the title when hovering on the chart
       chart.subscribeCrosshairMove(function(param) {
         if (
           param === undefined ||
@@ -111,7 +122,7 @@ const CustomBarChart = ({ data, base, baseChange, field, title, width }) => {
           param.point.x < 0 ||
           param.point.x > width ||
           param.point.y < 0 ||
-          param.point.y > height
+          param.point.y > HEIGHT
         ) {
           setLastBarText()
         } else {
@@ -131,16 +142,17 @@ const CustomBarChart = ({ data, base, baseChange, field, title, width }) => {
 
       setChartCreated(chart)
     }
-  }, [base, baseChange, chartCreated, data, formattedData, height, title, width])
+  }, [base, baseChange, chartCreated, data, formattedData, title, topScale, type, width])
+
   // responsiveness
   useEffect(() => {
     if (width) {
-      chartCreated && chartCreated.resize(width, height)
+      chartCreated && chartCreated.resize(width, HEIGHT)
       chartCreated && chartCreated.timeScale().scrollToPosition(0)
     }
-  }, [chartCreated, height, width])
+  }, [chartCreated, width])
 
   return <div ref={ref} />
 }
 
-export default CustomBarChart
+export default TradingViewChart

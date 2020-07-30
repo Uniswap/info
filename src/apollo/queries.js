@@ -56,6 +56,28 @@ export const GET_BLOCKS = timestamps => {
   return gql(queryString)
 }
 
+export const HOURLY_PRICES = (tokenAddress, blocks) => {
+  let queryString = 'query blocks {'
+  queryString += blocks.map(
+    block => `
+      t${block.timestamp}:token(id:"${tokenAddress}", block: { number: ${block.number} }) { 
+        derivedETH
+      }
+    `
+  )
+  queryString += ','
+  queryString += blocks.map(
+    block => `
+      b${block.timestamp}: bundle(id:"1", block: { number: ${block.number} }) { 
+        ethPrice
+      }
+    `
+  )
+
+  queryString += '}'
+  return gql(queryString)
+}
+
 export const SHARE_VALUE = (pairAddress, blocks) => {
   let queryString = 'query blocks {'
   queryString += blocks.map(
@@ -74,9 +96,7 @@ export const SHARE_VALUE = (pairAddress, blocks) => {
       }
     `
   )
-
   queryString += ','
-
   queryString += blocks.map(
     block => `
       b${block.timestamp}: bundle(id:"1", block: { number: ${block.number} }) { 

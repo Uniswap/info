@@ -25,18 +25,28 @@ const AppWrapper = styled.div`
 const ContentWrapper = styled.div`
   display: grid;
   grid-template-columns: ${({ open }) => (open ? '1fr 220px' : '1fr 80px')};
-  grid-gap: 0rem;
+  grid-gap: 1rem;
 
   @media screen and (max-width: 1080px) {
     grid-template-columns: 1fr;
+    grid-gap: 0;
   }
 `
 
 const Right = styled.div`
-  position: sticky;
-  top: 32px;
+  position: fixed;
+  right: 0;
+  top: 0rem;
+  margin-top: 3rem;
   width: ${({ open }) => (open ? '220px' : '80px')};
   height: ${({ open }) => (open ? '100%' : '20px')};
+  border-top-left-radius: 25px;
+  background-color: transparent;
+
+  box-shadow: ${({ open }) =>
+    open
+      ? '0px 24px 32px rgba(0, 0, 0, 0.04), 0px 16px 24px rgba(0, 0, 0, 0.04), 0px 4px 8px rgba(0, 0, 0, 0.04), 0px 0px 1px rgba(0, 0, 0, 0.04);'
+      : 'none'};
 
   @media screen and (max-width: 1080px) {
     display: none;
@@ -160,7 +170,7 @@ function App() {
                     <SubHeader />
                     <AllTokensPage />
                   </Center>
-                  <Right open={savedOpen}>
+                  <Right open={savedOpen} onClick={() => setSavedOpen(true)}>
                     <PinnedData open={savedOpen} setSavedOpen={setSavedOpen} />
                   </Right>
                 </ContentWrapper>

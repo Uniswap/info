@@ -4,10 +4,9 @@ import { useTimeframe } from '../../contexts/Application'
 import { timeframeOptions } from '../../constants'
 import { useGlobalChartData, useGlobalData } from '../../contexts/GlobalData'
 import dayjs from 'dayjs'
-import CustomAreaChart from '../CustomAreaChart'
-import CustomBarChart from '../CustomBarChart'
 import { useMedia } from 'react-use'
 import DropdownSelect from '../DropdownSelect'
+import TradingViewChart, { CHART_TYPES } from '../TradingviewChart'
 
 const CHART_VIEW = {
   VOLUME: 'Volume',
@@ -78,13 +77,10 @@ const GlobalChart = ({ display }) => {
   }, [dailyData, utcStartTime, volumeWindow, weeklyData])
   const below800 = useMedia('(max-width: 800px)')
 
-  const ref = useRef()
-
-  const isClient = typeof window === 'object'
-
-  const [width, setWidth] = useState(ref?.current?.container?.clientWidth)
-
   // update the width on a window resize
+  const ref = useRef()
+  const isClient = typeof window === 'object'
+  const [width, setWidth] = useState(ref?.current?.container?.clientWidth)
   useEffect(() => {
     if (!isClient) {
       return false
@@ -103,25 +99,27 @@ const GlobalChart = ({ display }) => {
       )}
       {chartDataFiltered && chartView === CHART_VIEW.LIQUIDITY && (
         <ResponsiveContainer aspect={60 / 28} ref={ref}>
-          <CustomAreaChart
+          <TradingViewChart
             data={chartDataFiltered}
             base={totalLiquidityUSD}
             baseChange={liquidityChangeUSD}
             title="Liquidity"
             field="totalLiquidityUSD"
             width={width}
+            type={CHART_TYPES.AREA}
           />
         </ResponsiveContainer>
       )}
       {chartDataFiltered && chartView === CHART_VIEW.VOLUME && (
         <ResponsiveContainer aspect={60 / 28}>
-          <CustomBarChart
+          <TradingViewChart
             data={chartDataFiltered}
             base={oneDayVolumeUSD}
             baseChange={volumeChangeUSD}
             title="Volume"
             field="dailyVolumeUSD"
             width={width}
+            type={CHART_TYPES.BAR}
           />
         </ResponsiveContainer>
       )}

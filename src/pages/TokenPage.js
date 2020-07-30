@@ -132,6 +132,7 @@ function TokenPage({ address, history }) {
   // transactions
   const txnChangeFormatted = formattedPercent(txnChange)
 
+  const below1180 = useMedia('(max-width: 1180px)')
   const below1080 = useMedia('(max-width: 1080px)')
   const below800 = useMedia('(max-width: 800px)')
   const below600 = useMedia('(max-width: 600px)')
@@ -215,7 +216,7 @@ function TokenPage({ address, history }) {
         </RowBetween>
       </FixedMenu>
       <ContentWrapper>
-        {!below800 && (
+        {!below1180 && (
           <SubNav>
             <SubNavEl onClick={() => handleScroll(OverviewRef)} isActive={active === OverviewRef}>
               <TrendingUp size={20} style={{ marginRight: '1rem' }} />

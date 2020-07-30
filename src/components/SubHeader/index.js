@@ -39,7 +39,7 @@ function SubHeader({
     <Wrapper>
       <RowBetween>
         <RowFixed>
-          <Title />
+          {!below600 ? <Title /> : <Search small={true} />}
           {!below1080 && (
             <AutoRow gap="0.5rem" style={{ marginLeft: '1rem' }}>
               <BasicLink to="/home">

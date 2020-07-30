@@ -12,16 +12,18 @@ import { Hover } from '..'
 import TokenLogo from '../TokenLogo'
 
 const RightColumn = styled(AutoColumn)`
-  position: sticky;
+  position: fixed;
   top: 3rem;
+  right: 0;
   padding: 1.25rem;
-  /* border-left: 1px solid ${({ theme }) => theme.bg3}; */
-  border: 1px solid ${({ theme }) => theme.bg3};
-  border-top-left-radius: 12px;
-  border-bottom-left-radius: 12px;
-  margin-top: 1rem;
-  /* border-bottom-left-radius: ${({ open }) => (open ? '12' : '12px')};
-  border-bottom: ${({ open, theme }) => (open ? '' : '1px solid' + theme.bg3)}; */
+  border: ${({ theme, open }) => !open && '1px solid' + theme.bg3};
+  border-top-left-radius: 25px;
+  border-bottom-left-radius: 25px;
+
+  :hover {
+    cursor: pointer;
+    border: ${({ theme, open }) => !open && '1px solid' + theme.bg4};
+  }
 `
 
 const Wrapper = styled.div`
@@ -90,10 +92,9 @@ function PinnedData({ history, open, setSavedOpen }) {
   }
 
   return !open ? (
-    <RightColumn open={open}>
-      <SavedButton open={open} onClick={() => setSavedOpen(true)}>
+    <RightColumn open={open} onClick={() => setSavedOpen(true)}>
+      <SavedButton open={open}>
         <Bookmark size={16} />
-        {/* <TYPE.main ml={'4px'}>Saved</TYPE.main> */}
       </SavedButton>
     </RightColumn>
   ) : (
