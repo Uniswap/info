@@ -3,10 +3,7 @@ import { createChart, CrosshairMode } from 'lightweight-charts'
 import dayjs from 'dayjs'
 import { formattedNum } from '../../utils'
 
-// constant height for charts
-const HEIGHT = 300
-
-const CandleStickChart = ({ data, width }) => {
+const CandleStickChart = ({ data, width, height = 300, valueFormatter = val => formattedNum(val, true) }) => {
   // reference for DOM element to create with chart
   const ref = useRef()
 
@@ -28,7 +25,7 @@ const CandleStickChart = ({ data, width }) => {
     if (!chartCreated) {
       const chart = createChart(ref.current, {
         width: width,
-        height: HEIGHT,
+        height: height,
         layout: {
           backgroundColor: 'transparent',
           textColor: 'black'
@@ -49,6 +46,9 @@ const CandleStickChart = ({ data, width }) => {
         },
         timeScale: {
           borderColor: 'rgba(197, 203, 206, 0.8)'
+        },
+        localization: {
+          priceFormatter: val => formattedNum(val)
         }
       })
 
@@ -85,7 +85,7 @@ const CandleStickChart = ({ data, width }) => {
           param.point.x < 0 ||
           param.point.x > width ||
           param.point.y < 0 ||
-          param.point.y > HEIGHT
+          param.point.y > height
         ) {
           setLastBarText()
         } else {
@@ -93,7 +93,7 @@ const CandleStickChart = ({ data, width }) => {
           const time = dayjs.unix(param.time).format('MM/DD h:mm A')
           toolTip.innerHTML =
             '<div style="font-size: 22px; margin: 4px 0px; color: #20262E">' +
-            formattedNum(price, true) +
+            valueFormatter(price) +
             '<span style="font-size: 12px; margin: 4px 6px; color: #20262E">' +
             time +
             ' UTC' +
@@ -104,15 +104,15 @@ const CandleStickChart = ({ data, width }) => {
 
       setChartCreated(chart)
     }
-  }, [chartCreated, formattedData, width])
+  }, [chartCreated, formattedData, width, height, valueFormatter])
 
   // responsiveness
   useEffect(() => {
     if (width) {
-      chartCreated && chartCreated.resize(width, HEIGHT)
+      chartCreated && chartCreated.resize(width, height)
       chartCreated && chartCreated.timeScale().scrollToPosition(0)
     }
-  }, [chartCreated, width])
+  }, [chartCreated, height, width])
 
   return <div ref={ref} />
 }

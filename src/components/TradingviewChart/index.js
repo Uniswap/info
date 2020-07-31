@@ -41,7 +41,7 @@ const TradingViewChart = ({ type = CHART_TYPES.BAR, data, base, baseChange, fiel
         rightPriceScale: {
           scaleMargins: {
             top: topScale,
-            bottom: 0.2
+            bottom: 0
           },
           borderVisible: false
         },
@@ -70,6 +70,9 @@ const TradingViewChart = ({ type = CHART_TYPES.BAR, data, base, baseChange, fiel
             color: 'rgba(32, 38, 46, 0.1)',
             labelVisible: false
           }
+        },
+        localization: {
+          priceFormatter: val => formattedNum(val, true)
         }
       })
 

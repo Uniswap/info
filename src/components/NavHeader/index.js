@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import { RowFixed, RowBetween } from '../Row'
 import { useMedia } from 'react-use'
 import { useGlobalData, useEthPrice } from '../../contexts/GlobalData'
-import { formattedNum, formattedPercent, toK } from '../../utils'
+import { formattedNum, toK } from '../../utils'
 import { TYPE } from '../../Theme'
 
 import UniPrice from '../UniPrice'
@@ -53,13 +53,12 @@ export default function NavHeader() {
 
   const [showPriceCard, setShowPriceCard] = useState(false)
 
-  const { oneDayVolumeUSD, oneDayTxns, v1Data, txnChange, pairCount } = useGlobalData()
+  const { oneDayVolumeUSD, totalLiquidityUSD, oneDayTxns, pairCount } = useGlobalData()
   const [ethPrice] = useEthPrice()
   const formattedEthPrice = ethPrice ? formattedNum(ethPrice, true) : '-'
-  let txnChangeFormatted = txnChange ? formattedPercent(txnChange) : '-'
 
-  const liquidity = v1Data?.totalLiquidityUSD ? '$' + toK(parseFloat(v1Data?.totalLiquidityUSD), true) : ''
-  const volume = v1Data?.dailyVolumeUSD ? '$' + toK(v1Data?.dailyVolumeUSD, true) : ''
+  const liquidity = totalLiquidityUSD ? '$' + toK(parseFloat(totalLiquidityUSD), true) : ''
+  const volume = oneDayVolumeUSD ? '$' + toK(oneDayVolumeUSD, true) : ''
 
   const seconds = useSessionStart()
 
@@ -92,22 +91,22 @@ export default function NavHeader() {
           )}
           {!below816 && (
             <HeaderText>
-              V1 Liquidity: <b>{liquidity}</b>
+              Liquidity: <b>{liquidity}</b>
             </HeaderText>
           )}
           {!below816 && (
             <HeaderText>
-              V1 Volume: <b>{volume}</b>
+              Volume (24HR): <b>{volume}</b>
+            </HeaderText>
+          )}
+          {!below1180 && (
+            <HeaderText>
+              Transactions (24H): <b>{oneDayTxns}</b>
             </HeaderText>
           )}
           {!below1024 && (
             <HeaderText>
               Pairs: <b>{pairCount}</b>
-            </HeaderText>
-          )}
-          {!below1180 && (
-            <HeaderText>
-              Transactions (24H): <b>{oneDayTxns}</b>&nbsp;{txnChangeFormatted && txnChangeFormatted}
             </HeaderText>
           )}
           {!below1295 && (

@@ -28,6 +28,7 @@ const UPDATE = 'UPDATE'
 const UPDATE_TOKEN_TXNS = 'UPDATE_TOKEN_TXNS'
 const UPDATE_CHART_DATA = 'UPDATE_CHART_DATA'
 const UPDATE_HOURLY_DATA = 'UPDATE_HOURLY_DATA'
+const UPDATE_DAILY_PRICE_DATA = 'UPDATE_DAILY_PRICE_DATA'
 const UPDATE_TOP_TOKENS = ' UPDATE_TOP_TOKENS'
 const UPDATE_ALL_PAIRS = 'UPDATE_ALL_PAIRS'
 
@@ -101,6 +102,20 @@ function reducer(state, { type, payload }) {
       }
     }
 
+    case UPDATE_DAILY_PRICE_DATA: {
+      const { address, data, timeWindow } = payload
+      return {
+        ...state,
+        [address]: {
+          ...state?.[address],
+          dailyPriceData: {
+            ...state?.[address].dailyPriceData,
+            [timeWindow]: data
+          }
+        }
+      }
+    }
+
     case UPDATE_ALL_PAIRS: {
       const { address, allPairs } = payload
       return {
@@ -166,11 +181,38 @@ export default function Provider({ children }) {
     })
   }, [])
 
+  const updateDailyPriceData = useCallback((address, data, timeWindow) => {
+    dispatch({
+      type: UPDATE_DAILY_PRICE_DATA,
+      payload: { address, data, timeWindow }
+    })
+  }, [])
+
   return (
     <TokenDataContext.Provider
       value={useMemo(
-        () => [state, { update, updateTokenTxns, updateChartData, updateTopTokens, updateAllPairs, updateHourlyData }],
-        [state, update, updateTokenTxns, updateChartData, updateTopTokens, updateAllPairs, updateHourlyData]
+        () => [
+          state,
+          {
+            update,
+            updateTokenTxns,
+            updateChartData,
+            updateTopTokens,
+            updateAllPairs,
+            updateHourlyData,
+            updateDailyPriceData
+          }
+        ],
+        [
+          state,
+          update,
+          updateTokenTxns,
+          updateChartData,
+          updateTopTokens,
+          updateAllPairs,
+          updateHourlyData,
+          updateDailyPriceData
+        ]
       )}
     >
       {children}
@@ -383,7 +425,7 @@ const getTokenPairs = async tokenAddress => {
   }
 }
 
-const getHourlyTokenData = async (tokenAddress, startTime) => {
+const getHourlyTokenData = async (tokenAddress, startTime, interval = 3600) => {
   const utcEndTime = dayjs.utc()
   let time = startTime
 
@@ -391,14 +433,15 @@ const getHourlyTokenData = async (tokenAddress, startTime) => {
   const timestamps = []
   while (time < utcEndTime.unix()) {
     timestamps.push(time)
-    time += 3600
+    time += interval
   }
 
+  // backout if invalid timestamp format
   if (timestamps.length === 0) {
     return []
   }
 
-  // once you have all the timestamps, get the blocks
+  // once you have all the timestamps, get the blocks for each timestamp in a bulk query
   let blocks
   try {
     blocks = await getBlocksFromTimestamps(timestamps)
@@ -416,6 +459,7 @@ const getHourlyTokenData = async (tokenAddress, startTime) => {
     fetchPolicy: 'cache-first'
   })
 
+  // format token ETH price results
   let values = []
   for (var row in result?.data) {
     let timestamp = row.split('t')[1]
@@ -428,7 +472,7 @@ const getHourlyTokenData = async (tokenAddress, startTime) => {
     }
   }
 
-  // add eth prices
+  // go through eth usd prices and assign to original values array
   let index = 0
   for (var brow in result?.data) {
     let timestamp = brow.split('b')[1]
@@ -613,6 +657,27 @@ export function useTokenHourlyData(tokenAddress, timeWindow) {
       fetch()
     }
   }, [chartData, timeWindow, tokenAddress, updateHourlyData])
+
+  return chartData
+}
+
+export function useTokenDailyData(tokenAddress, timeWindow) {
+  const [state, { updateDailyPriceData }] = useTokenDataContext()
+  const chartData = state?.[tokenAddress]?.dailyPriceData?.[timeWindow]
+
+  useEffect(() => {
+    const currentTime = dayjs.utc()
+    const windowSize = timeWindow === timeframeOptions.MONTH ? 'month' : 'week'
+    const startTime = timeWindow === timeframeOptions.ALL_TIME ? 1589760000 : currentTime.subtract(1, windowSize).unix()
+
+    async function fetch() {
+      let data = await getHourlyTokenData(tokenAddress, startTime, 86400)
+      updateDailyPriceData(tokenAddress, data, timeWindow)
+    }
+    if (!chartData) {
+      fetch()
+    }
+  }, [chartData, timeWindow, tokenAddress, updateDailyPriceData])
 
   return chartData
 }

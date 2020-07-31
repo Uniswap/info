@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import styled from 'styled-components'
 import { Area, XAxis, YAxis, ResponsiveContainer, Tooltip, AreaChart, BarChart, Bar } from 'recharts'
 import { RowBetween, AutoRow } from '../Row'
@@ -6,32 +6,50 @@ import { RowBetween, AutoRow } from '../Row'
 import { toK, toNiceDate, toNiceDateYear, formattedNum, getTimeframe } from '../../utils'
 import { OptionButton } from '../ButtonStyled'
 import { darken } from 'polished'
-import { usePairChartData } from '../../contexts/PairData'
+import { usePairChartData, useHourlyRateData, usePairData } from '../../contexts/PairData'
 import { timeframeOptions } from '../../constants'
 import { useMedia } from 'react-use'
 import { EmptyCard } from '..'
 import DropdownSelect from '../DropdownSelect'
+import CandleStickChart from '../CandleChart'
+import LocalLoader from '../LocalLoader'
 
 const ChartWrapper = styled.div`
   height: 100%;
-  min-height: 448px;
+  max-height: 320px;
 
   @media screen and (max-width: 600px) {
     min-height: 200px;
   }
 `
 
+const OptionsRow = styled.div`
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  margin-bottom: 40px;
+`
+
 const CHART_VIEW = {
   VOLUME: 'Volume',
-  LIQUIDITY: 'Liquidity'
+  LIQUIDITY: 'Liquidity',
+  RATE0: 'Rate 0',
+  RATE1: 'Rate 1'
 }
 
 const PairChart = ({ address, color }) => {
   const [chartFilter, setChartFilter] = useState(CHART_VIEW.LIQUIDITY)
 
-  const chartData = usePairChartData(address)
+  const [timeWindow, setTimeWindow] = useState(timeframeOptions.WEEK)
 
-  const [timeWindow, setTimeWindow] = useState(timeframeOptions.ALL_TIME)
+  const ref = useRef()
+
+  // get data for pair, and rates
+  const pairData = usePairData(address)
+  const chartData = usePairChartData(address)
+  const hourlyData = useHourlyRateData(address, timeWindow)
+  const hourlyRate0 = hourlyData && hourlyData[0]
+  const hourlyRate1 = hourlyData && hourlyData[1]
 
   const below1080 = useMedia('(max-width: 1080px)')
   const below600 = useMedia('(max-width: 600px)')
@@ -48,7 +66,27 @@ const PairChart = ({ address, color }) => {
     )
   }
 
-  const aspect = below1080 ? 60 / 32 : 60 / 45
+  /**
+   * Used to format values on chart on scroll
+   * Needs to be raw html for chart API to parse styles
+   * @param {*} val
+   */
+  function valueFormatter(val) {
+    if (chartFilter === CHART_VIEW.RATE0) {
+      return (
+        formattedNum(val) +
+        `<span style="font-size: 12px; margin-left: 4px;">${pairData?.token0?.symbol}/${pairData?.token1?.symbol}<span>`
+      )
+    }
+    if (chartFilter === CHART_VIEW.RATE1) {
+      return (
+        formattedNum(val) +
+        `<span style="font-size: 12px; margin-left: 4px;">${pairData?.token1?.symbol}/${pairData?.token0?.symbol}<span>`
+      )
+    }
+  }
+
+  const aspect = below1080 ? 60 / 32 : 60 / 28
 
   return (
     <ChartWrapper>
@@ -58,8 +96,8 @@ const PairChart = ({ address, color }) => {
           <DropdownSelect options={timeframeOptions} active={timeWindow} setActive={setTimeWindow} color={color} />
         </RowBetween>
       ) : (
-        <RowBetween mb={40}>
-          <AutoRow gap="10px">
+        <OptionsRow>
+          <AutoRow gap="6px" style={{ flexWrap: 'nowrap' }}>
             <OptionButton
               active={chartFilter === CHART_VIEW.LIQUIDITY}
               onClick={() => setChartFilter(CHART_VIEW.LIQUIDITY)}
@@ -68,6 +106,12 @@ const PairChart = ({ address, color }) => {
             </OptionButton>
             <OptionButton active={chartFilter === CHART_VIEW.VOLUME} onClick={() => setChartFilter(CHART_VIEW.VOLUME)}>
               Volume
+            </OptionButton>
+            <OptionButton active={chartFilter === CHART_VIEW.RATE0} onClick={() => setChartFilter(CHART_VIEW.RATE0)}>
+              {pairData.token0 ? pairData.token0.symbol + '/' + pairData.token1.symbol : '-'}
+            </OptionButton>
+            <OptionButton active={chartFilter === CHART_VIEW.RATE1} onClick={() => setChartFilter(CHART_VIEW.RATE1)}>
+              {pairData.token0 ? pairData.token1.symbol + '/' + pairData.token0.symbol : '-'}
             </OptionButton>
           </AutoRow>
           <AutoRow justify="flex-end" gap="6px">
@@ -90,7 +134,7 @@ const PairChart = ({ address, color }) => {
               All
             </OptionButton>
           </AutoRow>
-        </RowBetween>
+        </OptionsRow>
       )}
       {chartFilter === CHART_VIEW.LIQUIDITY && (
         <ResponsiveContainer aspect={aspect}>
@@ -150,6 +194,24 @@ const PairChart = ({ address, color }) => {
           </AreaChart>
         </ResponsiveContainer>
       )}
+      {chartFilter === CHART_VIEW.RATE0 &&
+        (hourlyRate0 ? (
+          <ResponsiveContainer aspect={aspect} ref={ref}>
+            <CandleStickChart data={hourlyRate0} width={400} address={address} valueFormatter={valueFormatter} />
+          </ResponsiveContainer>
+        ) : (
+          <LocalLoader />
+        ))}
+
+      {chartFilter === CHART_VIEW.RATE1 &&
+        (hourlyRate0 ? (
+          <ResponsiveContainer aspect={aspect} ref={ref}>
+            <CandleStickChart data={hourlyRate1} width={400} address={address} valueFormatter={valueFormatter} />
+          </ResponsiveContainer>
+        ) : (
+          <LocalLoader />
+        ))}
+
       {chartFilter === CHART_VIEW.VOLUME && (
         <ResponsiveContainer aspect={aspect}>
           <BarChart

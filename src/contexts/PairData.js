@@ -7,7 +7,8 @@ import {
   FILTERED_TRANSACTIONS,
   PAIRS_CURRENT,
   PAIRS_BULK,
-  PAIRS_DYNAMIC_BULK
+  PAIRS_DYNAMIC_BULK,
+  HOURLY_PAIR_RATES
 } from '../apollo/queries'
 
 import { useEthPrice } from './GlobalData'
@@ -15,12 +16,20 @@ import { useEthPrice } from './GlobalData'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 
-import { getPercentChange, get2DayPercentChange, getBlockFromTimestamp, isAddress } from '../utils'
+import {
+  getPercentChange,
+  get2DayPercentChange,
+  getBlockFromTimestamp,
+  isAddress,
+  getBlocksFromTimestamps
+} from '../utils'
+import { timeframeOptions } from '../constants'
 
 const UPDATE = 'UPDATE'
 const UPDATE_PAIR_TXNS = 'UPDATE_PAIR_TXNS'
 const UPDATE_CHART_DATA = 'UPDATE_CHART_DATA'
 const UPDATE_TOP_PAIRS = 'UPDATE_TOP_PAIRS'
+const UPDATE_HOURLY_DATA = 'UPDATE_HOURLY_DATA'
 
 dayjs.extend(utc)
 
@@ -85,6 +94,20 @@ function reducer(state, { type, payload }) {
       }
     }
 
+    case UPDATE_HOURLY_DATA: {
+      const { address, hourlyData, timeWindow } = payload
+      return {
+        ...state,
+        [address]: {
+          ...state?.[address],
+          hourlyData: {
+            ...state?.[address].hourlyData,
+            [timeWindow]: hourlyData
+          }
+        }
+      }
+    }
+
     default: {
       throw Error(`Unexpected action type in DataContext reducer: '${type}'.`)
     }
@@ -128,14 +151,22 @@ export default function Provider({ children }) {
     })
   }, [])
 
+  const updateHourlyData = useCallback((address, hourlyData, timeWindow) => {
+    dispatch({
+      type: UPDATE_HOURLY_DATA,
+      payload: { address, hourlyData, timeWindow }
+    })
+  }, [])
+
   return (
     <PairDataContext.Provider
-      value={useMemo(() => [state, { update, updatePairTxns, updateChartData, updateTopPairs }], [
+      value={useMemo(() => [state, { update, updatePairTxns, updateChartData, updateTopPairs, updateHourlyData }], [
         state,
         update,
         updatePairTxns,
         updateChartData,
-        updateTopPairs
+        updateTopPairs,
+        updateHourlyData
       ])}
     >
       {children}
@@ -446,6 +477,73 @@ const getPairChartData = async pairAddress => {
   return data
 }
 
+const getHourlyRateData = async (pairAddress, startTime) => {
+  const utcEndTime = dayjs.utc()
+  let time = startTime
+
+  // create an array of hour start times until we reach current hour
+  const timestamps = []
+  while (time < utcEndTime.unix()) {
+    timestamps.push(time)
+    time += 3600
+  }
+
+  // backout if invalid timestamp format
+  if (timestamps.length === 0) {
+    return []
+  }
+
+  // once you have all the timestamps, get the blocks for each timestamp in a bulk query
+  let blocks
+  try {
+    blocks = await getBlocksFromTimestamps(timestamps)
+  } catch (e) {
+    console.log('error fetchign blocks')
+  }
+  // catch failing case
+  if (blocks.length === 0) {
+    return []
+  }
+
+  // pass the blocks to a token query
+  let result = await client.query({
+    query: HOURLY_PAIR_RATES(pairAddress, blocks),
+    fetchPolicy: 'cache-first'
+  })
+
+  // format token ETH price results
+  let values = []
+  for (var row in result?.data) {
+    let timestamp = row.split('t')[1]
+    if (timestamp) {
+      values.push({
+        timestamp,
+        rate0: parseFloat(result.data[row]?.token0Price),
+        rate1: parseFloat(result.data[row]?.token1Price)
+      })
+    }
+  }
+
+  let formattedHistoryRate0 = []
+  let formattedHistoryRate1 = []
+
+  // for each hour, construct the open and close price
+  for (let i = 0; i < values.length - 1; i++) {
+    formattedHistoryRate0.push({
+      timestamp: values[i].timestamp,
+      open: parseFloat(values[i].rate0),
+      close: parseFloat(values[i + 1].rate0)
+    })
+    formattedHistoryRate1.push({
+      timestamp: values[i].timestamp,
+      open: parseFloat(values[i].rate1),
+      close: parseFloat(values[i + 1].rate1)
+    })
+  }
+
+  return [formattedHistoryRate0, formattedHistoryRate1]
+}
+
 export function Updater() {
   const [, { updateTopPairs }] = usePairDataContext()
   const [ethPrice] = useEthPrice()
@@ -472,6 +570,27 @@ export function Updater() {
     ethPrice && getData()
   }, [ethPrice, updateTopPairs])
   return null
+}
+
+export function useHourlyRateData(pairAddress, timeWindow) {
+  const [state, { updateHourlyData }] = usePairDataContext()
+  const chartData = state?.[pairAddress]?.hourlyData?.[timeWindow]
+
+  useEffect(() => {
+    const currentTime = dayjs.utc()
+    const windowSize = timeWindow === timeframeOptions.MONTH ? 'month' : 'week'
+    const startTime = timeWindow === timeframeOptions.ALL_TIME ? 1589760000 : currentTime.subtract(1, windowSize).unix()
+
+    async function fetch() {
+      let data = await getHourlyRateData(pairAddress, startTime)
+      updateHourlyData(pairAddress, data, timeWindow)
+    }
+    if (!chartData) {
+      fetch()
+    }
+  }, [chartData, timeWindow, pairAddress, updateHourlyData])
+
+  return chartData
 }
 
 /**

@@ -8,7 +8,7 @@ import { OptionButton } from '../ButtonStyled'
 import { darken } from 'polished'
 import { useMedia, usePrevious } from 'react-use'
 import { timeframeOptions } from '../../constants'
-import { useTokenChartData, useTokenHourlyData } from '../../contexts/TokenData'
+import { useTokenChartData, useTokenHourlyData, useTokenDailyData } from '../../contexts/TokenData'
 import DropdownSelect from '../DropdownSelect'
 import CandleStickChart from '../CandleChart'
 import LocalLoader from '../LocalLoader'
@@ -25,8 +25,8 @@ const ChartWrapper = styled.div`
 const CHART_VIEW = {
   VOLUME: 'Volume',
   LIQUIDITY: 'Liquidity',
-  PRICE: 'Price',
-  HOURLY: 'Hourly'
+  PRICE: 'Price (D)',
+  HOURLY: 'Price (H)'
 }
 
 const TokenChart = ({ address, color }) => {
@@ -45,6 +45,7 @@ const TokenChart = ({ address, color }) => {
   const [timeWindow, setTimeWindow] = useState(timeframeOptions.WEEK)
 
   const hourlyData = useTokenHourlyData(address, timeWindow)
+  const dailyPriceData = useTokenDailyData(address, timeWindow)
 
   const below1080 = useMedia('(max-width: 1080px)')
   const below600 = useMedia('(max-width: 600px)')
@@ -89,10 +90,10 @@ const TokenChart = ({ address, color }) => {
               Volume
             </OptionButton>
             <OptionButton active={chartFilter === CHART_VIEW.PRICE} onClick={() => setChartFilter(CHART_VIEW.PRICE)}>
-              Price
+              Price (D)
             </OptionButton>
             <OptionButton active={chartFilter === CHART_VIEW.HOURLY} onClick={() => setChartFilter(CHART_VIEW.HOURLY)}>
-              Hourly
+              Price (H)
             </OptionButton>
           </AutoRow>
 
@@ -178,66 +179,15 @@ const TokenChart = ({ address, color }) => {
           </AreaChart>
         </ResponsiveContainer>
       )}
-      {chartFilter === CHART_VIEW.PRICE && chartData && (
-        <ResponsiveContainer aspect={aspect}>
-          <AreaChart margin={{ top: 0, right: 10, bottom: 6, left: 0 }} barCategoryGap={1} data={chartData}>
-            <defs>
-              <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor={color} stopOpacity={0.35} />
-                <stop offset="95%" stopColor={color} stopOpacity={0} />
-              </linearGradient>
-            </defs>
-            <XAxis
-              tickLine={false}
-              axisLine={false}
-              interval="preserveEnd"
-              tickMargin={16}
-              minTickGap={120}
-              tickFormatter={tick => toNiceDate(tick)}
-              dataKey="date"
-              tick={{ fill: 'black' }}
-              type={'number'}
-              domain={domain}
-            />
-            <YAxis
-              type="number"
-              orientation="left"
-              tickFormatter={tick => '$' + toK(tick)}
-              axisLine={false}
-              tickLine={false}
-              interval="preserveEnd"
-              minTickGap={80}
-              yAxisId={0}
-              tick={{ fill: 'black' }}
-            />
-            <Tooltip
-              cursor={true}
-              formatter={val => formattedNum(val, true)}
-              labelFormatter={label => toNiceDateYear(label)}
-              labelStyle={{ paddingTop: 4 }}
-              contentStyle={{
-                padding: '10px 14px',
-                borderRadius: 10,
-                borderColor: color,
-                color: 'black'
-              }}
-              wrapperStyle={{ top: -70, left: -10 }}
-            />
-            <Area
-              key={'other'}
-              dataKey={'priceUSD'}
-              stackId="2"
-              strokeWidth={2}
-              dot={false}
-              type="monotone"
-              name={'Price'}
-              yAxisId={0}
-              stroke={darken(0.12, color)}
-              fill="url(#colorUv)"
-            />
-          </AreaChart>
-        </ResponsiveContainer>
-      )}
+      {chartFilter === CHART_VIEW.PRICE &&
+        (dailyPriceData ? (
+          <ResponsiveContainer aspect={aspect} ref={ref}>
+            <CandleStickChart data={dailyPriceData} width={width} address={address} />
+          </ResponsiveContainer>
+        ) : (
+          <LocalLoader />
+        ))}
+
       {chartFilter === CHART_VIEW.HOURLY &&
         (hourlyData ? (
           <ResponsiveContainer aspect={aspect} ref={ref}>

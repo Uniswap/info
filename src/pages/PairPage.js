@@ -135,9 +135,7 @@ function PairPage({ pairAddress, history }) {
     trackedReserveUSD,
     oneDayVolumeUSD,
     volumeChangeUSD,
-    liquidityChangeUSD,
-    oneDayTxns,
-    txnChange
+    liquidityChangeUSD
   } = usePairData(pairAddress)
 
   useEffect(() => {
@@ -179,9 +177,6 @@ function PairPage({ pairAddress, history }) {
   const token0Rate = reserve0 && reserve1 ? formattedNum(reserve1 / reserve0) : '-'
   const token1Rate = reserve0 && reserve1 ? formattedNum(reserve0 / reserve1) : '-'
 
-  // txn percentage change
-  const txnChangeFormatted = formattedPercent(txnChange)
-
   const below1282 = useMedia('(max-width: 1282px)')
   const below1080 = useMedia('(max-width: 1080px)')
   const below900 = useMedia('(max-width: 900px)')
@@ -206,7 +201,7 @@ function PairPage({ pairAddress, history }) {
     setActive(ref.current)
     window.scrollTo({
       behavior: 'smooth',
-      top: ref.current.offsetTop - - 180
+      top: ref.current.offsetTop - -180
     })
   }
 
@@ -346,20 +341,7 @@ function PairPage({ pairAddress, history }) {
                     </RowBetween>
                   </AutoColumn>
                 </Panel>
-                <Panel style={{ height: '100%' }}>
-                  <AutoColumn gap="20px">
-                    <RowBetween>
-                      <TYPE.main>Transactions (24hrs)</TYPE.main>
-                      <div />
-                    </RowBetween>
-                    <RowBetween align="flex-end">
-                      <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
-                        {oneDayTxns ?? '-'}
-                      </TYPE.main>
-                      <TYPE.main>{txnChangeFormatted}</TYPE.main>
-                    </RowBetween>
-                  </AutoColumn>
-                </Panel>
+
                 <Panel style={{ height: '100%' }}>
                   <AutoColumn gap="20px">
                     <RowBetween>
@@ -384,7 +366,7 @@ function PairPage({ pairAddress, history }) {
                     </Hover>
                   </AutoColumn>
                 </Panel>
-                <Panel style={{ gridColumn: below1080 ? '1' : '2/4', gridRow: below1080 ? '' : '1/6' }}>
+                <Panel style={{ gridColumn: below1080 ? '1' : '2/4', gridRow: below1080 ? '' : '1/8' }}>
                   <PairChart address={pairAddress} color={backgroundColor} />
                 </Panel>
               </PanelWrapper>
