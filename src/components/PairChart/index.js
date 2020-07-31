@@ -116,16 +116,16 @@ const PairChart = ({ address, color }) => {
           </AutoRow>
           <AutoRow justify="flex-end" gap="6px">
             <OptionButton
-              active={timeWindow === timeframeOptions.MONTH}
-              onClick={() => setTimeWindow(timeframeOptions.MONTH)}
-            >
-              1M
-            </OptionButton>
-            <OptionButton
               active={timeWindow === timeframeOptions.WEEK}
               onClick={() => setTimeWindow(timeframeOptions.WEEK)}
             >
               1W
+            </OptionButton>
+            <OptionButton
+              active={timeWindow === timeframeOptions.MONTH}
+              onClick={() => setTimeWindow(timeframeOptions.MONTH)}
+            >
+              1M
             </OptionButton>
             <OptionButton
               active={timeWindow === timeframeOptions.ALL_TIME}
