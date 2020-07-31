@@ -131,7 +131,6 @@ export const ThemedBackground = styled.div`
   right: 0;
 
   max-width: 100vw !important;
-  width: 100vw !important;
   height: 200vh;
   background: ${({ backgroundColor }) =>
     `radial-gradient(50% 50% at 50% 50%, ${backgroundColor} 0%, rgba(255, 255, 255, 0) 100%)`};

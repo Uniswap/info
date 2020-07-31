@@ -76,12 +76,7 @@ export const PageWrapper = styled.div`
   display: flex;
   flex-direction: column;
   padding-bottom: 100px;
-  /* padding: 0 24px; */
   padding-bottom: 80px;
-
-  & > * {
-    padding: 0 24px;
-  }
 
   @media screen and (max-width: 600px) {
     & > * {
