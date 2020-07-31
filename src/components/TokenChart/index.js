@@ -13,6 +13,7 @@ import DropdownSelect from '../DropdownSelect'
 import CandleStickChart from '../CandleChart'
 import LocalLoader from '../LocalLoader'
 import { AutoColumn } from '../Column'
+import { Activity } from 'react-feather'
 
 const ChartWrapper = styled.div`
   height: 100%;
@@ -30,12 +31,14 @@ const PriceOption = styled(OptionButton)`
 const CHART_VIEW = {
   VOLUME: 'Volume',
   LIQUIDITY: 'Liquidity',
-  PRICE: 'Price'
+  PRICE: 'Price',
+  LINE_PRICE: 'LINE_PRICE'
 }
 
 const DATA_FREQUENCY = {
   DAY: 'DAY',
-  HOUR: 'HOUR'
+  HOUR: 'HOUR',
+  LINE: 'LINE'
 }
 
 const TokenChart = ({ address, color, base }) => {
@@ -58,13 +61,15 @@ const TokenChart = ({ address, color, base }) => {
   const hourlyData = useTokenHourlyData(address, timeWindow)
   const dailyPriceData = useTokenDailyData(address, timeWindow)
 
+  // switch to day if switched to daily frequency
+
   const below1080 = useMedia('(max-width: 1080px)')
   const below600 = useMedia('(max-width: 600px)')
 
   let utcStartTime = getTimeframe(timeWindow)
   const domain = [dataMin => (dataMin > utcStartTime ? dataMin : utcStartTime), 'dataMax']
 
-  const aspect = below1080 ? 60 / 32 : below600 ? 60 / 42 : 60 / 28
+  const aspect = below1080 ? 60 / 32 : below600 ? 60 / 42 : 60 / 22
 
   // update the width on a window resize
   const ref = useRef()
@@ -89,7 +94,16 @@ const TokenChart = ({ address, color, base }) => {
           <DropdownSelect options={timeframeOptions} active={timeWindow} setActive={setTimeWindow} color={color} />
         </RowBetween>
       ) : (
-        <RowBetween mb={40} align="flex-start">
+        <RowBetween
+          mb={
+            chartFilter === CHART_VIEW.LIQUIDITY ||
+            chartFilter === CHART_VIEW.VOLUME ||
+            (chartFilter === CHART_VIEW.PRICE && frequency === DATA_FREQUENCY.LINE)
+              ? 40
+              : 0
+          }
+          align="flex-start"
+        >
           <AutoColumn gap="8px">
             <RowFixed>
               <OptionButton
@@ -118,7 +132,13 @@ const TokenChart = ({ address, color, base }) => {
             </RowFixed>
             {chartFilter === CHART_VIEW.PRICE && (
               <AutoRow gap="4px">
-                <PriceOption active={frequency === DATA_FREQUENCY.DAY} onClick={() => setFrequency(DATA_FREQUENCY.DAY)}>
+                <PriceOption
+                  active={frequency === DATA_FREQUENCY.DAY}
+                  onClick={() => {
+                    setTimeWindow(timeframeOptions.MONTH)
+                    setFrequency(DATA_FREQUENCY.DAY)
+                  }}
+                >
                   D
                 </PriceOption>
                 <PriceOption
@@ -126,6 +146,12 @@ const TokenChart = ({ address, color, base }) => {
                   onClick={() => setFrequency(DATA_FREQUENCY.HOUR)}
                 >
                   H
+                </PriceOption>
+                <PriceOption
+                  active={frequency === DATA_FREQUENCY.LINE}
+                  onClick={() => setFrequency(DATA_FREQUENCY.LINE)}
+                >
+                  <Activity size={14} />
                 </PriceOption>
               </AutoRow>
             )}
@@ -213,7 +239,66 @@ const TokenChart = ({ address, color, base }) => {
         </ResponsiveContainer>
       )}
       {chartFilter === CHART_VIEW.PRICE &&
-        (hourlyData ? (
+        (frequency === DATA_FREQUENCY.LINE ? (
+          <ResponsiveContainer aspect={below1080 ? 60 / 32 : 60 / 16}>
+            <AreaChart margin={{ top: 0, right: 10, bottom: 6, left: 0 }} barCategoryGap={1} data={chartData}>
+              <defs>
+                <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor={color} stopOpacity={0.35} />
+                  <stop offset="95%" stopColor={color} stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <XAxis
+                tickLine={false}
+                axisLine={false}
+                interval="preserveEnd"
+                tickMargin={16}
+                minTickGap={120}
+                tickFormatter={tick => toNiceDate(tick)}
+                dataKey="date"
+                tick={{ fill: 'black' }}
+                type={'number'}
+                domain={domain}
+              />
+              <YAxis
+                type="number"
+                orientation="left"
+                tickFormatter={tick => '$' + toK(tick)}
+                axisLine={false}
+                tickLine={false}
+                interval="preserveEnd"
+                minTickGap={80}
+                yAxisId={0}
+                tick={{ fill: 'black' }}
+              />
+              <Tooltip
+                cursor={true}
+                formatter={val => formattedNum(val, true)}
+                labelFormatter={label => toNiceDateYear(label)}
+                labelStyle={{ paddingTop: 4 }}
+                contentStyle={{
+                  padding: '10px 14px',
+                  borderRadius: 10,
+                  borderColor: color,
+                  color: 'black'
+                }}
+                wrapperStyle={{ top: -70, left: -10 }}
+              />
+              <Area
+                key={'other'}
+                dataKey={'priceUSD'}
+                stackId="2"
+                strokeWidth={2}
+                dot={false}
+                type="monotone"
+                name={'Price'}
+                yAxisId={0}
+                stroke={darken(0.12, color)}
+                fill="url(#colorUv)"
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        ) : hourlyData ? (
           <ResponsiveContainer aspect={aspect} ref={ref}>
             <CandleStickChart
               data={frequency === DATA_FREQUENCY.DAY ? dailyPriceData : hourlyData}

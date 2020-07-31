@@ -81,7 +81,7 @@ const CandleStickChart = ({ data, width, height = 300, base, valueFormatter = va
       toolTip.className = 'three-line-legend'
       ref.current.appendChild(toolTip)
       toolTip.style.display = 'block'
-      toolTip.style.left = (base ? 80 : 3) + 'px'
+      toolTip.style.left = (base ? 116 : 3) + 'px'
       toolTip.style.top = 50 + 'px'
       toolTip.style.backgroundColor = 'transparent'
 
