@@ -56,7 +56,7 @@ export const GET_BLOCKS = timestamps => {
   return gql(queryString)
 }
 
-export const HOURLY_PRICES = (tokenAddress, blocks) => {
+export const PRICES_BY_BLOCK = (tokenAddress, blocks) => {
   let queryString = 'query blocks {'
   queryString += blocks.map(
     block => `

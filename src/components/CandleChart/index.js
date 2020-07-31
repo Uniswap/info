@@ -2,8 +2,9 @@ import React, { useState, useEffect, useRef } from 'react'
 import { createChart, CrosshairMode } from 'lightweight-charts'
 import dayjs from 'dayjs'
 import { formattedNum } from '../../utils'
+import { usePrevious } from 'react-use'
 
-const CandleStickChart = ({ data, width, height = 300, valueFormatter = val => formattedNum(val, true) }) => {
+const CandleStickChart = ({ data, width, height = 300, base, valueFormatter = val => formattedNum(val, true) }) => {
   // reference for DOM element to create with chart
   const ref = useRef()
 
@@ -19,6 +20,18 @@ const CandleStickChart = ({ data, width, height = 300, valueFormatter = val => f
 
   // pointer to the chart object
   const [chartCreated, setChartCreated] = useState(false)
+  const dataPrev = usePrevious(data)
+
+  useEffect(() => {
+    if (data !== dataPrev && chartCreated) {
+      // remove the tooltip element
+      let tooltip = document.getElementById('tooltip-id')
+      let node = document.getElementById('test-id')
+      node.removeChild(tooltip)
+      chartCreated.resize(0, 0)
+      setChartCreated()
+    }
+  }, [chartCreated, data, dataPrev])
 
   // if no chart created yet, create one with options and add to DOM manually
   useEffect(() => {
@@ -64,16 +77,19 @@ const CandleStickChart = ({ data, width, height = 300, valueFormatter = val => f
       candleSeries.setData(formattedData)
 
       var toolTip = document.createElement('div')
+      toolTip.setAttribute('id', 'tooltip-id')
       toolTip.className = 'three-line-legend'
       ref.current.appendChild(toolTip)
       toolTip.style.display = 'block'
-      toolTip.style.left = 3 + 'px'
+      toolTip.style.left = (base ? 80 : 3) + 'px'
       toolTip.style.top = 50 + 'px'
       toolTip.style.backgroundColor = 'transparent'
 
       // get the title of the chart
       function setLastBarText() {
-        toolTip.innerHTML = ''
+        toolTip.innerHTML = base
+          ? '<div style="font-size: 22px; margin: 4px 0px; color: #20262E">' + valueFormatter(base) + '</div>'
+          : ''
       }
       setLastBarText()
 
@@ -104,7 +120,7 @@ const CandleStickChart = ({ data, width, height = 300, valueFormatter = val => f
 
       setChartCreated(chart)
     }
-  }, [chartCreated, formattedData, width, height, valueFormatter])
+  }, [chartCreated, formattedData, width, height, valueFormatter, base])
 
   // responsiveness
   useEffect(() => {
@@ -114,7 +130,7 @@ const CandleStickChart = ({ data, width, height = 300, valueFormatter = val => f
     }
   }, [chartCreated, height, width])
 
-  return <div ref={ref} />
+  return <div ref={ref} id="test-id" />
 }
 
 export default CandleStickChart

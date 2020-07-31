@@ -7,7 +7,7 @@ import {
   TOKEN_CHART,
   TOKENS_CURRENT,
   TOKENS_DYNAMIC,
-  HOURLY_PRICES
+  PRICES_BY_BLOCK
 } from '../apollo/queries'
 
 import { useEthPrice } from './GlobalData'
@@ -425,7 +425,7 @@ const getTokenPairs = async tokenAddress => {
   }
 }
 
-const getHourlyTokenData = async (tokenAddress, startTime, interval = 3600) => {
+const getIntervalTokenData = async (tokenAddress, startTime, interval = 3600) => {
   const utcEndTime = dayjs.utc()
   let time = startTime
 
@@ -455,7 +455,7 @@ const getHourlyTokenData = async (tokenAddress, startTime, interval = 3600) => {
 
   // pass the blocks to a token query
   let result = await client.query({
-    query: HOURLY_PRICES(tokenAddress, blocks),
+    query: PRICES_BY_BLOCK(tokenAddress, blocks),
     fetchPolicy: 'cache-first'
   })
 
@@ -647,10 +647,16 @@ export function useTokenHourlyData(tokenAddress, timeWindow) {
   useEffect(() => {
     const currentTime = dayjs.utc()
     const windowSize = timeWindow === timeframeOptions.MONTH ? 'month' : 'week'
-    const startTime = timeWindow === timeframeOptions.ALL_TIME ? 1589760000 : currentTime.subtract(1, windowSize).unix()
+    const startTime =
+      timeWindow === timeframeOptions.ALL_TIME
+        ? 1589760000
+        : currentTime
+            .subtract(1, windowSize)
+            .startOf('hour')
+            .unix()
 
     async function fetch() {
-      let data = await getHourlyTokenData(tokenAddress, startTime)
+      let data = await getIntervalTokenData(tokenAddress, startTime)
       updateHourlyData(tokenAddress, data, timeWindow)
     }
     if (!chartData) {
@@ -668,10 +674,16 @@ export function useTokenDailyData(tokenAddress, timeWindow) {
   useEffect(() => {
     const currentTime = dayjs.utc()
     const windowSize = timeWindow === timeframeOptions.MONTH ? 'month' : 'week'
-    const startTime = timeWindow === timeframeOptions.ALL_TIME ? 1589760000 : currentTime.subtract(1, windowSize).unix()
+    const startTime =
+      timeWindow === timeframeOptions.ALL_TIME
+        ? 1589760000
+        : currentTime
+            .subtract(1, windowSize)
+            .startOf('hour')
+            .unix()
 
     async function fetch() {
-      let data = await getHourlyTokenData(tokenAddress, startTime, 86400)
+      let data = await getIntervalTokenData(tokenAddress, startTime, 86400)
       updateDailyPriceData(tokenAddress, data, timeWindow)
     }
     if (!chartData) {

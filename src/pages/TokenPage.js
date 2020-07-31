@@ -291,7 +291,7 @@ function TokenPage({ address, history }) {
                   </AutoColumn>
                 </Panel>
                 <Panel style={{ gridColumn: below1080 ? '1' : '2/4', gridRow: below1080 ? '' : '1/4' }}>
-                  <TokenChart address={address} color={backgroundColor} />
+                  <TokenChart address={address} color={backgroundColor} base={priceUSD} />
                 </Panel>
               </PanelWrapper>
             </>
