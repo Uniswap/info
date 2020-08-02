@@ -118,6 +118,8 @@ const CandleStickChart = ({ data, width, height = 300, base, valueFormatter = va
         }
       })
 
+      chart.timeScale().fitContent()
+
       setChartCreated(chart)
     }
   }, [chartCreated, formattedData, width, height, valueFormatter, base])

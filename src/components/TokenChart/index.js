@@ -42,8 +42,8 @@ const DATA_FREQUENCY = {
 }
 
 const TokenChart = ({ address, color, base }) => {
+  // settings for the window and candle width
   const [chartFilter, setChartFilter] = useState(CHART_VIEW.PRICE)
-
   const [frequency, setFrequency] = useState(DATA_FREQUENCY.HOUR)
 
   // reset view on new address
@@ -57,18 +57,33 @@ const TokenChart = ({ address, color, base }) => {
   const chartData = useTokenChartData(address)
 
   const [timeWindow, setTimeWindow] = useState(timeframeOptions.WEEK)
+  const prevWindow = usePrevious(timeWindow)
 
   const hourlyData = useTokenHourlyData(address, timeWindow)
   const dailyPriceData = useTokenDailyData(address, timeWindow)
 
-  // switch to day if switched to daily frequency
+  // switch to hourly data when switched to week window
+  useEffect(() => {
+    if (timeWindow === timeframeOptions.WEEK && prevWindow && prevWindow !== timeframeOptions.WEEK) {
+      setFrequency(DATA_FREQUENCY.HOUR)
+    }
+  }, [prevWindow, timeWindow])
+
+  // switch to daily data if switche to month or all time view
+  useEffect(() => {
+    if (timeWindow === timeframeOptions.MONTH && prevWindow && prevWindow !== timeframeOptions.MONTH) {
+      setFrequency(DATA_FREQUENCY.DAY)
+    }
+    if (timeWindow === timeframeOptions.ALL_TIME && prevWindow && prevWindow !== timeframeOptions.ALL_TIME) {
+      setFrequency(DATA_FREQUENCY.DAY)
+    }
+  }, [prevWindow, timeWindow])
 
   const below1080 = useMedia('(max-width: 1080px)')
   const below600 = useMedia('(max-width: 600px)')
 
   let utcStartTime = getTimeframe(timeWindow)
   const domain = [dataMin => (dataMin > utcStartTime ? dataMin : utcStartTime), 'dataMax']
-
   const aspect = below1080 ? 60 / 32 : below600 ? 60 / 42 : 60 / 22
 
   // update the width on a window resize
@@ -123,7 +138,6 @@ const TokenChart = ({ address, color, base }) => {
               <OptionButton
                 active={chartFilter === CHART_VIEW.PRICE}
                 onClick={() => {
-                  console.log('click')
                   setChartFilter(CHART_VIEW.PRICE)
                 }}
               >

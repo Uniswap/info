@@ -203,7 +203,7 @@ function PinnedData({ history, open, setSavedOpen }) {
                 )
               })
           ) : (
-            <TYPE.light>Pinned pairs will appear here.</TYPE.light>
+            <TYPE.light>Pinned tokens will appear here.</TYPE.light>
           )}
         </AutoColumn>
       </AutoColumn>
