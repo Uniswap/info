@@ -16,7 +16,6 @@ import Loader from '../../components/Loader'
 import { ButtonDropdown } from '../../components/ButtonStyled'
 import { Hover, PageWrapper, FixedMenu, ContentWrapper } from '../../components'
 import DoubleTokenLogo from '../../components/DoubleLogo'
-import QuestionHelper from '../../components/QuestionHelper'
 import { TrendingUp, PieChart, Activity } from 'react-feather'
 import { SubNav, SubNavEl } from '../../components/index'
 
