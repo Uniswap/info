@@ -161,7 +161,9 @@ const TradingViewChart = ({ type = CHART_TYPES.BAR, data, base, baseChange, fiel
         ) {
           setLastBarText()
         } else {
-          let dateStr = param.time.year + ' - ' + param.time.month + ' - ' + (param.time.day + 1)
+          let dateStr = dayjs(param.time.year + '-' + param.time.month + '-' + (param.time.day + 1)).format(
+            'MMMM D, YYYY'
+          )
           var price = param.seriesPrices.get(series)
 
           toolTip.innerHTML =
