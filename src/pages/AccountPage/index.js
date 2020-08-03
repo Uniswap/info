@@ -255,7 +255,7 @@ function AccountPage({ account }) {
                     <TYPE.main fontSize={'16px'} fontWeight={400} color="#888D9B">
                       Liquidity Value (Including Fees)
                     </TYPE.main>
-                    <QuestionHelper text={'hey'} />
+                    <div />
                   </RowBetween>
                   <RowFixed align="flex-end">
                     <TYPE.main fontSize={'24px'} lineHeight={1} fontWeight={600}>
@@ -268,7 +268,7 @@ function AccountPage({ account }) {
                     <TYPE.main fontSize={'16px'} fontWeight={400} color="#888D9B">
                       Total Fees Earned
                     </TYPE.main>
-                    <QuestionHelper text={'hey'} />
+                    <div />
                   </RowBetween>
                   <RowFixed align="flex-end">
                     <TYPE.main fontSize={'24px'} lineHeight={1} fontWeight={600} color="green">
