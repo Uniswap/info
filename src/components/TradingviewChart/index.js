@@ -2,11 +2,37 @@ import React, { useState, useEffect, useRef } from 'react'
 import { createChart } from 'lightweight-charts'
 import dayjs from 'dayjs'
 import { formattedNum } from '../../utils'
+import styled from 'styled-components'
+import { Crosshair } from 'react-feather'
 
 export const CHART_TYPES = {
   BAR: 'BAR',
   AREA: 'AREA'
 }
+
+const Wrapper = styled.div`
+  position: relative;
+`
+
+const IconWrapper = styled.div`
+  position: absolute;
+  right: 0;
+  background-color: white;
+  border-radius: 50%;
+  height: 16px;
+  width: 16px;
+  padding: 0px;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+
+  :hover {
+    cursor: pointer;
+    opacity: 0.7;
+  }
+`
 
 // constant height for charts
 const HEIGHT = 300
@@ -161,7 +187,18 @@ const TradingViewChart = ({ type = CHART_TYPES.BAR, data, base, baseChange, fiel
     }
   }, [chartCreated, width])
 
-  return <div ref={ref} />
+  return (
+    <Wrapper>
+      <div ref={ref} />
+      <IconWrapper>
+        <Crosshair
+          onClick={() => {
+            chartCreated && chartCreated.timeScale().fitContent()
+          }}
+        />
+      </IconWrapper>
+    </Wrapper>
+  )
 }
 
 export default TradingViewChart

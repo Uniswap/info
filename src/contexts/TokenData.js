@@ -421,8 +421,6 @@ const getIntervalTokenData = async (tokenAddress, startTime, interval = 3600) =>
     return []
   }
 
-  console.log(blocks)
-
   // pass the blocks to a token query
   let result = await client.query({
     query: PRICES_BY_BLOCK(tokenAddress, blocks),

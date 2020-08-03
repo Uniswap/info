@@ -3,6 +3,28 @@ import { createChart, CrosshairMode } from 'lightweight-charts'
 import dayjs from 'dayjs'
 import { formattedNum } from '../../utils'
 import { usePrevious } from 'react-use'
+import styled from 'styled-components'
+import { Crosshair } from 'react-feather'
+
+const IconWrapper = styled.div`
+  position: absolute;
+  right: 10px;
+  background-color: white;
+  border-radius: 50%;
+  height: 16px;
+  width: 16px;
+  padding: 0px;
+  bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+
+  :hover {
+    cursor: pointer;
+    opacity: 0.7;
+  }
+`
 
 const CandleStickChart = ({ data, width, height = 300, base, valueFormatter = val => formattedNum(val, true) }) => {
   // reference for DOM element to create with chart
@@ -132,7 +154,18 @@ const CandleStickChart = ({ data, width, height = 300, base, valueFormatter = va
     }
   }, [chartCreated, height, width])
 
-  return <div ref={ref} id="test-id" />
+  return (
+    <div>
+      <div ref={ref} id="test-id" />
+      <IconWrapper>
+        <Crosshair
+          onClick={() => {
+            chartCreated && chartCreated.timeScale().fitContent()
+          }}
+        />
+      </IconWrapper>
+    </div>
+  )
 }
 
 export default CandleStickChart

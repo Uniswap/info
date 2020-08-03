@@ -55,24 +55,23 @@ const ThemedBackground = styled.div`
 `
 
 function GlobalPage() {
-  const transactions = useGlobalTransactions()
-
+  // get data for lists and totals
   const allPairs = useAllPairData()
   const allTokens = useAllTokenData()
+  const transactions = useGlobalTransactions()
+  const { totalLiquidityUSD, oneDayVolumeUSD, volumeChangeUSD, liquidityChangeUSD } = useGlobalData()
 
+  // breakpoints
   const below1180 = useMedia('(max-width: 1180px)')
   const below800 = useMedia('(max-width: 800px)')
   const below600 = useMedia('(max-width: 600px)')
 
-  const { totalLiquidityUSD, oneDayVolumeUSD, volumeChangeUSD, liquidityChangeUSD } = useGlobalData()
-
+  // scrolling refs
   const OverviewRef = useRef()
   const PairsRef = useRef()
   const TokensRef = useRef()
   const TransactionsRef = useRef()
-
   const [active, setActive] = useState(null)
-
   useEffect(() => {
     setActive(OverviewRef)
     document.querySelector('body').scrollTo({
@@ -81,6 +80,7 @@ function GlobalPage() {
     })
   }, [])
 
+  // scroll to ref on click
   const handleScroll = ref => {
     setActive(ref.current)
     window.scrollTo({
@@ -142,18 +142,14 @@ function GlobalPage() {
             </Box>
           )}
           {!below800 && (
-            <>
-              <TYPE.main fontSize={'1.125rem'}>Statistics</TYPE.main>
-
-              <GridRow style={{ marginTop: '1rem' }}>
-                <Panel style={{ height: '100%', minHeight: '300px' }}>
-                  <GlobalChart display="liquidity" />
-                </Panel>
-                <Panel style={{ height: '100%' }}>
-                  <GlobalChart display="volume" />
-                </Panel>
-              </GridRow>
-            </>
+            <GridRow>
+              <Panel style={{ height: '100%', minHeight: '300px' }}>
+                <GlobalChart display="liquidity" />
+              </Panel>
+              <Panel style={{ height: '100%' }}>
+                <GlobalChart display="volume" />
+              </Panel>
+            </GridRow>
           )}
           {below800 && (
             <AutoColumn style={{ marginTop: '6px' }} gap="24px">

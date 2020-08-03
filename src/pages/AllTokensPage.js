@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import 'feather-icons'
 
 import TopTokenList from '../components/TokenList'
@@ -9,6 +9,10 @@ import { PageWrapper, FullWrapper } from '../components'
 
 function AllTokensPage() {
   const allTokens = useAllTokenData()
+
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
 
   return (
     <PageWrapper>

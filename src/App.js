@@ -2,8 +2,7 @@ import React, { useState } from 'react'
 import styled from 'styled-components'
 import { ApolloProvider } from 'react-apollo'
 import { client } from './apollo/client'
-import { Route, Switch, BrowserRouter, withRouter, Redirect } from 'react-router-dom'
-
+import { Route, Switch, BrowserRouter, Redirect } from 'react-router-dom'
 import GlobalPage from './pages/GlobalPage'
 import TokenPage from './pages/TokenPage'
 import PairPage from './pages/PairPage'
@@ -49,9 +48,25 @@ const Center = styled.div`
   height: 100%;
 `
 
-function App() {
-  const NavHeaderUpdated = withRouter(props => <NavHeader default {...props} />)
+/**
+ * Wrap the component with the header and sidebar pinned tab
+ */
+const LayoutWrapper = ({ children, savedOpen, setSavedOpen }) => {
+  return (
+    <>
+      <NavHeader />
+      <SubHeader />
+      <ContentWrapper open={savedOpen}>
+        <Center id="center">{children}</Center>
+        <Right open={savedOpen}>
+          <PinnedData open={savedOpen} setSavedOpen={setSavedOpen} />
+        </Right>
+      </ContentWrapper>
+    </>
+  )
+}
 
+function App() {
   const [savedOpen, setSavedOpen] = useState(true)
 
   const globalData = useGlobalData()
@@ -73,19 +88,9 @@ function App() {
                 render={({ match }) => {
                   if (isAddress(match.params.tokenAddress.toLowerCase())) {
                     return (
-                      <>
-                        <NavHeaderUpdated token={match.params.tokenAddress.toLowerCase()} />
-                        <SubHeader />
-
-                        <ContentWrapper open={savedOpen}>
-                          <Center id="center">
-                            <TokenPage address={match.params.tokenAddress.toLowerCase()} />
-                          </Center>
-                          <Right open={savedOpen}>
-                            <PinnedData open={savedOpen} setSavedOpen={setSavedOpen} />
-                          </Right>
-                        </ContentWrapper>
-                      </>
+                      <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
+                        <TokenPage address={match.params.tokenAddress.toLowerCase()} />
+                      </LayoutWrapper>
                     )
                   } else {
                     return <Redirect to="/home" />
@@ -99,19 +104,9 @@ function App() {
                 render={({ match }) => {
                   if (isAddress(match.params.pairAddress.toLowerCase())) {
                     return (
-                      <>
-                        <NavHeaderUpdated pair={match.params.pairAddress.toLowerCase()} />
-                        <SubHeader />
-
-                        <ContentWrapper open={savedOpen}>
-                          <Center id="center">
-                            <PairPage pairAddress={match.params.pairAddress.toLowerCase()} />
-                          </Center>
-                          <Right open={savedOpen}>
-                            <PinnedData open={savedOpen} setSavedOpen={setSavedOpen} />
-                          </Right>
-                        </ContentWrapper>
-                      </>
+                      <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
+                        <PairPage pairAddress={match.params.pairAddress.toLowerCase()} />
+                      </LayoutWrapper>
                     )
                   } else {
                     return <Redirect to="/home" />
@@ -125,19 +120,9 @@ function App() {
                 render={({ match }) => {
                   if (isAddress(match.params.accountAddress.toLowerCase())) {
                     return (
-                      <>
-                        <NavHeaderUpdated />
-                        <SubHeader />
-
-                        <ContentWrapper open={savedOpen}>
-                          <Center id="center">
-                            <AccountPage account={match.params.accountAddress.toLowerCase()} />
-                          </Center>
-                          <Right open={savedOpen}>
-                            <PinnedData open={savedOpen} setSavedOpen={setSavedOpen} />
-                          </Right>
-                        </ContentWrapper>
-                      </>
+                      <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
+                        <AccountPage account={match.params.accountAddress.toLowerCase()} />
+                      </LayoutWrapper>
                     )
                   } else {
                     return <Redirect to="/home" />
@@ -146,44 +131,21 @@ function App() {
               />
 
               <Route path="/home">
-                <NavHeaderUpdated />
-                <SubHeader />
-                <ContentWrapper open={savedOpen}>
-                  <Center id="center">
-                    <GlobalPage />
-                  </Center>
-                  <Right open={savedOpen}>
-                    <PinnedData open={savedOpen} setSavedOpen={setSavedOpen} />
-                  </Right>
-                </ContentWrapper>
+                <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
+                  <GlobalPage />
+                </LayoutWrapper>
               </Route>
 
               <Route path="/all-tokens">
-                <NavHeaderUpdated />
-                <SubHeader />
-
-                <ContentWrapper open={savedOpen}>
-                  <Center id="center">
-                    <AllTokensPage />
-                  </Center>
-                  <Right open={savedOpen} onClick={() => setSavedOpen(true)}>
-                    <PinnedData open={savedOpen} setSavedOpen={setSavedOpen} />
-                  </Right>
-                </ContentWrapper>
+                <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
+                  <AllTokensPage />
+                </LayoutWrapper>
               </Route>
 
               <Route path="/all-pairs">
-                <NavHeaderUpdated />
-                <SubHeader />
-
-                <ContentWrapper open={savedOpen}>
-                  <Center id="center">
-                    <AllPairsPage />
-                  </Center>
-                  <Right open={savedOpen}>
-                    <PinnedData open={savedOpen} setSavedOpen={setSavedOpen} />
-                  </Right>
-                </ContentWrapper>
+                <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
+                  <AllPairsPage />
+                </LayoutWrapper>
               </Route>
 
               <Redirect to="/home" />

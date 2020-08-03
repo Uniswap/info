@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import 'feather-icons'
 
 import { TYPE } from '../Theme'
@@ -9,6 +9,10 @@ import { PageWrapper, FullWrapper } from '../components'
 
 function AllPairsPage() {
   const allPairs = useAllPairData()
+
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
 
   return (
     <PageWrapper>
