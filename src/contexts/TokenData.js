@@ -27,8 +27,7 @@ import { timeframeOptions } from '../constants'
 const UPDATE = 'UPDATE'
 const UPDATE_TOKEN_TXNS = 'UPDATE_TOKEN_TXNS'
 const UPDATE_CHART_DATA = 'UPDATE_CHART_DATA'
-const UPDATE_HOURLY_DATA = 'UPDATE_HOURLY_DATA'
-const UPDATE_DAILY_PRICE_DATA = 'UPDATE_DAILY_PRICE_DATA'
+const UPDATE_PRICE_DATA = 'UPDATE_PRICE_DATA'
 const UPDATE_TOP_TOKENS = ' UPDATE_TOP_TOKENS'
 const UPDATE_ALL_PAIRS = 'UPDATE_ALL_PAIRS'
 
@@ -88,29 +87,15 @@ function reducer(state, { type, payload }) {
       }
     }
 
-    case UPDATE_HOURLY_DATA: {
-      const { address, hourlyData, timeWindow } = payload
+    case UPDATE_PRICE_DATA: {
+      const { address, data, timeWindow, interval } = payload
       return {
         ...state,
         [address]: {
           ...state?.[address],
-          hourlyData: {
-            ...state?.[address].hourlyData,
-            [timeWindow]: hourlyData
-          }
-        }
-      }
-    }
-
-    case UPDATE_DAILY_PRICE_DATA: {
-      const { address, data, timeWindow } = payload
-      return {
-        ...state,
-        [address]: {
-          ...state?.[address],
-          dailyPriceData: {
-            ...state?.[address].dailyPriceData,
-            [timeWindow]: data
+          [timeWindow]: {
+            ...state?.[address]?.[timeWindow],
+            [interval]: data
           }
         }
       }
@@ -174,17 +159,10 @@ export default function Provider({ children }) {
     })
   }, [])
 
-  const updateHourlyData = useCallback((address, hourlyData, timeWindow) => {
+  const updatePriceData = useCallback((address, data, timeWindow, interval) => {
     dispatch({
-      type: UPDATE_HOURLY_DATA,
-      payload: { address, hourlyData, timeWindow }
-    })
-  }, [])
-
-  const updateDailyPriceData = useCallback((address, data, timeWindow) => {
-    dispatch({
-      type: UPDATE_DAILY_PRICE_DATA,
-      payload: { address, data, timeWindow }
+      type: UPDATE_PRICE_DATA,
+      payload: { address, data, timeWindow, interval }
     })
   }, [])
 
@@ -199,20 +177,10 @@ export default function Provider({ children }) {
             updateChartData,
             updateTopTokens,
             updateAllPairs,
-            updateHourlyData,
-            updateDailyPriceData
+            updatePriceData
           }
         ],
-        [
-          state,
-          update,
-          updateTokenTxns,
-          updateChartData,
-          updateTopTokens,
-          updateAllPairs,
-          updateHourlyData,
-          updateDailyPriceData
-        ]
+        [state, update, updateTokenTxns, updateChartData, updateTopTokens, updateAllPairs, updatePriceData]
       )}
     >
       {children}
@@ -453,6 +421,8 @@ const getIntervalTokenData = async (tokenAddress, startTime, interval = 3600) =>
     return []
   }
 
+  console.log(blocks)
+
   // pass the blocks to a token query
   let result = await client.query({
     query: PRICES_BY_BLOCK(tokenAddress, blocks),
@@ -640,9 +610,16 @@ export function useTokenChartData(tokenAddress) {
   return chartData
 }
 
-export function useTokenHourlyData(tokenAddress, timeWindow) {
-  const [state, { updateHourlyData }] = useTokenDataContext()
-  const chartData = state?.[tokenAddress]?.hourlyData?.[timeWindow]
+/**
+ * get candlestick data for a token - saves in context based on the window and the
+ * interval size
+ * @param {*} tokenAddress
+ * @param {*} timeWindow // a preset time window from constant - how far back to look
+ * @param {*} interval  // the chunk size in seconds - default is 1 hour of 3600s
+ */
+export function useTokenPriceData(tokenAddress, timeWindow, interval = 3600) {
+  const [state, { updatePriceData }] = useTokenDataContext()
+  const chartData = state?.[tokenAddress]?.[timeWindow]?.[interval]
 
   useEffect(() => {
     const currentTime = dayjs.utc()
@@ -656,40 +633,13 @@ export function useTokenHourlyData(tokenAddress, timeWindow) {
             .unix()
 
     async function fetch() {
-      let data = await getIntervalTokenData(tokenAddress, startTime)
-      updateHourlyData(tokenAddress, data, timeWindow)
+      let data = await getIntervalTokenData(tokenAddress, startTime, interval)
+      updatePriceData(tokenAddress, data, timeWindow, interval)
     }
     if (!chartData) {
       fetch()
     }
-  }, [chartData, timeWindow, tokenAddress, updateHourlyData])
-
-  return chartData
-}
-
-export function useTokenDailyData(tokenAddress, timeWindow) {
-  const [state, { updateDailyPriceData }] = useTokenDataContext()
-  const chartData = state?.[tokenAddress]?.dailyPriceData?.[timeWindow]
-
-  useEffect(() => {
-    const currentTime = dayjs.utc()
-    const windowSize = timeWindow === timeframeOptions.MONTH ? 'month' : 'week'
-    const startTime =
-      timeWindow === timeframeOptions.ALL_TIME
-        ? 1589760000
-        : currentTime
-            .subtract(1, windowSize)
-            .startOf('hour')
-            .unix()
-
-    async function fetch() {
-      let data = await getIntervalTokenData(tokenAddress, startTime, 86400)
-      updateDailyPriceData(tokenAddress, data, timeWindow)
-    }
-    if (!chartData) {
-      fetch()
-    }
-  }, [chartData, timeWindow, tokenAddress, updateDailyPriceData])
+  }, [chartData, interval, timeWindow, tokenAddress, updatePriceData])
 
   return chartData
 }

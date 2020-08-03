@@ -16,6 +16,7 @@ import Loader from '../../components/Loader'
 import { ButtonDropdown } from '../../components/ButtonStyled'
 import { Hover, PageWrapper, FixedMenu, ContentWrapper } from '../../components'
 import DoubleTokenLogo from '../../components/DoubleLogo'
+import QuestionHelper from '../../components/QuestionHelper'
 import { TrendingUp, PieChart, Activity } from 'react-feather'
 import { SubNav, SubNavEl } from '../../components/index'
 
@@ -252,9 +253,9 @@ function AccountPage({ account }) {
                 <AutoColumn gap="10px">
                   <RowBetween>
                     <TYPE.main fontSize={'16px'} fontWeight={400} color="#888D9B">
-                      Liquidity Value
+                      Liquidity Value (Including Fees)
                     </TYPE.main>
-                    <div />
+                    <QuestionHelper text={'hey'} />
                   </RowBetween>
                   <RowFixed align="flex-end">
                     <TYPE.main fontSize={'24px'} lineHeight={1} fontWeight={600}>
@@ -267,7 +268,7 @@ function AccountPage({ account }) {
                     <TYPE.main fontSize={'16px'} fontWeight={400} color="#888D9B">
                       Total Fees Earned
                     </TYPE.main>
-                    <div />
+                    <QuestionHelper text={'hey'} />
                   </RowBetween>
                   <RowFixed align="flex-end">
                     <TYPE.main fontSize={'24px'} lineHeight={1} fontWeight={600} color="green">

@@ -23,8 +23,6 @@ const AppWrapper = styled.div`
 `
 const ContentWrapper = styled.div`
   display: grid;
-  /* grid-template-columns: ${({ open }) => (open ? '1fr 220px' : '1fr 80px')}; */
-  /* grid-gap: 1rem; */
 
   @media screen and (max-width: 1080px) {
     grid-template-columns: 1fr;

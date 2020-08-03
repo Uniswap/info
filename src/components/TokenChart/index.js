@@ -8,7 +8,7 @@ import { OptionButton } from '../ButtonStyled'
 import { darken } from 'polished'
 import { useMedia, usePrevious } from 'react-use'
 import { timeframeOptions } from '../../constants'
-import { useTokenChartData, useTokenHourlyData, useTokenDailyData } from '../../contexts/TokenData'
+import { useTokenChartData, useTokenPriceData } from '../../contexts/TokenData'
 import DropdownSelect from '../DropdownSelect'
 import CandleStickChart from '../CandleChart'
 import LocalLoader from '../LocalLoader'
@@ -59,8 +59,29 @@ const TokenChart = ({ address, color, base }) => {
   const [timeWindow, setTimeWindow] = useState(timeframeOptions.WEEK)
   const prevWindow = usePrevious(timeWindow)
 
-  const hourlyData = useTokenHourlyData(address, timeWindow)
-  const dailyPriceData = useTokenDailyData(address, timeWindow)
+  // hourly and daily price data based on the current time window
+  const hourlyWeek = useTokenPriceData(address, timeframeOptions.WEEK, 3600)
+  const hourlyMonth = useTokenPriceData(address, timeframeOptions.MONTH, 3600)
+  const hourlyAll = useTokenPriceData(address, timeframeOptions.ALL_TIME, 3600)
+  const dailyWeek = useTokenPriceData(address, timeframeOptions.WEEK, 86400)
+  const dailyMonth = useTokenPriceData(address, timeframeOptions.MONTH, 86400)
+  const dailyAll = useTokenPriceData(address, timeframeOptions.ALL_TIME, 86400)
+
+  const priceData =
+    timeWindow === timeframeOptions.MONTH
+      ? // monthly selected
+        frequency === DATA_FREQUENCY.DAY
+        ? dailyMonth
+        : hourlyMonth
+      : // weekly selected
+      timeWindow === timeframeOptions.WEEK
+      ? frequency === DATA_FREQUENCY.DAY
+        ? dailyWeek
+        : hourlyWeek
+      : // all time selected
+      frequency === DATA_FREQUENCY.DAY
+      ? dailyAll
+      : hourlyAll
 
   // switch to hourly data when switched to week window
   useEffect(() => {
@@ -312,14 +333,9 @@ const TokenChart = ({ address, color, base }) => {
               />
             </AreaChart>
           </ResponsiveContainer>
-        ) : hourlyData ? (
+        ) : priceData ? (
           <ResponsiveContainer aspect={aspect} ref={ref}>
-            <CandleStickChart
-              data={frequency === DATA_FREQUENCY.DAY ? dailyPriceData : hourlyData}
-              width={width}
-              address={address}
-              base={base}
-            />
+            <CandleStickChart data={priceData} width={width} address={address} base={base} />
           </ResponsiveContainer>
         ) : (
           <LocalLoader />

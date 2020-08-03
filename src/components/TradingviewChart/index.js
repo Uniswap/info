@@ -83,11 +83,12 @@ const TradingViewChart = ({ type = CHART_TYPES.BAR, data, base, baseChange, fiel
               priceFormat: {
                 type: 'volume'
               },
-              priceScaleId: '',
               scaleMargins: {
                 top: 0.32,
                 bottom: 0
-              }
+              },
+              lineColor: '#ff007a',
+              lineWidth: 3
             })
           : chart.addAreaSeries({
               topColor: '#ff007a',
