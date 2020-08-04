@@ -93,7 +93,7 @@ function AccountLookup({ history }) {
         <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '2rem' }}>
           Top LPs Per Pair
         </TYPE.main>
-        <Panel>{topLps && <LPList lps={topLps} maxItems={50} />}</Panel>
+        <Panel>{topLps && <LPList lps={topLps} maxItems={200} />}</Panel>
       </FullWrapper>
     </PageWrapper>
   )
