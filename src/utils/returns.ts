@@ -178,9 +178,12 @@ export function getMetricsForPositionWindow(positionT0: Position, positionT1: Po
 
   // calculate squares to find imp loss and fee differences
   const sqrK_t0 = Math.sqrt(token0_amount_t0 * token1_amount_t0)
-  const priceRatioT1 = positionT1.token0PriceUSD ? positionT1.token1PriceUSD / positionT1.token0PriceUSD : 0
-  const token0_amount_no_fees = positionT1.token1PriceUSD ? sqrK_t0 * Math.sqrt(priceRatioT1) : 0
-  const token1_amount_no_fees = Number(positionT1.token1PriceUSD) ? sqrK_t0 / Math.sqrt(priceRatioT1) : 0
+  // eslint-disable-next-line eqeqeq
+  const priceRatioT1 = positionT1.token0PriceUSD != 0 ? positionT1.token1PriceUSD / positionT1.token0PriceUSD : 0
+
+  const token0_amount_no_fees = positionT1.token1PriceUSD && priceRatioT1 ? sqrK_t0 * Math.sqrt(priceRatioT1) : 0
+  const token1_amount_no_fees =
+    Number(positionT1.token1PriceUSD) && priceRatioT1 ? sqrK_t0 / Math.sqrt(priceRatioT1) : 0
   const no_fees_usd =
     token0_amount_no_fees * positionT1.token0PriceUSD + token1_amount_no_fees * positionT1.token1PriceUSD
 

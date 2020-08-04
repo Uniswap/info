@@ -204,28 +204,24 @@ function AccountPage({ account }) {
               {showDropdown && (
                 <Flyout>
                   <AutoColumn gap="0px">
-                    {positions
-                      ?.filter(p => {
-                        return p.liquidityTokenBalance > 0
-                      })
-                      .map((p, i) => {
-                        return (
-                          p.pair.id !== activePosition?.pair.id && (
-                            <MenuRow
-                              onClick={() => {
-                                setActivePosition(p)
-                                setShowDropdown(false)
-                              }}
-                              key={i}
-                            >
-                              <DoubleTokenLogo a0={p.pair.token0.id} a1={p.pair.token1.id} size={16} />
-                              <Text fontWeight={400} color="black" ml={'16px'} fontSize="16px">
-                                {p.pair.token0.symbol}-{p.pair.token1.symbol} Position
-                              </Text>
-                            </MenuRow>
-                          )
+                    {positions?.map((p, i) => {
+                      return (
+                        p.pair.id !== activePosition?.pair.id && (
+                          <MenuRow
+                            onClick={() => {
+                              setActivePosition(p)
+                              setShowDropdown(false)
+                            }}
+                            key={i}
+                          >
+                            <DoubleTokenLogo a0={p.pair.token0.id} a1={p.pair.token1.id} size={16} />
+                            <Text fontWeight={400} color="black" ml={'16px'} fontSize="16px">
+                              {p.pair.token0.symbol}-{p.pair.token1.symbol} Position
+                            </Text>
+                          </MenuRow>
                         )
-                      })}
+                      )
+                    })}
                     {activePosition && (
                       <MenuRow
                         onClick={() => {
