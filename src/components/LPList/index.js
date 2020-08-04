@@ -6,12 +6,13 @@ import utc from 'dayjs/plugin/utc'
 import { Box, Flex, Text } from 'rebass'
 import styled from 'styled-components'
 
-import Link from '../Link'
+import Link, { CustomLink } from '../Link'
 import { Divider } from '..'
 import { withRouter } from 'react-router-dom'
 import { formattedNum } from '../../utils'
 import { TYPE } from '../../Theme'
 import DoubleTokenLogo from '../DoubleLogo'
+import { RowFixed } from '../Row'
 
 dayjs.extend(utc)
 
@@ -110,9 +111,14 @@ function LPList({ lps, color, disbaleLinks, maxItems = 10 }) {
             {below800 ? lp.user.id.slice(0, 4) + '...' + lp.user.id.slice(38, 42) : lp.user.id}
           </Link>
         </DataText>
-        <DataText area="pair">
-          {!below600 && <DoubleTokenLogo a0={lp.token0} a1={lp.token1} size={16} margin={true} />}
-          {lp.pairName}
+
+        <DataText area="name">
+          <CustomLink area="pair" to={'/pair/' + lp.pairAddress}>
+            <RowFixed>
+              {!below600 && <DoubleTokenLogo a0={lp.token0} a1={lp.token1} size={16} margin={true} />}
+              {lp.pairName}
+            </RowFixed>
+          </CustomLink>
         </DataText>
         <DataText area="value">{formattedNum(lp.usd, true)}</DataText>
       </DashGrid>

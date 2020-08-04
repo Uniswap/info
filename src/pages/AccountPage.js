@@ -370,7 +370,7 @@ function AccountPage({ account }) {
           </Panel>
         </DashboardWrapper>
         {!below1080 && (
-          <SubNav>
+          <SubNav style={{ marginTop: 0 }}>
             <SubNavEl onClick={() => handleScroll(OverviewRef)} isActive={active === OverviewRef}>
               <TrendingUp size={20} style={{ marginRight: '1rem' }} />
               <TYPE.main>Overview</TYPE.main>

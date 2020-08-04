@@ -63,7 +63,7 @@ function AccountLookup({ history }) {
           return topLps.push({
             user: entry.user,
             pairName: pairData.token0.symbol + '-' + pairData.token1.symbol,
-            pairAddress: pairData.id,
+            pairAddress: entry.pair.id,
             token0: pairData.token0.id,
             token1: pairData.token1.id,
             usd:
@@ -91,7 +91,7 @@ function AccountLookup({ history }) {
           <AccountSearch />
         </AccountWrapper>
         <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '2rem' }}>
-          Top LPs Per Top Pairs
+          Top LPs Per Pair
         </TYPE.main>
         <Panel>{topLps && <LPList lps={topLps} maxItems={50} />}</Panel>
       </FullWrapper>

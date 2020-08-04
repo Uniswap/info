@@ -34,7 +34,6 @@ const Right = styled.div`
   position: fixed;
   right: 0;
   bottom: 0rem;
-  margin-top: 3rem;
   z-index: 99;
   width: 220px;
   height: ${({ open }) => (open ? 'fit-content' : '64px')};

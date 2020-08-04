@@ -174,7 +174,7 @@ function PositionList({ positions }) {
               <Text fontSize="12px">
                 {parseFloat(position.pair.token0.derivedETH)
                   ? formattedNum(
-                      position?.uniswap.return / (parseFloat(position.pair.token0.derivedETH) * ethPrice) / 2,
+                      position?.fees.sum / (parseFloat(position.pair.token0.derivedETH) * ethPrice) / 2,
                       false,
                       true
                     )
