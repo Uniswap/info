@@ -367,7 +367,7 @@ export function useUserLiquidityHistory(account) {
 
         formattedHistory.push({
           date: dayTimestamp,
-          valueUSD: dailyUSD
+          valueUSD: isFinite(dailyUSD) ? dailyUSD : 0 // check for case where resrve was 0 so infinite result
         })
       }
 

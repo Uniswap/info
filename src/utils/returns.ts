@@ -165,12 +165,8 @@ export async function getLPReturnsOnPair(user: string, pair, ethPrice: number) {
  * @param positionT1 // '' at the end of the window
  */
 export function getMetricsForPositionWindow(positionT0: Position, positionT1: Position): ReturnMetrics {
-  console.log('------NEW---------')
-
   positionT0 = formatPricesForEarlyTimestamps(positionT0)
   positionT1 = formatPricesForEarlyTimestamps(positionT1)
-  console.log(positionT0)
-  console.log(positionT1)
 
   // calculate ownership at ends of window, for end of window we need original LP token balance / new total supply
   const t0Ownership = positionT0.liquidityTokenBalance / positionT0.liquidityTokenTotalSupply
