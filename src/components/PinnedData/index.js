@@ -1,19 +1,18 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { withRouter } from 'react-router-dom'
 import styled from 'styled-components'
-import { AutoRow, RowBetween, RowFixed } from '../Row'
+import { RowBetween, RowFixed } from '../Row'
 import { AutoColumn } from '../Column'
 import { TYPE } from '../../Theme'
-import { ButtonLight, ButtonFaded } from '../ButtonStyled'
-import { useSavedAccounts, useSavedPairs, useSavedTokens } from '../../contexts/LocalStorage'
-import { isAddress } from '../../utils'
-import { X, Bookmark, ChevronDown } from 'react-feather'
+import { useSavedTokens, useSavedPairs } from '../../contexts/LocalStorage'
 import { Hover } from '..'
 import TokenLogo from '../TokenLogo'
+import AccountSearch from '../AccountSearch'
+import { Bookmark, ChevronDown, X } from 'react-feather'
+import { ButtonFaded } from '../ButtonStyled'
 
 const RightColumn = styled.div`
   position: fixed;
-  /* width: ${({ open }) => (open ? '180px' : '40px')}; */
   right: 0;
   bottom: 0px;
   padding: 1.25rem;
@@ -27,47 +26,9 @@ const RightColumn = styled.div`
       ? '0px 24px 32px rgba(0, 0, 0, 0.04), 0px 16px 24px rgba(0, 0, 0, 0.04), 0px 4px 8px rgba(0, 0, 0, 0.04), 0px 0px 1px rgba(0, 0, 0, 0.04);'
       : 'none'};
 
-
   :hover {
     cursor: pointer;
     border: ${({ theme, open }) => !open && '1px solid' + theme.bg4};
-  }
-`
-
-const Wrapper = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: flex-end;
-  width: 180px;
-  border-radius: 12px;
-  background: ${({ theme }) => theme.bg2};
-`
-
-const Input = styled.input`
-  position: relative;
-  display: flex;
-  align-items: center;
-  width: 100%;
-  white-space: nowrap;
-  background: none;
-  border: none;
-  outline: none;
-  padding: 8px 16px;
-  border-radius: 20px;
-  color: ${({ theme }) => theme.textColor};
-  background-color: ${({ theme }) => theme.bg2};
-  font-size: 16px;
-
-  ::placeholder {
-    color: ${({ theme }) => theme.text3};
-    font-size: 16px;
-  }
-
-  @media screen and (max-width: 640px) {
-    ::placeholder {
-      font-size: 1rem;
-    }
   }
 `
 
@@ -82,22 +43,8 @@ const SavedButton = styled(RowBetween)`
 `
 
 function PinnedData({ history, open, setSavedOpen }) {
-  const [accountValue, setAccountValue] = useState()
-
-  const [savedAccounts, addAccount, removeAccount] = useSavedAccounts()
-
   const [savedPairs, , removePair] = useSavedPairs()
-
   const [savedTokens, , removeToken] = useSavedTokens()
-
-  function handleAccountSearch() {
-    if (isAddress(accountValue)) {
-      history.push('/account/' + accountValue)
-      if (!savedAccounts.includes(accountValue)) {
-        addAccount(accountValue)
-      }
-    }
-  }
 
   return !open ? (
     <RightColumn open={open} onClick={() => setSavedOpen(true)}>
@@ -114,38 +61,7 @@ function PinnedData({ history, open, setSavedOpen }) {
         </RowFixed>
         <ChevronDown />
       </SavedButton>
-      <AutoColumn gap={'1rem'}>
-        <TYPE.main>Accounts</TYPE.main>
-        <AutoColumn gap={'12px'}>
-          {savedAccounts?.length > 0 ? (
-            savedAccounts.map(account => {
-              return (
-                <RowBetween key={account}>
-                  <ButtonFaded onClick={() => history.push('/account/' + account)}>
-                    <TYPE.header>{account?.slice(0, 6) + '...' + account?.slice(38, 42)}</TYPE.header>
-                  </ButtonFaded>
-                  <Hover onClick={() => removeAccount(account)}>
-                    <X size={16} />
-                  </Hover>
-                </RowBetween>
-              )
-            })
-          ) : (
-            <TYPE.light>No pinned wallets</TYPE.light>
-          )}
-        </AutoColumn>
-        <AutoRow>
-          <Wrapper>
-            <Input
-              placeholder="0x..."
-              onChange={e => {
-                setAccountValue(e.target.value)
-              }}
-            />
-          </Wrapper>
-        </AutoRow>
-        <ButtonLight onClick={handleAccountSearch}>Load Account Details</ButtonLight>
-      </AutoColumn>
+      <AccountSearch />
       <AutoColumn gap="40px" style={{ marginTop: '2rem' }}>
         <AutoColumn gap={'12px'}>
           <TYPE.main>Pinned Pairs</TYPE.main>

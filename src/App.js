@@ -15,6 +15,7 @@ import AllTokensPage from './pages/AllTokensPage'
 import AllPairsPage from './pages/AllPairsPage'
 import PinnedData from './components/PinnedData'
 import SubHeader from './components/SubHeader'
+import AccountLookup from './pages/AccountLookup'
 
 const AppWrapper = styled.div`
   position: relative;
@@ -145,6 +146,12 @@ function App() {
               <Route path="/all-pairs">
                 <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
                   <AllPairsPage />
+                </LayoutWrapper>
+              </Route>
+
+              <Route path="/account-lookup">
+                <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
+                  <AccountLookup />
                 </LayoutWrapper>
               </Route>
 

@@ -17,14 +17,12 @@ function AllPairsPage() {
   return (
     <PageWrapper>
       <FullWrapper>
-        <span>
-          <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '2rem', marginBottom: '1rem' }}>
-            All Pairs
-          </TYPE.main>
-          <Panel style={{ marginTop: '6px' }}>
-            <PairList pairs={allPairs} disbaleLinks={true} maxItems={50} />
-          </Panel>
-        </span>
+        <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '2rem', marginBottom: '1rem' }}>
+          All Pairs
+        </TYPE.main>
+        <Panel style={{ marginTop: '6px' }}>
+          <PairList pairs={allPairs} disbaleLinks={true} maxItems={50} />
+        </Panel>
       </FullWrapper>
     </PageWrapper>
   )
