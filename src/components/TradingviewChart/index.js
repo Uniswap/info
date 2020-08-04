@@ -3,7 +3,7 @@ import { createChart } from 'lightweight-charts'
 import dayjs from 'dayjs'
 import { formattedNum } from '../../utils'
 import styled from 'styled-components'
-import { Crosshair } from 'react-feather'
+import { Layout } from 'react-feather'
 
 export const CHART_TYPES = {
   BAR: 'BAR',
@@ -18,7 +18,7 @@ const IconWrapper = styled.div`
   position: absolute;
   right: 0;
   background-color: white;
-  border-radius: 50%;
+  border-radius: 3px;
   height: 16px;
   width: 16px;
   padding: 0px;
@@ -193,7 +193,7 @@ const TradingViewChart = ({ type = CHART_TYPES.BAR, data, base, baseChange, fiel
     <Wrapper>
       <div ref={ref} />
       <IconWrapper>
-        <Crosshair
+        <Layout
           onClick={() => {
             chartCreated && chartCreated.timeScale().fitContent()
           }}

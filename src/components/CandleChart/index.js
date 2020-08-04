@@ -4,13 +4,13 @@ import dayjs from 'dayjs'
 import { formattedNum } from '../../utils'
 import { usePrevious } from 'react-use'
 import styled from 'styled-components'
-import { Crosshair } from 'react-feather'
+import { Layout } from 'react-feather'
 
 const IconWrapper = styled.div`
   position: absolute;
   right: 10px;
   background-color: white;
-  border-radius: 50%;
+  border-radius: 3px;
   height: 16px;
   width: 16px;
   padding: 0px;
@@ -158,7 +158,7 @@ const CandleStickChart = ({ data, width, height = 300, base, valueFormatter = va
     <div>
       <div ref={ref} id="test-id" />
       <IconWrapper>
-        <Crosshair
+        <Layout
           onClick={() => {
             chartCreated && chartCreated.timeScale().fitContent()
           }}
