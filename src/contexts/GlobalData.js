@@ -5,9 +5,19 @@ import utc from 'dayjs/plugin/utc'
 import { useTimeframe } from './Application'
 import { timeframeOptions } from '../constants'
 import { getPercentChange, getBlockFromTimestamp, getBlocksFromTimestamps, get2DayPercentChange } from '../utils'
-import { GLOBAL_DATA, GLOBAL_TXNS, GLOBAL_CHART, ETH_PRICE, ALL_PAIRS, ALL_TOKENS, PAIR_CHART } from '../apollo/queries'
+import {
+  GLOBAL_DATA,
+  GLOBAL_TXNS,
+  GLOBAL_CHART,
+  ETH_PRICE,
+  ALL_PAIRS,
+  ALL_TOKENS,
+  PAIR_CHART,
+  TOP_LPS_PER_PAIRS
+} from '../apollo/queries'
 import weekOfYear from 'dayjs/plugin/weekOfYear'
 import { getV1Data } from './V1Data'
+import { useAllPairData } from './PairData'
 
 const UPDATE = 'UPDATE'
 const UPDATE_TXNS = 'UPDATE_TXNS'
@@ -16,6 +26,7 @@ const UPDATE_ETH_PRICE = 'UPDATE_ETH_PRICE'
 const ETH_PRICE_KEY = 'ETH_PRICE_KEY'
 const UPDATE_ALL_PAIRS_IN_UNISWAP = 'UPDAUPDATE_ALL_PAIRS_IN_UNISWAPTE_TOP_PAIRS'
 const UPDATE_ALL_TOKENS_IN_UNISWAP = 'UPDATE_ALL_TOKENS_IN_UNISWAP'
+const UPDATE_TOP_LPS = 'UPDATE_TOP_LPS'
 
 dayjs.extend(utc)
 dayjs.extend(weekOfYear)
@@ -74,6 +85,14 @@ function reducer(state, { type, payload }) {
       return {
         ...state,
         allTokens
+      }
+    }
+
+    case UPDATE_TOP_LPS: {
+      const { topLps } = payload
+      return {
+        ...state,
+        topLps
       }
     }
     default: {
@@ -140,17 +159,35 @@ export default function Provider({ children }) {
       }
     })
   }, [])
+
+  const updateTopLps = useCallback(topLps => {
+    dispatch({
+      type: UPDATE_TOP_LPS,
+      payload: {
+        topLps
+      }
+    })
+  }, [])
   return (
     <GlobalDataContext.Provider
       value={useMemo(
         () => [
           state,
-          { update, updateTransactions, updateChart, updateEthPrice, updateAllPairsInUniswap, updateAllTokensInUniswap }
+          {
+            update,
+            updateTransactions,
+            updateChart,
+            updateEthPrice,
+            updateTopLps,
+            updateAllPairsInUniswap,
+            updateAllTokensInUniswap
+          }
         ],
         [
           state,
           update,
           updateTransactions,
+          updateTopLps,
           updateChart,
           updateEthPrice,
           updateAllPairsInUniswap,
@@ -568,4 +605,63 @@ export function useAllTokensInUniswap() {
   let allTokens = state?.allTokens
 
   return allTokens || []
+}
+
+export function useTopLps() {
+  const [state, { updateTopLps }] = useGlobalDataContext()
+  let topLps = state?.topLps
+
+  const allPairs = useAllPairData()
+
+  useEffect(() => {
+    async function fetchData() {
+      // get top 20 by reserves
+      let top200Pairs = Object.keys(allPairs)
+        ?.sort((a, b) => parseFloat(allPairs[a].reserveUSD > allPairs[b].reserveUSD ? -1 : 1))
+        ?.slice(0, 199)
+        .map(pair => pair)
+
+      let topLpLists = await Promise.all(
+        top200Pairs.map(async pair => {
+          // for each one, fetch top LPs
+          const { data: lps } = await client.query({
+            query: TOP_LPS_PER_PAIRS,
+            variables: {
+              pair: pair.toString()
+            },
+            fetchPolicy: 'cache-first'
+          })
+          return lps.liquidityPositions
+        })
+      )
+
+      // get the top lps from the results formatted
+      const topLps = []
+      topLpLists.map(list => {
+        return list.map(entry => {
+          const pairData = allPairs[entry.pair.id]
+          return topLps.push({
+            user: entry.user,
+            pairName: pairData.token0.symbol + '-' + pairData.token1.symbol,
+            pairAddress: entry.pair.id,
+            token0: pairData.token0.id,
+            token1: pairData.token1.id,
+            usd:
+              (parseFloat(entry.liquidityTokenBalance) / parseFloat(pairData.totalSupply)) *
+              parseFloat(pairData.reserveUSD)
+          })
+        })
+      })
+
+      const sorted = topLps.sort((a, b) => (a.usd > b.usd ? -1 : 1))
+      const shorter = sorted.splice(0, 200)
+      updateTopLps(shorter)
+    }
+
+    if (!topLps) {
+      fetchData()
+    }
+  })
+
+  return topLps
 }

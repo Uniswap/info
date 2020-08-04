@@ -32,10 +32,10 @@ const PRICE_DISCOVERY_START_TIMESTAMP = 1589747086
 
 function formatPricesForEarlyTimestamps(position): Position {
   if (position.timestamp < PRICE_DISCOVERY_START_TIMESTAMP) {
-    if (priceOverrides.includes(position.pair.token0.id)) {
+    if (priceOverrides.includes(position?.pair.token0.id)) {
       position.token0PriceUSD = 1
     }
-    if (priceOverrides.includes(position.pair.token1.id)) {
+    if (priceOverrides.includes(position?.pair.token1.id)) {
       position.token1PriceUSD = 1
     }
     // WETH price
@@ -79,7 +79,7 @@ async function getPrincipalForUserPerPair(user: string, pairAddress: string) {
   }
 
   for (const index in results.data.burns) {
-    const burn = results.data.mints[index]
+    const burn = results.data.burns[index]
     const burnToken0 = burn.pair.token0.id
     const burnToken1 = burn.pair.token1.id
 
@@ -144,10 +144,6 @@ export async function getLPReturnsOnPair(user: string, pair, ethPrice: number) {
 
   return {
     principal,
-    hodl: {
-      sum: principal.usd + hodlReturn, // change with multiple windows
-      return: hodlReturn
-    },
     net: {
       return: netReturn
     },

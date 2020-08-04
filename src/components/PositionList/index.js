@@ -201,9 +201,7 @@ function PositionList({ positions }) {
   const positionsSorted =
     positions &&
     positions
-      .filter(position => {
-        return position.liquidityTokenBalance > 0
-      })
+
       .sort((p0, p1) => {
         if (sortedColumn === SORT_FIELD.PRINCIPAL) {
           return p0?.principal?.usd > p1?.principal?.usd ? (sortDirection ? -1 : 1) : sortDirection ? 1 : -1
