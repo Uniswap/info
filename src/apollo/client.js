@@ -10,6 +10,18 @@ export const client = new ApolloClient({
   shouldBatch: true
 })
 
+/**
+ * Used for liquidity htofix. uniswap2 is not tracking
+ * total liquidity fore tokens correctly.
+ */
+export const tempClient = new ApolloClient({
+  link: new HttpLink({
+    uri: 'https://api.thegraph.com/subgraphs/name/ianlapham/uniswapv2'
+  }),
+  cache: new InMemoryCache(),
+  shouldBatch: true
+})
+
 export const v1Client = new ApolloClient({
   link: new HttpLink({
     uri: 'https://api.thegraph.com/subgraphs/name/ianlapham/uniswap'

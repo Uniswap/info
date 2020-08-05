@@ -18,6 +18,7 @@ import { Hover, PageWrapper, FixedMenu, ContentWrapper } from '../components'
 import DoubleTokenLogo from '../components/DoubleLogo'
 import { TrendingUp, PieChart, Activity } from 'react-feather'
 import { SubNav, SubNavEl } from '../components/index'
+import Link from '../components/Link'
 
 const ListOptions = styled(AutoRow)`
   height: 40px;
@@ -167,9 +168,16 @@ function AccountPage({ account }) {
               Account Stats
             </Text>
             <AccountWrapper>
-              <Text fontSize={20} fontWeight={600}>
-                {account?.slice(0, 6) + '...' + account?.slice(38, 42)}
-              </Text>
+              <Link
+                lineHeight={'145.23%'}
+                href={'https://etherscan.io/address/' + account}
+                target="_blank"
+                color="#ff007a"
+              >
+                <Text fontSize={20} fontWeight={600}>
+                  {account?.slice(0, 6) + '...' + account?.slice(38, 42)}
+                </Text>
+              </Link>
             </AccountWrapper>
           </RowBetween>
         </Header>
@@ -261,7 +269,7 @@ function AccountPage({ account }) {
                 <AutoColumn gap="10px">
                   <RowBetween>
                     <TYPE.main fontSize={'16px'} fontWeight={400} color="#888D9B">
-                      Total Fees Earned
+                      Fees Earned (Cumulative)
                     </TYPE.main>
                     <div />
                   </RowBetween>

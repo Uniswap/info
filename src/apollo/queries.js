@@ -80,7 +80,7 @@ export const PRICES_BY_BLOCK = (tokenAddress, blocks) => {
 
 export const TOP_LPS_PER_PAIRS = gql`
   query lps($pair: Bytes!) {
-    liquidityPositions(where: { pair: $pair }, orderBy: liquidityTokenBalance, orderDirection: desc, first: 50) {
+    liquidityPositions(where: { pair: $pair }, orderBy: liquidityTokenBalance, orderDirection: desc, first: 20) {
       user {
         id
       }
@@ -728,6 +728,15 @@ export const TOKENS_CURRENT = gql`
   query tokens {
     tokens(first: 200, orderBy: tradeVolumeUSD, orderDirection: desc) {
       ...TokenFields
+    }
+  }
+`
+
+export const TOKENS_CURRENT_LIQUIDITY = gql`
+  query tokens {
+    tokens(first: 200, orderBy: tradeVolumeUSD, orderDirection: desc) {
+      id
+      totalLiquidity
     }
   }
 `

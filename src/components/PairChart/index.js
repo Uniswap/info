@@ -46,7 +46,7 @@ const PairChart = ({ address, color }) => {
 
   // get data for pair, and rates
   const pairData = usePairData(address)
-  const chartData = usePairChartData(address)
+  let chartData = usePairChartData(address)
   const hourlyData = useHourlyRateData(address, timeWindow)
   const hourlyRate0 = hourlyData && hourlyData[0]
   const hourlyRate1 = hourlyData && hourlyData[1]
@@ -55,8 +55,7 @@ const PairChart = ({ address, color }) => {
   const below600 = useMedia('(max-width: 600px)')
 
   let utcStartTime = getTimeframe(timeWindow)
-
-  const domain = [dataMin => (dataMin > utcStartTime ? dataMin : utcStartTime), 'dataMax']
+  chartData = chartData?.filter(entry => entry.date >= utcStartTime)
 
   if (chartData && chartData.length === 0) {
     return (
@@ -155,7 +154,7 @@ const PairChart = ({ address, color }) => {
               dataKey="date"
               tick={{ fill: 'black' }}
               type={'number'}
-              domain={domain}
+              domain={['dataMin', 'dataMax']}
             />
             <YAxis
               type="number"
@@ -229,7 +228,7 @@ const PairChart = ({ address, color }) => {
               dataKey="date"
               tick={{ fill: 'black' }}
               type={'number'}
-              domain={domain}
+              domain={['dataMin', 'dataMax']}
             />
             <YAxis
               type="number"

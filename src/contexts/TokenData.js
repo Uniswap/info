@@ -1,13 +1,14 @@
 import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect } from 'react'
 
-import { client } from '../apollo/client'
+import { client, tempClient } from '../apollo/client'
 import {
   TOKEN_DATA,
   FILTERED_TRANSACTIONS,
   TOKEN_CHART,
   TOKENS_CURRENT,
   TOKENS_DYNAMIC,
-  PRICES_BY_BLOCK
+  PRICES_BY_BLOCK,
+  TOKENS_CURRENT_LIQUIDITY
 } from '../apollo/queries'
 
 import { useEthPrice } from './GlobalData'
@@ -201,6 +202,11 @@ const getTopTokens = async (ethPrice, ethPriceOld) => {
       fetchPolicy: 'cache-first'
     })
 
+    let tempLiquidity = await tempClient.query({
+      query: TOKENS_CURRENT_LIQUIDITY,
+      fetchPolicy: 'cache-first'
+    })
+
     let oneDayResult = await client.query({
       query: TOKENS_DYNAMIC(oneDayBlock),
       fetchPolicy: 'cache-first'
@@ -210,6 +216,10 @@ const getTopTokens = async (ethPrice, ethPriceOld) => {
       query: TOKENS_DYNAMIC(twoDayBlock),
       fetchPolicy: 'cache-first'
     })
+
+    let liquidityData = tempLiquidity?.data?.tokens.reduce((obj, cur, i) => {
+      return { ...obj, [cur.id]: cur }
+    }, {})
 
     let oneDayData = oneDayResult?.data?.tokens.reduce((obj, cur, i) => {
       return { ...obj, [cur.id]: cur }
@@ -226,6 +236,7 @@ const getTopTokens = async (ethPrice, ethPriceOld) => {
       current?.data?.tokens.map(token => {
         let data = token
 
+        let liquidityDataThisToken = liquidityData?.[token.id]
         let oneDayHistory = oneDayData?.[token.id]
         let twoDayHistory = twoDayData?.[token.id]
 
@@ -241,7 +252,8 @@ const getTopTokens = async (ethPrice, ethPriceOld) => {
           twoDayHistory?.txCount ?? 0
         )
 
-        const currentLiquidityUSD = data?.totalLiquidity * ethPrice * data?.derivedETH
+        const currentLiquidityUSD = liquidityDataThisToken?.totalLiquidity * ethPrice * data?.derivedETH
+
         const oldLiquidityUSD = oneDayHistory?.totalLiquidity * ethPriceOld * oneDayHistory?.derivedETH
 
         // percent changes
@@ -471,7 +483,8 @@ const getTokenChartData = async tokenAddress => {
   let startTime = utcStartTime.startOf('minute').unix() - 1
 
   try {
-    let result = await client.query({
+    // hotfix for liquidity bug in uniswap2 subgraph
+    let result = await tempClient.query({
       query: TOKEN_CHART,
       variables: {
         tokenAddr: tokenAddress

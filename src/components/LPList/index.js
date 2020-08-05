@@ -6,7 +6,7 @@ import utc from 'dayjs/plugin/utc'
 import { Box, Flex, Text } from 'rebass'
 import styled from 'styled-components'
 
-import Link, { CustomLink } from '../Link'
+import { CustomLink } from '../Link'
 import { Divider } from '..'
 import { withRouter } from 'react-router-dom'
 import { formattedNum } from '../../utils'
@@ -103,13 +103,13 @@ function LPList({ lps, color, disbaleLinks, maxItems = 10 }) {
           </DataText>
         )}
         <DataText area="name" fontWeight="500" justifyContent="flex-start">
-          <Link
+          <CustomLink
             style={{ marginLeft: below600 ? 0 : '1rem', whiteSpace: 'nowrap' }}
-            href={'https://etherscan.io/address/' + lp.user.id}
+            to={'/account/' + lp.user.id}
             target="_blank"
           >
             {below800 ? lp.user.id.slice(0, 4) + '...' + lp.user.id.slice(38, 42) : lp.user.id}
-          </Link>
+          </CustomLink>
         </DataText>
 
         <DataText area="name">

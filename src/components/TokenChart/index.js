@@ -43,7 +43,7 @@ const DATA_FREQUENCY = {
 
 const TokenChart = ({ address, color, base }) => {
   // settings for the window and candle width
-  const [chartFilter, setChartFilter] = useState(CHART_VIEW.PRICE)
+  const [chartFilter, setChartFilter] = useState(CHART_VIEW.LIQUIDITY)
   const [frequency, setFrequency] = useState(DATA_FREQUENCY.HOUR)
 
   // reset view on new address
@@ -54,7 +54,7 @@ const TokenChart = ({ address, color, base }) => {
     }
   }, [address, addressPrev])
 
-  const chartData = useTokenChartData(address)
+  let chartData = useTokenChartData(address)
 
   const [timeWindow, setTimeWindow] = useState(timeframeOptions.WEEK)
   const prevWindow = usePrevious(timeWindow)
@@ -106,6 +106,8 @@ const TokenChart = ({ address, color, base }) => {
   let utcStartTime = getTimeframe(timeWindow)
   const domain = [dataMin => (dataMin > utcStartTime ? dataMin : utcStartTime), 'dataMax']
   const aspect = below1080 ? 60 / 32 : below600 ? 60 / 42 : 60 / 22
+
+  chartData = chartData?.filter(entry => entry.date >= utcStartTime)
 
   // update the width on a window resize
   const ref = useRef()
@@ -232,7 +234,7 @@ const TokenChart = ({ address, color, base }) => {
               dataKey="date"
               tick={{ fill: 'black' }}
               type={'number'}
-              domain={domain}
+              domain={['dataMin', 'dataMax']}
             />
             <YAxis
               type="number"
@@ -353,7 +355,7 @@ const TokenChart = ({ address, color, base }) => {
               tickFormatter={tick => toNiceDate(tick)}
               dataKey="date"
               type={'number'}
-              domain={domain}
+              domain={['dataMin', 'dataMax']}
             />
             <YAxis
               type="number"

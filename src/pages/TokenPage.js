@@ -140,18 +140,6 @@ function TokenPage({ address, history }) {
 
   const [dismissed, markAsDismissed] = usePathDismissed(history.location.pathname)
 
-  const [manualLiquidity, setManualLiquidity] = useState(0)
-  useEffect(() => {
-    let calculated = 0
-    for (let pairAddress in fetchedPairsList) {
-      const pair = fetchedPairsList[pairAddress]
-      calculated = calculated + parseFloat(pair.reserveUSD ?? 0)
-    }
-    setManualLiquidity(calculated / 2)
-  }, [fetchedPairsList])
-
-  const useManualLiquidity = parseFloat(totalLiquidityUSD / manualLiquidity) < 0.5
-
   const [savedTokens, addToken] = useSavedTokens()
 
   const [active, setActive] = useState(null)
@@ -255,7 +243,7 @@ function TokenPage({ address, history }) {
                     </RowBetween>
                     <RowBetween align="flex-end">
                       <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
-                        {useManualLiquidity ? formattedNum(manualLiquidity, true) : liquidity}
+                        {liquidity}
                       </TYPE.main>
                       <TYPE.main>{liquidityChange}</TYPE.main>
                     </RowBetween>
