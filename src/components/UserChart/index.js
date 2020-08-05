@@ -9,7 +9,7 @@ import { useMedia } from 'react-use'
 import { timeframeOptions } from '../../constants'
 import DropdownSelect from '../DropdownSelect'
 import { Text } from 'rebass'
-import { useUserLiquidityHistory } from '../../contexts/User'
+import { useUserLiquidityChart } from '../../contexts/User'
 import LocalLoader from '../LocalLoader'
 
 const ChartWrapper = styled.div`
@@ -22,7 +22,7 @@ const ChartWrapper = styled.div`
 `
 
 const UserChart = ({ account }) => {
-  const chartData = useUserLiquidityHistory(account)
+  const chartData = useUserLiquidityChart(account)
 
   const [timeWindow, setTimeWindow] = useState(timeframeOptions.ALL_TIME)
   let utcStartTime = getTimeframe(timeWindow)

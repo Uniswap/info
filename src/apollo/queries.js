@@ -56,6 +56,23 @@ export const GET_BLOCKS = timestamps => {
   return gql(queryString)
 }
 
+export const POSITIONS_BY_BLOCK = (account, blocks) => {
+  let queryString = 'query blocks {'
+  queryString += blocks.map(
+    block => `
+      t${block.timestamp}:liquidityPositions(where: {user: "${account}"}, block: { number: ${block.number} }) { 
+        liquidityTokenBalance
+        pair {
+          totalSupply
+          reserveUSD
+        }
+      }
+    `
+  )
+  queryString += '}'
+  return gql(queryString)
+}
+
 export const PRICES_BY_BLOCK = (tokenAddress, blocks) => {
   let queryString = 'query blocks {'
   queryString += blocks.map(
@@ -202,28 +219,10 @@ export const USER_MINTS_BUNRS_PER_PAIR = gql`
   }
 `
 
-export const USER_HISTORY__PER_PAIR = gql`
-  query snapshots($user: Bytes!, $pair: Bytes!) {
-    liquidityPositionSnapshots(where: { user: $user, pair: $pair }, orderBy: timestamp, orderDirection: asc) {
+export const FIRST_SNAPSHOT = gql`
+  query snapshots($user: Bytes!) {
+    liquidityPositionSnapshots(first: 1, where: { user: $user }, orderBy: timestamp, orderDirection: asc) {
       timestamp
-      reserveUSD
-      liquidityTokenBalance
-      liquidityTokenTotalSupply
-      reserve0
-      reserve1
-      token0PriceUSD
-      token1PriceUSD
-      pair {
-        id
-        reserveUSD
-        totalSupply
-        token0 {
-          id
-        }
-        token1 {
-          id
-        }
-      }
     }
   }
 `

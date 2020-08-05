@@ -1,4 +1,4 @@
-import { USER_MINTS_BUNRS_PER_PAIR, USER_HISTORY__PER_PAIR } from '../apollo/queries'
+import { USER_MINTS_BUNRS_PER_PAIR } from '../apollo/queries'
 import { client } from '../apollo/client'
 import dayjs from 'dayjs'
 import { getShareValueOverTime } from '.'
@@ -99,62 +99,6 @@ async function getPrincipalForUserPerPair(user: string, pairAddress: string) {
   return { usd, amount0, amount1 }
 }
 
-export async function getLPReturnsOnPair(user: string, pair, ethPrice: number) {
-  // initialize values
-  const principal = await getPrincipalForUserPerPair(user, pair.id)
-  let hodlReturn = 0
-  let netReturn = 0
-  let uniswapReturn = 0
-  let fees = 0
-
-  // get snapshots of position changes on this pair for this user
-  const {
-    data: { liquidityPositionSnapshots: history }
-  } = await client.query({
-    query: USER_HISTORY__PER_PAIR,
-    variables: {
-      user,
-      pair: pair.id
-    }
-  })
-
-  // get data about the current position
-  const currentPosition: Position = {
-    pair,
-    liquidityTokenBalance: history[history.length - 1].liquidityTokenBalance,
-    liquidityTokenTotalSupply: pair.totalSupply,
-    reserve0: pair.reserve0,
-    reserve1: pair.reserve1,
-    reserveUSD: pair.reserveUSD,
-    token0PriceUSD: pair.token0.derivedETH * ethPrice,
-    token1PriceUSD: pair.token1.derivedETH * ethPrice
-  }
-
-  for (const index in history) {
-    // get positions at both bounds of the window
-    let positionT0 = history[index]
-    let positionT1 = parseInt(index) === history.length - 1 ? currentPosition : history[parseInt(index) + 1]
-
-    let results = getMetricsForPositionWindow(positionT0, positionT1)
-    hodlReturn = hodlReturn + results.hodleReturn
-    netReturn = netReturn + results.netReturn
-    uniswapReturn = uniswapReturn + results.uniswapReturn
-    fees = fees + results.fees
-  }
-
-  return {
-    principal,
-    net: {
-      return: netReturn
-    },
-    uniswap: {
-      return: uniswapReturn
-    },
-    fees: {
-      sum: fees
-    }
-  }
-}
 /**
  * Core algorithm for calculating retursn within one time window.
  * @param positionT0 // users liquidity info and token rates at beginning of window
@@ -248,12 +192,11 @@ export async function getHistoricalPairReturns(startDateTimestamp, currentPairDa
   shareValues?.map(share => {
     shareValuesFormatted[share.timestamp] = share
   })
-  const formattedHistory = []
 
-  let netFees = 0
-
-  // set the default position
+  // set the default position and data
   let positionT0 = pairSnapshots[0]
+  const formattedHistory = []
+  let netFees = 0
 
   // keep track of up to date metrics as we parse each day
   for (const index in dayTimestamps) {
@@ -304,4 +247,60 @@ export async function getHistoricalPairReturns(startDateTimestamp, currentPairDa
   }
 
   return formattedHistory
+}
+
+/**
+ * For a given pair and user, get the return metrics
+ * @param user
+ * @param pair
+ * @param ethPrice
+ */
+export async function getLPReturnsOnPair(user: string, pair, ethPrice: number, snapshots) {
+  // initialize values
+  const principal = await getPrincipalForUserPerPair(user, pair.id)
+  let hodlReturn = 0
+  let netReturn = 0
+  let uniswapReturn = 0
+  let fees = 0
+
+  snapshots = snapshots.filter(entry => {
+    return entry.pair.id === pair.id
+  })
+
+  // get data about the current position
+  const currentPosition: Position = {
+    pair,
+    liquidityTokenBalance: snapshots[snapshots.length - 1].liquidityTokenBalance,
+    liquidityTokenTotalSupply: pair.totalSupply,
+    reserve0: pair.reserve0,
+    reserve1: pair.reserve1,
+    reserveUSD: pair.reserveUSD,
+    token0PriceUSD: pair.token0.derivedETH * ethPrice,
+    token1PriceUSD: pair.token1.derivedETH * ethPrice
+  }
+
+  for (const index in snapshots) {
+    // get positions at both bounds of the window
+    let positionT0 = snapshots[index]
+    let positionT1 = parseInt(index) === snapshots.length - 1 ? currentPosition : snapshots[parseInt(index) + 1]
+
+    let results = getMetricsForPositionWindow(positionT0, positionT1)
+    hodlReturn = hodlReturn + results.hodleReturn
+    netReturn = netReturn + results.netReturn
+    uniswapReturn = uniswapReturn + results.uniswapReturn
+    fees = fees + results.fees
+  }
+
+  return {
+    principal,
+    net: {
+      return: netReturn
+    },
+    uniswap: {
+      return: uniswapReturn
+    },
+    fees: {
+      sum: fees
+    }
+  }
 }

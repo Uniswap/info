@@ -103,11 +103,7 @@ function LPList({ lps, color, disbaleLinks, maxItems = 10 }) {
           </DataText>
         )}
         <DataText area="name" fontWeight="500" justifyContent="flex-start">
-          <CustomLink
-            style={{ marginLeft: below600 ? 0 : '1rem', whiteSpace: 'nowrap' }}
-            to={'/account/' + lp.user.id}
-            target="_blank"
-          >
+          <CustomLink style={{ marginLeft: below600 ? 0 : '1rem', whiteSpace: 'nowrap' }} to={'/account/' + lp.user.id}>
             {below800 ? lp.user.id.slice(0, 4) + '...' + lp.user.id.slice(38, 42) : lp.user.id}
           </CustomLink>
         </DataText>

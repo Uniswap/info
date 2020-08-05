@@ -117,6 +117,10 @@ export async function getBlockFromTimestamp(timestamp) {
  * @param {Array} timestamps
  */
 export async function getBlocksFromTimestamps(timestamps) {
+  if (timestamps?.length === 0) {
+    return []
+  }
+
   let result = await blockClient.query({
     query: GET_BLOCKS(timestamps),
     fetchPolicy: 'cache-first'

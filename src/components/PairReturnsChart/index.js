@@ -8,7 +8,7 @@ import { OptionButton } from '../ButtonStyled'
 import { useMedia } from 'react-use'
 import { timeframeOptions } from '../../constants'
 import DropdownSelect from '../DropdownSelect'
-import { useReturnsPerPairHistory } from '../../contexts/User'
+import { useUserPositionChart } from '../../contexts/User'
 import { useTimeframe } from '../../contexts/Application'
 import dayjs from 'dayjs'
 import { Text } from 'rebass'
@@ -23,7 +23,7 @@ const ChartWrapper = styled.div`
 `
 
 const PairReturnsChart = ({ account, position }) => {
-  const data = useReturnsPerPairHistory(position, account)
+  const data = useUserPositionChart(position, account)
 
   const [timeWindow, setTimeWindow] = useTimeframe()
 
