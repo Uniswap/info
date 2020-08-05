@@ -229,8 +229,8 @@ export const USER_HISTORY__PER_PAIR = gql`
 `
 
 export const USER_HISTORY = gql`
-  query snapshots($user: Bytes!) {
-    liquidityPositionSnapshots(where: { user: $user }) {
+  query snapshots($user: Bytes!, $skip: Int!) {
+    liquidityPositionSnapshots(first: 1000, skip: $skip, where: { user: $user }) {
       timestamp
       reserveUSD
       liquidityTokenBalance

@@ -244,95 +244,63 @@ export async function getHistoricalPairReturns(startDateTimestamp, currentPairDa
   }
 
   const shareValues = await getShareValueOverTime(currentPairData.id, dayTimestamps)
+  const shareValuesFormatted = {}
+  shareValues?.map(share => {
+    shareValuesFormatted[share.timestamp] = share
+  })
   const formattedHistory = []
 
-  // keep track of up to date metrics as we parse each day
-  let returns = {
-    pair: currentPairData,
-    lastUpdated: sortedPositions[0].timestamp,
-    liquidityTokenBalance: parseFloat(sortedPositions[0].liquidityTokenBalance),
-    liquidityTokenTotalSupply: parseFloat(sortedPositions[0].liquidityTokenTotalSupply),
-    reserve0: parseFloat(sortedPositions[0].reserve0),
-    reserve1: parseFloat(sortedPositions[0].reserve1),
-    reserveUSD: parseFloat(sortedPositions[0].reserveUSD),
-    token0PriceUSD: parseFloat(sortedPositions[0].token0PriceUSD),
-    token1PriceUSD: parseFloat(sortedPositions[0].token1PriceUSD),
-    assetReturn: 0,
-    uniswapReturn: 0,
-    netReturn: 0,
-    assetChange: 0,
-    uniswapChange: 0,
-    netChange: 0
-  }
+  let netFees = 0
 
+  // set the default position
+  let positionT0 = pairSnapshots[0]
+
+  // keep track of up to date metrics as we parse each day
   for (const index in dayTimestamps) {
+    // get the bounds on the day
     const dayTimestamp = dayTimestamps[index]
     const timestampCeiling = dayTimestamp + 86400
 
-    const shareValue = shareValues[index]
-
-    const positionT0: Position = returns
-    let positionT1: Position = {
-      pair: currentPairData,
-      liquidityTokenBalance: returns.liquidityTokenBalance,
-      liquidityTokenTotalSupply: shareValue.totalSupply,
-      reserve0: shareValue.reserve0,
-      reserve1: shareValue.reserve1,
-      reserveUSD: shareValue.reserveUSD,
-      token0PriceUSD: shareValue.token0PriceUSD,
-      token1PriceUSD: shareValue.token1PriceUSD
-    }
-
-    // if today , use latest data instead of last day data
-    if (parseInt(index) === dayTimestamps.length - 1) {
-      positionT1 = currentPairData
-      positionT1.liquidityTokenTotalSupply = currentPairData.totalSupply
-      positionT1.token0PriceUSD = parseFloat(currentPairData.token0.derivedETH) * currentETHPrice
-      positionT1.token1PriceUSD = parseFloat(currentPairData.token1.derivedETH) * currentETHPrice
-    }
-
-    // get position changes on this day
-    const positionChanges = pairSnapshots?.filter(snapshot => {
+    // for each change in position value that day, create a window and update
+    const dailyChanges = pairSnapshots.filter(snapshot => {
       return snapshot.timestamp < timestampCeiling && snapshot.timestamp > dayTimestamp
     })
 
-    let needsUpdate = false
-    // find latest change, and use that as end of window for today
-    for (const index in positionChanges) {
-      const positionChange = positionChanges[index]
-      // case where more recent timestamp is found for pair
-      if (returns.lastUpdated < positionChange.timestamp) {
-        returns.lastUpdated = positionChange.timestamp
-        positionT1 = positionChange
-        needsUpdate = true // position has changes - update the global metrics
+    for (let i = 0; i < dailyChanges.length; i++) {
+      const positionT1 = dailyChanges[i]
+      const localReturns = getMetricsForPositionWindow(positionT0, positionT1)
+      netFees = netFees + localReturns.fees
+      positionT0 = positionT1
+    }
+
+    // now treat the end of the day as a hypothetical position
+    let positionT1 = shareValuesFormatted[dayTimestamp + 86400]
+    if (!positionT1) {
+      positionT1 = {
+        pair: currentPairData.id,
+        liquidityTokenBalance: positionT0.liquidityTokenBalance,
+        totalSupply: currentPairData.totalSupply,
+        reserve0: currentPairData.reserve0,
+        reserve1: currentPairData.reserve1,
+        reserveUSD: currentPairData.reserveUSD,
+        token0PriceUSD: currentPairData.token0.derivedETH * currentETHPrice,
+        token1PriceUSD: currentPairData.token1.derivedETH * currentETHPrice
       }
     }
 
-    // get the rteurns for this current window
-    const calculatedReturns = getMetricsForPositionWindow(positionT0, positionT1)
+    if (positionT1) {
+      positionT1.liquidityTokenTotalSupply = positionT1.totalSupply
+      positionT1.liquidityTokenBalance = positionT0.liquidityTokenBalance
+      const localReturns = getMetricsForPositionWindow(positionT0, positionT1)
+      const currentLiquidityValue = (positionT1.liquidityTokenBalance / positionT1.totalSupply) * positionT1.reserveUSD
+      const localFees = netFees + localReturns.fees
 
-    // account for profits or loss because position actually changed here
-    if (needsUpdate) {
-      returns.netReturn = returns.netReturn + calculatedReturns.netReturn
-      returns.assetReturn = returns.assetReturn + calculatedReturns.hodleReturn
-      returns.uniswapReturn = returns.uniswapReturn + calculatedReturns.uniswapReturn
+      formattedHistory.push({
+        date: dayTimestamp,
+        usdValue: currentLiquidityValue,
+        fees: localFees
+      })
     }
-
-    const localNetReturn = returns.netReturn + calculatedReturns.netReturn
-    const localAssetReturn = returns.assetReturn + calculatedReturns.hodleReturn
-    const localUnsiwapReturn = returns.uniswapReturn + calculatedReturns.uniswapReturn
-
-    const currentLiquidityValue = positionT0.liquidityTokenBalance * shareValue.sharePriceUsd
-
-    formattedHistory.push({
-      date: dayTimestamp,
-      usdValue: currentLiquidityValue,
-      netReturn: localNetReturn,
-      assetReturn: localAssetReturn,
-      uniswapReturn: localUnsiwapReturn,
-      impLoss: calculatedReturns.impLoss,
-      fees: calculatedReturns.fees
-    })
   }
 
   return formattedHistory

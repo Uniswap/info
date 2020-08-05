@@ -113,18 +113,6 @@ function AccountPage({ account }) {
       : 0
   }, [transactions])
 
-  const positionValue = useMemo(() => {
-    return positions
-      ? positions.reduce((total, position) => {
-          return (
-            total +
-            (parseFloat(position?.liquidityTokenBalance) / parseFloat(position?.pair?.totalSupply)) *
-              position?.pair?.reserveUSD
-          )
-        }, 0)
-      : 0
-  }, [positions])
-
   // settings for list view and dropdowns
   const hideLPContent = positions && positions.length === 0
   const [showDropdown, setShowDropdown] = useState(false)
@@ -136,6 +124,18 @@ function AccountPage({ account }) {
   const aggregateFees = dynamicPositions?.reduce(function(total, position) {
     return total + position.fees.sum
   }, 0)
+
+  const positionValue = useMemo(() => {
+    return dynamicPositions
+      ? dynamicPositions.reduce((total, position) => {
+          return (
+            total +
+            (parseFloat(position?.liquidityTokenBalance) / parseFloat(position?.pair?.totalSupply)) *
+              position?.pair?.reserveUSD
+          )
+        }, 0)
+      : 0
+  }, [dynamicPositions])
 
   const OverviewRef = useRef()
   const StatsRef = useRef()

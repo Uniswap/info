@@ -254,15 +254,27 @@ export function useUserLiquidityHistory(account) {
   useEffect(() => {
     async function fetchData() {
       try {
-        let result = await client.query({
-          query: USER_HISTORY,
-          variables: {
-            user: account
-          },
-          fetchPolicy: 'cache-first'
-        })
-        if (result) {
-          updateUserPositionHistory(account, result.data.liquidityPositionSnapshots)
+        let skip = 0
+        let allResults = []
+        let found = false
+        while (!found) {
+          let result = await client.query({
+            query: USER_HISTORY,
+            variables: {
+              skip: skip,
+              user: account
+            },
+            fetchPolicy: 'cache-first'
+          })
+          allResults = allResults.concat(result.data.liquidityPositionSnapshots)
+          if (result.data.liquidityPositionSnapshots.length < 1000) {
+            found = true
+          } else {
+            skip += 1000
+          }
+        }
+        if (allResults) {
+          updateUserPositionHistory(account, allResults)
         }
       } catch (e) {
         console.log(e)
