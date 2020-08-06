@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useReducer, useMemo, useCallback, useState, useEffect } from 'react'
 import { timeframeOptions } from '../constants'
-
+import Web3 from 'web3'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 dayjs.extend(utc)
@@ -8,10 +8,12 @@ dayjs.extend(utc)
 const UPDATE = 'UPDATE'
 const UPDATE_TIMEFRAME = 'UPDATE_TIMEFRAME'
 const UPDATE_SESSION_START = 'UPDATE_SESSION_START'
+const UPDATE_WEB3 = 'UPDATE_WEB3'
 
 const TIME_KEY = 'TIME_KEY'
 const CURRENCY = 'CURRENCY'
 const SESSION_START = 'SESSION_START'
+const WEB3 = 'WEB3'
 
 const ApplicationContext = createContext()
 
@@ -40,6 +42,13 @@ function reducer(state, { type, payload }) {
       return {
         ...state,
         SESSION_START: timestamp
+      }
+    }
+    case UPDATE_WEB3: {
+      const { web3 } = payload
+      return {
+        ...state,
+        WEB3: web3
       }
     }
 
@@ -83,12 +92,22 @@ export default function Provider({ children }) {
     })
   }, [])
 
+  const updateWeb3 = useCallback(web3 => {
+    dispatch({
+      type: UPDATE_WEB3,
+      payload: {
+        web3
+      }
+    })
+  }, [])
+
   return (
     <ApplicationContext.Provider
-      value={useMemo(() => [state, { update, updateSessionStart, updateTimeframe }], [
+      value={useMemo(() => [state, { update, updateSessionStart, updateTimeframe, updateWeb3 }], [
         state,
         update,
         updateTimeframe,
+        updateWeb3,
         updateSessionStart
       ])}
     >
@@ -160,4 +179,18 @@ export function useSessionStart() {
   }, [seconds, sessionStart])
 
   return parseInt(seconds / 1000)
+}
+
+export function useWeb3() {
+  const [state, { updateWeb3 }] = useApplicationContext()
+  const web3 = state?.[WEB3]
+
+  useEffect(() => {
+    if (!web3) {
+      const web3 = new Web3(new Web3.providers.HttpProvider(process.env.REACT_APP_NETWORK_URL))
+      updateWeb3(web3)
+    }
+  })
+
+  return web3
 }

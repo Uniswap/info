@@ -5,7 +5,6 @@ import LocalLoader from '../LocalLoader'
 import utc from 'dayjs/plugin/utc'
 import { Box, Flex, Text } from 'rebass'
 import styled from 'styled-components'
-import Web3 from 'web3'
 
 import { CustomLink } from '../Link'
 import { Divider } from '..'
@@ -101,22 +100,6 @@ function LPList({ lps, disbaleLinks, maxItems = 10 }) {
     }
   }, [ITEMS_PER_PAGE, lps])
 
-  const web3 = new Web3(new Web3.providers.HttpProvider(process.env.REACT_APP_NETWORK_URL))
-
-  const [formattedLps, setFormattedLps] = useState()
-  useEffect(() => {
-    async function fetch() {
-      for (let i = 0; i < lps.length; i++) {
-        let code = await web3.eth.getCode(lps[i].user.id)
-        lps[i].type = code === '0x' ? 'EOA' : 'Smart Contract'
-      }
-      setFormattedLps(lps)
-    }
-    if (!formattedLps && lps) {
-      fetch()
-    }
-  }, [formattedLps, lps, web3.eth])
-
   const ListItem = ({ lp, index }) => {
     return (
       <DashGrid style={{ height: '48px' }} disbaleLinks={disbaleLinks} focus={true}>
@@ -125,7 +108,6 @@ function LPList({ lps, disbaleLinks, maxItems = 10 }) {
             {index}
           </DataText>
         )}
-
         <DataText area="name" fontWeight="500" justifyContent="flex-start">
           <CustomLink style={{ marginLeft: below600 ? 0 : '1rem', whiteSpace: 'nowrap' }} to={'/account/' + lp.user.id}>
             {below800 ? lp.user.id.slice(0, 4) + '...' + lp.user.id.slice(38, 42) : lp.user.id}
@@ -152,8 +134,8 @@ function LPList({ lps, disbaleLinks, maxItems = 10 }) {
   }
 
   const lpList =
-    formattedLps &&
-    formattedLps.slice(ITEMS_PER_PAGE * (page - 1), page * ITEMS_PER_PAGE).map((lp, index) => {
+    lps &&
+    lps.slice(ITEMS_PER_PAGE * (page - 1), page * ITEMS_PER_PAGE).map((lp, index) => {
       return (
         <div key={index}>
           <ListItem key={index} index={(page - 1) * 10 + index + 1} lp={lp} />
