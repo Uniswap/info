@@ -282,7 +282,7 @@ function AccountPage({ account }) {
                 <AutoColumn gap="10px">
                   <RowBetween>
                     <TYPE.main fontSize={'16px'} fontWeight={400} color="#888D9B">
-                      Liquidity Value (Including Fees)
+                      Liquidity (Including Fees)
                     </TYPE.main>
                     <div />
                   </RowBetween>

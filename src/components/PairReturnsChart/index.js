@@ -62,7 +62,7 @@ const PairReturnsChart = ({ account, position }) => {
         <OptionsRow>
           <AutoRow gap="6px" style={{ flexWrap: 'nowrap' }}>
             <OptionButton active={chartView === CHART_VIEW.VALUE} onClick={() => setChartView(CHART_VIEW.VALUE)}>
-              Liquidity Value
+              Liquidity
             </OptionButton>
             <OptionButton active={chartView === CHART_VIEW.FEES} onClick={() => setChartView(CHART_VIEW.FEES)}>
               Fees
@@ -141,7 +141,7 @@ const PairReturnsChart = ({ account, position }) => {
                 strokeWidth={2}
                 dot={false}
                 type="monotone"
-                name={'Liquidity Value'}
+                name={'Liquidity'}
                 dataKey={'usdValue'}
                 yAxisId={0}
                 stroke={darken(0.12, color)}
