@@ -74,6 +74,7 @@ export default function Provider({ children }) {
     })
   }, [])
 
+  // global time window for charts - see timeframe options in constants
   const updateTimeframe = useCallback(newTimeFrame => {
     dispatch({
       type: UPDATE_TIMEFRAME,
@@ -83,6 +84,7 @@ export default function Provider({ children }) {
     })
   }, [])
 
+  // used for refresh button
   const updateSessionStart = useCallback(timestamp => {
     dispatch({
       type: UPDATE_SESSION_START,
@@ -140,7 +142,6 @@ export function useStartTimestamp() {
 
   // monitor the old date fetched
   useEffect(() => {
-    // based on window, get starttime
     let startTime =
       dayjs
         .utc()
