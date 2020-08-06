@@ -2,13 +2,14 @@ import React, { useEffect } from 'react'
 import 'feather-icons'
 import { withRouter } from 'react-router-dom'
 import { TYPE } from '../Theme'
-import { PageWrapper, FullWrapper } from '../components'
+import { PageWrapper, FullWrapper, FixedMenu } from '../components'
 import Panel from '../components/Panel'
 import LPList from '../components/LPList'
 import styled from 'styled-components'
 import AccountSearch from '../components/AccountSearch'
 import { useTopLps } from '../contexts/GlobalData'
 import LocalLoader from '../components/LocalLoader'
+import { RowBetween } from '../components/Row'
 
 const AccountWrapper = styled.div`
   width: 400px;
@@ -28,10 +29,13 @@ function AccountLookup() {
 
   return (
     <PageWrapper>
+      <FixedMenu>
+        <RowBetween>
+          <TYPE.largeHeader>Account Lookup</TYPE.largeHeader>
+          <div />
+        </RowBetween>
+      </FixedMenu>
       <FullWrapper>
-        <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '2rem', marginBottom: '1rem' }}>
-          Account Lookup
-        </TYPE.main>
         <AccountWrapper>
           <AccountSearch />
         </AccountWrapper>

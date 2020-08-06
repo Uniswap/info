@@ -209,9 +209,7 @@ function AccountPage({ account }) {
       </FixedMenu>
       <ContentWrapper>
         <DashboardWrapper>
-          {showWarning && (
-            <Warning>Note: Fees from pairs including AMPL may be incorrect due to token mechanics.</Warning>
-          )}
+          {showWarning && <Warning>Fees cannot currently be calculated for pairs that include AMPL.</Warning>}
           {!hideLPContent && (
             <DropdownWrapper>
               <ButtonDropdown

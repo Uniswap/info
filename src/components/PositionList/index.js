@@ -5,7 +5,7 @@ import LocalLoader from '../LocalLoader'
 import utc from 'dayjs/plugin/utc'
 import { Box, Flex, Text } from 'rebass'
 import styled from 'styled-components'
-import Link from '../Link'
+import Link, { CustomLink } from '../Link'
 import { Divider } from '../../components'
 import DoubleTokenLogo from '../DoubleLogo'
 import { withRouter } from 'react-router-dom'
@@ -139,9 +139,11 @@ function PositionList({ positions }) {
             <DoubleTokenLogo size={16} a0={position.pair.token0.id} a1={position.pair.token1.id} margin={!below740} />
           </AutoColumn>
           <AutoColumn gap="8px" justify="flex-start" style={{ marginLeft: '20px' }}>
-            <Text style={{ whiteSpace: 'nowrap' }} to={'/pair/'}>
-              {position.pair.token0.symbol + '-' + position.pair.token1.symbol}
-            </Text>
+            <CustomLink to={'/pair/' + position.pair.id}>
+              <Text style={{ whiteSpace: 'nowrap' }} to={'/pair/'}>
+                {position.pair.token0.symbol + '-' + position.pair.token1.symbol}
+              </Text>
+            </CustomLink>
             <AutoColumn gap="8px" justify="flex-start">
               <Link external href={getPoolLink(position.pair.token0.id, position.pair.token1.id)}>
                 Add
