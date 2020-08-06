@@ -2,7 +2,7 @@ import React, { createContext, useContext, useReducer, useMemo, useCallback, use
 import { client } from '../apollo/client'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
-import { useTimeframe, useWeb3 } from './Application'
+import { useTimeframe } from './Application'
 import { timeframeOptions } from '../constants'
 import { getPercentChange, getBlockFromTimestamp, getBlocksFromTimestamps, get2DayPercentChange } from '../utils'
 import {
@@ -612,8 +612,6 @@ export function useTopLps() {
 
   const allPairs = useAllPairData()
 
-  const web3 = useWeb3()
-
   useEffect(() => {
     async function fetchData() {
       // get top 20 by reserves
@@ -632,10 +630,10 @@ export function useTopLps() {
             },
             fetchPolicy: 'cache-first'
           })
-          for (let i = 0; i < results.liquidityPositions.length; i++) {
-            let code = await web3.eth.getCode(results.liquidityPositions[i].user.id)
-            results.liquidityPositions[i].type = code === '0x' ? 'EOA' : 'Smart Contract'
-          }
+          // for (let i = 0; i < results.liquidityPositions.length; i++) {
+          //   let code = await web3.eth.getCode(results.liquidityPositions[i].user.id)
+          //   results.liquidityPositions[i].type = code === '0x' ? 'EOA' : 'Smart Contract'
+          // }
           return results.liquidityPositions
         })
       )
@@ -651,7 +649,6 @@ export function useTopLps() {
             pairAddress: entry.pair.id,
             token0: pairData.token0.id,
             token1: pairData.token1.id,
-            type: entry.type ?? 'EOA',
             usd:
               (parseFloat(entry.liquidityTokenBalance) / parseFloat(pairData.totalSupply)) *
               parseFloat(pairData.reserveUSD)
@@ -664,7 +661,7 @@ export function useTopLps() {
       updateTopLps(shorter)
     }
 
-    if (!topLps && allPairs && Object.keys(allPairs).length > 0 && web3) {
+    if (!topLps && allPairs && Object.keys(allPairs).length > 0) {
       fetchData()
     }
   })

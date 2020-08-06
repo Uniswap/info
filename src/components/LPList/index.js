@@ -41,8 +41,8 @@ const List = styled(Box)`
 const DashGrid = styled.div`
   display: grid;
   grid-gap: 1em;
-  grid-template-columns: 10px 1.5fr 1fr 1fr 1fr;
-  grid-template-areas: 'number name type pair value';
+  grid-template-columns: 10px 1.5fr 1fr 1fr;
+  grid-template-areas: 'number name pair value';
   padding: 0 4px;
 
   > * {
@@ -78,7 +78,6 @@ const DataText = styled(Flex)`
 function LPList({ lps, disbaleLinks, maxItems = 10 }) {
   const below600 = useMedia('(max-width: 600px)')
   const below800 = useMedia('(max-width: 800px)')
-  const below1080 = useMedia('(max-width: 1080px)')
 
   // pagination
   const [page, setPage] = useState(1)
@@ -114,11 +113,11 @@ function LPList({ lps, disbaleLinks, maxItems = 10 }) {
           </CustomLink>
         </DataText>
 
-        {!below1080 && (
+        {/* {!below1080 && (
           <DataText area="type" justifyContent="flex-end">
             {lp.type}
           </DataText>
-        )}
+        )} */}
 
         <DataText>
           <CustomLink area="pair" to={'/pair/' + lp.pairAddress}>
@@ -159,11 +158,11 @@ function LPList({ lps, disbaleLinks, maxItems = 10 }) {
             Account
           </Text>
         </Flex>
-        {!below1080 && (
+        {/* {!below1080 && (
           <Flex alignItems="center" justifyContent="flexEnd">
             <TYPE.main area="type">Type</TYPE.main>
           </Flex>
-        )}
+        )} */}
         <Flex alignItems="center" justifyContent="flexEnd">
           <TYPE.main area="pair">Pair</TYPE.main>
         </Flex>
