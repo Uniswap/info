@@ -141,7 +141,7 @@ const PairReturnsChart = ({ account, position }) => {
                 strokeWidth={2}
                 dot={false}
                 type="monotone"
-                name={'(USD)'}
+                name={'Liquidity Value'}
                 dataKey={'usdValue'}
                 yAxisId={0}
                 stroke={darken(0.12, color)}
@@ -202,7 +202,7 @@ const PairReturnsChart = ({ account, position }) => {
                 strokeWidth={2}
                 dot={false}
                 type="monotone"
-                name={' (USD)'}
+                name={'Fees Earned (Cumulative)'}
                 dataKey={'fees'}
                 yAxisId={0}
                 stroke={darken(0.12, color)}
