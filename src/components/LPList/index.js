@@ -5,6 +5,7 @@ import LocalLoader from '../LocalLoader'
 import utc from 'dayjs/plugin/utc'
 import { Box, Flex, Text } from 'rebass'
 import styled from 'styled-components'
+import Web3 from 'web3'
 
 import { CustomLink } from '../Link'
 import { Divider } from '..'
@@ -41,12 +42,17 @@ const List = styled(Box)`
 const DashGrid = styled.div`
   display: grid;
   grid-gap: 1em;
-  grid-template-columns: 10px 1.5fr 1fr 1fr;
-  grid-template-areas: 'number name pair value';
+  grid-template-columns: 10px 1.5fr 1fr 1fr 1fr;
+  grid-template-areas: 'number name type pair value';
   padding: 0 4px;
 
   > * {
     justify-content: flex-end;
+  }
+
+  @media screen and (max-width: 1080px) {
+    grid-template-columns: 10px 1.5fr 1fr 1fr;
+    grid-template-areas: 'number name pair value';
   }
 
   @media screen and (max-width: 600px) {
@@ -70,9 +76,10 @@ const DataText = styled(Flex)`
   }
 `
 
-function LPList({ lps, color, disbaleLinks, maxItems = 10 }) {
+function LPList({ lps, disbaleLinks, maxItems = 10 }) {
   const below600 = useMedia('(max-width: 600px)')
   const below800 = useMedia('(max-width: 800px)')
+  const below1080 = useMedia('(max-width: 1080px)')
 
   // pagination
   const [page, setPage] = useState(1)
@@ -94,6 +101,22 @@ function LPList({ lps, color, disbaleLinks, maxItems = 10 }) {
     }
   }, [ITEMS_PER_PAGE, lps])
 
+  const web3 = new Web3(new Web3.providers.HttpProvider(process.env.REACT_APP_NETWORK_URL))
+
+  const [formattedLps, setFormattedLps] = useState()
+  useEffect(() => {
+    async function fetch() {
+      for (let i = 0; i < lps.length; i++) {
+        let code = await web3.eth.getCode(lps[i].user.id)
+        lps[i].type = code === '0x' ? 'EOA' : 'Smart Contract'
+      }
+      setFormattedLps(lps)
+    }
+    if (!formattedLps && lps) {
+      fetch()
+    }
+  }, [formattedLps, lps, web3.eth])
+
   const ListItem = ({ lp, index }) => {
     return (
       <DashGrid style={{ height: '48px' }} disbaleLinks={disbaleLinks} focus={true}>
@@ -102,13 +125,20 @@ function LPList({ lps, color, disbaleLinks, maxItems = 10 }) {
             {index}
           </DataText>
         )}
+
         <DataText area="name" fontWeight="500" justifyContent="flex-start">
           <CustomLink style={{ marginLeft: below600 ? 0 : '1rem', whiteSpace: 'nowrap' }} to={'/account/' + lp.user.id}>
             {below800 ? lp.user.id.slice(0, 4) + '...' + lp.user.id.slice(38, 42) : lp.user.id}
           </CustomLink>
         </DataText>
 
-        <DataText area="name">
+        {!below1080 && (
+          <DataText area="type" justifyContent="flex-end">
+            {lp.type}
+          </DataText>
+        )}
+
+        <DataText>
           <CustomLink area="pair" to={'/pair/' + lp.pairAddress}>
             <RowFixed>
               {!below600 && <DoubleTokenLogo a0={lp.token0} a1={lp.token1} size={16} margin={true} />}
@@ -122,8 +152,8 @@ function LPList({ lps, color, disbaleLinks, maxItems = 10 }) {
   }
 
   const lpList =
-    lps &&
-    lps.slice(ITEMS_PER_PAGE * (page - 1), page * ITEMS_PER_PAGE).map((lp, index) => {
+    formattedLps &&
+    formattedLps.slice(ITEMS_PER_PAGE * (page - 1), page * ITEMS_PER_PAGE).map((lp, index) => {
       return (
         <div key={index}>
           <ListItem key={index} index={(page - 1) * 10 + index + 1} lp={lp} />
@@ -147,11 +177,16 @@ function LPList({ lps, color, disbaleLinks, maxItems = 10 }) {
             Account
           </Text>
         </Flex>
+        {!below1080 && (
+          <Flex alignItems="center" justifyContent="flexEnd">
+            <TYPE.main area="type">Type</TYPE.main>
+          </Flex>
+        )}
         <Flex alignItems="center" justifyContent="flexEnd">
           <TYPE.main area="pair">Pair</TYPE.main>
         </Flex>
         <Flex alignItems="center" justifyContent="flexEnd">
-          <TYPE.main area="value">USD Supplied</TYPE.main>
+          <TYPE.main area="value">Value</TYPE.main>
         </Flex>
       </DashGrid>
       <Divider />

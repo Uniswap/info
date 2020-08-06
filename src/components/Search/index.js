@@ -11,7 +11,7 @@ import { useAllPairData, usePairData } from '../../contexts/PairData'
 import DoubleTokenLogo from '../DoubleLogo'
 import { useMedia } from 'react-use'
 import { useAllPairsInUniswap, useAllTokensInUniswap } from '../../contexts/GlobalData'
-import { OVERVIEW_TOKEN_BLACKLIST, OVERVIEW_PAIR_BLACKLIST } from '../../constants'
+import { OVERVIEW_TOKEN_BLACKLIST } from '../../constants'
 
 import { transparentize } from 'polished'
 
@@ -211,9 +211,6 @@ export const Search = ({ small = false }) => {
             return 0
           })
           .filter(pair => {
-            if (OVERVIEW_PAIR_BLACKLIST.includes(pair.id)) {
-              return false
-            }
             if (value && value.includes(' ')) {
               const pairA = value.split(' ')[0]?.toUpperCase()
               const pairB = value.split(' ')[1]?.toUpperCase()

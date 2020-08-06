@@ -19,6 +19,7 @@ import DoubleTokenLogo from '../components/DoubleLogo'
 import { TrendingUp, PieChart, Activity } from 'react-feather'
 import { SubNav, SubNavEl } from '../components/index'
 import Link from '../components/Link'
+import { FEE_WARNING_TOKENS } from '../constants'
 
 const ListOptions = styled(AutoRow)`
   height: 40px;
@@ -88,6 +89,15 @@ const PanelWrapper = styled.div`
   align-items: start;
 `
 
+const Warning = styled.div`
+  background-color: ${({ theme }) => theme.bg2}
+  padding: 1rem;
+  font-weight: 600;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+  width: calc(100% - 2rem);
+`
+
 const LIST_VIEW = {
   POSITIONS: 'POSITIONS',
   TRANSACTIONS: 'TRANSACTIONS',
@@ -113,6 +123,21 @@ function AccountPage({ account }) {
         }, 0)
       : 0
   }, [transactions])
+
+  // if any position has token from fee warning list, show warning
+  const [showWarning, setShowWarning] = useState(false)
+  useEffect(() => {
+    if (positions) {
+      for (let i = 0; i < positions.length; i++) {
+        if (
+          FEE_WARNING_TOKENS.includes(positions[i].pair.token0.id) ||
+          FEE_WARNING_TOKENS.includes(positions[i].pair.token1.id)
+        ) {
+          setShowWarning(true)
+        }
+      }
+    }
+  }, [positions])
 
   // settings for list view and dropdowns
   const hideLPContent = positions && positions.length === 0
@@ -184,6 +209,9 @@ function AccountPage({ account }) {
       </FixedMenu>
       <ContentWrapper>
         <DashboardWrapper>
+          {showWarning && (
+            <Warning>Note: Fees from pairs including AMPL may be incorrect due to token mechanics.</Warning>
+          )}
           {!hideLPContent && (
             <DropdownWrapper>
               <ButtonDropdown
@@ -262,7 +290,7 @@ function AccountPage({ account }) {
                   </RowBetween>
                   <RowFixed align="flex-end">
                     <TYPE.main fontSize={'24px'} lineHeight={1} fontWeight={600}>
-                      {formattedNum(positionValue, true)}
+                      {positionValue ? formattedNum(positionValue, true) : '-'}
                     </TYPE.main>
                   </RowFixed>
                 </AutoColumn>
@@ -274,8 +302,13 @@ function AccountPage({ account }) {
                     <div />
                   </RowBetween>
                   <RowFixed align="flex-end">
-                    <TYPE.main fontSize={'24px'} lineHeight={1} fontWeight={600} color="green">
-                      {formattedNum(aggregateFees, true, true)}
+                    <TYPE.main
+                      fontSize={'24px'}
+                      lineHeight={1}
+                      fontWeight={600}
+                      color={aggregateFees ? 'green' : 'black'}
+                    >
+                      {aggregateFees ? formattedNum(aggregateFees, true, true) : '-'}
                     </TYPE.main>
                   </RowFixed>
                 </AutoColumn>

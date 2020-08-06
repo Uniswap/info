@@ -11,7 +11,7 @@ import { Divider } from '../../components'
 import { withRouter } from 'react-router-dom'
 import { formattedNum } from '../../utils'
 import DoubleTokenLogo from '../DoubleLogo'
-import { OVERVIEW_PAIR_BLACKLIST } from '../../constants'
+import {} from '../../constants'
 
 dayjs.extend(utc)
 
@@ -195,8 +195,7 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
       .slice(ITEMS_PER_PAGE * (page - 1), page * ITEMS_PER_PAGE)
       .map((pairAddress, index) => {
         return (
-          pairAddress &&
-          !OVERVIEW_PAIR_BLACKLIST.includes(pairAddress) && (
+          pairAddress && (
             <div key={index}>
               <ListItem key={index} index={(page - 1) * 10 + index + 1} pairAddress={pairAddress} />
               <Divider />

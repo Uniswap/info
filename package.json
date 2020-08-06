@@ -12,6 +12,7 @@
     "@types/react": "^16.9.36",
     "@types/react-dom": "^16.9.8",
     "@types/styled-components": "^5.1.0",
+    "@web3-react/core": "^6.1.1",
     "animated-number-react": "^0.1.1",
     "apollo-cache-inmemory": "^1.6.3",
     "apollo-client": "^2.6.4",
@@ -59,7 +60,8 @@
     "typescript": "^3.9.5",
     "unstated": "^2.1.1",
     "wcag-contrast": "^3.0.0",
-    "web3-react": "^5.0.4"
+    "web3": "^1.2.11",
+    "web3-react": "^5.0.5"
   },
   "scripts": {
     "start": "react-scripts start",

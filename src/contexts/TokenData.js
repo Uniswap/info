@@ -425,55 +425,57 @@ const getIntervalTokenData = async (tokenAddress, startTime, interval = 3600) =>
   let blocks
   try {
     blocks = await getBlocksFromTimestamps(timestamps)
-  } catch (e) {
-    console.log('error fetchign blocks')
-  }
-  // catch failing case
-  if (!blocks || blocks.length === 0) {
-    return []
-  }
 
-  // pass the blocks to a token query
-  let result = await client.query({
-    query: PRICES_BY_BLOCK(tokenAddress, blocks),
-    fetchPolicy: 'cache-first'
-  })
+    // catch failing case
+    if (!blocks || blocks.length === 0) {
+      return []
+    }
 
-  // format token ETH price results
-  let values = []
-  for (var row in result?.data) {
-    let timestamp = row.split('t')[1]
-    let derivedETH = parseFloat(result.data[row]?.derivedETH)
-    if (timestamp) {
-      values.push({
-        timestamp,
-        derivedETH
+    // pass the blocks to a token query
+    let result = await client.query({
+      query: PRICES_BY_BLOCK(tokenAddress, blocks),
+      fetchPolicy: 'cache-first'
+    })
+
+    // format token ETH price results
+    let values = []
+    for (var row in result?.data) {
+      let timestamp = row.split('t')[1]
+      let derivedETH = parseFloat(result.data[row]?.derivedETH)
+      if (timestamp) {
+        values.push({
+          timestamp,
+          derivedETH
+        })
+      }
+    }
+
+    // go through eth usd prices and assign to original values array
+    let index = 0
+    for (var brow in result?.data) {
+      let timestamp = brow.split('b')[1]
+      if (timestamp) {
+        values[index].priceUSD = result.data[brow].ethPrice * values[index].derivedETH
+        index += 1
+      }
+    }
+
+    let formattedHistory = []
+
+    // for each hour, construct the open and close price
+    for (let i = 0; i < values.length - 1; i++) {
+      formattedHistory.push({
+        timestamp: values[i].timestamp,
+        open: parseFloat(values[i].priceUSD),
+        close: parseFloat(values[i + 1].priceUSD)
       })
     }
+
+    return formattedHistory
+  } catch (e) {
+    console.log('error fetching blocks')
+    return []
   }
-
-  // go through eth usd prices and assign to original values array
-  let index = 0
-  for (var brow in result?.data) {
-    let timestamp = brow.split('b')[1]
-    if (timestamp) {
-      values[index].priceUSD = result.data[brow].ethPrice * values[index].derivedETH
-      index += 1
-    }
-  }
-
-  let formattedHistory = []
-
-  // for each hour, construct the open and close price
-  for (let i = 0; i < values.length - 1; i++) {
-    formattedHistory.push({
-      timestamp: values[i].timestamp,
-      open: parseFloat(values[i].priceUSD),
-      close: parseFloat(values[i + 1].priceUSD)
-    })
-  }
-
-  return formattedHistory
 }
 
 const getTokenChartData = async tokenAddress => {

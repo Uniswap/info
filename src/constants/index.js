@@ -15,10 +15,12 @@ export const OVERVIEW_TOKEN_BLACKLIST = [
   '0x495c7f3a713870f68f8b418b355c085dfdc412c3',
   '0xc3761eb917cd790b30dad99f6cc5b4ff93c4f9ea',
   '0xe31debd7abff90b06bca21010dd860d8701fd901'
-  // '0x1b76d0364e803fb94c1d5ca9faf55f05ee494731'
 ]
 
-export const OVERVIEW_PAIR_BLACKLIST = []
+/**
+ * For tokens that cause erros on fee calculations
+ */
+export const FEE_WARNING_TOKENS = ['0xd46ba6d942050d489dbd938a2c909a5d5039a161']
 
 export const SURPRESS_WARNINGS = [
   '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',

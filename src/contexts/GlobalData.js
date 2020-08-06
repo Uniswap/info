@@ -18,7 +18,6 @@ import {
 import weekOfYear from 'dayjs/plugin/weekOfYear'
 import { getV1Data } from './V1Data'
 import { useAllPairData } from './PairData'
-
 const UPDATE = 'UPDATE'
 const UPDATE_TXNS = 'UPDATE_TXNS'
 const UPDATE_CHART = 'UPDATE_CHART'
@@ -616,13 +615,13 @@ export function useTopLps() {
   useEffect(() => {
     async function fetchData() {
       // get top 20 by reserves
-      let top200Pairs = Object.keys(allPairs)
+      let topPairs = Object.keys(allPairs)
         ?.sort((a, b) => parseFloat(allPairs[a].reserveUSD > allPairs[b].reserveUSD ? -1 : 1))
-        ?.slice(0, 199)
+        ?.slice(0, 99)
         .map(pair => pair)
 
       let topLpLists = await Promise.all(
-        top200Pairs.map(async pair => {
+        topPairs.map(async pair => {
           // for each one, fetch top LPs
           const { data: lps } = await client.query({
             query: TOP_LPS_PER_PAIRS,
@@ -654,11 +653,11 @@ export function useTopLps() {
       })
 
       const sorted = topLps.sort((a, b) => (a.usd > b.usd ? -1 : 1))
-      const shorter = sorted.splice(0, 200)
+      const shorter = sorted.splice(0, 100)
       updateTopLps(shorter)
     }
 
-    if (!topLps) {
+    if (!topLps && allPairs && Object.keys(allPairs).length > 0) {
       fetchData()
     }
   })
