@@ -3,7 +3,7 @@ name: Upload uniswap.info
 on:
   push:
     branches:
-      - master
+      - v2
 
 jobs:
   deploy:
