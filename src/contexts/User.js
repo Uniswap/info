@@ -336,19 +336,21 @@ export function useUserLiquidityChart(account) {
       // for each day, map over all positions and sum USD, push value to history
       let newData = []
       for (var row in dayDatas) {
+        let currentDay = {}
         let timestamp = row.split('t')[1]
         let valueUSD = 0
         if (timestamp) {
           for (let i = 0; i < dayDatas[row].length; i++) {
             let pairInfo = dayDatas[row][i]
-            valueUSD +=
+            const pairLiquidityValue =
               (parseFloat(pairInfo.liquidityTokenBalance) / pairInfo.pair.totalSupply) * pairInfo.pair.reserveUSD
+            valueUSD += pairLiquidityValue
+            currentDay[pairInfo.pair.id] = pairLiquidityValue
           }
+          currentDay.date = timestamp
+          currentDay.valueUSD = valueUSD
         }
-        newData.push({
-          date: timestamp,
-          valueUSD: valueUSD
-        })
+        newData.push(currentDay)
       }
 
       setFormattedHistory(newData)
