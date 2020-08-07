@@ -158,6 +158,7 @@ export function useStartTimestamp() {
   return startDateTimestamp
 }
 
+// keep track of session length for refresh ticker
 export function useSessionStart() {
   const [state, { updateSessionStart }] = useApplicationContext()
   const sessionStart = state?.[SESSION_START]
@@ -182,6 +183,10 @@ export function useSessionStart() {
   return parseInt(seconds / 1000)
 }
 
+/**
+ * @todo this isnt used now - if ever needed probably better to use
+ * web3-react instead of this custom hook
+ */
 export function useWeb3() {
   const [state, { updateWeb3 }] = useApplicationContext()
   const web3 = state?.[WEB3]

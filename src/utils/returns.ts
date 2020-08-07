@@ -168,7 +168,6 @@ export async function getHistoricalPairReturns(startDateTimestamp, currentPairDa
   if (!currentPairData.createdAtTimestamp) {
     return null
   }
-
   let dayIndex: number = Math.round(startDateTimestamp / 86400) // get unique day bucket unix
   const currentDayIndex: number = Math.round(dayjs.utc().unix() / 86400)
   let sortedPositions = pairSnapshots.sort((a, b) => {
@@ -181,7 +180,7 @@ export async function getHistoricalPairReturns(startDateTimestamp, currentPairDa
   const dayTimestamps = []
   while (dayIndex < currentDayIndex) {
     // only account for days where this pair existed
-    if (dayIndex * 86400 > parseInt(currentPairData.createdAtTimestamp)) {
+    if (dayIndex * 86400 >= parseInt(currentPairData.createdAtTimestamp)) {
       dayTimestamps.push(dayIndex * 86400)
     }
     dayIndex = dayIndex + 1
@@ -208,7 +207,6 @@ export async function getHistoricalPairReturns(startDateTimestamp, currentPairDa
     const dailyChanges = pairSnapshots.filter(snapshot => {
       return snapshot.timestamp < timestampCeiling && snapshot.timestamp > dayTimestamp
     })
-
     for (let i = 0; i < dailyChanges.length; i++) {
       const positionT1 = dailyChanges[i]
       const localReturns = getMetricsForPositionWindow(positionT0, positionT1)
@@ -234,8 +232,10 @@ export async function getHistoricalPairReturns(startDateTimestamp, currentPairDa
     if (positionT1) {
       positionT1.liquidityTokenTotalSupply = positionT1.totalSupply
       positionT1.liquidityTokenBalance = positionT0.liquidityTokenBalance
+      const currentLiquidityValue =
+        (parseFloat(positionT1.liquidityTokenBalance) / parseFloat(positionT1.liquidityTokenTotalSupply)) *
+        parseFloat(positionT1.reserveUSD)
       const localReturns = getMetricsForPositionWindow(positionT0, positionT1)
-      const currentLiquidityValue = (positionT1.liquidityTokenBalance / positionT1.totalSupply) * positionT1.reserveUSD
       const localFees = netFees + localReturns.fees
 
       formattedHistory.push({

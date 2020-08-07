@@ -8,7 +8,7 @@ import { OptionButton } from '../ButtonStyled'
 import { useMedia } from 'react-use'
 import { timeframeOptions } from '../../constants'
 import DropdownSelect from '../DropdownSelect'
-import { useUserPositionChart } from '../../contexts/User'
+import { useUserPositionChart, useUserLiquidityChart } from '../../contexts/User'
 import { useTimeframe } from '../../contexts/Application'
 import LocalLoader from '../LocalLoader'
 import { darken } from 'polished'
@@ -35,7 +35,8 @@ const CHART_VIEW = {
 }
 
 const PairReturnsChart = ({ account, position }) => {
-  let data = useUserPositionChart(position, account)
+  let feeData = useUserPositionChart(position, account)
+  let liquidtyData = useUserLiquidityChart(account)
 
   const [chartView, setChartView] = useState(CHART_VIEW.VALUE)
 
@@ -47,7 +48,14 @@ const PairReturnsChart = ({ account, position }) => {
 
   // based on window, get starttime
   let utcStartTime = getTimeframe(timeWindow)
-  data = data?.filter(entry => entry.date >= utcStartTime)
+  feeData = feeData?.filter(entry => entry.date >= utcStartTime)
+
+  liquidtyData = liquidtyData
+    ?.filter(entry => entry.date >= utcStartTime)
+    .map(entry => {
+      entry.usdValue = parseFloat(entry[position.pair.id])
+      return !isNaN(parseFloat(entry[position.pair.id])) && entry
+    })
 
   const aspect = below600 ? 60 / 42 : 60 / 16
 
@@ -93,8 +101,8 @@ const PairReturnsChart = ({ account, position }) => {
 
       {chartView === CHART_VIEW.VALUE ? (
         <ResponsiveContainer aspect={aspect}>
-          {data ? (
-            <AreaChart margin={{ top: 0, right: 0, bottom: 6, left: 0 }} barCategoryGap={1} data={data}>
+          {liquidtyData ? (
+            <AreaChart margin={{ top: 0, right: 0, bottom: 6, left: 0 }} barCategoryGap={1} data={liquidtyData}>
               <defs>
                 <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor={color} stopOpacity={0.35} />
@@ -154,8 +162,8 @@ const PairReturnsChart = ({ account, position }) => {
         </ResponsiveContainer>
       ) : (
         <ResponsiveContainer aspect={aspect}>
-          {data ? (
-            <AreaChart margin={{ top: 0, right: 0, bottom: 6, left: 0 }} barCategoryGap={1} data={data}>
+          {feeData ? (
+            <AreaChart margin={{ top: 0, right: 0, bottom: 6, left: 0 }} barCategoryGap={1} data={feeData}>
               <defs>
                 <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor={color} stopOpacity={0.35} />

@@ -160,7 +160,7 @@ function AccountPage({ account }) {
               position?.pair?.reserveUSD
           )
         }, 0)
-      : 0
+      : null
   }, [dynamicPositions])
 
   const OverviewRef = useRef()
@@ -288,7 +288,11 @@ function AccountPage({ account }) {
                   </RowBetween>
                   <RowFixed align="flex-end">
                     <TYPE.main fontSize={'24px'} lineHeight={1} fontWeight={600}>
-                      {positionValue ? formattedNum(positionValue, true) : '-'}
+                      {positionValue
+                        ? formattedNum(positionValue, true)
+                        : positionValue === 0
+                        ? formattedNum(0, true)
+                        : '-'}
                     </TYPE.main>
                   </RowFixed>
                 </AutoColumn>

@@ -3,8 +3,13 @@ import { client } from '../apollo/client'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { useTimeframe } from './Application'
-import { timeframeOptions } from '../constants'
-import { getPercentChange, getBlockFromTimestamp, getBlocksFromTimestamps, get2DayPercentChange } from '../utils'
+import {
+  getPercentChange,
+  getBlockFromTimestamp,
+  getBlocksFromTimestamps,
+  get2DayPercentChange,
+  getTimeframe
+} from '../utils'
 import {
   GLOBAL_DATA,
   GLOBAL_TXNS,
@@ -12,11 +17,9 @@ import {
   ETH_PRICE,
   ALL_PAIRS,
   ALL_TOKENS,
-  PAIR_CHART,
   TOP_LPS_PER_PAIRS
 } from '../apollo/queries'
 import weekOfYear from 'dayjs/plugin/weekOfYear'
-import { getV1Data } from './V1Data'
 import { useAllPairData } from './PairData'
 const UPDATE = 'UPDATE'
 const UPDATE_TXNS = 'UPDATE_TXNS'
@@ -27,6 +30,7 @@ const UPDATE_ALL_PAIRS_IN_UNISWAP = 'UPDAUPDATE_ALL_PAIRS_IN_UNISWAPTE_TOP_PAIRS
 const UPDATE_ALL_TOKENS_IN_UNISWAP = 'UPDATE_ALL_TOKENS_IN_UNISWAP'
 const UPDATE_TOP_LPS = 'UPDATE_TOP_LPS'
 
+// format dayjs with the libraries that we need
 dayjs.extend(utc)
 dayjs.extend(weekOfYear)
 
@@ -199,27 +203,41 @@ export default function Provider({ children }) {
   )
 }
 
+/**
+ * Gets all the global data for the overview page.
+ * Needs current eth price and the old eth price to get
+ * 24 hour USD changes.
+ * @param {*} ethPrice
+ * @param {*} oldEthPrice
+ */
 async function getGlobalData(ethPrice, oldEthPrice) {
+  // data for each day , historic data used for % changes
   let data = {}
   let oneDayData = {}
   let twoDayData = {}
+
   try {
+    // get timestamps for the days
     const utcCurrentTime = dayjs()
     const utcOneDayBack = utcCurrentTime.subtract(1, 'day').unix()
     const utcTwoDaysBack = utcCurrentTime.subtract(2, 'day').unix()
+
+    // get the blocks needed for time travel queries
     let [oneDayBlock, twoDayBlock] = await getBlocksFromTimestamps([utcOneDayBack, utcTwoDaysBack])
 
+    // fetch the global data
     let result = await client.query({
       query: GLOBAL_DATA(),
       fetchPolicy: 'cache-first'
     })
     data = result.data.uniswapFactories[0]
+
+    // fetch the historical data
     let oneDayResult = await client.query({
       query: GLOBAL_DATA(oneDayBlock?.number),
       fetchPolicy: 'cache-first'
     })
     oneDayData = oneDayResult.data.uniswapFactories[0]
-
     let twoDayResult = await client.query({
       query: GLOBAL_DATA(twoDayBlock?.number),
       fetchPolicy: 'cache-first'
@@ -245,12 +263,14 @@ async function getGlobalData(ethPrice, oldEthPrice) {
         twoDayData.txCount ? twoDayData.txCount : 0
       )
 
+      // format the total liquidity in USD
       data.totalLiquidityUSD = data.totalLiquidityETH * ethPrice
-
       const liquidityChangeUSD = getPercentChange(
         data.totalLiquidityETH * ethPrice,
         oneDayData.totalLiquidityETH * oldEthPrice
       )
+
+      // add relevant fields with the calculated amounts
       data.oneDayVolumeUSD = oneDayVolumeUSD
       data.volumeChangeUSD = volumeChangeUSD
       data.oneDayVolumeETH = oneDayVolumeETH
@@ -258,9 +278,6 @@ async function getGlobalData(ethPrice, oldEthPrice) {
       data.liquidityChangeUSD = liquidityChangeUSD
       data.oneDayTxns = oneDayTxns
       data.txnChange = txnChange
-
-      const v1Data = await getV1Data()
-      data.v1Data = v1Data
     }
   } catch (e) {
     console.log(e)
@@ -269,6 +286,11 @@ async function getGlobalData(ethPrice, oldEthPrice) {
   return data
 }
 
+/**
+ * Get historical data for volume and liquidity used in global charts
+ * on main page
+ * @param {*} oldestDateToFetch // start of window to fetch from
+ */
 const getChartData = async oldestDateToFetch => {
   let data = []
   let weeklyData = []
@@ -284,48 +306,22 @@ const getChartData = async oldestDateToFetch => {
       fetchPolicy: 'cache-first'
     })
 
-    let blockedResult = await client.query({
-      query: PAIR_CHART,
-      variables: {
-        pairAddress: '0xed9c854cb02de75ce4c9bba992828d6cb7fd5c71'
-      },
-      fetchPolicy: 'cache-first'
-    })
-
-    let blockedResultOther = await client.query({
-      query: PAIR_CHART,
-      variables: {
-        pairAddress: '0x257d37ce4d0796ea2efebcb49b46e34002cc65d3'
-      },
-      fetchPolicy: 'cache-first'
-    })
-
     data = [...result.data.uniswapDayDatas]
 
     if (data) {
       let dayIndexSet = new Set()
       let dayIndexArray = []
       const oneDay = 24 * 60 * 60
+
+      // for each day, parse the daily volume and format for chart array
       data.forEach((dayData, i) => {
         // add the day index to the set of days
         dayIndexSet.add((data[i].date / oneDay).toFixed(0))
         dayIndexArray.push(data[i])
         dayData.dailyVolumeUSD = parseFloat(dayData.dailyVolumeUSD)
-        blockedResult.data.pairDayDatas.map(blockedDay => {
-          if (blockedDay.date === dayData.date && dayData.dailyVolumeUSD > blockedDay.dailyVolumeUSD) {
-            dayData.dailyVolumeUSD = dayData.dailyVolumeUSD - parseFloat(blockedDay.dailyVolumeUSD)
-          }
-          return true
-        })
-        blockedResultOther.data.pairDayDatas.map(blockedDay => {
-          if (blockedDay.date === dayData.date && dayData.dailyVolumeUSD > blockedDay.dailyVolumeUSD) {
-            dayData.dailyVolumeUSD = dayData.dailyVolumeUSD - parseFloat(blockedDay.dailyVolumeUSD)
-          }
-          return true
-        })
       })
 
-      // fill in empty days
+      // fill in empty days ( there will be no day datas if no trades made that day )
       let timestamp = data[0].date ? data[0].date : oldestDateToFetch
       let latestLiquidityUSD = data[0].totalLiquidityUSD
       let latestDayDats = data[0].mostLiquidTokens
@@ -349,10 +345,11 @@ const getChartData = async oldestDateToFetch => {
       }
     }
 
+    // format weekly data for weekly sized chunks
     data = data.sort((a, b) => (parseInt(a.date) > parseInt(b.date) ? 1 : -1))
     let startIndexWeekly = -1
     let currentWeek = -1
-    data.forEach((dayData, i) => {
+    data.forEach((entry, i) => {
       const week = dayjs.utc(dayjs.unix(data[i].date)).week()
       if (week !== currentWeek) {
         currentWeek = week
@@ -370,6 +367,9 @@ const getChartData = async oldestDateToFetch => {
   return [data, weeklyData]
 }
 
+/**
+ * Get and format transactions for global page
+ */
 const getGlobalTransactions = async () => {
   let transactions = {}
 
@@ -407,6 +407,9 @@ const getGlobalTransactions = async () => {
   return transactions
 }
 
+/**
+ * Gets the current price  of ETH, 24 hour price, and % change between them
+ */
 const getEthPrice = async () => {
   const utcCurrentTime = dayjs()
   const utcOneDayBack = utcCurrentTime
@@ -440,6 +443,9 @@ const getEthPrice = async () => {
   return [ethPrice, ethPriceOneDay, priceChangeETH]
 }
 
+/**
+ * Loop through every pair on uniswap, used for search
+ */
 async function getAllPairsOnUniswap() {
   try {
     let allFound = false
@@ -465,6 +471,9 @@ async function getAllPairsOnUniswap() {
   }
 }
 
+/**
+ * Loop through every token on uniswap, used for search
+ */
 async function getAllTokensOnUniswap() {
   try {
     let allFound = false
@@ -490,6 +499,9 @@ async function getAllTokensOnUniswap() {
   }
 }
 
+/**
+ * Hook that fetches overview data, plus all tokens and pairs for search
+ */
 export function useGlobalData() {
   const [state, { update, updateAllPairsInUniswap, updateAllTokensInUniswap }] = useGlobalDataContext()
   const [ethPrice, oldEthPrice] = useEthPrice()
@@ -523,29 +535,23 @@ export function useGlobalChartData() {
   const chartDataDaily = state?.chartData?.daily
   const chartDataWeekly = state?.chartData?.weekly
 
-  // monitor the old date fetched
+  /**
+   * Keep track of oldest date fetched. Used to
+   * limit data fetched until its actually needed.
+   * (dont fetch year long stuff unless year option selected)
+   */
   useEffect(() => {
-    const utcEndTime = dayjs.utc()
     // based on window, get starttime
-    let utcStartTime
-    switch (activeWindow) {
-      case timeframeOptions.WEEK:
-        utcStartTime = utcEndTime.subtract(1, 'week').startOf('day')
-        break
-      case timeframeOptions.ALL_TIME:
-        utcStartTime = utcEndTime.subtract(1, 'year')
-        break
-      default:
-        utcStartTime = utcEndTime.subtract(1, 'year').startOf('year')
-        break
-    }
-    let startTime = utcStartTime.startOf('hour').unix() - 1
+    let startTime = getTimeframe(activeWindow)
 
     if ((activeWindow && startTime < oldestDateFetch) || !oldestDateFetch) {
       setOldestDateFetched(startTime)
     }
   }, [activeWindow, oldestDateFetch])
 
+  /**
+   * Fetch data if none fetched or older data is needed
+   */
   useEffect(() => {
     async function fetchData() {
       // historical stuff for chart
@@ -606,6 +612,10 @@ export function useAllTokensInUniswap() {
   return allTokens || []
 }
 
+/**
+ * Get the top liquidity positions based on USD size
+ * @TODO Not a perfect lookup needs improvement
+ */
 export function useTopLps() {
   const [state, { updateTopLps }] = useGlobalDataContext()
   let topLps = state?.topLps
@@ -630,10 +640,6 @@ export function useTopLps() {
             },
             fetchPolicy: 'cache-first'
           })
-          // for (let i = 0; i < results.liquidityPositions.length; i++) {
-          //   let code = await web3.eth.getCode(results.liquidityPositions[i].user.id)
-          //   results.liquidityPositions[i].type = code === '0x' ? 'EOA' : 'Smart Contract'
-          // }
           return results.liquidityPositions
         })
       )

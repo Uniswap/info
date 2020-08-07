@@ -10,10 +10,9 @@ import _Decimal from 'decimal.js-light'
 import toFormat from 'toformat'
 import { timeframeOptions } from '../constants'
 
+// format libraries
 const Decimal = toFormat(_Decimal)
-
 BigNumber.set({ EXPONENTIAL_AT: 50 })
-
 dayjs.extend(utc)
 
 export function getTimeframe(timeWindow) {
@@ -25,18 +24,22 @@ export function getTimeframe(timeWindow) {
       utcStartTime =
         utcEndTime
           .subtract(1, 'week')
-          .startOf('day')
+          .endOf('day')
           .unix() - 1
       break
     case timeframeOptions.MONTH:
       utcStartTime =
         utcEndTime
           .subtract(1, 'month')
-          .startOf('day')
+          .endOf('day')
           .unix() - 1
       break
     case timeframeOptions.ALL_TIME:
-      utcStartTime = utcEndTime.subtract(1, 'year').unix() - 1
+      utcStartTime =
+        utcEndTime
+          .subtract(1, 'year')
+          .endOf('day')
+          .unix() - 1
       break
     default:
       utcStartTime =
@@ -396,6 +399,12 @@ export function formattedPercent(percent, useBrackets = false) {
   }
 }
 
+/**
+ * gets the amoutn difference plus the % change in change itself (second order change)
+ * @param {*} valueNow
+ * @param {*} value24HoursAgo
+ * @param {*} value48HoursAgo
+ */
 export const get2DayPercentChange = (valueNow, value24HoursAgo, value48HoursAgo) => {
   // get volume info for both 24 hour periods
   let currentChange = valueNow - value24HoursAgo
@@ -409,6 +418,11 @@ export const get2DayPercentChange = (valueNow, value24HoursAgo, value48HoursAgo)
   return [currentChange, adjustedPercentChange]
 }
 
+/**
+ * get standard percent change between two values
+ * @param {*} valueNow
+ * @param {*} value24HoursAgo
+ */
 export const getPercentChange = (valueNow, value24HoursAgo) => {
   const adjustedPercentChange =
     ((parseFloat(valueNow) - parseFloat(value24HoursAgo)) / parseFloat(value24HoursAgo)) * 100
