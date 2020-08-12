@@ -246,9 +246,9 @@ async function getGlobalData(ethPrice, oldEthPrice) {
 
     if (data && oneDayData && twoDayData) {
       let [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentChange(
-        data.totalVolumeUSD,
-        oneDayData.totalVolumeUSD ? oneDayData.totalVolumeUSD : 0,
-        twoDayData.totalVolumeUSD ? twoDayData.totalVolumeUSD : 0
+        data.untrackedVolumeUSD,
+        oneDayData.untrackedVolumeUSD ? oneDayData.untrackedVolumeUSD : 0,
+        twoDayData.untrackedVolumeUSD ? twoDayData.untrackedVolumeUSD : 0
       )
 
       const [oneDayVolumeETH, volumeChangeETH] = get2DayPercentChange(

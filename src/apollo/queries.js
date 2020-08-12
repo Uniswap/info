@@ -438,6 +438,7 @@ export const GLOBAL_DATA = block => {
         totalVolumeETH
         totalLiquidityUSD
         totalLiquidityETH
+        untrackedVolumeUSD
         txCount
         pairCount
       }
@@ -450,6 +451,7 @@ export const GLOBAL_DATA = block => {
         totalVolumeETH
         totalLiquidityUSD
         totalLiquidityETH
+        untrackedVolumeUSD
         txCount
         pairCount
       }
@@ -728,15 +730,6 @@ export const TOKENS_CURRENT = gql`
   query tokens {
     tokens(first: 200, orderBy: tradeVolumeUSD, orderDirection: desc) {
       ...TokenFields
-    }
-  }
-`
-
-export const TOKENS_CURRENT_LIQUIDITY = gql`
-  query tokens {
-    tokens(first: 200, orderBy: tradeVolumeUSD, orderDirection: desc) {
-      id
-      totalLiquidity
     }
   }
 `

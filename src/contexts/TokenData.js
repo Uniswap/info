@@ -1,14 +1,13 @@
 import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect } from 'react'
 
-import { client, tempClient } from '../apollo/client'
+import { client } from '../apollo/client'
 import {
   TOKEN_DATA,
   FILTERED_TRANSACTIONS,
   TOKEN_CHART,
   TOKENS_CURRENT,
   TOKENS_DYNAMIC,
-  PRICES_BY_BLOCK,
-  TOKENS_CURRENT_LIQUIDITY
+  PRICES_BY_BLOCK
 } from '../apollo/queries'
 
 import { useEthPrice } from './GlobalData'
@@ -202,11 +201,6 @@ const getTopTokens = async (ethPrice, ethPriceOld) => {
       fetchPolicy: 'cache-first'
     })
 
-    let tempLiquidity = await tempClient.query({
-      query: TOKENS_CURRENT_LIQUIDITY,
-      fetchPolicy: 'cache-first'
-    })
-
     let oneDayResult = await client.query({
       query: TOKENS_DYNAMIC(oneDayBlock),
       fetchPolicy: 'cache-first'
@@ -216,10 +210,6 @@ const getTopTokens = async (ethPrice, ethPriceOld) => {
       query: TOKENS_DYNAMIC(twoDayBlock),
       fetchPolicy: 'cache-first'
     })
-
-    let liquidityData = tempLiquidity?.data?.tokens.reduce((obj, cur, i) => {
-      return { ...obj, [cur.id]: cur }
-    }, {})
 
     let oneDayData = oneDayResult?.data?.tokens.reduce((obj, cur, i) => {
       return { ...obj, [cur.id]: cur }
@@ -236,7 +226,7 @@ const getTopTokens = async (ethPrice, ethPriceOld) => {
         current?.data?.tokens.map(async token => {
           let data = token
 
-          let liquidityDataThisToken = liquidityData?.[token.id]
+          // let liquidityDataThisToken = liquidityData?.[token.id]
           let oneDayHistory = oneDayData?.[token.id]
           let twoDayHistory = twoDayData?.[token.id]
 
@@ -268,7 +258,7 @@ const getTopTokens = async (ethPrice, ethPriceOld) => {
             twoDayHistory?.txCount ?? 0
           )
 
-          const currentLiquidityUSD = liquidityDataThisToken?.totalLiquidity * ethPrice * data?.derivedETH
+          const currentLiquidityUSD = data?.totalLiquidity * ethPrice * data?.derivedETH
 
           const oldLiquidityUSD = oneDayHistory?.totalLiquidity * ethPriceOld * oneDayHistory?.derivedETH
 
@@ -524,7 +514,7 @@ const getTokenChartData = async tokenAddress => {
 
   try {
     // hotfix for liquidity bug in uniswap2 subgraph
-    let result = await tempClient.query({
+    let result = await client.query({
       query: TOKEN_CHART,
       variables: {
         tokenAddr: tokenAddress
