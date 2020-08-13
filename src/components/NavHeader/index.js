@@ -6,10 +6,6 @@ import Search from '../Search'
 import { RowFixed, RowBetween } from '../Row'
 import { AutoColumn } from '../Column'
 import { useMedia } from 'react-use'
-import { useGlobalData } from '../../contexts/GlobalData'
-import { toK } from '../../helpers'
-import { ButtonDark } from '../ButtonStyled'
-import Link from '../Link'
 
 const Header = styled.div`
   width: calc(100% - 80px);
@@ -23,31 +19,31 @@ const Header = styled.div`
   }
 `
 
-const CombinedWrapper = styled(RowFixed)`
-  border-radius: 16px;
-  justify-content: flex-end;
-`
-
-const CombinedData = styled.div`
-  color: ${({ theme }) => theme.primary1};
-  margin-right: 0.75rem;
-  font-size: 1rem;
-`
+// const CombinedWrapper = styled(RowFixed)`
+//   border-radius: 16px;
+//   justify-content: flex-end;
+// `
+//
+// const CombinedData = styled.div`
+//   color: ${({ theme }) => theme.primary1};
+//   margin-right: 0.75rem;
+//   font-size: 1rem;
+// `
 
 export default function NavHeader({ token, pair, account }) {
   const isHome = !token && !pair && !account
 
-  const below1024 = useMedia('(max-width: 1024px)')
+  // const below1024 = useMedia('(max-width: 1024px)')
   const below600 = useMedia('(max-width: 600px)')
 
-  const { totalLiquidityUSD, oneDayVolumeUSD, v1Data } = useGlobalData()
+  // const { totalLiquidityUSD, oneDayVolumeUSD, v1Data } = useGlobalData()
 
-  const liquidity =
-    totalLiquidityUSD && v1Data?.totalLiquidityUSD
-      ? '$' + toK(parseFloat(totalLiquidityUSD) + parseFloat(v1Data?.totalLiquidityUSD), true)
-      : ''
-  const volume =
-    oneDayVolumeUSD && v1Data?.dailyVolumeUSD ? '$' + toK(oneDayVolumeUSD + v1Data?.dailyVolumeUSD, true) : ''
+  // const liquidity =
+  //   totalLiquidityUSD && v1Data?.totalLiquidityUSD
+  //     ? '$' + toK(parseFloat(totalLiquidityUSD) + parseFloat(v1Data?.totalLiquidityUSD), true)
+  //     : ''
+  // const volume =
+  //   oneDayVolumeUSD && v1Data?.dailyVolumeUSD ? '$' + toK(oneDayVolumeUSD + v1Data?.dailyVolumeUSD, true) : ''
 
   return below600 ? (
     <Header>
@@ -67,25 +63,25 @@ export default function NavHeader({ token, pair, account }) {
               <Search small={true} />
             </div>
           )}
-          {isHome && (
-            <CombinedWrapper>
-              {!below1024 && (
-                <>
-                  <CombinedData>
-                    Combined Liquidity: <b>{liquidity}</b>
-                  </CombinedData>
-                  <CombinedData>
-                    Combined Vol: <b>{volume}</b>
-                  </CombinedData>
-                </>
-              )}
-              <Link href="https://migrate.uniswap.info" target="_blank">
-                <ButtonDark style={{ minWidth: 'initial', height: '36px' }}>
-                  View combined {below1024 && 'data'} ↗
-                </ButtonDark>
-              </Link>
-            </CombinedWrapper>
-          )}
+          {/*{isHome && (*/}
+          {/*  <CombinedWrapper>*/}
+          {/*    {!below1024 && (*/}
+          {/*      <>*/}
+          {/*        <CombinedData>*/}
+          {/*          Combined Liquidity: <b>{liquidity}</b>*/}
+          {/*        </CombinedData>*/}
+          {/*        <CombinedData>*/}
+          {/*          Combined Vol: <b>{volume}</b>*/}
+          {/*        </CombinedData>*/}
+          {/*      </>*/}
+          {/*    )}*/}
+          {/*    <Link href="" target="_blank">*/}
+          {/*      <ButtonDark style={{ minWidth: 'initial', height: '36px' }}>*/}
+          {/*        View combined {below1024 && 'data'} ↗*/}
+          {/*      </ButtonDark>*/}
+          {/*    </Link>*/}
+          {/*  </CombinedWrapper>*/}
+          {/*)}*/}
         </RowFixed>
       </RowBetween>
     </Header>
