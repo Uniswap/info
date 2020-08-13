@@ -40,7 +40,7 @@ export default function TokenLogo({ address, header = false, size = '24px', ...r
     setError(false)
   }, [address])
 
-  if (error || BAD_IMAGES[address]) {
+  if (error) {
     return (
       <Inline>
         <Image {...rest} alt={''} src={PlaceHolder} size={size} />
@@ -89,10 +89,13 @@ export default function TokenLogo({ address, header = false, size = '24px', ...r
         src={uri}
         size={size}
         onError={event => {
-          BAD_IMAGES[address] = true
-          FALLBACK_URIS[address] = urlList[1]
-          setError(true)
-          event.preventDefault()
+          if (FALLBACK_URIS[address]) {
+            BAD_IMAGES[address] = true
+            setError(true)
+            event.preventDefault()
+          } else {
+            FALLBACK_URIS[address] = urlList[1]
+          }
         }}
       />
     </Inline>

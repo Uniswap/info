@@ -361,6 +361,11 @@ export function isEquivalent(a, b) {
 }
 
 export function getLogoUrlList(address) {
+  if (!address) {
+    return [
+      'https://etherscan.io/images/main/empty-token.png'
+    ]
+  }
   return [
     `https://1inch.exchange/assets/tokens/${address.toLowerCase()}.png`,
     `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${address}/logo.png`,
