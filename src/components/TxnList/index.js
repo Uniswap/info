@@ -220,14 +220,12 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
           if (isSrcFirst) {
             newTxn.token0Symbol = swap.pair.token0.symbol
             newTxn.token1Symbol = swap.pair.token1.symbol
-            newTxn.token0Amount = Math.abs(srcAmount)
-            newTxn.token1Amount = Math.abs(destAmount)
           } else {
             newTxn.token0Symbol = swap.pair.token1.symbol
             newTxn.token1Symbol = swap.pair.token0.symbol
-            newTxn.token0Amount = Math.abs(destAmount)
-            newTxn.token1Amount = Math.abs(srcAmount)
           }
+          newTxn.token0Amount = Math.abs(srcAmount)
+          newTxn.token1Amount = Math.abs(destAmount)
 
           newTxn.hash = swap.transaction.id
           newTxn.timestamp = swap.transaction.timestamp
@@ -277,19 +275,12 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
   const below780 = useMedia('(max-width: 780px)')
 
   const ListItem = ({ item }) => {
-    if (item.token0Symbol === 'WETH') {
-      item.token0Symbol = 'ETH'
-    }
-
-    if (item.token1Symbol === 'WETH') {
-      item.token1Symbol = 'ETH'
-    }
 
     return (
       <DashGrid style={{ height: '60px' }}>
         <DataText area="txn" fontWeight="500">
           <Link color={color} external href={urls.showTransaction(item.hash)}>
-            {getTransactionType(item.type, item.token1Symbol, item.token0Symbol)}
+            {getTransactionType(item.type, item.token0Symbol, item.token1Symbol)}
           </Link>
         </DataText>
         <DataText area="value">
@@ -297,8 +288,8 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
         </DataText>
         {!below780 && (
           <>
-            <DataText area="amountOther">{formattedNum(item.token1Amount) + ' ' + item.token1Symbol}</DataText>
-            <DataText area="amountToken">{formattedNum(item.token0Amount) + ' ' + item.token0Symbol}</DataText>
+            <DataText area="amountOther">{formattedNum(item.token0Amount) + ' ' + item.token0Symbol}</DataText>
+            <DataText area="amountToken">{formattedNum(item.token1Amount) + ' ' + item.token1Symbol}</DataText>
           </>
         )}
         {!below1080 && (
