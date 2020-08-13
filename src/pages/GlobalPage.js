@@ -11,7 +11,7 @@ import TopTokenList from '../components/TokenList'
 import TxnList from '../components/TxnList'
 import GlobalChart from '../components/GlobalChart'
 import { Hover, TYPE } from '../Theme'
-import { formattedNum, formattedPercent } from '../helpers'
+import { ETH, formattedNum, formattedPercent } from '../helpers'
 import { useGlobalData, useEthPrice, useGlobalTransactions } from '../contexts/GlobalData'
 import { useAllPairData } from '../contexts/PairData'
 import { Search } from '../components/Search'
@@ -206,7 +206,7 @@ function GlobalPage({ history }) {
             <AutoColumn gap="20px">
               <RowBetween>
                 <TYPE.main>Uniswap ETH price</TYPE.main>
-                <TokenLogo address={'0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'} />
+                <TokenLogo address={ETH} />
               </RowBetween>
               <RowBetween align="flex-end">
                 {formattedEthPrice && (

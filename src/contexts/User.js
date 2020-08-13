@@ -13,7 +13,7 @@ import { timeframeOptions } from '../constants'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { useEthPrice } from './GlobalData'
-import { getShareValueOverTime } from '../helpers'
+import { ETH, getShareValueOverTime } from '../helpers'
 
 dayjs.extend(utc)
 
@@ -605,7 +605,7 @@ export async function getReturns(user, pair, ethPrice) {
     }
 
     // hard code prices before launch to get better results for stablecoins and WETH
-    if (positionT0.timestamp < 1589747086) {
+    if (positionT0.timestamp < 1597093302) {
       if (priceOverrides.includes(positionT0.pair.token0.id)) {
         positionT0.token0PriceUSD = 1
       }
@@ -614,14 +614,14 @@ export async function getReturns(user, pair, ethPrice) {
       }
 
       // WETH price
-      if (positionT0.pair.token0.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
-        positionT0.token0PriceUSD = 203
+      if (positionT0.pair.token0.id === ETH) {
+        positionT0.token0PriceUSD = 395.84
       }
-      if (positionT0.pair.token1.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
-        positionT0.token1PriceUSD = 203
+      if (positionT0.pair.token1.id === ETH) {
+        positionT0.token1PriceUSD = 395.84
       }
     }
-    if (positionT1.timestamp < 1589747086) {
+    if (positionT1.timestamp < 1597093302) {
       if (priceOverrides.includes(positionT1.pair.token0.id)) {
         positionT1.token0PriceUSD = 1
       }
@@ -629,11 +629,11 @@ export async function getReturns(user, pair, ethPrice) {
         positionT1.token1PriceUSD = 1
       }
       // WETH price
-      if (positionT1.pair.token0.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
-        positionT1.token0PriceUSD = 203
+      if (positionT1.pair.token0.id === ETH) {
+        positionT1.token0PriceUSD = 395.84
       }
-      if (positionT1.pair.token1.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
-        positionT1.token1PriceUSD = 203
+      if (positionT1.pair.token1.id === ETH) {
+        positionT1.token1PriceUSD = 395.84
       }
     }
 

@@ -595,7 +595,7 @@ export function usePairChartData(pairAddress) {
 }
 
 /**
- * Get list of all pairs in Uniswap
+ * Get list of all pairs in Mooniswap
  */
 export function useAllPairData() {
   const [state] = usePairDataContext()

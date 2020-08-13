@@ -254,22 +254,6 @@ const getChartData = async oldestDateToFetch => {
       fetchPolicy: 'cache-first'
     })
 
-    let blockedResult = await client.query({
-      query: PAIR_CHART,
-      variables: {
-        pairAddress: '0xed9c854cb02de75ce4c9bba992828d6cb7fd5c71'
-      },
-      fetchPolicy: 'cache-first'
-    })
-
-    let blockedResultOther = await client.query({
-      query: PAIR_CHART,
-      variables: {
-        pairAddress: '0x257d37ce4d0796ea2efebcb49b46e34002cc65d3'
-      },
-      fetchPolicy: 'cache-first'
-    })
-
     data = [...result.data.mooniswapDayDatas]
 
     if (data) {
@@ -281,18 +265,6 @@ const getChartData = async oldestDateToFetch => {
         dayIndexSet.add((data[i].date / oneDay).toFixed(0))
         dayIndexArray.push(data[i])
         dayData.dailyVolumeUSD = parseFloat(dayData.dailyVolumeUSD)
-        blockedResult.data.pairDayDatas.map(blockedDay => {
-          if (blockedDay.date === dayData.date && dayData.dailyVolumeUSD > blockedDay.dailyVolumeUSD) {
-            dayData.dailyVolumeUSD = dayData.dailyVolumeUSD - parseFloat(blockedDay.dailyVolumeUSD)
-          }
-          return true
-        })
-        blockedResultOther.data.pairDayDatas.map(blockedDay => {
-          if (blockedDay.date === dayData.date && dayData.dailyVolumeUSD > blockedDay.dailyVolumeUSD) {
-            dayData.dailyVolumeUSD = dayData.dailyVolumeUSD - parseFloat(blockedDay.dailyVolumeUSD)
-          }
-          return true
-        })
       })
 
       // fill in empty days
@@ -410,7 +382,7 @@ const getEthPrice = async () => {
   return [ethPrice, ethPriceOneDay, priceChangeETH]
 }
 
-async function getAllPairsOnUniswap() {
+async function getAllPairsOnMooniswap() {
   try {
     let allFound = false
     let pairs = []
@@ -435,7 +407,7 @@ async function getAllPairsOnUniswap() {
   }
 }
 
-async function getAllTokensOnUniswap() {
+async function getAllTokensOnMooniswap() {
   try {
     let allFound = false
     let skipCount = 0
@@ -471,10 +443,10 @@ export function useGlobalData() {
       let globalData = await getGlobalData(ethPrice, oldEthPrice)
       globalData && update(globalData)
 
-      let allPairs = await getAllPairsOnUniswap()
+      let allPairs = await getAllPairsOnMooniswap()
       updateAllPairsInUniswap(allPairs)
 
-      let allTokens = await getAllTokensOnUniswap()
+      let allTokens = await getAllTokensOnMooniswap()
       updateAllTokensInUniswap(allTokens)
     }
     if (!data && ethPrice && oldEthPrice) {

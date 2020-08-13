@@ -3,8 +3,11 @@ import styled from 'styled-components'
 import { isAddress } from '../../helpers/index.js'
 import PlaceHolder from '../../assets/placeholder.png'
 import EthereumLogo from '../../assets/eth.png'
+import { getLogoUrlList } from '../../helpers/index'
+import { ETH } from '../../helpers'
 
 const BAD_IMAGES = {}
+const FALLBACK_URIS = {}
 
 const Inline = styled.div`
   display: flex;
@@ -54,7 +57,7 @@ export default function TokenLogo({ address, header = false, size = '24px', ...r
     address = '0xc011a72400e58ecd99ee497cf89e3775d4bd732f'
   }
 
-  if (address?.toLowerCase() === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
+  if (address?.toLowerCase() === ETH) {
     return (
       <StyledEthereumLogo size={size} {...rest}>
         <img
@@ -66,19 +69,28 @@ export default function TokenLogo({ address, header = false, size = '24px', ...r
     )
   }
 
-  const path = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${isAddress(
-    address
-  )}/logo.png`
+  const urlList = getLogoUrlList(isAddress(address))
+  let uri
+  if (!uri) {
+    const defaultUri = urlList[0]
+    if (!BAD_IMAGES[defaultUri]) {
+      uri = defaultUri
+    }
+    if (FALLBACK_URIS[address]) {
+      uri = FALLBACK_URIS[address]
+    }
+  }
 
   return (
     <Inline>
       <Image
         {...rest}
         alt={''}
-        src={path}
+        src={uri}
         size={size}
         onError={event => {
           BAD_IMAGES[address] = true
+          FALLBACK_URIS[address] = urlList[1]
           setError(true)
           event.preventDefault()
         }}
