@@ -20,17 +20,17 @@ export const ETH = ADDRESS_ZERO
 
 export function getPoolLink(token0Address, token1Address = null) {
   if (!token1Address) {
-    return `https://mooniswap.exchange/add/${token0Address}-${token0Address}`
+    return `https://mooniswap.exchange/#/add/${token0Address}/${token0Address}`
   } else {
-    return `https://mooniswap.exchange/add/${token0Address}-${token1Address}`
+    return `https://mooniswap.exchange/#/add/${token0Address}/${token1Address}`
   }
 }
 
 export function getSwapLink(token0Address, token1Address = null) {
   if (!token1Address) {
-    return `https://mooniswap.exchange/swap?inputCurrency=${token0Address}`
+    return `https://mooniswap.exchange/#/swap?inputCurrency=${token0Address}`
   } else {
-    return `https://mooniswap.exchange/swap?inputCurrency=${token0Address}&outputCurrency=${token1Address}`
+    return `https://mooniswap.exchange/#/swap?inputCurrency=${token0Address}&outputCurrency=${token1Address}`
   }
 }
 
