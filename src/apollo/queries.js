@@ -376,6 +376,7 @@ export const GLOBAL_TXNS = gql`
             symbol
           }
         }
+        sender
         liquidity
         amount0
         amount1
@@ -417,6 +418,7 @@ export const GLOBAL_TXNS = gql`
             symbol
           }
         }
+        sender
         srcAmount
         destAmount
         amountUSD
@@ -688,6 +690,7 @@ export const FILTERED_TRANSACTIONS = gql`
           symbol
         }
       }
+      sender
       liquidity
       amount0
       amount1
@@ -730,8 +733,12 @@ export const FILTERED_TRANSACTIONS = gql`
           symbol
         }
       }
+      sender
       srcAmount
       destAmount
+      amountUSD
+      src
+      dest
     }
   }
 `
