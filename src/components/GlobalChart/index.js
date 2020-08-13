@@ -96,12 +96,12 @@ const GlobalChart = ({ display }) => {
     <>
       {below600 ? (
         <RowBetween mb={40}>
-          <DropdownSelect options={CHART_VIEW} active={chartView} setActive={setChartView} color={'#ff007a'} />
+          <DropdownSelect options={CHART_VIEW} active={chartView} setActive={setChartView} color={'#1557b4'} />
           <DropdownSelect
             options={timeframeOptions}
             active={localWindow}
             setActive={setLocalWindow}
-            color={'#ff007a'}
+            color={'#1557b4'}
           />
         </RowBetween>
       ) : (
@@ -150,6 +150,7 @@ const GlobalChart = ({ display }) => {
           </Row>
         </RowBetween>
       )}
+
       {chartData && chartView === CHART_VIEW.LIQUIDITY && (
         <ResponsiveContainer aspect={below1080 ? 60 / 28 : 60 / 28}>
           <AreaChart margin={{ top: 20, right: 0, bottom: 6, left: 0 }} barCategoryGap={1} data={chartData}>
@@ -158,14 +159,14 @@ const GlobalChart = ({ display }) => {
               dataKey={'totalLiquidityUSD'}
               stackId="2"
               strokeWidth={1}
-              stroke={'#ff007a'}
+              stroke={'#1557b4'}
               dot={false}
               type="monotone"
               name={'Liquidity'}
               yAxisId={0}
               opacity={'1'}
               isAnimationActive={false}
-              fill="#ff007a80"
+              fill="#1557b4"
             />
             <XAxis
               tickLine={true}
@@ -206,7 +207,7 @@ const GlobalChart = ({ display }) => {
               contentStyle={{
                 padding: '10px 14px',
                 borderRadius: 10,
-                borderColor: '#ff007a80',
+                borderColor: '#1557b4',
                 color: 'black'
               }}
               wrapperStyle={{ top: -70, left: -10 }}
@@ -249,7 +250,7 @@ const GlobalChart = ({ display }) => {
               orientation={'right'}
             />
             <Tooltip
-              cursor={{ fill: '#ff007a', opacity: 0.1 }}
+              cursor={{ fill: '#1557b4', opacity: 0.1 }}
               formatter={val => '$' + toK(val, true)}
               labelFormatter={label =>
                 volumeWindow === VOLUME_WINDOW.WEEKLY ? toWeeklyDate(label - 1) : toNiceDateYear(label)
@@ -258,7 +259,7 @@ const GlobalChart = ({ display }) => {
               contentStyle={{
                 padding: '10px 14px',
                 borderRadius: 10,
-                borderColor: '#ff007a80',
+                borderColor: '#1557b4',
                 color: 'black'
               }}
               wrapperStyle={{ top: -70, left: -10 }}
@@ -267,11 +268,11 @@ const GlobalChart = ({ display }) => {
               type="monotone"
               name={'Volume'}
               dataKey={volumeWindow === VOLUME_WINDOW.DAYS ? 'dailyVolumeUSD' : 'weeklyVolumeUSD'}
-              fill="#ff007a"
+              fill="#1557b4"
               opacity={'0.5'}
               yAxisId={0}
               strokeWidth={2}
-              stroke={'#ff007a'}
+              stroke={'#1557b4'}
               isAnimationActive={false}
             />
           </BarChart>

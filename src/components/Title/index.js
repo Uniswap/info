@@ -79,9 +79,9 @@ export default function Title({ token, pair, account }) {
       <Flex alignItems="center">
         <RowFixed>
           <UniIcon id="link" onClick={() => history.push('/')}>
-            <img src={Logo} alt="logo" />
+            <img src={Logo} alt="logo" width="55px"/>
           </UniIcon>
-          <img style={{ marginLeft: '4px', marginTop: '0px' }} src={Wordmark} alt="logo" />
+          <img style={{ marginLeft: '4px', marginTop: '0px' }} src={Wordmark} alt="logo" width="300px"/>
         </RowFixed>
         <Text fontWeight={600} mx="4px" lineHeight="1.5rem">
           {getName()}

@@ -3,6 +3,7 @@ import { ThemeProvider as StyledComponentsThemeProvider, createGlobalStyle } fro
 import { useDarkModeManager } from '../contexts/LocalStorage'
 import styled from 'styled-components'
 import { Text } from 'rebass'
+import { transparentize } from 'polished'
 
 export default function ThemeProvider({ children }) {
   const [darkMode] = useDarkModeManager()
@@ -42,14 +43,14 @@ const theme = (darkMode, color) => ({
   advancedBG: darkMode ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.4)',
 
   //primary colors
-  primary1: darkMode ? '#2172E5' : '#ff007a',
-  primary2: darkMode ? '#3680E7' : '#FF8CC3',
-  primary3: darkMode ? '#4D8FEA' : '#FF99C9',
-  primary4: darkMode ? '#376bad70' : '#F6DDE8',
-  primary5: darkMode ? '#153d6f70' : '#FDEAF1',
+  primary1: darkMode ? '#3A619D' : '#3A619D',
+  primary2: darkMode ? '#3680E7' : '#3680E7',
+  primary3: darkMode ? '#4D8FEA' : '#4D8FEA',
+  primary4: darkMode ? '#376bad70' : '#376bad70',
+  primary5: darkMode ? '#153d6f70' : '#e7e7e7',
 
   // color text
-  primaryText1: darkMode ? '#6da8ff' : '#ff007a',
+  primaryText1: darkMode ? '#6da8ff' : '#474747',
 
   // secondary colors
   secondary1: darkMode ? '#2172E5' : '#ff007a',
@@ -60,12 +61,14 @@ const theme = (darkMode, color) => ({
 
   // other
   red1: '#FF6871',
+  red2: '#F82D3A',
   green1: '#27AE60',
   yellow1: '#FFE270',
   yellow2: '#F3841E',
+  horse: darkMode ? '#ffffff' : '#3A619D',
   link: '#2172E5',
 
-  background: darkMode ? 'black' : `radial-gradient(50% 50% at 50% 50%, #ff007a30 0%, #F7F8FA 100%)`
+  background: darkMode ? 'black' : `radial-gradient(50% 50% at 50% 50%, #376bad15 0%, #376bad00 100%)`
 })
 
 const TextWrapper = styled(Text)`
@@ -125,8 +128,7 @@ export const ThemedBackground = styled.div`
   max-width: 100vw !important;
   width: 100vw !important;
   height: 200vh;
-  background: ${({ backgroundColor }) =>
-    `radial-gradient(50% 50% at 50% 50%, ${backgroundColor} 0%, rgba(255, 255, 255, 0) 100%)`};
+  
   position: absolute;
   top: 0px;
   left: 0px;
@@ -164,11 +166,10 @@ export const GlobalStyle = createGlobalStyle`
     font-size: 1rem;
     font-variant: none;
     color: 'black';
-    background-color: ${({ theme }) => theme.backgroundColor};
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-    overflow: auto;
-    height: 100%;
+    background-image: ${({ theme }) =>
+  `radial-gradient(50% 50% at 50% 50%, ${transparentize(0.9, theme.primary1)} 0%, ${transparentize(
+    1,
+    theme.bg1
+  )} 100%)`};
   }
 `
