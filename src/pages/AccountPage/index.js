@@ -170,13 +170,13 @@ function AccountPage({ account }) {
   // animated dollar values
   const [animatedNetReturn, setAnimatedNetReturn] = useState()
   const [animatedAssetReturn, setAnimatedAssetReturn] = useState()
-  const [animatedUniswapReturn, setAnimatedUniswapReturn] = useState() // derive from net and asset
+  const [animatedMooniswapReturn, setAnimatedMooniswapReturn] = useState() // derive from net and asset
   const [animatedPositionValue, setAnimatedPositionVal] = useState()
 
   // animated percent values
   const [animatedNetChange, setAnimatedNetChange] = useState()
   const [animatedAssetChange, setAnimatedAssetChange] = useState()
-  const [animatedUniswapChange, setAnimatedUniswapChange] = useState()
+  const [animatedMooniswapChange, setAnimatedMooniswapChange] = useState()
 
   // reset aggregate values if they change
   useEffect(() => {
@@ -185,8 +185,8 @@ function AccountPage({ account }) {
     averageNetChange && setAnimatedNetChange(averageNetChange)
     averageAssetChange && setAnimatedAssetChange(averageAssetChange)
     assetReturn && setAnimatedAssetReturn(assetReturn)
-    netReturn && assetReturn && setAnimatedUniswapReturn(netReturn - assetReturn)
-    averageNetChange && averageAssetChange && setAnimatedUniswapChange(averageNetChange - averageAssetChange)
+    netReturn && assetReturn && setAnimatedMooniswapReturn(netReturn - assetReturn)
+    averageNetChange && averageAssetChange && setAnimatedMooniswapChange(averageNetChange - averageAssetChange)
   }, [assetReturn, averageAssetChange, averageNetChange, netReturn, positionValue])
 
   return (
@@ -300,16 +300,16 @@ function AccountPage({ account }) {
               <AutoColumn gap="10px">
                 <RowBetween>
                   <TYPE.main fontSize={'16px'} fontWeight={400} color="#888D9B">
-                    Uniswap Return
+                    Mooniswap Return
                   </TYPE.main>
                   <div />
                 </RowBetween>
                 <RowFixed align="flex-end">
                   <TYPE.main fontSize={'24px'} lineHeight={1} fontWeight={600}>
-                    <AnimatedNumber value={animatedUniswapReturn} formatValue={formatValue} duration={200} />
+                    <AnimatedNumber value={animatedMooniswapReturn} formatValue={formatValue} duration={200} />
                   </TYPE.main>
                   <TYPE.main fontSize="18px" ml="8px">
-                    <AnimatedNumber value={animatedUniswapChange} formatValue={formatAnimatedPercent} duration={200} />
+                    <AnimatedNumber value={animatedMooniswapChange} formatValue={formatAnimatedPercent} duration={200} />
                   </TYPE.main>
                 </RowFixed>
               </AutoColumn>
@@ -337,16 +337,16 @@ function AccountPage({ account }) {
                 account={account}
                 baseNetReturn={netReturn}
                 baseAssetReturn={assetReturn}
-                baseUniswapReturn={netReturn - assetReturn}
+                baseMooniswapReturn={netReturn - assetReturn}
                 baseAssetChange={averageAssetChange}
                 baseNetChange={averageNetChange}
-                baseUniswapChange={averageNetChange - averageAssetChange}
+                baseMooniswapChange={averageNetChange - averageAssetChange}
                 setAnimatedAssetReturn={setAnimatedAssetReturn}
                 setAnimatedNetReturn={setAnimatedNetReturn}
-                setAnimatedUniswapReturn={setAnimatedUniswapReturn}
+                setAnimatedMooniswapReturn={setAnimatedMooniswapReturn}
                 setAnimatedAssetChange={setAnimatedAssetChange}
                 setAnimatedNetChange={setAnimatedNetChange}
-                setAnimatedUniswapChange={setAnimatedUniswapChange}
+                setAnimatedMooniswapChange={setAnimatedMooniswapChange}
                 position={activePosition}
                 setAnimatedPositionVal={setAnimatedPositionVal}
                 positionValue={positionValue}

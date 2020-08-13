@@ -1,6 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
-import Unicorn from '../../assets/unicorn.svg'
+import Unicorn from '../../assets/logo.svg'
 
 // const rotate = keyframes`
 //  0% {

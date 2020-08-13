@@ -47,7 +47,7 @@ export default function NavHeader({ token, pair, account }) {
   // const below1024 = useMedia('(max-width: 1024px)')
   const below600 = useMedia('(max-width: 600px)')
 
-  // const { totalLiquidityUSD, oneDayVolumeUSD, v1Data } = useGlobalData()
+  // const { totalLiquidityUSD, oneDayVolumeUSD } = useGlobalData()
 
   // const liquidity =
   //   totalLiquidityUSD && v1Data?.totalLiquidityUSD

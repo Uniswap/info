@@ -200,7 +200,7 @@ function PositionList({ positions, transactions }) {
             )}{' '}
             {!showFlyout && (
               <DataText area="return">
-                {formattedNum(position?.uniswapReturn, true, true)} ({formattedPercent(position?.uniswapPercentChange)})
+                {formattedNum(position?.mooniswapReturn, true, true)} ({formattedPercent(position?.mooniswapPercentChange)})
               </DataText>
             )}{' '}
             {!showFlyout && (
@@ -277,12 +277,12 @@ function PositionList({ positions, transactions }) {
                     </AutoColumn>
                     <AutoColumn gap="10px">
                       <Text fontSize={16} color={'#888D9B'} fontWeight={500}>
-                        Uniswap Return
+                        Mooniswap Return
                       </Text>
                       <Text fontWeight={500}>
                         <RowFixed>
-                          {formattedNum(position?.uniswapReturn, true, true)} (
-                          {formattedPercent(position?.uniswapPercentChange)})
+                          {formattedNum(position?.mooniswapReturn, true, true)} (
+                          {formattedPercent(position?.mooniswapPercentChange)})
                         </RowFixed>
                       </Text>
                     </AutoColumn>
@@ -364,7 +364,7 @@ function PositionList({ positions, transactions }) {
                 setSortDirection(sortedColumn !== SORT_FIELD.VOL_7DAYS ? true : !sortDirection)
               }}
             >
-              Uniswap Return {sortedColumn === SORT_FIELD.VOL_7DAYS ? (!sortDirection ? '↑' : '↓') : ''}
+              Mooniswap Return {sortedColumn === SORT_FIELD.VOL_7DAYS ? (!sortDirection ? '↑' : '↓') : ''}
             </ClickableText>
           </Flex>
         )}

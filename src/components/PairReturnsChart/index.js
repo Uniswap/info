@@ -29,16 +29,16 @@ const PairReturnsChart = ({
   account,
   baseNetReturn,
   baseAssetReturn,
-  baseUniswapReturn,
+  baseMooniswapReturn,
   setAnimatedNetReturn,
   setAnimatedAssetReturn,
-  setAnimatedUniswapReturn,
+  setAnimatedMooniswapReturn,
   setAnimatedAssetChange,
   setAnimatedNetChange,
-  setAnimatedUniswapChange,
+  setAnimatedMooniswapChange,
   baseAssetChange,
   baseNetChange,
-  baseUniswapChange,
+  baseMooniswapChange,
   setAnimatedPositionVal,
   positionValue,
   position
@@ -119,10 +119,10 @@ const PairReturnsChart = ({
               if (e?.activePayload?.[0]?.value) {
                 setAnimatedPositionVal(e.activePayload[0].value)
                 setAnimatedAssetReturn(e.activePayload[1].value)
-                setAnimatedUniswapReturn(e.activePayload[2].value)
+                setAnimatedMooniswapReturn(e.activePayload[2].value)
                 setAnimatedNetReturn(e.activePayload[3].value)
                 setAnimatedAssetChange(e.activePayload[4].value)
-                setAnimatedUniswapChange(e.activePayload[5].value)
+                setAnimatedMooniswapChange(e.activePayload[5].value)
                 setAnimatedNetChange(e.activePayload[6].value)
               }
             }}
@@ -130,10 +130,10 @@ const PairReturnsChart = ({
               setAnimatedPositionVal(positionValue)
               setAnimatedNetReturn(baseNetReturn)
               setAnimatedAssetReturn(baseAssetReturn)
-              setAnimatedUniswapReturn(baseUniswapReturn)
+              setAnimatedMooniswapReturn(baseMooniswapReturn)
               setAnimatedAssetChange(baseAssetChange)
               setAnimatedNetChange(baseNetChange)
-              setAnimatedUniswapChange(baseUniswapChange)
+              setAnimatedMooniswapChange(baseMooniswapChange)
             }}
             margin={{ top: 0, right: 10, bottom: 6, left: 0 }}
             barCategoryGap={1}
@@ -190,10 +190,10 @@ const PairReturnsChart = ({
             />
             <Bar type="monotone" dataKey="usdValue" fill="rgba(0,0,0,0.05)" yAxisId={1} />
             <Line type="monotone" dataKey="assetReturn" stroke="#82ca9d" />
-            <Line type="monotone" dataKey="uniswapReturn" stroke="blue" />
+            <Line type="monotone" dataKey="mooniswapReturn" stroke="blue" />
             <Line type="monotone" dataKey="netReturn" stroke="purple" />
             <Line dataKey="assetChange" stroke="transparent" />
-            <Line dataKey="uniswapChange" stroke="transparent" />
+            <Line dataKey="mooniswapChange" stroke="transparent" />
             <Line dataKey="netChange" stroke="transparent" />
           </ComposedChart>
         </ResponsiveContainer>

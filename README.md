@@ -1,11 +1,8 @@
-# Uniswap History
+# Mooniswap History
 
-![Tests](https://github.com/Uniswap/uniswap-info/workflows/Tests/badge.svg)
-[![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
+Transaction and liquidity pool stats for [Mooniswap](https://mooniswap.exchange).
 
-Transaction and liquidity pool stats for [Uniswap](https://uniswap.org).
-
-Check it out live: [https://uniswap.info](https://uniswap.info).
+Check it out live: [https://mooniswap.info](https://mooniswap.info).
 
 ### To Start Development
 

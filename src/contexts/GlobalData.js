@@ -7,15 +7,14 @@ import { timeframeOptions } from '../constants'
 import { getPercentChange, getBlockFromTimestamp, getBlocksFromTimestamps, get2DayPercentChange } from '../helpers'
 import { GLOBAL_DATA, GLOBAL_TXNS, GLOBAL_CHART, ETH_PRICE, ALL_PAIRS, ALL_TOKENS } from '../apollo/queries'
 import weekOfYear from 'dayjs/plugin/weekOfYear'
-import { getV1Data } from './V1Data'
 
 const UPDATE = 'UPDATE'
 const UPDATE_TXNS = 'UPDATE_TXNS'
 const UPDATE_CHART = 'UPDATE_CHART'
 const UPDATE_ETH_PRICE = 'UPDATE_ETH_PRICE'
 const ETH_PRICE_KEY = 'ETH_PRICE_KEY'
-const UPDATE_ALL_PAIRS_IN_UNISWAP = 'UPDAUPDATE_ALL_PAIRS_IN_UNISWAPTE_TOP_PAIRS'
-const UPDATE_ALL_TOKENS_IN_UNISWAP = 'UPDATE_ALL_TOKENS_IN_UNISWAP'
+const UPDATE_ALL_PAIRS_IN_MOONISWAP = 'UPDAUPDATE_ALL_PAIRS_IN_MOONISWAPTE_TOP_PAIRS'
+const UPDATE_ALL_TOKENS_IN_MOONISWAP = 'UPDATE_ALL_TOKENS_IN_MOONISWAP'
 
 dayjs.extend(utc)
 dayjs.extend(weekOfYear)
@@ -61,7 +60,7 @@ function reducer(state, { type, payload }) {
       }
     }
 
-    case UPDATE_ALL_PAIRS_IN_UNISWAP: {
+    case UPDATE_ALL_PAIRS_IN_MOONISWAP: {
       const { allPairs } = payload
       return {
         ...state,
@@ -69,7 +68,7 @@ function reducer(state, { type, payload }) {
       }
     }
 
-    case UPDATE_ALL_TOKENS_IN_UNISWAP: {
+    case UPDATE_ALL_TOKENS_IN_MOONISWAP: {
       const { allTokens } = payload
       return {
         ...state,
@@ -123,18 +122,18 @@ export default function Provider({ children }) {
     })
   }, [])
 
-  const updateAllPairsInUniswap = useCallback(allPairs => {
+  const updateAllPairsInMooniswap = useCallback(allPairs => {
     dispatch({
-      type: UPDATE_ALL_PAIRS_IN_UNISWAP,
+      type: UPDATE_ALL_PAIRS_IN_MOONISWAP,
       payload: {
         allPairs
       }
     })
   }, [])
 
-  const updateAllTokensInUniswap = useCallback(allTokens => {
+  const updateAllTokensInMooniswap = useCallback(allTokens => {
     dispatch({
-      type: UPDATE_ALL_TOKENS_IN_UNISWAP,
+      type: UPDATE_ALL_TOKENS_IN_MOONISWAP,
       payload: {
         allTokens
       }
@@ -145,7 +144,7 @@ export default function Provider({ children }) {
       value={useMemo(
         () => [
           state,
-          { update, updateTransactions, updateChart, updateEthPrice, updateAllPairsInUniswap, updateAllTokensInUniswap }
+          { update, updateTransactions, updateChart, updateEthPrice, updateAllPairsInMooniswap, updateAllTokensInMooniswap }
         ],
         [
           state,
@@ -153,8 +152,8 @@ export default function Provider({ children }) {
           updateTransactions,
           updateChart,
           updateEthPrice,
-          updateAllPairsInUniswap,
-          updateAllTokensInUniswap
+          updateAllPairsInMooniswap,
+          updateAllTokensInMooniswap
         ]
       )}
     >
@@ -228,9 +227,6 @@ async function getGlobalData(ethPrice, oldEthPrice) {
       data.liquidityChangeUSD = liquidityChangeUSD
       data.oneDayTxns = oneDayTxns
       data.txnChange = txnChange
-
-      const v1Data = await getV1Data()
-      data.v1Data = v1Data
     }
   } catch (e) {
     console.log(e)
@@ -434,7 +430,7 @@ async function getAllTokensOnMooniswap() {
 }
 
 export function useGlobalData() {
-  const [state, { update, updateAllPairsInUniswap, updateAllTokensInUniswap }] = useGlobalDataContext()
+  const [state, { update, updateAllPairsInMooniswap, updateAllTokensInMooniswap }] = useGlobalDataContext()
   const [ethPrice, oldEthPrice] = useEthPrice()
 
   const data = state?.globalData
@@ -445,15 +441,15 @@ export function useGlobalData() {
       globalData && update(globalData)
 
       let allPairs = await getAllPairsOnMooniswap()
-      updateAllPairsInUniswap(allPairs)
+      updateAllPairsInMooniswap(allPairs)
 
       let allTokens = await getAllTokensOnMooniswap()
-      updateAllTokensInUniswap(allTokens)
+      updateAllTokensInMooniswap(allTokens)
     }
     if (!data && ethPrice && oldEthPrice) {
       fetchData()
     }
-  }, [ethPrice, oldEthPrice, update, data, updateAllPairsInUniswap, updateAllTokensInUniswap])
+  }, [ethPrice, oldEthPrice, update, data, updateAllPairsInMooniswap, updateAllTokensInMooniswap])
 
   return data || {}
 }
@@ -535,14 +531,14 @@ export function useEthPrice() {
   return [ethPrice, ethPriceOld]
 }
 
-export function useAllPairsInUniswap() {
+export function useAllPairsInMooniswap() {
   const [state] = useGlobalDataContext()
   let allPairs = state?.allPairs
 
   return allPairs || []
 }
 
-export function useAllTokensInUniswap() {
+export function useAllTokensInMooniswap() {
   const [state] = useGlobalDataContext()
   let allTokens = state?.allTokens
 

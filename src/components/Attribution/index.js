@@ -2,17 +2,14 @@ import React from 'react'
 
 const Attribution = () => (
   <p className="attribution">
-    <a href="https://github.com/Uniswap/uniswap-info" rel="noopener noreferrer" target="_blank">
+    <a href="https://github.com/CryptoManiacsZone/mooniswap-info" rel="noopener noreferrer" target="_blank">
       Github
     </a>{' '}
     |{' '}
-    <a href="https://uniswap.io" rel="noopener noreferrer" target="_blank">
-      Uniswap
+    <a href="https://mooniswap.exchange" rel="noopener noreferrer" target="_blank">
+      Mooniswap
     </a>{' '}
     |{' '}
-    <a href="https://gifer.com/en/1Atv" rel="noopener noreferrer" target="_blank">
-      GIF
-    </a>
   </p>
 )
 

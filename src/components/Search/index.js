@@ -10,7 +10,7 @@ import { useAllTokenData, useTokenData } from '../../contexts/TokenData'
 import { useAllPairData, usePairData } from '../../contexts/PairData'
 import DoubleTokenLogo from '../DoubleLogo'
 import { useMedia } from 'react-use'
-import { useAllPairsInUniswap, useAllTokensInUniswap } from '../../contexts/GlobalData'
+import { useAllPairsInMooniswap, useAllTokensInMooniswap } from '../../contexts/GlobalData'
 import { OVERVIEW_TOKEN_BLACKLIST, OVERVIEW_PAIR_BLACKLIST } from '../../constants'
 
 const Wrapper = styled.div`
@@ -113,10 +113,10 @@ const Blue = styled.span`
 `
 
 export const Search = ({ small = false }) => {
-  const allTokens = useAllTokensInUniswap()
+  const allTokens = useAllTokensInMooniswap()
   const allTokenData = useAllTokenData()
 
-  const allPairs = useAllPairsInUniswap()
+  const allPairs = useAllPairsInMooniswap()
   const allPairData = useAllPairData()
 
   const [showMenu, toggleMenu] = useState(false)

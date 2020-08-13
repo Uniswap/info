@@ -1,4 +1,4 @@
-name: Upload uniswap.info
+name: Upload mooniswap.info
 
 on:
   push:

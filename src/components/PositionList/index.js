@@ -183,15 +183,15 @@ function PositionList({ positions }) {
             <AutoColumn gap="12px">
               <Text fontWeight={500}>
                 <RowFixed>
-                  {formattedNum(position?.uniswapReturn, true, true)} (
-                  {formattedPercent(position?.uniswapPercentChange)})
+                  {formattedNum(position?.mooniswapReturn, true, true)} (
+                  {formattedPercent(position?.mooniswapPercentChange)})
                 </RowFixed>
               </Text>
               <AutoColumn gap="4px" justify="flex-end">
                 <Text fontSize="12px">
                   {parseFloat(position.pair.token0.derivedETH)
                     ? formattedNum(
-                        position?.uniswapReturn / (parseFloat(position.pair.token0.derivedETH) * ethPrice) / 2,
+                        position?.mooniswapReturn / (parseFloat(position.pair.token0.derivedETH) * ethPrice) / 2,
                         false,
                         true
                       )
@@ -201,7 +201,7 @@ function PositionList({ positions }) {
                 <Text fontSize="12px">
                   {parseFloat(position.pair.token1.derivedETH)
                     ? formattedNum(
-                        position?.uniswapReturn / (parseFloat(position.pair.token1.derivedETH) * ethPrice) / 2,
+                        position?.mooniswapReturn / (parseFloat(position.pair.token1.derivedETH) * ethPrice) / 2,
                         false,
                         true
                       )
@@ -323,7 +323,7 @@ function PositionList({ positions }) {
                 setSortDirection(sortedColumn !== SORT_FIELD.VOL_7DAYS ? true : !sortDirection)
               }}
             >
-              Uniswap Return {sortedColumn === SORT_FIELD.VOL_7DAYS ? (!sortDirection ? '↑' : '↓') : ''}
+              Mooniswap Return {sortedColumn === SORT_FIELD.VOL_7DAYS ? (!sortDirection ? '↑' : '↓') : ''}
             </ClickableText>
           </Flex>
         )}
