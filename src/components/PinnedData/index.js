@@ -18,12 +18,12 @@ const RightColumn = styled.div`
   height: 100vh;
   width: ${({ open }) => (open ? '160px' : '18px')};
   padding: 1.25rem;
-  /* border: ${({ theme, open }) => !open && '1px solid' + theme.bg3}; */
-  border-top-left-radius: 12px;
-  border-bottom-left-radius: 0px;
+  border-left: ${({ theme, open }) => '1px solid' + theme.bg3};
+  /* border-top-left-radius: 12px;
+  border-bottom-left-radius: 0px; */
   background-color: ${({ theme }) => theme.bg1};
-  box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.04), 0px 4px 8px rgba(0, 0, 0, 0.04), 0px 16px 24px rgba(0, 0, 0, 0.04),
-    0px 24px 32px rgba(0, 0, 0, 0.04);
+  /* box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.04), 0px 4px 8px rgba(0, 0, 0, 0.04), 0px 16px 24px rgba(0, 0, 0, 0.04),
+    0px 24px 32px rgba(0, 0, 0, 0.04); */
   z-index: 9999;
 
   /* box-shadow: ${({ open }) =>
