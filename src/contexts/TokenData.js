@@ -391,6 +391,7 @@ const getTokenData = async (address, ethPrice, ethPriceOld) => {
       data.oneDayTxns = data.txCount
     }
 
+    // fix for WETH
     if (data.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
       data.name = 'ETH (Wrapped)'
       data.symbol = 'ETH'

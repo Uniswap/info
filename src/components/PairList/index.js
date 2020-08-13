@@ -11,7 +11,7 @@ import { Divider } from '../../components'
 import { withRouter } from 'react-router-dom'
 import { formattedNum } from '../../utils'
 import DoubleTokenLogo from '../DoubleLogo'
-import {} from '../../constants'
+import FormattedName from '../FormattedName'
 
 dayjs.extend(utc)
 
@@ -168,7 +168,7 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
               margin={!below740}
             />
             <CustomLink style={{ marginLeft: '20px', whiteSpace: 'nowrap' }} to={'/pair/' + pairAddress} color={color}>
-              {pairData.token0.symbol + '-' + pairData.token1.symbol}
+              <FormattedName text={pairData.token0.symbol + '-' + pairData.token1.symbol} maxCharacters={16} />
             </CustomLink>
           </DataText>
           <DataText area="liq">{liquidity}</DataText>

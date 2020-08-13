@@ -514,7 +514,7 @@ const getHourlyRateData = async (pairAddress, startTime) => {
     console.log('error fetchign blocks')
   }
   // catch failing case
-  if (blocks.length === 0) {
+  if (!blocks || blocks?.length === 0) {
     return []
   }
 

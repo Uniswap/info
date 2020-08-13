@@ -13,6 +13,7 @@ import { formattedNum, formattedPercent } from '../../utils'
 import { useMedia } from 'react-use'
 import { withRouter } from 'react-router-dom'
 import { OVERVIEW_TOKEN_BLACKLIST } from '../../constants'
+import FormattedName from '../FormattedName'
 
 dayjs.extend(utc)
 
@@ -175,13 +176,13 @@ function TopTokenList({ tokens, history, itemMax = 10 }) {
             {!below680 && <div style={{ marginRight: '1rem' }}>{index}</div>}
             <TokenLogo address={item.id} />
             <CustomLink style={{ marginLeft: '16px', whiteSpace: 'nowrap' }} to={'/token/' + item.id}>
-              {below680 ? item.symbol : item.name}
+              <FormattedName text={below680 ? item.symbol : item.name} maxCharacters={20} />
             </CustomLink>
           </Row>
         </DataText>
         {!below680 && (
           <DataText area="symbol" color="text" fontWeight="500">
-            {item.symbol}
+            <FormattedName text={item.symbol} maxCharacters={5} />
           </DataText>
         )}
         <DataText area="liq">{formattedNum(item.totalLiquidityUSD, true)}</DataText>
