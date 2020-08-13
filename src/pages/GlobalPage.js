@@ -205,7 +205,7 @@ function GlobalPage({ history }) {
             {showPriceCard && <UniPrice />}
             <AutoColumn gap="20px">
               <RowBetween>
-                <TYPE.main>Uniswap ETH price</TYPE.main>
+                <TYPE.main>Mooniswap ETH price</TYPE.main>
                 <TokenLogo address={ETH} />
               </RowBetween>
               <RowBetween align="flex-end">

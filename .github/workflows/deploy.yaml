@@ -2,8 +2,8 @@ name: Upload uniswap.info
 
 on:
   push:
-    branches:
-      - v2
+    tags:
+      - 'v*.*.*'
 
 jobs:
   deploy:
@@ -27,7 +27,7 @@ jobs:
           AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: 'us-east-1'
+          AWS_REGION: 'eu-central-1'
           SOURCE_DIR: 'build'
       - name: Deploy index.html
         uses: jakejarvis/s3-sync-action@be0c4ab89158cac4278689ebedd8407dd5f35a83
@@ -37,5 +37,5 @@ jobs:
           AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: 'us-east-1'
+          AWS_REGION: 'eu-central-1'
           SOURCE_DIR: 'build'
