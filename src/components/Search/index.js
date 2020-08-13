@@ -325,12 +325,12 @@ export const Search = ({ small = false }) => {
             below410
               ? 'Search...'
               : below470
-              ? 'Search Uniswap...'
+              ? 'Search Mooniswap...'
               : below700
               ? 'Search pairs and tokens...'
               : small
               ? 'Search pairs and tokens...'
-              : 'Search or paste address to find Uniswap pairs and tokens...'
+              : 'Search or paste address to find Mooniswap pairs and tokens...'
           }
           value={value}
           onChange={e => {
