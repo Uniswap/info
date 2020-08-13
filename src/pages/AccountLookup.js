@@ -29,13 +29,11 @@ function AccountLookup() {
 
   return (
     <PageWrapper>
-      <FixedMenu>
+      <FullWrapper>
         <RowBetween>
           <TYPE.largeHeader>Account Lookup</TYPE.largeHeader>
           <div />
         </RowBetween>
-      </FixedMenu>
-      <FullWrapper>
         <AccountWrapper>
           <AccountSearch />
         </AccountWrapper>

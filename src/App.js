@@ -6,7 +6,6 @@ import { Route, Switch, BrowserRouter, Redirect } from 'react-router-dom'
 import GlobalPage from './pages/GlobalPage'
 import TokenPage from './pages/TokenPage'
 import PairPage from './pages/PairPage'
-import NavHeader from './components/NavHeader'
 import LocalLoader from './components/LocalLoader'
 import { useGlobalData, useGlobalChartData } from './contexts/GlobalData'
 import { isAddress } from './utils'
@@ -23,6 +22,7 @@ const AppWrapper = styled.div`
 `
 const ContentWrapper = styled.div`
   display: grid;
+  grid-template-columns: ${({ open }) => (open ? '180px 1fr 200px' : '180px 1fr 64px')};
 
   @media screen and (max-width: 1080px) {
     grid-template-columns: 1fr;
@@ -35,9 +35,9 @@ const Right = styled.div`
   right: 0;
   bottom: 0rem;
   z-index: 99;
-  width: 220px;
+  width: 200px;
   height: ${({ open }) => (open ? 'fit-content' : '64px')};
-  border-top-left-radius: 25px;
+  /* border-top-left-radius: 25px; */
 
   @media screen and (max-width: 1080px) {
     display: none;
@@ -46,6 +46,9 @@ const Right = styled.div`
 
 const Center = styled.div`
   height: 100%;
+  /* box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.04), 0px 4px 8px rgba(0, 0, 0, 0.04), 0px 16px 24px rgba(0, 0, 0, 0.04),
+    0px 24px 32px rgba(0, 0, 0, 0.04); */
+  z-index: 9999;
 `
 
 /**
@@ -54,9 +57,8 @@ const Center = styled.div`
 const LayoutWrapper = ({ children, savedOpen, setSavedOpen }) => {
   return (
     <>
-      <NavHeader />
-      <SubHeader />
       <ContentWrapper open={savedOpen}>
+        <SubHeader />
         <Center id="center">{children}</Center>
         <Right open={savedOpen}>
           <PinnedData open={savedOpen} setSavedOpen={setSavedOpen} />
@@ -67,7 +69,7 @@ const LayoutWrapper = ({ children, savedOpen, setSavedOpen }) => {
 }
 
 function App() {
-  const [savedOpen, setSavedOpen] = useState(true)
+  const [savedOpen, setSavedOpen] = useState(false)
 
   const globalData = useGlobalData()
   const globalChartData = useGlobalChartData()

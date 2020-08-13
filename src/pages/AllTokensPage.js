@@ -17,13 +17,11 @@ function AllTokensPage() {
 
   return (
     <PageWrapper>
-      <FixedMenu>
+      <FullWrapper>
         <RowBetween>
           <TYPE.largeHeader>Top Tokens</TYPE.largeHeader>
           <div />
         </RowBetween>
-      </FixedMenu>
-      <FullWrapper>
         <Panel style={{ marginTop: '6px' }}>
           <TopTokenList tokens={allTokens} itemMax={50} />
         </Panel>

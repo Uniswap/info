@@ -75,7 +75,7 @@ export const SubNavEl = styled.li`
 export const PageWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  padding-bottom: 100px;
+  padding-top: 36px;
   padding-bottom: 80px;
 
   @media screen and (max-width: 600px) {
@@ -89,7 +89,7 @@ export const ContentWrapper = styled.div`
   display: grid;
   justify-content: start;
   align-items: start;
-  grid-template-columns: 1fr 180px;
+  grid-template-columns: 1fr;
   grid-gap: 24px;
   max-width: 1440px;
   width: 100%;
@@ -106,7 +106,7 @@ export const ContentWrapperLarge = styled.div`
   display: grid;
   justify-content: start;
   align-items: start;
-  grid-template-columns: 1fr 180px;
+  grid-template-columns: 1fr;
   grid-gap: 24px;
   padding: 0 2rem;
   margin: 0 auto;
@@ -140,13 +140,15 @@ export const FullWrapper = styled.div`
 
 export const FixedMenu = styled.div`
   z-index: 99;
-  position: sticky;
-  top: 5.25rem;
+  width: 100%;
+  box-sizing: border-box;
+  /* position: sticky; */
+  /* top: 5.25rem; */
   padding: 1rem;
   box-sizing: border-box;
-  background-color: ${({ theme }) => transparentize(0.6, theme.bg1)};
-  backdrop-filter: blur(20px);
-  border-bottom: 1px solid ${({ theme }) => theme.bg2};
+  /* background-color: ${({ theme }) => transparentize(0.6, theme.bg1)}; */
+  /* backdrop-filter: blur(20px); */
+  /* border-bottom: 1px solid ${({ theme }) => theme.bg2}; */
   margin-bottom: 2rem;
 `
 

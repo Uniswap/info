@@ -17,13 +17,11 @@ function AllPairsPage() {
 
   return (
     <PageWrapper>
-      <FixedMenu>
+      <FullWrapper>
         <RowBetween>
           <TYPE.largeHeader>Top Pairs</TYPE.largeHeader>
           <div />
         </RowBetween>
-      </FixedMenu>
-      <FullWrapper>
         <Panel>
           <PairList pairs={allPairs} disbaleLinks={true} maxItems={50} />
         </Panel>

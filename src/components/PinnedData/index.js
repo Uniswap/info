@@ -8,27 +8,32 @@ import { useSavedTokens, useSavedPairs } from '../../contexts/LocalStorage'
 import { Hover } from '..'
 import TokenLogo from '../TokenLogo'
 import AccountSearch from '../AccountSearch'
-import { Bookmark, ChevronDown, X } from 'react-feather'
+import { Bookmark, ChevronRight, X } from 'react-feather'
 import { ButtonFaded } from '../ButtonStyled'
 
 const RightColumn = styled.div`
   position: fixed;
   right: 0;
-  bottom: 0px;
+  top: 0px;
+  height: 100vh;
+  width: ${({ open }) => (open ? '160px' : '18px')};
   padding: 1.25rem;
-  border: ${({ theme, open }) => !open && '1px solid' + theme.bg3};
+  /* border: ${({ theme, open }) => !open && '1px solid' + theme.bg3}; */
   border-top-left-radius: 12px;
   border-bottom-left-radius: 0px;
   background-color: ${({ theme }) => theme.bg1};
+  box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.04), 0px 4px 8px rgba(0, 0, 0, 0.04), 0px 16px 24px rgba(0, 0, 0, 0.04),
+    0px 24px 32px rgba(0, 0, 0, 0.04);
+  z-index: 9999;
 
-  box-shadow: ${({ open }) =>
+  /* box-shadow: ${({ open }) =>
     open
       ? '0px 24px 32px rgba(0, 0, 0, 0.04), 0px 16px 24px rgba(0, 0, 0, 0.04), 0px 4px 8px rgba(0, 0, 0, 0.04), 0px 0px 1px rgba(0, 0, 0, 0.04);'
-      : 'none'};
+      : 'none'}; */
 
   :hover {
     cursor: pointer;
-    border: ${({ theme, open }) => !open && '1px solid' + theme.bg4};
+    /* border: ${({ theme, open }) => !open && '1px solid' + theme.bg4}; */
   }
 `
 
@@ -59,7 +64,7 @@ function PinnedData({ history, open, setSavedOpen }) {
           <Bookmark size={16} />
           <TYPE.main ml={'4px'}>Saved</TYPE.main>
         </RowFixed>
-        <ChevronDown />
+        <ChevronRight />
       </SavedButton>
       <AccountSearch />
       <AutoColumn gap="40px" style={{ marginTop: '2rem' }}>

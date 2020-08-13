@@ -186,7 +186,7 @@ function AccountPage({ account }) {
 
   return (
     <PageWrapper>
-      <FixedMenu>
+      <ContentWrapper>
         <Header ref={OverviewRef}>
           <RowBetween>
             <Text fontSize={24} fontWeight={600}>
@@ -206,8 +206,6 @@ function AccountPage({ account }) {
             </AccountWrapper>
           </RowBetween>
         </Header>
-      </FixedMenu>
-      <ContentWrapper>
         <DashboardWrapper>
           {showWarning && <Warning>Fees cannot currently be calculated for pairs that include AMPL.</Warning>}
           {!hideLPContent && (

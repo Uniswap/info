@@ -167,45 +167,8 @@ function TokenPage({ address, history }) {
 
   return (
     <PageWrapper>
-      <ThemedBackground backgroundColor={transparentize(0.4, backgroundColor)} />
+      <ThemedBackground backgroundColor={transparentize(0.6, backgroundColor)} />
 
-      <FixedMenu>
-        <RowBetween style={{ flexWrap: 'wrap' }} ref={OverviewRef}>
-          <RowFixed style={{ flexWrap: 'wrap' }}>
-            <RowFixed style={{ alignItems: 'baseline' }}>
-              <TokenLogo address={address} size="24px" style={{ alignSelf: 'center' }} />
-              <Text fontSize={'1.25rem'} fontWeight={500} style={{ margin: '0 1rem' }}>
-                {name ? name + ' ' : ''} {symbol ? '(' + symbol + ')' : ''}
-              </Text>{' '}
-              {!below1080 && (
-                <>
-                  <Text fontSize={'1.5rem'} fontWeight={500} style={{ marginRight: '1rem' }}>
-                    {price}
-                  </Text>
-                  {priceChange}
-                </>
-              )}
-            </RowFixed>
-          </RowFixed>
-          <span>
-            <RowFixed ml={below600 ? '0' : '2.5rem'} mt={below600 ? '1rem' : '0'}>
-              {!!!savedTokens[address] && !below800 && (
-                <Hover onClick={() => addToken(address, symbol)}>
-                  <PlusCircle style={{ marginRight: '0.5rem' }} />
-                </Hover>
-              )}
-              <Link href={getPoolLink(address)} target="_blank">
-                <ButtonLight color={backgroundColor}>+ Add Liquidity</ButtonLight>
-              </Link>
-              <Link href={getSwapLink(address)} target="_blank">
-                <ButtonDark ml={'.5rem'} mr={below1080 && '.5rem'} color={backgroundColor}>
-                  Trade
-                </ButtonDark>
-              </Link>
-            </RowFixed>
-          </span>
-        </RowBetween>
-      </FixedMenu>
       <Warning
         type={'token'}
         show={!dismissed && !SURPRESS_WARNINGS.includes(address)}
@@ -215,6 +178,41 @@ function TokenPage({ address, history }) {
       <ContentWrapper>
         <WarningGrouping disabled={!dismissed && !SURPRESS_WARNINGS.includes(address)}>
           <DashboardWrapper>
+            <RowBetween style={{ flexWrap: 'wrap' }} ref={OverviewRef} style={{ marginBottom: '2rem' }}>
+              <RowFixed style={{ flexWrap: 'wrap' }}>
+                <RowFixed style={{ alignItems: 'baseline' }}>
+                  <TokenLogo address={address} size="24px" style={{ alignSelf: 'center' }} />
+                  <Text fontSize={'2rem'} fontWeight={500} style={{ margin: '0 1rem' }}>
+                    {name ? name + ' ' : ''} {symbol ? '(' + symbol + ')' : ''}
+                  </Text>{' '}
+                  {!below1080 && (
+                    <>
+                      <Text fontSize={'1.5rem'} fontWeight={500} style={{ marginRight: '1rem' }}>
+                        {price}
+                      </Text>
+                      {priceChange}
+                    </>
+                  )}
+                </RowFixed>
+              </RowFixed>
+              <span>
+                <RowFixed ml={below600 ? '0' : '2.5rem'} mt={below600 ? '1rem' : '0'}>
+                  {!!!savedTokens[address] && !below800 && (
+                    <Hover onClick={() => addToken(address, symbol)}>
+                      <PlusCircle style={{ marginRight: '0.5rem' }} />
+                    </Hover>
+                  )}
+                  <Link href={getPoolLink(address)} target="_blank">
+                    <ButtonLight color={backgroundColor}>+ Add Liquidity</ButtonLight>
+                  </Link>
+                  <Link href={getSwapLink(address)} target="_blank">
+                    <ButtonDark ml={'.5rem'} mr={below1080 && '.5rem'} color={backgroundColor}>
+                      Trade
+                    </ButtonDark>
+                  </Link>
+                </RowFixed>
+              </span>
+            </RowBetween>
             <>
               {!below1080 && <TYPE.main fontSize={'1.125rem'}>Token Stats</TYPE.main>}
               <PanelWrapper style={{ marginTop: below1080 ? '0' : '1.5rem' }}>

@@ -9,13 +9,17 @@ import PairList from '../components/PairList'
 import TopTokenList from '../components/TokenList'
 import TxnList from '../components/TxnList'
 import GlobalChart from '../components/GlobalChart'
+import Search from '../components/Search'
+import NavHeader from '../components/NavHeader'
+
 import { useGlobalData, useGlobalTransactions } from '../contexts/GlobalData'
 import { useAllPairData } from '../contexts/PairData'
 import { useMedia } from 'react-use'
 import Panel from '../components/Panel'
 import { useAllTokenData } from '../contexts/TokenData'
-import { TYPE } from '../Theme'
 import { formattedNum, formattedPercent } from '../utils'
+import { TYPE, ThemedBackground } from '../Theme'
+import { transparentize } from 'polished'
 import Link, { CustomLink } from '../components/Link'
 import { TrendingUp, PieChart, Disc, List } from 'react-feather'
 import { SubNav, SubNavEl, PageWrapper, FixedMenu, ContentWrapper } from '../components'
@@ -39,19 +43,6 @@ const GridRow = styled.div`
   column-gap: 6px;
   align-items: start;
   justify-content: space-between;
-`
-
-const ThemedBackground = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 200vh;
-  max-width: 100vw;
-  z-index: -1;
-
-  transform: translateY(-70vh);
-  background: ${({ theme }) => theme.background};
 `
 
 function GlobalPage() {
@@ -91,22 +82,17 @@ function GlobalPage() {
 
   return (
     <PageWrapper>
-      <ThemedBackground />
+      <ThemedBackground backgroundColor={transparentize(0.8, '#ff007a')} />
       <div ref={OverviewRef} />
-      <FixedMenu>
-        <AutoColumn gap="40px">
-          <RowBetween>
-            <TYPE.largeHeader>Protocol Overview</TYPE.largeHeader>
-            {!below600 && (
-              <Link href="https://uniswap.org/" target="_blank">
-                <ButtonDark style={{ minWidth: 'initial' }}>Learn More</ButtonDark>
-              </Link>
-            )}
-          </RowBetween>
-        </AutoColumn>
-      </FixedMenu>
+
       <ContentWrapper>
         <div>
+          <AutoColumn gap="24px" style={{ paddingBottom: '24px' }}>
+            <TYPE.largeHeader>Uniswap Protocol Overview</TYPE.largeHeader>
+            <Search />
+            <NavHeader />
+          </AutoColumn>
+
           {below800 && ( // mobile card
             <Box mb={20}>
               <Panel>
@@ -185,26 +171,6 @@ function GlobalPage() {
             <TxnList transactions={transactions} />
           </Panel>
         </div>
-        {!below1180 && (
-          <SubNav style={{ marginTop: 0 }}>
-            <SubNavEl onClick={() => handleScroll(OverviewRef)} isActive={active === OverviewRef}>
-              <TrendingUp size={20} style={{ marginRight: '1rem' }} />
-              <TYPE.main>Overview</TYPE.main>
-            </SubNavEl>
-            <SubNavEl onClick={() => handleScroll(PairsRef)} isActive={active === OverviewRef}>
-              <PieChart size={20} style={{ marginRight: '1rem' }} />
-              <TYPE.main>Top Pairs</TYPE.main>
-            </SubNavEl>
-            <SubNavEl onClick={() => handleScroll(TokensRef)} isActive={active === OverviewRef}>
-              <Disc size={20} style={{ marginRight: '1rem' }} />
-              <TYPE.main>Top Tokens</TYPE.main>
-            </SubNavEl>
-            <SubNavEl onClick={() => handleScroll(TransactionsRef)} isActive={active === OverviewRef}>
-              <List size={20} style={{ marginRight: '1rem' }} />
-              <TYPE.main>Transactions</TYPE.main>
-            </SubNavEl>
-          </SubNav>
-        )}
       </ContentWrapper>
     </PageWrapper>
   )
