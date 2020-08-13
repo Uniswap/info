@@ -282,6 +282,7 @@ async function getBulkPairData(pairList, ethPrice) {
 }
 
 const getPairData = async (address, ethPrice) => {
+
   let data = []
   let oneDayData = []
   let twoDayData = []
@@ -359,16 +360,6 @@ const getPairData = async (address, ethPrice) => {
     }
   } catch (e) {
     console.log(e)
-  }
-
-  if (data?.token0?.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
-    data.token0.name = 'ETH (Wrapped)'
-    data.token0.symbol = 'ETH'
-  }
-
-  if (data?.token1?.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
-    data.token1.name = 'ETH (Wrapped)'
-    data.token1.symbol = 'ETH'
   }
 
   return data
@@ -548,6 +539,7 @@ export function usePairData(pairAddress) {
   useEffect(() => {
     async function fetchData() {
       if (!pairData && pairAddress) {
+        debugger
         let data = await getPairData(pairAddress, ethPrice)
         update(pairAddress, data)
       }
