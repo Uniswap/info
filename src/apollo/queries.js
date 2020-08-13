@@ -420,6 +420,8 @@ export const GLOBAL_TXNS = gql`
         srcAmount
         destAmount
         amountUSD
+        src
+        dest
       }
     }
   }

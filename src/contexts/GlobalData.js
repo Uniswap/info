@@ -323,6 +323,7 @@ const getGlobalTransactions = async () => {
     transactions.mints = []
     transactions.burns = []
     transactions.swaps = []
+
     result?.data?.transactions &&
       result.data.transactions.map(transaction => {
         if (transaction.mints.length > 0) {

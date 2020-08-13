@@ -177,14 +177,18 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
     if (transactions && transactions.mints && transactions.burns && transactions.swaps) {
       let newTxns = []
       if (transactions.mints.length > 0) {
-        transactions.mints.map(mint => {
+        transactions.mints.forEach(mint => {
+          // for referrals
+          if (mint.amount0 === '0') {
+            return true
+          }
           let newTxn = {}
           newTxn.hash = mint.transaction.id
           newTxn.timestamp = mint.transaction.timestamp
           newTxn.type = TXN_TYPE.ADD
           newTxn.token0Amount = mint.amount0
           newTxn.token1Amount = mint.amount1
-          newTxn.account = mint.to
+          newTxn.account = mint.sender
           newTxn.token0Symbol = mint.pair.token0.symbol
           newTxn.token1Symbol = mint.pair.token1.symbol
           newTxn.amountUSD = mint.amountUSD
@@ -192,7 +196,7 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
         })
       }
       if (transactions.burns.length > 0) {
-        transactions.burns.map(burn => {
+        transactions.burns.forEach(burn => {
           let newTxn = {}
           newTxn.hash = burn.transaction.id
           newTxn.timestamp = burn.transaction.timestamp
@@ -208,18 +212,18 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
       }
       if (transactions.swaps.length > 0) {
         transactions.swaps.map(swap => {
-          const isSrcFirst = swap.pair.token0.address === swap.src
+          const isSrcFirst = swap.pair.token0.id === swap.src
           const netToken0 = isSrcFirst ? swap.srcAmount : swap.destAmount
           const netToken1 = isSrcFirst ? swap.destAmount : swap.srcAmount
 
           let newTxn = {}
 
-          if (netToken0 < 0) {
+          if (isSrcFirst) {
             newTxn.token0Symbol = swap.pair.token0.symbol
             newTxn.token1Symbol = swap.pair.token1.symbol
             newTxn.token0Amount = Math.abs(netToken0)
             newTxn.token1Amount = Math.abs(netToken1)
-          } else if (netToken1 < 0) {
+          } else {
             newTxn.token0Symbol = swap.pair.token1.symbol
             newTxn.token1Symbol = swap.pair.token0.symbol
             newTxn.token0Amount = Math.abs(netToken1)
@@ -231,7 +235,7 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
           newTxn.type = TXN_TYPE.SWAP
 
           newTxn.amountUSD = swap.amountUSD
-          newTxn.account = swap.to
+          newTxn.account = swap.sender
           return newTxns.push(newTxn)
         })
       }
