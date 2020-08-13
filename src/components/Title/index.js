@@ -28,6 +28,12 @@ const UniIcon = styled(Link)`
   }
 `
 
+const WrapImage = styled.div`
+  margin-left: 4px; 
+  margin-top: 0px;
+  max-width: 300px;
+`
+
 export default function Title({ token, pair, account }) {
   const history = useHistory()
 
@@ -77,12 +83,14 @@ export default function Title({ token, pair, account }) {
   return (
     <TitleWrapper onClick={() => history.push('/')}>
       <Flex alignItems="center">
-        <RowFixed>
-          <UniIcon id="link" onClick={() => history.push('/')}>
-            <img src={Logo} alt="logo" width="55px"/>
-          </UniIcon>
-          <img style={{ marginLeft: '4px', marginTop: '0px' }} src={Wordmark} alt="logo" width="300px"/>
-        </RowFixed>
+          <div>
+            <UniIcon id="link" onClick={() => history.push('/')}>
+              <img src={Logo} alt="logo" width="55px"/>
+            </UniIcon>
+          </div>
+          <WrapImage>
+            <img style={{ width: '100%' }} src={Wordmark} alt="logo"/>
+          </WrapImage>
         <Text fontWeight={600} mx="4px" lineHeight="1.5rem">
           {getName()}
         </Text>

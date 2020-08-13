@@ -8,15 +8,26 @@ import { AutoColumn } from '../Column'
 import { useMedia } from 'react-use'
 
 const Header = styled.div`
-  width: calc(100% - 80px);
-  padding: 20px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: calc(100% - 20px);
+  overflow: scroll;
+  padding: 20px 0;
+  
+  & > * {
+    width: 100%;
+    max-width: 1240px;
+  }
+
+  @media screen and (max-width: 1080px) {
+    width: calc(100% - 40px);
+    padding: 20px 20px;
+  }
+
   background-color: rgba(255, 255, 255, 0.3);
   margin-bottom: 20px;
-
-  @media screen and (max-width: 640px) {
-    width: calc(100% - 40px);
-    padding: 32px 20px;
-  }
 `
 
 // const CombinedWrapper = styled(RowFixed)`
