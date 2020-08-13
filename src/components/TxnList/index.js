@@ -208,8 +208,9 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
       }
       if (transactions.swaps.length > 0) {
         transactions.swaps.map(swap => {
-          const netToken0 = swap.amount0In - swap.amount0Out
-          const netToken1 = swap.amount1In - swap.amount1Out
+          const isSrcFirst = swap.pair.token0.address === swap.src
+          const netToken0 = isSrcFirst ? swap.srcAmount : swap.destAmount
+          const netToken1 = isSrcFirst ? swap.destAmount : swap.srcAmount
 
           let newTxn = {}
 

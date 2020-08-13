@@ -183,18 +183,18 @@ async function getGlobalData(ethPrice, oldEthPrice) {
       query: GLOBAL_DATA(),
       fetchPolicy: 'cache-first'
     })
-    data = result.data.uniswapFactories[0]
+    data = result.data.mooniswapFactories[0]
     let oneDayResult = await client.query({
       query: GLOBAL_DATA(oneDayBlock?.number),
       fetchPolicy: 'cache-first'
     })
-    oneDayData = oneDayResult.data.uniswapFactories[0]
+    oneDayData = oneDayResult.data.mooniswapFactories[0]
 
     let twoDayResult = await client.query({
       query: GLOBAL_DATA(twoDayBlock?.number),
       fetchPolicy: 'cache-first'
     })
-    twoDayData = twoDayResult.data.uniswapFactories[0]
+    twoDayData = twoDayResult.data.mooniswapFactories[0]
 
     if (data && oneDayData && twoDayData) {
       let [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentChange(
@@ -270,7 +270,7 @@ const getChartData = async oldestDateToFetch => {
       fetchPolicy: 'cache-first'
     })
 
-    data = [...result.data.uniswapDayDatas]
+    data = [...result.data.mooniswapDayDatas]
 
     if (data) {
       let dayIndexSet = new Set()
