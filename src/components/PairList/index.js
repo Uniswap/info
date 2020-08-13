@@ -48,6 +48,8 @@ const DashGrid = styled.div`
   :hover {
     cursor: ${({ focus }) => focus && 'pointer'};
     background-color: ${({ focus, theme }) => focus && theme.bg3};
+    margin: 0 -20px;
+    padding: 0 20px;
   }
 
   > * {
@@ -237,7 +239,7 @@ function PairList({ pairs, color, history, disbaleLinks, maxItems = 10 }) {
 
   return (
     <ListWrapper>
-      <DashGrid center={true} disbaleLinks={disbaleLinks} style={{ height: 'fit-content', padding: '0 0 1rem 0' }}>
+      <DashGrid center={true} disbaleLinks={disbaleLinks} style={{ height: 'fit-content', padding: '0 0 1rem 0', margin: 0 }}>
         <Flex alignItems="center" justifyContent="flexStart">
           <Text area="name" fontWeight="500">
             Name
