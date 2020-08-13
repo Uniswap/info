@@ -74,6 +74,7 @@ export default function Provider({ children }) {
     })
   }, [])
 
+  // global time window for charts - see timeframe options in constants
   const updateTimeframe = useCallback(newTimeFrame => {
     dispatch({
       type: UPDATE_TIMEFRAME,
@@ -83,6 +84,7 @@ export default function Provider({ children }) {
     })
   }, [])
 
+  // used for refresh button
   const updateSessionStart = useCallback(timestamp => {
     dispatch({
       type: UPDATE_SESSION_START,
@@ -140,7 +142,6 @@ export function useStartTimestamp() {
 
   // monitor the old date fetched
   useEffect(() => {
-    // based on window, get starttime
     let startTime =
       dayjs
         .utc()
@@ -157,6 +158,7 @@ export function useStartTimestamp() {
   return startDateTimestamp
 }
 
+// keep track of session length for refresh ticker
 export function useSessionStart() {
   const [state, { updateSessionStart }] = useApplicationContext()
   const sessionStart = state?.[SESSION_START]
@@ -181,6 +183,10 @@ export function useSessionStart() {
   return parseInt(seconds / 1000)
 }
 
+/**
+ * @todo this isnt used now - if ever needed probably better to use
+ * web3-react instead of this custom hook
+ */
 export function useWeb3() {
   const [state, { updateWeb3 }] = useApplicationContext()
   const web3 = state?.[WEB3]

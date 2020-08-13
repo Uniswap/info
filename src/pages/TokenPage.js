@@ -30,6 +30,7 @@ import { SURPRESS_WARNINGS } from '../constants'
 import { usePathDismissed, useSavedTokens } from '../contexts/LocalStorage'
 import { Hover, SubNav, SubNavEl, PageWrapper, FixedMenu, ContentWrapper } from '../components'
 import { PlusCircle, TrendingUp, List, PieChart, Trello } from 'react-feather'
+import FormattedName from '../components/FormattedName'
 
 const DashboardWrapper = styled.div`
   width: 100%;
@@ -326,13 +327,13 @@ function TokenPage({ address, history }) {
                   <Column>
                     <TYPE.main>Symbol</TYPE.main>
                     <Text style={{ marginTop: '.5rem' }} fontSize={24} fontWeight="500">
-                      {symbol}
+                      <FormattedName text={symbol} maxCharacters={12} />
                     </Text>
                   </Column>
                   <Column>
                     <TYPE.main>Name</TYPE.main>
                     <Text style={{ marginTop: '.5rem' }} fontSize={24} fontWeight="500">
-                      {name}
+                      <FormattedName text={name} maxCharacters={16} />
                     </Text>
                   </Column>
                   <Column>

@@ -141,11 +141,10 @@ const TradingViewChart = ({ type = CHART_TYPES.BAR, data, base, baseChange, fiel
       function setLastBarText() {
         toolTip.innerHTML =
           `<div style="font-size: 16px; margin: 4px 0px; color: #20262E;">${title}</div>` +
-          '<div style="font-size: 22px; font-weight: 500; margin: 4px 0px; color: #20262E">' +
-          formattedNum(base, true) +
+          '<div style="font-size: 22px; margin: 4px 0px; color: #20262E">' +
+          formattedNum(base ?? 0, true) +
           `<span style="margin-left: 10px; font-size: 16px; color: ${color};">${formattedPercentChange}</span>` +
-          '</div>' +
-          '<div>24HR</div>'
+          '</div>'
       }
       setLastBarText()
 

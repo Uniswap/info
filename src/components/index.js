@@ -150,6 +150,11 @@ export const FixedMenu = styled.div`
   /* backdrop-filter: blur(20px); */
   /* border-bottom: 1px solid ${({ theme }) => theme.bg2}; */
   margin-bottom: 2rem;
+  max-width: 100vw;
+
+  @media screen and (max-width: 800px) {
+    margin-bottom: 0;
+  }
 `
 
 export { Hint, Divider, Address, EmptyCard }

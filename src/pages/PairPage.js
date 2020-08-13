@@ -31,6 +31,7 @@ import { SURPRESS_WARNINGS } from '../constants'
 import { usePathDismissed, useSavedPairs } from '../contexts/LocalStorage'
 
 import { TrendingUp, PieChart, List, PlusCircle } from 'react-feather'
+import FormattedName from '../components/FormattedName'
 
 const DashboardWrapper = styled.div`
   width: 100%;
@@ -87,6 +88,7 @@ const TokenDetailsLayout = styled.div`
 const FixedPanel = styled(Panel)`
   width: fit-content;
   padding: 8px 12px;
+  border-radius: 10px;
 
   :hover {
     cursor: pointer;
@@ -177,6 +179,10 @@ function PairPage({ pairAddress, history }) {
   const token0Rate = reserve0 && reserve1 ? formattedNum(reserve1 / reserve0) : '-'
   const token1Rate = reserve0 && reserve1 ? formattedNum(reserve0 / reserve1) : '-'
 
+  // formatted symbols for overflow
+  const formattedSymbol0 = token0?.symbol.length > 6 ? token0?.symbol.slice(0, 5) + '...' : token0?.symbol
+  const formattedSymbol1 = token1?.symbol.length > 6 ? token1?.symbol.slice(0, 5) + '...' : token1?.symbol
+
   const below1282 = useMedia('(max-width: 1282px)')
   const below1080 = useMedia('(max-width: 1080px)')
   const below900 = useMedia('(max-width: 900px)')
@@ -212,7 +218,6 @@ function PairPage({ pairAddress, history }) {
       <ThemedBackground backgroundColor={transparentize(0.6, backgroundColor)} />
 
       <span ref={OverviewRef} />
-
       <Warning
         type={'pair'}
         show={!dismissed && !(SURPRESS_WARNINGS.includes(token0?.id) && SURPRESS_WARNINGS.includes(token1?.id))}
@@ -357,7 +362,8 @@ function PairPage({ pairAddress, history }) {
                       <AutoRow gap="4px">
                         <TokenLogo address={token0?.id} />
                         <TYPE.main fontSize={20} lineHeight={1} fontWeight={500}>
-                          {reserve0 ? formattedNum(reserve0) : ''} {token0?.symbol ?? ''}
+                          {reserve0 ? formattedNum(reserve0) : ''}{' '}
+                          <FormattedName text={token0?.symbol ?? ''} maxCharacters={8} />
                         </TYPE.main>
                       </AutoRow>
                     </Hover>
@@ -365,7 +371,8 @@ function PairPage({ pairAddress, history }) {
                       <AutoRow gap="4px">
                         <TokenLogo address={token1?.id} />
                         <TYPE.main fontSize={20} lineHeight={1} fontWeight={500}>
-                          {reserve1 ? formattedNum(reserve1) : ''} {token1?.symbol ?? ''}
+                          {reserve1 ? formattedNum(reserve1) : ''}{' '}
+                          <FormattedName text={token1?.symbol ?? ''} maxCharacters={8} />
                         </TYPE.main>
                       </AutoRow>
                     </Hover>
@@ -402,7 +409,8 @@ function PairPage({ pairAddress, history }) {
                   <Column>
                     <TYPE.main>Pair Name</TYPE.main>
                     <Text style={{ marginTop: '.5rem' }} fontSize={16} fontWeight="500">
-                      {token0 && token1 ? token0.symbol + '-' + token1.symbol : ''}
+                      <FormattedName text={token0?.symbol ?? ''} maxCharacters={8} />-
+                      <FormattedName text={token1?.symbol ?? ''} maxCharacters={8} />
                     </Text>
                   </Column>
                   <Column>
@@ -415,7 +423,9 @@ function PairPage({ pairAddress, history }) {
                     </AutoRow>
                   </Column>
                   <Column>
-                    <TYPE.main>{token0 && token0.symbol + ' Address'}</TYPE.main>
+                    <TYPE.main>
+                      <FormattedName text={token0?.symbol ?? ''} maxCharacters={8} /> Address
+                    </TYPE.main>
                     <AutoRow align="flex-end">
                       <Text style={{ marginTop: '.5rem' }} fontSize={16} fontWeight="500">
                         {token0 && token0.id.slice(0, 6) + '...' + token0.id.slice(38, 42)}
@@ -424,7 +434,9 @@ function PairPage({ pairAddress, history }) {
                     </AutoRow>
                   </Column>
                   <Column>
-                    <TYPE.main>{token1 && token1.symbol + ' Address'}</TYPE.main>
+                    <TYPE.main>
+                      <FormattedName text={token1?.symbol ?? ''} maxCharacters={8} /> Address
+                    </TYPE.main>
                     <AutoRow align="flex-end">
                       <Text style={{ marginTop: '.5rem' }} fontSize={16} fontWeight="500">
                         {token1 && token1.id.slice(0, 6) + '...' + token1.id.slice(38, 42)}

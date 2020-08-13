@@ -51,6 +51,12 @@ const PairChart = ({ address, color }) => {
   const hourlyRate0 = hourlyData && hourlyData[0]
   const hourlyRate1 = hourlyData && hourlyData[1]
 
+  // formatted symbols for overflow
+  const formattedSymbol0 =
+    pairData?.token0?.symbol.length > 6 ? pairData?.token0?.symbol.slice(0, 5) + '...' : pairData?.token0?.symbol
+  const formattedSymbol1 =
+    pairData?.token1?.symbol.length > 6 ? pairData?.token1?.symbol.slice(0, 5) + '...' : pairData?.token1?.symbol
+
   const below1080 = useMedia('(max-width: 1080px)')
   const below600 = useMedia('(max-width: 600px)')
 
@@ -74,13 +80,13 @@ const PairChart = ({ address, color }) => {
     if (chartFilter === CHART_VIEW.RATE0) {
       return (
         formattedNum(val) +
-        `<span style="font-size: 12px; margin-left: 4px;">${pairData?.token0?.symbol}/${pairData?.token1?.symbol}<span>`
+        `<span style="font-size: 12px; margin-left: 4px;">${formattedSymbol0}/${formattedSymbol1}<span>`
       )
     }
     if (chartFilter === CHART_VIEW.RATE1) {
       return (
         formattedNum(val) +
-        `<span style="font-size: 12px; margin-left: 4px;">${pairData?.token1?.symbol}/${pairData?.token0?.symbol}<span>`
+        `<span style="font-size: 12px; margin-left: 4px;">${formattedSymbol1}/${formattedSymbol0}<span>`
       )
     }
   }
@@ -107,10 +113,10 @@ const PairChart = ({ address, color }) => {
               Volume
             </OptionButton>
             <OptionButton active={chartFilter === CHART_VIEW.RATE0} onClick={() => setChartFilter(CHART_VIEW.RATE0)}>
-              {pairData.token0 ? pairData.token0.symbol + '/' + pairData.token1.symbol : '-'}
+              {pairData.token0 ? formattedSymbol0 + '/' + formattedSymbol1 : '-'}
             </OptionButton>
             <OptionButton active={chartFilter === CHART_VIEW.RATE1} onClick={() => setChartFilter(CHART_VIEW.RATE1)}>
-              {pairData.token0 ? pairData.token1.symbol + '/' + pairData.token0.symbol : '-'}
+              {pairData.token0 ? formattedSymbol1 + '/' + formattedSymbol0 : '-'}
             </OptionButton>
           </AutoRow>
           <AutoRow justify="flex-end" gap="6px">

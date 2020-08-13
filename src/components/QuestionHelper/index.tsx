@@ -33,9 +33,10 @@ interface TooltipProps extends Omit<PopoverProps, 'content'> {
   text: string
 }
 
-function Tooltip({ text, ...rest }: TooltipProps) {
+export function Tooltip({ text, ...rest }: TooltipProps) {
   return <Popover content={<TooltipContainer>{text}</TooltipContainer>} {...rest} />
 }
+
 export default function QuestionHelper({ text, disabled }: { text: string; disabled?: boolean }) {
   const [show, setShow] = useState<boolean>(false)
 
