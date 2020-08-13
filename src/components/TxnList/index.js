@@ -213,21 +213,20 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
       if (transactions.swaps.length > 0) {
         transactions.swaps.map(swap => {
           const isSrcFirst = swap.pair.token0.id === swap.src
-          const netToken0 = isSrcFirst ? swap.srcAmount : swap.destAmount
-          const netToken1 = isSrcFirst ? swap.destAmount : swap.srcAmount
+          const srcAmount = swap.srcAmount
+          const destAmount = swap.destAmount
 
           let newTxn = {}
-
           if (isSrcFirst) {
             newTxn.token0Symbol = swap.pair.token0.symbol
             newTxn.token1Symbol = swap.pair.token1.symbol
-            newTxn.token0Amount = Math.abs(netToken0)
-            newTxn.token1Amount = Math.abs(netToken1)
+            newTxn.token0Amount = Math.abs(srcAmount)
+            newTxn.token1Amount = Math.abs(destAmount)
           } else {
             newTxn.token0Symbol = swap.pair.token1.symbol
             newTxn.token1Symbol = swap.pair.token0.symbol
-            newTxn.token0Amount = Math.abs(netToken1)
-            newTxn.token1Amount = Math.abs(netToken0)
+            newTxn.token0Amount = Math.abs(destAmount)
+            newTxn.token1Amount = Math.abs(srcAmount)
           }
 
           newTxn.hash = swap.transaction.id
@@ -236,6 +235,7 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
 
           newTxn.amountUSD = swap.amountUSD
           newTxn.account = swap.sender
+
           return newTxns.push(newTxn)
         })
       }
