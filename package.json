@@ -1,8 +1,8 @@
 {
-  "name": "uniswap-info",
+  "name": "mooniswap-info",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://uniswap.info",
+  "homepage": "https://mooniswap.info",
   "dependencies": {
     "@popperjs/core": "^2.4.2",
     "@reach/portal": "^0.10.3",

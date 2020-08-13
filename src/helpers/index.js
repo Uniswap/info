@@ -15,23 +15,22 @@ BigNumber.set({ EXPONENTIAL_AT: 50 })
 
 dayjs.extend(utc)
 
+export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000'
+export const ETH = ADDRESS_ZERO
+
 export function getPoolLink(token0Address, token1Address = null) {
   if (!token1Address) {
-    return `https://uniswap.exchange/add/${token0Address}-${
-      token0Address === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
-        ? 'ETH'
-        : '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
-    }`
+    return `https://mooniswap.exchange/add/${token0Address}-${token0Address}`
   } else {
-    return `https://uniswap.exchange/add/${token0Address}-${token1Address}`
+    return `https://mooniswap.exchange/add/${token0Address}-${token1Address}`
   }
 }
 
 export function getSwapLink(token0Address, token1Address = null) {
   if (!token1Address) {
-    return `https://uniswap.exchange/swap?inputCurrency=${token0Address}`
+    return `https://mooniswap.exchange/swap?inputCurrency=${token0Address}`
   } else {
-    return `https://uniswap.exchange/swap?inputCurrency=${token0Address}&outputCurrency=${token1Address}`
+    return `https://mooniswap.exchange/swap?inputCurrency=${token0Address}&outputCurrency=${token1Address}`
   }
 }
 
@@ -359,4 +358,11 @@ export function isEquivalent(a, b) {
     }
   }
   return true
+}
+
+export function getLogoUrlList(address) {
+  return [
+    `https://1inch.exchange/assets/tokens/${address.toLowerCase()}.png`,
+    `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${address}/logo.png`,
+  ]
 }

@@ -2,17 +2,17 @@ import { useState, useCallback, useEffect, useRef } from 'react'
 import { shade } from 'polished'
 import Vibrant from 'node-vibrant'
 import { hex } from 'wcag-contrast'
-import { isAddress } from '../helpers'
+import { getLogoUrlList, isAddress } from '../helpers'
 import copy from 'copy-to-clipboard'
 
 export function useColor(tokenAddress, token) {
   const [color, setColor] = useState('#2172E5')
   if (tokenAddress) {
-    const path = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${isAddress(
+    const pathList = getLogoUrlList(isAddress(
       tokenAddress
-    )}/logo.png`
-    if (path) {
-      Vibrant.from(path).getPalette((err, palette) => {
+    ))
+    if (pathList?.length > 0) {
+      Vibrant.from(pathList[0]).getPalette((err, palette) => {
         if (palette && palette.Vibrant) {
           let detectedHex = palette.Vibrant.hex
           let AAscore = hex(detectedHex, '#FFF')
