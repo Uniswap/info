@@ -58,7 +58,7 @@ function App() {
                       </>
                     )
                   } else {
-                    return <Redirect to="/#/home" />
+                    return <Redirect to="/home" />
                   }
                 }}
               />
@@ -78,7 +78,7 @@ function App() {
                       </>
                     )
                   } else {
-                    return <Redirect to="/#/home" />
+                    return <Redirect to="/home" />
                   }
                 }}
               />
