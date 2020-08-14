@@ -101,8 +101,6 @@ function SideNav({ history }) {
 
   const seconds = useSessionStart()
 
-  console.log(history.location.pathname.split('/')[1])
-
   return (
     <Wrapper>
       {!below600 ? (

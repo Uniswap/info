@@ -13,7 +13,7 @@ import { formattedNum, getPoolLink } from '../../utils'
 import { AutoColumn } from '../Column'
 import { useEthPrice } from '../../contexts/GlobalData'
 import { RowFixed } from '../Row'
-import { ButtonFaded } from '../ButtonStyled'
+import { ButtonLight } from '../ButtonStyled'
 
 dayjs.extend(utc)
 
@@ -149,12 +149,12 @@ function PositionList({ positions }) {
               <Link
                 external
                 href={getPoolLink(position.pair.token0.id, position.pair.token1.id)}
-                style={{ marginRight: '1rem' }}
+                style={{ marginRight: '.5rem' }}
               >
-                <ButtonFaded>Add</ButtonFaded>
+                <ButtonLight style={{ padding: '2px 4px', borderRadius: '4px' }}>Add</ButtonLight>
               </Link>
               <Link external href={getPoolLink(position.pair.token0.id, position.pair.token1.id, true)}>
-                <ButtonFaded> Remove</ButtonFaded>
+                <ButtonLight style={{ padding: '2px 4px', borderRadius: '4px' }}>Remove</ButtonLight>
               </Link>
             </RowFixed>
           </AutoColumn>
