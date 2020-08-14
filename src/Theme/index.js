@@ -138,7 +138,7 @@ export const ThemedBackground = styled.div`
   position: absolute;
   top: 0px;
   left: 0px;
-  z-index: 999;
+  z-index: 30;
 
   transform: translateY(-110vh);
 `
@@ -156,7 +156,6 @@ export const GlobalStyle = createGlobalStyle`
     padding: 0;
     width: 100%;
     height: 100%;
-    /* overflow: auto; */
     font-size: 14px;    
   }
 

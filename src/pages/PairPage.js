@@ -6,7 +6,7 @@ import styled from 'styled-components'
 import { Text } from 'rebass'
 import Panel from '../components/Panel'
 
-import { PageWrapper, FixedMenu, ContentWrapperLarge } from '../components/index'
+import { PageWrapper, ContentWrapperLarge } from '../components/index'
 import { AutoRow, RowBetween, RowFixed } from '../components/Row'
 import Column, { AutoColumn } from '../components/Column'
 import { ButtonLight, ButtonDark } from '../components/ButtonStyled'
@@ -14,6 +14,7 @@ import PairChart from '../components/PairChart'
 import Link from '../components/Link'
 import TxnList from '../components/TxnList'
 import Loader from '../components/Loader'
+import { BasicLink } from '../components/Link'
 
 import { formattedNum, formattedPercent, getPoolLink, getSwapLink } from '../utils'
 import { useColor } from '../hooks'
@@ -30,7 +31,7 @@ import Warning from '../components/Warning'
 import { SURPRESS_WARNINGS } from '../constants'
 import { usePathDismissed, useSavedPairs } from '../contexts/LocalStorage'
 
-import { TrendingUp, PieChart, List, PlusCircle } from 'react-feather'
+import { Bookmark, PlusCircle } from 'react-feather'
 import FormattedName from '../components/FormattedName'
 
 const DashboardWrapper = styled.div`
@@ -225,6 +226,10 @@ function PairPage({ pairAddress, history }) {
         address={pairAddress}
       />
       <ContentWrapperLarge>
+        <Text>
+          <BasicLink to="/all-pairs">{'Pairs '}</BasicLink>→ {token0?.symbol}-{token1?.symbol}
+        </Text>
+
         <WarningGrouping
           disabled={!dismissed && !(SURPRESS_WARNINGS.includes(token0?.id) && SURPRESS_WARNINGS.includes(token1?.id))}
         >
@@ -234,7 +239,7 @@ function PairPage({ pairAddress, history }) {
                 <RowFixed style={{ flexWrap: 'wrap', minWidth: '100px' }}>
                   <RowFixed>
                     {token0 && token1 && (
-                      <DoubleTokenLogo a0={token0?.id || ''} a1={token1?.id || ''} size={24} margin={true} />
+                      <DoubleTokenLogo a0={token0?.id || ''} a1={token1?.id || ''} size={32} margin={true} />
                     )}{' '}
                     <Text fontSize={'2rem'} fontWeight={500} style={{ margin: '0 1rem' }}>
                       {token0 && token1 ? (
@@ -257,11 +262,14 @@ function PairPage({ pairAddress, history }) {
                   mt={below1080 && '1rem'}
                   style={{ flexDirection: below1080 ? 'row-reverse' : 'initial' }}
                 >
-                  {!!!savedPairs[pairAddress] && !below1080 && (
+                  {!!!savedPairs[pairAddress] && !below1080 ? (
                     <Hover onClick={() => addPair(pairAddress, token0.id, token1.id, token0.symbol, token1.symbol)}>
                       <PlusCircle style={{ marginRight: '0.5rem' }} />
                     </Hover>
+                  ) : (
+                    <Bookmark style={{ marginRight: '0.5rem', opacity: 0.4 }} />
                   )}
+
                   <Link external href={getPoolLink(token0?.id, token1?.id)}>
                     <ButtonLight color={backgroundColor}>+ Add Liquidity</ButtonLight>
                   </Link>

@@ -12,8 +12,6 @@ import LocalLoader from '../components/LocalLoader'
 import { RowBetween } from '../components/Row'
 
 const AccountWrapper = styled.div`
-  width: 400px;
-
   @media screen and (max-width: 600px) {
     width: 100%;
   }
@@ -31,14 +29,14 @@ function AccountLookup() {
     <PageWrapper>
       <FullWrapper>
         <RowBetween>
-          <TYPE.largeHeader>Account Lookup</TYPE.largeHeader>
+          <TYPE.largeHeader>Wallet analytics</TYPE.largeHeader>
           <div />
         </RowBetween>
         <AccountWrapper>
           <AccountSearch />
         </AccountWrapper>
         <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '2rem' }}>
-          Top Positions
+          Top Liquidity Positions
         </TYPE.main>
         <Panel>{topLps && topLps.length > 0 ? <LPList lps={topLps} maxItems={200} /> : <LocalLoader />}</Panel>
       </FullWrapper>

@@ -9,6 +9,8 @@ import { useSavedAccounts } from '../../contexts/LocalStorage'
 import { AutoColumn } from '../Column'
 import { TYPE } from '../../Theme'
 import { Hover } from '..'
+import CopyHelper from '../Copy'
+
 import { X } from 'react-feather'
 
 const Wrapper = styled.div`
@@ -18,7 +20,7 @@ const Wrapper = styled.div`
   justify-content: flex-end;
   width: 100%;
   border-radius: 12px;
-  background: ${({ theme }) => theme.bg2};
+  /* background: ${({ theme }) => theme.bg2}; */
 `
 
 const Input = styled.input`
@@ -31,10 +33,14 @@ const Input = styled.input`
   border: none;
   outline: none;
   padding: 8px 16px;
-  border-radius: 20px;
+  border-radius: 12px;
   color: ${({ theme }) => theme.textColor};
-  background-color: ${({ theme }) => theme.bg2};
+  background-color: ${({ theme }) => theme.white};
   font-size: 16px;
+  margin-right: 1rem;
+
+  box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.04), 0px 4px 8px rgba(0, 0, 0, 0.04), 0px 16px 24px rgba(0, 0, 0, 0.04),
+    0px 24px 32px rgba(0, 0, 0, 0.04);
 
   ::placeholder {
     color: ${({ theme }) => theme.text3};
@@ -48,7 +54,12 @@ const Input = styled.input`
   }
 `
 
-function AccountLookup({ history }) {
+const AccountLink = styled.span`
+  display: flex;
+  color: ${({ theme }) => theme.link};
+`
+
+function AccountLookup({ history, small }) {
   const [accountValue, setAccountValue] = useState()
   const [savedAccounts, addAccount, removeAccount] = useSavedAccounts()
 
@@ -63,14 +74,36 @@ function AccountLookup({ history }) {
 
   return (
     <AutoColumn gap={'1rem'}>
-      <TYPE.main>Accounts</TYPE.main>
+      {!small && (
+        <>
+          <AutoRow>
+            <Wrapper>
+              <Input
+                placeholder="0x..."
+                onChange={e => {
+                  setAccountValue(e.target.value)
+                }}
+              />
+            </Wrapper>
+            <ButtonLight onClick={handleAccountSearch}>Load Account Details</ButtonLight>
+          </AutoRow>
+        </>
+      )}
+      <TYPE.main>{small ? 'Accounts' : 'Saved Accounts'}</TYPE.main>
+
       <AutoColumn gap={'12px'}>
         {savedAccounts?.length > 0 ? (
           savedAccounts.map(account => {
             return (
               <RowBetween key={account}>
                 <ButtonFaded onClick={() => history.push('/account/' + account)}>
-                  <TYPE.header>{account?.slice(0, 6) + '...' + account?.slice(38, 42)}</TYPE.header>
+                  {small ? (
+                    <TYPE.header>{account?.slice(0, 6) + '...' + account?.slice(38, 42)}</TYPE.header>
+                  ) : (
+                    <AccountLink>
+                      {account?.slice(0, 42)} <CopyHelper toCopy={account} />
+                    </AccountLink>
+                  )}
                 </ButtonFaded>
                 <Hover onClick={() => removeAccount(account)}>
                   <X size={16} />
@@ -82,17 +115,6 @@ function AccountLookup({ history }) {
           <TYPE.light>No pinned wallets</TYPE.light>
         )}
       </AutoColumn>
-      <AutoRow>
-        <Wrapper>
-          <Input
-            placeholder="0x..."
-            onChange={e => {
-              setAccountValue(e.target.value)
-            }}
-          />
-        </Wrapper>
-      </AutoRow>
-      <ButtonLight onClick={handleAccountSearch}>Load Account Details</ButtonLight>
     </AutoColumn>
   )
 }

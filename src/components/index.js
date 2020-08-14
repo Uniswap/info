@@ -55,20 +55,24 @@ export const SideBar = styled.span`
 
 export const SubNav = styled.ul`
   list-style: none;
-  position: sticky;
-  top: 11.25rem;
-  padding: 0px;
-  margin-top: 3rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: flex-start;
+  padding: 0;
+  margin-bottom: 2rem;
 `
 export const SubNavEl = styled.li`
   list-style: none;
   display: flex;
-  margin-bottom: 1rem;
-  width: 100%;
+  padding-bottom: 0.5rem;
+  margin-right: 1rem;
   font-weight: ${({ isActive }) => (isActive ? 600 : 500)};
+  border-bottom: 1px solid rgba(0, 0, 0, 0);
 
   :hover {
     cursor: pointer;
+    border-bottom: 1px solid ${({ theme }) => theme.bg3};
   }
 `
 

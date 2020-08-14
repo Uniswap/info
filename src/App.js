@@ -13,7 +13,9 @@ import AccountPage from './pages/AccountPage'
 import AllTokensPage from './pages/AllTokensPage'
 import AllPairsPage from './pages/AllPairsPage'
 import PinnedData from './components/PinnedData'
-import SubHeader from './components/SubHeader'
+import NavHeader from './components/NavHeader'
+
+import SideNav from './components/SideNav'
 import AccountLookup from './pages/AccountLookup'
 
 const AppWrapper = styled.div`
@@ -22,7 +24,7 @@ const AppWrapper = styled.div`
 `
 const ContentWrapper = styled.div`
   display: grid;
-  grid-template-columns: ${({ open }) => (open ? '180px 1fr 200px' : '180px 1fr 64px')};
+  grid-template-columns: ${({ open }) => (open ? '196px 1fr 200px' : '196px 1fr 64px')};
 
   @media screen and (max-width: 1080px) {
     grid-template-columns: 1fr;
@@ -35,9 +37,8 @@ const Right = styled.div`
   right: 0;
   bottom: 0rem;
   z-index: 99;
-  width: 200px;
+  width: ${({ open }) => (open ? '200px' : '64px')};
   height: ${({ open }) => (open ? 'fit-content' : '64px')};
-  /* border-top-left-radius: 25px; */
 
   @media screen and (max-width: 1080px) {
     display: none;
@@ -46,9 +47,11 @@ const Right = styled.div`
 
 const Center = styled.div`
   height: 100%;
-  /* box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.04), 0px 4px 8px rgba(0, 0, 0, 0.04), 0px 16px 24px rgba(0, 0, 0, 0.04),
-    0px 24px 32px rgba(0, 0, 0, 0.04); */
   z-index: 9999;
+  transition: width 0.25s ease;
+
+  border-radius: 12px;
+  background-color: ${({ theme }) => theme.white};
 `
 
 /**
@@ -58,7 +61,7 @@ const LayoutWrapper = ({ children, savedOpen, setSavedOpen }) => {
   return (
     <>
       <ContentWrapper open={savedOpen}>
-        <SubHeader />
+        <SideNav />
         <Center id="center">{children}</Center>
         <Right open={savedOpen}>
           <PinnedData open={savedOpen} setSavedOpen={setSavedOpen} />

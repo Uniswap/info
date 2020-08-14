@@ -7,6 +7,7 @@ import { useAllPairData } from '../contexts/PairData'
 import PairList from '../components/PairList'
 import { PageWrapper, FullWrapper, FixedMenu } from '../components'
 import { RowBetween } from '../components/Row'
+import Search from '../components/Search'
 
 function AllPairsPage() {
   const allPairs = useAllPairData()
@@ -20,7 +21,7 @@ function AllPairsPage() {
       <FullWrapper>
         <RowBetween>
           <TYPE.largeHeader>Top Pairs</TYPE.largeHeader>
-          <div />
+          <Search small={true} />
         </RowBetween>
         <Panel>
           <PairList pairs={allPairs} disbaleLinks={true} maxItems={50} />

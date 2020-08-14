@@ -14,6 +14,8 @@ import Column, { AutoColumn } from '../components/Column'
 import { ButtonLight, ButtonDark } from '../components/ButtonStyled'
 import TxnList from '../components/TxnList'
 import TokenChart from '../components/TokenChart'
+import { BasicLink } from '../components/Link'
+import Search from '../components/Search'
 
 import { formattedNum, formattedPercent, getPoolLink, getSwapLink } from '../utils'
 
@@ -29,7 +31,7 @@ import Warning from '../components/Warning'
 import { SURPRESS_WARNINGS } from '../constants'
 import { usePathDismissed, useSavedTokens } from '../contexts/LocalStorage'
 import { Hover, SubNav, SubNavEl, PageWrapper, FixedMenu, ContentWrapper } from '../components'
-import { PlusCircle, TrendingUp, List, PieChart, Trello } from 'react-feather'
+import { PlusCircle, Bookmark, TrendingUp, List, PieChart, Trello } from 'react-feather'
 import FormattedName from '../components/FormattedName'
 
 const DashboardWrapper = styled.div`
@@ -162,7 +164,7 @@ function TokenPage({ address, history }) {
     setActive(ref.current)
     window.scrollTo({
       behavior: 'smooth',
-      top: ref.current.offsetTop - 180
+      top: ref.current.offsetTop - 16
     })
   }
 
@@ -177,12 +179,31 @@ function TokenPage({ address, history }) {
         address={address}
       />
       <ContentWrapper>
+        <RowBetween style={{ flexWrap: 'wrap', alingItems: 'start' }}>
+          <AutoRow align="flex-end" style={{ width: 'fit-content' }}>
+            <Text>
+              <BasicLink to="/all-pairs">{'Tokens '}</BasicLink>→ {symbol}{' '}
+            </Text>
+            <Link
+              style={{ width: 'fit-content' }}
+              color={backgroundColor}
+              external
+              href={'https://etherscan.io/address/' + address}
+            >
+              <Text style={{ marginLeft: '.15rem' }} fontSize={'14px'} fontWeight={400}>
+                ({address.slice(0, 8) + '...' + address.slice(36, 42)})
+              </Text>
+            </Link>
+            <CopyHelper toCopy={address} />
+          </AutoRow>
+        </RowBetween>
+
         <WarningGrouping disabled={!dismissed && !SURPRESS_WARNINGS.includes(address)}>
-          <DashboardWrapper>
-            <RowBetween style={{ flexWrap: 'wrap' }} ref={OverviewRef} style={{ marginBottom: '2rem' }}>
+          <DashboardWrapper style={{ marginTop: below1080 ? '0' : '1rem' }}>
+            <RowBetween style={{ flexWrap: 'wrap', marginBottom: '2rem', alignItems: 'flex-start' }} ref={OverviewRef}>
               <RowFixed style={{ flexWrap: 'wrap' }}>
                 <RowFixed style={{ alignItems: 'baseline' }}>
-                  <TokenLogo address={address} size="24px" style={{ alignSelf: 'center' }} />
+                  <TokenLogo address={address} size="32px" style={{ alignSelf: 'center' }} />
                   <Text fontSize={'2rem'} fontWeight={500} style={{ margin: '0 1rem' }}>
                     {name ? name + ' ' : ''} {symbol ? '(' + symbol + ')' : ''}
                   </Text>{' '}
@@ -198,10 +219,14 @@ function TokenPage({ address, history }) {
               </RowFixed>
               <span>
                 <RowFixed ml={below600 ? '0' : '2.5rem'} mt={below600 ? '1rem' : '0'}>
-                  {!!!savedTokens[address] && !below800 && (
+                  {!!!savedTokens[address] && !below800 ? (
                     <Hover onClick={() => addToken(address, symbol)}>
                       <PlusCircle style={{ marginRight: '0.5rem' }} />
                     </Hover>
+                  ) : (
+                    // <Hover onClick={() => addToken(address, symbol)}>
+                    <Bookmark style={{ marginRight: '0.5rem', opacity: 0.4 }} />
+                    // </Hover>
                   )}
                   <Link href={getPoolLink(address)} target="_blank">
                     <ButtonLight color={backgroundColor}>+ Add Liquidity</ButtonLight>
@@ -214,9 +239,9 @@ function TokenPage({ address, history }) {
                 </RowFixed>
               </span>
             </RowBetween>
+
             <>
-              {!below1080 && <TYPE.main fontSize={'1.125rem'}>Token Stats</TYPE.main>}
-              <PanelWrapper style={{ marginTop: below1080 ? '0' : '1.5rem' }}>
+              <PanelWrapper style={{ marginTop: below1080 ? '0' : '1rem' }}>
                 {below1080 && price && (
                   <Panel>
                     <AutoColumn gap="20px">
@@ -282,6 +307,7 @@ function TokenPage({ address, history }) {
                 </Panel>
               </PanelWrapper>
             </>
+
             <span ref={PairsRef}>
               <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
                 Top Pairs
@@ -355,26 +381,6 @@ function TokenPage({ address, history }) {
             </>
           </DashboardWrapper>
         </WarningGrouping>
-        {!below1180 && (
-          <SubNav>
-            <SubNavEl onClick={() => handleScroll(OverviewRef)} isActive={active === OverviewRef}>
-              <TrendingUp size={20} style={{ marginRight: '1rem' }} />
-              <TYPE.main>Overview</TYPE.main>
-            </SubNavEl>
-            <SubNavEl onClick={() => handleScroll(PairsRef)} isActive={active === PairsRef}>
-              <PieChart size={20} style={{ marginRight: '1rem' }} />
-              <TYPE.main>Pairs</TYPE.main>
-            </SubNavEl>
-            <SubNavEl onClick={() => handleScroll(TransactionsRef)} isActive={active === TransactionsRef}>
-              <List size={20} style={{ marginRight: '1rem' }} />
-              <TYPE.main>Transactions</TYPE.main>
-            </SubNavEl>
-            <SubNavEl onClick={() => handleScroll(DataRef)} isActive={active === DataRef}>
-              <Trello size={20} style={{ marginRight: '1rem' }} />
-              <TYPE.main>Token Info</TYPE.main>
-            </SubNavEl>
-          </SubNav>
-        )}
       </ContentWrapper>
     </PageWrapper>
   )

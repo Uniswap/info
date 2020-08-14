@@ -9,8 +9,8 @@ import UniPrice from '../UniPrice'
 
 const Header = styled.div`
   width: 100%;
-  /* background-color: ${({ theme }) => theme.text1}; */
-  /* color: ${({ theme }) => theme.bg1}; */
+  /* background-color: ${({ theme }) => theme.text1};
+  color: ${({ theme }) => theme.bg1}; */
   position: sticky;
   top: 0;
   /* z-index: 9999; */
@@ -63,7 +63,7 @@ export default function NavHeader() {
               {showPriceCard && <UniPrice />}
             </HeaderText>
           )}
-          {!below816 && (
+          {/* {!below816 && (
             <HeaderText>
               Liquidity: <Medium>{liquidity}</Medium>
             </HeaderText>
@@ -72,7 +72,7 @@ export default function NavHeader() {
             <HeaderText>
               Volume (24HR): <Medium>{volume}</Medium>
             </HeaderText>
-          )}
+          )} */}
           {!below1180 && (
             <HeaderText>
               Transactions (24H): <Medium>{oneDayTxns}</Medium>

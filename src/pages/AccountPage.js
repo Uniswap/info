@@ -14,9 +14,9 @@ import { TYPE } from '../Theme'
 import { useMedia } from 'react-use'
 import Loader from '../components/Loader'
 import { ButtonDropdown } from '../components/ButtonStyled'
-import { Hover, PageWrapper, FixedMenu, ContentWrapper } from '../components'
+import { Hover, PageWrapper, ContentWrapper } from '../components'
 import DoubleTokenLogo from '../components/DoubleLogo'
-import { TrendingUp, PieChart, Activity } from 'react-feather'
+import { Bookmark, TrendingUp, PieChart, Activity } from 'react-feather'
 import { SubNav, SubNavEl } from '../components/index'
 import Link from '../components/Link'
 import { FEE_WARNING_TOKENS } from '../constants'
@@ -39,7 +39,7 @@ const AccountWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  color: ${({ theme }) => theme.primary1};
+  /* color: ${({ theme }) => theme.primary1}; */
 `
 
 const Header = styled.div``
@@ -187,22 +187,28 @@ function AccountPage({ account }) {
   return (
     <PageWrapper>
       <ContentWrapper>
+        <Text>
+          {`Accounts → `}
+          <Link lineHeight={'145.23%'} href={'https://etherscan.io/address/' + account} target="_blank">
+            {account?.slice(0, 42)}{' '}
+          </Link>
+        </Text>
+
         <Header ref={OverviewRef}>
           <RowBetween>
-            <Text fontSize={24} fontWeight={600}>
-              Account Stats
-            </Text>
-            <AccountWrapper>
-              <Link
-                lineHeight={'145.23%'}
-                href={'https://etherscan.io/address/' + account}
-                target="_blank"
-                color="#ff007a"
-              >
-                <Text fontSize={20} fontWeight={600}>
-                  {account?.slice(0, 6) + '...' + account?.slice(38, 42)}
+            <span>
+              <Text fontSize={24} fontWeight={600}>
+                {account?.slice(0, 6) + '...' + account?.slice(38, 42)}
+              </Text>
+
+              <Link lineHeight={'145.23%'} href={'https://etherscan.io/address/' + account} target="_blank">
+                <Text fontSize={14} fontWeight={500}>
+                  View on Etherscan
                 </Text>
               </Link>
+            </span>
+            <AccountWrapper>
+              <Bookmark style={{ opacity: 0.4 }} />
             </AccountWrapper>
           </RowBetween>
         </Header>
@@ -326,98 +332,59 @@ function AccountPage({ account }) {
               </Panel>
             </PanelWrapper>
           )}
-          <AutoColumn gap="16px" ref={StatsRef}>
-            <ListOptions gap="10px" style={{ marginTop: '2rem' }}>
-              {!hideLPContent && (
-                <Hover>
-                  <TYPE.main
-                    onClick={() => {
-                      setListView(LIST_VIEW.POSITIONS)
-                    }}
-                    fontSize={below600 ? '14px' : '1.125rem'}
-                    color={listView !== LIST_VIEW.POSITIONS ? '#aeaeae' : 'black'}
-                  >
-                    Positions
-                  </TYPE.main>
-                </Hover>
-              )}
-              <Hover>
-                <TYPE.main
-                  onClick={() => {
-                    setListView(LIST_VIEW.TRANSACTIONS)
-                  }}
-                  fontSize={below600 ? '14px' : '1.125rem'}
-                  color={listView !== LIST_VIEW.TRANSACTIONS ? '#aeaeae' : 'black'}
-                >
-                  Transactions
-                </TYPE.main>
-              </Hover>
-              <Hover>
-                <TYPE.main
-                  onClick={() => {
-                    setListView(LIST_VIEW.STATS)
-                  }}
-                  fontSize={below600 ? '14px' : '1.125rem'}
-                  color={listView !== LIST_VIEW.STATS ? '#aeaeae' : 'black'}
-                >
-                  Account Stats
-                </TYPE.main>
-              </Hover>
-            </ListOptions>
-          </AutoColumn>
+          <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
+            Positions
+          </TYPE.main>{' '}
           <Panel
             style={{
               border: '1px solid rgba(43, 43, 43, 0.05)',
-              marginTop: '1.5rem',
-              marginBottom: '120px'
+              marginTop: '1.5rem'
             }}
           >
-            {listView === LIST_VIEW.TRANSACTIONS ? (
-              transactions ? (
-                <TxnList transactions={transactions} />
-              ) : (
-                <Loader />
-              )
-            ) : listView === LIST_VIEW.POSITIONS ? (
-              <PositionList positions={positions} />
-            ) : (
-              <div>
-                <AutoRow gap="20px">
-                  <AutoColumn gap="8px">
-                    <Text fontSize={24} fontWeight={600}>
-                      {totalSwappedUSD ? formattedNum(totalSwappedUSD, true) : '-'}
-                    </Text>
-                    <Text fontSize={16}>Total Value Swapped</Text>
-                  </AutoColumn>
-                  <AutoColumn gap="8px">
-                    <Text fontSize={24} fontWeight={600}>
-                      {totalSwappedUSD ? formattedNum(totalSwappedUSD * 0.003, true) : '-'}
-                    </Text>
-                    <Text fontSize={16}>Total Fees Paid</Text>
-                  </AutoColumn>
-                  <AutoColumn gap="8px">
-                    <Text fontSize={24} fontWeight={600}>
-                      {transactionCount ? transactionCount : '-'}
-                    </Text>
-                    <Text fontSize={16}>Total Transactions</Text>
-                  </AutoColumn>
-                </AutoRow>
-              </div>
-            )}
+            <PositionList positions={positions} />
+          </Panel>
+          <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
+            Transactions
+          </TYPE.main>{' '}
+          <Panel
+            style={{
+              border: '1px solid rgba(43, 43, 43, 0.05)',
+              marginTop: '1.5rem'
+            }}
+          >
+            <TxnList transactions={transactions} />
+          </Panel>
+          <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
+            Wallet Stats
+          </TYPE.main>{' '}
+          <Panel
+            style={{
+              border: '1px solid rgba(43, 43, 43, 0.05)',
+              marginTop: '1.5rem'
+            }}
+          >
+            <AutoRow gap="20px">
+              <AutoColumn gap="8px">
+                <Text fontSize={24} fontWeight={600}>
+                  {totalSwappedUSD ? formattedNum(totalSwappedUSD, true) : '-'}
+                </Text>
+                <Text fontSize={16}>Total Value Swapped</Text>
+              </AutoColumn>
+              <AutoColumn gap="8px">
+                <Text fontSize={24} fontWeight={600}>
+                  {totalSwappedUSD ? formattedNum(totalSwappedUSD * 0.003, true) : '-'}
+                </Text>
+                <Text fontSize={16}>Total Fees Paid</Text>
+              </AutoColumn>
+              <AutoColumn gap="8px">
+                <Text fontSize={24} fontWeight={600}>
+                  {transactionCount ? transactionCount : '-'}
+                </Text>
+                <Text fontSize={16}>Total Transactions</Text>
+              </AutoColumn>
+            </AutoRow>
           </Panel>
         </DashboardWrapper>
-        {!below1080 && (
-          <SubNav style={{ marginTop: 0 }}>
-            <SubNavEl onClick={() => handleScroll(OverviewRef)} isActive={active === OverviewRef}>
-              <TrendingUp size={20} style={{ marginRight: '1rem' }} />
-              <TYPE.main>Overview</TYPE.main>
-            </SubNavEl>
-            <SubNavEl onClick={() => handleScroll(StatsRef)} isActive={active === OverviewRef}>
-              <PieChart size={20} style={{ marginRight: '1rem' }} />
-              <TYPE.main>Account Stats</TYPE.main>
-            </SubNavEl>
-          </SubNav>
-        )}
       </ContentWrapper>
     </PageWrapper>
   )

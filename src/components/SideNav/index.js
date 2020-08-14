@@ -1,5 +1,4 @@
 import React from 'react'
-import { withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 import { AutoColumn } from '../Column'
 import Title from '../Title'
@@ -7,8 +6,11 @@ import { BasicLink } from '../Link'
 import { useMedia } from 'react-use'
 import { transparentize } from 'polished'
 import { TYPE } from '../../Theme'
+import { withRouter } from 'react-router-dom'
 
 import Logo from '../../assets/logo_white.svg'
+
+import { PlusCircle, Bookmark, TrendingUp, List, PieChart, Disc } from 'react-feather'
 
 import Link from '../Link'
 import { useSessionStart } from '../../contexts/Application'
@@ -22,7 +24,6 @@ const Wrapper = styled.div`
   position: sticky;
   top: 0px;
   z-index: 9999;
-  border-bottom: 1px solid ${({ theme }) => theme.bg3};
   box-sizing: border-box;
   background-color: #1b1c22;
   color: ${({ theme }) => theme.bg2};
@@ -38,8 +39,13 @@ const Wrapper = styled.div`
 
 const Option = styled.div`
   font-weight: 500;
-  font-size: 16px;
-  color: ${({ theme, activeText }) => (activeText ? theme.white : theme.text2)};
+  font-size: 14px;
+  opacity: ${({ activeText }) => (activeText ? 1 : 0.4)};
+  color: ${({ theme }) => theme.white};
+  display: flex;
+  :hover {
+    opacity: 1;
+  }
 `
 
 const MobileWrapper = styled.div`
@@ -48,41 +54,46 @@ const MobileWrapper = styled.div`
   align-items: center;
 `
 
-const Header = styled.div`
-  width: 100%;
-  background-color: ${({ theme }) => theme.text1};
-  color: ${({ theme }) => theme.bg1};
-  position: sticky;
-  top: 0;
-  z-index: 9999;
-`
-
 const HeaderText = styled.div`
   margin-right: 0.75rem;
   font-size: 0.825rem;
   font-weight: 500;
   display: inline-box;
   display: -webkit-inline-box;
+  opacity: 0.6;
+  :hover {
+    opacity: 1;
+  }
+  a {
+    color: ${({ theme }) => theme.white};
+  }
 `
 
 const Polling = styled.div`
   position: fixed;
   display: flex;
-  /* align-items: center; */
   left: 0;
   bottom: 0;
   padding: 1rem;
   color: white;
+  opacity: 0.4;
+  transition: opacity 0.25s ease;
+  :hover {
+    opacity: 1;
+  }
 `
 const PollingDot = styled.div`
   width: 8px;
   height: 8px;
+  min-height: 8px;
+  min-width: 8px;
   margin-right: 0.5rem;
+  margin-top: 3px;
   border-radius: 50%;
   background-color: ${({ theme }) => theme.green1};
 `
 
-function SubHeader({ history }) {
+function SideNav({ history }) {
   const below1080 = useMedia('(max-width: 1080px)')
   const below600 = useMedia('(max-width: 600px)')
 
@@ -97,18 +108,30 @@ function SubHeader({ history }) {
           <AutoColumn gap="1rem" style={{ marginLeft: '1rem', marginTop: '2rem' }}>
             <Title />
             {!below1080 && (
-              <AutoColumn gap="1rem">
+              <AutoColumn gap="1.25rem" style={{ marginTop: '1rem' }}>
                 <BasicLink to="/home">
-                  <Option activeText={history.location.pathname === '/home' ?? undefined}>Overview</Option>
+                  <Option activeText={history.location.pathname === '/home' ?? undefined}>
+                    <TrendingUp size={20} style={{ marginRight: '.75rem' }} />
+                    Overview
+                  </Option>
                 </BasicLink>
                 <BasicLink to="/all-pairs">
-                  <Option activeText={history.location.pathname === '/all-pairs' ?? undefined}>Pairs</Option>
+                  <Option activeText={history.location.pathname === '/all-pairs' ?? undefined}>
+                    <PieChart size={20} style={{ marginRight: '.75rem' }} />
+                    Pairs
+                  </Option>
                 </BasicLink>
                 <BasicLink to="/all-tokens">
-                  <Option activeText={history.location.pathname === '/all-tokens' ?? undefined}>Tokens</Option>
+                  <Option activeText={history.location.pathname === '/all-tokens' ?? undefined}>
+                    <Disc size={20} style={{ marginRight: '.75rem' }} />
+                    Tokens
+                  </Option>
                 </BasicLink>
                 <BasicLink to="/account-lookup">
-                  <Option activeText={history.location.pathname === '/account-lookup' ?? undefined}>Accounts</Option>
+                  <Option activeText={history.location.pathname === '/account-lookup' ?? undefined}>
+                    <List size={20} style={{ marginRight: '.75rem' }} />
+                    Accounts
+                  </Option>
                 </BasicLink>
               </AutoColumn>
             )}
@@ -116,22 +139,27 @@ function SubHeader({ history }) {
           {/* {!below600 && <Search small={true} />} */}
           <AutoColumn gap="0.5rem" style={{ marginLeft: '1rem', marginBottom: '4rem' }}>
             <HeaderText>
-              <Link style={{ color: 'white' }} href="https://v1.uniswap.info" target="_blank">
+              <Link href="https://uniswap.org" target="_blank">
+                Uniswap.org
+              </Link>
+            </HeaderText>
+            <HeaderText>
+              <Link href="https://v1.uniswap.info" target="_blank">
                 V1 Analytics
               </Link>
             </HeaderText>
             <HeaderText>
-              <Link style={{ color: 'white' }} href="https://uniswap.org/docs/v2" target="_blank">
+              <Link href="https://uniswap.org/docs/v2" target="_blank">
                 Docs
               </Link>
             </HeaderText>
             <HeaderText>
-              <Link style={{ color: 'white' }} href="https://discord.com/invite/XErMcTq" target="_blank">
+              <Link href="https://discord.com/invite/XErMcTq" target="_blank">
                 Discord
               </Link>
             </HeaderText>
             <HeaderText>
-              <Link style={{ color: 'white' }} href="https://twitter.com/UniswapProtocol" target="_blank">
+              <Link href="https://twitter.com/UniswapProtocol" target="_blank">
                 Twitter
               </Link>
             </HeaderText>
@@ -155,4 +183,4 @@ function SubHeader({ history }) {
   )
 }
 
-export default withRouter(SubHeader)
+export default withRouter(SideNav)
