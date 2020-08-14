@@ -10,7 +10,7 @@ import { withRouter } from 'react-router-dom'
 
 import Logo from '../../assets/logo_white.svg'
 
-import { PlusCircle, Bookmark, TrendingUp, List, PieChart, Disc } from 'react-feather'
+import { TrendingUp, List, PieChart, Disc } from 'react-feather'
 
 import Link from '../Link'
 import { useSessionStart } from '../../contexts/Application'
@@ -101,6 +101,8 @@ function SideNav({ history }) {
 
   const seconds = useSessionStart()
 
+  console.log(history.location.pathname.split('/')[1])
+
   return (
     <Wrapper>
       {!below600 ? (
@@ -115,14 +117,26 @@ function SideNav({ history }) {
                     Overview
                   </Option>
                 </BasicLink>
-                <BasicLink to="/all-pairs">
-                  <Option activeText={history.location.pathname === '/all-pairs' ?? undefined}>
+                <BasicLink to="/pairs">
+                  <Option
+                    activeText={
+                      (history.location.pathname.split('/')[1] === 'pairs' ||
+                        history.location.pathname.split('/')[1] === 'pair') ??
+                      undefined
+                    }
+                  >
                     <PieChart size={20} style={{ marginRight: '.75rem' }} />
                     Pairs
                   </Option>
                 </BasicLink>
-                <BasicLink to="/all-tokens">
-                  <Option activeText={history.location.pathname === '/all-tokens' ?? undefined}>
+                <BasicLink to="/tokens">
+                  <Option
+                    activeText={
+                      (history.location.pathname.split('/')[1] === 'tokens' ||
+                        history.location.pathname.split('/')[1] === 'token') ??
+                      undefined
+                    }
+                  >
                     <Disc size={20} style={{ marginRight: '.75rem' }} />
                     Tokens
                   </Option>
@@ -136,7 +150,6 @@ function SideNav({ history }) {
               </AutoColumn>
             )}
           </AutoColumn>
-          {/* {!below600 && <Search small={true} />} */}
           <AutoColumn gap="0.5rem" style={{ marginLeft: '1rem', marginBottom: '4rem' }}>
             <HeaderText>
               <Link href="https://uniswap.org" target="_blank">
@@ -176,7 +189,6 @@ function SideNav({ history }) {
       ) : (
         <MobileWrapper>
           <img src={Logo} alt={'logo'} onClick={() => history.push('/home')} />
-          {/* <Search small={true} /> */}
         </MobileWrapper>
       )}
     </Wrapper>

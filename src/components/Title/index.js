@@ -81,7 +81,7 @@ export default function Title({ token, pair, account }) {
           <UniIcon id="link" onClick={() => history.push('/')}>
             <img width={'24px'} src={Logo} alt="logo" />
           </UniIcon>
-          {/* <img width={'84px'} style={{ marginLeft: '8px', marginTop: '0px' }} src={Wordmark} alt="logo" /> */}
+          <img width={'84px'} style={{ marginLeft: '8px', marginTop: '0px' }} src={Wordmark} alt="logo" />
         </RowFixed>
         <Text fontWeight={600} mx="4px" lineHeight="1.5rem">
           {getName()}

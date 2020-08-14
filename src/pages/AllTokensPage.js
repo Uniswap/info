@@ -5,7 +5,7 @@ import TopTokenList from '../components/TokenList'
 import { TYPE } from '../Theme'
 import Panel from '../components/Panel'
 import { useAllTokenData } from '../contexts/TokenData'
-import { PageWrapper, FullWrapper, FixedMenu } from '../components'
+import { PageWrapper, FullWrapper } from '../components'
 import { RowBetween } from '../components/Row'
 import Search from '../components/Search'
 

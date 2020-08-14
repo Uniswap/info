@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import { RowFixed, RowBetween } from '../Row'
 import { useMedia } from 'react-use'
 import { useGlobalData, useEthPrice } from '../../contexts/GlobalData'
-import { formattedNum, toK } from '../../utils'
+import { formattedNum } from '../../utils'
 
 import UniPrice from '../UniPrice'
 
@@ -37,12 +37,12 @@ export default function NavHeader() {
 
   const [showPriceCard, setShowPriceCard] = useState(false)
 
-  const { oneDayVolumeUSD, totalLiquidityUSD, oneDayTxns, pairCount } = useGlobalData()
+  const { oneDayVolumeUSD, oneDayTxns, pairCount } = useGlobalData()
   const [ethPrice] = useEthPrice()
   const formattedEthPrice = ethPrice ? formattedNum(ethPrice, true) : '-'
 
-  const liquidity = totalLiquidityUSD ? '$' + toK(parseFloat(totalLiquidityUSD), true) : ''
-  const volume = oneDayVolumeUSD ? '$' + toK(oneDayVolumeUSD, true) : ''
+  // const liquidity = totalLiquidityUSD ? '$' + toK(parseFloat(totalLiquidityUSD), true) : ''
+  // const volume = oneDayVolumeUSD ? '$' + toK(oneDayVolumeUSD, true) : ''
 
   const oneDayFees = oneDayVolumeUSD ? formattedNum(oneDayVolumeUSD * 0.003, true) : ''
 

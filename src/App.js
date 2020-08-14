@@ -13,7 +13,6 @@ import AccountPage from './pages/AccountPage'
 import AllTokensPage from './pages/AllTokensPage'
 import AllPairsPage from './pages/AllPairsPage'
 import PinnedData from './components/PinnedData'
-import NavHeader from './components/NavHeader'
 
 import SideNav from './components/SideNav'
 import AccountLookup from './pages/AccountLookup'
@@ -141,13 +140,13 @@ function App() {
                 </LayoutWrapper>
               </Route>
 
-              <Route path="/all-tokens">
+              <Route path="/tokens">
                 <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
                   <AllTokensPage />
                 </LayoutWrapper>
               </Route>
 
-              <Route path="/all-pairs">
+              <Route path="/pairs">
                 <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
                   <AllPairsPage />
                 </LayoutWrapper>

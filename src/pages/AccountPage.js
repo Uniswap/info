@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef, useEffect } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 import styled from 'styled-components'
 import { useUserTransactions, useUserPositions } from '../contexts/User'
 import TxnList from '../components/TxnList'
@@ -11,26 +11,12 @@ import UserChart from '../components/UserChart'
 import PairReturnsChart from '../components/PairReturnsChart'
 import PositionList from '../components/PositionList'
 import { TYPE } from '../Theme'
-import { useMedia } from 'react-use'
-import Loader from '../components/Loader'
 import { ButtonDropdown } from '../components/ButtonStyled'
-import { Hover, PageWrapper, ContentWrapper } from '../components'
+import { PageWrapper, ContentWrapper } from '../components'
 import DoubleTokenLogo from '../components/DoubleLogo'
-import { Bookmark, TrendingUp, PieChart, Activity } from 'react-feather'
-import { SubNav, SubNavEl } from '../components/index'
+import { Bookmark, Activity } from 'react-feather'
 import Link from '../components/Link'
 import { FEE_WARNING_TOKENS } from '../constants'
-
-const ListOptions = styled(AutoRow)`
-  height: 40px;
-  width: 100%;
-  font-size: 1.25rem;
-  font-weight: 600;
-
-  @media screen and (max-width: 640px) {
-    font-size: 1rem;
-  }
-`
 
 const AccountWrapper = styled.div`
   background-color: rgba(255, 255, 255, 0.2);
@@ -90,7 +76,7 @@ const PanelWrapper = styled.div`
 `
 
 const Warning = styled.div`
-  background-color: ${({ theme }) => theme.bg2}
+  background-color: ${({ theme }) => theme.bg2};
   padding: 1rem;
   font-weight: 600;
   border-radius: 10px;
@@ -98,19 +84,10 @@ const Warning = styled.div`
   width: calc(100% - 2rem);
 `
 
-const LIST_VIEW = {
-  POSITIONS: 'POSITIONS',
-  TRANSACTIONS: 'TRANSACTIONS',
-  STATS: 'STATS'
-}
-
 function AccountPage({ account }) {
   // get data for this account
   const transactions = useUserTransactions(account)
   const positions = useUserPositions(account)
-
-  const below1080 = useMedia('(max-width: 1080px)')
-  const below600 = useMedia('(max-width: 600px)')
 
   // get data for user stats
   const transactionCount = transactions?.swaps?.length + transactions?.burns?.length + transactions?.mints?.length
@@ -142,7 +119,6 @@ function AccountPage({ account }) {
   // settings for list view and dropdowns
   const hideLPContent = positions && positions.length === 0
   const [showDropdown, setShowDropdown] = useState(false)
-  const [listView, setListView] = useState(hideLPContent ? LIST_VIEW.TRANSACTIONS : LIST_VIEW.POSITIONS)
   const [activePosition, setActivePosition] = useState()
 
   const dynamicPositions = activePosition ? [activePosition] : positions
@@ -163,26 +139,12 @@ function AccountPage({ account }) {
       : null
   }, [dynamicPositions])
 
-  const OverviewRef = useRef()
-  const StatsRef = useRef()
-
-  const [active, setActive] = useState(null)
-
   useEffect(() => {
-    setActive(OverviewRef)
     window.scrollTo({
       behavior: 'smooth',
       top: 0
     })
   }, [])
-
-  const handleScroll = ref => {
-    setActive(ref.current)
-    window.scrollTo({
-      behavior: 'smooth',
-      top: ref.current.offsetTop - 120
-    })
-  }
 
   return (
     <PageWrapper>
@@ -194,7 +156,7 @@ function AccountPage({ account }) {
           </Link>
         </Text>
 
-        <Header ref={OverviewRef}>
+        <Header>
           <RowBetween>
             <span>
               <Text fontSize={24} fontWeight={600}>

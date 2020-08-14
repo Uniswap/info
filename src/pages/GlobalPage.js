@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { withRouter } from 'react-router-dom'
 import { Box } from 'rebass'
 import styled from 'styled-components'
@@ -20,10 +20,9 @@ import { useAllTokenData } from '../contexts/TokenData'
 import { formattedNum, formattedPercent } from '../utils'
 import { TYPE, ThemedBackground } from '../Theme'
 import { transparentize } from 'polished'
-import Link, { CustomLink } from '../components/Link'
-import { TrendingUp, PieChart, Disc, List } from 'react-feather'
-import { SubNav, SubNavEl, PageWrapper, FixedMenu, ContentWrapper } from '../components'
-import { ButtonDark } from '../components/ButtonStyled'
+import { CustomLink } from '../components/Link'
+
+import { PageWrapper, ContentWrapper } from '../components'
 
 const ListOptions = styled(AutoRow)`
   height: 40px;
@@ -53,37 +52,20 @@ function GlobalPage() {
   const { totalLiquidityUSD, oneDayVolumeUSD, volumeChangeUSD, liquidityChangeUSD } = useGlobalData()
 
   // breakpoints
-  const below1180 = useMedia('(max-width: 1180px)')
   const below800 = useMedia('(max-width: 800px)')
-  const below600 = useMedia('(max-width: 600px)')
 
   // scrolling refs
-  const OverviewRef = useRef()
-  const PairsRef = useRef()
-  const TokensRef = useRef()
-  const TransactionsRef = useRef()
-  const [active, setActive] = useState(null)
+
   useEffect(() => {
-    setActive(OverviewRef)
     document.querySelector('body').scrollTo({
       behavior: 'smooth',
       top: 0
     })
   }, [])
 
-  // scroll to ref on click
-  const handleScroll = ref => {
-    setActive(ref.current)
-    window.scrollTo({
-      behavior: 'smooth',
-      top: ref.current.offsetTop - 180
-    })
-  }
-
   return (
     <PageWrapper>
       <ThemedBackground backgroundColor={transparentize(0.8, '#ff007a')} />
-      <div ref={OverviewRef} />
 
       <ContentWrapper>
         <div>
@@ -144,25 +126,25 @@ function GlobalPage() {
               </Panel>
             </AutoColumn>
           )}
-          <ListOptions ref={PairsRef} gap="10px" style={{ marginTop: '2rem', marginBottom: '.5rem' }}>
+          <ListOptions gap="10px" style={{ marginTop: '2rem', marginBottom: '.5rem' }}>
             <RowBetween>
               <TYPE.main fontSize={'1rem'}>Top Pairs</TYPE.main>
-              <CustomLink to={'/all-pairs'}>See All</CustomLink>
+              <CustomLink to={'/pairs'}>See All</CustomLink>
             </RowBetween>
           </ListOptions>
           <Panel style={{ marginTop: '6px', padding: '1.125rem 0 ' }}>
             <PairList pairs={allPairs} />
           </Panel>
-          <ListOptions ref={TokensRef} gap="10px" style={{ marginTop: '2rem', marginBottom: '.5rem' }}>
+          <ListOptions gap="10px" style={{ marginTop: '2rem', marginBottom: '.5rem' }}>
             <RowBetween>
               <TYPE.main fontSize={'1.125rem'}>Top Tokens</TYPE.main>
-              <CustomLink to={'/all-tokens'}>See All</CustomLink>
+              <CustomLink to={'/tokens'}>See All</CustomLink>
             </RowBetween>
           </ListOptions>
           <Panel style={{ marginTop: '6px', padding: '1.125rem 0 ' }}>
             <TopTokenList tokens={allTokens} />
           </Panel>
-          <span ref={TransactionsRef}>
+          <span>
             <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '2rem' }}>
               Transactions
             </TYPE.main>

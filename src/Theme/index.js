@@ -132,14 +132,14 @@ export const ThemedBackground = styled.div`
   pointer-events: none;
   max-width: 100vw !important;
   height: 200vh;
-  mix-blend-mode: multiply;
+  mix-blend-mode: hard-light;
   background: ${({ backgroundColor }) =>
     `radial-gradient(50% 50% at 50% 50%, ${backgroundColor} 0%, rgba(255, 255, 255, 0) 100%)`};
   position: absolute;
   top: 0px;
   left: 0px;
-  z-index: 30;
-
+  /* z-index: 30; */
+  z-index: 999;
   transform: translateY(-110vh);
 `
 

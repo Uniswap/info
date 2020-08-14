@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react'
+import React from 'react'
 import 'feather-icons'
 import { withRouter } from 'react-router-dom'
 import { Text } from 'rebass'
@@ -15,7 +15,7 @@ import { ButtonLight, ButtonDark } from '../components/ButtonStyled'
 import TxnList from '../components/TxnList'
 import TokenChart from '../components/TokenChart'
 import { BasicLink } from '../components/Link'
-import Search from '../components/Search'
+// import Search from '../components/Search'
 
 import { formattedNum, formattedPercent, getPoolLink, getSwapLink } from '../utils'
 
@@ -30,8 +30,8 @@ import { useEffect } from 'react'
 import Warning from '../components/Warning'
 import { SURPRESS_WARNINGS } from '../constants'
 import { usePathDismissed, useSavedTokens } from '../contexts/LocalStorage'
-import { Hover, SubNav, SubNavEl, PageWrapper, FixedMenu, ContentWrapper } from '../components'
-import { PlusCircle, Bookmark, TrendingUp, List, PieChart, Trello } from 'react-feather'
+import { Hover, PageWrapper, ContentWrapper } from '../components'
+import { PlusCircle, Bookmark } from 'react-feather'
 import FormattedName from '../components/FormattedName'
 
 const DashboardWrapper = styled.div`
@@ -136,7 +136,6 @@ function TokenPage({ address, history }) {
   // transactions
   const txnChangeFormatted = formattedPercent(txnChange)
 
-  const below1180 = useMedia('(max-width: 1180px)')
   const below1080 = useMedia('(max-width: 1080px)')
   const below800 = useMedia('(max-width: 800px)')
   const below600 = useMedia('(max-width: 600px)')
@@ -145,28 +144,12 @@ function TokenPage({ address, history }) {
 
   const [savedTokens, addToken] = useSavedTokens()
 
-  const [active, setActive] = useState(null)
-
-  const OverviewRef = useRef()
-  const PairsRef = useRef()
-  const TransactionsRef = useRef()
-  const DataRef = useRef()
-
   useEffect(() => {
-    setActive(OverviewRef)
     window.scrollTo({
       behavior: 'smooth',
       top: 0
     })
   }, [])
-
-  const handleScroll = ref => {
-    setActive(ref.current)
-    window.scrollTo({
-      behavior: 'smooth',
-      top: ref.current.offsetTop - 16
-    })
-  }
 
   return (
     <PageWrapper>
@@ -182,7 +165,7 @@ function TokenPage({ address, history }) {
         <RowBetween style={{ flexWrap: 'wrap', alingItems: 'start' }}>
           <AutoRow align="flex-end" style={{ width: 'fit-content' }}>
             <Text>
-              <BasicLink to="/all-pairs">{'Tokens '}</BasicLink>→ {symbol}{' '}
+              <BasicLink to="/tokens">{'Tokens '}</BasicLink>→ {symbol}{' '}
             </Text>
             <Link
               style={{ width: 'fit-content' }}
@@ -194,13 +177,12 @@ function TokenPage({ address, history }) {
                 ({address.slice(0, 8) + '...' + address.slice(36, 42)})
               </Text>
             </Link>
-            <CopyHelper toCopy={address} />
           </AutoRow>
         </RowBetween>
 
         <WarningGrouping disabled={!dismissed && !SURPRESS_WARNINGS.includes(address)}>
           <DashboardWrapper style={{ marginTop: below1080 ? '0' : '1rem' }}>
-            <RowBetween style={{ flexWrap: 'wrap', marginBottom: '2rem', alignItems: 'flex-start' }} ref={OverviewRef}>
+            <RowBetween style={{ flexWrap: 'wrap', marginBottom: '2rem', alignItems: 'flex-start' }}>
               <RowFixed style={{ flexWrap: 'wrap' }}>
                 <RowFixed style={{ alignItems: 'baseline' }}>
                   <TokenLogo address={address} size="32px" style={{ alignSelf: 'center' }} />
@@ -308,7 +290,7 @@ function TokenPage({ address, history }) {
               </PanelWrapper>
             </>
 
-            <span ref={PairsRef}>
+            <span>
               <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
                 Top Pairs
               </TYPE.main>
@@ -326,7 +308,7 @@ function TokenPage({ address, history }) {
                 <Loader />
               )}
             </Panel>
-            <RowBetween mt={40} mb={'1rem'} ref={TransactionsRef}>
+            <RowBetween mt={40} mb={'1rem'}>
               <TYPE.main fontSize={'1.125rem'}>Transactions</TYPE.main> <div />
             </RowBetween>
             <Panel
@@ -338,7 +320,7 @@ function TokenPage({ address, history }) {
               {transactions ? <TxnList color={backgroundColor} transactions={transactions} /> : <Loader />}
             </Panel>
             <>
-              <RowBetween style={{ marginTop: '3rem' }} ref={DataRef}>
+              <RowBetween style={{ marginTop: '3rem' }}>
                 <TYPE.main fontSize={'1.125rem'}>Token Information</TYPE.main>{' '}
               </RowBetween>
               <Panel

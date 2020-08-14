@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useEffect, useState } from 'react'
 import { withRouter } from 'react-router-dom'
 import 'feather-icons'
 import styled from 'styled-components'
@@ -109,25 +109,6 @@ const WarningGrouping = styled.div`
   pointer-events: ${({ disabled }) => disabled && 'none'};
 `
 
-const SubNav = styled.ul`
-  list-style: none;
-  position: sticky;
-  top: 11.25rem;
-  padding: 0px;
-  margin-top: 3rem;
-`
-const SubNavEl = styled.li`
-  list-style: none;
-  display: flex;
-  margin-bottom: 1rem;
-  width: 100%;
-  font-weight: ${({ isActive }) => (isActive ? 600 : 500)};
-
-  :hover {
-    cursor: pointer;
-  }
-`
-
 function PairPage({ pairAddress, history }) {
   const {
     token0,
@@ -181,36 +162,20 @@ function PairPage({ pairAddress, history }) {
   const token1Rate = reserve0 && reserve1 ? formattedNum(reserve0 / reserve1) : '-'
 
   // formatted symbols for overflow
-  const formattedSymbol0 = token0?.symbol.length > 6 ? token0?.symbol.slice(0, 5) + '...' : token0?.symbol
-  const formattedSymbol1 = token1?.symbol.length > 6 ? token1?.symbol.slice(0, 5) + '...' : token1?.symbol
+  // const formattedSymbol0 = token0?.symbol.length > 6 ? token0?.symbol.slice(0, 5) + '...' : token0?.symbol
+  // const formattedSymbol1 = token1?.symbol.length > 6 ? token1?.symbol.slice(0, 5) + '...' : token1?.symbol
 
-  const below1282 = useMedia('(max-width: 1282px)')
   const below1080 = useMedia('(max-width: 1080px)')
   const below900 = useMedia('(max-width: 900px)')
 
   const [dismissed, markAsDismissed] = usePathDismissed(history.location.pathname)
 
-  const OverviewRef = useRef()
-  const DataRef = useRef()
-  const TransactionsRef = useRef()
-
-  const [active, setActive] = useState(null)
-
   useEffect(() => {
-    setActive(OverviewRef)
     window.scrollTo({
       behavior: 'smooth',
       top: 0
     })
   }, [])
-
-  const handleScroll = ref => {
-    setActive(ref.current)
-    window.scrollTo({
-      behavior: 'smooth',
-      top: ref.current.offsetTop - -180
-    })
-  }
 
   const [savedPairs, addPair] = useSavedPairs()
 
@@ -218,7 +183,7 @@ function PairPage({ pairAddress, history }) {
     <PageWrapper>
       <ThemedBackground backgroundColor={transparentize(0.6, backgroundColor)} />
 
-      <span ref={OverviewRef} />
+      <span />
       <Warning
         type={'pair'}
         show={!dismissed && !(SURPRESS_WARNINGS.includes(token0?.id) && SURPRESS_WARNINGS.includes(token1?.id))}
@@ -227,7 +192,7 @@ function PairPage({ pairAddress, history }) {
       />
       <ContentWrapperLarge>
         <Text>
-          <BasicLink to="/all-pairs">{'Pairs '}</BasicLink>→ {token0?.symbol}-{token1?.symbol}
+          <BasicLink to="/pairs">{'Pairs '}</BasicLink>→ {token0?.symbol}-{token1?.symbol}
         </Text>
 
         <WarningGrouping
@@ -390,7 +355,6 @@ function PairPage({ pairAddress, history }) {
                   <PairChart address={pairAddress} color={backgroundColor} />
                 </Panel>
               </PanelWrapper>
-              <span ref={TransactionsRef} />
               <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
                 Transactions
               </TYPE.main>{' '}
@@ -402,7 +366,7 @@ function PairPage({ pairAddress, history }) {
               >
                 {transactions ? <TxnList transactions={transactions} /> : <Loader />}
               </Panel>
-              <RowBetween style={{ marginTop: '3rem' }} ref={DataRef}>
+              <RowBetween style={{ marginTop: '3rem' }}>
                 <TYPE.main fontSize={'1.125rem'}>Pair Information</TYPE.main>{' '}
               </RowBetween>
               <Panel
