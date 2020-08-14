@@ -24,6 +24,7 @@ export const OVERVIEW_PAIR_BLACKLIST = []
 
 export const SURPRESS_WARNINGS = [
   ETH,
+  '0xd533a949740bb3306d119cc777fa900ba034cd52',
   '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
   '0xb6ed7644c69416d67b522e20bc294a9a9b405b31',
   '0xfc1e690f61efd961294b3e1ce3313fbd8aa4f85d',
