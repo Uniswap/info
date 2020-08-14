@@ -7,11 +7,7 @@ import { useMedia } from 'react-use'
 import { transparentize } from 'polished'
 import { TYPE } from '../../Theme'
 import { withRouter } from 'react-router-dom'
-
-import Logo from '../../assets/logo_white.svg'
-
 import { TrendingUp, List, PieChart, Disc } from 'react-feather'
-
 import Link from '../Link'
 import { useSessionStart } from '../../contexts/Application'
 
@@ -191,7 +187,10 @@ function SideNav({ history }) {
             <Polling style={{ marginLeft: '.75rem' }}>
               <PollingDot />
               <TYPE.small color={'white'}>
-                Updated {!!seconds ? seconds + 's' : '-'} ago <a href="/">(refresh)</a>
+                Updated {!!seconds ? seconds + 's' : '-'} ago{' '}
+                <a href="/" style={{ color: 'white' }}>
+                  (refresh)
+                </a>
               </TYPE.small>
             </Polling>
           )}

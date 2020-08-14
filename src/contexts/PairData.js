@@ -262,7 +262,7 @@ function parseData(data, oneDayData, twoDayData, oneWeekData, ethPrice, oneDayBl
   const oneWeekVolumeUSD = parseFloat(oneWeekData ? data?.volumeUSD - oneWeekData?.volumeUSD : data.volumeUSD)
 
   // set volume properties
-  data.oneDayVolumeUSD = oneDayVolumeUSD
+  data.oneDayVolumeUSD = parseFloat(oneDayVolumeUSD)
   data.oneWeekVolumeUSD = oneWeekVolumeUSD
   data.volumeChangeUSD = volumeChangeUSD
   data.oneDayVolumeUntracked = oneDayVolumeUntracked
@@ -274,15 +274,13 @@ function parseData(data, oneDayData, twoDayData, oneWeekData, ethPrice, oneDayBl
 
   // format if pair hasnt existed for a day or a week
   if (!oneDayData && data && data.createdAtBlockNumber > oneDayBlock) {
-    data.oneDayVolumeUSD = data.volumeUSD
-    data.oneDayVolumeETH = data.tradeVolume * data.derivedETH
+    data.oneDayVolumeUSD = parseFloat(data.volumeUSD)
   }
   if (!oneDayData && data) {
-    data.oneDayVolumeUSD = data.volumeUSD
-    data.oneDayVolumeETH = data.tradeVolume * data.derivedETH
+    data.oneDayVolumeUSD = parseFloat(data.volumeUSD)
   }
   if (!oneWeekData && data) {
-    data.oneWeekVolumeUSD = data.volumeUSD
+    data.oneWeekVolumeUSD = parseFloat(data.volumeUSD)
   }
   if (data?.token0?.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
     data.token0.name = 'Ether (Wrapped)'

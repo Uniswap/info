@@ -10,6 +10,7 @@ import TokenLogo from '../TokenLogo'
 import AccountSearch from '../AccountSearch'
 import { Bookmark, ChevronRight, X } from 'react-feather'
 import { ButtonFaded } from '../ButtonStyled'
+import FormattedName from '../FormattedName'
 
 const RightColumn = styled.div`
   position: fixed;
@@ -74,7 +75,7 @@ function PinnedData({ history, open, setSavedOpen }) {
                     <ButtonFaded onClick={() => history.push('/pair/' + address)}>
                       <RowFixed>
                         <TYPE.header>
-                          {pair.token0Symbol} / {pair.token1Symbol}
+                          <FormattedName text={pair.token0Symbol + '/' + pair.token1Symbol} maxCharacters={12} />
                         </TYPE.header>
                       </RowFixed>
                     </ButtonFaded>
@@ -104,7 +105,9 @@ function PinnedData({ history, open, setSavedOpen }) {
                     <ButtonFaded onClick={() => history.push('/token/' + address)}>
                       <RowFixed>
                         <TokenLogo address={address} size={'14px'} />
-                        <TYPE.header ml={'6px'}>{token.symbol}</TYPE.header>
+                        <TYPE.header ml={'6px'}>
+                          <FormattedName text={token.symbol} maxCharacters={12} />
+                        </TYPE.header>
                       </RowFixed>
                     </ButtonFaded>
                     <Hover onClick={() => removeToken(address)}>

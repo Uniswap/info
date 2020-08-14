@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
 import { XAxis, YAxis, ResponsiveContainer, Tooltip, Legend, LineChart, Line, CartesianGrid } from 'recharts'
 import { AutoRow, RowBetween, RowFixed } from '../Row'
@@ -45,6 +45,11 @@ const LegendCircle = styled.div`
 
 `
 
+const CHART_VIEW = {
+  VALUE: 'Value',
+  FEES: 'Fees'
+}
+
 const PairReturnsChart = ({ account, position }) => {
   let data = useUserPositionChart(position, account)
 
@@ -53,6 +58,8 @@ const PairReturnsChart = ({ account, position }) => {
   const below600 = useMedia('(max-width: 600px)')
 
   const color = useColor(position?.pair.token0.id)
+
+  const [chartView, setChartView] = useState(CHART_VIEW.VALUE)
 
   // based on window, get starttime
   let utcStartTime = getTimeframe(timeWindow)
@@ -84,7 +91,12 @@ const PairReturnsChart = ({ account, position }) => {
       ) : (
         <OptionsRow>
           <AutoRow gap="6px" style={{ flexWrap: 'nowrap' }}>
-            <Text>Liquidity and Fees</Text>
+            <OptionButton active={chartView === CHART_VIEW.VALUE} onClick={() => setChartView(CHART_VIEW.VALUE)}>
+              Liquidity
+            </OptionButton>
+            <OptionButton active={chartView === CHART_VIEW.FEES} onClick={() => setChartView(CHART_VIEW.FEES)}>
+              Fees
+            </OptionButton>
           </AutoRow>
           <AutoRow justify="flex-end" gap="6px">
             <OptionButton
@@ -131,24 +143,13 @@ const PairReturnsChart = ({ account, position }) => {
             />
             <YAxis
               type="number"
-              orientation="left"
-              tickFormatter={tick => '$' + toK(tick)}
-              axisLine={false}
-              tickLine={false}
-              interval="preserveEnd"
-              minTickGap={80}
-              yAxisId={0}
-              tick={{ fill: 'black' }}
-            />
-            <YAxis
-              type="number"
               orientation="right"
               tickFormatter={tick => '$' + toK(tick)}
               axisLine={false}
               tickLine={false}
               interval="preserveEnd"
               minTickGap={80}
-              yAxisId={1}
+              yAxisId={0}
               tick={{ fill: 'black' }}
             />
             <Tooltip
@@ -164,8 +165,14 @@ const PairReturnsChart = ({ account, position }) => {
               }}
               wrapperStyle={{ top: -70, left: -10 }}
             />
-            <Line type="monotone" dataKey="usdValue" stroke={color} yAxisId={1} name={'Liquidity'} />
-            <Line type="monotone" dataKey="fees" stroke="green" yAxisId={0} name={'Fees Earned (Cumulative)'} />
+
+            <Line
+              type="monotone"
+              dataKey={chartView === CHART_VIEW.VALUE ? 'usdValue' : 'fees'}
+              stroke={color}
+              yAxisId={0}
+              name={chartView === CHART_VIEW.VALUE ? 'Liquidity' : 'Fees Earned (Cumulative)'}
+            />
             <Legend content={renderLegend} />
           </LineChart>
         ) : (

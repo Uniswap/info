@@ -182,8 +182,8 @@ function PairPage({ pairAddress, history }) {
   const token1Rate = reserve0 && reserve1 ? formattedNum(reserve0 / reserve1) : '-'
 
   // formatted symbols for overflow
-  // const formattedSymbol0 = token0?.symbol.length > 6 ? token0?.symbol.slice(0, 5) + '...' : token0?.symbol
-  // const formattedSymbol1 = token1?.symbol.length > 6 ? token1?.symbol.slice(0, 5) + '...' : token1?.symbol
+  const formattedSymbol0 = token0?.symbol.length > 6 ? token0?.symbol.slice(0, 5) + '...' : token0?.symbol
+  const formattedSymbol1 = token1?.symbol.length > 6 ? token1?.symbol.slice(0, 5) + '...' : token1?.symbol
 
   const below1080 = useMedia('(max-width: 1080px)')
   const below900 = useMedia('(max-width: 900px)')
@@ -282,7 +282,7 @@ function PairPage({ pairAddress, history }) {
                   <TokenLogo address={token0?.id} size={'16px'} />
                   <TYPE.main fontSize={'16px'} lineHeight={1} fontWeight={500} ml={'4px'}>
                     {token0 && token1
-                      ? `1 ${token0?.symbol} = ${token0Rate} ${token1?.symbol} ${
+                      ? `1 ${formattedSymbol0} = ${token0Rate} ${formattedSymbol1} ${
                           parseFloat(token0?.derivedETH) ? '(' + token0USD + ')' : ''
                         }`
                       : '-'}
@@ -294,7 +294,7 @@ function PairPage({ pairAddress, history }) {
                   <TokenLogo address={token1?.id} size={'16px'} />
                   <TYPE.main fontSize={'16px'} lineHeight={1} fontWeight={500} ml={'4px'}>
                     {token0 && token1
-                      ? `1 ${token1?.symbol} = ${token1Rate} ${token0?.symbol}  ${
+                      ? `1 ${formattedSymbol1} = ${token1Rate} ${formattedSymbol0}  ${
                           parseFloat(token1?.derivedETH) ? '(' + token1USD + ')' : ''
                         }`
                       : '-'}
