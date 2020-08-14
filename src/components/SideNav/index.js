@@ -20,7 +20,7 @@ const Wrapper = styled.div`
   background-color: ${({ theme }) => transparentize(0.4, theme.bg1)};
   backdrop-filter: blur(20px);
   color: ${({ theme }) => theme.text1};
-  padding: 0.5rem 0.5rem 0.5rem 1rem;
+  padding: 0.5rem 0.5rem 0.5rem 0.75rem;
   position: sticky;
   top: 0px;
   z-index: 9999;
@@ -107,7 +107,7 @@ function SideNav({ history }) {
     <Wrapper>
       {!below600 ? (
         <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%' }}>
-          <AutoColumn gap="1rem" style={{ marginLeft: '1rem', marginTop: '2rem' }}>
+          <AutoColumn gap="1rem" style={{ marginLeft: '.75rem', marginTop: '2rem' }}>
             <Title />
             {!below1080 && (
               <AutoColumn gap="1.25rem" style={{ marginTop: '1rem' }}>
@@ -141,8 +141,14 @@ function SideNav({ history }) {
                     Tokens
                   </Option>
                 </BasicLink>
-                <BasicLink to="/account-lookup">
-                  <Option activeText={history.location.pathname === '/account-lookup' ?? undefined}>
+                <BasicLink to="/accounts">
+                  <Option
+                    activeText={
+                      (history.location.pathname.split('/')[1] === 'accounts' ||
+                        history.location.pathname.split('/')[1] === 'account') ??
+                      undefined
+                    }
+                  >
                     <List size={20} style={{ marginRight: '.75rem' }} />
                     Accounts
                   </Option>
@@ -150,7 +156,7 @@ function SideNav({ history }) {
               </AutoColumn>
             )}
           </AutoColumn>
-          <AutoColumn gap="0.5rem" style={{ marginLeft: '1rem', marginBottom: '4rem' }}>
+          <AutoColumn gap="0.5rem" style={{ marginLeft: '.75rem', marginBottom: '4rem' }}>
             <HeaderText>
               <Link href="https://uniswap.org" target="_blank">
                 Uniswap.org
@@ -178,7 +184,7 @@ function SideNav({ history }) {
             </HeaderText>
           </AutoColumn>
           {!below1180 && (
-            <Polling style={{ marginLeft: '1rem' }}>
+            <Polling style={{ marginLeft: '.75rem' }}>
               <PollingDot />
               <TYPE.small color={'white'}>
                 Updated {!!seconds ? seconds + 's' : '-'} ago <a href="/">(refresh)</a>

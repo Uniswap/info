@@ -152,7 +152,7 @@ function App() {
                 </LayoutWrapper>
               </Route>
 
-              <Route path="/account-lookup">
+              <Route path="/accounts">
                 <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
                   <AccountLookup />
                 </LayoutWrapper>

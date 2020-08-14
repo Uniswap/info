@@ -17,6 +17,7 @@ import DoubleTokenLogo from '../components/DoubleLogo'
 import { Bookmark, Activity } from 'react-feather'
 import Link from '../components/Link'
 import { FEE_WARNING_TOKENS } from '../constants'
+import { BasicLink } from '../components/Link'
 
 const AccountWrapper = styled.div`
   background-color: rgba(255, 255, 255, 0.2);
@@ -25,7 +26,6 @@ const AccountWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  /* color: ${({ theme }) => theme.primary1}; */
 `
 
 const Header = styled.div``
@@ -150,8 +150,9 @@ function AccountPage({ account }) {
     <PageWrapper>
       <ContentWrapper>
         <Text>
-          {`Accounts → `}
+          <BasicLink to="/accounts">{'Accounts '}</BasicLink>→{' '}
           <Link lineHeight={'145.23%'} href={'https://etherscan.io/address/' + account} target="_blank">
+            {' '}
             {account?.slice(0, 42)}{' '}
           </Link>
         </Text>

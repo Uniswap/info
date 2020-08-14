@@ -114,7 +114,7 @@ function AccountLookup({ history, small }) {
             {savedAccounts?.length > 0 &&
               savedAccounts.map(account => {
                 return (
-                  <DashGrid center={true} style={{ height: 'fit-content', padding: '1rem 0 0 0' }}>
+                  <DashGrid key={account} center={true} style={{ height: 'fit-content', padding: '1rem 0 0 0' }}>
                     <Flex
                       area="account"
                       justifyContent="space-between"
