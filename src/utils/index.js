@@ -95,6 +95,23 @@ export const toWeeklyDate = date => {
   return dayjs.utc(wkStart).format('MMM DD') + ' - ' + dayjs.utc(wkEnd).format('MMM DD')
 }
 
+export function getTimestampsForChanges() {
+  const utcCurrentTime = dayjs()
+  const t1 = utcCurrentTime
+    .subtract(1, 'day')
+    .startOf('minute')
+    .unix()
+  const t2 = utcCurrentTime
+    .subtract(2, 'day')
+    .startOf('minute')
+    .unix()
+  const tWeek = utcCurrentTime
+    .subtract(1, 'week')
+    .startOf('minute')
+    .unix()
+  return [t1, t2, tWeek]
+}
+
 /**
  * @notice Fetches first block after a given timestamp
  * @dev Query speed is optimized by limiting to a 600-second period
@@ -407,8 +424,8 @@ export function formattedPercent(percent, useBrackets = false) {
  */
 export const get2DayPercentChange = (valueNow, value24HoursAgo, value48HoursAgo) => {
   // get volume info for both 24 hour periods
-  let currentChange = valueNow - value24HoursAgo
-  let previousChange = value24HoursAgo - value48HoursAgo
+  let currentChange = parseFloat(valueNow) - parseFloat(value24HoursAgo)
+  let previousChange = parseFloat(value24HoursAgo) - parseFloat(value48HoursAgo)
 
   const adjustedPercentChange = (parseFloat(currentChange - previousChange) / parseFloat(previousChange)) * 100
 

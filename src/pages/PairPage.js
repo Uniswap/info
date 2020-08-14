@@ -136,6 +136,8 @@ function PairPage({ pairAddress, history }) {
     reserveUSD,
     trackedReserveUSD,
     oneDayVolumeUSD,
+    oneDayVolumeUntracked,
+    volumeChangeUntracked,
     volumeChangeUSD,
     liquidityChangeUSD
   } = usePairData(pairAddress)
@@ -158,14 +160,32 @@ function PairPage({ pairAddress, history }) {
   // mark if using untracked liquidity
   const [usingTracked, setUsingTracked] = useState(true)
   useEffect(() => {
-    if (!trackedReserveUSD) {
-      setUsingTracked(false)
-    }
+    setUsingTracked(!trackedReserveUSD ? false : true)
   }, [trackedReserveUSD])
 
   // volume
-  const volume = oneDayVolumeUSD ? formattedNum(oneDayVolumeUSD, true) : oneDayVolumeUSD === 0 ? '$0' : '-'
-  const volumeChange = formattedPercent(volumeChangeUSD)
+  const volume =
+    oneDayVolumeUSD || oneDayVolumeUSD === 0
+      ? formattedNum(oneDayVolumeUSD === 0 ? oneDayVolumeUntracked : oneDayVolumeUSD, true)
+      : oneDayVolumeUSD === 0
+      ? '$0'
+      : '-'
+
+  // mark if using untracked volume
+  const [usingUtVolume, setUsingUtVolume] = useState(false)
+  useEffect(() => {
+    setUsingUtVolume(oneDayVolumeUSD === 0 ? true : false)
+  }, [oneDayVolumeUSD])
+
+  const volumeChange = formattedPercent(!usingUtVolume ? volumeChangeUSD : volumeChangeUntracked)
+
+  // get fees
+  const fees =
+    oneDayVolumeUSD || oneDayVolumeUSD === 0
+      ? usingUtVolume
+        ? formattedNum(oneDayVolumeUntracked * 0.003, true)
+        : formattedNum(oneDayVolumeUSD * 0.003, true)
+      : '-'
 
   // token data for usd
   const [ethPrice] = useEthPrice()
@@ -340,11 +360,7 @@ function PairPage({ pairAddress, history }) {
                     </RowBetween>
                     <RowBetween align="flex-end">
                       <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
-                        {oneDayVolumeUSD
-                          ? formattedNum(oneDayVolumeUSD * 0.003, true)
-                          : oneDayVolumeUSD === 0
-                          ? '$0'
-                          : '-'}
+                        {fees}
                       </TYPE.main>
                       <TYPE.main>{volumeChange}</TYPE.main>
                     </RowBetween>

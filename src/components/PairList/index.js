@@ -98,15 +98,13 @@ const DataText = styled(Flex)`
 const SORT_FIELD = {
   LIQ: 0,
   VOL: 1,
-  TXNS: 2,
   VOL_7DAYS: 3,
   FEES: 4
 }
 
 const FIELD_TO_VALUE = {
-  [SORT_FIELD.LIQ]: 'trackedReserveETH', // sort with tracked volume only
+  [SORT_FIELD.LIQ]: 'trackedReserveUSD', // sort with tracked volume only
   [SORT_FIELD.VOL]: 'oneDayVolumeUSD',
-  [SORT_FIELD.TXNS]: 'oneDayTxns',
   [SORT_FIELD.VOL_7DAYS]: 'oneWeekVolumeUSD',
   [SORT_FIELD.FEES]: 'oneDayVolumeUSD'
 }

@@ -32,7 +32,7 @@ const CHART_VIEW = {
   VOLUME: 'Volume',
   LIQUIDITY: 'Liquidity',
   PRICE: 'Price',
-  LINE_PRICE: 'LINE_PRICE'
+  LINE_PRICE: 'Price (Line)'
 }
 
 const DATA_FREQUENCY = {
@@ -43,7 +43,7 @@ const DATA_FREQUENCY = {
 
 const TokenChart = ({ address, color, base }) => {
   // settings for the window and candle width
-  const [chartFilter, setChartFilter] = useState(CHART_VIEW.LIQUIDITY)
+  const [chartFilter, setChartFilter] = useState(CHART_VIEW.PRICE)
   const [frequency, setFrequency] = useState(DATA_FREQUENCY.HOUR)
 
   // reset view on new address

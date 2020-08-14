@@ -14,6 +14,9 @@ import { useAllPairsInUniswap, useAllTokensInUniswap } from '../../contexts/Glob
 import { OVERVIEW_TOKEN_BLACKLIST } from '../../constants'
 
 import { transparentize } from 'polished'
+import { client } from '../../apollo/client'
+import { PAIR_SEARCH, TOKEN_SEARCH } from '../../apollo/queries'
+import FormattedName from '../FormattedName'
 
 const Container = styled.div`
   height: 38px;
@@ -117,10 +120,10 @@ const Blue = styled.span`
 `
 
 export const Search = ({ small = false }) => {
-  const allTokens = useAllTokensInUniswap()
+  let allTokens = useAllTokensInUniswap()
   const allTokenData = useAllTokenData()
 
-  const allPairs = useAllPairsInUniswap()
+  let allPairs = useAllPairsInUniswap()
   const allPairData = useAllPairData()
 
   const [showMenu, toggleMenu] = useState(false)
@@ -144,9 +147,66 @@ export const Search = ({ small = false }) => {
     }
   }, [value])
 
+  const [searchedTokens, setSearchedTokens] = useState([])
+  const [searchedPairs, setSearchedPairs] = useState([])
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        if (value?.length > 0) {
+          let tokens = await client.query({
+            variables: {
+              value: value ? value.toUpperCase() : ''
+            },
+            query: TOKEN_SEARCH
+          })
+
+          let pairs = await client.query({
+            variables: {
+              tokens: tokens.data.asSymbol?.map(t => t.id)
+            },
+            query: PAIR_SEARCH
+          })
+          setSearchedPairs(pairs.data.as0.concat(pairs.data.as1))
+          setSearchedTokens(tokens.data.asSymbol)
+        }
+      } catch (e) {
+        console.log(e)
+      }
+    }
+    fetchData()
+  }, [value])
+
   function escapeRegExp(string) {
     return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') // $& means the whole matched string
   }
+
+  // add the searched tokens to the list if now found yet
+  allTokens = allTokens.concat(
+    searchedTokens.filter(searchedToken => {
+      let included = false
+      allTokens.map(token => {
+        if (token.id === searchedToken.id) {
+          included = true
+        }
+        return true
+      })
+      return !included
+    })
+  )
+
+  allPairs = allPairs.concat(
+    searchedPairs.filter(searchedPair => {
+      let included = false
+      allPairs.map(pair => {
+        if (pair.id === searchedPair.id) {
+          included = true
+        }
+        return true
+      })
+      return !included
+    })
+  )
 
   const filteredTokenList = useMemo(() => {
     return allTokens
@@ -167,7 +227,7 @@ export const Search = ({ small = false }) => {
               return -1
             }
             if (!tokenA?.oneDayVolumeUSD && tokenB?.oneDayVolumeUSD) {
-              return 1
+              return tokenA?.totalLiquidity > tokenB?.totalLiquidity ? -1 : 1
             }
             return 1
           })
@@ -267,17 +327,8 @@ export const Search = ({ small = false }) => {
     }
   }, [filteredPairList])
 
-  const [tokensShown, setTokensShown] = useState(0)
-
-  useEffect(() => {
-    setTokensShown(Math.min(Object.keys(filteredTokenList).length, 3))
-  }, [filteredTokenList])
-
-  const [pairsShown, setPairsShown] = useState(0)
-
-  useEffect(() => {
-    setPairsShown(Math.min(Object.keys(filteredPairList).length, 3))
-  }, [filteredPairList])
+  const [tokensShown, setTokensShown] = useState(3)
+  const [pairsShown, setPairsShown] = useState(3)
 
   function onDismiss() {
     setPairsShown(3)
@@ -337,10 +388,6 @@ export const Search = ({ small = false }) => {
         <SearchIconLarge />
       </Wrapper>
       <Menu hide={!showMenu} ref={menuRef}>
-        {/* <FilterSection>
-          <Gray>Results</Gray>
-        </FilterSection> */}
-
         <Heading>
           <Gray>Pairs</Gray>
         </Heading>
@@ -387,8 +434,12 @@ export const Search = ({ small = false }) => {
               <BasicLink to={'/token/' + token.id} key={token.id} onClick={onDismiss}>
                 <MenuItem>
                   <TokenLogo address={token.id} style={{ marginRight: '10px' }} />
-                  <span>{token.name}</span>
-                  <span>({token.symbol})</span>
+                  <span>
+                    <FormattedName text={token.name} maxCharacters={20} />
+                  </span>
+                  <span>
+                    (<FormattedName text={token.symbol} maxCharacters={6} />)
+                  </span>
                 </MenuItem>
               </BasicLink>
             )
