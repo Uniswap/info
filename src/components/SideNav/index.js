@@ -40,7 +40,7 @@ const Wrapper = styled.div`
 const Option = styled.div`
   font-weight: 500;
   font-size: 14px;
-  opacity: ${({ activeText }) => (activeText ? 1 : 0.8)};
+  opacity: ${({ activeText }) => (activeText ? 1 : 0.6)};
   color: ${({ theme }) => theme.white};
   display: flex;
   :hover {
@@ -111,7 +111,7 @@ function SideNav({ history }) {
     <Wrapper isMobile={below1080}>
       {!below1080 ? (
         <DesktopWrapper>
-          <AutoColumn gap="1rem" style={{ marginLeft: '.75rem', marginTop: '2rem' }}>
+          <AutoColumn gap="1rem" style={{ marginLeft: '.75rem', marginTop: '1.5rem' }}>
             <Title />
             {!below1080 && (
               <AutoColumn gap="1.25rem" style={{ marginTop: '1rem' }}>
