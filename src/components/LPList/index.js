@@ -145,7 +145,7 @@ function LPList({ lps, disbaleLinks, maxItems = 10 }) {
 
   return (
     <ListWrapper>
-      <DashGrid center={true} disbaleLinks={disbaleLinks} style={{ height: 'fit-content', padding: '1rem 0' }}>
+      <DashGrid center={true} disbaleLinks={disbaleLinks} style={{ height: 'fit-content', padding: ' 0 0 1rem 0' }}>
         {!below600 && (
           <Flex alignItems="center" justifyContent="flex-start">
             <Text area="number" fontWeight="500">
