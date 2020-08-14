@@ -6,7 +6,6 @@ import { Route, Switch, BrowserRouter, Redirect } from 'react-router-dom'
 import GlobalPage from './pages/GlobalPage'
 import TokenPage from './pages/TokenPage'
 import PairPage from './pages/PairPage'
-import NavHeader from './components/NavHeader'
 import LocalLoader from './components/LocalLoader'
 import { useGlobalData, useGlobalChartData } from './contexts/GlobalData'
 import { isAddress } from './utils'
@@ -14,7 +13,8 @@ import AccountPage from './pages/AccountPage'
 import AllTokensPage from './pages/AllTokensPage'
 import AllPairsPage from './pages/AllPairsPage'
 import PinnedData from './components/PinnedData'
-import SubHeader from './components/SubHeader'
+
+import SideNav from './components/SideNav'
 import AccountLookup from './pages/AccountLookup'
 
 const AppWrapper = styled.div`
@@ -23,6 +23,7 @@ const AppWrapper = styled.div`
 `
 const ContentWrapper = styled.div`
   display: grid;
+  grid-template-columns: ${({ open }) => (open ? '196px 1fr 200px' : '196px 1fr 64px')};
 
   @media screen and (max-width: 1080px) {
     grid-template-columns: 1fr;
@@ -35,9 +36,8 @@ const Right = styled.div`
   right: 0;
   bottom: 0rem;
   z-index: 99;
-  width: 220px;
+  width: ${({ open }) => (open ? '200px' : '64px')};
   height: ${({ open }) => (open ? 'fit-content' : '64px')};
-  border-top-left-radius: 25px;
 
   @media screen and (max-width: 1080px) {
     display: none;
@@ -46,6 +46,11 @@ const Right = styled.div`
 
 const Center = styled.div`
   height: 100%;
+  z-index: 9999;
+  transition: width 0.25s ease;
+
+  border-radius: 12px;
+  background-color: ${({ theme }) => theme.white};
 `
 
 /**
@@ -54,9 +59,8 @@ const Center = styled.div`
 const LayoutWrapper = ({ children, savedOpen, setSavedOpen }) => {
   return (
     <>
-      <NavHeader />
-      <SubHeader />
       <ContentWrapper open={savedOpen}>
+        <SideNav />
         <Center id="center">{children}</Center>
         <Right open={savedOpen}>
           <PinnedData open={savedOpen} setSavedOpen={setSavedOpen} />
@@ -67,7 +71,7 @@ const LayoutWrapper = ({ children, savedOpen, setSavedOpen }) => {
 }
 
 function App() {
-  const [savedOpen, setSavedOpen] = useState(true)
+  const [savedOpen, setSavedOpen] = useState(false)
 
   const globalData = useGlobalData()
   const globalChartData = useGlobalChartData()
@@ -136,19 +140,19 @@ function App() {
                 </LayoutWrapper>
               </Route>
 
-              <Route path="/all-tokens">
+              <Route path="/tokens">
                 <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
                   <AllTokensPage />
                 </LayoutWrapper>
               </Route>
 
-              <Route path="/all-pairs">
+              <Route path="/pairs">
                 <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
                   <AllPairsPage />
                 </LayoutWrapper>
               </Route>
 
-              <Route path="/account-lookup">
+              <Route path="/accounts">
                 <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
                   <AccountLookup />
                 </LayoutWrapper>

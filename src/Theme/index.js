@@ -65,7 +65,7 @@ const theme = (darkMode, color) => ({
   yellow2: '#F3841E',
   link: '#2172E5',
 
-  background: darkMode ? 'black' : `radial-gradient(50% 50% at 50% 50%, #ff007a30 0%, #fff 100%)`
+  background: darkMode ? 'black' : `radial-gradient(50% 50% at 50% 50%, #ff007a30 0%, #fff 0%)`
 })
 
 const TextWrapper = styled(Text)`
@@ -86,7 +86,7 @@ export const TYPE = {
   },
 
   largeHeader(props) {
-    return <TextWrapper fontWeight={500} color={'text1'} fontSize={20} {...props} />
+    return <TextWrapper fontWeight={500} color={'text1'} fontSize={24} {...props} />
   },
 
   light(props) {
@@ -129,16 +129,18 @@ export const ThemedBackground = styled.div`
   top: 0;
   left: 0;
   right: 0;
-
+  pointer-events: none;
   max-width: 100vw !important;
+  min-width: 1200px;
   height: 200vh;
+  mix-blend-mode: color;
   background: ${({ backgroundColor }) =>
     `radial-gradient(50% 50% at 50% 50%, ${backgroundColor} 0%, rgba(255, 255, 255, 0) 100%)`};
   position: absolute;
   top: 0px;
   left: 0px;
-  z-index: -1;
-
+  /* z-index: 30; */
+  z-index: 30;
   transform: translateY(-110vh);
 `
 
@@ -155,7 +157,6 @@ export const GlobalStyle = createGlobalStyle`
     padding: 0;
     width: 100%;
     height: 100%;
-    /* overflow: auto; */
     font-size: 14px;    
   }
 

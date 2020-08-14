@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useEffect, useState } from 'react'
 import { withRouter } from 'react-router-dom'
 import 'feather-icons'
 import styled from 'styled-components'
@@ -6,7 +6,7 @@ import styled from 'styled-components'
 import { Text } from 'rebass'
 import Panel from '../components/Panel'
 
-import { PageWrapper, FixedMenu, ContentWrapperLarge } from '../components/index'
+import { PageWrapper, ContentWrapperLarge } from '../components/index'
 import { AutoRow, RowBetween, RowFixed } from '../components/Row'
 import Column, { AutoColumn } from '../components/Column'
 import { ButtonLight, ButtonDark } from '../components/ButtonStyled'
@@ -14,6 +14,7 @@ import PairChart from '../components/PairChart'
 import Link from '../components/Link'
 import TxnList from '../components/TxnList'
 import Loader from '../components/Loader'
+import { BasicLink } from '../components/Link'
 
 import { formattedNum, formattedPercent, getPoolLink, getSwapLink } from '../utils'
 import { useColor } from '../hooks'
@@ -30,7 +31,7 @@ import Warning from '../components/Warning'
 import { SURPRESS_WARNINGS } from '../constants'
 import { usePathDismissed, useSavedPairs } from '../contexts/LocalStorage'
 
-import { TrendingUp, PieChart, List, PlusCircle } from 'react-feather'
+import { Bookmark, PlusCircle } from 'react-feather'
 import FormattedName from '../components/FormattedName'
 
 const DashboardWrapper = styled.div`
@@ -108,25 +109,6 @@ const WarningGrouping = styled.div`
   pointer-events: ${({ disabled }) => disabled && 'none'};
 `
 
-const SubNav = styled.ul`
-  list-style: none;
-  position: sticky;
-  top: 11.25rem;
-  padding: 0px;
-  margin-top: 3rem;
-`
-const SubNavEl = styled.li`
-  list-style: none;
-  display: flex;
-  margin-bottom: 1rem;
-  width: 100%;
-  font-weight: ${({ isActive }) => (isActive ? 600 : 500)};
-
-  :hover {
-    cursor: pointer;
-  }
-`
-
 function PairPage({ pairAddress, history }) {
   const {
     token0,
@@ -180,36 +162,20 @@ function PairPage({ pairAddress, history }) {
   const token1Rate = reserve0 && reserve1 ? formattedNum(reserve0 / reserve1) : '-'
 
   // formatted symbols for overflow
-  const formattedSymbol0 = token0?.symbol.length > 6 ? token0?.symbol.slice(0, 5) + '...' : token0?.symbol
-  const formattedSymbol1 = token1?.symbol.length > 6 ? token1?.symbol.slice(0, 5) + '...' : token1?.symbol
+  // const formattedSymbol0 = token0?.symbol.length > 6 ? token0?.symbol.slice(0, 5) + '...' : token0?.symbol
+  // const formattedSymbol1 = token1?.symbol.length > 6 ? token1?.symbol.slice(0, 5) + '...' : token1?.symbol
 
-  const below1282 = useMedia('(max-width: 1282px)')
   const below1080 = useMedia('(max-width: 1080px)')
   const below900 = useMedia('(max-width: 900px)')
 
   const [dismissed, markAsDismissed] = usePathDismissed(history.location.pathname)
 
-  const OverviewRef = useRef()
-  const DataRef = useRef()
-  const TransactionsRef = useRef()
-
-  const [active, setActive] = useState(null)
-
   useEffect(() => {
-    setActive(OverviewRef)
     window.scrollTo({
       behavior: 'smooth',
       top: 0
     })
   }, [])
-
-  const handleScroll = ref => {
-    setActive(ref.current)
-    window.scrollTo({
-      behavior: 'smooth',
-      top: ref.current.offsetTop - -180
-    })
-  }
 
   const [savedPairs, addPair] = useSavedPairs()
 
@@ -217,79 +183,7 @@ function PairPage({ pairAddress, history }) {
     <PageWrapper>
       <ThemedBackground backgroundColor={transparentize(0.6, backgroundColor)} />
 
-      <span ref={OverviewRef} />
-      <FixedMenu>
-        <AutoColumn gap="40px">
-          <RowBetween style={{ flexWrap: 'wrap' }}>
-            <RowFixed style={{ flexWrap: 'wrap', minWidth: '100px' }}>
-              <RowFixed>
-                {token0 && token1 && (
-                  <DoubleTokenLogo a0={token0?.id || ''} a1={token1?.id || ''} size={24} margin={true} />
-                )}{' '}
-                <Text fontSize={'20px'} fontWeight={500} style={{ margin: '0 1rem' }}>
-                  {token0 && token1 ? (
-                    <>
-                      <HoverSpan onClick={() => history.push(`/token/${token0?.id}`)}>{token0.symbol}</HoverSpan>
-                      <span>-</span>
-                      <HoverSpan onClick={() => history.push(`/token/${token1?.id}`)}>
-                        <FormattedName text={token1.symbol} maxCharacters={8} />{' '}
-                      </HoverSpan>{' '}
-                      Pair
-                    </>
-                  ) : (
-                    ''
-                  )}
-                </Text>
-              </RowFixed>
-              <AutoRow gap="6px" style={{ width: 'fit-content', marginTop: below900 ? '1rem' : '0' }}>
-                <FixedPanel onClick={() => history.push(`/token/${token0?.id}`)}>
-                  <RowFixed>
-                    <TokenLogo address={token0?.id} size={'16px'} />
-                    <TYPE.main fontSize={below900 ? '12px' : '16px'} lineHeight={1} fontWeight={500} ml={'4px'}>
-                      {token0 && token1
-                        ? `1 ${formattedSymbol0} = ${token0Rate} ${formattedSymbol1} ${
-                            !below900 && parseFloat(token0?.derivedETH) ? '(' + token0USD + ')' : ''
-                          }`
-                        : '-'}
-                    </TYPE.main>
-                  </RowFixed>
-                </FixedPanel>
-                <FixedPanel onClick={() => history.push(`/token/${token1?.id}`)}>
-                  <RowFixed>
-                    <TokenLogo address={token1?.id} size={'16px'} />
-                    <TYPE.main fontSize={below900 ? '12px' : '16px'} lineHeight={1} fontWeight={500} ml={'4px'}>
-                      {token0 && token1
-                        ? `1 ${formattedSymbol1} = ${token1Rate} ${formattedSymbol0}  ${
-                            !below900 && parseFloat(token1?.derivedETH) ? '(' + token1USD + ')' : ''
-                          }`
-                        : '-'}
-                    </TYPE.main>
-                  </RowFixed>
-                </FixedPanel>
-              </AutoRow>
-            </RowFixed>
-            <RowFixed
-              ml={below900 ? '0' : '2.5rem'}
-              mt={below1080 && '1rem'}
-              style={{ flexDirection: below1080 ? 'row-reverse' : 'initial' }}
-            >
-              {!!!savedPairs[pairAddress] && !below1080 && (
-                <Hover onClick={() => addPair(pairAddress, token0.id, token1.id, token0.symbol, token1.symbol)}>
-                  <PlusCircle style={{ marginRight: '0.5rem' }} />
-                </Hover>
-              )}
-              <Link external href={getPoolLink(token0?.id, token1?.id)}>
-                <ButtonLight color={backgroundColor}>+ Add Liquidity</ButtonLight>
-              </Link>
-              <Link external href={getSwapLink(token0?.id, token1?.id)}>
-                <ButtonDark ml={!below1080 && '.5rem'} mr={below1080 && '.5rem'} color={backgroundColor}>
-                  Trade
-                </ButtonDark>
-              </Link>
-            </RowFixed>
-          </RowBetween>
-        </AutoColumn>
-      </FixedMenu>
+      <span />
       <Warning
         type={'pair'}
         show={!dismissed && !(SURPRESS_WARNINGS.includes(token0?.id) && SURPRESS_WARNINGS.includes(token1?.id))}
@@ -297,10 +191,97 @@ function PairPage({ pairAddress, history }) {
         address={pairAddress}
       />
       <ContentWrapperLarge>
+        <Text>
+          <BasicLink to="/pairs">{'Pairs '}</BasicLink>→ {token0?.symbol}-{token1?.symbol}
+        </Text>
+
         <WarningGrouping
           disabled={!dismissed && !(SURPRESS_WARNINGS.includes(token0?.id) && SURPRESS_WARNINGS.includes(token1?.id))}
         >
           <DashboardWrapper>
+            <AutoColumn gap="40px" style={{ marginBottom: '1.5rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', width: '100%' }}>
+                <RowFixed style={{ flexWrap: 'wrap', minWidth: '100px' }}>
+                  <RowFixed>
+                    {token0 && token1 && (
+                      <DoubleTokenLogo a0={token0?.id || ''} a1={token1?.id || ''} size={32} margin={true} />
+                    )}{' '}
+                    <Text fontSize={below1080 ? '1.5rem' : '2rem'} fontWeight={500} style={{ margin: '0 1rem' }}>
+                      {token0 && token1 ? (
+                        <>
+                          <HoverSpan onClick={() => history.push(`/token/${token0?.id}`)}>{token0.symbol}</HoverSpan>
+                          <span>-</span>
+                          <HoverSpan onClick={() => history.push(`/token/${token1?.id}`)}>
+                            {token1.symbol}
+                          </HoverSpan>{' '}
+                          Pair
+                        </>
+                      ) : (
+                        ''
+                      )}
+                    </Text>
+                  </RowFixed>
+                </RowFixed>
+                <RowFixed
+                  ml={below900 ? '0' : '2.5rem'}
+                  mt={below1080 && '1rem'}
+                  style={{ flexDirection: below1080 ? 'row-reverse' : 'initial' }}
+                >
+                  {!!!savedPairs[pairAddress] && !below1080 ? (
+                    <Hover onClick={() => addPair(pairAddress, token0.id, token1.id, token0.symbol, token1.symbol)}>
+                      <PlusCircle style={{ marginRight: '0.5rem' }} />
+                    </Hover>
+                  ) : !below1080 ? (
+                    <Bookmark style={{ marginRight: '0.5rem', opacity: 0.4 }} />
+                  ) : (
+                    <></>
+                  )}
+
+                  <Link external href={getPoolLink(token0?.id, token1?.id)}>
+                    <ButtonLight color={backgroundColor}>+ Add Liquidity</ButtonLight>
+                  </Link>
+                  <Link external href={getSwapLink(token0?.id, token1?.id)}>
+                    <ButtonDark ml={!below1080 && '.5rem'} mr={below1080 && '.5rem'} color={backgroundColor}>
+                      Trade
+                    </ButtonDark>
+                  </Link>
+                </RowFixed>
+              </div>
+            </AutoColumn>
+            <AutoRow
+              gap="6px"
+              style={{
+                width: 'fit-content',
+                marginTop: below900 ? '1rem' : '0',
+                marginBottom: below900 ? '0' : '2rem',
+                flexWrap: 'wrap'
+              }}
+            >
+              <FixedPanel onClick={() => history.push(`/token/${token0?.id}`)}>
+                <RowFixed>
+                  <TokenLogo address={token0?.id} size={'16px'} />
+                  <TYPE.main fontSize={'16px'} lineHeight={1} fontWeight={500} ml={'4px'}>
+                    {token0 && token1
+                      ? `1 ${token0?.symbol} = ${token0Rate} ${token1?.symbol} ${
+                          parseFloat(token0?.derivedETH) ? '(' + token0USD + ')' : ''
+                        }`
+                      : '-'}
+                  </TYPE.main>
+                </RowFixed>
+              </FixedPanel>
+              <FixedPanel onClick={() => history.push(`/token/${token1?.id}`)}>
+                <RowFixed>
+                  <TokenLogo address={token1?.id} size={'16px'} />
+                  <TYPE.main fontSize={'16px'} lineHeight={1} fontWeight={500} ml={'4px'}>
+                    {token0 && token1
+                      ? `1 ${token1?.symbol} = ${token1Rate} ${token0?.symbol}  ${
+                          parseFloat(token1?.derivedETH) ? '(' + token1USD + ')' : ''
+                        }`
+                      : '-'}
+                  </TYPE.main>
+                </RowFixed>
+              </FixedPanel>
+            </AutoRow>
             <>
               {!below1080 && <TYPE.main fontSize={'1.125rem'}>Pair Stats</TYPE.main>}
               <PanelWrapper style={{ marginTop: '1.5rem' }}>
@@ -381,7 +362,6 @@ function PairPage({ pairAddress, history }) {
                   <PairChart address={pairAddress} color={backgroundColor} />
                 </Panel>
               </PanelWrapper>
-              <span ref={TransactionsRef} />
               <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
                 Transactions
               </TYPE.main>{' '}
@@ -393,7 +373,7 @@ function PairPage({ pairAddress, history }) {
               >
                 {transactions ? <TxnList transactions={transactions} /> : <Loader />}
               </Panel>
-              <RowBetween style={{ marginTop: '3rem' }} ref={DataRef}>
+              <RowBetween style={{ marginTop: '3rem' }}>
                 <TYPE.main fontSize={'1.125rem'}>Pair Information</TYPE.main>{' '}
               </RowBetween>
               <Panel
@@ -453,7 +433,7 @@ function PairPage({ pairAddress, history }) {
             </>
           </DashboardWrapper>
         </WarningGrouping>
-        {!below1282 && (
+        {/* {!below1282 && (
           <SubNav>
             <SubNavEl onClick={() => handleScroll(OverviewRef)} isActive={active === OverviewRef}>
               <TrendingUp size={20} style={{ marginRight: '1rem' }} />
@@ -468,7 +448,7 @@ function PairPage({ pairAddress, history }) {
               <TYPE.main>Pair Data</TYPE.main>
             </SubNavEl>
           </SubNav>
-        )}
+        )} */}
       </ContentWrapperLarge>
     </PageWrapper>
   )

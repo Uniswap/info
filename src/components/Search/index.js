@@ -16,7 +16,7 @@ import { OVERVIEW_TOKEN_BLACKLIST } from '../../constants'
 import { transparentize } from 'polished'
 
 const Container = styled.div`
-  height: 38px;
+  height: 48px;
   z-index: 30;
   position: relative;
 `
@@ -27,16 +27,22 @@ const Wrapper = styled.div`
   flex-direction: row;
   align-items: center;
   justify-content: flex-end;
-  padding: 8px 16px;
+  padding: 12px 16px;
   border-radius: 12px;
-  background: ${({ theme }) => transparentize(0.2, theme.bg1)};
+  background: ${({ theme }) => transparentize(0.4, theme.bg1)};
   border-bottom-right-radius: ${({ open }) => (open ? '0px' : '12px')};
   border-bottom-left-radius: ${({ open }) => (open ? '0px' : '12px')};
   z-index: 9999;
-  width: 300px;
-
+  width: 100%;
+  min-width: 300px;
+  box-sizing: border-box;
+  box-shadow: ${({ open }) =>
+    !open
+      ? '0px 24px 32px rgba(0, 0, 0, 0.04), 0px 16px 24px rgba(0, 0, 0, 0.04), 0px 4px 8px rgba(0, 0, 0, 0.04), 0px 0px 1px rgba(0, 0, 0, 0.04) '
+      : 'none'};
   @media screen and (max-width: 600px) {
-    width: 240px;
+    width: ${({ small }) => (small ? '160px' : '100%')};
+    min-width: 40px;
   }
 `
 const Input = styled.input`
