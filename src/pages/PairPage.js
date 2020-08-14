@@ -200,13 +200,13 @@ function PairPage({ pairAddress, history }) {
         >
           <DashboardWrapper>
             <AutoColumn gap="40px" style={{ marginBottom: '1.5rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', width: '100%' }}>
                 <RowFixed style={{ flexWrap: 'wrap', minWidth: '100px' }}>
                   <RowFixed>
                     {token0 && token1 && (
                       <DoubleTokenLogo a0={token0?.id || ''} a1={token1?.id || ''} size={32} margin={true} />
                     )}{' '}
-                    <Text fontSize={'2rem'} fontWeight={500} style={{ margin: '0 1rem' }}>
+                    <Text fontSize={below1080 ? '1.5rem' : '2rem'} fontWeight={500} style={{ margin: '0 1rem' }}>
                       {token0 && token1 ? (
                         <>
                           <HoverSpan onClick={() => history.push(`/token/${token0?.id}`)}>{token0.symbol}</HoverSpan>
@@ -231,8 +231,10 @@ function PairPage({ pairAddress, history }) {
                     <Hover onClick={() => addPair(pairAddress, token0.id, token1.id, token0.symbol, token1.symbol)}>
                       <PlusCircle style={{ marginRight: '0.5rem' }} />
                     </Hover>
-                  ) : (
+                  ) : !below1080 ? (
                     <Bookmark style={{ marginRight: '0.5rem', opacity: 0.4 }} />
+                  ) : (
+                    <></>
                   )}
 
                   <Link external href={getPoolLink(token0?.id, token1?.id)}>
@@ -248,7 +250,12 @@ function PairPage({ pairAddress, history }) {
             </AutoColumn>
             <AutoRow
               gap="6px"
-              style={{ width: 'fit-content', marginTop: below900 ? '1rem' : '0', marginBottom: '2rem' }}
+              style={{
+                width: 'fit-content',
+                marginTop: below900 ? '1rem' : '0',
+                marginBottom: below900 ? '0' : '2rem',
+                flexWrap: 'wrap'
+              }}
             >
               <FixedPanel onClick={() => history.push(`/token/${token0?.id}`)}>
                 <RowFixed>

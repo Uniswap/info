@@ -131,15 +131,16 @@ export const ThemedBackground = styled.div`
   right: 0;
   pointer-events: none;
   max-width: 100vw !important;
+  min-width: 1200px;
   height: 200vh;
-  mix-blend-mode: hard-light;
+  mix-blend-mode: color;
   background: ${({ backgroundColor }) =>
     `radial-gradient(50% 50% at 50% 50%, ${backgroundColor} 0%, rgba(255, 255, 255, 0) 100%)`};
   position: absolute;
   top: 0px;
   left: 0px;
   /* z-index: 30; */
-  z-index: 999;
+  z-index: 30;
   transform: translateY(-110vh);
 `
 

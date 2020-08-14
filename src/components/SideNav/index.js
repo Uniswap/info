@@ -16,9 +16,8 @@ import Link from '../Link'
 import { useSessionStart } from '../../contexts/Application'
 
 const Wrapper = styled.div`
-  height: 100vh;
+  height: ${({ isMobile }) => (isMobile ? 'initial' : '100vh')};
   background-color: ${({ theme }) => transparentize(0.4, theme.bg1)};
-  backdrop-filter: blur(20px);
   color: ${({ theme }) => theme.text1};
   padding: 0.5rem 0.5rem 0.5rem 0.75rem;
   position: sticky;
@@ -30,6 +29,7 @@ const Wrapper = styled.div`
 
   @media screen and (max-width: 800px) {
     grid-template-columns: 1fr;
+    position: relative;
   }
 
   @media screen and (max-width: 600px) {
@@ -40,12 +40,19 @@ const Wrapper = styled.div`
 const Option = styled.div`
   font-weight: 500;
   font-size: 14px;
-  opacity: ${({ activeText }) => (activeText ? 1 : 0.4)};
+  opacity: ${({ activeText }) => (activeText ? 1 : 0.8)};
   color: ${({ theme }) => theme.white};
   display: flex;
   :hover {
     opacity: 1;
   }
+`
+
+const DesktopWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100vh;
 `
 
 const MobileWrapper = styled.div`
@@ -60,7 +67,7 @@ const HeaderText = styled.div`
   font-weight: 500;
   display: inline-box;
   display: -webkit-inline-box;
-  opacity: 0.6;
+  opacity: 0.8;
   :hover {
     opacity: 1;
   }
@@ -95,16 +102,15 @@ const PollingDot = styled.div`
 
 function SideNav({ history }) {
   const below1080 = useMedia('(max-width: 1080px)')
-  const below600 = useMedia('(max-width: 600px)')
 
   const below1180 = useMedia('(max-width: 1180px)')
 
   const seconds = useSessionStart()
 
   return (
-    <Wrapper>
-      {!below600 ? (
-        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%' }}>
+    <Wrapper isMobile={below1080}>
+      {!below1080 ? (
+        <DesktopWrapper>
           <AutoColumn gap="1rem" style={{ marginLeft: '.75rem', marginTop: '2rem' }}>
             <Title />
             {!below1080 && (
@@ -189,10 +195,10 @@ function SideNav({ history }) {
               </TYPE.small>
             </Polling>
           )}
-        </div>
+        </DesktopWrapper>
       ) : (
         <MobileWrapper>
-          <img src={Logo} alt={'logo'} onClick={() => history.push('/home')} />
+          <Title />
         </MobileWrapper>
       )}
     </Wrapper>

@@ -186,7 +186,7 @@ function TokenPage({ address, history }) {
               <RowFixed style={{ flexWrap: 'wrap' }}>
                 <RowFixed style={{ alignItems: 'baseline' }}>
                   <TokenLogo address={address} size="32px" style={{ alignSelf: 'center' }} />
-                  <Text fontSize={'2rem'} fontWeight={500} style={{ margin: '0 1rem' }}>
+                  <Text fontSize={below1080 ? '1.5rem' : '2rem'} fontWeight={500} style={{ margin: '0 1rem' }}>
                     {name ? name + ' ' : ''} {symbol ? '(' + symbol + ')' : ''}
                   </Text>{' '}
                   {!below1080 && (
@@ -205,10 +205,10 @@ function TokenPage({ address, history }) {
                     <Hover onClick={() => addToken(address, symbol)}>
                       <PlusCircle style={{ marginRight: '0.5rem' }} />
                     </Hover>
-                  ) : (
-                    // <Hover onClick={() => addToken(address, symbol)}>
+                  ) : !below1080 ? (
                     <Bookmark style={{ marginRight: '0.5rem', opacity: 0.4 }} />
-                    // </Hover>
+                  ) : (
+                    <></>
                   )}
                   <Link href={getPoolLink(address)} target="_blank">
                     <ButtonLight color={backgroundColor}>+ Add Liquidity</ButtonLight>

@@ -54,7 +54,7 @@ const Panel = styled(RebassBox)`
   ${props =>
     props.rounded &&
     css`
-      border-radius: 24px;
+      border-radius: 8px;
       @media only screen and (min-width: 40em) {
         border-radius: 10px;
       }
