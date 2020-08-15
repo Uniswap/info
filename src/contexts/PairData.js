@@ -293,6 +293,40 @@ function parseData(data, oneDayData, twoDayData, oneWeekData, ethPrice, oneDayBl
   return data
 }
 
+function parseData(data, oneDayData, twoDayData, oneWeekData, ethPrice, oneDayBlock) {
+  const [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentChange(
+    data?.volumeUSD,
+    oneDayData?.volumeUSD ? oneDayData?.volumeUSD : 0,
+    twoDayData?.volumeUSD ? twoDayData?.volumeUSD : 0
+  )
+
+  const oneWeekVolumeUSD = parseFloat(oneWeekData ? data?.volumeUSD - oneWeekData?.volumeUSD : data.volumeUSD)
+
+  const [oneDayTxns, txnChange] = get2DayPercentChange(
+    data.txCount,
+    oneDayData?.txCount ? oneDayData?.txCount : 0,
+    twoDayData?.txCount ? twoDayData?.txCount : 0
+  )
+
+  const liquidityChangeUSD = getPercentChange(data.reserveUSD, oneDayData?.reserveUSD)
+
+  data.trackedReserveUSD = data.trackedReserveETH * ethPrice
+  data.oneDayVolumeUSD = oneDayVolumeUSD
+  data.oneWeekVolumeUSD = oneWeekVolumeUSD
+  data.volumeChangeUSD = volumeChangeUSD
+  data.liquidityChangeUSD = liquidityChangeUSD
+  data.oneDayTxns = oneDayTxns
+  data.txnChange = txnChange
+
+  // new tokens
+  if (!oneDayData && data && data.createdAtBlockNumber > oneDayBlock) {
+    data.oneDayVolumeUSD = data.volumeUSD
+    data.oneDayVolumeETH = data.tradeVolume * data.derivedETH
+  }
+
+  return data
+}
+
 const getPairTransactions = async pairAddress => {
   const transactions = {}
 
