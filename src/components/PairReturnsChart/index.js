@@ -8,7 +8,7 @@ import { OptionButton } from '../ButtonStyled'
 import { useMedia } from 'react-use'
 import { timeframeOptions } from '../../constants'
 import DropdownSelect from '../DropdownSelect'
-import { useUserPositionChart, useUserLiquidityChart } from '../../contexts/User'
+import { useUserPositionChart } from '../../contexts/User'
 import { useTimeframe } from '../../contexts/Application'
 import LocalLoader from '../LocalLoader'
 import { Text } from 'rebass'
@@ -51,8 +51,7 @@ const CHART_VIEW = {
 }
 
 const PairReturnsChart = ({ account, position }) => {
-  let feeData = useUserPositionChart(position, account)
-  let liquidtyData = useUserLiquidityChart(account)
+  let data = useUserPositionChart(position, account)
 
   const [timeWindow, setTimeWindow] = useTimeframe()
 
@@ -64,14 +63,7 @@ const PairReturnsChart = ({ account, position }) => {
 
   // based on window, get starttime
   let utcStartTime = getTimeframe(timeWindow)
-  feeData = feeData?.filter(entry => entry.date >= utcStartTime)
-
-  liquidtyData = liquidtyData
-    ?.filter(entry => entry.date >= utcStartTime)
-    .map(entry => {
-      entry.usdValue = parseFloat(entry[position.pair.id])
-      return !isNaN(parseFloat(entry[position.pair.id])) && entry
-    })
+  data = data?.filter(entry => entry.date >= utcStartTime)
 
   const aspect = below600 ? 60 / 42 : 60 / 16
 
