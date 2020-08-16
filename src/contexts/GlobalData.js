@@ -246,9 +246,9 @@ async function getGlobalData(ethPrice, oldEthPrice) {
 
     if (data && oneDayData && twoDayData) {
       let [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentChange(
-        data.totalVolumeUSD,
-        oneDayData.totalVolumeUSD ? oneDayData.totalVolumeUSD : 0,
-        twoDayData.totalVolumeUSD ? twoDayData.totalVolumeUSD : 0
+        data.untrackedVolumeUSD,
+        oneDayData.untrackedVolumeUSD ? oneDayData.untrackedVolumeUSD : 0,
+        twoDayData.untrackedVolumeUSD ? twoDayData.untrackedVolumeUSD : 0
       )
 
       const [oneDayVolumeETH, volumeChangeETH] = get2DayPercentChange(
@@ -459,9 +459,9 @@ async function getAllPairsOnUniswap() {
         },
         fetchPolicy: 'cache-first'
       })
-      skipCount = skipCount + 1000
+      skipCount = skipCount + 500
       pairs = pairs.concat(result?.data?.pairs)
-      if (result?.data?.pairs.length < 1000) {
+      if (result?.data?.pairs.length < 500 || pairs.length > 500) {
         allFound = true
       }
     }
@@ -488,10 +488,10 @@ async function getAllTokensOnUniswap() {
         fetchPolicy: 'cache-first'
       })
       tokens = tokens.concat(result?.data?.tokens)
-      if (result?.data?.tokens?.length < 1000) {
+      if (result?.data?.tokens?.length < 500 || tokens.length > 500) {
         allFound = true
       }
-      skipCount = skipCount += 1000
+      skipCount = skipCount += 500
     }
     return tokens
   } catch (e) {

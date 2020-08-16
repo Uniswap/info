@@ -31,12 +31,12 @@ export default function CopyHelper({ toCopy }) {
     <CopyIcon onClick={() => setCopied(toCopy)}>
       {isCopied ? (
         <TransactionStatusText>
-          <CheckCircle size={'16'} stroke="black" />
+          <CheckCircle size={'14'} stroke="black" />
           {/* <TransactionStatusText>Copied</TransactionStatusText> */}
         </TransactionStatusText>
       ) : (
         <TransactionStatusText>
-          <Copy size={'16'} stroke="black" />
+          <Copy size={'14'} stroke="black" />
         </TransactionStatusText>
       )}
     </CopyIcon>

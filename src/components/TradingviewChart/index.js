@@ -128,8 +128,8 @@ const TradingViewChart = ({ type = CHART_TYPES.BAR, data, base, baseChange, fiel
       toolTip.className = 'three-line-legend'
       ref.current.appendChild(toolTip)
       toolTip.style.display = 'block'
-      toolTip.style.left = 8 + 'px'
-      toolTip.style.top = 8 + 'px'
+      toolTip.style.left = -4 + 'px'
+      toolTip.style.top = '-' + 8 + 'px'
       toolTip.style.backgroundColor = 'transparent'
 
       // format numbers
@@ -142,7 +142,7 @@ const TradingViewChart = ({ type = CHART_TYPES.BAR, data, base, baseChange, fiel
         toolTip.innerHTML =
           `<div style="font-size: 16px; margin: 4px 0px; color: #20262E;">${title}</div>` +
           '<div style="font-size: 22px; margin: 4px 0px; color: #20262E">' +
-          formattedNum(base, true) +
+          formattedNum(base ?? 0, true) +
           `<span style="margin-left: 10px; font-size: 16px; color: ${color};">${formattedPercentChange}</span>` +
           '</div>'
       }

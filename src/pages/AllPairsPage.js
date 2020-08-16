@@ -5,8 +5,9 @@ import { TYPE } from '../Theme'
 import Panel from '../components/Panel'
 import { useAllPairData } from '../contexts/PairData'
 import PairList from '../components/PairList'
-import { PageWrapper, FullWrapper, FixedMenu } from '../components'
+import { PageWrapper, FullWrapper } from '../components'
 import { RowBetween } from '../components/Row'
+import Search from '../components/Search'
 
 function AllPairsPage() {
   const allPairs = useAllPairData()
@@ -17,13 +18,11 @@ function AllPairsPage() {
 
   return (
     <PageWrapper>
-      <FixedMenu>
+      <FullWrapper>
         <RowBetween>
           <TYPE.largeHeader>Top Pairs</TYPE.largeHeader>
-          <div />
+          <Search small={true} />
         </RowBetween>
-      </FixedMenu>
-      <FullWrapper>
         <Panel>
           <PairList pairs={allPairs} disbaleLinks={true} maxItems={50} />
         </Panel>

@@ -4,19 +4,7 @@ import { HttpLink } from 'apollo-link-http'
 
 export const client = new ApolloClient({
   link: new HttpLink({
-    uri: 'https://api.thegraph.com/subgraphs/name/ianlapham/uniswap2'
-  }),
-  cache: new InMemoryCache(),
-  shouldBatch: true
-})
-
-/**
- * Used for liquidity htofix. uniswap2 is not tracking
- * total liquidity fore tokens correctly.
- */
-export const tempClient = new ApolloClient({
-  link: new HttpLink({
-    uri: 'https://api.thegraph.com/subgraphs/name/ianlapham/uniswapv2'
+    uri: 'https://api.thegraph.com/subgraphs/name/ianlapham/unsiwap3'
   }),
   cache: new InMemoryCache(),
   shouldBatch: true

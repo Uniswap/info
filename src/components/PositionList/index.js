@@ -13,6 +13,7 @@ import { formattedNum, getPoolLink } from '../../utils'
 import { AutoColumn } from '../Column'
 import { useEthPrice } from '../../contexts/GlobalData'
 import { RowFixed } from '../Row'
+import { ButtonLight } from '../ButtonStyled'
 
 dayjs.extend(utc)
 
@@ -144,14 +145,18 @@ function PositionList({ positions }) {
                 {position.pair.token0.symbol + '-' + position.pair.token1.symbol}
               </Text>
             </CustomLink>
-            <AutoColumn gap="8px" justify="flex-start">
-              <Link external href={getPoolLink(position.pair.token0.id, position.pair.token1.id)}>
-                Add
+            <RowFixed gap="8px" justify="flex-start">
+              <Link
+                external
+                href={getPoolLink(position.pair.token0.id, position.pair.token1.id)}
+                style={{ marginRight: '.5rem' }}
+              >
+                <ButtonLight style={{ padding: '2px 4px', borderRadius: '4px' }}>Add</ButtonLight>
               </Link>
               <Link external href={getPoolLink(position.pair.token0.id, position.pair.token1.id, true)}>
-                Remove
+                <ButtonLight style={{ padding: '2px 4px', borderRadius: '4px' }}>Remove</ButtonLight>
               </Link>
-            </AutoColumn>
+            </RowFixed>
           </AutoColumn>
         </DataText>
         <DataText area="uniswap">

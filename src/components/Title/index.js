@@ -7,8 +7,8 @@ import { useTokenData } from '../../contexts/TokenData'
 import { usePairData } from '../../contexts/PairData'
 import Link from '../Link'
 import { RowFixed } from '../Row'
-import Logo from '../../assets/logo.svg'
-import Wordmark from '../../assets/wordmark.svg'
+import Logo from '../../assets/logo_white.svg'
+import Wordmark from '../../assets/wordmark_white.svg'
 import { useMedia } from 'react-use'
 
 const TitleWrapper = styled.div`
