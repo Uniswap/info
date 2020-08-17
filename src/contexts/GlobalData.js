@@ -294,19 +294,26 @@ async function getGlobalData(ethPrice, oldEthPrice) {
 const getChartData = async oldestDateToFetch => {
   let data = []
   let weeklyData = []
-
   const utcEndTime = dayjs.utc()
+  let skip = 0
+  let allFound = false
 
   try {
-    let result = await client.query({
-      query: GLOBAL_CHART,
-      variables: {
-        startTime: oldestDateToFetch
-      },
-      fetchPolicy: 'cache-first'
-    })
-
-    data = [...result.data.uniswapDayDatas]
+    while (!allFound) {
+      let result = await client.query({
+        query: GLOBAL_CHART,
+        variables: {
+          startTime: oldestDateToFetch,
+          skip
+        },
+        fetchPolicy: 'cache-first'
+      })
+      skip += 1000
+      data = data.concat(result.data.uniswapDayDatas)
+      if (result.data.uniswapDayDatas.length < 1000) {
+        allFound = true
+      }
+    }
 
     if (data) {
       let dayIndexSet = new Set()

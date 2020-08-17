@@ -405,8 +405,8 @@ export const PAIR_DAY_DATA_BULK = (pairs, startTimestamp) => {
 }
 
 export const GLOBAL_CHART = gql`
-  query uniswapDayDatas($startTime: Int!) {
-    uniswapDayDatas(where: { date_gt: $startTime }, orderBy: date, orderDirection: asc) {
+  query uniswapDayDatas($startTime: Int!, $skip: Int!) {
+    uniswapDayDatas(first: 1000, skip: $skip, where: { date_gt: $startTime }, orderBy: date, orderDirection: asc) {
       id
       date
       totalVolumeUSD
@@ -414,15 +414,6 @@ export const GLOBAL_CHART = gql`
       dailyVolumeETH
       totalLiquidityUSD
       totalLiquidityETH
-      mostLiquidTokens {
-        id
-        totalLiquidityETH
-        totalLiquidityUSD
-        token {
-          id
-          symbol
-        }
-      }
     }
   }
 `
