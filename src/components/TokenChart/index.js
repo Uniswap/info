@@ -238,7 +238,7 @@ const TokenChart = ({ address, color, base }) => {
             />
             <YAxis
               type="number"
-              orientation="left"
+              orientation="right"
               tickFormatter={tick => '$' + toK(tick)}
               axisLine={false}
               tickLine={false}
