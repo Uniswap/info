@@ -128,6 +128,7 @@ const TradingViewChart = ({ type = CHART_TYPES.BAR, data, base, baseChange, fiel
       toolTip.className = 'three-line-legend'
       ref.current.appendChild(toolTip)
       toolTip.style.display = 'block'
+      toolTip.style.fontWeight = '500'
       toolTip.style.left = -4 + 'px'
       toolTip.style.top = '-' + 8 + 'px'
       toolTip.style.backgroundColor = 'transparent'

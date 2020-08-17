@@ -138,7 +138,7 @@ function TokenPage({ address, history }) {
 
   const below1080 = useMedia('(max-width: 1080px)')
   const below800 = useMedia('(max-width: 800px)')
-  const below600 = useMedia('(max-width: 600px)')
+  const below500 = useMedia('(max-width: 500px)')
 
   const [dismissed, markAsDismissed] = usePathDismissed(history.location.pathname)
 
@@ -200,7 +200,7 @@ function TokenPage({ address, history }) {
                 </RowFixed>
               </RowFixed>
               <span>
-                <RowFixed ml={below600 ? '0' : '2.5rem'} mt={below600 ? '1rem' : '0'}>
+                <RowFixed ml={below500 ? '0' : '2.5rem'} mt={below500 ? '1rem' : '0'}>
                   {!!!savedTokens[address] && !below800 ? (
                     <Hover onClick={() => addToken(address, symbol)}>
                       <PlusCircle style={{ marginRight: '0.5rem' }} />
@@ -233,7 +233,7 @@ function TokenPage({ address, history }) {
                       </RowBetween>
                       <RowBetween align="flex-end">
                         {' '}
-                        <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
+                        <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={500}>
                           {price}
                         </TYPE.main>
                         <TYPE.main>{priceChange}</TYPE.main>
@@ -248,7 +248,7 @@ function TokenPage({ address, history }) {
                       <div />
                     </RowBetween>
                     <RowBetween align="flex-end">
-                      <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
+                      <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={500}>
                         {liquidity}
                       </TYPE.main>
                       <TYPE.main>{liquidityChange}</TYPE.main>
@@ -262,7 +262,7 @@ function TokenPage({ address, history }) {
                       <div />
                     </RowBetween>
                     <RowBetween align="flex-end">
-                      <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
+                      <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={500}>
                         {volume}
                       </TYPE.main>
                       <TYPE.main>{volumeChange}</TYPE.main>
@@ -277,7 +277,7 @@ function TokenPage({ address, history }) {
                       <div />
                     </RowBetween>
                     <RowBetween align="flex-end">
-                      <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
+                      <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={500}>
                         {oneDayTxns}
                       </TYPE.main>
                       <TYPE.main>{txnChangeFormatted}</TYPE.main>

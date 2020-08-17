@@ -111,7 +111,7 @@ function AccountLookup({ history, small }) {
               <TYPE.main area="account">Saved Accounts</TYPE.main>
             </DashGrid>
             <Divider />
-            {savedAccounts?.length > 0 &&
+            {savedAccounts?.length > 0 ? (
               savedAccounts.map(account => {
                 return (
                   <DashGrid key={account} center={true} style={{ height: 'fit-content', padding: '1rem 0 0 0' }}>
@@ -127,7 +127,10 @@ function AccountLookup({ history, small }) {
                     </Flex>
                   </DashGrid>
                 )
-              })}
+              })
+            ) : (
+              <div style={{ marginTop: '1rem' }}>No saved accounts</div>
+            )}
           </Panel>
         )}
 

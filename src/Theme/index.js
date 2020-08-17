@@ -131,7 +131,6 @@ export const ThemedBackground = styled.div`
   right: 0;
   pointer-events: none;
   max-width: 100vw !important;
-  min-width: 1200px;
   height: 200vh;
   mix-blend-mode: color;
   background: ${({ backgroundColor }) =>
