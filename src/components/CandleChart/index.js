@@ -26,7 +26,14 @@ const IconWrapper = styled.div`
   }
 `
 
-const CandleStickChart = ({ data, width, height = 300, base, valueFormatter = val => formattedNum(val, true) }) => {
+const CandleStickChart = ({
+  data,
+  width,
+  height = 300,
+  base,
+  margin = true,
+  valueFormatter = val => formattedNum(val, true)
+}) => {
   // reference for DOM element to create with chart
   const ref = useRef()
 
@@ -39,6 +46,16 @@ const CandleStickChart = ({ data, width, height = 300, base, valueFormatter = va
       high: parseFloat(entry.close)
     }
   })
+
+  if (formattedData) {
+    formattedData.push({
+      time: dayjs().unix(),
+      open: parseFloat(formattedData[formattedData.length - 1].close),
+      close: parseFloat(base),
+      low: parseFloat(formattedData[formattedData.length - 1].open),
+      high: parseFloat(formattedData[formattedData.length - 1].close)
+    })
+  }
 
   // pointer to the chart object
   const [chartCreated, setChartCreated] = useState(false)
@@ -77,7 +94,8 @@ const CandleStickChart = ({ data, width, height = 300, base, valueFormatter = va
           mode: CrosshairMode.Normal
         },
         rightPriceScale: {
-          borderColor: 'rgba(197, 203, 206, 0.8)'
+          borderColor: 'rgba(197, 203, 206, 0.8)',
+          visible: true
         },
         timeScale: {
           borderColor: 'rgba(197, 203, 206, 0.8)'
@@ -103,7 +121,7 @@ const CandleStickChart = ({ data, width, height = 300, base, valueFormatter = va
       toolTip.className = 'three-line-legend'
       ref.current.appendChild(toolTip)
       toolTip.style.display = 'block'
-      toolTip.style.left = (base ? 116 : 3) + 'px'
+      toolTip.style.left = (margin ? 116 : 10) + 'px'
       toolTip.style.top = 50 + 'px'
       toolTip.style.backgroundColor = 'transparent'
 

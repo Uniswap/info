@@ -337,7 +337,7 @@ const TokenChart = ({ address, color, base }) => {
           </ResponsiveContainer>
         ) : priceData ? (
           <ResponsiveContainer aspect={aspect} ref={ref}>
-            <CandleStickChart data={priceData} width={width} address={address} base={base} />
+            <CandleStickChart data={priceData} width={width} base={base} />
           </ResponsiveContainer>
         ) : (
           <LocalLoader />

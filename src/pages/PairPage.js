@@ -374,7 +374,7 @@ function PairPage({ pairAddress, history }) {
                     </Hover>
                   </AutoColumn>
                 </Panel>
-                <Panel style={{ gridColumn: below1080 ? '1' : '2/4', gridRow: below1080 ? '' : '1/8' }}>
+                <Panel style={{ gridColumn: below1080 ? '1' : '2/4', gridRow: below1080 ? '' : '1/5' }}>
                   <PairChart address={pairAddress} color={backgroundColor} />
                 </Panel>
               </PanelWrapper>
@@ -449,22 +449,6 @@ function PairPage({ pairAddress, history }) {
             </>
           </DashboardWrapper>
         </WarningGrouping>
-        {/* {!below1282 && (
-          <SubNav>
-            <SubNavEl onClick={() => handleScroll(OverviewRef)} isActive={active === OverviewRef}>
-              <TrendingUp size={20} style={{ marginRight: '1rem' }} />
-              <TYPE.main>Overview</TYPE.main>
-            </SubNavEl>
-            <SubNavEl onClick={() => handleScroll(TransactionsRef)} isActive={active === TransactionsRef}>
-              <List size={20} style={{ marginRight: '1rem' }} />
-              <TYPE.main>Transactions</TYPE.main>
-            </SubNavEl>
-            <SubNavEl onClick={() => handleScroll(DataRef)} isActive={active === DataRef}>
-              <PieChart size={20} style={{ marginRight: '1rem' }} />
-              <TYPE.main>Pair Data</TYPE.main>
-            </SubNavEl>
-          </SubNav>
-        )} */}
       </ContentWrapperLarge>
     </PageWrapper>
   )

@@ -561,7 +561,7 @@ export function usePairData(pairAddress) {
     async function fetchData() {
       if (!pairData && pairAddress) {
         let data = await getBulkPairData([pairAddress], ethPrice)
-        update(pairAddress, data[0])
+        data && update(pairAddress, data[0])
       }
     }
     if (!pairData && pairAddress && ethPrice && isAddress(pairAddress)) {

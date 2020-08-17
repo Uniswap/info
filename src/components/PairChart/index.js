@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import styled from 'styled-components'
 import { Area, XAxis, YAxis, ResponsiveContainer, Tooltip, AreaChart, BarChart, Bar } from 'recharts'
 import { RowBetween, AutoRow } from '../Row'
@@ -16,7 +16,7 @@ import LocalLoader from '../LocalLoader'
 
 const ChartWrapper = styled.div`
   height: 100%;
-  max-height: 320px;
+  max-height: 300px;
 
   @media screen and (max-width: 600px) {
     min-height: 200px;
@@ -42,7 +42,22 @@ const PairChart = ({ address, color }) => {
 
   const [timeWindow, setTimeWindow] = useState(timeframeOptions.WEEK)
 
+  // update the width on a window resize
   const ref = useRef()
+  const isClient = typeof window === 'object'
+  const [width, setWidth] = useState(ref?.current?.container?.clientWidth)
+  const [height, setHeight] = useState(ref?.current?.container?.clientHeight)
+  useEffect(() => {
+    if (!isClient) {
+      return false
+    }
+    function handleResize() {
+      setWidth(ref?.current?.container?.clientWidth ?? width)
+      setHeight(ref?.current?.container?.clientHeight ?? height)
+    }
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [height, isClient, width]) // Empty array ensures that effect is only run on mount and unmount
 
   // get data for pair, and rates
   const pairData = usePairData(address)
@@ -57,6 +72,7 @@ const PairChart = ({ address, color }) => {
   const formattedSymbol1 =
     pairData?.token1?.symbol.length > 6 ? pairData?.token1?.symbol.slice(0, 5) + '...' : pairData?.token1?.symbol
 
+  const below1600 = useMedia('(max-width: 1600px)')
   const below1080 = useMedia('(max-width: 1080px)')
   const below600 = useMedia('(max-width: 600px)')
 
@@ -91,7 +107,7 @@ const PairChart = ({ address, color }) => {
     }
   }
 
-  const aspect = below1080 ? 60 / 32 : 60 / 28
+  const aspect = below1600 ? 60 / 28 : below1080 ? 60 / 14 : 60 / 22
 
   return (
     <ChartWrapper>
@@ -164,7 +180,7 @@ const PairChart = ({ address, color }) => {
             />
             <YAxis
               type="number"
-              orientation="left"
+              orientation="right"
               tickFormatter={tick => '$' + toK(tick)}
               axisLine={false}
               tickLine={false}
@@ -202,16 +218,22 @@ const PairChart = ({ address, color }) => {
       {chartFilter === CHART_VIEW.RATE0 &&
         (hourlyRate0 ? (
           <ResponsiveContainer aspect={aspect} ref={ref}>
-            <CandleStickChart data={hourlyRate0} width={400} address={address} valueFormatter={valueFormatter} />
+            <CandleStickChart
+              data={hourlyRate0}
+              base={100}
+              margin={false}
+              width={width}
+              valueFormatter={valueFormatter}
+            />
           </ResponsiveContainer>
         ) : (
           <LocalLoader />
         ))}
 
       {chartFilter === CHART_VIEW.RATE1 &&
-        (hourlyRate0 ? (
+        (hourlyRate1 ? (
           <ResponsiveContainer aspect={aspect} ref={ref}>
-            <CandleStickChart data={hourlyRate1} width={400} address={address} valueFormatter={valueFormatter} />
+            <CandleStickChart data={hourlyRate1} width={width} valueFormatter={valueFormatter} />
           </ResponsiveContainer>
         ) : (
           <LocalLoader />
@@ -243,6 +265,7 @@ const PairChart = ({ address, color }) => {
               tickFormatter={tick => '$' + toK(tick)}
               tickLine={false}
               interval="preserveEnd"
+              orientation="right"
               minTickGap={80}
               yAxisId={0}
               tick={{ fill: 'black' }}
