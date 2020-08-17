@@ -8,6 +8,7 @@ import { GET_BLOCK, GET_BLOCKS, SHARE_VALUE } from '../apollo/queries'
 import { Text } from 'rebass'
 import _Decimal from 'decimal.js-light'
 import toFormat from 'toformat'
+import numeral from 'numeral'
 
 const Decimal = toFormat(_Decimal)
 
@@ -33,6 +34,10 @@ export function getSwapLink(token0Address, token1Address = null) {
   } else {
     return `https://uniswap.exchange/swap?inputCurrency=${token0Address}&outputCurrency=${token1Address}`
   }
+}
+
+export function fixedNum(val) {
+  return numeral(val).format('0,0')
 }
 
 export const toNiceDate = date => {
@@ -175,7 +180,7 @@ export const toK = (num, fixed, cutoff = false) => {
         : Number(num / divideBy).toFixed(2)
       : Number(num / divideBy)
   if (num > 999999999 || num < -9999999) {
-    return `${formatter(1000000000)}M`
+    return `${formatter(1000000000)}B`
   } else if (num > 999999 || num < -999999) {
     return `${formatter(1000000)}M`
   } else if (num > 999 || num < -999) {

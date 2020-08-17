@@ -11,7 +11,7 @@ import TopTokenList from '../components/TokenList'
 import TxnList from '../components/TxnList'
 import GlobalChart from '../components/GlobalChart'
 import { Hover, TYPE } from '../Theme'
-import { formattedNum, formattedPercent } from '../helpers'
+import { formattedNum, formattedPercent, fixedNum } from '../helpers'
 import { useGlobalData, useEthPrice, useGlobalTransactions } from '../contexts/GlobalData'
 import { useAllPairData } from '../contexts/PairData'
 import { Search } from '../components/Search'
@@ -254,7 +254,7 @@ function GlobalPage({ history }) {
               </RowBetween>
               <RowBetween align="flex-end">
                 <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
-                  {oneDayTxns}
+                  {fixedNum(oneDayTxns)}
                 </TYPE.main>
                 <TYPE.main fontSize={14}>{txnChangeFormatted && txnChangeFormatted}</TYPE.main>
               </RowBetween>
