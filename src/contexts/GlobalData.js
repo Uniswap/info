@@ -5,7 +5,7 @@ import utc from 'dayjs/plugin/utc'
 import { useTimeframe } from './Application'
 import { timeframeOptions } from '../constants'
 import { getPercentChange, getBlockFromTimestamp, getBlocksFromTimestamps, get2DayPercentChange } from '../helpers'
-import { GLOBAL_DATA, GLOBAL_TXNS, GLOBAL_CHART, ETH_PRICE, ALL_PAIRS, ALL_TOKENS, PAIR_CHART } from '../apollo/queries'
+import { GLOBAL_DATA, GLOBAL_TXNS, GLOBAL_CHART, ETH_PRICE, ALL_PAIRS, ALL_TOKENS } from '../apollo/queries'
 import weekOfYear from 'dayjs/plugin/weekOfYear'
 import { getV1Data } from './V1Data'
 
@@ -245,32 +245,26 @@ const getChartData = async oldestDateToFetch => {
 
   const utcEndTime = dayjs.utc()
 
+  let skip = 0
+  let allFound = false
+
   try {
-    let result = await client.query({
-      query: GLOBAL_CHART,
-      variables: {
-        startTime: oldestDateToFetch
-      },
-      fetchPolicy: 'cache-first'
-    })
-
-    let blockedResult = await client.query({
-      query: PAIR_CHART,
-      variables: {
-        pairAddress: '0xed9c854cb02de75ce4c9bba992828d6cb7fd5c71'
-      },
-      fetchPolicy: 'cache-first'
-    })
-
-    let blockedResultOther = await client.query({
-      query: PAIR_CHART,
-      variables: {
-        pairAddress: '0x257d37ce4d0796ea2efebcb49b46e34002cc65d3'
-      },
-      fetchPolicy: 'cache-first'
-    })
-
-    data = [...result.data.uniswapDayDatas]
+    while (!allFound) {
+      let result = await client.query({
+        query: GLOBAL_CHART,
+        variables: {
+          startTime: oldestDateToFetch,
+          skip
+        },
+        fetchPolicy: 'cache-first'
+      })
+      skip += 1000
+      data = data.concat(result.data.uniswapDayDatas)
+      if (result.data.uniswapDayDatas.length < 1000) {
+        allFound = true
+      }
+      data = data.concat(result.data.uniswapDayDatas)
+    }
 
     if (data) {
       let dayIndexSet = new Set()
@@ -281,18 +275,6 @@ const getChartData = async oldestDateToFetch => {
         dayIndexSet.add((data[i].date / oneDay).toFixed(0))
         dayIndexArray.push(data[i])
         dayData.dailyVolumeUSD = parseFloat(dayData.dailyVolumeUSD)
-        blockedResult.data.pairDayDatas.map(blockedDay => {
-          if (blockedDay.date === dayData.date && dayData.dailyVolumeUSD > blockedDay.dailyVolumeUSD) {
-            dayData.dailyVolumeUSD = dayData.dailyVolumeUSD - parseFloat(blockedDay.dailyVolumeUSD)
-          }
-          return true
-        })
-        blockedResultOther.data.pairDayDatas.map(blockedDay => {
-          if (blockedDay.date === dayData.date && dayData.dailyVolumeUSD > blockedDay.dailyVolumeUSD) {
-            dayData.dailyVolumeUSD = dayData.dailyVolumeUSD - parseFloat(blockedDay.dailyVolumeUSD)
-          }
-          return true
-        })
       })
 
       // fill in empty days
