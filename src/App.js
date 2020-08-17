@@ -23,10 +23,12 @@ const AppWrapper = styled.div`
 `
 const ContentWrapper = styled.div`
   display: grid;
-  grid-template-columns: ${({ open }) => (open ? '196px 1fr 200px' : '196px 1fr 64px')};
+  grid-template-columns: ${({ open }) => (open ? '220px 1fr 200px' : '220px 1fr 64px')};
 
   @media screen and (max-width: 1080px) {
     grid-template-columns: 1fr;
+    max-width: 100vw;
+    overflow: hidden;
     grid-gap: 0;
   }
 `
@@ -36,7 +38,7 @@ const Right = styled.div`
   right: 0;
   bottom: 0rem;
   z-index: 99;
-  width: ${({ open }) => (open ? '200px' : '64px')};
+  width: ${({ open }) => (open ? '220px' : '64px')};
   height: ${({ open }) => (open ? 'fit-content' : '64px')};
 
   @media screen and (max-width: 1080px) {

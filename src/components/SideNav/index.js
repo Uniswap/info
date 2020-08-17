@@ -20,7 +20,8 @@ const Wrapper = styled.div`
   top: 0px;
   z-index: 9999;
   box-sizing: border-box;
-  background-color: #1b1c22;
+  /* background-color: #1b1c22; */
+  background: linear-gradient(193.68deg, #1b1c22 0.68%, #000000 100.48%);
   color: ${({ theme }) => theme.bg2};
 
   @media screen and (max-width: 800px) {
@@ -184,14 +185,13 @@ function SideNav({ history }) {
             </HeaderText>
           </AutoColumn>
           {!below1180 && (
-            <Polling style={{ marginLeft: '.75rem' }}>
+            <Polling style={{ marginLeft: '.5rem' }}>
               <PollingDot />
-              <TYPE.small color={'white'}>
-                Updated {!!seconds ? seconds + 's' : '-'} ago{' '}
-                <a href="/" style={{ color: 'white' }}>
-                  (refresh)
-                </a>
-              </TYPE.small>
+              <a href="/" style={{ color: 'white' }}>
+                <TYPE.small color={'white'}>
+                  Updated {!!seconds ? seconds + 's' : '-'} ago <br />
+                </TYPE.small>
+              </a>
             </Polling>
           )}
         </DesktopWrapper>
