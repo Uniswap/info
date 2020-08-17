@@ -242,9 +242,6 @@ async function getGlobalData(ethPrice, oldEthPrice) {
 const getChartData = async oldestDateToFetch => {
   let data = []
   let weeklyData = []
-
-  const utcEndTime = dayjs.utc()
-
   let skip = 0
   let allFound = false
 
@@ -262,8 +259,9 @@ const getChartData = async oldestDateToFetch => {
       data = data.concat(result.data.uniswapDayDatas)
       if (result.data.uniswapDayDatas.length < 1000) {
         allFound = true
+      } else {
+        data = data.concat(result.data.uniswapDayDatas)
       }
-      data = data.concat(result.data.uniswapDayDatas)
     }
 
     if (data) {
@@ -276,29 +274,6 @@ const getChartData = async oldestDateToFetch => {
         dayIndexArray.push(data[i])
         dayData.dailyVolumeUSD = parseFloat(dayData.dailyVolumeUSD)
       })
-
-      // fill in empty days
-      let timestamp = data[0].date ? data[0].date : oldestDateToFetch
-      let latestLiquidityUSD = data[0].totalLiquidityUSD
-      let latestDayDats = data[0].mostLiquidTokens
-      let index = 1
-      while (timestamp < utcEndTime.unix() - oneDay) {
-        const nextDay = timestamp + oneDay
-        let currentDayIndex = (nextDay / oneDay).toFixed(0)
-        if (!dayIndexSet.has(currentDayIndex)) {
-          data.push({
-            date: nextDay,
-            dailyVolumeUSD: 0,
-            totalLiquidityUSD: latestLiquidityUSD,
-            mostLiquidTokens: latestDayDats
-          })
-        } else {
-          latestLiquidityUSD = dayIndexArray[index].totalLiquidityUSD
-          latestDayDats = dayIndexArray[index].mostLiquidTokens
-          index = index + 1
-        }
-        timestamp = nextDay
-      }
     }
 
     data = data.sort((a, b) => (parseInt(a.date) > parseInt(b.date) ? 1 : -1))
@@ -312,9 +287,8 @@ const getChartData = async oldestDateToFetch => {
       }
       weeklyData[startIndexWeekly] = weeklyData[startIndexWeekly] || {}
       weeklyData[startIndexWeekly].date = data[i].date
-      weeklyData[startIndexWeekly].weeklyVolumeUSD = weeklyData[startIndexWeekly].weeklyVolumeUSD
-        ? weeklyData[startIndexWeekly].weeklyVolumeUSD + data[i].dailyVolumeUSD
-        : data[i].dailyVolumeUSD
+      weeklyData[startIndexWeekly].weeklyVolumeUSD =
+        (weeklyData[startIndexWeekly].weeklyVolumeUSD ?? 0) + data[i].dailyVolumeUSD
     })
   } catch (e) {
     console.log(e)
