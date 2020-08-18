@@ -13,6 +13,7 @@ import PairChart from '../components/PairChart'
 import Link from '../components/Link'
 import TxnList from '../components/TxnList'
 import Loader from '../components/Loader'
+import Question from '../components/Question'
 
 import { formattedNum, formattedPercent, getPoolLink, getSwapLink } from '../helpers'
 import { useColor } from '../hooks'
@@ -300,7 +301,10 @@ function PairPage({ pairAddress, history }) {
               <Panel style={{ height: '100%' }}>
                 <AutoColumn gap="20px">
                   <RowBetween>
-                    <TYPE.main>Fees (24hrs)</TYPE.main>
+                    <TYPE.main>
+                      Fees (24hrs)
+                      <Question style={{ marginLeft: 2 }} text="0.3% from trading volume + slippage reward"/>
+                    </TYPE.main>
                     <div />
                   </RowBetween>
                   <RowBetween align="flex-end">
