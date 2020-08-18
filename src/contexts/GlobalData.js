@@ -385,9 +385,8 @@ const getChartData = async oldestDateToFetch => {
       }
       weeklyData[startIndexWeekly] = weeklyData[startIndexWeekly] || {}
       weeklyData[startIndexWeekly].date = data[i].date
-      weeklyData[startIndexWeekly].weeklyVolumeUSD = weeklyData[startIndexWeekly].weeklyVolumeUSD
-        ? weeklyData[startIndexWeekly].weeklyVolumeUSD + data[i].dailyVolumeUSD
-        : data[i].dailyVolumeUSD
+      weeklyData[startIndexWeekly].weeklyVolumeUSD =
+        (weeklyData[startIndexWeekly].weeklyVolumeUSD ?? 0) + data[i].dailyVolumeUSD
     })
   } catch (e) {
     console.log(e)
