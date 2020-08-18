@@ -13,7 +13,6 @@ const Header = styled.div`
   align-items: center;
   justify-content: center;
   width: calc(100% - 20px);
-  overflow: scroll;
   padding: 20px 0;
   
   & > * {
