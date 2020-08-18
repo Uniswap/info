@@ -399,7 +399,6 @@ const getPairData = async (address, ethPrice) => {
       extraFee0TwoDaysAgo + extraFee1DayAgo + (volumeUsdTwoDay * 0.003)
     )
 
-    debugger
     data.trackedReserveUSD = data.trackedReserveETH * ethPrice
     data.oneDayExtraFee = String(extraFee0 + extraFee1)
     data.oneDayTotalFee = totalFeeOneDay
