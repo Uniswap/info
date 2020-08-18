@@ -262,18 +262,19 @@ async function getBulkPairData(pairList, ethPrice) {
 
         const liquidityChangeUSD = getPercentChange(data.reserveUSD, oneDayHistory?.reserveUSD)
 
-        let extraFee0Now = (data.lpExtraFeeInToken0 * data.derivedETH0 * ethPrice) || 0
-        let extraFee0DayAgo = (oneDayHistory.lpExtraFeeInToken0 * data.derivedETH0 * ethPrice) || 0
-        let extraFee0TwoDaysAgo = (twoDayHistory.lpExtraFeeInToken0 * data.derivedETH0 * ethPrice) || 0
+        // todo: finish that
+        let extraFee0Now = (data.lpExtraFeeInToken0 * pair.derivedETH0 * ethPrice) || 0
+        let extraFee0DayAgo = (oneDayHistory.lpExtraFeeInToken0 * pair.derivedETH0 * ethPrice) || 0
+        let extraFee0TwoDaysAgo = (twoDayHistory.lpExtraFeeInToken0 * pair.derivedETH0 * ethPrice) || 0
         const [extraFee0] = get2DayPercentChange(
           extraFee0Now,
           extraFee0DayAgo,
           extraFee0TwoDaysAgo
         )
 
-        let extraFee1Now = (data.lpExtraFeeInToken1 * data.derivedETH1 * ethPrice) || 0
-        let extraFee1DayAgo = (oneDayHistory.lpExtraFeeInToken1 * data.derivedETH1 * ethPrice) || 0
-        let extraFee1TwoDaysAgo = (twoDayHistory.lpExtraFeeInToken1 * data.derivedETH1 * ethPrice) || 0
+        let extraFee1Now = (data.lpExtraFeeInToken1 * pair.derivedETH1 * ethPrice) || 0
+        let extraFee1DayAgo = (oneDayHistory.lpExtraFeeInToken1 * pair.derivedETH1 * ethPrice) || 0
+        let extraFee1TwoDaysAgo = (twoDayHistory.lpExtraFeeInToken1 * pair.derivedETH1 * ethPrice) || 0
         const [extraFee1] = get2DayPercentChange(
           extraFee1Now,
           extraFee1DayAgo,
