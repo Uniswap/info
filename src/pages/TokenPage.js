@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import 'feather-icons'
 import { withRouter } from 'react-router-dom'
 import { Text } from 'rebass'
@@ -17,7 +17,7 @@ import TokenChart from '../components/TokenChart'
 import { BasicLink } from '../components/Link'
 // import Search from '../components/Search'
 
-import { formattedNum, formattedPercent, getPoolLink, getSwapLink } from '../utils'
+import { formattedNum, formattedPercent, getPoolLink, getSwapLink, localNumber } from '../utils'
 
 import { useTokenData, useTokenTransactions, useTokenPairs } from '../contexts/TokenData'
 import { TYPE, ThemedBackground } from '../Theme'
@@ -98,8 +98,10 @@ function TokenPage({ address, history }) {
     symbol,
     priceUSD,
     oneDayVolumeUSD,
+    oneDayVolumeUT,
     totalLiquidityUSD,
     volumeChangeUSD,
+    volumeChangeUT,
     priceChangeUSD,
     liquidityChangeUSD,
     oneDayTxns,
@@ -126,11 +128,23 @@ function TokenPage({ address, history }) {
   const priceChange = priceChangeUSD ? formattedPercent(priceChangeUSD) : ''
 
   // volume
-  const volume = oneDayVolumeUSD ? formattedNum(oneDayVolumeUSD, true) : oneDayVolumeUSD === 0 ? '$0' : ''
-  const volumeChange = formattedPercent(volumeChangeUSD)
+  const volume =
+    oneDayVolumeUSD || oneDayVolumeUSD === 0
+      ? formattedNum(oneDayVolumeUSD === 0 ? oneDayVolumeUT : oneDayVolumeUSD, true)
+      : oneDayVolumeUSD === 0
+      ? '$0'
+      : '-'
+
+  // mark if using untracked volume
+  const [usingUtVolume, setUsingUtVolume] = useState(false)
+  useEffect(() => {
+    setUsingUtVolume(oneDayVolumeUSD === 0 ? true : false)
+  }, [oneDayVolumeUSD])
+
+  const volumeChange = formattedPercent(!usingUtVolume ? volumeChangeUSD : volumeChangeUT)
 
   // liquidity
-  const liquidity = totalLiquidityUSD ? formattedNum(totalLiquidityUSD, true) : totalLiquidityUSD === 0 ? '$0' : ''
+  const liquidity = totalLiquidityUSD ? formattedNum(totalLiquidityUSD, true) : totalLiquidityUSD === 0 ? '$0' : '-'
   const liquidityChange = formattedPercent(liquidityChangeUSD)
 
   // transactions
@@ -258,7 +272,7 @@ function TokenPage({ address, history }) {
                 <Panel>
                   <AutoColumn gap="20px">
                     <RowBetween>
-                      <TYPE.main>Volume (24hrs)</TYPE.main>
+                      <TYPE.main>Volume (24hrs) {usingUtVolume && '(Untracked)'}</TYPE.main>
                       <div />
                     </RowBetween>
                     <RowBetween align="flex-end">
@@ -278,7 +292,7 @@ function TokenPage({ address, history }) {
                     </RowBetween>
                     <RowBetween align="flex-end">
                       <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={500}>
-                        {oneDayTxns}
+                        {oneDayTxns ? localNumber(oneDayTxns) : '-'}
                       </TYPE.main>
                       <TYPE.main>{txnChangeFormatted}</TYPE.main>
                     </RowBetween>

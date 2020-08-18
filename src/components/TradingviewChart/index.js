@@ -4,6 +4,7 @@ import dayjs from 'dayjs'
 import { formattedNum } from '../../utils'
 import styled from 'styled-components'
 import { Layout } from 'react-feather'
+import { usePrevious } from 'react-use'
 
 export const CHART_TYPES = {
   BAR: 'BAR',
@@ -37,12 +38,33 @@ const IconWrapper = styled.div`
 // constant height for charts
 const HEIGHT = 300
 
-const TradingViewChart = ({ type = CHART_TYPES.BAR, data, base, baseChange, field, title, width }) => {
+const TradingViewChart = ({
+  type = CHART_TYPES.BAR,
+  data,
+  base,
+  baseChange,
+  field,
+  title,
+  width,
+  useWeekly = false
+}) => {
   // reference for DOM element to create with chart
   const ref = useRef()
 
   // pointer to the chart object
   const [chartCreated, setChartCreated] = useState(false)
+  const dataPrev = usePrevious(data)
+
+  useEffect(() => {
+    if (data !== dataPrev && chartCreated && type === CHART_TYPES.BAR) {
+      // remove the tooltip element
+      let tooltip = document.getElementById('tooltip-id' + type)
+      let node = document.getElementById('test-id' + type)
+      node.removeChild(tooltip)
+      chartCreated.resize(0, 0)
+      setChartCreated()
+    }
+  }, [chartCreated, data, dataPrev, type])
 
   // parese the data and format for tardingview consumption
   const formattedData = data?.map(entry => {
@@ -125,6 +147,7 @@ const TradingViewChart = ({ type = CHART_TYPES.BAR, data, base, baseChange, fiel
 
       series.setData(formattedData)
       var toolTip = document.createElement('div')
+      toolTip.setAttribute('id', 'tooltip-id' + type)
       toolTip.className = 'three-line-legend'
       ref.current.appendChild(toolTip)
       toolTip.style.display = 'block'
@@ -161,9 +184,13 @@ const TradingViewChart = ({ type = CHART_TYPES.BAR, data, base, baseChange, fiel
         ) {
           setLastBarText()
         } else {
-          let dateStr = dayjs(param.time.year + '-' + param.time.month + '-' + (param.time.day + 1)).format(
-            'MMMM D, YYYY'
-          )
+          let dateStr = useWeekly
+            ? dayjs(param.time.year + '-' + param.time.month + '-' + (param.time.day + 1))
+                .startOf('week')
+                .format('MMMM D, YYYY') +
+              '-' +
+              dayjs(param.time.year + '-' + param.time.month + '-' + (param.time.day + 1)).format('MMMM D, YYYY')
+            : dayjs(param.time.year + '-' + param.time.month + '-' + (param.time.day + 1)).format('MMMM D, YYYY')
           var price = param.seriesPrices.get(series)
 
           toolTip.innerHTML =
@@ -177,9 +204,11 @@ const TradingViewChart = ({ type = CHART_TYPES.BAR, data, base, baseChange, fiel
         }
       })
 
+      chart.timeScale().fitContent()
+
       setChartCreated(chart)
     }
-  }, [base, baseChange, chartCreated, data, formattedData, title, topScale, type, width])
+  }, [base, baseChange, chartCreated, data, formattedData, title, topScale, type, useWeekly, width])
 
   // responsiveness
   useEffect(() => {
@@ -191,7 +220,7 @@ const TradingViewChart = ({ type = CHART_TYPES.BAR, data, base, baseChange, fiel
 
   return (
     <Wrapper>
-      <div ref={ref} />
+      <div ref={ref} id={'test-id' + type} />
       <IconWrapper>
         <Layout
           onClick={() => {

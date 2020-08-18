@@ -9,9 +9,10 @@ import styled from 'styled-components'
 import { CustomLink } from '../Link'
 import { Divider } from '../../components'
 import { withRouter } from 'react-router-dom'
-import { formattedNum } from '../../utils'
+import { formattedNum, formattedPercent } from '../../utils'
 import DoubleTokenLogo from '../DoubleLogo'
 import FormattedName from '../FormattedName'
+import QuestionHelper from '../QuestionHelper'
 
 dayjs.extend(utc)
 
@@ -62,13 +63,13 @@ const DashGrid = styled.div`
 
   @media screen and (min-width: 1080px) {
     padding: 0 1.125rem;
-    grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr ;
-    grid-template-areas: ' name liq vol volWeek fees ';
+    grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr 1fr;
+    grid-template-areas: ' name liq vol volWeek fees apy';
   }
 
   @media screen and (min-width: 1200px) {
-    grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr;
-    grid-template-areas: ' name liq vol volWeek fees';
+    grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr 1fr;
+    grid-template-areas: ' name liq vol volWeek fees apy';
   }
 `
 
@@ -100,7 +101,8 @@ const SORT_FIELD = {
   LIQ: 0,
   VOL: 1,
   VOL_7DAYS: 3,
-  FEES: 4
+  FEES: 4,
+  APY: 5
 }
 
 const FIELD_TO_VALUE = {
@@ -145,16 +147,7 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
     if (pairData && pairData.token0 && pairData.token1) {
       const liquidity = formattedNum(pairData.reserveUSD, true)
       const volume = formattedNum(pairData.oneDayVolumeUSD, true)
-
-      if (pairData.token0.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
-        pairData.token0.name = 'ETH (Wrapped)'
-        pairData.token0.symbol = 'ETH'
-      }
-
-      if (pairData.token1.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
-        pairData.token1.name = 'ETH (Wrapped)'
-        pairData.token1.symbol = 'ETH'
-      }
+      const apy = formattedPercent((pairData.oneDayVolumeUSD * 0.003 * 365 * 100) / pairData.reserveUSD)
 
       return (
         <DashGrid style={{ height: '48px' }} disbaleLinks={disbaleLinks} focus={true}>
@@ -174,6 +167,7 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
           <DataText area="vol">{volume}</DataText>
           {!below1080 && <DataText area="volWeek">{formattedNum(pairData.oneWeekVolumeUSD, true)}</DataText>}
           {!below1080 && <DataText area="fees">{formattedNum(pairData.oneDayVolumeUSD * 0.003, true)}</DataText>}
+          {!below1080 && <DataText area="apy">{apy}</DataText>}
         </DashGrid>
       )
     } else {
@@ -187,6 +181,11 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
       .sort((addressA, addressB) => {
         const pairA = pairs[addressA]
         const pairB = pairs[addressB]
+        if (sortedColumn === SORT_FIELD.APY) {
+          const apy0 = parseFloat(pairA.oneDayVolumeUSD * 0.003 * 356 * 100) / parseFloat(pairA.reserveUSD)
+          const apy1 = parseFloat(pairB.oneDayVolumeUSD * 0.003 * 356 * 100) / parseFloat(pairB.reserveUSD)
+          return apy0 > apy1 ? (sortDirection ? -1 : 1) * 1 : (sortDirection ? -1 : 1) * -1
+        }
         return parseFloat(pairA[FIELD_TO_VALUE[sortedColumn]]) > parseFloat(pairB[FIELD_TO_VALUE[sortedColumn]])
           ? (sortDirection ? -1 : 1) * 1
           : (sortDirection ? -1 : 1) * -1
@@ -262,6 +261,20 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
             >
               Fees (24hr) {sortedColumn === SORT_FIELD.FEES ? (!sortDirection ? '↑' : '↓') : ''}
             </ClickableText>
+          </Flex>
+        )}
+        {!below1080 && (
+          <Flex alignItems="center" justifyContent="flexEnd">
+            <ClickableText
+              area="apy"
+              onClick={e => {
+                setSortedColumn(SORT_FIELD.APY)
+                setSortDirection(sortedColumn !== SORT_FIELD.APY ? true : !sortDirection)
+              }}
+            >
+              APY {sortedColumn === SORT_FIELD.APY ? (!sortDirection ? '↑' : '↓') : ''}
+            </ClickableText>
+            <QuestionHelper text={'Based on 24hr volume anualized'} />
           </Flex>
         )}
       </DashGrid>

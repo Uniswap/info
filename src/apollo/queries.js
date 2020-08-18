@@ -44,14 +44,26 @@ export const GET_BLOCK = gql`
   }
 `
 
-export const GET_BLOCKS = timestamps => {
+export const GET_BLOCKS_SKIPPED = (timestamps, skip, end) => {
   let queryString = 'query blocks {'
-  queryString += timestamps.map(
-    timestamp => `t${timestamp}:blocks(first: 1, orderBy: timestamp, orderDirection: asc, where: { timestamp_gt: ${timestamp}, timestamp_lt: ${timestamp +
+  queryString += timestamps.slice(skip, end).map(timestamp => {
+    return `t${timestamp}:blocks(first: 1, orderBy: timestamp, orderDirection: desc, where: { timestamp_gt: ${timestamp}, timestamp_lt: ${timestamp +
       600} }) {
       number
     }`
-  )
+  })
+  queryString += '}'
+  return gql(queryString)
+}
+
+export const GET_BLOCKS = timestamps => {
+  let queryString = 'query blocks {'
+  queryString += timestamps.map(timestamp => {
+    return `t${timestamp}:blocks(first: 1, orderBy: timestamp, orderDirection: desc, where: { timestamp_gt: ${timestamp}, timestamp_lt: ${timestamp +
+      600} }) {
+      number
+    }`
+  })
   queryString += '}'
   return gql(queryString)
 }
@@ -355,8 +367,8 @@ export const USER_TRANSACTIONS = gql`
 `
 
 export const PAIR_CHART = gql`
-  query pairDayDatas($pairAddress: Bytes!) {
-    pairDayDatas(orderBy: date, orderDirection: asc, where: { pairAddress: $pairAddress }) {
+  query pairDayDatas($pairAddress: Bytes!, $skip: Int!) {
+    pairDayDatas(first: 1000, skip: $skip, orderBy: date, orderDirection: asc, where: { pairAddress: $pairAddress }) {
       id
       date
       dailyVolumeToken0
@@ -669,8 +681,8 @@ export const PAIRS_HISTORICAL_BULK = (block, pairs) => {
 }
 
 export const TOKEN_CHART = gql`
-  query tokenDayDatas($tokenAddr: String!) {
-    tokenDayDatas(orderBy: date, orderDirection: asc, where: { token: $tokenAddr }) {
+  query tokenDayDatas($tokenAddr: String!, $skip: Int!) {
+    tokenDayDatas(first: 1000, skip: $skip, orderBy: date, orderDirection: asc, where: { token: $tokenAddr }) {
       id
       date
       priceUSD
@@ -703,6 +715,7 @@ const TokenFields = `
     derivedETH
     tradeVolume
     tradeVolumeUSD
+    untrackedVolumeUSD
     totalLiquidity
     txCount
   }

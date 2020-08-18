@@ -1,12 +1,13 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react'
 import { ResponsiveContainer } from 'recharts'
-import { useTimeframe } from '../../contexts/Application'
 import { timeframeOptions } from '../../constants'
 import { useGlobalChartData, useGlobalData } from '../../contexts/GlobalData'
-import dayjs from 'dayjs'
 import { useMedia } from 'react-use'
 import DropdownSelect from '../DropdownSelect'
 import TradingViewChart, { CHART_TYPES } from '../TradingviewChart'
+import { RowFixed } from '../Row'
+import { OptionButton } from '../ButtonStyled'
+import { getTimeframe } from '../../utils'
 
 const CHART_VIEW = {
   VOLUME: 'Volume',
@@ -21,41 +22,23 @@ const GlobalChart = ({ display }) => {
   // chart options
   const [chartView, setChartView] = useState(display === 'volume' ? CHART_VIEW.VOLUME : CHART_VIEW.LIQUIDITY)
 
-  const [volumeWindow] = useState(VOLUME_WINDOW.DAYS)
-
-  // local window used for this chart only, global window for all data detching
-  const [globalWindow, setGlobalWindow] = useTimeframe()
-  const [localWindow] = useState(globalWindow)
+  // time window and window size for chart
+  const timeWindow = timeframeOptions.ALL_TIME
+  const [volumeWindow, setVolumeWindow] = useState(VOLUME_WINDOW.DAYS)
 
   // global historical data
   const [dailyData, weeklyData] = useGlobalChartData()
-  const { totalLiquidityUSD, oneDayVolumeUSD, volumeChangeUSD, liquidityChangeUSD } = useGlobalData()
+  const {
+    totalLiquidityUSD,
+    oneDayVolumeUSD,
+    volumeChangeUSD,
+    liquidityChangeUSD,
+    oneWeekVolume,
+    weeklyVolumeChange
+  } = useGlobalData()
 
-  let utcEndTime = dayjs.utc()
-  useEffect(() => {
-    setGlobalWindow(localWindow)
-  }, [localWindow, setGlobalWindow])
-  // based on window, get starttime
-  let utcStartTime
-  switch (localWindow) {
-    case timeframeOptions.WEEK:
-      utcStartTime =
-        utcEndTime
-          ?.subtract(1, 'week')
-          .startOf('day')
-          .unix() - 1
-      break
-    case timeframeOptions.ALL_TIME:
-      utcStartTime = utcEndTime?.subtract(1, 'year').unix() - 1
-      break
-    default:
-      utcStartTime =
-        utcEndTime
-          ?.subtract(1, 'year')
-          .startOf('year')
-          .unix() - 1
-      break
-  }
+  // based on window, get starttim
+  let utcStartTime = getTimeframe(timeWindow)
 
   const chartDataFiltered = useMemo(() => {
     let currentData = volumeWindow === VOLUME_WINDOW.DAYS ? dailyData : weeklyData
@@ -97,10 +80,11 @@ const GlobalChart = ({ display }) => {
       {below800 && (
         <DropdownSelect options={CHART_VIEW} active={chartView} setActive={setChartView} color={'#ff007a'} />
       )}
+
       {chartDataFiltered && chartView === CHART_VIEW.LIQUIDITY && (
         <ResponsiveContainer aspect={60 / 28} ref={ref}>
           <TradingViewChart
-            data={chartDataFiltered}
+            data={dailyData}
             base={totalLiquidityUSD}
             baseChange={liquidityChangeUSD}
             title="Liquidity"
@@ -114,14 +98,32 @@ const GlobalChart = ({ display }) => {
         <ResponsiveContainer aspect={60 / 28}>
           <TradingViewChart
             data={chartDataFiltered}
-            base={oneDayVolumeUSD}
-            baseChange={volumeChangeUSD}
-            title="Volume"
-            field="dailyVolumeUSD"
+            base={volumeWindow === VOLUME_WINDOW.WEEKLY ? oneWeekVolume : oneDayVolumeUSD}
+            baseChange={volumeWindow === VOLUME_WINDOW.WEEKLY ? weeklyVolumeChange : volumeChangeUSD}
+            title={volumeWindow === VOLUME_WINDOW.WEEKLY ? 'Volume (7d)' : 'Volume'}
+            field={volumeWindow === VOLUME_WINDOW.WEEKLY ? 'weeklyVolumeUSD' : 'dailyVolumeUSD'}
             width={width}
             type={CHART_TYPES.BAR}
+            useWeekly={volumeWindow === VOLUME_WINDOW.WEEKLY}
           />
         </ResponsiveContainer>
+      )}
+      {display === 'volume' && (
+        <RowFixed>
+          <OptionButton
+            active={volumeWindow === VOLUME_WINDOW.DAYS}
+            onClick={() => setVolumeWindow(VOLUME_WINDOW.DAYS)}
+          >
+            D
+          </OptionButton>
+          <OptionButton
+            style={{ marginLeft: '4px' }}
+            active={volumeWindow === VOLUME_WINDOW.WEEKLY}
+            onClick={() => setVolumeWindow(VOLUME_WINDOW.WEEKLY)}
+          >
+            W
+          </OptionButton>
+        </RowFixed>
       )}
     </>
   ) : (

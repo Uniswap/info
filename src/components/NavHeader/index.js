@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import { RowFixed, RowBetween } from '../Row'
 import { useMedia } from 'react-use'
 import { useGlobalData, useEthPrice } from '../../contexts/GlobalData'
-import { formattedNum } from '../../utils'
+import { formattedNum, localNumber } from '../../utils'
 
 import UniPrice from '../UniPrice'
 
@@ -63,24 +63,15 @@ export default function NavHeader() {
               {showPriceCard && <UniPrice />}
             </HeaderText>
           )}
-          {/* {!below816 && (
-            <HeaderText>
-              Liquidity: <Medium>{liquidity}</Medium>
-            </HeaderText>
-          )}
-          {!below816 && (
-            <HeaderText>
-              Volume (24HR): <Medium>{volume}</Medium>
-            </HeaderText>
-          )} */}
+
           {!below1180 && (
             <HeaderText>
-              Transactions (24H): <Medium>{oneDayTxns}</Medium>
+              Transactions (24H): <Medium>{localNumber(oneDayTxns)}</Medium>
             </HeaderText>
           )}
           {!below1024 && (
             <HeaderText>
-              Pairs: <Medium>{pairCount}</Medium>
+              Pairs: <Medium>{localNumber(pairCount)}</Medium>
             </HeaderText>
           )}
           {!below1295 && (

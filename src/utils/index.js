@@ -9,6 +9,7 @@ import { Text } from 'rebass'
 import _Decimal from 'decimal.js-light'
 import toFormat from 'toformat'
 import { timeframeOptions } from '../constants'
+import Numeral from 'numeral'
 
 // format libraries
 const Decimal = toFormat(_Decimal)
@@ -78,6 +79,10 @@ export function getSwapLink(token0Address, token1Address = null) {
       token0Address === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' ? 'ETH' : token0Address
     }&outputCurrency=${token1Address === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' ? 'ETH' : token1Address}`
   }
+}
+
+export function localNumber(val) {
+  return Numeral(val).format('0,0')
 }
 
 export const toNiceDate = date => {
@@ -265,21 +270,7 @@ export const isAddress = value => {
 }
 
 export const toK = (num, fixed, cutoff = false) => {
-  const formatter = divideBy =>
-    fixed === true
-      ? cutoff
-        ? Number(num / divideBy).toFixed(0)
-        : Number(num / divideBy).toFixed(2)
-      : Number(num / divideBy)
-  if (num > 999999999 || num < -9999999) {
-    return `${formatter(1000000000)}M`
-  } else if (num > 999999 || num < -999999) {
-    return `${formatter(1000000)}M`
-  } else if (num > 999 || num < -999) {
-    return `${formatter(1000)}K`
-  } else {
-    return formatter(1)
-  }
+  return Numeral(num).format('0.00a')
 }
 
 export const setThemeColor = theme => document.documentElement.style.setProperty('--c-token', theme || '#333333')

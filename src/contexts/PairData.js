@@ -321,14 +321,23 @@ const getPairChartData = async pairAddress => {
   let startTime = utcStartTime.unix() - 1
 
   try {
-    let result = await client.query({
-      query: PAIR_CHART,
-      variables: {
-        pairAddress: pairAddress
-      },
-      fetchPolicy: 'cache-first'
-    })
-    data = result.data.pairDayDatas
+    let allFound = false
+    let skip = 0
+    while (!allFound) {
+      let result = await client.query({
+        query: PAIR_CHART,
+        variables: {
+          pairAddress: pairAddress,
+          skip
+        },
+        fetchPolicy: 'cache-first'
+      })
+      skip += 1000
+      data = data.concat(result.data.pairDayDatas)
+      if (result.data.pairDayDatas.length < 1000) {
+        allFound = true
+      }
+    }
 
     let dayIndexSet = new Set()
     let dayIndexArray = []
@@ -393,7 +402,8 @@ const getHourlyRateData = async (pairAddress, startTime) => {
   try {
     blocks = await getBlocksFromTimestamps(timestamps)
   } catch (e) {
-    console.log('error fetchign blocks')
+    console.log(e)
+    console.log('error fetching blocks')
   }
   // catch failing case
   if (!blocks || blocks?.length === 0) {

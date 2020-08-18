@@ -364,6 +364,13 @@ const getTokenData = async (address, ethPrice, ethPriceOld) => {
     )
 
     // calculate percentage changes and daily changes
+    const [oneDayVolumeUT, volumeChangeUT] = get2DayPercentChange(
+      data.untrackedVolumeUSD,
+      oneDayData?.untrackedVolumeUSD ?? 0,
+      twoDayData?.untrackedVolumeUSD ?? 0
+    )
+
+    // calculate percentage changes and daily changes
     const [oneDayTxns, txnChange] = get2DayPercentChange(
       data.txCount,
       oneDayData?.txCount ?? 0,
@@ -384,6 +391,8 @@ const getTokenData = async (address, ethPrice, ethPriceOld) => {
     data.oneDayVolumeUSD = oneDayVolumeUSD
     data.volumeChangeUSD = volumeChangeUSD
     data.priceChangeUSD = priceChangeUSD
+    data.oneDayVolumeUT = oneDayVolumeUT
+    data.volumeChangeUT = volumeChangeUT
     const liquidityChangeUSD = getPercentChange(currentLiquidityUSD ?? 0, oldLiquidityUSD ?? 0)
     data.liquidityChangeUSD = liquidityChangeUSD
     data.oneDayTxns = oneDayTxns
@@ -519,15 +528,24 @@ const getTokenChartData = async tokenAddress => {
   let startTime = utcStartTime.startOf('minute').unix() - 1
 
   try {
-    // hotfix for liquidity bug in uniswap2 subgraph
-    let result = await client.query({
-      query: TOKEN_CHART,
-      variables: {
-        tokenAddr: tokenAddress
-      },
-      fetchPolicy: 'cache-first'
-    })
-    data = data.concat(result.data.tokenDayDatas)
+    let allFound = false
+    let skip = 0
+    while (!allFound) {
+      let result = await client.query({
+        query: TOKEN_CHART,
+        variables: {
+          tokenAddr: tokenAddress,
+          skip
+        },
+        fetchPolicy: 'cache-first'
+      })
+      if (result.data.tokenDayDatas.length < 1000) {
+        allFound = true
+      }
+      skip += 1000
+      data = data.concat(result.data.tokenDayDatas)
+    }
+
     let dayIndexSet = new Set()
     let dayIndexArray = []
     const oneDay = 24 * 60 * 60

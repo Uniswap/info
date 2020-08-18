@@ -47,13 +47,13 @@ const CandleStickChart = ({
     }
   })
 
-  if (formattedData) {
+  if (formattedData && formattedData.length > 0) {
     formattedData.push({
       time: dayjs().unix(),
       open: parseFloat(formattedData[formattedData.length - 1].close),
       close: parseFloat(base),
-      low: parseFloat(formattedData[formattedData.length - 1].open),
-      high: parseFloat(formattedData[formattedData.length - 1].close)
+      low: Math.min(parseFloat(base), parseFloat(formattedData[formattedData.length - 1].close)),
+      high: Math.max(parseFloat(base), parseFloat(formattedData[formattedData.length - 1].close))
     })
   }
 
@@ -162,7 +162,7 @@ const CandleStickChart = ({
 
       setChartCreated(chart)
     }
-  }, [chartCreated, formattedData, width, height, valueFormatter, base])
+  }, [chartCreated, formattedData, width, height, valueFormatter, base, margin])
 
   // responsiveness
   useEffect(() => {

@@ -215,15 +215,23 @@ async function getGlobalData(ethPrice, oldEthPrice) {
   let data = {}
   let oneDayData = {}
   let twoDayData = {}
+  let oneWeekData = {}
 
   try {
     // get timestamps for the days
     const utcCurrentTime = dayjs()
     const utcOneDayBack = utcCurrentTime.subtract(1, 'day').unix()
     const utcTwoDaysBack = utcCurrentTime.subtract(2, 'day').unix()
+    const utcOneWeekBack = utcCurrentTime.subtract(1, 'week').unix()
+    const utcTwoWeeksBack = utcCurrentTime.subtract(2, 'week').unix()
 
     // get the blocks needed for time travel queries
-    let [oneDayBlock, twoDayBlock] = await getBlocksFromTimestamps([utcOneDayBack, utcTwoDaysBack])
+    let [oneDayBlock, twoDayBlock, oneWeekBlock, twoWeekBlock] = await getBlocksFromTimestamps([
+      utcOneDayBack,
+      utcTwoDaysBack,
+      utcOneWeekBack,
+      utcTwoWeeksBack
+    ])
 
     // fetch the global data
     let result = await client.query({
@@ -238,23 +246,36 @@ async function getGlobalData(ethPrice, oldEthPrice) {
       fetchPolicy: 'cache-first'
     })
     oneDayData = oneDayResult.data.uniswapFactories[0]
+
     let twoDayResult = await client.query({
       query: GLOBAL_DATA(twoDayBlock?.number),
       fetchPolicy: 'cache-first'
     })
     twoDayData = twoDayResult.data.uniswapFactories[0]
 
-    if (data && oneDayData && twoDayData) {
+    let oneWeekResult = await client.query({
+      query: GLOBAL_DATA(oneWeekBlock?.number),
+      fetchPolicy: 'cache-first'
+    })
+    oneWeekData = oneWeekResult.data.uniswapFactories[0]
+
+    let twoWeekResult = await client.query({
+      query: GLOBAL_DATA(twoWeekBlock?.number),
+      fetchPolicy: 'cache-first'
+    })
+    const twoWeekData = twoWeekResult.data.uniswapFactories[0]
+
+    if (data && oneDayData && twoDayData && twoWeekData) {
       let [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentChange(
         data.untrackedVolumeUSD,
         oneDayData.untrackedVolumeUSD ? oneDayData.untrackedVolumeUSD : 0,
         twoDayData.untrackedVolumeUSD ? twoDayData.untrackedVolumeUSD : 0
       )
 
-      const [oneDayVolumeETH, volumeChangeETH] = get2DayPercentChange(
-        data.totalVolumeETH,
-        oneDayData.totalVolumeETH ? oneDayData.totalVolumeETH : 0,
-        twoDayData.totalVolumeETH ? twoDayData.totalVolumeETH : 0
+      const [oneWeekVolume, weeklyVolumeChange] = get2DayPercentChange(
+        data.untrackedVolumeUSD,
+        oneWeekData.untrackedVolumeUSD,
+        twoWeekData.untrackedVolumeUSD
       )
 
       const [oneDayTxns, txnChange] = get2DayPercentChange(
@@ -272,9 +293,9 @@ async function getGlobalData(ethPrice, oldEthPrice) {
 
       // add relevant fields with the calculated amounts
       data.oneDayVolumeUSD = oneDayVolumeUSD
+      data.oneWeekVolume = oneWeekVolume
+      data.weeklyVolumeChange = weeklyVolumeChange
       data.volumeChangeUSD = volumeChangeUSD
-      data.oneDayVolumeETH = oneDayVolumeETH
-      data.volumeChangeETH = volumeChangeETH
       data.liquidityChangeUSD = liquidityChangeUSD
       data.oneDayTxns = oneDayTxns
       data.txnChange = txnChange

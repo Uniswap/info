@@ -16,7 +16,7 @@ import LocalLoader from '../LocalLoader'
 
 const ChartWrapper = styled.div`
   height: 100%;
-  max-height: 300px;
+  max-height: 340px;
 
   @media screen and (max-width: 600px) {
     min-height: 200px;
@@ -37,7 +37,7 @@ const CHART_VIEW = {
   RATE1: 'Rate 1'
 }
 
-const PairChart = ({ address, color }) => {
+const PairChart = ({ address, color, base0, base1 }) => {
   const [chartFilter, setChartFilter] = useState(CHART_VIEW.LIQUIDITY)
 
   const [timeWindow, setTimeWindow] = useState(timeframeOptions.WEEK)
@@ -107,7 +107,7 @@ const PairChart = ({ address, color }) => {
     }
   }
 
-  const aspect = below1600 ? 60 / 28 : below1080 ? 60 / 14 : 60 / 22
+  const aspect = below1080 ? 60 / 20 : below1600 ? 60 / 28 : 60 / 22
 
   return (
     <ChartWrapper>
@@ -215,12 +215,13 @@ const PairChart = ({ address, color }) => {
           </AreaChart>
         </ResponsiveContainer>
       )}
-      {chartFilter === CHART_VIEW.RATE0 &&
-        (hourlyRate0 ? (
+
+      {chartFilter === CHART_VIEW.RATE1 &&
+        (hourlyRate1 ? (
           <ResponsiveContainer aspect={aspect} ref={ref}>
             <CandleStickChart
-              data={hourlyRate0}
-              base={100}
+              data={hourlyRate1}
+              base={base0}
               margin={false}
               width={width}
               valueFormatter={valueFormatter}
@@ -230,10 +231,16 @@ const PairChart = ({ address, color }) => {
           <LocalLoader />
         ))}
 
-      {chartFilter === CHART_VIEW.RATE1 &&
-        (hourlyRate1 ? (
+      {chartFilter === CHART_VIEW.RATE0 &&
+        (hourlyRate0 ? (
           <ResponsiveContainer aspect={aspect} ref={ref}>
-            <CandleStickChart data={hourlyRate1} width={width} valueFormatter={valueFormatter} />
+            <CandleStickChart
+              data={hourlyRate0}
+              base={base1}
+              margin={false}
+              width={width}
+              valueFormatter={valueFormatter}
+            />
           </ResponsiveContainer>
         ) : (
           <LocalLoader />

@@ -25,6 +25,10 @@ const ContentWrapper = styled.div`
   display: grid;
   grid-template-columns: ${({ open }) => (open ? '220px 1fr 200px' : '220px 1fr 64px')};
 
+  @media screen and (max-width: 1400px) {
+    grid-template-columns: 220px 1fr;
+  }
+
   @media screen and (max-width: 1080px) {
     grid-template-columns: 1fr;
     max-width: 100vw;
@@ -41,7 +45,7 @@ const Right = styled.div`
   width: ${({ open }) => (open ? '220px' : '64px')};
   height: ${({ open }) => (open ? 'fit-content' : '64px')};
 
-  @media screen and (max-width: 1080px) {
+  @media screen and (max-width: 1400px) {
     display: none;
   }
 `
