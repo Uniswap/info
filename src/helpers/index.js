@@ -251,16 +251,16 @@ export const formattedNum = (number, usd = false, acceptNegatives = false) => {
   if (num < 0.0001) {
     if (acceptNegatives) {
       return usd
-        ? '$' + Number(parseFloat(num).toFixed(4)).toLocaleString()
-        : '' + Number(parseFloat(num).toFixed(4)).toLocaleString()
+        ? '$' + Number(parseFloat(num).toFixed(4)).toLocaleString('ru-Ru')
+        : '' + Number(parseFloat(num).toFixed(4)).toLocaleString('ru-Ru')
     }
     return usd ? '< $0.0001' : '< 0.0001'
   }
 
   if (num > 1000) {
     return usd
-      ? '$' + Number(parseFloat(num).toFixed(0)).toLocaleString()
-      : '' + Number(parseFloat(num).toFixed(0)).toLocaleString()
+      ? '$' + Number(parseFloat(num).toFixed(0)).toLocaleString('ru-Ru')
+      : '' + Number(parseFloat(num).toFixed(0)).toLocaleString('ru-Ru')
   }
 
   if (usd) {
