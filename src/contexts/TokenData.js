@@ -20,7 +20,8 @@ import {
   getPercentChange,
   getBlockFromTimestamp,
   isAddress,
-  getBlocksFromTimestamps
+  getBlocksFromTimestamps,
+  splitQuery
 } from '../utils'
 import { timeframeOptions } from '../constants'
 
@@ -474,17 +475,13 @@ const getIntervalTokenData = async (tokenAddress, startTime, interval = 3600) =>
       return []
     }
 
-    // pass the blocks to a token query
-    let result = await client.query({
-      query: PRICES_BY_BLOCK(tokenAddress, blocks),
-      fetchPolicy: 'cache-first'
-    })
+    let result = await splitQuery(PRICES_BY_BLOCK, client, [tokenAddress], blocks, 100)
 
     // format token ETH price results
     let values = []
-    for (var row in result?.data) {
+    for (var row in result) {
       let timestamp = row.split('t')[1]
-      let derivedETH = parseFloat(result.data[row]?.derivedETH)
+      let derivedETH = parseFloat(result[row]?.derivedETH)
       if (timestamp) {
         values.push({
           timestamp,
@@ -495,10 +492,10 @@ const getIntervalTokenData = async (tokenAddress, startTime, interval = 3600) =>
 
     // go through eth usd prices and assign to original values array
     let index = 0
-    for (var brow in result?.data) {
+    for (var brow in result) {
       let timestamp = brow.split('b')[1]
       if (timestamp) {
-        values[index].priceUSD = result.data[brow].ethPrice * values[index].derivedETH
+        values[index].priceUSD = result[brow].ethPrice * values[index].derivedETH
         index += 1
       }
     }

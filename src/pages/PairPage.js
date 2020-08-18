@@ -322,7 +322,7 @@ function PairPage({ pairAddress, history }) {
                 <Panel style={{ height: '100%' }}>
                   <AutoColumn gap="20px">
                     <RowBetween>
-                      <TYPE.main>Volume (24hrs)</TYPE.main>
+                      <TYPE.main>Volume (24hrs) {usingUtVolume && '(Untracked)'}</TYPE.main>
                       <div />
                     </RowBetween>
                     <RowBetween align="flex-end">
