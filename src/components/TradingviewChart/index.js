@@ -3,8 +3,8 @@ import { createChart } from 'lightweight-charts'
 import dayjs from 'dayjs'
 import { formattedNum } from '../../utils'
 import styled from 'styled-components'
-import { Layout } from 'react-feather'
 import { usePrevious } from 'react-use'
+import { Play } from 'react-feather'
 
 export const CHART_TYPES = {
   BAR: 'BAR',
@@ -222,7 +222,7 @@ const TradingViewChart = ({
     <Wrapper>
       <div ref={ref} id={'test-id' + type} />
       <IconWrapper>
-        <Layout
+        <Play
           onClick={() => {
             chartCreated && chartCreated.timeScale().fitContent()
           }}
