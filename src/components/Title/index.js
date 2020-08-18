@@ -2,9 +2,7 @@ import React from 'react'
 import { useHistory } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { Text, Flex } from 'rebass'
-import { useTokenData } from '../../contexts/TokenData'
-import { usePairData } from '../../contexts/PairData'
+import { Flex, Text } from 'rebass'
 import Link from '../Link'
 import Logo from '../../assets/logo.svg'
 import Wordmark from '../../assets/wordmark.svg'
@@ -33,13 +31,8 @@ const WrapImage = styled.div`
   max-width: 300px;
 `
 
-export default function Title({ token, pair, account }) {
+export default function Title({ account }) {
   const history = useHistory()
-
-  const { name, symbol } = useTokenData(token)
-  const { token0, token1 } = usePairData(pair)
-  const symbol0 = token0 && token0.symbol
-  const symbol1 = token1 && token1.symbol
 
   const below1080 = useMedia('(max-width: 1080px)')
 
@@ -51,47 +44,46 @@ export default function Title({ token, pair, account }) {
     if (account) {
       return (
         <div>
-          <span style={{ fontWeight: 400, verticalAlign: '-webkit-baseline-middle' }}> → Account → Overview </span>
+          <span style={ { fontWeight: 400, verticalAlign: '-webkit-baseline-middle' } }> → Account → Overview </span>
         </div>
       )
     }
 
-    if (symbol0 && symbol1) {
-      return (
-        <div>
-          <span style={{ fontWeight: 400, verticalAlign: '-webkit-baseline-middle' }}>
-            {' '}
-            / {symbol0 + '-' + symbol1}
-          </span>
-        </div>
-      )
-    }
-    if (name && symbol) {
-      return (
-        <div>
-          <span style={{ fontWeight: 400, verticalAlign: '-webkit-baseline-middle' }}>
-            / {!below1080 ? name : ''} {'(' + symbol + ')'}
-          </span>
-        </div>
-      )
-    } else {
-      return ''
-    }
+    // if (symbol0 && symbol1) {
+    //   return (
+    //     <div>
+    //       <span style={{ fontWeight: 400, verticalAlign: '-webkit-baseline-middle' }}>
+    //         {' '}
+    //         / {symbol0 + '-' + symbol1}
+    //       </span>
+    //     </div>
+    //   )
+    // }
+    // if (name && symbol) {
+    //   return (
+    //     <div>
+    //       <span style={{ fontWeight: 400, verticalAlign: '-webkit-baseline-middle' }}>
+    //         / {!below1080 ? name : ''} {'(' + symbol + ')'}
+    //       </span>
+    //     </div>
+    //   )
+    // }
+    return ''
   }
 
   return (
-    <TitleWrapper onClick={() => history.push('/')}>
+    <TitleWrapper onClick={ () => history.push('/') }>
       <Flex alignItems="center">
-          <div>
-            <UniIcon id="link" onClick={() => history.push('/')}>
-              <img src={Logo} alt="logo" width="55px"/>
-            </UniIcon>
-          </div>
-          <WrapImage>
-            <img style={{ width: '100%' }} src={Wordmark} alt="logo"/>
-          </WrapImage>
-        <Text fontWeight={600} mx="4px" lineHeight="1.5rem">
-          {getName()}
+        <div>
+          <UniIcon id="link" onClick={ () => history.push('/') }>
+            <img src={ Logo } alt="logo" width="55px"/>
+          </UniIcon>
+        </div>
+        <WrapImage>
+          <img style={ { width: '100%' } } src={ Wordmark } alt="logo"/>
+        </WrapImage>
+        <Text fontWeight={ 600 } mx="4px" lineHeight="1.5rem">
+          { getName() }
         </Text>
       </Flex>
     </TitleWrapper>

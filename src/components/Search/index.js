@@ -25,8 +25,8 @@ const Wrapper = styled.div`
   border-bottom-right-radius: ${({ open }) => (open ? '0px' : '12px')};
   border-bottom-left-radius: ${({ open }) => (open ? '0px' : '12px')};
   ${({ small }) =>
-    !small &&
-    ` box-shadow: 0 2.8px 2.8px -9px rgba(0, 0, 0, 0.008), 0 6.7px 6.7px -9px rgba(0, 0, 0, 0.012),
+  !small &&
+  ` box-shadow: 0 2.8px 2.8px -9px rgba(0, 0, 0, 0.008), 0 6.7px 6.7px -9px rgba(0, 0, 0, 0.012),
     0 12.5px 12.6px -9px rgba(0, 0, 0, 0.015), 0 22.3px 22.6px -9px rgba(0, 0, 0, 0.018),
     0 41.8px 42.2px -9px rgba(0, 0, 0, 0.022), 0 100px 101px -9px rgba(0, 0, 0, 0.03);`};
 `
@@ -147,106 +147,106 @@ export const Search = ({ small = false }) => {
   const filteredTokenList = useMemo(() => {
     return allTokens
       ? allTokens
-          .sort((a, b) => {
-            if (OVERVIEW_TOKEN_BLACKLIST.includes(a.id)) {
-              return 1
-            }
-            if (OVERVIEW_TOKEN_BLACKLIST.includes(b.id)) {
-              return -1
-            }
-            const tokenA = allTokenData[a.id]
-            const tokenB = allTokenData[b.id]
-            if (tokenA?.oneDayVolumeUSD && tokenB?.oneDayVolumeUSD) {
-              return tokenA.oneDayVolumeUSD > tokenB.oneDayVolumeUSD ? -1 : 1
-            }
-            if (tokenA?.oneDayVolumeUSD && !tokenB?.oneDayVolumeUSD) {
-              return -1
-            }
-            if (!tokenA?.oneDayVolumeUSD && tokenB?.oneDayVolumeUSD) {
-              return 1
-            }
+        .sort((a, b) => {
+          if (OVERVIEW_TOKEN_BLACKLIST.includes(a.id)) {
             return 1
-          })
-          .filter(token => {
-            if (OVERVIEW_TOKEN_BLACKLIST.includes(token.id)) {
-              return false
+          }
+          if (OVERVIEW_TOKEN_BLACKLIST.includes(b.id)) {
+            return -1
+          }
+          const tokenA = allTokenData[a.id]
+          const tokenB = allTokenData[b.id]
+          if (tokenA?.oneDayVolumeUSD && tokenB?.oneDayVolumeUSD) {
+            return tokenA.oneDayVolumeUSD > tokenB.oneDayVolumeUSD ? -1 : 1
+          }
+          if (tokenA?.oneDayVolumeUSD && !tokenB?.oneDayVolumeUSD) {
+            return -1
+          }
+          if (!tokenA?.oneDayVolumeUSD && tokenB?.oneDayVolumeUSD) {
+            return 1
+          }
+          return 1
+        })
+        .filter(token => {
+          if (OVERVIEW_TOKEN_BLACKLIST.includes(token.id)) {
+            return false
+          }
+          const regexMatches = Object.keys(token).map(tokenEntryKey => {
+            const isAddress = value.slice(0, 2) === '0x'
+            if (tokenEntryKey === 'id' && isAddress) {
+              return token[tokenEntryKey].match(new RegExp(escapeRegExp(value), 'i'))
             }
-            const regexMatches = Object.keys(token).map(tokenEntryKey => {
-              const isAddress = value.slice(0, 2) === '0x'
-              if (tokenEntryKey === 'id' && isAddress) {
-                return token[tokenEntryKey].match(new RegExp(escapeRegExp(value), 'i'))
-              }
-              if (tokenEntryKey === 'symbol' && !isAddress) {
-                return token[tokenEntryKey].match(new RegExp(escapeRegExp(value), 'i'))
-              }
-              if (tokenEntryKey === 'name' && !isAddress) {
-                return token[tokenEntryKey].match(new RegExp(escapeRegExp(value), 'i'))
-              }
-              return false
-            })
-            return regexMatches.some(m => m)
+            if (tokenEntryKey === 'symbol' && !isAddress) {
+              return token[tokenEntryKey].match(new RegExp(escapeRegExp(value), 'i'))
+            }
+            if (tokenEntryKey === 'name' && !isAddress) {
+              return token[tokenEntryKey].match(new RegExp(escapeRegExp(value), 'i'))
+            }
+            return false
           })
+          return regexMatches.some(m => m)
+        })
       : []
   }, [allTokenData, allTokens, value])
 
   const filteredPairList = useMemo(() => {
     return allPairs
       ? allPairs
-          .sort((a, b) => {
-            const pairA = allPairData[a.id]
-            const pairB = allPairData[b.id]
-            if (pairA?.trackedReserveETH && pairB?.trackedReserveETH) {
-              return parseFloat(pairA.trackedReserveETH) > parseFloat(pairB.trackedReserveETH) ? -1 : 1
+        .sort((a, b) => {
+          const pairA = allPairData[a.id]
+          const pairB = allPairData[b.id]
+          if (pairA?.trackedReserveETH && pairB?.trackedReserveETH) {
+            return parseFloat(pairA.trackedReserveETH) > parseFloat(pairB.trackedReserveETH) ? -1 : 1
+          }
+          if (pairA?.trackedReserveETH && !pairB?.trackedReserveETH) {
+            return -1
+          }
+          if (!pairA?.trackedReserveETH && pairB?.trackedReserveETH) {
+            return 1
+          }
+          return 0
+        })
+        .filter(pair => {
+          if (OVERVIEW_PAIR_BLACKLIST.includes(pair.id)) {
+            return false
+          }
+          if (value && value.includes(' ')) {
+            const pairA = value.split(' ')[0]?.toUpperCase()
+            const pairB = value.split(' ')[1]?.toUpperCase()
+            return (
+              (pair.token0.symbol.includes(pairA) || pair.token0.symbol.includes(pairB)) &&
+              (pair.token1.symbol.includes(pairA) || pair.token1.symbol.includes(pairB))
+            )
+          }
+          if (value && value.includes('-')) {
+            const pairA = value.split('-')[0]?.toUpperCase()
+            const pairB = value.split('-')[1]?.toUpperCase()
+            return (
+              (pair.token0.symbol.includes(pairA) || pair.token0.symbol.includes(pairB)) &&
+              (pair.token1.symbol.includes(pairA) || pair.token1.symbol.includes(pairB))
+            )
+          }
+          const regexMatches = Object.keys(pair).map(field => {
+            const isAddress = value.slice(0, 2) === '0x'
+            if (field === 'id' && isAddress) {
+              return pair[field].match(new RegExp(escapeRegExp(value), 'i'))
             }
-            if (pairA?.trackedReserveETH && !pairB?.trackedReserveETH) {
-              return -1
-            }
-            if (!pairA?.trackedReserveETH && pairB?.trackedReserveETH) {
-              return 1
-            }
-            return 0
-          })
-          .filter(pair => {
-            if (OVERVIEW_PAIR_BLACKLIST.includes(pair.id)) {
-              return false
-            }
-            if (value && value.includes(' ')) {
-              const pairA = value.split(' ')[0]?.toUpperCase()
-              const pairB = value.split(' ')[1]?.toUpperCase()
+            if (field === 'token0') {
               return (
-                (pair.token0.symbol.includes(pairA) || pair.token0.symbol.includes(pairB)) &&
-                (pair.token1.symbol.includes(pairA) || pair.token1.symbol.includes(pairB))
+                pair[field].symbol.match(new RegExp(escapeRegExp(value), 'i')) ||
+                pair[field].name.match(new RegExp(escapeRegExp(value), 'i'))
               )
             }
-            if (value && value.includes('-')) {
-              const pairA = value.split('-')[0]?.toUpperCase()
-              const pairB = value.split('-')[1]?.toUpperCase()
+            if (field === 'token1') {
               return (
-                (pair.token0.symbol.includes(pairA) || pair.token0.symbol.includes(pairB)) &&
-                (pair.token1.symbol.includes(pairA) || pair.token1.symbol.includes(pairB))
+                pair[field].symbol.match(new RegExp(escapeRegExp(value), 'i')) ||
+                pair[field].name.match(new RegExp(escapeRegExp(value), 'i'))
               )
             }
-            const regexMatches = Object.keys(pair).map(field => {
-              const isAddress = value.slice(0, 2) === '0x'
-              if (field === 'id' && isAddress) {
-                return pair[field].match(new RegExp(escapeRegExp(value), 'i'))
-              }
-              if (field === 'token0') {
-                return (
-                  pair[field].symbol.match(new RegExp(escapeRegExp(value), 'i')) ||
-                  pair[field].name.match(new RegExp(escapeRegExp(value), 'i'))
-                )
-              }
-              if (field === 'token1') {
-                return (
-                  pair[field].symbol.match(new RegExp(escapeRegExp(value), 'i')) ||
-                  pair[field].name.match(new RegExp(escapeRegExp(value), 'i'))
-                )
-              }
-              return false
-            })
-            return regexMatches.some(m => m)
+            return false
           })
+          return regexMatches.some(m => m)
+        })
       : []
   }, [allPairData, allPairs, value])
 
@@ -327,10 +327,10 @@ export const Search = ({ small = false }) => {
               : below470
               ? 'Search Mooniswap...'
               : below700
-              ? 'Search pairs and tokens...'
-              : small
-              ? 'Search pairs and tokens...'
-              : 'Search or paste address to find Mooniswap pairs and tokens...'
+                ? 'Search pairs and tokens...'
+                : small
+                  ? 'Search pairs and tokens...'
+                  : 'Search or paste address to find Mooniswap pairs and tokens...'
           }
           value={value}
           onChange={e => {
@@ -352,24 +352,24 @@ export const Search = ({ small = false }) => {
         <div>
           {filteredPairList && Object.keys(filteredPairList).length === 0 && <MenuItem>No results</MenuItem>}
           {filteredPairList &&
-            filteredPairList.slice(0, pairsShown).map(pair => {
-              if (pair?.token0?.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
-                pair.token0.name = 'ETH (Wrapped)'
-                pair.token0.symbol = 'ETH'
-              }
-              if (pair?.token1.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
-                pair.token1.name = 'ETH (Wrapped)'
-                pair.token1.symbol = 'ETH'
-              }
-              return (
-                <BasicLink to={'/pair/' + pair.id} key={pair.id} onClick={onDismiss}>
-                  <MenuItem>
-                    <DoubleTokenLogo a0={pair?.token0?.id} a1={pair?.token1?.id} margin={true} />
-                    <span style={{ marginLeft: '10px' }}>{pair.token0.symbol + '-' + pair.token1.symbol} Pair</span>
-                  </MenuItem>
-                </BasicLink>
-              )
-            })}
+          filteredPairList.slice(0, pairsShown).map(pair => {
+            if (pair?.token0?.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
+              pair.token0.name = 'ETH (Wrapped)'
+              pair.token0.symbol = 'ETH'
+            }
+            if (pair?.token1.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
+              pair.token1.name = 'ETH (Wrapped)'
+              pair.token1.symbol = 'ETH'
+            }
+            return (
+              <BasicLink to={'/pair/' + pair.id} key={pair.id} onClick={onDismiss}>
+                <MenuItem>
+                  <DoubleTokenLogo a0={pair?.token0?.id} a1={pair?.token1?.id} margin={true} />
+                  <span style={{ marginLeft: '10px' }}>{pair.token0.symbol + '-' + pair.token1.symbol} Pair</span>
+                </MenuItem>
+              </BasicLink>
+            )
+          })}
           <Heading
             hide={!(Object.keys(filteredPairList).length > 3 && Object.keys(filteredPairList).length >= pairsShown)}
           >

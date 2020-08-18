@@ -2,7 +2,6 @@ import React, { createContext, useCallback, useContext, useEffect, useMemo, useR
 
 import { client } from '../apollo/client'
 import {
-  ALL_TOKENS_BY_BLOCK,
   FILTERED_TRANSACTIONS,
   PAIR_CHART,
   PAIR_DATA,
