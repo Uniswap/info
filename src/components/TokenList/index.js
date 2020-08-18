@@ -173,7 +173,7 @@ function TopTokenList({ tokens, history, itemMax = 10 }) {
       <DashGrid style={{ height: '48px' }} focus={true}>
         <DataText area="name" fontWeight="500">
           <Row>
-            {!below680 && <div style={{ marginRight: '1rem' }}>{index}</div>}
+            {!below680 && <div style={{ marginRight: '1rem', width: '10px' }}>{index}</div>}
             <TokenLogo address={item.id} />
             <CustomLink style={{ marginLeft: '16px', whiteSpace: 'nowrap' }} to={'/token/' + item.id}>
               <FormattedName text={below680 ? item.symbol : item.name} maxCharacters={20} />

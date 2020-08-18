@@ -21,7 +21,8 @@ import {
   get2DayPercentChange,
   isAddress,
   getBlocksFromTimestamps,
-  getTimestampsForChanges
+  getTimestampsForChanges,
+  splitQuery
 } from '../utils'
 import { timeframeOptions } from '../constants'
 
@@ -402,7 +403,6 @@ const getHourlyRateData = async (pairAddress, startTime) => {
   try {
     blocks = await getBlocksFromTimestamps(timestamps)
   } catch (e) {
-    console.log(e)
     console.log('error fetching blocks')
   }
   // catch failing case
@@ -410,21 +410,17 @@ const getHourlyRateData = async (pairAddress, startTime) => {
     return []
   }
 
-  // pass the blocks to a token query
-  let result = await client.query({
-    query: HOURLY_PAIR_RATES(pairAddress, blocks),
-    fetchPolicy: 'cache-first'
-  })
+  const result = await splitQuery(HOURLY_PAIR_RATES, client, [pairAddress], blocks, 500)
 
   // format token ETH price results
   let values = []
-  for (var row in result?.data) {
+  for (var row in result) {
     let timestamp = row.split('t')[1]
     if (timestamp) {
       values.push({
         timestamp,
-        rate0: parseFloat(result.data[row]?.token0Price),
-        rate1: parseFloat(result.data[row]?.token1Price)
+        rate0: parseFloat(result[row]?.token0Price),
+        rate1: parseFloat(result[row]?.token1Price)
       })
     }
   }

@@ -40,7 +40,7 @@ const CHART_VIEW = {
 const PairChart = ({ address, color, base0, base1 }) => {
   const [chartFilter, setChartFilter] = useState(CHART_VIEW.LIQUIDITY)
 
-  const [timeWindow, setTimeWindow] = useState(timeframeOptions.WEEK)
+  const [timeWindow, setTimeWindow] = useState(timeframeOptions.MONTH)
 
   // update the width on a window resize
   const ref = useRef()
@@ -121,17 +121,38 @@ const PairChart = ({ address, color, base0, base1 }) => {
           <AutoRow gap="6px" style={{ flexWrap: 'nowrap' }}>
             <OptionButton
               active={chartFilter === CHART_VIEW.LIQUIDITY}
-              onClick={() => setChartFilter(CHART_VIEW.LIQUIDITY)}
+              onClick={() => {
+                setTimeWindow(timeframeOptions.ALL_TIME)
+                setChartFilter(CHART_VIEW.LIQUIDITY)
+              }}
             >
               Liquidity
             </OptionButton>
-            <OptionButton active={chartFilter === CHART_VIEW.VOLUME} onClick={() => setChartFilter(CHART_VIEW.VOLUME)}>
+            <OptionButton
+              active={chartFilter === CHART_VIEW.VOLUME}
+              onClick={() => {
+                setTimeWindow(timeframeOptions.ALL_TIME)
+                setChartFilter(CHART_VIEW.VOLUME)
+              }}
+            >
               Volume
             </OptionButton>
-            <OptionButton active={chartFilter === CHART_VIEW.RATE0} onClick={() => setChartFilter(CHART_VIEW.RATE0)}>
+            <OptionButton
+              active={chartFilter === CHART_VIEW.RATE0}
+              onClick={() => {
+                setTimeWindow(timeframeOptions.WEEK)
+                setChartFilter(CHART_VIEW.RATE0)
+              }}
+            >
               {pairData.token0 ? formattedSymbol0 + '/' + formattedSymbol1 : '-'}
             </OptionButton>
-            <OptionButton active={chartFilter === CHART_VIEW.RATE1} onClick={() => setChartFilter(CHART_VIEW.RATE1)}>
+            <OptionButton
+              active={chartFilter === CHART_VIEW.RATE1}
+              onClick={() => {
+                setTimeWindow(timeframeOptions.WEEK)
+                setChartFilter(CHART_VIEW.RATE1)
+              }}
+            >
               {pairData.token0 ? formattedSymbol1 + '/' + formattedSymbol0 : '-'}
             </OptionButton>
           </AutoRow>

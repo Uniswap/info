@@ -117,6 +117,35 @@ export function getTimestampsForChanges() {
   return [t1, t2, tWeek]
 }
 
+export async function splitQuery(query, localClient, vars, list, skipCount = 100) {
+  let fetchedData = {}
+  let allFound = false
+  let skip = 0
+
+  while (!allFound) {
+    let end = list.length
+    if (skip + skipCount < list.length) {
+      end = skip + skipCount
+    }
+    let sliced = list.slice(skip, end)
+    let result = await localClient.query({
+      query: query(...vars, sliced),
+      fetchPolicy: 'cache-first'
+    })
+    fetchedData = {
+      ...fetchedData,
+      ...result.data
+    }
+    if (Object.keys(result.data).length < skipCount || skip + skipCount > list.length) {
+      allFound = true
+    } else {
+      skip += skipCount
+    }
+  }
+
+  return fetchedData
+}
+
 /**
  * @notice Fetches first block after a given timestamp
  * @dev Query speed is optimized by limiting to a 600-second period
@@ -146,17 +175,14 @@ export async function getBlocksFromTimestamps(timestamps) {
     return []
   }
 
-  let result = await blockClient.query({
-    query: GET_BLOCKS(timestamps),
-    fetchPolicy: 'cache-first'
-  })
+  const fetchedData = await splitQuery(GET_BLOCKS, blockClient, [], timestamps, 500)
 
   let blocks = []
-  if (result.data) {
-    for (var t in result.data) {
+  if (fetchedData) {
+    for (var t in fetchedData) {
       blocks.push({
         timestamp: t.split('t')[1],
-        number: result.data[t][0]['number']
+        number: fetchedData[t][0]['number']
       })
     }
   }
