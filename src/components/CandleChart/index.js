@@ -4,7 +4,7 @@ import dayjs from 'dayjs'
 import { formattedNum } from '../../utils'
 import { usePrevious } from 'react-use'
 import styled from 'styled-components'
-import { Layout } from 'react-feather'
+import { Play } from 'react-feather'
 
 const IconWrapper = styled.div`
   position: absolute;
@@ -176,7 +176,7 @@ const CandleStickChart = ({
     <div>
       <div ref={ref} id="test-id" />
       <IconWrapper>
-        <Layout
+        <Play
           onClick={() => {
             chartCreated && chartCreated.timeScale().fitContent()
           }}
