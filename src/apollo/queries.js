@@ -458,6 +458,8 @@ export const PAIR_DATA = (pairAddress, block) => {
         trackedReserveETH
         reserveETH
         volumeUSD
+        lpExtraFeeInToken0
+        lpExtraFeeInToken1
       }
     }`
     : ` query pairs {
@@ -486,6 +488,8 @@ export const PAIR_DATA = (pairAddress, block) => {
         totalSupply
         trackedReserveETH
         volumeUSD
+        lpExtraFeeInToken0
+        lpExtraFeeInToken1
       }
     }`
 
@@ -507,6 +511,8 @@ export const PAIRS_DYNAMIC_BULK = (block, pairs) => {
       trackedReserveETH
       volumeUSD
       totalSupply
+      lpExtraFeeInToken0
+      lpExtraFeeInToken1
     }
   }
   `
@@ -539,6 +545,8 @@ export const PAIRS_BULK = gql`
       trackedReserveETH
       volumeUSD
       createdAtBlockNumber
+      lpExtraFeeInToken0
+      lpExtraFeeInToken1
     }
   }
 `
@@ -552,6 +560,19 @@ export const ALL_TOKENS = gql`
     }
   }
 `
+
+export const ALL_TOKENS_BY_BLOCK = (block) => {
+ const queryString = `
+  query pairs {
+    tokens(first: 1000, skip: $skip, block: {number: ${block}}) {
+      id
+      name
+      symbol
+      derivedETH
+    }
+  }`
+  return gql(queryString)
+}
 
 export const ALL_PAIRS = gql`
   query pairs($skip: Int!) {

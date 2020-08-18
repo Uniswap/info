@@ -120,6 +120,7 @@ const FIELD_TO_VALUE = {
 }
 
 function PairList({ pairs, color, history, disbaleLinks, maxItems = 10 }) {
+
   const below600 = useMedia('(max-width: 600px)')
   const below740 = useMedia('(max-width: 740px)')
   const below1080 = useMedia('(max-width: 1080px)')
@@ -187,7 +188,7 @@ function PairList({ pairs, color, history, disbaleLinks, maxItems = 10 }) {
           <DataText area="liq">{liquidity}</DataText>
           <DataText area="vol">{volume}</DataText>
           {!below1080 && <DataText area="volWeek">{formattedNum(pairData.oneWeekVolumeUSD, true)}</DataText>}
-          {!below1080 && <DataText area="fees">{formattedNum(pairData.oneDayVolumeUSD * 0.003, true)}</DataText>}
+          {!below1080 && <DataText area="fees">{formattedNum(pairData.oneDayTotalFee, true)}</DataText>}
           {!below740 &&
             (disbaleLinks ? (
               <Flex area="pool" justifyContent="flex-end" alignItems="center">

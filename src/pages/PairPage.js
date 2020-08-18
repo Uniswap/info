@@ -136,7 +136,9 @@ function PairPage({ pairAddress, history }) {
     volumeChangeUSD,
     liquidityChangeUSD,
     oneDayTxns,
-    txnChange
+    txnChange,
+    oneDayExtraFee,
+    extraFeeChangeUSD
   } = usePairData(pairAddress)
 
   useEffect(() => {
@@ -165,6 +167,7 @@ function PairPage({ pairAddress, history }) {
   // volume
   const volume = oneDayVolumeUSD ? formattedNum(oneDayVolumeUSD, true) : oneDayVolumeUSD === 0 ? '$0' : '-'
   const volumeChange = formattedPercent(volumeChangeUSD)
+  const percentChange = formattedPercent(extraFeeChangeUSD)
 
   // token data for usd
   const [ethPrice] = useEthPrice()
@@ -303,12 +306,16 @@ function PairPage({ pairAddress, history }) {
                   <RowBetween align="flex-end">
                     <TYPE.main fontSize={'2rem'} lineHeight={1} fontWeight={600}>
                       {oneDayVolumeUSD
-                        ? formattedNum(oneDayVolumeUSD * 0.003, true)
+                        ? !oneDayExtraFee || oneDayExtraFee === '0'
+                          ? formattedNum(oneDayVolumeUSD * 0.003, true)
+                          : formattedNum(oneDayVolumeUSD * 0.003, true) + ' + ' + formattedNum(oneDayExtraFee, true)
                         : oneDayVolumeUSD === 0
                         ? '$0'
                         : '-'}
                     </TYPE.main>
-                    <TYPE.main>{volumeChange}</TYPE.main>
+                    <TYPE.main>
+                      {percentChange}
+                    </TYPE.main>
                   </RowBetween>
                 </AutoColumn>
               </Panel>
