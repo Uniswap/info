@@ -561,18 +561,16 @@ export const ALL_TOKENS = gql`
   }
 `
 
-export const ALL_TOKENS_BY_BLOCK = (block) => {
- const queryString = `
-  query pairs {
-    tokens(first: 1000, skip: $skip, block: {number: ${block}}) {
-      id
-      name
-      symbol
-      derivedETH
+export const ALL_TOKENS_BY_BLOCK = (block) => gql`
+    query tokens($skip: Int!) {
+        tokens(first: 1000, skip: $skip, block: {number: ${block}}) {
+            id
+            name
+            symbol
+            derivedETH
+        }
     }
-  }`
-  return gql(queryString)
-}
+`
 
 export const ALL_PAIRS = gql`
   query pairs($skip: Int!) {

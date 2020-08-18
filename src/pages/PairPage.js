@@ -306,7 +306,7 @@ function PairPage({ pairAddress, history }) {
                   <RowBetween align="flex-end">
                     <TYPE.main fontSize={'2rem'} lineHeight={1} fontWeight={600}>
                       {oneDayVolumeUSD
-                        ? !oneDayExtraFee || oneDayExtraFee === '0'
+                        ? !oneDayExtraFee || oneDayExtraFee <= 0
                           ? formattedNum(oneDayVolumeUSD * 0.003, true)
                           : formattedNum(oneDayVolumeUSD * 0.003, true) + ' + ' + formattedNum(oneDayExtraFee, true)
                         : oneDayVolumeUSD === 0
@@ -314,7 +314,11 @@ function PairPage({ pairAddress, history }) {
                         : '-'}
                     </TYPE.main>
                     <TYPE.main>
-                      {percentChange}
+                      {
+                        !oneDayExtraFee || oneDayExtraFee <= 0
+                          ? volumeChange
+                          : percentChange
+                      }
                     </TYPE.main>
                   </RowBetween>
                 </AutoColumn>

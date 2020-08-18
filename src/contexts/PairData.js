@@ -2,6 +2,7 @@ import React, { createContext, useCallback, useContext, useEffect, useMemo, useR
 
 import { client } from '../apollo/client'
 import {
+  ALL_TOKENS_BY_BLOCK,
   FILTERED_TRANSACTIONS,
   PAIR_CHART,
   PAIR_DATA,
@@ -181,16 +182,6 @@ async function getBulkPairData(pairList, ethPrice) {
       })
     )
 
-    // let [oneDayResultToken, twoDayResultToken] = await Promise.all(
-    //   [oneDayBlock, twoDayBlock].map(async block => {
-    //     let result = client.query({
-    //       query: ALL_TOKENS_BY_BLOCK(block),
-    //       fetchPolicy: 'cache-first'
-    //     })
-    //     return result
-    //   })
-    // )
-
     let oneDayData = oneDayResult?.data?.pairs.reduce((obj, cur, i) => {
       return { ...obj, [cur.id]: cur }
     }, {})
@@ -206,8 +197,6 @@ async function getBulkPairData(pairList, ethPrice) {
     let pairData = await Promise.all(
       current &&
       current.data.pairs.map(async pair => {
-        pair.derivedETH0 = pair.token0.derivedETH
-        pair.derivedETH1 = pair.token1.derivedETH
 
         let data = pair
         let oneDayHistory = oneDayData?.[pair.id]
@@ -262,26 +251,28 @@ async function getBulkPairData(pairList, ethPrice) {
 
         const liquidityChangeUSD = getPercentChange(data.reserveUSD, oneDayHistory?.reserveUSD)
 
-        // todo: finish that
-        let extraFee0Now = (data.lpExtraFeeInToken0 * pair.derivedETH0 * ethPrice) || 0
-        let extraFee0DayAgo = (oneDayHistory.lpExtraFeeInToken0 * pair.derivedETH0 * ethPrice) || 0
-        let extraFee0TwoDaysAgo = (twoDayHistory.lpExtraFeeInToken0 * pair.derivedETH0 * ethPrice) || 0
+        const currentToken0 = pair.token0
+        const currentToken1 = pair.token1
+
+        let extraFee0Now = (data.lpExtraFeeInToken0 * currentToken0.derivedETH * ethPrice) || 0
+        let extraFee0DayAgo = (oneDayHistory.lpExtraFeeInToken0 * currentToken0.derivedETH * ethPrice) || 0
+        let extraFee0TwoDaysAgo = (twoDayHistory.lpExtraFeeInToken0 * currentToken0.derivedETH * ethPrice) || 0
         const [extraFee0] = get2DayPercentChange(
           extraFee0Now,
           extraFee0DayAgo,
           extraFee0TwoDaysAgo
         )
 
-        let extraFee1Now = (data.lpExtraFeeInToken1 * pair.derivedETH1 * ethPrice) || 0
-        let extraFee1DayAgo = (oneDayHistory.lpExtraFeeInToken1 * pair.derivedETH1 * ethPrice) || 0
-        let extraFee1TwoDaysAgo = (twoDayHistory.lpExtraFeeInToken1 * pair.derivedETH1 * ethPrice) || 0
+        let extraFee1Now = (data.lpExtraFeeInToken1 * currentToken1.derivedETH * ethPrice) || 0
+        let extraFee1DayAgo = (oneDayHistory.lpExtraFeeInToken1 * currentToken1.derivedETH * ethPrice) || 0
+        let extraFee1TwoDaysAgo = (twoDayHistory.lpExtraFeeInToken1 * currentToken1.derivedETH * ethPrice) || 0
         const [extraFee1] = get2DayPercentChange(
           extraFee1Now,
           extraFee1DayAgo,
           extraFee1TwoDaysAgo
         )
 
-        const [totalFeeOneDay, feeChangeUSD] = get2DayPercentChange(
+        let [totalFeeOneDay, feeChangeUSD] = get2DayPercentChange(
           extraFee0Now + extraFee1Now + (volumeUsdNow * 0.003),
           extraFee0DayAgo + extraFee1DayAgo + (volumeUsdOneDay * 0.003),
           extraFee0TwoDaysAgo + extraFee1DayAgo + (volumeUsdTwoDay * 0.003)
@@ -386,8 +377,8 @@ const getPairData = async (address, ethPrice) => {
     const liquidityChangeUSD = getPercentChange(data.reserveUSD, oneDayData?.reserveUSD)
 
     let extraFee0Now = (data.lpExtraFeeInToken0 * data.token0.derivedETH * ethPrice) || 0
-    let extraFee0DayAgo = (oneDayData.lpExtraFeeInToken0 * oneDayData.token0.derivedETH * ethPrice) || 0
-    let extraFee0TwoDaysAgo = (twoDayData.lpExtraFeeInToken0 * twoDayData.token0.derivedETH * ethPrice) || 0
+    let extraFee0DayAgo = (oneDayData.lpExtraFeeInToken0 * data.token0.derivedETH * ethPrice) || 0
+    let extraFee0TwoDaysAgo = (twoDayData.lpExtraFeeInToken0 * data.token0.derivedETH * ethPrice) || 0
     const [extraFee0] = get2DayPercentChange(
       extraFee0Now,
       extraFee0DayAgo,
@@ -395,8 +386,8 @@ const getPairData = async (address, ethPrice) => {
     )
 
     let extraFee1Now = (data.lpExtraFeeInToken1 * data.token1.derivedETH * ethPrice) || 0
-    let extraFee1DayAgo = (oneDayData.lpExtraFeeInToken1 * oneDayData.token1.derivedETH * ethPrice) || 0
-    let extraFee1TwoDaysAgo = (twoDayData.lpExtraFeeInToken1 * twoDayData.token1.derivedETH * ethPrice) || 0
+    let extraFee1DayAgo = (oneDayData.lpExtraFeeInToken1 * data.token1.derivedETH * ethPrice) || 0
+    let extraFee1TwoDaysAgo = (twoDayData.lpExtraFeeInToken1 * data.token1.derivedETH * ethPrice) || 0
     const [extraFee1] = get2DayPercentChange(
       extraFee1Now,
       extraFee1DayAgo,
