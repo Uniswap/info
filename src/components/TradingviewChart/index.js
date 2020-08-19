@@ -18,7 +18,7 @@ const Wrapper = styled.div`
 const IconWrapper = styled.div`
   position: absolute;
   right: 0;
-  background-color: white;
+  /* background-color: white; */
   border-radius: 3px;
   height: 16px;
   width: 16px;
@@ -27,7 +27,7 @@ const IconWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+  /* box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24); */
 
   :hover {
     cursor: pointer;
