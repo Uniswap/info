@@ -470,6 +470,9 @@ const getEthPrice = async () => {
   return [ethPrice, ethPriceOneDay, priceChangeETH]
 }
 
+const PAIRS_TO_FETCH = 500
+const TOKENS_TO_FETCH = 500
+
 /**
  * Loop through every pair on uniswap, used for search
  */
@@ -486,9 +489,9 @@ async function getAllPairsOnUniswap() {
         },
         fetchPolicy: 'cache-first'
       })
-      skipCount = skipCount + 500
+      skipCount = skipCount + PAIRS_TO_FETCH
       pairs = pairs.concat(result?.data?.pairs)
-      if (result?.data?.pairs.length < 500 || pairs.length > 500) {
+      if (result?.data?.pairs.length < PAIRS_TO_FETCH || pairs.length > PAIRS_TO_FETCH) {
         allFound = true
       }
     }
@@ -515,10 +518,10 @@ async function getAllTokensOnUniswap() {
         fetchPolicy: 'cache-first'
       })
       tokens = tokens.concat(result?.data?.tokens)
-      if (result?.data?.tokens?.length < 500 || tokens.length > 500) {
+      if (result?.data?.tokens?.length < TOKENS_TO_FETCH || tokens.length > TOKENS_TO_FETCH) {
         allFound = true
       }
-      skipCount = skipCount += 500
+      skipCount = skipCount += TOKENS_TO_FETCH
     }
     return tokens
   } catch (e) {

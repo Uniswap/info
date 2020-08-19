@@ -162,19 +162,22 @@ export const Search = ({ small = false }) => {
         if (value?.length > 0) {
           let tokens = await client.query({
             variables: {
-              value: value ? value.toUpperCase() : ''
+              value: value ? value.toUpperCase() : '',
+              id: value
             },
             query: TOKEN_SEARCH
           })
 
           let pairs = await client.query({
+            query: PAIR_SEARCH,
             variables: {
-              tokens: tokens.data.asSymbol?.map(t => t.id)
-            },
-            query: PAIR_SEARCH
+              tokens: tokens.data.asSymbol?.map(t => t.id),
+              id: value
+            }
           })
-          setSearchedPairs(pairs.data.as0.concat(pairs.data.as1))
-          setSearchedTokens(tokens.data.asSymbol)
+          setSearchedPairs(pairs.data.as0.concat(pairs.data.as1).concat(pairs.data.asAddress))
+          let foundTokens = tokens.data.asSymbol.concat(tokens.data.asAddress).concat(tokens.data.asName)
+          setSearchedTokens(foundTokens)
         }
       } catch (e) {
         console.log(e)
@@ -201,6 +204,17 @@ export const Search = ({ small = false }) => {
     })
   )
 
+  let uniqueTokens = []
+  let found = {}
+  allTokens &&
+    allTokens.map(token => {
+      if (!found[token.id]) {
+        found[token.id] = true
+        uniqueTokens.push(token)
+      }
+      return true
+    })
+
   allPairs = allPairs.concat(
     searchedPairs.filter(searchedPair => {
       let included = false
@@ -214,9 +228,20 @@ export const Search = ({ small = false }) => {
     })
   )
 
+  let uniquePairs = []
+  let pairsFound = {}
+  allPairs &&
+    allPairs.map(pair => {
+      if (!pairsFound[pair.id]) {
+        pairsFound[pair.id] = true
+        uniquePairs.push(pair)
+      }
+      return true
+    })
+
   const filteredTokenList = useMemo(() => {
-    return allTokens
-      ? allTokens
+    return uniqueTokens
+      ? uniqueTokens
           .sort((a, b) => {
             if (OVERVIEW_TOKEN_BLACKLIST.includes(a.id)) {
               return 1
@@ -257,11 +282,11 @@ export const Search = ({ small = false }) => {
             return regexMatches.some(m => m)
           })
       : []
-  }, [allTokenData, allTokens, value])
+  }, [allTokenData, uniqueTokens, value])
 
   const filteredPairList = useMemo(() => {
-    return allPairs
-      ? allPairs
+    return uniquePairs
+      ? uniquePairs
           .sort((a, b) => {
             const pairA = allPairData[a.id]
             const pairB = allPairData[b.id]
@@ -315,7 +340,7 @@ export const Search = ({ small = false }) => {
             return regexMatches.some(m => m)
           })
       : []
-  }, [allPairData, allPairs, value])
+  }, [allPairData, uniquePairs, value])
 
   useEffect(() => {
     if (Object.keys(filteredTokenList).length > 2) {

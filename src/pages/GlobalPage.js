@@ -128,15 +128,6 @@ function GlobalPage() {
           )}
           <ListOptions gap="10px" style={{ marginTop: '2rem', marginBottom: '.5rem' }}>
             <RowBetween>
-              <TYPE.main fontSize={'1rem'}>Top Pairs</TYPE.main>
-              <CustomLink to={'/pairs'}>See All</CustomLink>
-            </RowBetween>
-          </ListOptions>
-          <Panel style={{ marginTop: '6px', padding: '1.125rem 0 ' }}>
-            <PairList pairs={allPairs} />
-          </Panel>
-          <ListOptions gap="10px" style={{ marginTop: '2rem', marginBottom: '.5rem' }}>
-            <RowBetween>
               <TYPE.main fontSize={'1.125rem'}>Top Tokens</TYPE.main>
               <CustomLink to={'/tokens'}>See All</CustomLink>
             </RowBetween>
@@ -144,6 +135,16 @@ function GlobalPage() {
           <Panel style={{ marginTop: '6px', padding: '1.125rem 0 ' }}>
             <TopTokenList tokens={allTokens} />
           </Panel>
+          <ListOptions gap="10px" style={{ marginTop: '2rem', marginBottom: '.5rem' }}>
+            <RowBetween>
+              <TYPE.main fontSize={'1rem'}>Top Pairs</TYPE.main>
+              <CustomLink to={'/pairs'}>See All</CustomLink>
+            </RowBetween>
+          </ListOptions>
+          <Panel style={{ marginTop: '6px', padding: '1.125rem 0 ' }}>
+            <PairList pairs={allPairs} />
+          </Panel>
+
           <span>
             <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '2rem' }}>
               Transactions

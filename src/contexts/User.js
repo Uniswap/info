@@ -252,6 +252,7 @@ export function useUserPositionChart(position, account) {
       pairSnapshots &&
       !formattedHistory &&
       currentPairData &&
+      Object.keys(currentPairData).length > 0 &&
       pairAddress &&
       currentETHPrice
     ) {

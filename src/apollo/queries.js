@@ -519,7 +519,7 @@ export const ALL_TOKENS = gql`
 `
 
 export const TOKEN_SEARCH = gql`
-  query tokens($value: String) {
+  query tokens($value: String, $id: String) {
     asSymbol: tokens(where: { symbol_contains: $value }, orderBy: totalLiquidity, orderDirection: desc) {
       id
       symbol
@@ -532,7 +532,7 @@ export const TOKEN_SEARCH = gql`
       name
       totalLiquidity
     }
-    asAddress: tokens(where: { id: $value }, orderBy: totalLiquidity, orderDirection: desc) {
+    asAddress: tokens(where: { id: $id }, orderBy: totalLiquidity, orderDirection: desc) {
       id
       symbol
       name
@@ -542,7 +542,7 @@ export const TOKEN_SEARCH = gql`
 `
 
 export const PAIR_SEARCH = gql`
-  query pairs($tokens: [Bytes]!) {
+  query pairs($tokens: [Bytes]!, $id: String) {
     as0: pairs(where: { token0_in: $tokens }) {
       id
       token0 {
@@ -557,6 +557,19 @@ export const PAIR_SEARCH = gql`
       }
     }
     as1: pairs(where: { token1_in: $tokens }) {
+      id
+      token0 {
+        id
+        symbol
+        name
+      }
+      token1 {
+        id
+        symbol
+        name
+      }
+    }
+    asAddress: pairs(where: { id: $id }) {
       id
       token0 {
         id
@@ -615,6 +628,8 @@ const PairFields = `
     trackedReserveETH
     reserveETH
     volumeUSD
+    token0Price
+    token1Price
     untrackedVolumeUSD
     createdAtTimestamp
   }

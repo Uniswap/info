@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import { XAxis, YAxis, ResponsiveContainer, Tooltip, Legend, LineChart, Line, CartesianGrid } from 'recharts'
-import { AutoRow, RowBetween, RowFixed } from '../Row'
+import { XAxis, YAxis, ResponsiveContainer, Tooltip, LineChart, Line, CartesianGrid } from 'recharts'
+import { AutoRow, RowBetween } from '../Row'
 
 import { toK, toNiceDate, toNiceDateYear, formattedNum, getTimeframe } from '../../utils'
 import { OptionButton } from '../ButtonStyled'
@@ -11,7 +11,6 @@ import DropdownSelect from '../DropdownSelect'
 import { useUserPositionChart } from '../../contexts/User'
 import { useTimeframe } from '../../contexts/Application'
 import LocalLoader from '../LocalLoader'
-import { Text } from 'rebass'
 import { useColor } from '../../hooks'
 
 const ChartWrapper = styled.div`
@@ -27,22 +26,6 @@ const OptionsRow = styled.div`
   flex-direction: row;
   width: 100%;
   margin-bottom: 40px;
-`
-
-const LegendWrapper = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 20px;
-`
-
-const LegendCircle = styled.div`
-  background-color: ${({ color }) => color}
-  border-radius: 50%;
-  height: 8px;
-  width: 8px;
-  margin-left: 4px;
-
 `
 
 const CHART_VIEW = {
@@ -66,20 +49,6 @@ const PairReturnsChart = ({ account, position }) => {
   data = data?.filter(entry => entry.date >= utcStartTime)
 
   const aspect = below600 ? 60 / 42 : 60 / 16
-
-  const renderLegend = props => {
-    const { payload } = props
-
-    return (
-      <LegendWrapper>
-        {payload.map((entry, index) => (
-          <RowFixed style={{ marginRight: '40px' }} key={index}>
-            <Text>{entry.value}</Text>: <LegendCircle color={index === 0 ? color : 'green'} />
-          </RowFixed>
-        ))}
-      </LegendWrapper>
-    )
-  }
 
   return (
     <ChartWrapper>
@@ -147,8 +116,8 @@ const PairReturnsChart = ({ account, position }) => {
               tickFormatter={tick => '$' + toK(tick)}
               axisLine={false}
               tickLine={false}
-              interval="preserveEnd"
-              minTickGap={80}
+              interval="preserveStartEnd"
+              minTickGap={0}
               yAxisId={0}
               tick={{ fill: 'black' }}
             />
@@ -173,7 +142,6 @@ const PairReturnsChart = ({ account, position }) => {
               yAxisId={0}
               name={chartView === CHART_VIEW.VALUE ? 'Liquidity' : 'Fees Earned (Cumulative)'}
             />
-            <Legend content={renderLegend} />
           </LineChart>
         ) : (
           <LocalLoader />

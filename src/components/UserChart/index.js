@@ -28,10 +28,11 @@ const UserChart = ({ account }) => {
   let utcStartTime = getTimeframe(timeWindow)
 
   const below600 = useMedia('(max-width: 600px)')
+  const above1600 = useMedia('(min-width: 1600px)')
 
   const domain = [dataMin => (dataMin > utcStartTime ? dataMin : utcStartTime), 'dataMax']
 
-  const aspect = below600 ? 60 / 42 : 60 / 16
+  const aspect = above1600 ? 60 / 12 : below600 ? 60 / 42 : 60 / 16
 
   return (
     <ChartWrapper>
@@ -90,7 +91,7 @@ const UserChart = ({ account }) => {
             />
             <YAxis
               type="number"
-              orientation="left"
+              orientation="right"
               tickFormatter={tick => '$' + toK(tick)}
               axisLine={false}
               tickLine={false}

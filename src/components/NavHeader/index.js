@@ -58,6 +58,7 @@ export default function NavHeader() {
               onMouseLeave={() => {
                 setShowPriceCard(false)
               }}
+              style={{ position: 'relative' }}
             >
               ETH Price: <Medium>{formattedEthPrice}</Medium>
               {showPriceCard && <UniPrice />}
