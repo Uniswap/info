@@ -16,6 +16,7 @@ import PinnedData from './components/PinnedData'
 
 import SideNav from './components/SideNav'
 import AccountLookup from './pages/AccountLookup'
+import { OVERVIEW_TOKEN_BLACKLIST, PAIR_BLACKLIST } from './constants'
 
 const AppWrapper = styled.div`
   position: relative;
@@ -96,6 +97,9 @@ function App() {
                 strict
                 path="/token/:tokenAddress"
                 render={({ match }) => {
+                  if (OVERVIEW_TOKEN_BLACKLIST.includes(match.params.tokenAddress.toLowerCase())) {
+                    return <Redirect to="/home" />
+                  }
                   if (isAddress(match.params.tokenAddress.toLowerCase())) {
                     return (
                       <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
@@ -112,6 +116,9 @@ function App() {
                 strict
                 path="/pair/:pairAddress"
                 render={({ match }) => {
+                  if (PAIR_BLACKLIST.includes(match.params.pairAddress.toLowerCase())) {
+                    return <Redirect to="/home" />
+                  }
                   if (isAddress(match.params.pairAddress.toLowerCase())) {
                     return (
                       <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
