@@ -513,6 +513,7 @@ const getIntervalTokenData = async (tokenAddress, startTime, interval = 3600) =>
 
     return formattedHistory
   } catch (e) {
+    console.log(e)
     console.log('error fetching blocks')
     return []
   }

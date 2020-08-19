@@ -96,15 +96,15 @@ const ClickableText = styled(Text)`
 `
 
 const DataText = styled(Flex)`
-  @media screen and (max-width: 40em) {
-    font-size: 0.85rem;
-  }
-
   align-items: center;
-  text-align: right;
+  text-align: center;
 
   & > * {
     font-size: 14px;
+  }
+
+  @media screen and (max-width: 600px) {
+    font-size: 12px;
   }
 `
 
@@ -130,6 +130,7 @@ function TopTokenList({ tokens, history, itemMax = 10 }) {
 
   const below1080 = useMedia('(max-width: 1080px)')
   const below680 = useMedia('(max-width: 680px)')
+  const below600 = useMedia('(max-width: 600px)')
 
   useEffect(() => {
     setMaxPage(1) // edit this to do modular
@@ -176,7 +177,11 @@ function TopTokenList({ tokens, history, itemMax = 10 }) {
             {!below680 && <div style={{ marginRight: '1rem', width: '10px' }}>{index}</div>}
             <TokenLogo address={item.id} />
             <CustomLink style={{ marginLeft: '16px', whiteSpace: 'nowrap' }} to={'/token/' + item.id}>
-              <FormattedName text={below680 ? item.symbol : item.name} maxCharacters={20} />
+              <FormattedName
+                text={below680 ? item.symbol : item.name}
+                maxCharacters={below600 ? 8 : 16}
+                adjustSize={true}
+              />
             </CustomLink>
           </Row>
         </DataText>

@@ -4,13 +4,17 @@ import { Tooltip } from '../QuestionHelper'
 
 const TextWrapper = styled.div`
   position: relative;
-  margin-left: 4px;
+  margin-left: ${({ margin }) => margin && '4px'}
   :hover {
     cursor: pointer;
   }
+
+  @media screen and (max-width: 600px) {
+    font-size: ${({ adjustSize }) => adjustSize && '12px'};
+  }
 `
 
-const FormattedName = ({ text, maxCharacters }) => {
+const FormattedName = ({ text, maxCharacters, margin = false, adjustSize = false, ...rest }) => {
   const [showHover, setShowHover] = useState(false)
 
   if (!text) {
@@ -20,14 +24,24 @@ const FormattedName = ({ text, maxCharacters }) => {
   if (text.length > maxCharacters) {
     return (
       <Tooltip text={text} show={showHover}>
-        <TextWrapper onMouseEnter={() => setShowHover(true)} onMouseLeave={() => setShowHover(false)}>
+        <TextWrapper
+          onMouseEnter={() => setShowHover(true)}
+          onMouseLeave={() => setShowHover(false)}
+          margin={margin}
+          adjustSize={adjustSize}
+          {...rest}
+        >
           {' ' + text.slice(0, maxCharacters - 1) + '...'}
         </TextWrapper>
       </Tooltip>
     )
   }
 
-  return text
+  return (
+    <TextWrapper margin={margin} adjustSize={adjustSize} {...rest}>
+      {text}
+    </TextWrapper>
+  )
 }
 
 export default FormattedName

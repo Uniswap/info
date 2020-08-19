@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react'
 import styled from 'styled-components'
 
-import Row from '../Row'
+import Row, { RowFixed } from '../Row'
 import TokenLogo from '../TokenLogo'
 import { Search as SearchIcon } from 'react-feather'
 import { BasicLink } from '../Link'
@@ -467,13 +467,11 @@ export const Search = ({ small = false }) => {
             return (
               <BasicLink to={'/token/' + token.id} key={token.id} onClick={onDismiss}>
                 <MenuItem>
-                  <TokenLogo address={token.id} style={{ marginRight: '10px' }} />
-                  <span>
-                    <FormattedName text={token.name} maxCharacters={20} />
-                  </span>
-                  <span>
+                  <RowFixed>
+                    <TokenLogo address={token.id} style={{ marginRight: '10px' }} />
+                    <FormattedName text={token.name} maxCharacters={20} style={{ marginRight: '6px' }} />
                     (<FormattedName text={token.symbol} maxCharacters={6} />)
-                  </span>
+                  </RowFixed>
                 </MenuItem>
               </BasicLink>
             )

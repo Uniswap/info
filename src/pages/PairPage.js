@@ -358,8 +358,10 @@ function PairPage({ pairAddress, history }) {
                       <AutoRow gap="4px">
                         <TokenLogo address={token0?.id} />
                         <TYPE.main fontSize={20} lineHeight={1} fontWeight={500}>
-                          {reserve0 ? formattedNum(reserve0) : ''}{' '}
-                          <FormattedName text={token0?.symbol ?? ''} maxCharacters={8} />
+                          <RowFixed>
+                            {reserve0 ? formattedNum(reserve0) : ''}{' '}
+                            <FormattedName text={token0?.symbol ?? ''} maxCharacters={8} margin={true} />
+                          </RowFixed>
                         </TYPE.main>
                       </AutoRow>
                     </Hover>
@@ -367,8 +369,10 @@ function PairPage({ pairAddress, history }) {
                       <AutoRow gap="4px">
                         <TokenLogo address={token1?.id} />
                         <TYPE.main fontSize={20} lineHeight={1} fontWeight={500}>
-                          {reserve1 ? formattedNum(reserve1) : ''}{' '}
-                          <FormattedName text={token1?.symbol ?? ''} maxCharacters={8} />
+                          <RowFixed>
+                            {reserve1 ? formattedNum(reserve1) : ''}{' '}
+                            <FormattedName text={token1?.symbol ?? ''} maxCharacters={8} margin={true} />
+                          </RowFixed>
                         </TYPE.main>
                       </AutoRow>
                     </Hover>
@@ -404,8 +408,10 @@ function PairPage({ pairAddress, history }) {
                   <Column>
                     <TYPE.main>Pair Name</TYPE.main>
                     <Text style={{ marginTop: '.5rem' }} fontSize={16} fontWeight="500">
-                      <FormattedName text={token0?.symbol ?? ''} maxCharacters={8} />-
-                      <FormattedName text={token1?.symbol ?? ''} maxCharacters={8} />
+                      <RowFixed>
+                        <FormattedName text={token0?.symbol ?? ''} maxCharacters={8} />-
+                        <FormattedName text={token1?.symbol ?? ''} maxCharacters={8} />
+                      </RowFixed>
                     </Text>
                   </Column>
                   <Column>
@@ -419,7 +425,10 @@ function PairPage({ pairAddress, history }) {
                   </Column>
                   <Column>
                     <TYPE.main>
-                      <FormattedName text={token0?.symbol ?? ''} maxCharacters={8} /> Address
+                      <RowFixed>
+                        <FormattedName text={token0?.symbol ?? ''} maxCharacters={8} />{' '}
+                        <span style={{ marginLeft: '4px' }}>Address</span>
+                      </RowFixed>
                     </TYPE.main>
                     <AutoRow align="flex-end">
                       <Text style={{ marginTop: '.5rem' }} fontSize={16} fontWeight="500">
@@ -430,7 +439,10 @@ function PairPage({ pairAddress, history }) {
                   </Column>
                   <Column>
                     <TYPE.main>
-                      <FormattedName text={token1?.symbol ?? ''} maxCharacters={8} /> Address
+                      <RowFixed>
+                        <FormattedName text={token1?.symbol ?? ''} maxCharacters={8} />{' '}
+                        <span style={{ marginLeft: '4px' }}>Address</span>
+                      </RowFixed>
                     </TYPE.main>
                     <AutoRow align="flex-end">
                       <Text style={{ marginTop: '.5rem' }} fontSize={16} fontWeight="500">

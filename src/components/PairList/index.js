@@ -93,7 +93,7 @@ const DataText = styled(Flex)`
   }
 
   @media screen and (max-width: 600px) {
-    font-size: 13px;
+    font-size: 12px;
   }
 `
 
@@ -160,7 +160,11 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
               margin={!below740}
             />
             <CustomLink style={{ marginLeft: '20px', whiteSpace: 'nowrap' }} to={'/pair/' + pairAddress} color={color}>
-              <FormattedName text={pairData.token0.symbol + '-' + pairData.token1.symbol} maxCharacters={16} />
+              <FormattedName
+                text={pairData.token0.symbol + '-' + pairData.token1.symbol}
+                maxCharacters={below600 ? 8 : 16}
+                adjustSize={true}
+              />
             </CustomLink>
           </DataText>
           <DataText area="liq">{liquidity}</DataText>

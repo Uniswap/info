@@ -154,8 +154,11 @@ function TokenPage({ address, history }) {
   const below800 = useMedia('(max-width: 800px)')
   const below500 = useMedia('(max-width: 500px)')
 
-  const [dismissed, markAsDismissed] = usePathDismissed(history.location.pathname)
+  // format for long symbol
+  const LENGTH = below1080 ? 10 : 16
+  const formattedSymbol = symbol?.length > LENGTH ? symbol.slice(0, LENGTH) + '...' : symbol
 
+  const [dismissed, markAsDismissed] = usePathDismissed(history.location.pathname)
   const [savedTokens, addToken] = useSavedTokens()
 
   useEffect(() => {
@@ -201,7 +204,10 @@ function TokenPage({ address, history }) {
                 <RowFixed style={{ alignItems: 'baseline' }}>
                   <TokenLogo address={address} size="32px" style={{ alignSelf: 'center' }} />
                   <Text fontSize={below1080 ? '1.5rem' : '2rem'} fontWeight={500} style={{ margin: '0 1rem' }}>
-                    {name ? name + ' ' : ''} {symbol ? '(' + symbol + ')' : ''}
+                    <RowFixed gap="6px">
+                      <FormattedName text={name ? name + ' ' : ''} maxCharacters={16} style={{ marginRight: '6px' }} />{' '}
+                      {formattedSymbol ? `(${formattedSymbol})` : ''}
+                    </RowFixed>
                   </Text>{' '}
                   {!below1080 && (
                     <>
@@ -313,7 +319,8 @@ function TokenPage({ address, history }) {
               rounded
               style={{
                 border: '1px solid rgba(43, 43, 43, 0.05)',
-                marginTop: '1.5rem'
+                marginTop: '1.5rem',
+                padding: '1.125rem 0 '
               }}
             >
               {address && fetchedPairsList ? (
