@@ -109,7 +109,7 @@ const GlobalChart = ({ display }) => {
         </ResponsiveContainer>
       )}
       {display === 'volume' && (
-        <RowFixed style={{ bottom: '70px', position: 'absolute', left: '20px', zIndex: 999 }}>
+        <RowFixed style={{ bottom: '70px', position: 'absolute', left: '20px', zIndex: 10 }}>
           <OptionButton
             active={volumeWindow === VOLUME_WINDOW.DAYS}
             onClick={() => setVolumeWindow(VOLUME_WINDOW.DAYS)}
