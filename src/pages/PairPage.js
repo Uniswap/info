@@ -303,7 +303,7 @@ function PairPage({ pairAddress, history }) {
                   <RowBetween>
                     <TYPE.main>
                       Fees (24hrs)
-                      <Question style={{ marginLeft: 2 }} text="0.3% swap fee  + slippage reward"/>
+                      <Question style={{ marginLeft: 2 }} text="0.3 percent swap earning + LP slippage profit"/>
                     </TYPE.main>
                     <div />
                   </RowBetween>
