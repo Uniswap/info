@@ -1,34 +1,84 @@
-import React from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
 import { ApolloProvider } from 'react-apollo'
 import { client } from './apollo/client'
-import { Route, Switch, BrowserRouter, withRouter, Redirect } from 'react-router-dom'
-
+import { Route, Switch, BrowserRouter, Redirect } from 'react-router-dom'
 import GlobalPage from './pages/GlobalPage'
 import TokenPage from './pages/TokenPage'
 import PairPage from './pages/PairPage'
-import NavHeader from './components/NavHeader'
 import LocalLoader from './components/LocalLoader'
 import { useGlobalData, useGlobalChartData } from './contexts/GlobalData'
-import { isAddress } from './helpers'
-import { OVERVIEW_TOKEN_BLACKLIST, OVERVIEW_PAIR_BLACKLIST } from './constants'
+import { isAddress } from './utils'
+import AccountPage from './pages/AccountPage'
 import AllTokensPage from './pages/AllTokensPage'
 import AllPairsPage from './pages/AllPairsPage'
+import PinnedData from './components/PinnedData'
+
+import SideNav from './components/SideNav'
+import AccountLookup from './pages/AccountLookup'
+import { OVERVIEW_TOKEN_BLACKLIST, PAIR_BLACKLIST } from './constants'
 
 const AppWrapper = styled.div`
   position: relative;
   width: 100%;
-  max-width: 100vw;
-  min-height: 100vh;
-  overflow-y: scroll;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
+`
+const ContentWrapper = styled.div`
+  display: grid;
+  grid-template-columns: ${({ open }) => (open ? '220px 1fr 200px' : '220px 1fr 64px')};
+
+  @media screen and (max-width: 1400px) {
+    grid-template-columns: 220px 1fr;
+  }
+
+  @media screen and (max-width: 1080px) {
+    grid-template-columns: 1fr;
+    max-width: 100vw;
+    overflow: hidden;
+    grid-gap: 0;
+  }
 `
 
+const Right = styled.div`
+  position: fixed;
+  right: 0;
+  bottom: 0rem;
+  z-index: 99;
+  width: ${({ open }) => (open ? '220px' : '64px')};
+  height: ${({ open }) => (open ? 'fit-content' : '64px')};
+
+  @media screen and (max-width: 1400px) {
+    display: none;
+  }
+`
+
+const Center = styled.div`
+  height: 100%;
+  z-index: 9999;
+  transition: width 0.25s ease;
+
+  border-radius: 12px;
+  background-color: ${({ theme }) => theme.white};
+`
+
+/**
+ * Wrap the component with the header and sidebar pinned tab
+ */
+const LayoutWrapper = ({ children, savedOpen, setSavedOpen }) => {
+  return (
+    <>
+      <ContentWrapper open={savedOpen}>
+        <SideNav />
+        <Center id="center">{children}</Center>
+        <Right open={savedOpen}>
+          <PinnedData open={savedOpen} setSavedOpen={setSavedOpen} />
+        </Right>
+      </ContentWrapper>
+    </>
+  )
+}
+
 function App() {
-  const NavHeaderUpdated = withRouter(props => <NavHeader default {...props} />)
+  const [savedOpen, setSavedOpen] = useState(false)
 
   const globalData = useGlobalData()
   const globalChartData = useGlobalChartData()
@@ -47,15 +97,14 @@ function App() {
                 strict
                 path="/token/:tokenAddress"
                 render={({ match }) => {
-                  if (
-                    isAddress(match.params.tokenAddress.toLowerCase()) &&
-                    !OVERVIEW_TOKEN_BLACKLIST.includes(match.params.tokenAddress.toLowerCase())
-                  ) {
+                  if (OVERVIEW_TOKEN_BLACKLIST.includes(match.params.tokenAddress.toLowerCase())) {
+                    return <Redirect to="/home" />
+                  }
+                  if (isAddress(match.params.tokenAddress.toLowerCase())) {
                     return (
-                      <>
-                        <NavHeaderUpdated token={match.params.tokenAddress.toLowerCase()} />
+                      <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
                         <TokenPage address={match.params.tokenAddress.toLowerCase()} />
-                      </>
+                      </LayoutWrapper>
                     )
                   } else {
                     return <Redirect to="/home" />
@@ -67,33 +116,61 @@ function App() {
                 strict
                 path="/pair/:pairAddress"
                 render={({ match }) => {
-                  if (
-                    isAddress(match.params.pairAddress.toLowerCase()) &&
-                    !OVERVIEW_PAIR_BLACKLIST.includes(match.params.pairAddress.toLowerCase())
-                  ) {
+                  if (PAIR_BLACKLIST.includes(match.params.pairAddress.toLowerCase())) {
+                    return <Redirect to="/home" />
+                  }
+                  if (isAddress(match.params.pairAddress.toLowerCase())) {
                     return (
-                      <>
-                        <NavHeaderUpdated pair={match.params.pairAddress.toLowerCase()} />
+                      <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
                         <PairPage pairAddress={match.params.pairAddress.toLowerCase()} />
-                      </>
+                      </LayoutWrapper>
                     )
                   } else {
                     return <Redirect to="/home" />
                   }
                 }}
               />
+              <Route
+                exacts
+                strict
+                path="/account/:accountAddress"
+                render={({ match }) => {
+                  if (isAddress(match.params.accountAddress.toLowerCase())) {
+                    return (
+                      <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
+                        <AccountPage account={match.params.accountAddress.toLowerCase()} />
+                      </LayoutWrapper>
+                    )
+                  } else {
+                    return <Redirect to="/home" />
+                  }
+                }}
+              />
+
               <Route path="/home">
-                <NavHeaderUpdated />
-                <GlobalPage />
+                <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
+                  <GlobalPage />
+                </LayoutWrapper>
               </Route>
-              <Route path="/all-tokens">
-                <NavHeaderUpdated />
-                <AllTokensPage />
+
+              <Route path="/tokens">
+                <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
+                  <AllTokensPage />
+                </LayoutWrapper>
               </Route>
-              <Route path="/all-pairs">
-                <NavHeaderUpdated />
-                <AllPairsPage />
+
+              <Route path="/pairs">
+                <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
+                  <AllPairsPage />
+                </LayoutWrapper>
               </Route>
+
+              <Route path="/accounts">
+                <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
+                  <AccountLookup />
+                </LayoutWrapper>
+              </Route>
+
               <Redirect to="/home" />
             </Switch>
           </BrowserRouter>

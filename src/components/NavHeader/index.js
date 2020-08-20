@@ -1,90 +1,84 @@
-import React from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
-
-import Title from '../Title'
-import Search from '../Search'
 import { RowFixed, RowBetween } from '../Row'
-import { AutoColumn } from '../Column'
 import { useMedia } from 'react-use'
-import { useGlobalData } from '../../contexts/GlobalData'
-import { toK } from '../../helpers'
-import { ButtonDark } from '../ButtonStyled'
-import Link from '../Link'
+import { useGlobalData, useEthPrice } from '../../contexts/GlobalData'
+import { formattedNum, localNumber } from '../../utils'
+
+import UniPrice from '../UniPrice'
 
 const Header = styled.div`
-  width: calc(100% - 80px);
-  padding: 20px 40px;
-  background-color: rgba(255, 255, 255, 0.3);
-  margin-bottom: 20px;
-
-  @media screen and (max-width: 640px) {
-    width: calc(100% - 40px);
-    padding: 32px 20px;
-  }
+  width: 100%;
+  /* background-color: ${({ theme }) => theme.text1};
+  color: ${({ theme }) => theme.bg1}; */
+  position: sticky;
+  top: 0;
+  /* z-index: 9999; */
 `
 
-const CombinedWrapper = styled(RowFixed)`
-  border-radius: 16px;
-  justify-content: flex-end;
-`
-
-const CombinedData = styled.div`
-  color: ${({ theme }) => theme.primary1};
+const HeaderText = styled.div`
   margin-right: 0.75rem;
-  font-size: 1rem;
+  font-size: 0.825rem;
+  font-weight: 400;
+  display: inline-box;
+  display: -webkit-inline-box;
 `
 
-export default function NavHeader({ token, pair, account }) {
-  const isHome = !token && !pair && !account
+const Medium = styled.span`
+  font-weight: 500;
+`
 
+export default function NavHeader() {
+  const below1295 = useMedia('(max-width: 1295px)')
+  const below1180 = useMedia('(max-width: 1180px)')
   const below1024 = useMedia('(max-width: 1024px)')
-  const below600 = useMedia('(max-width: 600px)')
+  const below400 = useMedia('(max-width: 400px)')
+  const below816 = useMedia('(max-width: 816px)')
 
-  const { totalLiquidityUSD, oneDayVolumeUSD, v1Data } = useGlobalData()
+  const [showPriceCard, setShowPriceCard] = useState(false)
 
-  const liquidity =
-    totalLiquidityUSD && v1Data?.totalLiquidityUSD
-      ? '$' + toK(parseFloat(totalLiquidityUSD) + parseFloat(v1Data?.totalLiquidityUSD), true)
-      : ''
-  const volume =
-    oneDayVolumeUSD && v1Data?.dailyVolumeUSD ? '$' + toK(oneDayVolumeUSD + v1Data?.dailyVolumeUSD, true) : ''
+  const { oneDayVolumeUSD, oneDayTxns, pairCount } = useGlobalData()
+  const [ethPrice] = useEthPrice()
+  const formattedEthPrice = ethPrice ? formattedNum(ethPrice, true) : '-'
 
-  return below600 ? (
+  // const liquidity = totalLiquidityUSD ? '$' + toK(parseFloat(totalLiquidityUSD), true) : ''
+  // const volume = oneDayVolumeUSD ? '$' + toK(oneDayVolumeUSD, true) : ''
+
+  const oneDayFees = oneDayVolumeUSD ? formattedNum(oneDayVolumeUSD * 0.003, true) : ''
+
+  return (
     <Header>
-      <AutoColumn gap="20px">
-        <Title token={token} pair={pair} />
-        {!isHome && <Search small={true} />}
-      </AutoColumn>
-    </Header>
-  ) : (
-    <Header>
-      <RowBetween>
-        <Title token={token} pair={pair} account={account} />
+      <RowBetween style={{ padding: below816 ? '0.5rem' : '.5rem' }}>
         <RowFixed>
-          {!isHome && (
-            <div style={{ width: '370px' }}>
-              {' '}
-              <Search small={true} />
-            </div>
+          {!below400 && (
+            <HeaderText
+              onMouseEnter={() => {
+                setShowPriceCard(true)
+              }}
+              onMouseLeave={() => {
+                setShowPriceCard(false)
+              }}
+              style={{ position: 'relative' }}
+            >
+              ETH Price: <Medium>{formattedEthPrice}</Medium>
+              {showPriceCard && <UniPrice />}
+            </HeaderText>
           )}
-          {isHome && (
-            <CombinedWrapper>
-              {!below1024 && (
-                <>
-                  <CombinedData>
-                    Combined Liquidity: <b>{liquidity}</b>
-                  </CombinedData>
-                  <CombinedData>
-                    Combined Vol: <b>{volume}</b>
-                  </CombinedData>
-                </>
-              )}
-              <Link href="https://migrate.uniswap.info" target="_blank">
-                <ButtonDark style={{ minWidth: 'initial', height: '36px' }}>
-                  View combined {below1024 && 'data'} ↗
-                </ButtonDark>
-              </Link>
-            </CombinedWrapper>
+
+          {!below1180 && (
+            <HeaderText>
+              Transactions (24H): <Medium>{localNumber(oneDayTxns)}</Medium>
+            </HeaderText>
+          )}
+          {!below1024 && (
+            <HeaderText>
+              Pairs: <Medium>{localNumber(pairCount)}</Medium>
+            </HeaderText>
+          )}
+          {!below1295 && (
+            <HeaderText>
+              Fees (24H): <Medium>{oneDayFees}</Medium>&nbsp;
+            </HeaderText>
           )}
         </RowFixed>
       </RowBetween>

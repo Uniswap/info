@@ -1,118 +1,82 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import { Area, XAxis, YAxis, ResponsiveContainer, Tooltip, AreaChart, CartesianGrid } from 'recharts'
+import { Area, XAxis, YAxis, ResponsiveContainer, Tooltip, AreaChart } from 'recharts'
 import { AutoRow, RowBetween } from '../Row'
-
-import { toK, toNiceDate, toNiceDateYear, formattedNum } from '../../helpers'
+import { toK, toNiceDate, toNiceDateYear, formattedNum, getTimeframe } from '../../utils'
 import { OptionButton } from '../ButtonStyled'
 import { darken } from 'polished'
 import { useMedia } from 'react-use'
 import { timeframeOptions } from '../../constants'
-import dayjs from 'dayjs'
 import DropdownSelect from '../DropdownSelect'
-import { useUserLiquidityHistory } from '../../contexts/User'
+import { Text } from 'rebass'
+import { useUserLiquidityChart } from '../../contexts/User'
+import LocalLoader from '../LocalLoader'
 
 const ChartWrapper = styled.div`
   height: 100%;
-  min-height: 390px;
+  max-height: 390px;
 
   @media screen and (max-width: 600px) {
     min-height: 200px;
   }
 `
 
-const CHART_VIEW = {
-  LIQUIDITY: 'Liquidity'
-}
-
-const UserChart = ({ account, setAnimatedVal, animatedVal, positionValue }) => {
-  const [chartFilter, setChartFilter] = useState(CHART_VIEW.LIQUIDITY)
-
-  const chartData = useUserLiquidityHistory(account)
+const UserChart = ({ account }) => {
+  const chartData = useUserLiquidityChart(account)
 
   const [timeWindow, setTimeWindow] = useState(timeframeOptions.ALL_TIME)
+  let utcStartTime = getTimeframe(timeWindow)
 
-  const below1080 = useMedia('(max-width: 1080px)')
   const below600 = useMedia('(max-width: 600px)')
+  const above1600 = useMedia('(min-width: 1600px)')
 
-  // find start time based on required time window, update domain
-  const utcEndTime = dayjs.utc()
-  // based on window, get starttime
-  let utcStartTime
-  switch (timeWindow) {
-    case timeframeOptions.WEEK:
-      utcStartTime =
-        utcEndTime
-          .subtract(1, 'week')
-          .startOf('day')
-          .unix() - 1
-      break
-    case timeframeOptions.ALL_TIME:
-      utcStartTime = utcEndTime.subtract(1, 'year').unix() - 1
-      break
-    default:
-      utcStartTime =
-        utcEndTime
-          .subtract(1, 'year')
-          .startOf('year')
-          .unix() - 1
-      break
-  }
   const domain = [dataMin => (dataMin > utcStartTime ? dataMin : utcStartTime), 'dataMax']
+
+  const aspect = above1600 ? 60 / 12 : below600 ? 60 / 42 : 60 / 16
 
   return (
     <ChartWrapper>
       {below600 ? (
         <RowBetween mb={40}>
-          <DropdownSelect options={CHART_VIEW} active={chartFilter} setActive={setChartFilter} color={'#ff007a'} />
+          <div />
           <DropdownSelect options={timeframeOptions} active={timeWindow} setActive={setTimeWindow} color={'#ff007a'} />
         </RowBetween>
       ) : (
         <RowBetween mb={40}>
           <AutoRow gap="10px">
-            <OptionButton
-              active={chartFilter === CHART_VIEW.LIQUIDITY}
-              onClick={() => setChartFilter(CHART_VIEW.LIQUIDITY)}
-            >
-              Liquidity
-            </OptionButton>
+            <Text>Liquidity Value</Text>
           </AutoRow>
-          <AutoRow justify="flex-end" gap="10px">
+          <AutoRow justify="flex-end" gap="4px">
+            <OptionButton
+              active={timeWindow === timeframeOptions.MONTH}
+              onClick={() => setTimeWindow(timeframeOptions.MONTH)}
+            >
+              1M
+            </OptionButton>
             <OptionButton
               active={timeWindow === timeframeOptions.WEEK}
               onClick={() => setTimeWindow(timeframeOptions.WEEK)}
             >
-              1 Week
+              1W
             </OptionButton>
             <OptionButton
               active={timeWindow === timeframeOptions.ALL_TIME}
               onClick={() => setTimeWindow(timeframeOptions.ALL_TIME)}
             >
-              All Time
+              All
             </OptionButton>
           </AutoRow>
         </RowBetween>
       )}
-      {chartFilter === CHART_VIEW.LIQUIDITY && chartData && (
-        <ResponsiveContainer aspect={below1080 ? 60 / 32 : below600 ? 60 / 42 : 60 / 26}>
-          <AreaChart
-            onMouseMove={e => {
-              if (e?.activePayload?.[0]?.value && animatedVal !== e?.activePayload?.[0]?.value) {
-                setAnimatedVal(e.activePayload[0].value)
-              }
-            }}
-            onMouseLeave={() => setAnimatedVal(positionValue)}
-            margin={{ top: 0, right: 10, bottom: 6, left: 0 }}
-            barCategoryGap={1}
-            data={chartData}
-          >
+      {chartData ? (
+        <ResponsiveContainer aspect={aspect} style={{ height: 'inherit' }}>
+          <AreaChart margin={{ top: 0, right: 10, bottom: 6, left: 0 }} barCategoryGap={1} data={chartData}>
             <defs>
               <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor={'#ff007a'} stopOpacity={0.35} />
                 <stop offset="95%" stopColor={'#ff007a'} stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid stroke="#DFE1E9" />
             <XAxis
               tickLine={false}
               axisLine={false}
@@ -127,7 +91,7 @@ const UserChart = ({ account, setAnimatedVal, animatedVal, positionValue }) => {
             />
             <YAxis
               type="number"
-              orientation="left"
+              orientation="right"
               tickFormatter={tick => '$' + toK(tick)}
               axisLine={false}
               tickLine={false}
@@ -163,6 +127,8 @@ const UserChart = ({ account, setAnimatedVal, animatedVal, positionValue }) => {
             />
           </AreaChart>
         </ResponsiveContainer>
+      ) : (
+        <LocalLoader />
       )}
     </ChartWrapper>
   )

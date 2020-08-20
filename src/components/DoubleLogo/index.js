@@ -12,11 +12,15 @@ export default function DoubleTokenLogo({ a0, a1, size = 24, margin = false }) {
 
   const HigherLogo = styled(TokenLogo)`
     z-index: 2;
+    background-color: white;
+    border-radius: 50%;
   `
 
   const CoveredLogo = styled(TokenLogo)`
     position: absolute;
     left: ${({ sizeraw }) => (sizeraw / 2).toString() + 'px'};
+    background-color: white;
+    border-radius: 50%;
   `
 
   return (

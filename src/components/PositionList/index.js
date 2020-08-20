@@ -5,14 +5,15 @@ import LocalLoader from '../LocalLoader'
 import utc from 'dayjs/plugin/utc'
 import { Box, Flex, Text } from 'rebass'
 import styled from 'styled-components'
-import Link from '../Link'
+import Link, { CustomLink } from '../Link'
 import { Divider } from '../../components'
 import DoubleTokenLogo from '../DoubleLogo'
 import { withRouter } from 'react-router-dom'
-import { formattedNum, rawPercent, formattedPercent } from '../../helpers'
+import { formattedNum, getPoolLink } from '../../utils'
 import { AutoColumn } from '../Column'
 import { useEthPrice } from '../../contexts/GlobalData'
 import { RowFixed } from '../Row'
+import { ButtonLight } from '../ButtonStyled'
 
 dayjs.extend(utc)
 
@@ -41,8 +42,8 @@ const List = styled(Box)`
 const DashGrid = styled.div`
   display: grid;
   grid-gap: 1em;
-  grid-template-columns: 100px 1fr 1fr;
-  grid-template-areas: 'name usd ownership';
+  grid-template-columns: 5px 0.5fr 1fr 1fr;
+  grid-template-areas: 'number name uniswap return';
   align-items: flex-start;
   padding: 20px 0;
 
@@ -58,8 +59,13 @@ const DashGrid = styled.div`
   }
 
   @media screen and (min-width: 1200px) {
-    grid-template-columns: 35px 1.5fr 1fr 1fr 1fr 1fr 1fr;
-    grid-template-areas: 'number name ownership market return combinded value';
+    grid-template-columns: 35px 2.5fr 1fr 1fr;
+    grid-template-areas: 'number name uniswap return';
+  }
+
+  @media screen and (max-width: 740px) {
+    grid-template-columns: 2.5fr 1fr 1fr;
+    grid-template-areas: 'name uniswap return';
   }
 `
 
@@ -89,16 +95,12 @@ const DataText = styled(Flex)`
 `
 
 const SORT_FIELD = {
-  LIQ: 0
+  VALUE: 'VALUE',
+  UNISWAP_RETURN: 'UNISWAP_RETURN'
 }
-
-// const FIELD_TO_VALUE = {
-//   [SORT_FIELD.LIQ]: 'trackedReserveETH' // sort with tracked volume only
-// }
 
 function PositionList({ positions }) {
   const below740 = useMedia('(max-width: 740px)')
-  const below1080 = useMedia('(max-width: 1080px)')
 
   // pagination
   const [page, setPage] = useState(1)
@@ -107,7 +109,7 @@ function PositionList({ positions }) {
 
   // sorting
   const [sortDirection, setSortDirection] = useState(true)
-  const [sortedColumn, setSortedColumn] = useState(SORT_FIELD.LIQ)
+  const [sortedColumn, setSortedColumn] = useState(SORT_FIELD.VALUE)
 
   useEffect(() => {
     setMaxPage(1) // edit this to do modular
@@ -127,152 +129,108 @@ function PositionList({ positions }) {
   const [ethPrice] = useEthPrice()
 
   const ListItem = ({ position, index }) => {
-    if (position) {
-      const poolOwnership = position.liquidityTokenBalance / position.pair.totalSupply
-      const valueUSD = poolOwnership * position.pair.reserveUSD
-      return (
-        <DashGrid focus={true}>
-          <DataText area="number">{index}</DataText>
-          <DataText area="name" fontWeight="500" justifyContent="flex-start" alignItems="flex-start">
-            <AutoColumn gap="8px" justify="flex-start" align="flex-start">
-              <DoubleTokenLogo size={16} a0={position.pair.token0.id} a1={position.pair.token1.id} margin={!below740} />
-            </AutoColumn>
-            <AutoColumn gap="8px" justify="flex-start" style={{ marginLeft: '20px' }}>
+    const poolOwnership = position.liquidityTokenBalance / position.pair.totalSupply
+    const valueUSD = poolOwnership * position.pair.reserveUSD
+
+    return (
+      <DashGrid focus={true}>
+        {!below740 && <DataText area="number">{index}</DataText>}
+        <DataText area="name" fontWeight="500" justifyContent="flex-start" alignItems="flex-start">
+          <AutoColumn gap="8px" justify="flex-start" align="flex-start">
+            <DoubleTokenLogo size={16} a0={position.pair.token0.id} a1={position.pair.token1.id} margin={!below740} />
+          </AutoColumn>
+          <AutoColumn gap="8px" justify="flex-start" style={{ marginLeft: '20px' }}>
+            <CustomLink to={'/pair/' + position.pair.id}>
               <Text style={{ whiteSpace: 'nowrap' }} to={'/pair/'}>
                 {position.pair.token0.symbol + '-' + position.pair.token1.symbol}
               </Text>
-              <AutoColumn gap="8px" justify="flex-start">
-                <Link>Add</Link>
-                <Link>Remove</Link>
-              </AutoColumn>
-            </AutoColumn>
-          </DataText>
-          <DataText area="ownership">{rawPercent(poolOwnership)}</DataText>
-          <DataText area="market">
-            <AutoColumn gap="12px">
-              <Text fontWeight={500}>
-                <RowFixed>
-                  {formattedNum(position?.assetReturn, true, true)} ({formattedPercent(position?.assetPercentChange)})
-                </RowFixed>
+            </CustomLink>
+            <RowFixed gap="8px" justify="flex-start">
+              <Link
+                external
+                href={getPoolLink(position.pair.token0.id, position.pair.token1.id)}
+                style={{ marginRight: '.5rem' }}
+              >
+                <ButtonLight style={{ padding: '2px 4px', borderRadius: '4px' }}>Add</ButtonLight>
+              </Link>
+              <Link external href={getPoolLink(position.pair.token0.id, position.pair.token1.id, true)}>
+                <ButtonLight style={{ padding: '2px 4px', borderRadius: '4px' }}>Remove</ButtonLight>
+              </Link>
+            </RowFixed>
+          </AutoColumn>
+        </DataText>
+        <DataText area="uniswap">
+          <AutoColumn gap="12px" justify="flex-end">
+            <Text fontWeight={500}>{formattedNum(valueUSD, true, true)}</Text>
+            <AutoColumn gap="4px" justify="flex-end">
+              <Text fontSize="12px">
+                {formattedNum(poolOwnership * parseFloat(position.pair.reserve0))} {position.pair.token0.symbol}
               </Text>
-              <AutoColumn gap="4px" justify="flex-end">
-                <Text fontSize="12px">
-                  {parseFloat(position.pair.token0.derivedETH)
-                    ? formattedNum(
-                        position?.assetReturn / (parseFloat(position.pair.token0.derivedETH) * ethPrice) / 2,
-                        false,
-                        true
-                      )
-                    : 0}{' '}
-                  {position.pair.token0.symbol}
-                </Text>
-                <Text fontSize="12px">
-                  {parseFloat(position.pair.token1.derivedETH)
-                    ? formattedNum(
-                        position?.assetReturn / (parseFloat(position.pair.token1.derivedETH) * ethPrice) / 2,
-                        false,
-                        true
-                      )
-                    : 0}{' '}
-                  {position.pair.token1.symbol}
-                </Text>
-              </AutoColumn>
-            </AutoColumn>
-          </DataText>
-          <DataText area="return">
-            <AutoColumn gap="12px">
-              <Text fontWeight={500}>
-                <RowFixed>
-                  {formattedNum(position?.uniswapReturn, true, true)} (
-                  {formattedPercent(position?.uniswapPercentChange)})
-                </RowFixed>
+              <Text fontSize="12px">
+                {formattedNum(poolOwnership * parseFloat(position.pair.reserve1))} {position.pair.token1.symbol}
               </Text>
-              <AutoColumn gap="4px" justify="flex-end">
-                <Text fontSize="12px">
-                  {parseFloat(position.pair.token0.derivedETH)
-                    ? formattedNum(
-                        position?.uniswapReturn / (parseFloat(position.pair.token0.derivedETH) * ethPrice) / 2,
-                        false,
-                        true
-                      )
-                    : 0}{' '}
-                  {position.pair.token0.symbol}
-                </Text>
-                <Text fontSize="12px">
-                  {parseFloat(position.pair.token1.derivedETH)
-                    ? formattedNum(
-                        position?.uniswapReturn / (parseFloat(position.pair.token1.derivedETH) * ethPrice) / 2,
-                        false,
-                        true
-                      )
-                    : 0}{' '}
-                  {position.pair.token1.symbol}
-                </Text>
-              </AutoColumn>
             </AutoColumn>
-          </DataText>
-          <DataText area="combined">
-            <AutoColumn gap="12px">
-              <Text fontWeight={500}>
-                <RowFixed>
-                  {formattedNum(position?.netReturn, true, true)} ({formattedPercent(position?.netPercentChange)})
-                </RowFixed>
+          </AutoColumn>
+        </DataText>
+        <DataText area="return">
+          <AutoColumn gap="12px" justify="flex-end">
+            <Text fontWeight={500} color={'green'}>
+              <RowFixed>{formattedNum(position?.fees.sum, true, true)}</RowFixed>
+            </Text>
+            <AutoColumn gap="4px" justify="flex-end">
+              <Text fontSize="12px">
+                {parseFloat(position.pair.token0.derivedETH)
+                  ? formattedNum(
+                      position?.fees.sum / (parseFloat(position.pair.token0.derivedETH) * ethPrice) / 2,
+                      false,
+                      true
+                    )
+                  : 0}{' '}
+                {position.pair.token0.symbol}
               </Text>
-              <AutoColumn gap="4px" justify="flex-end">
-                <Text fontSize="12px">
-                  {parseFloat(position.pair.token0.derivedETH)
-                    ? formattedNum(
-                        position?.netReturn / (parseFloat(position.pair.token0.derivedETH) * ethPrice) / 2,
-                        false,
-                        true
-                      )
-                    : 0}{' '}
-                  {position.pair.token0.symbol}
-                </Text>
-                <Text fontSize="12px">
-                  {parseFloat(position.pair.token1.derivedETH)
-                    ? formattedNum(
-                        position?.netReturn / (parseFloat(position.pair.token1.derivedETH) * ethPrice) / 2,
-                        false,
-                        true
-                      )
-                    : 0}{' '}
-                  {position.pair.token1.symbol}
-                </Text>
-              </AutoColumn>
+              <Text fontSize="12px">
+                {parseFloat(position.pair.token1.derivedETH)
+                  ? formattedNum(
+                      position?.fees.sum / (parseFloat(position.pair.token1.derivedETH) * ethPrice) / 2,
+                      false,
+                      true
+                    )
+                  : 0}{' '}
+                {position.pair.token1.symbol}
+              </Text>
             </AutoColumn>
-          </DataText>
-          <DataText area="value">
-            <AutoColumn gap="12px" justify="flex-end">
-              <Text fontWeight={500}>{formattedNum(valueUSD, true)}</Text>
-              <AutoColumn gap="4px" justify="flex-end">
-                <Text fontSize="12px">
-                  {formattedNum(poolOwnership * parseFloat(position.pair.reserve0))} {position.pair.token0.symbol}
-                </Text>
-                <Text fontSize="12px">
-                  {formattedNum(poolOwnership * parseFloat(position.pair.reserve1))} {position.pair.token1.symbol}
-                </Text>
-              </AutoColumn>
-            </AutoColumn>
-          </DataText>
-        </DashGrid>
-      )
-    } else {
-      return ''
-    }
+          </AutoColumn>
+        </DataText>
+      </DashGrid>
+    )
   }
 
   const positionsSorted =
     positions &&
-    Object.keys(positions)
-      .sort((addressA, addressB) => {
+    positions
+
+      .sort((p0, p1) => {
+        if (sortedColumn === SORT_FIELD.PRINCIPAL) {
+          return p0?.principal?.usd > p1?.principal?.usd ? (sortDirection ? -1 : 1) : sortDirection ? 1 : -1
+        }
+        if (sortedColumn === SORT_FIELD.HODL) {
+          return p0?.hodl?.sum > p1?.hodl?.sum ? (sortDirection ? -1 : 1) : sortDirection ? 1 : -1
+        }
+        if (sortedColumn === SORT_FIELD.UNISWAP_RETURN) {
+          return p0?.uniswap?.return > p1?.uniswap?.return ? (sortDirection ? -1 : 1) : sortDirection ? 1 : -1
+        }
+        if (sortedColumn === SORT_FIELD.VALUE) {
+          const bal0 = (p0.liquidityTokenBalance / p0.pair.totalSupply) * p0.pair.reserveUSD
+          const bal1 = (p1.liquidityTokenBalance / p1.pair.totalSupply) * p1.pair.reserveUSD
+          return bal0 > bal1 ? (sortDirection ? -1 : 1) : sortDirection ? 1 : -1
+        }
         return 1
       })
       .slice(ITEMS_PER_PAGE * (page - 1), page * ITEMS_PER_PAGE)
-      .map((id, index) => {
+      .map((position, index) => {
         return (
           <div key={index}>
-            <ListItem key={index} index={(page - 1) * 10 + index + 1} position={positions[id]} />
+            <ListItem key={index} index={(page - 1) * 10 + index + 1} position={position} />
             <Divider />
           </div>
         )
@@ -280,12 +238,14 @@ function PositionList({ positions }) {
 
   return (
     <ListWrapper>
-      <DashGrid center={true} style={{ height: 'fit-content', padding: 0 }}>
-        <Flex alignItems="flex-start" justifyContent="flexStart">
-          <Text area="number" fontWeight="500">
-            #
-          </Text>
-        </Flex>
+      <DashGrid center={true} style={{ height: '32px', padding: 0 }}>
+        {!below740 && (
+          <Flex alignItems="flex-start" justifyContent="flexStart">
+            <Text area="number" fontWeight="500">
+              #
+            </Text>
+          </Flex>
+        )}
         <Flex alignItems="flex-start" justifyContent="flex-start">
           <Text area="name" fontWeight="500">
             Name
@@ -293,67 +253,27 @@ function PositionList({ positions }) {
         </Flex>
         <Flex alignItems="center" justifyContent="flexEnd">
           <ClickableText
-            area="ownership"
+            area="uniswap"
             onClick={e => {
-              setSortedColumn(SORT_FIELD.LIQ)
-              setSortDirection(sortedColumn !== SORT_FIELD.LIQ ? true : !sortDirection)
+              setSortedColumn(SORT_FIELD.VALUE)
+              setSortDirection(sortedColumn !== SORT_FIELD.VALUE ? true : !sortDirection)
             }}
           >
-            Pool Ownership {sortedColumn === SORT_FIELD.LIQ ? (!sortDirection ? '↑' : '↓') : ''}
+            {below740 ? 'Value' : 'Liquidity'} {sortedColumn === SORT_FIELD.VALUE ? (!sortDirection ? '↑' : '↓') : ''}
           </ClickableText>
         </Flex>
-        <Flex alignItems="center">
+        <Flex alignItems="center" justifyContent="flexEnd">
           <ClickableText
-            area="market"
-            onClick={e => {
-              setSortedColumn(SORT_FIELD.VOL)
-              setSortDirection(sortedColumn !== SORT_FIELD.VOL ? true : !sortDirection)
+            area="return"
+            onClick={() => {
+              setSortedColumn(SORT_FIELD.UNISWAP_RETURN)
+              setSortDirection(sortedColumn !== SORT_FIELD.UNISWAP_RETURN ? true : !sortDirection)
             }}
           >
-            Asset Return
-            {sortedColumn === SORT_FIELD.VOL ? (!sortDirection ? '↑' : '↓') : ''}
+            {below740 ? 'Fees' : 'Total Fees Earned'}{' '}
+            {sortedColumn === SORT_FIELD.UNISWAP_RETURN ? (!sortDirection ? '↑' : '↓') : ''}
           </ClickableText>
         </Flex>
-        {!below1080 && (
-          <Flex alignItems="center" justifyContent="flexEnd">
-            <ClickableText
-              area="return"
-              onClick={e => {
-                setSortedColumn(SORT_FIELD.VOL_7DAYS)
-                setSortDirection(sortedColumn !== SORT_FIELD.VOL_7DAYS ? true : !sortDirection)
-              }}
-            >
-              Uniswap Return {sortedColumn === SORT_FIELD.VOL_7DAYS ? (!sortDirection ? '↑' : '↓') : ''}
-            </ClickableText>
-          </Flex>
-        )}
-        {!below1080 && (
-          <Flex alignItems="center" justifyContent="flexEnd">
-            <ClickableText
-              area="combined"
-              onClick={e => {
-                setSortedColumn(SORT_FIELD.VOL_7DAYS)
-                setSortDirection(sortedColumn !== SORT_FIELD.VOL_7DAYS ? true : !sortDirection)
-              }}
-            >
-              Combined Return {sortedColumn === SORT_FIELD.VOL_7DAYS ? (!sortDirection ? '↑' : '↓') : ''}
-            </ClickableText>
-          </Flex>
-        )}
-        {!below1080 && (
-          <Flex alignItems="center" justifyContent="flexEnd">
-            <ClickableText
-              area="value"
-              onClick={e => {
-                setSortedColumn(SORT_FIELD.FEES)
-                setSortDirection(sortedColumn !== SORT_FIELD.FEES ? true : !sortDirection)
-              }}
-            >
-              Value{sortedColumn === SORT_FIELD.FEES ? (!sortDirection ? '↑' : '↓') : ''}
-            </ClickableText>
-          </Flex>
-        )}
-        <ClickableText area="manage" color="#FF007A"></ClickableText>
       </DashGrid>
       <Divider />
       <List p={0}>{!positionsSorted ? <LocalLoader /> : positionsSorted}</List>

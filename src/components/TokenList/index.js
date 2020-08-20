@@ -9,10 +9,11 @@ import { CustomLink } from '../Link'
 import Row from '../Row'
 import { Divider } from '..'
 
-import { formattedNum, formattedPercent } from '../../helpers'
+import { formattedNum, formattedPercent } from '../../utils'
 import { useMedia } from 'react-use'
 import { withRouter } from 'react-router-dom'
 import { OVERVIEW_TOKEN_BLACKLIST } from '../../constants'
+import FormattedName from '../FormattedName'
 
 dayjs.extend(utc)
 
@@ -43,10 +44,10 @@ const DashGrid = styled.div`
   grid-gap: 1em;
   grid-template-columns: 100px 1fr 1fr;
   grid-template-areas: 'name liq vol';
-  width: 100%;
+  padding: 0 1.125rem;
+
   > * {
     justify-content: flex-end;
-    width: 100%;
 
     &:first-child {
       justify-content: flex-start;
@@ -61,11 +62,6 @@ const DashGrid = styled.div`
     grid-template-columns: 180px 1fr 1fr 1fr;
     grid-template-areas: 'name symbol liq vol ';
 
-    :hover {
-      cursor: ${({ focus }) => focus && 'pointer'};
-      background-color: ${({ focus, theme }) => focus && theme.bg3};
-    }
-
     > * {
       justify-content: flex-end;
       width: 100%;
@@ -78,7 +74,7 @@ const DashGrid = styled.div`
 
   @media screen and (min-width: 1080px) {
     display: grid;
-    grid-gap: 1em;
+    grid-gap: 0.5em;
     grid-template-columns: 1.5fr 0.6fr 1fr 1fr 1fr 1fr;
     grid-template-areas: 'name symbol liq vol price change';
   }
@@ -100,15 +96,15 @@ const ClickableText = styled(Text)`
 `
 
 const DataText = styled(Flex)`
-  @media screen and (max-width: 40em) {
-    font-size: 0.85rem;
-  }
-
   align-items: center;
-  text-align: right;
+  text-align: center;
 
   & > * {
-    font-size: 1em;
+    font-size: 14px;
+  }
+
+  @media screen and (max-width: 600px) {
+    font-size: 12px;
   }
 `
 
@@ -134,6 +130,7 @@ function TopTokenList({ tokens, history, itemMax = 10 }) {
 
   const below1080 = useMedia('(max-width: 1080px)')
   const below680 = useMedia('(max-width: 680px)')
+  const below600 = useMedia('(max-width: 600px)')
 
   useEffect(() => {
     setMaxPage(1) // edit this to do modular
@@ -174,19 +171,23 @@ function TopTokenList({ tokens, history, itemMax = 10 }) {
       return ''
     }
     return (
-      <DashGrid style={{ height: '60px' }} focus={true} onClick={() => history.push('/token/' + item.id)}>
+      <DashGrid style={{ height: '48px' }} focus={true}>
         <DataText area="name" fontWeight="500">
           <Row>
-            {!below680 && <div style={{ marginRight: '1rem' }}>{index}</div>}
+            {!below680 && <div style={{ marginRight: '1rem', width: '10px' }}>{index}</div>}
             <TokenLogo address={item.id} />
             <CustomLink style={{ marginLeft: '16px', whiteSpace: 'nowrap' }} to={'/token/' + item.id}>
-              {below680 ? item.symbol : item.name}
+              <FormattedName
+                text={below680 ? item.symbol : item.name}
+                maxCharacters={below600 ? 8 : 16}
+                adjustSize={true}
+              />
             </CustomLink>
           </Row>
         </DataText>
         {!below680 && (
           <DataText area="symbol" color="text" fontWeight="500">
-            {item.symbol}
+            <FormattedName text={item.symbol} maxCharacters={5} />
           </DataText>
         )}
         <DataText area="liq">{formattedNum(item.totalLiquidityUSD, true)}</DataText>
@@ -203,7 +204,7 @@ function TopTokenList({ tokens, history, itemMax = 10 }) {
 
   return (
     <ListWrapper>
-      <DashGrid center={true} style={{ height: 'fit-content', padding: '0 0 1rem 0' }}>
+      <DashGrid center={true} style={{ height: 'fit-content', padding: '0 1.125rem 1rem 1.125rem' }}>
         <Flex alignItems="center" justifyContent="flexStart">
           <ClickableText
             color="text"

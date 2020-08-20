@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react'
 import styled from 'styled-components'
 
-import Row from '../Row'
+import Row, { RowFixed } from '../Row'
 import TokenLogo from '../TokenLogo'
 import { Search as SearchIcon } from 'react-feather'
 import { BasicLink } from '../Link'
@@ -11,7 +11,18 @@ import { useAllPairData, usePairData } from '../../contexts/PairData'
 import DoubleTokenLogo from '../DoubleLogo'
 import { useMedia } from 'react-use'
 import { useAllPairsInUniswap, useAllTokensInUniswap } from '../../contexts/GlobalData'
-import { OVERVIEW_TOKEN_BLACKLIST, OVERVIEW_PAIR_BLACKLIST } from '../../constants'
+import { OVERVIEW_TOKEN_BLACKLIST, PAIR_BLACKLIST } from '../../constants'
+
+import { transparentize } from 'polished'
+import { client } from '../../apollo/client'
+import { PAIR_SEARCH, TOKEN_SEARCH } from '../../apollo/queries'
+import FormattedName from '../FormattedName'
+
+const Container = styled.div`
+  height: 48px;
+  z-index: 30;
+  position: relative;
+`
 
 const Wrapper = styled.div`
   display: flex;
@@ -19,31 +30,38 @@ const Wrapper = styled.div`
   flex-direction: row;
   align-items: center;
   justify-content: flex-end;
-  padding: ${({ small }) => (!small ? '12px' : '8px 16px')};
+  padding: 12px 16px;
   border-radius: 12px;
-  background: ${({ theme }) => theme.advancedBG};
+  background: ${({ theme }) => transparentize(0.4, theme.bg1)};
   border-bottom-right-radius: ${({ open }) => (open ? '0px' : '12px')};
   border-bottom-left-radius: ${({ open }) => (open ? '0px' : '12px')};
-  ${({ small }) =>
-    !small &&
-    ` box-shadow: 0 2.8px 2.8px -9px rgba(0, 0, 0, 0.008), 0 6.7px 6.7px -9px rgba(0, 0, 0, 0.012),
-    0 12.5px 12.6px -9px rgba(0, 0, 0, 0.015), 0 22.3px 22.6px -9px rgba(0, 0, 0, 0.018),
-    0 41.8px 42.2px -9px rgba(0, 0, 0, 0.022), 0 100px 101px -9px rgba(0, 0, 0, 0.03);`};
+  z-index: 9999;
+  width: 100%;
+  min-width: 300px;
+  box-sizing: border-box;
+  box-shadow: ${({ open }) =>
+    !open
+      ? '0px 24px 32px rgba(0, 0, 0, 0.04), 0px 16px 24px rgba(0, 0, 0, 0.04), 0px 4px 8px rgba(0, 0, 0, 0.04), 0px 0px 1px rgba(0, 0, 0, 0.04) '
+      : 'none'};
+  @media screen and (max-width: 600px) {
+    width: ${({ small }) => (small ? '160px' : '100%')};
+    min-width: 40px;
+  }
 `
 const Input = styled.input`
   position: relative;
   display: flex;
   align-items: center;
-  width: 100%;
   white-space: nowrap;
   background: none;
   border: none;
   outline: none;
+  width: 100%;
   color: ${({ theme }) => theme.textColor};
-  font-size: ${({ large }) => (large ? '20px' : '16px')};
+  font-size: ${({ large }) => (large ? '20px' : '14px')};
 
   ::placeholder {
-    color: ${({ theme }) => theme.textColor};
+    color: ${({ theme }) => theme.bg5};
     font-size: 16px;
   }
 
@@ -64,7 +82,7 @@ const SearchIconLarge = styled(SearchIcon)`
 const Menu = styled.div`
   display: flex;
   flex-direction: column;
-  z-index: 10;
+  z-index: 9999;
   width: 100%;
   top: 50px;
   max-height: 540px;
@@ -96,11 +114,6 @@ const Heading = styled(Row)`
   display: ${({ hide = false }) => hide && 'none'};
 `
 
-const FilterSection = styled(Heading)`
-  z-index: 32;
-  background-color: #f7f8fa;
-`
-
 const Gray = styled.span`
   color: #888d9b;
 `
@@ -113,10 +126,10 @@ const Blue = styled.span`
 `
 
 export const Search = ({ small = false }) => {
-  const allTokens = useAllTokensInUniswap()
+  let allTokens = useAllTokensInUniswap()
   const allTokenData = useAllTokenData()
 
-  const allPairs = useAllPairsInUniswap()
+  let allPairs = useAllPairsInUniswap()
   const allPairData = useAllPairData()
 
   const [showMenu, toggleMenu] = useState(false)
@@ -140,13 +153,95 @@ export const Search = ({ small = false }) => {
     }
   }, [value])
 
+  const [searchedTokens, setSearchedTokens] = useState([])
+  const [searchedPairs, setSearchedPairs] = useState([])
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        if (value?.length > 0) {
+          let tokens = await client.query({
+            variables: {
+              value: value ? value.toUpperCase() : '',
+              id: value
+            },
+            query: TOKEN_SEARCH
+          })
+
+          let pairs = await client.query({
+            query: PAIR_SEARCH,
+            variables: {
+              tokens: tokens.data.asSymbol?.map(t => t.id),
+              id: value
+            }
+          })
+          setSearchedPairs(pairs.data.as0.concat(pairs.data.as1).concat(pairs.data.asAddress))
+          let foundTokens = tokens.data.asSymbol.concat(tokens.data.asAddress).concat(tokens.data.asName)
+          setSearchedTokens(foundTokens)
+        }
+      } catch (e) {
+        console.log(e)
+      }
+    }
+    fetchData()
+  }, [value])
+
   function escapeRegExp(string) {
     return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') // $& means the whole matched string
   }
 
+  // add the searched tokens to the list if now found yet
+  allTokens = allTokens.concat(
+    searchedTokens.filter(searchedToken => {
+      let included = false
+      allTokens.map(token => {
+        if (token.id === searchedToken.id) {
+          included = true
+        }
+        return true
+      })
+      return !included
+    })
+  )
+
+  let uniqueTokens = []
+  let found = {}
+  allTokens &&
+    allTokens.map(token => {
+      if (!found[token.id]) {
+        found[token.id] = true
+        uniqueTokens.push(token)
+      }
+      return true
+    })
+
+  allPairs = allPairs.concat(
+    searchedPairs.filter(searchedPair => {
+      let included = false
+      allPairs.map(pair => {
+        if (pair.id === searchedPair.id) {
+          included = true
+        }
+        return true
+      })
+      return !included
+    })
+  )
+
+  let uniquePairs = []
+  let pairsFound = {}
+  allPairs &&
+    allPairs.map(pair => {
+      if (!pairsFound[pair.id]) {
+        pairsFound[pair.id] = true
+        uniquePairs.push(pair)
+      }
+      return true
+    })
+
   const filteredTokenList = useMemo(() => {
-    return allTokens
-      ? allTokens
+    return uniqueTokens
+      ? uniqueTokens
           .sort((a, b) => {
             if (OVERVIEW_TOKEN_BLACKLIST.includes(a.id)) {
               return 1
@@ -163,7 +258,7 @@ export const Search = ({ small = false }) => {
               return -1
             }
             if (!tokenA?.oneDayVolumeUSD && tokenB?.oneDayVolumeUSD) {
-              return 1
+              return tokenA?.totalLiquidity > tokenB?.totalLiquidity ? -1 : 1
             }
             return 1
           })
@@ -187,11 +282,11 @@ export const Search = ({ small = false }) => {
             return regexMatches.some(m => m)
           })
       : []
-  }, [allTokenData, allTokens, value])
+  }, [allTokenData, uniqueTokens, value])
 
   const filteredPairList = useMemo(() => {
-    return allPairs
-      ? allPairs
+    return uniquePairs
+      ? uniquePairs
           .sort((a, b) => {
             const pairA = allPairData[a.id]
             const pairB = allPairData[b.id]
@@ -207,7 +302,7 @@ export const Search = ({ small = false }) => {
             return 0
           })
           .filter(pair => {
-            if (OVERVIEW_PAIR_BLACKLIST.includes(pair.id)) {
+            if (PAIR_BLACKLIST.includes(pair.id)) {
               return false
             }
             if (value && value.includes(' ')) {
@@ -248,7 +343,7 @@ export const Search = ({ small = false }) => {
             return regexMatches.some(m => m)
           })
       : []
-  }, [allPairData, allPairs, value])
+  }, [allPairData, uniquePairs, value])
 
   useEffect(() => {
     if (Object.keys(filteredTokenList).length > 2) {
@@ -266,17 +361,8 @@ export const Search = ({ small = false }) => {
     }
   }, [filteredPairList])
 
-  const [tokensShown, setTokensShown] = useState(0)
-
-  useEffect(() => {
-    setTokensShown(Math.min(Object.keys(filteredTokenList).length, 3))
-  }, [filteredTokenList])
-
-  const [pairsShown, setPairsShown] = useState(0)
-
-  useEffect(() => {
-    setPairsShown(Math.min(Object.keys(filteredPairList).length, 3))
-  }, [filteredPairList])
+  const [tokensShown, setTokensShown] = useState(3)
+  const [pairsShown, setPairsShown] = useState(3)
 
   function onDismiss() {
     setPairsShown(3)
@@ -308,15 +394,8 @@ export const Search = ({ small = false }) => {
   })
 
   return (
-    <div
-      style={{
-        height: '36px',
-        zIndex: '30',
-        position: 'relative'
-      }}
-    >
+    <Container>
       <Wrapper open={showMenu} shadow={true} small={small}>
-        <SearchIconLarge />
         <Input
           large={!small}
           type={'text'}
@@ -330,7 +409,7 @@ export const Search = ({ small = false }) => {
               ? 'Search pairs and tokens...'
               : small
               ? 'Search pairs and tokens...'
-              : 'Search or paste address to find Uniswap pairs and tokens...'
+              : 'Search Uniswap pairs and tokens...'
           }
           value={value}
           onChange={e => {
@@ -340,12 +419,9 @@ export const Search = ({ small = false }) => {
             toggleMenu(true)
           }}
         />
+        <SearchIconLarge />
       </Wrapper>
       <Menu hide={!showMenu} ref={menuRef}>
-        <FilterSection>
-          <Gray>Results</Gray>
-        </FilterSection>
-
         <Heading>
           <Gray>Pairs</Gray>
         </Heading>
@@ -391,9 +467,11 @@ export const Search = ({ small = false }) => {
             return (
               <BasicLink to={'/token/' + token.id} key={token.id} onClick={onDismiss}>
                 <MenuItem>
-                  <TokenLogo address={token.id} style={{ marginRight: '10px' }} />
-                  <span>{token.name}</span>
-                  <span>({token.symbol})</span>
+                  <RowFixed>
+                    <TokenLogo address={token.id} style={{ marginRight: '10px' }} />
+                    <FormattedName text={token.name} maxCharacters={20} style={{ marginRight: '6px' }} />
+                    (<FormattedName text={token.symbol} maxCharacters={6} />)
+                  </RowFixed>
                 </MenuItem>
               </BasicLink>
             )
@@ -412,7 +490,7 @@ export const Search = ({ small = false }) => {
           </Heading>
         </div>
       </Menu>
-    </div>
+    </Container>
   )
 }
 

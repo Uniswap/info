@@ -1,16 +1,19 @@
-import React, { useState } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import styled from 'styled-components'
 import { Area, XAxis, YAxis, ResponsiveContainer, Tooltip, AreaChart, BarChart, Bar } from 'recharts'
-import { AutoRow, RowBetween } from '../Row'
+import { AutoRow, RowBetween, RowFixed } from '../Row'
 
-import { toK, toNiceDate, toNiceDateYear, formattedNum } from '../../helpers'
+import { toK, toNiceDate, toNiceDateYear, formattedNum, getTimeframe } from '../../utils'
 import { OptionButton } from '../ButtonStyled'
 import { darken } from 'polished'
-import { useMedia } from 'react-use'
+import { useMedia, usePrevious } from 'react-use'
 import { timeframeOptions } from '../../constants'
-import dayjs from 'dayjs'
-import { useTokenChartData } from '../../contexts/TokenData'
+import { useTokenChartData, useTokenPriceData } from '../../contexts/TokenData'
 import DropdownSelect from '../DropdownSelect'
+import CandleStickChart from '../CandleChart'
+import LocalLoader from '../LocalLoader'
+import { AutoColumn } from '../Column'
+import { Activity } from 'react-feather'
 
 const ChartWrapper = styled.div`
   height: 100%;
@@ -21,46 +24,105 @@ const ChartWrapper = styled.div`
   }
 `
 
+const PriceOption = styled(OptionButton)`
+  border-radius: 2px;
+`
+
 const CHART_VIEW = {
   VOLUME: 'Volume',
   LIQUIDITY: 'Liquidity',
-  PRICE: 'Price'
+  PRICE: 'Price',
+  LINE_PRICE: 'Price (Line)'
 }
 
-const TokenChart = ({ address, color }) => {
-  const [chartFilter, setChartFilter] = useState(CHART_VIEW.LIQUIDITY)
+const DATA_FREQUENCY = {
+  DAY: 'DAY',
+  HOUR: 'HOUR',
+  LINE: 'LINE'
+}
 
-  const chartData = useTokenChartData(address)
+const TokenChart = ({ address, color, base }) => {
+  // settings for the window and candle width
+  const [chartFilter, setChartFilter] = useState(CHART_VIEW.PRICE)
+  const [frequency, setFrequency] = useState(DATA_FREQUENCY.HOUR)
 
-  const [timeWindow, setTimeWindow] = useState(timeframeOptions.ALL_TIME)
+  // reset view on new address
+  const addressPrev = usePrevious(address)
+  useEffect(() => {
+    if (address !== addressPrev && addressPrev) {
+      setChartFilter(CHART_VIEW.LIQUIDITY)
+    }
+  }, [address, addressPrev])
+
+  let chartData = useTokenChartData(address)
+
+  const [timeWindow, setTimeWindow] = useState(timeframeOptions.WEEK)
+  const prevWindow = usePrevious(timeWindow)
+
+  // hourly and daily price data based on the current time window
+  const hourlyWeek = useTokenPriceData(address, timeframeOptions.WEEK, 3600)
+  const hourlyMonth = useTokenPriceData(address, timeframeOptions.MONTH, 3600)
+  const hourlyAll = useTokenPriceData(address, timeframeOptions.ALL_TIME, 3600)
+  const dailyWeek = useTokenPriceData(address, timeframeOptions.WEEK, 86400)
+  const dailyMonth = useTokenPriceData(address, timeframeOptions.MONTH, 86400)
+  const dailyAll = useTokenPriceData(address, timeframeOptions.ALL_TIME, 86400)
+
+  const priceData =
+    timeWindow === timeframeOptions.MONTH
+      ? // monthly selected
+        frequency === DATA_FREQUENCY.DAY
+        ? dailyMonth
+        : hourlyMonth
+      : // weekly selected
+      timeWindow === timeframeOptions.WEEK
+      ? frequency === DATA_FREQUENCY.DAY
+        ? dailyWeek
+        : hourlyWeek
+      : // all time selected
+      frequency === DATA_FREQUENCY.DAY
+      ? dailyAll
+      : hourlyAll
+
+  // switch to hourly data when switched to week window
+  useEffect(() => {
+    if (timeWindow === timeframeOptions.WEEK && prevWindow && prevWindow !== timeframeOptions.WEEK) {
+      setFrequency(DATA_FREQUENCY.HOUR)
+    }
+  }, [prevWindow, timeWindow])
+
+  // switch to daily data if switche to month or all time view
+  useEffect(() => {
+    if (timeWindow === timeframeOptions.MONTH && prevWindow && prevWindow !== timeframeOptions.MONTH) {
+      setFrequency(DATA_FREQUENCY.DAY)
+    }
+    if (timeWindow === timeframeOptions.ALL_TIME && prevWindow && prevWindow !== timeframeOptions.ALL_TIME) {
+      setFrequency(DATA_FREQUENCY.DAY)
+    }
+  }, [prevWindow, timeWindow])
 
   const below1080 = useMedia('(max-width: 1080px)')
   const below600 = useMedia('(max-width: 600px)')
 
-  // find start time based on required time window, update domain
-  const utcEndTime = dayjs.utc()
-  // based on window, get starttime
-  let utcStartTime
-  switch (timeWindow) {
-    case timeframeOptions.WEEK:
-      utcStartTime =
-        utcEndTime
-          .subtract(1, 'week')
-          .startOf('day')
-          .unix() - 1
-      break
-    case timeframeOptions.ALL_TIME:
-      utcStartTime = utcEndTime.subtract(1, 'year').unix() - 1
-      break
-    default:
-      utcStartTime =
-        utcEndTime
-          .subtract(1, 'year')
-          .startOf('year')
-          .unix() - 1
-      break
-  }
+  let utcStartTime = getTimeframe(timeWindow)
   const domain = [dataMin => (dataMin > utcStartTime ? dataMin : utcStartTime), 'dataMax']
+  const aspect = below1080 ? 60 / 32 : below600 ? 60 / 42 : 60 / 22
+
+  chartData = chartData?.filter(entry => entry.date >= utcStartTime)
+
+  // update the width on a window resize
+  const ref = useRef()
+  const isClient = typeof window === 'object'
+  const [width, setWidth] = useState(ref?.current?.container?.clientWidth)
+  useEffect(() => {
+    if (!isClient) {
+      return false
+    }
+    function handleResize() {
+      setWidth(ref?.current?.container?.clientWidth ?? width)
+    }
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [isClient, width]) // Empty array ensures that effect is only run on mount and unmount
 
   return (
     <ChartWrapper>
@@ -70,39 +132,91 @@ const TokenChart = ({ address, color }) => {
           <DropdownSelect options={timeframeOptions} active={timeWindow} setActive={setTimeWindow} color={color} />
         </RowBetween>
       ) : (
-        <RowBetween mb={40}>
-          <AutoRow gap="10px">
-            <OptionButton
-              active={chartFilter === CHART_VIEW.LIQUIDITY}
-              onClick={() => setChartFilter(CHART_VIEW.LIQUIDITY)}
-            >
-              Liquidity
-            </OptionButton>
-            <OptionButton active={chartFilter === CHART_VIEW.VOLUME} onClick={() => setChartFilter(CHART_VIEW.VOLUME)}>
-              Volume
-            </OptionButton>
-            <OptionButton active={chartFilter === CHART_VIEW.PRICE} onClick={() => setChartFilter(CHART_VIEW.PRICE)}>
-              Price
-            </OptionButton>
-          </AutoRow>
-          <AutoRow justify="flex-end" gap="10px">
+        <RowBetween
+          mb={
+            chartFilter === CHART_VIEW.LIQUIDITY ||
+            chartFilter === CHART_VIEW.VOLUME ||
+            (chartFilter === CHART_VIEW.PRICE && frequency === DATA_FREQUENCY.LINE)
+              ? 40
+              : 0
+          }
+          align="flex-start"
+        >
+          <AutoColumn gap="8px">
+            <RowFixed>
+              <OptionButton
+                active={chartFilter === CHART_VIEW.LIQUIDITY}
+                onClick={() => setChartFilter(CHART_VIEW.LIQUIDITY)}
+                style={{ marginRight: '6px' }}
+              >
+                Liquidity
+              </OptionButton>
+              <OptionButton
+                active={chartFilter === CHART_VIEW.VOLUME}
+                onClick={() => setChartFilter(CHART_VIEW.VOLUME)}
+                style={{ marginRight: '6px' }}
+              >
+                Volume
+              </OptionButton>
+              <OptionButton
+                active={chartFilter === CHART_VIEW.PRICE}
+                onClick={() => {
+                  setChartFilter(CHART_VIEW.PRICE)
+                }}
+              >
+                Price
+              </OptionButton>
+            </RowFixed>
+            {chartFilter === CHART_VIEW.PRICE && (
+              <AutoRow gap="4px">
+                <PriceOption
+                  active={frequency === DATA_FREQUENCY.DAY}
+                  onClick={() => {
+                    setTimeWindow(timeframeOptions.MONTH)
+                    setFrequency(DATA_FREQUENCY.DAY)
+                  }}
+                >
+                  D
+                </PriceOption>
+                <PriceOption
+                  active={frequency === DATA_FREQUENCY.HOUR}
+                  onClick={() => setFrequency(DATA_FREQUENCY.HOUR)}
+                >
+                  H
+                </PriceOption>
+                <PriceOption
+                  active={frequency === DATA_FREQUENCY.LINE}
+                  onClick={() => setFrequency(DATA_FREQUENCY.LINE)}
+                >
+                  <Activity size={14} />
+                </PriceOption>
+              </AutoRow>
+            )}
+          </AutoColumn>
+          <AutoRow justify="flex-end" gap="6px" align="flex-start">
             <OptionButton
               active={timeWindow === timeframeOptions.WEEK}
               onClick={() => setTimeWindow(timeframeOptions.WEEK)}
             >
-              1 Week
+              1W
+            </OptionButton>
+            <OptionButton
+              active={timeWindow === timeframeOptions.MONTH}
+              onClick={() => setTimeWindow(timeframeOptions.MONTH)}
+            >
+              1M
             </OptionButton>
             <OptionButton
               active={timeWindow === timeframeOptions.ALL_TIME}
               onClick={() => setTimeWindow(timeframeOptions.ALL_TIME)}
             >
-              All Time
+              All
             </OptionButton>
           </AutoRow>
         </RowBetween>
       )}
       {chartFilter === CHART_VIEW.LIQUIDITY && chartData && (
-        <ResponsiveContainer aspect={below1080 ? 60 / 32 : below600 ? 60 / 42 : 60 / 16}>
+        <ResponsiveContainer aspect={aspect}>
           <AreaChart margin={{ top: 0, right: 10, bottom: 6, left: 0 }} barCategoryGap={1} data={chartData}>
             <defs>
               <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
@@ -120,11 +234,11 @@ const TokenChart = ({ address, color }) => {
               dataKey="date"
               tick={{ fill: 'black' }}
               type={'number'}
-              domain={domain}
+              domain={['dataMin', 'dataMax']}
             />
             <YAxis
               type="number"
-              orientation="left"
+              orientation="right"
               tickFormatter={tick => '$' + toK(tick)}
               axisLine={false}
               tickLine={false}
@@ -161,68 +275,76 @@ const TokenChart = ({ address, color }) => {
           </AreaChart>
         </ResponsiveContainer>
       )}
-      {chartFilter === CHART_VIEW.PRICE && chartData && (
-        <ResponsiveContainer aspect={below1080 ? 60 / 32 : 60 / 16}>
-          <AreaChart margin={{ top: 0, right: 10, bottom: 6, left: 0 }} barCategoryGap={1} data={chartData}>
-            <defs>
-              <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor={color} stopOpacity={0.35} />
-                <stop offset="95%" stopColor={color} stopOpacity={0} />
-              </linearGradient>
-            </defs>
-            <XAxis
-              tickLine={false}
-              axisLine={false}
-              interval="preserveEnd"
-              tickMargin={16}
-              minTickGap={120}
-              tickFormatter={tick => toNiceDate(tick)}
-              dataKey="date"
-              tick={{ fill: 'black' }}
-              type={'number'}
-              domain={domain}
-            />
-            <YAxis
-              type="number"
-              orientation="left"
-              tickFormatter={tick => '$' + toK(tick)}
-              axisLine={false}
-              tickLine={false}
-              interval="preserveEnd"
-              minTickGap={80}
-              yAxisId={0}
-              tick={{ fill: 'black' }}
-            />
-            <Tooltip
-              cursor={true}
-              formatter={val => formattedNum(val, true)}
-              labelFormatter={label => toNiceDateYear(label)}
-              labelStyle={{ paddingTop: 4 }}
-              contentStyle={{
-                padding: '10px 14px',
-                borderRadius: 10,
-                borderColor: color,
-                color: 'black'
-              }}
-              wrapperStyle={{ top: -70, left: -10 }}
-            />
-            <Area
-              key={'other'}
-              dataKey={'priceUSD'}
-              stackId="2"
-              strokeWidth={2}
-              dot={false}
-              type="monotone"
-              name={'Price'}
-              yAxisId={0}
-              stroke={darken(0.12, color)}
-              fill="url(#colorUv)"
-            />
-          </AreaChart>
-        </ResponsiveContainer>
-      )}
+      {chartFilter === CHART_VIEW.PRICE &&
+        (frequency === DATA_FREQUENCY.LINE ? (
+          <ResponsiveContainer aspect={below1080 ? 60 / 32 : 60 / 16}>
+            <AreaChart margin={{ top: 0, right: 10, bottom: 6, left: 0 }} barCategoryGap={1} data={chartData}>
+              <defs>
+                <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor={color} stopOpacity={0.35} />
+                  <stop offset="95%" stopColor={color} stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <XAxis
+                tickLine={false}
+                axisLine={false}
+                interval="preserveEnd"
+                tickMargin={16}
+                minTickGap={120}
+                tickFormatter={tick => toNiceDate(tick)}
+                dataKey="date"
+                tick={{ fill: 'black' }}
+                type={'number'}
+                domain={domain}
+              />
+              <YAxis
+                type="number"
+                orientation="right"
+                tickFormatter={tick => '$' + toK(tick)}
+                axisLine={false}
+                tickLine={false}
+                interval="preserveEnd"
+                minTickGap={80}
+                yAxisId={0}
+                tick={{ fill: 'black' }}
+              />
+              <Tooltip
+                cursor={true}
+                formatter={val => formattedNum(val, true)}
+                labelFormatter={label => toNiceDateYear(label)}
+                labelStyle={{ paddingTop: 4 }}
+                contentStyle={{
+                  padding: '10px 14px',
+                  borderRadius: 10,
+                  borderColor: color,
+                  color: 'black'
+                }}
+                wrapperStyle={{ top: -70, left: -10 }}
+              />
+              <Area
+                key={'other'}
+                dataKey={'priceUSD'}
+                stackId="2"
+                strokeWidth={2}
+                dot={false}
+                type="monotone"
+                name={'Price'}
+                yAxisId={0}
+                stroke={darken(0.12, color)}
+                fill="url(#colorUv)"
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        ) : priceData ? (
+          <ResponsiveContainer aspect={aspect} ref={ref}>
+            <CandleStickChart data={priceData} width={width} base={base} />
+          </ResponsiveContainer>
+        ) : (
+          <LocalLoader />
+        ))}
+
       {chartFilter === CHART_VIEW.VOLUME && (
-        <ResponsiveContainer aspect={below1080 ? 60 / 32 : 60 / 16}>
+        <ResponsiveContainer aspect={aspect}>
           <BarChart margin={{ top: 0, right: 10, bottom: 6, left: 10 }} barCategoryGap={1} data={chartData}>
             <XAxis
               tickLine={false}
@@ -233,7 +355,7 @@ const TokenChart = ({ address, color }) => {
               tickFormatter={tick => toNiceDate(tick)}
               dataKey="date"
               type={'number'}
-              domain={domain}
+              domain={['dataMin', 'dataMax']}
             />
             <YAxis
               type="number"
@@ -241,6 +363,7 @@ const TokenChart = ({ address, color }) => {
               tickMargin={16}
               tickFormatter={tick => '$' + toK(tick)}
               tickLine={false}
+              orientation="right"
               interval="preserveEnd"
               minTickGap={80}
               yAxisId={0}

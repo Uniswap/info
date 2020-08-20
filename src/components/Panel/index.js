@@ -22,12 +22,13 @@ const Panel = styled(RebassBox)`
   background-color: ${({ theme }) => theme.advancedBG};
   padding: 1.25rem;
   width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  border-radius: 12px;
-  border: 1px solid transparent;
-
+  border-radius: 8px;
+  border: 1px solid ${({ theme }) => theme.bg3};
+  box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.05);  /* box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.01), 0px 4px 8px rgba(0, 0, 0, 0.01), 0px 16px 24px rgba(0, 0, 0, 0.01), 0px 24px 32px rgba(0, 0, 0, 0.01); */
   :hover {
       cursor: ${({ hover }) => hover && 'pointer'};
       border: ${({ hover, theme }) => hover && '1px solid' + theme.bg5};
@@ -53,7 +54,7 @@ const Panel = styled(RebassBox)`
   ${props =>
     props.rounded &&
     css`
-      border-radius: 24px;
+      border-radius: 8px;
       @media only screen and (min-width: 40em) {
         border-radius: 10px;
       }

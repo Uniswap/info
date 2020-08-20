@@ -1,13 +1,13 @@
 import React from 'react'
 import { Button as RebassButton } from 'rebass/styled-components'
 import styled from 'styled-components'
-import { Plus, ChevronDown } from 'react-feather'
+import { Plus, ChevronDown, ChevronUp } from 'react-feather'
 import { darken, transparentize } from 'polished'
 import { RowBetween } from '../Row'
 
 const Base = styled(RebassButton)`
   padding: 8px 12px;
-  font-size: 1rem;
+  font-size: 0.825rem;
   font-weight: 600;
   border-radius: 12px;
   cursor: pointer;
@@ -18,7 +18,7 @@ const Base = styled(RebassButton)`
 
 const BaseCustom = styled(RebassButton)`
   padding: 16px 12px;
-  font-size: 1rem;
+  font-size: 0.825rem;
   font-weight: 400;
   border-radius: 12px;
   cursor: pointer;
@@ -74,12 +74,12 @@ export const ButtonLight = styled(Base)`
   }
 `
 
-export function ButtonDropdown({ disabled = false, children, ...rest }) {
+export function ButtonDropdown({ disabled = false, children, open, ...rest }) {
   return (
     <Base {...rest} disabled={disabled}>
       <RowBetween>
         <div style={{ display: 'flex', alignItems: 'center' }}>{children}</div>
-        <ChevronDown size={24} fill="black" />
+        {open ? <ChevronUp size={24} fill="black" /> : <ChevronDown size={24} fill="black" />}
       </RowBetween>
     </Base>
   )
@@ -127,14 +127,15 @@ export function ButtonCustom({ children, bgColor, color, ...rest }) {
 }
 
 export const OptionButton = styled.div`
-  font-weight: ${({ active }) => (active ? 600 : 400)};
+  font-weight: 500;
   width: fit-content;
   white-space: nowrap;
-  padding: 0 6px;
+  padding: 6px;
   border-radius: 6px;
+  border: 1px solid ${({ theme }) => theme.bg4};
+  background-color: ${({ active }) => active && 'rgba(0, 0, 0, 0.06)'};
 
   :hover {
     cursor: ${({ disabled }) => !disabled && 'pointer'};
-    background-color: ${({ disabled }) => !disabled && 'rgba(0, 0, 0, 0.06)'};
   }
 `

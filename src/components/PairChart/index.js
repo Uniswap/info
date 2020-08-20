@@ -1,66 +1,83 @@
-import React, { useState } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import styled from 'styled-components'
 import { Area, XAxis, YAxis, ResponsiveContainer, Tooltip, AreaChart, BarChart, Bar } from 'recharts'
 import { RowBetween, AutoRow } from '../Row'
 
-import { toK, toNiceDate, toNiceDateYear, formattedNum } from '../../helpers'
+import { toK, toNiceDate, toNiceDateYear, formattedNum, getTimeframe } from '../../utils'
 import { OptionButton } from '../ButtonStyled'
 import { darken } from 'polished'
-import { usePairChartData } from '../../contexts/PairData'
+import { usePairChartData, useHourlyRateData, usePairData } from '../../contexts/PairData'
 import { timeframeOptions } from '../../constants'
-import dayjs from 'dayjs'
 import { useMedia } from 'react-use'
 import { EmptyCard } from '..'
 import DropdownSelect from '../DropdownSelect'
+import CandleStickChart from '../CandleChart'
+import LocalLoader from '../LocalLoader'
 
 const ChartWrapper = styled.div`
   height: 100%;
-  min-height: 448px;
+  max-height: 340px;
 
   @media screen and (max-width: 600px) {
     min-height: 200px;
   }
 `
 
+const OptionsRow = styled.div`
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  margin-bottom: 40px;
+`
+
 const CHART_VIEW = {
   VOLUME: 'Volume',
-  LIQUIDITY: 'Liquidity'
+  LIQUIDITY: 'Liquidity',
+  RATE0: 'Rate 0',
+  RATE1: 'Rate 1'
 }
 
-const PairChart = ({ address, color }) => {
+const PairChart = ({ address, color, base0, base1 }) => {
   const [chartFilter, setChartFilter] = useState(CHART_VIEW.LIQUIDITY)
 
-  const chartData = usePairChartData(address)
+  const [timeWindow, setTimeWindow] = useState(timeframeOptions.MONTH)
 
-  const [timeWindow, setTimeWindow] = useState(timeframeOptions.ALL_TIME)
+  // update the width on a window resize
+  const ref = useRef()
+  const isClient = typeof window === 'object'
+  const [width, setWidth] = useState(ref?.current?.container?.clientWidth)
+  const [height, setHeight] = useState(ref?.current?.container?.clientHeight)
+  useEffect(() => {
+    if (!isClient) {
+      return false
+    }
+    function handleResize() {
+      setWidth(ref?.current?.container?.clientWidth ?? width)
+      setHeight(ref?.current?.container?.clientHeight ?? height)
+    }
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [height, isClient, width]) // Empty array ensures that effect is only run on mount and unmount
 
+  // get data for pair, and rates
+  const pairData = usePairData(address)
+  let chartData = usePairChartData(address)
+  const hourlyData = useHourlyRateData(address, timeWindow)
+  const hourlyRate0 = hourlyData && hourlyData[0]
+  const hourlyRate1 = hourlyData && hourlyData[1]
+
+  // formatted symbols for overflow
+  const formattedSymbol0 =
+    pairData?.token0?.symbol.length > 6 ? pairData?.token0?.symbol.slice(0, 5) + '...' : pairData?.token0?.symbol
+  const formattedSymbol1 =
+    pairData?.token1?.symbol.length > 6 ? pairData?.token1?.symbol.slice(0, 5) + '...' : pairData?.token1?.symbol
+
+  const below1600 = useMedia('(max-width: 1600px)')
   const below1080 = useMedia('(max-width: 1080px)')
   const below600 = useMedia('(max-width: 600px)')
 
-  // find start time based on required time window, update domain
-  const utcEndTime = dayjs.utc()
-  // based on window, get starttime
-  let utcStartTime
-  switch (timeWindow) {
-    case timeframeOptions.WEEK:
-      utcStartTime =
-        utcEndTime
-          .subtract(1, 'week')
-          .startOf('day')
-          .unix() - 1
-      break
-    case timeframeOptions.ALL_TIME:
-      utcStartTime = utcEndTime.subtract(1, 'year').unix() - 1
-      break
-    default:
-      utcStartTime =
-        utcEndTime
-          .subtract(1, 'year')
-          .startOf('year')
-          .unix() - 1
-      break
-  }
-  const domain = [dataMin => (dataMin > utcStartTime ? dataMin : utcStartTime), 'dataMax']
+  let utcStartTime = getTimeframe(timeWindow)
+  chartData = chartData?.filter(entry => entry.date >= utcStartTime)
 
   if (chartData && chartData.length === 0) {
     return (
@@ -70,7 +87,27 @@ const PairChart = ({ address, color }) => {
     )
   }
 
-  const aspect = below1080 ? 60 / 32 : 60 / 45
+  /**
+   * Used to format values on chart on scroll
+   * Needs to be raw html for chart API to parse styles
+   * @param {*} val
+   */
+  function valueFormatter(val) {
+    if (chartFilter === CHART_VIEW.RATE0) {
+      return (
+        formattedNum(val) +
+        `<span style="font-size: 12px; margin-left: 4px;">${formattedSymbol0}/${formattedSymbol1}<span>`
+      )
+    }
+    if (chartFilter === CHART_VIEW.RATE1) {
+      return (
+        formattedNum(val) +
+        `<span style="font-size: 12px; margin-left: 4px;">${formattedSymbol1}/${formattedSymbol0}<span>`
+      )
+    }
+  }
+
+  const aspect = below1080 ? 60 / 20 : below1600 ? 60 / 28 : 60 / 22
 
   return (
     <ChartWrapper>
@@ -80,33 +117,66 @@ const PairChart = ({ address, color }) => {
           <DropdownSelect options={timeframeOptions} active={timeWindow} setActive={setTimeWindow} color={color} />
         </RowBetween>
       ) : (
-        <RowBetween mb={40}>
-          <AutoRow gap="10px">
+        <OptionsRow>
+          <AutoRow gap="6px" style={{ flexWrap: 'nowrap' }}>
             <OptionButton
               active={chartFilter === CHART_VIEW.LIQUIDITY}
-              onClick={() => setChartFilter(CHART_VIEW.LIQUIDITY)}
+              onClick={() => {
+                setTimeWindow(timeframeOptions.ALL_TIME)
+                setChartFilter(CHART_VIEW.LIQUIDITY)
+              }}
             >
               Liquidity
             </OptionButton>
-            <OptionButton active={chartFilter === CHART_VIEW.VOLUME} onClick={() => setChartFilter(CHART_VIEW.VOLUME)}>
+            <OptionButton
+              active={chartFilter === CHART_VIEW.VOLUME}
+              onClick={() => {
+                setTimeWindow(timeframeOptions.ALL_TIME)
+                setChartFilter(CHART_VIEW.VOLUME)
+              }}
+            >
               Volume
             </OptionButton>
+            <OptionButton
+              active={chartFilter === CHART_VIEW.RATE0}
+              onClick={() => {
+                setTimeWindow(timeframeOptions.WEEK)
+                setChartFilter(CHART_VIEW.RATE0)
+              }}
+            >
+              {pairData.token0 ? formattedSymbol0 + '/' + formattedSymbol1 : '-'}
+            </OptionButton>
+            <OptionButton
+              active={chartFilter === CHART_VIEW.RATE1}
+              onClick={() => {
+                setTimeWindow(timeframeOptions.WEEK)
+                setChartFilter(CHART_VIEW.RATE1)
+              }}
+            >
+              {pairData.token0 ? formattedSymbol1 + '/' + formattedSymbol0 : '-'}
+            </OptionButton>
           </AutoRow>
-          <AutoRow justify="flex-end" gap="10px">
+          <AutoRow justify="flex-end" gap="6px">
             <OptionButton
               active={timeWindow === timeframeOptions.WEEK}
               onClick={() => setTimeWindow(timeframeOptions.WEEK)}
             >
-              1 Week
+              1W
+            </OptionButton>
+            <OptionButton
+              active={timeWindow === timeframeOptions.MONTH}
+              onClick={() => setTimeWindow(timeframeOptions.MONTH)}
+            >
+              1M
             </OptionButton>
             <OptionButton
               active={timeWindow === timeframeOptions.ALL_TIME}
               onClick={() => setTimeWindow(timeframeOptions.ALL_TIME)}
             >
-              All Time
+              All
             </OptionButton>
           </AutoRow>
-        </RowBetween>
+        </OptionsRow>
       )}
       {chartFilter === CHART_VIEW.LIQUIDITY && (
         <ResponsiveContainer aspect={aspect}>
@@ -127,11 +197,11 @@ const PairChart = ({ address, color }) => {
               dataKey="date"
               tick={{ fill: 'black' }}
               type={'number'}
-              domain={domain}
+              domain={['dataMin', 'dataMax']}
             />
             <YAxis
               type="number"
-              orientation="left"
+              orientation="right"
               tickFormatter={tick => '$' + toK(tick)}
               axisLine={false}
               tickLine={false}
@@ -166,6 +236,37 @@ const PairChart = ({ address, color }) => {
           </AreaChart>
         </ResponsiveContainer>
       )}
+
+      {chartFilter === CHART_VIEW.RATE1 &&
+        (hourlyRate1 ? (
+          <ResponsiveContainer aspect={aspect} ref={ref}>
+            <CandleStickChart
+              data={hourlyRate1}
+              base={base0}
+              margin={false}
+              width={width}
+              valueFormatter={valueFormatter}
+            />
+          </ResponsiveContainer>
+        ) : (
+          <LocalLoader />
+        ))}
+
+      {chartFilter === CHART_VIEW.RATE0 &&
+        (hourlyRate0 ? (
+          <ResponsiveContainer aspect={aspect} ref={ref}>
+            <CandleStickChart
+              data={hourlyRate0}
+              base={base1}
+              margin={false}
+              width={width}
+              valueFormatter={valueFormatter}
+            />
+          </ResponsiveContainer>
+        ) : (
+          <LocalLoader />
+        ))}
+
       {chartFilter === CHART_VIEW.VOLUME && (
         <ResponsiveContainer aspect={aspect}>
           <BarChart
@@ -183,7 +284,7 @@ const PairChart = ({ address, color }) => {
               dataKey="date"
               tick={{ fill: 'black' }}
               type={'number'}
-              domain={domain}
+              domain={['dataMin', 'dataMax']}
             />
             <YAxis
               type="number"
@@ -192,6 +293,7 @@ const PairChart = ({ address, color }) => {
               tickFormatter={tick => '$' + toK(tick)}
               tickLine={false}
               interval="preserveEnd"
+              orientation="right"
               minTickGap={80}
               yAxisId={0}
               tick={{ fill: 'black' }}

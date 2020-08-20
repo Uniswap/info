@@ -4,7 +4,7 @@ export const BUNDLE_ID = '1'
 
 export const timeframeOptions = {
   WEEK: '1 week',
-  // MONTH: '1 month',
+  MONTH: '1 month',
   // THREE_MONTHS: '3 months',
   // YEAR: '1 year',
   ALL_TIME: 'All time'
@@ -14,11 +14,17 @@ export const timeframeOptions = {
 export const OVERVIEW_TOKEN_BLACKLIST = [
   '0x495c7f3a713870f68f8b418b355c085dfdc412c3',
   '0xc3761eb917cd790b30dad99f6cc5b4ff93c4f9ea',
-  '0xe31debd7abff90b06bca21010dd860d8701fd901'
-  // '0x1b76d0364e803fb94c1d5ca9faf55f05ee494731'
+  '0xe31debd7abff90b06bca21010dd860d8701fd901',
+  '0xfc989fbb6b3024de5ca0144dc23c18a063942ac1'
 ]
 
-export const OVERVIEW_PAIR_BLACKLIST = []
+// pair blacklist
+export const PAIR_BLACKLIST = ['0xb6a741f37d6e455ebcc9f17e2c16d0586c3f57a5']
+
+/**
+ * For tokens that cause erros on fee calculations
+ */
+export const FEE_WARNING_TOKENS = ['0xd46ba6d942050d489dbd938a2c909a5d5039a161']
 
 export const SURPRESS_WARNINGS = [
   '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',

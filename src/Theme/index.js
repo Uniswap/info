@@ -65,7 +65,7 @@ const theme = (darkMode, color) => ({
   yellow2: '#F3841E',
   link: '#2172E5',
 
-  background: darkMode ? 'black' : `radial-gradient(50% 50% at 50% 50%, #ff007a30 0%, #F7F8FA 100%)`
+  background: darkMode ? 'black' : `radial-gradient(50% 50% at 50% 50%, #ff007a30 0%, #fff 0%)`
 })
 
 const TextWrapper = styled(Text)`
@@ -74,11 +74,19 @@ const TextWrapper = styled(Text)`
 
 export const TYPE = {
   main(props) {
-    return <TextWrapper fontWeight={500} color={'text1'} {...props} />
+    return <TextWrapper fontWeight={500} fontSize={14} color={'text1'} {...props} />
+  },
+
+  small(props) {
+    return <TextWrapper fontWeight={500} fontSize={11} color={'text1'} {...props} />
   },
 
   header(props) {
     return <TextWrapper fontWeight={600} color={'text1'} {...props} />
+  },
+
+  largeHeader(props) {
+    return <TextWrapper fontWeight={500} color={'text1'} fontSize={24} {...props} />
   },
 
   light(props) {
@@ -121,17 +129,17 @@ export const ThemedBackground = styled.div`
   top: 0;
   left: 0;
   right: 0;
-
+  pointer-events: none;
   max-width: 100vw !important;
-  width: 100vw !important;
   height: 200vh;
+  mix-blend-mode: color;
   background: ${({ backgroundColor }) =>
     `radial-gradient(50% 50% at 50% 50%, ${backgroundColor} 0%, rgba(255, 255, 255, 0) 100%)`};
   position: absolute;
   top: 0px;
   left: 0px;
-  z-index: -1;
-
+  /* z-index: 30; */
+  z-index: 30;
   transform: translateY(-110vh);
 `
 
@@ -148,7 +156,6 @@ export const GlobalStyle = createGlobalStyle`
     padding: 0;
     width: 100%;
     height: 100%;
-    overflow: auto;
     font-size: 14px;    
   }
 
@@ -160,15 +167,44 @@ export const GlobalStyle = createGlobalStyle`
     }
   }
 
+  
+.three-line-legend {
+	width: 100%;
+	height: 70px;
+	position: absolute;
+	padding: 8px;
+	font-size: 12px;
+	color: #20262E;
+	background-color: rgba(255, 255, 255, 0.23);
+	text-align: left;
+	z-index: 10;
+  pointer-events: none;
+}
+
+@media screen and (max-width: 800px) {
+  .three-line-legend {
+    display: none !important;
+  }
+}
+
+.tv-lightweight-charts{
+  width: 100% !important;
+  
+
+  & > * {
+    width: 100% !important;
+  }
+}
+
+
   html {
     font-size: 1rem;
     font-variant: none;
     color: 'black';
-    background-color: ${({ theme }) => theme.backgroundColor};
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-    overflow: auto;
+    /* overflow: auto; */
     height: 100%;
   }
 `

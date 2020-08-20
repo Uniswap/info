@@ -8,23 +8,66 @@ import { GET_BLOCK, GET_BLOCKS, SHARE_VALUE } from '../apollo/queries'
 import { Text } from 'rebass'
 import _Decimal from 'decimal.js-light'
 import toFormat from 'toformat'
-import numeral from 'numeral'
+import { timeframeOptions } from '../constants'
+import Numeral from 'numeral'
 
+// format libraries
 const Decimal = toFormat(_Decimal)
-
 BigNumber.set({ EXPONENTIAL_AT: 50 })
-
 dayjs.extend(utc)
 
-export function getPoolLink(token0Address, token1Address = null) {
+export function getTimeframe(timeWindow) {
+  const utcEndTime = dayjs.utc()
+  // based on window, get starttime
+  let utcStartTime
+  switch (timeWindow) {
+    case timeframeOptions.WEEK:
+      utcStartTime =
+        utcEndTime
+          .subtract(1, 'week')
+          .endOf('day')
+          .unix() - 1
+      break
+    case timeframeOptions.MONTH:
+      utcStartTime =
+        utcEndTime
+          .subtract(1, 'month')
+          .endOf('day')
+          .unix() - 1
+      break
+    case timeframeOptions.ALL_TIME:
+      utcStartTime =
+        utcEndTime
+          .subtract(1, 'year')
+          .endOf('day')
+          .unix() - 1
+      break
+    default:
+      utcStartTime =
+        utcEndTime
+          .subtract(1, 'year')
+          .startOf('year')
+          .unix() - 1
+      break
+  }
+  return utcStartTime
+}
+
+export function getPoolLink(token0Address, token1Address = null, remove = false) {
   if (!token1Address) {
-    return `https://uniswap.exchange/add/${token0Address}-${
-      token0Address === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
-        ? 'ETH'
-        : '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
-    }`
+    return (
+      `https://uniswap.exchange/` +
+      (remove ? `remove` : `add`) +
+      `/${token0Address === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' ? 'ETH' : token0Address}/${'ETH'}`
+    )
   } else {
-    return `https://uniswap.exchange/add/${token0Address}-${token1Address}`
+    return (
+      `https://uniswap.exchange/` +
+      (remove ? `remove` : `add`) +
+      `/${token0Address === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' ? 'ETH' : token0Address}/${
+        token1Address === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' ? 'ETH' : token1Address
+      }`
+    )
   }
 }
 
@@ -32,12 +75,14 @@ export function getSwapLink(token0Address, token1Address = null) {
   if (!token1Address) {
     return `https://uniswap.exchange/swap?inputCurrency=${token0Address}`
   } else {
-    return `https://uniswap.exchange/swap?inputCurrency=${token0Address}&outputCurrency=${token1Address}`
+    return `https://uniswap.exchange/swap?inputCurrency=${
+      token0Address === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' ? 'ETH' : token0Address
+    }&outputCurrency=${token1Address === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' ? 'ETH' : token1Address}`
   }
 }
 
-export function fixedNum(val) {
-  return numeral(val).format('0,0')
+export function localNumber(val) {
+  return Numeral(val).format('0,0')
 }
 
 export const toNiceDate = date => {
@@ -53,6 +98,52 @@ export const toWeeklyDate = date => {
   var wkStart = new Date(new Date(date).setDate(date.getDate() - lessDays))
   var wkEnd = new Date(new Date(wkStart).setDate(wkStart.getDate() + 6))
   return dayjs.utc(wkStart).format('MMM DD') + ' - ' + dayjs.utc(wkEnd).format('MMM DD')
+}
+
+export function getTimestampsForChanges() {
+  const utcCurrentTime = dayjs()
+  const t1 = utcCurrentTime
+    .subtract(1, 'day')
+    .startOf('minute')
+    .unix()
+  const t2 = utcCurrentTime
+    .subtract(2, 'day')
+    .startOf('minute')
+    .unix()
+  const tWeek = utcCurrentTime
+    .subtract(1, 'week')
+    .startOf('minute')
+    .unix()
+  return [t1, t2, tWeek]
+}
+
+export async function splitQuery(query, localClient, vars, list, skipCount = 100) {
+  let fetchedData = {}
+  let allFound = false
+  let skip = 0
+
+  while (!allFound) {
+    let end = list.length
+    if (skip + skipCount < list.length) {
+      end = skip + skipCount
+    }
+    let sliced = list.slice(skip, end)
+    let result = await localClient.query({
+      query: query(...vars, sliced),
+      fetchPolicy: 'cache-first'
+    })
+    fetchedData = {
+      ...fetchedData,
+      ...result.data
+    }
+    if (Object.keys(result.data).length < skipCount || skip + skipCount > list.length) {
+      allFound = true
+    } else {
+      skip += skipCount
+    }
+  }
+
+  return fetchedData
 }
 
 /**
@@ -80,20 +171,44 @@ export async function getBlockFromTimestamp(timestamp) {
  * @param {Array} timestamps
  */
 export async function getBlocksFromTimestamps(timestamps) {
-  let result = await blockClient.query({
-    query: GET_BLOCKS(timestamps),
-    fetchPolicy: 'cache-first'
-  })
+  if (timestamps?.length === 0) {
+    return []
+  }
+
+  const fetchedData = await splitQuery(GET_BLOCKS, blockClient, [], timestamps, 500)
+
   let blocks = []
-  if (result.data) {
-    for (var t in result.data) {
+  if (fetchedData) {
+    for (var t in fetchedData) {
       blocks.push({
         timestamp: t.split('t')[1],
-        number: result.data[t][0]['number']
+        number: fetchedData[t][0]['number']
       })
     }
   }
   return blocks
+}
+
+export async function getLiquidityTokenBalanceOvertime(account, timestamps) {
+  // get blocks based on timestamps
+  const blocks = await getBlocksFromTimestamps(timestamps)
+
+  // get historical share values with time travel queries
+  let result = await client.query({
+    query: SHARE_VALUE(account, blocks),
+    fetchPolicy: 'cache-first'
+  })
+
+  let values = []
+  for (var row in result?.data) {
+    let timestamp = row.split('t')[1]
+    if (timestamp) {
+      values.push({
+        timestamp,
+        balance: 0
+      })
+    }
+  }
 }
 
 /**
@@ -109,7 +224,10 @@ export async function getShareValueOverTime(pairAddress, timestamps) {
     timestamps = getTimestampRange(utcSevenDaysBack, 86400, 7)
   }
 
+  // get blocks based on timestamps
   const blocks = await getBlocksFromTimestamps(timestamps)
+
+  // get historical share values with time travel queries
   let result = await client.query({
     query: SHARE_VALUE(pairAddress, blocks),
     fetchPolicy: 'cache-first'
@@ -118,7 +236,7 @@ export async function getShareValueOverTime(pairAddress, timestamps) {
   let values = []
   for (var row in result?.data) {
     let timestamp = row.split('t')[1]
-    let sharePriceUsd = parseFloat(result.data[row].reserveUSD) / parseFloat(result.data[row].totalSupply)
+    let sharePriceUsd = parseFloat(result.data[row]?.reserveUSD) / parseFloat(result.data[row]?.totalSupply)
     if (timestamp) {
       values.push({
         timestamp,
@@ -129,7 +247,10 @@ export async function getShareValueOverTime(pairAddress, timestamps) {
         reserveUSD: result.data[row].reserveUSD,
         token0DerivedETH: result.data[row].token0.derivedETH,
         token1DerivedETH: result.data[row].token1.derivedETH,
-        roiUsd: values && values[0] ? sharePriceUsd / values[0]['sharePriceUsd'] : 1
+        roiUsd: values && values[0] ? sharePriceUsd / values[0]['sharePriceUsd'] : 1,
+        ethPrice: 0,
+        token0PriceUSD: 0,
+        token1PriceUSD: 0
       })
     }
   }
@@ -140,6 +261,8 @@ export async function getShareValueOverTime(pairAddress, timestamps) {
     let timestamp = brow.split('b')[1]
     if (timestamp) {
       values[index].ethPrice = result.data[brow].ethPrice
+      values[index].token0PriceUSD = result.data[brow].ethPrice * values[index].token0DerivedETH
+      values[index].token1PriceUSD = result.data[brow].ethPrice * values[index].token1DerivedETH
       index += 1
     }
   }
@@ -173,21 +296,7 @@ export const isAddress = value => {
 }
 
 export const toK = (num, fixed, cutoff = false) => {
-  const formatter = divideBy =>
-    fixed === true
-      ? cutoff
-        ? Number(num / divideBy).toFixed(0)
-        : Number(num / divideBy).toFixed(2)
-      : Number(num / divideBy)
-  if (num > 999999999 || num < -9999999) {
-    return `${formatter(1000000000)}B`
-  } else if (num > 999999 || num < -999999) {
-    return `${formatter(1000000)}M`
-  } else if (num > 999 || num < -999) {
-    return `${formatter(1000)}K`
-  } else {
-    return formatter(1)
-  }
+  return Numeral(num).format('0.00a')
 }
 
 export const setThemeColor = theme => document.documentElement.style.setProperty('--c-token', theme || '#333333')
@@ -254,12 +363,7 @@ export const formattedNum = (number, usd = false, acceptNegatives = false) => {
     }
     return 0
   }
-  if (num < 0.0001) {
-    if (acceptNegatives) {
-      return usd
-        ? '$' + Number(parseFloat(num).toFixed(4)).toLocaleString()
-        : '' + Number(parseFloat(num).toFixed(4)).toLocaleString()
-    }
+  if (num < 0.0001 && num > 0) {
     return usd ? '< $0.0001' : '< 0.0001'
   }
 
@@ -329,10 +433,16 @@ export function formattedPercent(percent, useBrackets = false) {
   }
 }
 
+/**
+ * gets the amoutn difference plus the % change in change itself (second order change)
+ * @param {*} valueNow
+ * @param {*} value24HoursAgo
+ * @param {*} value48HoursAgo
+ */
 export const get2DayPercentChange = (valueNow, value24HoursAgo, value48HoursAgo) => {
   // get volume info for both 24 hour periods
-  let currentChange = valueNow - value24HoursAgo
-  let previousChange = value24HoursAgo - value48HoursAgo
+  let currentChange = parseFloat(valueNow) - parseFloat(value24HoursAgo)
+  let previousChange = parseFloat(value24HoursAgo) - parseFloat(value48HoursAgo)
 
   const adjustedPercentChange = (parseFloat(currentChange - previousChange) / parseFloat(previousChange)) * 100
 
@@ -342,6 +452,11 @@ export const get2DayPercentChange = (valueNow, value24HoursAgo, value48HoursAgo)
   return [currentChange, adjustedPercentChange]
 }
 
+/**
+ * get standard percent change between two values
+ * @param {*} valueNow
+ * @param {*} value24HoursAgo
+ */
 export const getPercentChange = (valueNow, value24HoursAgo) => {
   const adjustedPercentChange =
     ((parseFloat(valueNow) - parseFloat(value24HoursAgo)) / parseFloat(value24HoursAgo)) * 100

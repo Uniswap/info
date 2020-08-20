@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 
-import { formatTime, formattedNum, urls } from '../../helpers'
+import { formatTime, formattedNum, urls } from '../../utils'
 import { useMedia } from 'react-use'
 import { useCurrentCurrency } from '../../contexts/Application'
 import { RowFixed, RowBetween } from '../Row'
@@ -13,6 +13,7 @@ import { Box, Flex, Text } from 'rebass'
 import Link from '../Link'
 import { Divider, EmptyCard } from '..'
 import DropdownSelect from '../DropdownSelect'
+import FormattedName from '../FormattedName'
 
 dayjs.extend(utc)
 
@@ -141,13 +142,15 @@ const TXN_TYPE = {
 const ITEMS_PER_PAGE = 10
 
 function getTransactionType(event, symbol0, symbol1) {
+  const formattedS0 = symbol0?.length > 8 ? symbol0.slice(0, 7) + '...' : symbol0
+  const formattedS1 = symbol1?.length > 8 ? symbol1.slice(0, 7) + '...' : symbol1
   switch (event) {
     case TXN_TYPE.ADD:
-      return 'Add ' + symbol0 + ' and ' + symbol1
+      return 'Add ' + formattedS0 + ' and ' + formattedS1
     case TXN_TYPE.REMOVE:
-      return 'Remove ' + symbol0 + ' and ' + symbol1
+      return 'Remove ' + formattedS0 + ' and ' + formattedS1
     case TXN_TYPE.SWAP:
-      return 'Swap ' + symbol0 + ' for ' + symbol1
+      return 'Swap ' + formattedS0 + ' for ' + formattedS1
     default:
       return ''
   }
@@ -281,7 +284,7 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
     }
 
     return (
-      <DashGrid style={{ height: '60px' }}>
+      <DashGrid style={{ height: '48px' }}>
         <DataText area="txn" fontWeight="500">
           <Link color={color} external href={urls.showTransaction(item.hash)}>
             {getTransactionType(item.type, item.token1Symbol, item.token0Symbol)}
@@ -292,8 +295,12 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
         </DataText>
         {!below780 && (
           <>
-            <DataText area="amountOther">{formattedNum(item.token1Amount) + ' ' + item.token1Symbol}</DataText>
-            <DataText area="amountToken">{formattedNum(item.token0Amount) + ' ' + item.token0Symbol}</DataText>
+            <DataText area="amountOther">
+              {formattedNum(item.token1Amount) + ' '} <FormattedName text={item.token1Symbol} maxCharacters={5} />
+            </DataText>
+            <DataText area="amountToken">
+              {formattedNum(item.token0Amount) + ' '} <FormattedName text={item.token0Symbol} maxCharacters={5} />
+            </DataText>
           </>
         )}
         {!below1080 && (

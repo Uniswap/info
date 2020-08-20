@@ -14,42 +14,25 @@ import Column, { AutoColumn } from '../components/Column'
 import { ButtonLight, ButtonDark } from '../components/ButtonStyled'
 import TxnList from '../components/TxnList'
 import TokenChart from '../components/TokenChart'
+import { BasicLink } from '../components/Link'
+// import Search from '../components/Search'
 
-import { formattedNum, formattedPercent, getPoolLink, getSwapLink } from '../helpers'
+import { formattedNum, formattedPercent, getPoolLink, getSwapLink, localNumber } from '../utils'
 
 import { useTokenData, useTokenTransactions, useTokenPairs } from '../contexts/TokenData'
 import { TYPE, ThemedBackground } from '../Theme'
+import { transparentize } from 'polished'
 import { useColor } from '../hooks'
 import CopyHelper from '../components/Copy'
 import { useMedia } from 'react-use'
-import { transparentize } from 'polished'
 import { useDataForList } from '../contexts/PairData'
 import { useEffect } from 'react'
 import Warning from '../components/Warning'
 import { SURPRESS_WARNINGS } from '../constants'
-import { usePathDismissed } from '../contexts/LocalStorage'
-
-const PageWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding-bottom: 100px;
-  width: calc(100% - 80px);
-  padding: 0 40px;
-
-  padding-bottom: 80px;
-
-  @media screen and (max-width: 640px) {
-    width: calc(100% - 40px);
-    padding: 0 20px;
-  }
-
-  & > * {
-    width: 90%;
-    max-width: 1240px;
-  }
-`
+import { usePathDismissed, useSavedTokens } from '../contexts/LocalStorage'
+import { Hover, PageWrapper, ContentWrapper } from '../components'
+import { PlusCircle, Bookmark } from 'react-feather'
+import FormattedName from '../components/FormattedName'
 
 const DashboardWrapper = styled.div`
   width: 100%;
@@ -115,8 +98,10 @@ function TokenPage({ address, history }) {
     symbol,
     priceUSD,
     oneDayVolumeUSD,
+    oneDayVolumeUT,
     totalLiquidityUSD,
     volumeChangeUSD,
+    volumeChangeUT,
     priceChangeUSD,
     liquidityChangeUSD,
     oneDayTxns,
@@ -143,223 +128,263 @@ function TokenPage({ address, history }) {
   const priceChange = priceChangeUSD ? formattedPercent(priceChangeUSD) : ''
 
   // volume
-  const volume = oneDayVolumeUSD ? formattedNum(oneDayVolumeUSD, true) : oneDayVolumeUSD === 0 ? '$0' : ''
-  const volumeChange = formattedPercent(volumeChangeUSD)
+  const volume =
+    oneDayVolumeUSD || oneDayVolumeUSD === 0
+      ? formattedNum(oneDayVolumeUSD === 0 ? oneDayVolumeUT : oneDayVolumeUSD, true)
+      : oneDayVolumeUSD === 0
+      ? '$0'
+      : '-'
+
+  // mark if using untracked volume
+  const [usingUtVolume, setUsingUtVolume] = useState(false)
+  useEffect(() => {
+    setUsingUtVolume(oneDayVolumeUSD === 0 ? true : false)
+  }, [oneDayVolumeUSD])
+
+  const volumeChange = formattedPercent(!usingUtVolume ? volumeChangeUSD : volumeChangeUT)
 
   // liquidity
-  const liquidity = totalLiquidityUSD ? formattedNum(totalLiquidityUSD, true) : totalLiquidityUSD === 0 ? '$0' : ''
+  const liquidity = totalLiquidityUSD ? formattedNum(totalLiquidityUSD, true) : totalLiquidityUSD === 0 ? '$0' : '-'
   const liquidityChange = formattedPercent(liquidityChangeUSD)
 
   // transactions
   const txnChangeFormatted = formattedPercent(txnChange)
 
   const below1080 = useMedia('(max-width: 1080px)')
-  const below600 = useMedia('(max-width: 600px)')
+  const below800 = useMedia('(max-width: 800px)')
+  const below500 = useMedia('(max-width: 500px)')
+
+  // format for long symbol
+  const LENGTH = below1080 ? 10 : 16
+  const formattedSymbol = symbol?.length > LENGTH ? symbol.slice(0, LENGTH) + '...' : symbol
 
   const [dismissed, markAsDismissed] = usePathDismissed(history.location.pathname)
+  const [savedTokens, addToken] = useSavedTokens()
 
-  const [manualLiquidity, setManualLiquidity] = useState(0)
   useEffect(() => {
-    let calculated = 0
-    for (let pairAddress in fetchedPairsList) {
-      const pair = fetchedPairsList[pairAddress]
-      calculated = calculated + parseFloat(pair.reserveUSD ?? 0)
-    }
-    setManualLiquidity(calculated / 2)
-  }, [fetchedPairsList])
-
-  const useManualLiquidity = parseFloat(totalLiquidityUSD / manualLiquidity) < 0.5
+    window.scrollTo({
+      behavior: 'smooth',
+      top: 0
+    })
+  }, [])
 
   return (
     <PageWrapper>
       <ThemedBackground backgroundColor={transparentize(0.6, backgroundColor)} />
+
       <Warning
         type={'token'}
         show={!dismissed && !SURPRESS_WARNINGS.includes(address)}
         setShow={markAsDismissed}
         address={address}
       />
-      <WarningGrouping disabled={!dismissed && !SURPRESS_WARNINGS.includes(address)}>
-        <RowBetween mt={20} style={{ flexWrap: 'wrap' }}>
-          <RowFixed style={{ flexWrap: 'wrap' }}>
-            <RowFixed mb={20} style={{ alignItems: 'baseline' }}>
-              <TokenLogo address={address} size="32px" style={{ alignSelf: 'center' }} />
-              <Text fontSize={'2rem'} fontWeight={600} style={{ margin: '0 1rem' }}>
-                {name ? name + ' ' : ''} {symbol ? '(' + symbol + ')' : ''}
-              </Text>{' '}
-              {!below1080 && (
-                <>
-                  <Text fontSize={'2rem'} fontWeight={500} style={{ marginRight: '1rem' }}>
-                    {price}
-                  </Text>
-                  {priceChange}
-                </>
-              )}
-            </RowFixed>
-          </RowFixed>
-          <span>
-            <RowFixed
-              mb={20}
-              ml={below600 ? '0' : '2.5rem'}
-              style={{ flexDirection: below1080 ? 'row-reverse' : 'initial' }}
+      <ContentWrapper>
+        <RowBetween style={{ flexWrap: 'wrap', alingItems: 'start' }}>
+          <AutoRow align="flex-end" style={{ width: 'fit-content' }}>
+            <Text>
+              <BasicLink to="/tokens">{'Tokens '}</BasicLink>→ {symbol}{' '}
+            </Text>
+            <Link
+              style={{ width: 'fit-content' }}
+              color={backgroundColor}
+              external
+              href={'https://etherscan.io/address/' + address}
             >
-              <Link href={getPoolLink(address)} target="_blank">
-                <ButtonLight color={backgroundColor}>+ Add Liquidity</ButtonLight>
-              </Link>
-              <Link href={getSwapLink(address)} target="_blank">
-                <ButtonDark ml={'.5rem'} mr={below1080 && '.5rem'} color={backgroundColor}>
-                  Trade
-                </ButtonDark>
-              </Link>
-            </RowFixed>
-          </span>
+              <Text style={{ marginLeft: '.15rem' }} fontSize={'14px'} fontWeight={400}>
+                ({address.slice(0, 8) + '...' + address.slice(36, 42)})
+              </Text>
+            </Link>
+          </AutoRow>
         </RowBetween>
-        <DashboardWrapper>
-          <>
-            {!below1080 && (
-              <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '2rem' }}>
-                Token Stats
-              </TYPE.main>
-            )}
 
-            <PanelWrapper style={{ marginTop: '1.5rem' }}>
-              {below1080 && price && (
+        <WarningGrouping disabled={!dismissed && !SURPRESS_WARNINGS.includes(address)}>
+          <DashboardWrapper style={{ marginTop: below1080 ? '0' : '1rem' }}>
+            <RowBetween style={{ flexWrap: 'wrap', marginBottom: '2rem', alignItems: 'flex-start' }}>
+              <RowFixed style={{ flexWrap: 'wrap' }}>
+                <RowFixed style={{ alignItems: 'baseline' }}>
+                  <TokenLogo address={address} size="32px" style={{ alignSelf: 'center' }} />
+                  <Text fontSize={below1080 ? '1.5rem' : '2rem'} fontWeight={500} style={{ margin: '0 1rem' }}>
+                    <RowFixed gap="6px">
+                      <FormattedName text={name ? name + ' ' : ''} maxCharacters={16} style={{ marginRight: '6px' }} />{' '}
+                      {formattedSymbol ? `(${formattedSymbol})` : ''}
+                    </RowFixed>
+                  </Text>{' '}
+                  {!below1080 && (
+                    <>
+                      <Text fontSize={'1.5rem'} fontWeight={500} style={{ marginRight: '1rem' }}>
+                        {price}
+                      </Text>
+                      {priceChange}
+                    </>
+                  )}
+                </RowFixed>
+              </RowFixed>
+              <span>
+                <RowFixed ml={below500 ? '0' : '2.5rem'} mt={below500 ? '1rem' : '0'}>
+                  {!!!savedTokens[address] && !below800 ? (
+                    <Hover onClick={() => addToken(address, symbol)}>
+                      <PlusCircle style={{ marginRight: '0.5rem' }} />
+                    </Hover>
+                  ) : !below1080 ? (
+                    <Bookmark style={{ marginRight: '0.5rem', opacity: 0.4 }} />
+                  ) : (
+                    <></>
+                  )}
+                  <Link href={getPoolLink(address)} target="_blank">
+                    <ButtonLight color={backgroundColor}>+ Add Liquidity</ButtonLight>
+                  </Link>
+                  <Link href={getSwapLink(address)} target="_blank">
+                    <ButtonDark ml={'.5rem'} mr={below1080 && '.5rem'} color={backgroundColor}>
+                      Trade
+                    </ButtonDark>
+                  </Link>
+                </RowFixed>
+              </span>
+            </RowBetween>
+
+            <>
+              <PanelWrapper style={{ marginTop: below1080 ? '0' : '1rem' }}>
+                {below1080 && price && (
+                  <Panel>
+                    <AutoColumn gap="20px">
+                      <RowBetween>
+                        <TYPE.main>Price</TYPE.main>
+                        <div />
+                      </RowBetween>
+                      <RowBetween align="flex-end">
+                        {' '}
+                        <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={500}>
+                          {price}
+                        </TYPE.main>
+                        <TYPE.main>{priceChange}</TYPE.main>
+                      </RowBetween>
+                    </AutoColumn>
+                  </Panel>
+                )}
                 <Panel>
                   <AutoColumn gap="20px">
                     <RowBetween>
-                      <TYPE.main>Price</TYPE.main>
+                      <TYPE.main>Total Liquidity</TYPE.main>
                       <div />
                     </RowBetween>
                     <RowBetween align="flex-end">
-                      {' '}
-                      <TYPE.main fontSize={'2rem'} lineHeight={1} fontWeight={600}>
-                        {price}
+                      <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={500}>
+                        {liquidity}
                       </TYPE.main>
-                      <TYPE.main>{priceChange}</TYPE.main>
+                      <TYPE.main>{liquidityChange}</TYPE.main>
                     </RowBetween>
                   </AutoColumn>
                 </Panel>
-              )}
-              <Panel>
-                <AutoColumn gap="20px">
-                  <RowBetween>
-                    <TYPE.main>Total Liquidity</TYPE.main>
-                    <div />
-                  </RowBetween>
-                  <RowBetween align="flex-end">
-                    <TYPE.main fontSize={'2rem'} lineHeight={1} fontWeight={600}>
-                      {useManualLiquidity ? formattedNum(manualLiquidity, true) : liquidity}
-                    </TYPE.main>
-                    <TYPE.main>{liquidityChange}</TYPE.main>
-                  </RowBetween>
-                </AutoColumn>
-              </Panel>
-              <Panel>
-                <AutoColumn gap="20px">
-                  <RowBetween>
-                    <TYPE.main>Volume (24hrs)</TYPE.main>
-                    <div />
-                  </RowBetween>
-                  <RowBetween align="flex-end">
-                    <TYPE.main fontSize={'2rem'} lineHeight={1} fontWeight={600}>
-                      {volume}
-                    </TYPE.main>
-                    <TYPE.main>{volumeChange}</TYPE.main>
-                  </RowBetween>
-                </AutoColumn>
-              </Panel>
+                <Panel>
+                  <AutoColumn gap="20px">
+                    <RowBetween>
+                      <TYPE.main>Volume (24hrs) {usingUtVolume && '(Untracked)'}</TYPE.main>
+                      <div />
+                    </RowBetween>
+                    <RowBetween align="flex-end">
+                      <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={500}>
+                        {volume}
+                      </TYPE.main>
+                      <TYPE.main>{volumeChange}</TYPE.main>
+                    </RowBetween>
+                  </AutoColumn>
+                </Panel>
 
-              <Panel>
-                <AutoColumn gap="20px">
-                  <RowBetween>
-                    <TYPE.main>Transactions (24hrs)</TYPE.main>
-                    <div />
-                  </RowBetween>
-                  <RowBetween align="flex-end">
-                    <TYPE.main fontSize={'2rem'} lineHeight={1} fontWeight={600}>
-                      {oneDayTxns}
-                    </TYPE.main>
-                    <TYPE.main>{txnChangeFormatted}</TYPE.main>
-                  </RowBetween>
-                </AutoColumn>
-              </Panel>
-              <Panel style={{ gridColumn: below1080 ? '1' : '2/4', gridRow: below1080 ? '' : '1/4' }}>
-                <TokenChart address={address} color={backgroundColor} />
-              </Panel>
-            </PanelWrapper>
-          </>
-          <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
-            Top Pairs
-          </TYPE.main>{' '}
-          <Panel
-            rounded
-            style={{
-              border: '1px solid rgba(43, 43, 43, 0.05)',
-              marginTop: '1.5rem'
-            }}
-            p={20}
-          >
-            {address && fetchedPairsList ? (
-              <PairList color={backgroundColor} address={address} pairs={fetchedPairsList} />
-            ) : (
-              <Loader />
-            )}
-          </Panel>
-          <RowBetween mt={40} mb={'1rem'}>
-            <TYPE.main fontSize={'1.125rem'}>Transactions</TYPE.main> <div />
-          </RowBetween>
-          <Panel
-            rounded
-            style={{
-              border: '1px solid rgba(43, 43, 43, 0.05)'
-            }}
-          >
-            {transactions ? <TxnList color={backgroundColor} transactions={transactions} /> : <Loader />}
-          </Panel>
-          <>
-            <RowBetween style={{ marginTop: '3rem' }}>
-              <TYPE.main fontSize={'1.125rem'}>Token Information</TYPE.main>{' '}
-            </RowBetween>
+                <Panel>
+                  <AutoColumn gap="20px">
+                    <RowBetween>
+                      <TYPE.main>Transactions (24hrs)</TYPE.main>
+                      <div />
+                    </RowBetween>
+                    <RowBetween align="flex-end">
+                      <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={500}>
+                        {oneDayTxns ? localNumber(oneDayTxns) : '-'}
+                      </TYPE.main>
+                      <TYPE.main>{txnChangeFormatted}</TYPE.main>
+                    </RowBetween>
+                  </AutoColumn>
+                </Panel>
+                <Panel style={{ gridColumn: below1080 ? '1' : '2/4', gridRow: below1080 ? '' : '1/4' }}>
+                  <TokenChart address={address} color={backgroundColor} base={priceUSD} />
+                </Panel>
+              </PanelWrapper>
+            </>
+
+            <span>
+              <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
+                Top Pairs
+              </TYPE.main>
+            </span>
             <Panel
               rounded
               style={{
                 border: '1px solid rgba(43, 43, 43, 0.05)',
-                marginTop: '1.5rem'
+                marginTop: '1.5rem',
+                padding: '1.125rem 0 '
               }}
-              p={20}
             >
-              <TokenDetailsLayout>
-                <Column>
-                  <TYPE.main>Symbol</TYPE.main>
-                  <Text style={{ marginTop: '.5rem' }} fontSize={24} fontWeight="500">
-                    {symbol}
-                  </Text>
-                </Column>
-                <Column>
-                  <TYPE.main>Name</TYPE.main>
-                  <Text style={{ marginTop: '.5rem' }} fontSize={24} fontWeight="500">
-                    {name}
-                  </Text>
-                </Column>
-                <Column>
-                  <TYPE.main>Address</TYPE.main>
-                  <AutoRow align="flex-end">
-                    <Text style={{ marginTop: '.5rem' }} fontSize={24} fontWeight="500">
-                      {address.slice(0, 8) + '...' + address.slice(36, 42)}
-                    </Text>
-                    <CopyHelper toCopy={address} />
-                  </AutoRow>
-                </Column>
-                <ButtonLight color={backgroundColor}>
-                  <Link color={backgroundColor} external href={'https://etherscan.io/address/' + address}>
-                    View on Etherscan ↗
-                  </Link>
-                </ButtonLight>
-              </TokenDetailsLayout>
+              {address && fetchedPairsList ? (
+                <PairList color={backgroundColor} address={address} pairs={fetchedPairsList} />
+              ) : (
+                <Loader />
+              )}
             </Panel>
-          </>
-        </DashboardWrapper>
-      </WarningGrouping>
+            <RowBetween mt={40} mb={'1rem'}>
+              <TYPE.main fontSize={'1.125rem'}>Transactions</TYPE.main> <div />
+            </RowBetween>
+            <Panel
+              rounded
+              style={{
+                border: '1px solid rgba(43, 43, 43, 0.05)'
+              }}
+            >
+              {transactions ? <TxnList color={backgroundColor} transactions={transactions} /> : <Loader />}
+            </Panel>
+            <>
+              <RowBetween style={{ marginTop: '3rem' }}>
+                <TYPE.main fontSize={'1.125rem'}>Token Information</TYPE.main>{' '}
+              </RowBetween>
+              <Panel
+                rounded
+                style={{
+                  border: '1px solid rgba(43, 43, 43, 0.05)',
+                  marginTop: '1.5rem'
+                }}
+                p={20}
+              >
+                <TokenDetailsLayout>
+                  <Column>
+                    <TYPE.main>Symbol</TYPE.main>
+                    <Text style={{ marginTop: '.5rem' }} fontSize={24} fontWeight="500">
+                      <FormattedName text={symbol} maxCharacters={12} />
+                    </Text>
+                  </Column>
+                  <Column>
+                    <TYPE.main>Name</TYPE.main>
+                    <Text style={{ marginTop: '.5rem' }} fontSize={24} fontWeight="500">
+                      <FormattedName text={name} maxCharacters={16} />
+                    </Text>
+                  </Column>
+                  <Column>
+                    <TYPE.main>Address</TYPE.main>
+                    <AutoRow align="flex-end">
+                      <Text style={{ marginTop: '.5rem' }} fontSize={24} fontWeight="500">
+                        {address.slice(0, 8) + '...' + address.slice(36, 42)}
+                      </Text>
+                      <CopyHelper toCopy={address} />
+                    </AutoRow>
+                  </Column>
+                  <ButtonLight color={backgroundColor}>
+                    <Link color={backgroundColor} external href={'https://etherscan.io/address/' + address}>
+                      View on Etherscan ↗
+                    </Link>
+                  </ButtonLight>
+                </TokenDetailsLayout>
+              </Panel>
+            </>
+          </DashboardWrapper>
+        </WarningGrouping>
+      </ContentWrapper>
     </PageWrapper>
   )
 }

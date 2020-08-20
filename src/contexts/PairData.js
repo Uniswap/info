@@ -7,7 +7,8 @@ import {
   FILTERED_TRANSACTIONS,
   PAIRS_CURRENT,
   PAIRS_BULK,
-  PAIRS_DYNAMIC_BULK
+  PAIRS_HISTORICAL_BULK,
+  HOURLY_PAIR_RATES
 } from '../apollo/queries'
 
 import { useEthPrice } from './GlobalData'
@@ -15,12 +16,21 @@ import { useEthPrice } from './GlobalData'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 
-import { getPercentChange, get2DayPercentChange, getBlockFromTimestamp, isAddress } from '../helpers'
+import {
+  getPercentChange,
+  get2DayPercentChange,
+  isAddress,
+  getBlocksFromTimestamps,
+  getTimestampsForChanges,
+  splitQuery
+} from '../utils'
+import { timeframeOptions } from '../constants'
 
 const UPDATE = 'UPDATE'
 const UPDATE_PAIR_TXNS = 'UPDATE_PAIR_TXNS'
 const UPDATE_CHART_DATA = 'UPDATE_CHART_DATA'
 const UPDATE_TOP_PAIRS = 'UPDATE_TOP_PAIRS'
+const UPDATE_HOURLY_DATA = 'UPDATE_HOURLY_DATA'
 
 dayjs.extend(utc)
 
@@ -85,6 +95,20 @@ function reducer(state, { type, payload }) {
       }
     }
 
+    case UPDATE_HOURLY_DATA: {
+      const { address, hourlyData, timeWindow } = payload
+      return {
+        ...state,
+        [address]: {
+          ...state?.[address],
+          hourlyData: {
+            ...state?.[address].hourlyData,
+            [timeWindow]: hourlyData
+          }
+        }
+      }
+    }
+
     default: {
       throw Error(`Unexpected action type in DataContext reducer: '${type}'.`)
     }
@@ -128,14 +152,22 @@ export default function Provider({ children }) {
     })
   }, [])
 
+  const updateHourlyData = useCallback((address, hourlyData, timeWindow) => {
+    dispatch({
+      type: UPDATE_HOURLY_DATA,
+      payload: { address, hourlyData, timeWindow }
+    })
+  }, [])
+
   return (
     <PairDataContext.Provider
-      value={useMemo(() => [state, { update, updatePairTxns, updateChartData, updateTopPairs }], [
+      value={useMemo(() => [state, { update, updatePairTxns, updateChartData, updateTopPairs, updateHourlyData }], [
         state,
         update,
         updatePairTxns,
         updateChartData,
-        updateTopPairs
+        updateTopPairs,
+        updateHourlyData
       ])}
     >
       {children}
@@ -144,22 +176,8 @@ export default function Provider({ children }) {
 }
 
 async function getBulkPairData(pairList, ethPrice) {
-  const utcCurrentTime = dayjs()
-  const utcOneDayBack = utcCurrentTime
-    .subtract(1, 'day')
-    .startOf('minute')
-    .unix()
-  const utcTwoDaysBack = utcCurrentTime
-    .subtract(2, 'day')
-    .startOf('minute')
-    .unix()
-  const utcOneWeekBack = utcCurrentTime
-    .subtract(1, 'week')
-    .startOf('minute')
-    .unix()
-  let oneDayBlock = await getBlockFromTimestamp(utcOneDayBack)
-  let twoDayBlock = await getBlockFromTimestamp(utcTwoDaysBack)
-  let oneWeekBlock = await getBlockFromTimestamp(utcOneWeekBack)
+  const [t1, t2, tWeek] = getTimestampsForChanges()
+  let [{ number: b1 }, { number: b2 }, { number: bWeek }] = await getBlocksFromTimestamps([t1, t2, tWeek])
 
   try {
     let current = await client.query({
@@ -171,9 +189,9 @@ async function getBulkPairData(pairList, ethPrice) {
     })
 
     let [oneDayResult, twoDayResult, oneWeekResult] = await Promise.all(
-      [oneDayBlock, twoDayBlock, oneWeekBlock].map(async block => {
+      [b1, b2, bWeek].map(async block => {
         let result = client.query({
-          query: PAIRS_DYNAMIC_BULK(block, pairList),
+          query: PAIRS_HISTORICAL_BULK(block, pairList),
           fetchPolicy: 'cache-first'
         })
         return result
@@ -197,81 +215,30 @@ async function getBulkPairData(pairList, ethPrice) {
         current.data.pairs.map(async pair => {
           let data = pair
           let oneDayHistory = oneDayData?.[pair.id]
-          let twoDayHistory = twoDayData?.[pair.id]
-          let oneWeekHistory = oneWeekData?.[pair.id]
-
-          // catch the case where token wasnt in top list in previous days
           if (!oneDayHistory) {
-            let oneDayResult = await client.query({
-              query: PAIR_DATA(pair.id, oneDayBlock),
+            let newData = await client.query({
+              query: PAIR_DATA(pair.id, b1),
               fetchPolicy: 'cache-first'
             })
-            oneDayHistory = oneDayResult
+            oneDayHistory = newData.data.pairs[0]
           }
+          let twoDayHistory = twoDayData?.[pair.id]
           if (!twoDayHistory) {
-            let twoDayResult = await client.query({
-              query: PAIR_DATA(pair.id, twoDayBlock),
+            let newData = await client.query({
+              query: PAIR_DATA(pair.id, b2),
               fetchPolicy: 'cache-first'
             })
-            twoDayHistory = twoDayResult
+            twoDayHistory = newData.data.pairs[0]
           }
+          let oneWeekHistory = oneWeekData?.[pair.id]
           if (!oneWeekHistory) {
-            let oneWeekResult = await client.query({
-              query: PAIR_DATA(pair.id, oneWeekBlock),
+            let newData = await client.query({
+              query: PAIR_DATA(pair.id, bWeek),
               fetchPolicy: 'cache-first'
             })
-            oneWeekHistory = oneWeekResult
+            oneWeekHistory = newData.data.pairs[0]
           }
-
-          const [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentChange(
-            data?.volumeUSD,
-            oneDayHistory?.volumeUSD ?? 0,
-            twoDayHistory?.volumeUSD ?? 0
-          )
-
-          const oneWeekVolumeUSD = parseFloat(
-            oneWeekData ? data?.volumeUSD - oneWeekHistory?.volumeUSD : data.volumeUSD
-          )
-          const [oneDayVolumeETH, volumeChangeETH] = get2DayPercentChange(
-            data.tradeVolumeETH,
-            oneDayHistory?.tradeVolumeETH ?? 0,
-            twoDayHistory?.tradeVolumeETH ?? 0
-          )
-          const [oneDayTxns, txnChange] = get2DayPercentChange(
-            data.txCount,
-            oneDayHistory?.txCount ?? 0,
-            twoDayHistory?.txCount ?? 0
-          )
-
-          const liquidityChangeUSD = getPercentChange(data.reserveUSD, oneDayHistory?.reserveUSD)
-          data.reserveUSD = data.reserveETH ? data.reserveETH * ethPrice : data.reserveUSD
-          data.trackedReserveUSD = parseFloat(pair.trackedReserveETH) * ethPrice
-          data.oneDayVolumeUSD = oneDayVolumeUSD
-          data.oneDayVolumeETH = oneDayVolumeETH
-          data.oneWeekVolumeUSD = oneWeekVolumeUSD
-          data.volumeChangeUSD = volumeChangeUSD
-          data.volumeChangeETH = volumeChangeETH
-          data.liquidityChangeUSD = liquidityChangeUSD
-          data.oneDayTxns = oneDayTxns
-          data.txnChange = txnChange
-          // new tokens
-          if (!oneDayHistory && data) {
-            data.oneDayVolumeUSD = data.volumeUSD
-            data.oneDayVolumeETH = data.tradeVolume * data.derivedETH
-          }
-          if (!oneWeekHistory && data) {
-            data.oneWeekVolumeUSD = data.volumeUSD
-          }
-          if (data?.token0?.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
-            data.token0.name = 'Ether (Wrapped)'
-            data.token0.symbol = 'ETH'
-          }
-
-          if (data?.token1?.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
-            data.token1.name = 'Ether (Wrapped)'
-            data.token1.symbol = 'ETH'
-          }
-
+          data = parseData(data, oneDayHistory, twoDayHistory, oneWeekHistory, ethPrice, b1)
           return data
         })
     )
@@ -281,96 +248,49 @@ async function getBulkPairData(pairList, ethPrice) {
   }
 }
 
-const getPairData = async (address, ethPrice) => {
-  let data = []
-  let oneDayData = []
-  let twoDayData = []
+function parseData(data, oneDayData, twoDayData, oneWeekData, ethPrice, oneDayBlock) {
+  // get volume changes
+  const [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentChange(
+    data?.volumeUSD,
+    oneDayData?.volumeUSD ? oneDayData.volumeUSD : 0,
+    twoDayData?.volumeUSD ? twoDayData.volumeUSD : 0
+  )
+  const [oneDayVolumeUntracked, volumeChangeUntracked] = get2DayPercentChange(
+    data?.untrackedVolumeUSD,
+    oneDayData?.untrackedVolumeUSD ? parseFloat(oneDayData?.untrackedVolumeUSD) : 0,
+    twoDayData?.untrackedVolumeUSD ? twoDayData?.untrackedVolumeUSD : 0
+  )
+  const oneWeekVolumeUSD = parseFloat(oneWeekData ? data?.volumeUSD - oneWeekData?.volumeUSD : data.volumeUSD)
 
-  const utcCurrentTime = dayjs()
-  const utcOneDayBack = utcCurrentTime
-    .subtract(1, 'day')
-    .startOf('minute')
-    .unix()
-  const utcTwoDaysBack = utcCurrentTime
-    .subtract(2, 'day')
-    .startOf('minute')
-    .unix()
-  const utcOneWeekBack = utcCurrentTime
-    .subtract(1, 'week')
-    .startOf('minute')
-    .unix()
-  let oneDayBlock = await getBlockFromTimestamp(utcOneDayBack)
-  let twoDayBlock = await getBlockFromTimestamp(utcTwoDaysBack)
-  let oneWeekBlock = await getBlockFromTimestamp(utcOneWeekBack)
+  // set volume properties
+  data.oneDayVolumeUSD = parseFloat(oneDayVolumeUSD)
+  data.oneWeekVolumeUSD = oneWeekVolumeUSD
+  data.volumeChangeUSD = volumeChangeUSD
+  data.oneDayVolumeUntracked = oneDayVolumeUntracked
+  data.volumeChangeUntracked = volumeChangeUntracked
 
-  try {
-    let result = await client.query({
-      query: PAIR_DATA(address),
-      fetchPolicy: 'cache-first'
-    })
-    data = result.data && result.data.pairs && result.data.pairs[0]
+  // set liquiditry properties
+  data.trackedReserveUSD = data.trackedReserveETH * ethPrice
+  data.liquidityChangeUSD = getPercentChange(data.reserveUSD, oneDayData?.reserveUSD)
 
-    let oneDayResult = await client.query({
-      query: PAIR_DATA(address, oneDayBlock),
-      fetchPolicy: 'cache-first'
-    })
-    oneDayData = oneDayResult.data.pairs[0]
-
-    let twoDayResult = await client.query({
-      query: PAIR_DATA(address, twoDayBlock),
-      fetchPolicy: 'cache-first'
-    })
-    twoDayData = twoDayResult.data.pairs[0]
-
-    let oneWeekResult = await client.query({
-      query: PAIR_DATA(address, oneWeekBlock),
-      fetchPolicy: 'cache-first'
-    })
-    let oneWeekData = oneWeekResult.data.pairs[0]
-
-    const [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentChange(
-      data?.volumeUSD,
-      oneDayData?.volumeUSD ? oneDayData?.volumeUSD : 0,
-      twoDayData?.volumeUSD ? twoDayData?.volumeUSD : 0
-    )
-
-    const oneWeekVolumeUSD = parseFloat(oneWeekData ? data?.volumeUSD - oneWeekData?.volumeUSD : data.volumeUSD)
-
-    const [oneDayTxns, txnChange] = get2DayPercentChange(
-      data.txCount,
-      oneDayData?.txCount ? oneDayData?.txCount : 0,
-      twoDayData?.txCount ? twoDayData?.txCount : 0
-    )
-
-    const liquidityChangeUSD = getPercentChange(data.reserveUSD, oneDayData?.reserveUSD)
-
-    data.trackedReserveUSD = data.trackedReserveETH * ethPrice
-    data.oneDayVolumeUSD = oneDayVolumeUSD
-    data.oneWeekVolumeUSD = oneWeekVolumeUSD
-    data.volumeChangeUSD = volumeChangeUSD
-    data.liquidityChangeUSD = liquidityChangeUSD
-    data.oneDayTxns = oneDayTxns
-    data.txnChange = txnChange
-
-    // new tokens
-    if (!oneDayData && data && data.createdAtBlockNumber > oneDayBlock) {
-      data.oneDayVolumeUSD = data.volumeUSD
-      data.oneDayVolumeETH = data.tradeVolume * data.derivedETH
-    }
-  } catch (e) {
-    console.log(e)
+  // format if pair hasnt existed for a day or a week
+  if (!oneDayData && data && data.createdAtBlockNumber > oneDayBlock) {
+    data.oneDayVolumeUSD = parseFloat(data.volumeUSD)
   }
-
+  if (!oneDayData && data) {
+    data.oneDayVolumeUSD = parseFloat(data.volumeUSD)
+  }
+  if (!oneWeekData && data) {
+    data.oneWeekVolumeUSD = parseFloat(data.volumeUSD)
+  }
   if (data?.token0?.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
-    data.token0.name = 'ETH (Wrapped)'
+    data.token0.name = 'Ether (Wrapped)'
     data.token0.symbol = 'ETH'
   }
-
   if (data?.token1?.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
-    data.token1.name = 'ETH (Wrapped)'
+    data.token1.name = 'Ether (Wrapped)'
     data.token1.symbol = 'ETH'
   }
-
   return data
 }
 
@@ -402,14 +322,23 @@ const getPairChartData = async pairAddress => {
   let startTime = utcStartTime.unix() - 1
 
   try {
-    let result = await client.query({
-      query: PAIR_CHART,
-      variables: {
-        pairAddress: pairAddress
-      },
-      fetchPolicy: 'cache-first'
-    })
-    data = result.data.pairDayDatas
+    let allFound = false
+    let skip = 0
+    while (!allFound) {
+      let result = await client.query({
+        query: PAIR_CHART,
+        variables: {
+          pairAddress: pairAddress,
+          skip
+        },
+        fetchPolicy: 'cache-first'
+      })
+      skip += 1000
+      data = data.concat(result.data.pairDayDatas)
+      if (result.data.pairDayDatas.length < 1000) {
+        allFound = true
+      }
+    }
 
     let dayIndexSet = new Set()
     let dayIndexArray = []
@@ -453,10 +382,72 @@ const getPairChartData = async pairAddress => {
   return data
 }
 
+const getHourlyRateData = async (pairAddress, startTime) => {
+  const utcEndTime = dayjs.utc()
+  let time = startTime
+
+  // create an array of hour start times until we reach current hour
+  const timestamps = []
+  while (time <= utcEndTime.unix() - 3600) {
+    timestamps.push(time)
+    time += 3600
+  }
+
+  // backout if invalid timestamp format
+  if (timestamps.length === 0) {
+    return []
+  }
+
+  // once you have all the timestamps, get the blocks for each timestamp in a bulk query
+  let blocks
+  try {
+    blocks = await getBlocksFromTimestamps(timestamps)
+  } catch (e) {
+    console.log('error fetching blocks')
+  }
+  // catch failing case
+  if (!blocks || blocks?.length === 0) {
+    return []
+  }
+
+  const result = await splitQuery(HOURLY_PAIR_RATES, client, [pairAddress], blocks, 500)
+
+  // format token ETH price results
+  let values = []
+  for (var row in result) {
+    let timestamp = row.split('t')[1]
+    if (timestamp) {
+      values.push({
+        timestamp,
+        rate0: parseFloat(result[row]?.token0Price),
+        rate1: parseFloat(result[row]?.token1Price)
+      })
+    }
+  }
+
+  let formattedHistoryRate0 = []
+  let formattedHistoryRate1 = []
+
+  // for each hour, construct the open and close price
+  for (let i = 0; i < values.length - 1; i++) {
+    formattedHistoryRate0.push({
+      timestamp: values[i].timestamp,
+      open: parseFloat(values[i].rate0),
+      close: parseFloat(values[i + 1].rate0)
+    })
+    formattedHistoryRate1.push({
+      timestamp: values[i].timestamp,
+      open: parseFloat(values[i].rate1),
+      close: parseFloat(values[i + 1].rate1)
+    })
+  }
+
+  return [formattedHistoryRate0, formattedHistoryRate1]
+}
+
 export function Updater() {
   const [, { updateTopPairs }] = usePairDataContext()
   const [ethPrice] = useEthPrice()
-
   useEffect(() => {
     async function getData() {
       // get top pairs by reserves
@@ -481,6 +472,33 @@ export function Updater() {
   return null
 }
 
+export function useHourlyRateData(pairAddress, timeWindow) {
+  const [state, { updateHourlyData }] = usePairDataContext()
+  const chartData = state?.[pairAddress]?.hourlyData?.[timeWindow]
+
+  useEffect(() => {
+    const currentTime = dayjs.utc()
+    const windowSize = timeWindow === timeframeOptions.MONTH ? 'month' : 'week'
+    const startTime =
+      timeWindow === timeframeOptions.ALL_TIME
+        ? 1589760000
+        : currentTime
+            .subtract(1, windowSize)
+            .startOf('hour')
+            .unix()
+
+    async function fetch() {
+      let data = await getHourlyRateData(pairAddress, startTime)
+      updateHourlyData(pairAddress, data, timeWindow)
+    }
+    if (!chartData) {
+      fetch()
+    }
+  }, [chartData, timeWindow, pairAddress, updateHourlyData])
+
+  return chartData
+}
+
 /**
  * @todo
  * store these updates to reduce future redundant calls
@@ -490,7 +508,7 @@ export function useDataForList(pairList) {
   const [ethPrice] = useEthPrice()
 
   const [stale, setStale] = useState(false)
-  const [fetched, setFetched] = useState()
+  const [fetched, setFetched] = useState([])
 
   // reset
   useEffect(() => {
@@ -531,7 +549,7 @@ export function useDataForList(pairList) {
   let formattedFetch =
     fetched &&
     fetched.reduce((obj, cur) => {
-      return { ...obj, [cur.id]: cur }
+      return { ...obj, [cur?.id]: cur }
     }, {})
 
   return formattedFetch
@@ -548,8 +566,8 @@ export function usePairData(pairAddress) {
   useEffect(() => {
     async function fetchData() {
       if (!pairData && pairAddress) {
-        let data = await getPairData(pairAddress, ethPrice)
-        update(pairAddress, data)
+        let data = await getBulkPairData([pairAddress], ethPrice)
+        data && update(pairAddress, data[0])
       }
     }
     if (!pairData && pairAddress && ethPrice && isAddress(pairAddress)) {
