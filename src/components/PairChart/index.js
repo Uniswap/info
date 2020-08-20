@@ -96,13 +96,13 @@ const PairChart = ({ address, color, base0, base1 }) => {
     if (chartFilter === CHART_VIEW.RATE0) {
       return (
         formattedNum(val) +
-        `<span style="font-size: 12px; margin-left: 4px;">${formattedSymbol0}/${formattedSymbol1}<span>`
+        `<span style="font-size: 12px; margin-left: 4px;">${formattedSymbol1}/${formattedSymbol0}<span>`
       )
     }
     if (chartFilter === CHART_VIEW.RATE1) {
       return (
         formattedNum(val) +
-        `<span style="font-size: 12px; margin-left: 4px;">${formattedSymbol1}/${formattedSymbol0}<span>`
+        `<span style="font-size: 12px; margin-left: 4px;">${formattedSymbol0}/${formattedSymbol1}<span>`
       )
     }
   }
@@ -144,7 +144,7 @@ const PairChart = ({ address, color, base0, base1 }) => {
                 setChartFilter(CHART_VIEW.RATE0)
               }}
             >
-              {pairData.token0 ? formattedSymbol0 + '/' + formattedSymbol1 : '-'}
+              {pairData.token0 ? formattedSymbol1 + '/' + formattedSymbol0 : '-'}
             </OptionButton>
             <OptionButton
               active={chartFilter === CHART_VIEW.RATE1}
@@ -153,7 +153,7 @@ const PairChart = ({ address, color, base0, base1 }) => {
                 setChartFilter(CHART_VIEW.RATE1)
               }}
             >
-              {pairData.token0 ? formattedSymbol1 + '/' + formattedSymbol0 : '-'}
+              {pairData.token0 ? formattedSymbol0 + '/' + formattedSymbol1 : '-'}
             </OptionButton>
           </AutoRow>
           <AutoRow justify="flex-end" gap="6px">
