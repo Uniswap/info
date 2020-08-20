@@ -1,10 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { createChart } from 'lightweight-charts'
 import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
 import { formattedNum } from '../../utils'
 import styled from 'styled-components'
 import { usePrevious } from 'react-use'
 import { Play } from 'react-feather'
+
+dayjs.extend(utc)
 
 export const CHART_TYPES = {
   BAR: 'BAR',
@@ -187,12 +190,14 @@ const TradingViewChart = ({
           setLastBarText()
         } else {
           let dateStr = useWeekly
-            ? dayjs(param.time.year + '-' + param.time.month + '-' + (param.time.day + 1))
+            ? dayjs(param.time.year + '-' + param.time.month + '-' + param.time.day)
                 .startOf('week')
                 .format('MMMM D, YYYY') +
               '-' +
-              dayjs(param.time.year + '-' + param.time.month + '-' + (param.time.day + 1)).format('MMMM D, YYYY')
-            : dayjs(param.time.year + '-' + param.time.month + '-' + (param.time.day + 1)).format('MMMM D, YYYY')
+              dayjs(param.time.year + '-' + param.time.month + '-' + param.time.day)
+                .endOf('week')
+                .format('MMMM D, YYYY')
+            : dayjs(param.time.year + '-' + param.time.month + '-' + param.time.day).format('MMMM D, YYYY')
           var price = param.seriesPrices.get(series)
 
           toolTip.innerHTML =
