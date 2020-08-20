@@ -379,7 +379,12 @@ function PairPage({ pairAddress, history }) {
                   </AutoColumn>
                 </Panel>
                 <Panel style={{ gridColumn: below1080 ? '1' : '2/4', gridRow: below1080 ? '' : '1/5' }}>
-                  <PairChart address={pairAddress} color={backgroundColor} base0={token0Rate} base1={token1Rate} />
+                  <PairChart
+                    address={pairAddress}
+                    color={backgroundColor}
+                    base0={reserve1 / reserve0}
+                    base1={reserve0 / reserve1}
+                  />
                 </Panel>
               </PanelWrapper>
               <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
