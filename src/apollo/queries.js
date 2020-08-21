@@ -276,9 +276,6 @@ export const USER_POSITIONS = gql`
         totalSupply
       }
       liquidityTokenBalance
-      historicalSnapshots {
-        id
-      }
     }
   }
 `
