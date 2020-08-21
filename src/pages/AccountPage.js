@@ -18,6 +18,8 @@ import { Bookmark, Activity } from 'react-feather'
 import Link from '../components/Link'
 import { FEE_WARNING_TOKENS } from '../constants'
 import { BasicLink } from '../components/Link'
+import { useMedia } from 'react-use'
+import Search from '../components/Search'
 
 const AccountWrapper = styled.div`
   background-color: rgba(255, 255, 255, 0.2);
@@ -146,17 +148,21 @@ function AccountPage({ account }) {
     })
   }, [])
 
+  const below600 = useMedia('(max-width: 600px)')
+
   return (
     <PageWrapper>
       <ContentWrapper>
-        <Text>
-          <BasicLink to="/accounts">{'Accounts '}</BasicLink>→{' '}
-          <Link lineHeight={'145.23%'} href={'https://etherscan.io/address/' + account} target="_blank">
-            {' '}
-            {account?.slice(0, 42)}{' '}
-          </Link>
-        </Text>
-
+        <RowBetween>
+          <Text>
+            <BasicLink to="/accounts">{'Accounts '}</BasicLink>→{' '}
+            <Link lineHeight={'145.23%'} href={'https://etherscan.io/address/' + account} target="_blank">
+              {' '}
+              {account?.slice(0, 42)}{' '}
+            </Link>
+          </Text>
+          {!below600 && <Search small={true} />}
+        </RowBetween>
         <Header>
           <RowBetween>
             <span>

@@ -40,10 +40,6 @@ export default function NavHeader() {
   const { oneDayVolumeUSD, oneDayTxns, pairCount } = useGlobalData()
   const [ethPrice] = useEthPrice()
   const formattedEthPrice = ethPrice ? formattedNum(ethPrice, true) : '-'
-
-  // const liquidity = totalLiquidityUSD ? '$' + toK(parseFloat(totalLiquidityUSD), true) : ''
-  // const volume = oneDayVolumeUSD ? '$' + toK(oneDayVolumeUSD, true) : ''
-
   const oneDayFees = oneDayVolumeUSD ? formattedNum(oneDayVolumeUSD * 0.003, true) : ''
 
   return (

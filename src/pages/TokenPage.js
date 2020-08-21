@@ -3,7 +3,6 @@ import 'feather-icons'
 import { withRouter } from 'react-router-dom'
 import { Text } from 'rebass'
 import styled from 'styled-components'
-
 import Link from '../components/Link'
 import Panel from '../components/Panel'
 import TokenLogo from '../components/TokenLogo'
@@ -15,10 +14,8 @@ import { ButtonLight, ButtonDark } from '../components/ButtonStyled'
 import TxnList from '../components/TxnList'
 import TokenChart from '../components/TokenChart'
 import { BasicLink } from '../components/Link'
-// import Search from '../components/Search'
-
+import Search from '../components/Search'
 import { formattedNum, formattedPercent, getPoolLink, getSwapLink, localNumber } from '../utils'
-
 import { useTokenData, useTokenTransactions, useTokenPairs } from '../contexts/TokenData'
 import { TYPE, ThemedBackground } from '../Theme'
 import { transparentize } from 'polished'
@@ -152,6 +149,7 @@ function TokenPage({ address, history }) {
 
   const below1080 = useMedia('(max-width: 1080px)')
   const below800 = useMedia('(max-width: 800px)')
+  const below600 = useMedia('(max-width: 600px)')
   const below500 = useMedia('(max-width: 500px)')
 
   // format for long symbol
@@ -195,6 +193,7 @@ function TokenPage({ address, history }) {
               </Text>
             </Link>
           </AutoRow>
+          {!below600 && <Search small={true} />}
         </RowBetween>
 
         <WarningGrouping disabled={!dismissed && !SURPRESS_WARNINGS.includes(address)}>

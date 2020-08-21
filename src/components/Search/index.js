@@ -3,7 +3,7 @@ import styled from 'styled-components'
 
 import Row, { RowFixed } from '../Row'
 import TokenLogo from '../TokenLogo'
-import { Search as SearchIcon } from 'react-feather'
+import { Search as SearchIcon, X } from 'react-feather'
 import { BasicLink } from '../Link'
 
 import { useAllTokenData, useTokenData } from '../../contexts/TokenData'
@@ -22,6 +22,10 @@ const Container = styled.div`
   height: 48px;
   z-index: 30;
   position: relative;
+
+  @media screen and (max-width: 600px) {
+    width: 100%;
+  }
 `
 
 const Wrapper = styled.div`
@@ -32,20 +36,23 @@ const Wrapper = styled.div`
   justify-content: flex-end;
   padding: 12px 16px;
   border-radius: 12px;
-  background: ${({ theme }) => transparentize(0.4, theme.bg1)};
+  background: ${({ theme, small, open }) => (small ? (open ? 'white' : 'none') : transparentize(0.4, theme.bg1))};
   border-bottom-right-radius: ${({ open }) => (open ? '0px' : '12px')};
   border-bottom-left-radius: ${({ open }) => (open ? '0px' : '12px')};
   z-index: 9999;
   width: 100%;
   min-width: 300px;
   box-sizing: border-box;
-  box-shadow: ${({ open }) =>
-    !open
+  box-shadow: ${({ open, small }) =>
+    !open && !small
       ? '0px 24px 32px rgba(0, 0, 0, 0.04), 0px 16px 24px rgba(0, 0, 0, 0.04), 0px 4px 8px rgba(0, 0, 0, 0.04), 0px 0px 1px rgba(0, 0, 0, 0.04) '
       : 'none'};
-  @media screen and (max-width: 600px) {
-    width: ${({ small }) => (small ? '160px' : '100%')};
-    min-width: 40px;
+  @media screen and (max-width: 500px) {
+    background: ${({ theme }) => transparentize(0.4, theme.bg1)};
+    box-shadow: ${({ open }) =>
+      !open
+        ? '0px 24px 32px rgba(0, 0, 0, 0.04), 0px 16px 24px rgba(0, 0, 0, 0.04), 0px 4px 8px rgba(0, 0, 0, 0.04), 0px 0px 1px rgba(0, 0, 0, 0.04) '
+        : 'none'};
   }
 `
 const Input = styled.input`
@@ -76,7 +83,22 @@ const SearchIconLarge = styled(SearchIcon)`
   height: 20px;
   width: 20px;
   margin-right: 0.5rem;
+  position: absolute;
+  right: 10px;
+  pointer-events: none;
   color: ${({ theme }) => theme.textColor};
+`
+
+const CloseIcon = styled(X)`
+  height: 20px;
+  width: 20px;
+  margin-right: 0.5rem;
+  position: absolute;
+  right: 10px;
+  color: ${({ theme }) => theme.textColor};
+  :hover {
+    cursor: pointer;
+  }
 `
 
 const Menu = styled.div`
@@ -394,20 +416,20 @@ export const Search = ({ small = false }) => {
   })
 
   return (
-    <Container>
+    <Container small={small}>
       <Wrapper open={showMenu} shadow={true} small={small}>
         <Input
           large={!small}
           type={'text'}
           ref={wrapperRef}
           placeholder={
-            below410
+            small
+              ? ''
+              : below410
               ? 'Search...'
               : below470
               ? 'Search Uniswap...'
               : below700
-              ? 'Search pairs and tokens...'
-              : small
               ? 'Search pairs and tokens...'
               : 'Search Uniswap pairs and tokens...'
           }
@@ -416,10 +438,12 @@ export const Search = ({ small = false }) => {
             setValue(e.target.value)
           }}
           onFocus={() => {
-            toggleMenu(true)
+            if (!showMenu) {
+              toggleMenu(true)
+            }
           }}
         />
-        <SearchIconLarge />
+        {!showMenu ? <SearchIconLarge /> : <CloseIcon onClick={() => toggleMenu(false)} />}
       </Wrapper>
       <Menu hide={!showMenu} ref={menuRef}>
         <Heading>

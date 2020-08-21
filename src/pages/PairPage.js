@@ -15,7 +15,7 @@ import Link from '../components/Link'
 import TxnList from '../components/TxnList'
 import Loader from '../components/Loader'
 import { BasicLink } from '../components/Link'
-
+import Search from '../components/Search'
 import { formattedNum, formattedPercent, getPoolLink, getSwapLink } from '../utils'
 import { useColor } from '../hooks'
 import { usePairData, usePairTransactions } from '../contexts/PairData'
@@ -187,6 +187,7 @@ function PairPage({ pairAddress, history }) {
 
   const below1080 = useMedia('(max-width: 1080px)')
   const below900 = useMedia('(max-width: 900px)')
+  const below600 = useMedia('(max-width: 600px)')
 
   const [dismissed, markAsDismissed] = usePathDismissed(history.location.pathname)
 
@@ -202,7 +203,6 @@ function PairPage({ pairAddress, history }) {
   return (
     <PageWrapper>
       <ThemedBackground backgroundColor={transparentize(0.6, backgroundColor)} />
-
       <span />
       <Warning
         type={'pair'}
@@ -211,10 +211,12 @@ function PairPage({ pairAddress, history }) {
         address={pairAddress}
       />
       <ContentWrapperLarge>
-        <Text>
-          <BasicLink to="/pairs">{'Pairs '}</BasicLink>→ {token0?.symbol}-{token1?.symbol}
-        </Text>
-
+        <RowBetween>
+          <Text>
+            <BasicLink to="/pairs">{'Pairs '}</BasicLink>→ {token0?.symbol}-{token1?.symbol}
+          </Text>
+          {!below600 && <Search small={true} />}
+        </RowBetween>
         <WarningGrouping
           disabled={!dismissed && !(SURPRESS_WARNINGS.includes(token0?.id) && SURPRESS_WARNINGS.includes(token1?.id))}
         >
