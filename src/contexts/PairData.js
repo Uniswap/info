@@ -501,6 +501,17 @@ const getPairChartData = async pairAddress => {
   return data
 }
 
+function chunkArray(myArray, chunk_size){
+  var results = [];
+
+  while (myArray.length) {
+    results.push(myArray.splice(0, chunk_size));
+  }
+
+  return results;
+}
+
+
 export function Updater() {
   const [, { updateTopPairs }] = usePairDataContext()
   const [ethPrice] = useEthPrice()
@@ -520,8 +531,18 @@ export function Updater() {
         return pair.id
       })
 
+      const chunks = chunkArray(formattedPairs, 100)
+      const p$$ = chunks.map((chunk) => {
+        return getBulkPairData(chunk, ethPrice)
+      })
+
+      const results = await Promise.all(p$$);
+      const topPairs = results.reduce((chunkResult, acc) => {
+        return [...acc, ...chunkResult];
+      }, [])
+
+      // formattedPairs.
       // get data for every pair in list
-      let topPairs = await getBulkPairData(formattedPairs, ethPrice)
       topPairs && updateTopPairs(topPairs)
     }
 
