@@ -288,6 +288,9 @@ function TopTokenList({ tokens, history, itemMax = 10 }) {
       <List p={0}>
         {filteredList &&
           filteredList.map((item, index) => {
+            if (item?.id === '0xdf5e0e81dff6faf3a7e52ba697820c5e32d806a8') {
+              item.symbol = 'yCRV';
+            }
             return (
               <div key={index}>
                 <ListItem key={index} index={(page - 1) * 10 + index + 1} item={item} />

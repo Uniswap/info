@@ -162,9 +162,22 @@ function PairList({ pairs, color, history, disbaleLinks, maxItems = 10 }) {
         pairData.token0.symbol = 'ETH'
       }
 
+      if (pairData.token0.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
+        pairData.token0.name = 'ETH (Wrapped)'
+        pairData.token0.symbol = 'ETH'
+      }
+
       if (pairData.token1.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
         pairData.token1.name = 'ETH (Wrapped)'
         pairData.token1.symbol = 'ETH'
+      }
+
+      if (pairData.token1.id === '0xdf5e0e81dff6faf3a7e52ba697820c5e32d806a8') {
+        pairData.token1.symbol = 'yCRV'
+      }
+
+      if (pairData.token0.id === '0xdf5e0e81dff6faf3a7e52ba697820c5e32d806a8') {
+        pairData.token1.symbol = 'yCRV'
       }
 
       return (
