@@ -112,7 +112,8 @@ const SORT_FIELD = {
 }
 
 const FIELD_TO_VALUE = {
-  [SORT_FIELD.LIQ]: 'trackedReserveETH', // sort with tracked volume only
+  // trackedReserveETH - to sort with tracked volume only
+  [SORT_FIELD.LIQ]: 'reserveUSD', //
   [SORT_FIELD.VOL]: 'oneDayVolumeUSD',
   [SORT_FIELD.TXNS]: 'oneDayTxns',
   [SORT_FIELD.VOL_7DAYS]: 'oneWeekVolumeUSD',
