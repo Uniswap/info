@@ -425,7 +425,6 @@ export const GLOBAL_DATA = block => {
         totalVolumeETH
         totalLiquidityUSD
         totalLiquidityETH
-        untrackedVolumeUSD
         txCount
         pairCount
       }
@@ -627,7 +626,6 @@ const PairFields = `
     volumeUSD
     token0Price
     token1Price
-    untrackedVolumeUSD
     createdAtTimestamp
   }
 `
@@ -673,7 +671,6 @@ export const PAIRS_HISTORICAL_BULK = (block, pairs) => {
       reserveUSD
       trackedReserveETH
       volumeUSD
-      untrackedVolumeUSD
     }
   }
   `
@@ -715,7 +712,6 @@ const TokenFields = `
     derivedETH
     tradeVolume
     tradeVolumeUSD
-    untrackedVolumeUSD
     totalLiquidity
     txCount
   }
