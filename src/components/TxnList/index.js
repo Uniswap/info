@@ -182,6 +182,12 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
           if (mint.amount0 === '0') {
             return true
           }
+          if (mint.pair.token0.id === '0xdf5e0e81dff6faf3a7e52ba697820c5e32d806a8') {
+            mint.pair.token0.symbol = 'yCRV';
+          }
+          if (mint.pair.token1.id === '0xdf5e0e81dff6faf3a7e52ba697820c5e32d806a8') {
+            mint.pair.token1.symbol = 'yCRV';
+          }
           let newTxn = {}
           newTxn.hash = mint.transaction.id
           newTxn.timestamp = mint.transaction.timestamp
@@ -198,6 +204,12 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
       if (transactions.burns.length > 0) {
         transactions.burns.forEach(burn => {
           let newTxn = {}
+          if (burn.pair.token0.id === '0xdf5e0e81dff6faf3a7e52ba697820c5e32d806a8') {
+            burn.pair.token0.symbol = 'yCRV';
+          }
+          if (burn.pair.token1.id === '0xdf5e0e81dff6faf3a7e52ba697820c5e32d806a8') {
+            burn.pair.token1.symbol = 'yCRV';
+          }
           newTxn.hash = burn.transaction.id
           newTxn.timestamp = burn.transaction.timestamp
           newTxn.type = TXN_TYPE.REMOVE
@@ -215,6 +227,13 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
           const isSrcFirst = swap.pair.token0.id === swap.src
           const srcAmount = swap.srcAmount
           const destAmount = swap.destAmount
+
+          if (swap.pair.token0.id === '0xdf5e0e81dff6faf3a7e52ba697820c5e32d806a8') {
+            swap.pair.token0.symbol = 'yCRV';
+          }
+          if (swap.pair.token1.id === '0xdf5e0e81dff6faf3a7e52ba697820c5e32d806a8') {
+            swap.pair.token1.symbol = 'yCRV';
+          }
 
           let newTxn = {}
           if (isSrcFirst) {
