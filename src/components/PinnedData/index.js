@@ -23,19 +23,25 @@ const RightColumn = styled.div`
   background-color: ${({ theme }) => theme.bg1};
   z-index: 9999;
   transition: width 0.25s ease;
+  overflow: scroll;
   :hover {
     cursor: pointer;
   }
 `
 
 const SavedButton = styled(RowBetween)`
-  padding-bottom: ${({ theme, open }) => open && '20px'};
+  padding-bottom: ${({ open }) => open && '20px'};
   border-bottom: ${({ theme, open }) => open && '1px solid' + theme.bg3};
-  margin-bottom: ${({ theme, open }) => open && '1.25rem'};
+  margin-bottom: ${({ open }) => open && '1.25rem'};
 
   :hover {
     cursor: pointer;
   }
+`
+
+const ScrollableDiv = styled(AutoColumn)`
+  overflow: scroll;
+  padding-bottom: 60px;
 `
 
 function PinnedData({ history, open, setSavedOpen }) {
@@ -89,7 +95,7 @@ function PinnedData({ history, open, setSavedOpen }) {
             <TYPE.light>Pinned pairs will appear here.</TYPE.light>
           )}
         </AutoColumn>
-        <AutoColumn gap={'12px'}>
+        <ScrollableDiv gap={'12px'}>
           <TYPE.main>Pinned Tokens</TYPE.main>
           {Object.keys(savedTokens).filter(key => {
             return !!savedTokens[key]
@@ -119,7 +125,7 @@ function PinnedData({ history, open, setSavedOpen }) {
           ) : (
             <TYPE.light>Pinned tokens will appear here.</TYPE.light>
           )}
-        </AutoColumn>
+        </ScrollableDiv>
       </AutoColumn>
     </RightColumn>
   )
