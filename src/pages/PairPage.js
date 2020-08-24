@@ -118,8 +118,6 @@ function PairPage({ pairAddress, history }) {
     reserveUSD,
     trackedReserveUSD,
     oneDayVolumeUSD,
-    oneDayVolumeUntracked,
-    volumeChangeUntracked,
     volumeChangeUSD,
     liquidityChangeUSD
   } = usePairData(pairAddress)
@@ -146,28 +144,12 @@ function PairPage({ pairAddress, history }) {
   }, [trackedReserveUSD])
 
   // volume
-  const volume =
-    oneDayVolumeUSD || oneDayVolumeUSD === 0
-      ? formattedNum(oneDayVolumeUSD === 0 ? oneDayVolumeUntracked : oneDayVolumeUSD, true)
-      : oneDayVolumeUSD === 0
-      ? '$0'
-      : '-'
+  const volume = oneDayVolumeUSD ? formattedNum(oneDayVolumeUSD, true) : oneDayVolumeUSD === 0 ? '$0' : '-'
 
-  // mark if using untracked volume
-  const [usingUtVolume, setUsingUtVolume] = useState(false)
-  useEffect(() => {
-    setUsingUtVolume(oneDayVolumeUSD === 0 ? true : false)
-  }, [oneDayVolumeUSD])
-
-  const volumeChange = formattedPercent(!usingUtVolume ? volumeChangeUSD : volumeChangeUntracked)
+  const volumeChange = formattedPercent(volumeChangeUSD)
 
   // get fees
-  const fees =
-    oneDayVolumeUSD || oneDayVolumeUSD === 0
-      ? usingUtVolume
-        ? formattedNum(oneDayVolumeUntracked * 0.003, true)
-        : formattedNum(oneDayVolumeUSD * 0.003, true)
-      : '-'
+  const fees = oneDayVolumeUSD ? formattedNum(oneDayVolumeUSD * 0.003, true) : oneDayVolumeUSD === 0 ? 0 : '-'
 
   // token data for usd
   const [ethPrice] = useEthPrice()
@@ -324,7 +306,7 @@ function PairPage({ pairAddress, history }) {
                 <Panel style={{ height: '100%' }}>
                   <AutoColumn gap="20px">
                     <RowBetween>
-                      <TYPE.main>Volume (24hrs) {usingUtVolume && '(Untracked)'}</TYPE.main>
+                      <TYPE.main>Volume (24hrs) </TYPE.main>
                       <div />
                     </RowBetween>
                     <RowBetween align="flex-end">
