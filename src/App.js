@@ -45,6 +45,7 @@ const Right = styled.div`
   z-index: 99;
   width: ${({ open }) => (open ? '220px' : '64px')};
   height: ${({ open }) => (open ? 'fit-content' : '64px')};
+  overflow: scroll;
 
   @media screen and (max-width: 1400px) {
     display: none;
