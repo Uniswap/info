@@ -6,29 +6,19 @@ import { useGlobalData, useEthPrice } from '../../contexts/GlobalData'
 import { formattedNum, localNumber } from '../../utils'
 
 import UniPrice from '../UniPrice'
+import { TYPE } from '../../Theme'
 
 const Header = styled.div`
   width: 100%;
-  /* background-color: ${({ theme }) => theme.text1};
-  color: ${({ theme }) => theme.bg1}; */
   position: sticky;
   top: 0;
-  /* z-index: 9999; */
-`
-
-const HeaderText = styled.div`
-  margin-right: 0.75rem;
-  font-size: 0.825rem;
-  font-weight: 400;
-  display: inline-box;
-  display: -webkit-inline-box;
 `
 
 const Medium = styled.span`
   font-weight: 500;
 `
 
-export default function NavHeader() {
+export default function GlobalStats() {
   const below1295 = useMedia('(max-width: 1295px)')
   const below1180 = useMedia('(max-width: 1180px)')
   const below1024 = useMedia('(max-width: 1024px)')
@@ -47,7 +37,8 @@ export default function NavHeader() {
       <RowBetween style={{ padding: below816 ? '0.5rem' : '.5rem' }}>
         <RowFixed>
           {!below400 && (
-            <HeaderText
+            <TYPE.main
+              mr={'1rem'}
               onMouseEnter={() => {
                 setShowPriceCard(true)
               }}
@@ -58,23 +49,23 @@ export default function NavHeader() {
             >
               ETH Price: <Medium>{formattedEthPrice}</Medium>
               {showPriceCard && <UniPrice />}
-            </HeaderText>
+            </TYPE.main>
           )}
 
           {!below1180 && (
-            <HeaderText>
+            <TYPE.main mr={'1rem'}>
               Transactions (24H): <Medium>{localNumber(oneDayTxns)}</Medium>
-            </HeaderText>
+            </TYPE.main>
           )}
           {!below1024 && (
-            <HeaderText>
+            <TYPE.main mr={'1rem'}>
               Pairs: <Medium>{localNumber(pairCount)}</Medium>
-            </HeaderText>
+            </TYPE.main>
           )}
           {!below1295 && (
-            <HeaderText>
+            <TYPE.main mr={'1rem'}>
               Fees (24H): <Medium>{oneDayFees}</Medium>&nbsp;
-            </HeaderText>
+            </TYPE.main>
           )}
         </RowFixed>
       </RowBetween>

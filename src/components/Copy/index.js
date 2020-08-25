@@ -2,6 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 import { useCopyClipboard } from '../../hooks'
 import { CheckCircle, Copy } from 'react-feather'
+import { StyledIcon } from '..'
 
 const CopyIcon = styled.div`
   color: #aeaeae;
@@ -31,12 +32,15 @@ export default function CopyHelper({ toCopy }) {
     <CopyIcon onClick={() => setCopied(toCopy)}>
       {isCopied ? (
         <TransactionStatusText>
-          <CheckCircle size={'14'} stroke="black" />
-          {/* <TransactionStatusText>Copied</TransactionStatusText> */}
+          <StyledIcon>
+            <CheckCircle size={'14'} />
+          </StyledIcon>
         </TransactionStatusText>
       ) : (
         <TransactionStatusText>
-          <Copy size={'14'} stroke="black" />
+          <StyledIcon>
+            <Copy size={'14'} />
+          </StyledIcon>
         </TransactionStatusText>
       )}
     </CopyIcon>

@@ -2,18 +2,15 @@ import React, { useEffect, useState } from 'react'
 import { withRouter } from 'react-router-dom'
 import 'feather-icons'
 import styled from 'styled-components'
-
-import { Text } from 'rebass'
 import Panel from '../components/Panel'
-
-import { PageWrapper, ContentWrapperLarge } from '../components/index'
+import { PageWrapper, ContentWrapperLarge, StyledIcon } from '../components/index'
 import { AutoRow, RowBetween, RowFixed } from '../components/Row'
 import Column, { AutoColumn } from '../components/Column'
 import { ButtonLight, ButtonDark } from '../components/ButtonStyled'
 import PairChart from '../components/PairChart'
 import Link from '../components/Link'
 import TxnList from '../components/TxnList'
-import Loader from '../components/Loader'
+import Loader from '../components/LocalLoader'
 import { BasicLink } from '../components/Link'
 import Search from '../components/Search'
 import { formattedNum, formattedPercent, getPoolLink, getSwapLink } from '../utils'
@@ -194,9 +191,9 @@ function PairPage({ pairAddress, history }) {
       />
       <ContentWrapperLarge>
         <RowBetween>
-          <Text>
+          <TYPE.body>
             <BasicLink to="/pairs">{'Pairs '}</BasicLink>→ {token0?.symbol}-{token1?.symbol}
-          </Text>
+          </TYPE.body>
           {!below600 && <Search small={true} />}
         </RowBetween>
         <WarningGrouping
@@ -210,7 +207,7 @@ function PairPage({ pairAddress, history }) {
                     {token0 && token1 && (
                       <DoubleTokenLogo a0={token0?.id || ''} a1={token1?.id || ''} size={32} margin={true} />
                     )}{' '}
-                    <Text fontSize={below1080 ? '1.5rem' : '2rem'} fontWeight={500} style={{ margin: '0 1rem' }}>
+                    <TYPE.main fontSize={below1080 ? '1.5rem' : '2rem'} style={{ margin: '0 1rem' }}>
                       {token0 && token1 ? (
                         <>
                           <HoverSpan onClick={() => history.push(`/token/${token0?.id}`)}>{token0.symbol}</HoverSpan>
@@ -223,7 +220,7 @@ function PairPage({ pairAddress, history }) {
                       ) : (
                         ''
                       )}
-                    </Text>
+                    </TYPE.main>
                   </RowFixed>
                 </RowFixed>
                 <RowFixed
@@ -233,10 +230,14 @@ function PairPage({ pairAddress, history }) {
                 >
                   {!!!savedPairs[pairAddress] && !below1080 ? (
                     <Hover onClick={() => addPair(pairAddress, token0.id, token1.id, token0.symbol, token1.symbol)}>
-                      <PlusCircle style={{ marginRight: '0.5rem' }} />
+                      <StyledIcon>
+                        <PlusCircle style={{ marginRight: '0.5rem' }} />
+                      </StyledIcon>
                     </Hover>
                   ) : !below1080 ? (
-                    <Bookmark style={{ marginRight: '0.5rem', opacity: 0.4 }} />
+                    <StyledIcon>
+                      <Bookmark style={{ marginRight: '0.5rem', opacity: 0.4 }} />
+                    </StyledIcon>
                   ) : (
                     <></>
                   )}
@@ -376,7 +377,6 @@ function PairPage({ pairAddress, history }) {
               </TYPE.main>{' '}
               <Panel
                 style={{
-                  border: '1px solid rgba(43, 43, 43, 0.05)',
                   marginTop: '1.5rem'
                 }}
               >
@@ -388,7 +388,6 @@ function PairPage({ pairAddress, history }) {
               <Panel
                 rounded
                 style={{
-                  border: '1px solid rgba(43, 43, 43, 0.05)',
                   marginTop: '1.5rem'
                 }}
                 p={20}
@@ -396,19 +395,19 @@ function PairPage({ pairAddress, history }) {
                 <TokenDetailsLayout>
                   <Column>
                     <TYPE.main>Pair Name</TYPE.main>
-                    <Text style={{ marginTop: '.5rem' }} fontSize={16} fontWeight="500">
+                    <TYPE.main style={{ marginTop: '.5rem' }}>
                       <RowFixed>
                         <FormattedName text={token0?.symbol ?? ''} maxCharacters={8} />-
                         <FormattedName text={token1?.symbol ?? ''} maxCharacters={8} />
                       </RowFixed>
-                    </Text>
+                    </TYPE.main>
                   </Column>
                   <Column>
                     <TYPE.main>Pair Address</TYPE.main>
                     <AutoRow align="flex-end">
-                      <Text style={{ marginTop: '.5rem' }} fontSize={16} fontWeight="500">
+                      <TYPE.main style={{ marginTop: '.5rem' }}>
                         {pairAddress.slice(0, 6) + '...' + pairAddress.slice(38, 42)}
-                      </Text>
+                      </TYPE.main>
                       <CopyHelper toCopy={pairAddress} />
                     </AutoRow>
                   </Column>
@@ -420,9 +419,9 @@ function PairPage({ pairAddress, history }) {
                       </RowFixed>
                     </TYPE.main>
                     <AutoRow align="flex-end">
-                      <Text style={{ marginTop: '.5rem' }} fontSize={16} fontWeight="500">
+                      <TYPE.main style={{ marginTop: '.5rem' }}>
                         {token0 && token0.id.slice(0, 6) + '...' + token0.id.slice(38, 42)}
-                      </Text>
+                      </TYPE.main>
                       <CopyHelper toCopy={token0?.id} />
                     </AutoRow>
                   </Column>
@@ -434,9 +433,9 @@ function PairPage({ pairAddress, history }) {
                       </RowFixed>
                     </TYPE.main>
                     <AutoRow align="flex-end">
-                      <Text style={{ marginTop: '.5rem' }} fontSize={16} fontWeight="500">
+                      <TYPE.main style={{ marginTop: '.5rem' }} fontSize={16}>
                         {token1 && token1.id.slice(0, 6) + '...' + token1.id.slice(38, 42)}
-                      </Text>
+                      </TYPE.main>
                       <CopyHelper toCopy={token1?.id} />
                     </AutoRow>
                   </Column>

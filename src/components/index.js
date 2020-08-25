@@ -9,7 +9,26 @@ import { urls } from '../utils'
 
 const Divider = styled(Box)`
   height: 1px;
-  background-color: rgba(43, 43, 43, 0.035);
+  background-color: ${({ theme }) => theme.divider};
+`
+
+export const IconWrapper = styled.div`
+  position: absolute;
+  right: 0;
+  border-radius: 3px;
+  height: 16px;
+  width: 16px;
+  padding: 0px;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: ${({ theme }) => theme.text1};
+
+  :hover {
+    cursor: pointer;
+    opacity: 0.7;
+  }
 `
 
 const Hint = ({ children, ...rest }) => (
@@ -35,6 +54,10 @@ export const Hover = styled.div`
     cursor: pointer;
     opacity: ${({ fade }) => fade && '0.7'};
   }
+`
+
+export const StyledIcon = styled.div`
+  color: ${({ theme }) => theme.text1};
 `
 
 const EmptyCard = styled.div`

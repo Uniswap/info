@@ -98,7 +98,7 @@ export const ButtonDark = styled(Base)`
 `
 
 export const ButtonFaded = styled(Base)`
-  background-color: rgba(0, 0, 0, 0.02);
+  background-color: ${({ theme }) => theme.bg2};
   color: (255, 255, 255, 0.5);
   white-space: nowrap;
 
@@ -133,7 +133,8 @@ export const OptionButton = styled.div`
   padding: 6px;
   border-radius: 6px;
   border: 1px solid ${({ theme }) => theme.bg4};
-  background-color: ${({ active }) => active && 'rgba(0, 0, 0, 0.06)'};
+  background-color: ${({ active, theme }) => active && theme.bg3};
+  color: ${({ theme }) => theme.text1};
 
   :hover {
     cursor: ${({ disabled }) => !disabled && 'pointer'};

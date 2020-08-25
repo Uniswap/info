@@ -7,7 +7,7 @@ import Link from '../components/Link'
 import Panel from '../components/Panel'
 import TokenLogo from '../components/TokenLogo'
 import PairList from '../components/PairList'
-import Loader from '../components/Loader'
+import Loader from '../components/LocalLoader'
 import { AutoRow, RowBetween, RowFixed } from '../components/Row'
 import Column, { AutoColumn } from '../components/Column'
 import { ButtonLight, ButtonDark } from '../components/ButtonStyled'
@@ -27,7 +27,7 @@ import { useEffect } from 'react'
 import Warning from '../components/Warning'
 import { SURPRESS_WARNINGS } from '../constants'
 import { usePathDismissed, useSavedTokens } from '../contexts/LocalStorage'
-import { Hover, PageWrapper, ContentWrapper } from '../components'
+import { Hover, PageWrapper, ContentWrapper, StyledIcon } from '../components'
 import { PlusCircle, Bookmark } from 'react-feather'
 import FormattedName from '../components/FormattedName'
 
@@ -166,9 +166,10 @@ function TokenPage({ address, history }) {
       <ContentWrapper>
         <RowBetween style={{ flexWrap: 'wrap', alingItems: 'start' }}>
           <AutoRow align="flex-end" style={{ width: 'fit-content' }}>
-            <Text>
-              <BasicLink to="/tokens">{'Tokens '}</BasicLink>→ {symbol}{' '}
-            </Text>
+            <TYPE.body>
+              <BasicLink to="/tokens">{'Tokens '}</BasicLink>→ {symbol}
+              {'  '}
+            </TYPE.body>
             <Link
               style={{ width: 'fit-content' }}
               color={backgroundColor}
@@ -189,17 +190,17 @@ function TokenPage({ address, history }) {
               <RowFixed style={{ flexWrap: 'wrap' }}>
                 <RowFixed style={{ alignItems: 'baseline' }}>
                   <TokenLogo address={address} size="32px" style={{ alignSelf: 'center' }} />
-                  <Text fontSize={below1080 ? '1.5rem' : '2rem'} fontWeight={500} style={{ margin: '0 1rem' }}>
+                  <TYPE.main fontSize={below1080 ? '1.5rem' : '2rem'} fontWeight={500} style={{ margin: '0 1rem' }}>
                     <RowFixed gap="6px">
                       <FormattedName text={name ? name + ' ' : ''} maxCharacters={16} style={{ marginRight: '6px' }} />{' '}
                       {formattedSymbol ? `(${formattedSymbol})` : ''}
                     </RowFixed>
-                  </Text>{' '}
+                  </TYPE.main>{' '}
                   {!below1080 && (
                     <>
-                      <Text fontSize={'1.5rem'} fontWeight={500} style={{ marginRight: '1rem' }}>
+                      <TYPE.main fontSize={'1.5rem'} fontWeight={500} style={{ marginRight: '1rem' }}>
                         {price}
-                      </Text>
+                      </TYPE.main>
                       {priceChange}
                     </>
                   )}
@@ -209,10 +210,14 @@ function TokenPage({ address, history }) {
                 <RowFixed ml={below500 ? '0' : '2.5rem'} mt={below500 ? '1rem' : '0'}>
                   {!!!savedTokens[address] && !below800 ? (
                     <Hover onClick={() => addToken(address, symbol)}>
-                      <PlusCircle style={{ marginRight: '0.5rem' }} />
+                      <StyledIcon>
+                        <PlusCircle style={{ marginRight: '0.5rem' }} />
+                      </StyledIcon>
                     </Hover>
                   ) : !below1080 ? (
-                    <Bookmark style={{ marginRight: '0.5rem', opacity: 0.4 }} />
+                    <StyledIcon>
+                      <Bookmark style={{ marginRight: '0.5rem', opacity: 0.4 }} />
+                    </StyledIcon>
                   ) : (
                     <></>
                   )}
@@ -304,7 +309,6 @@ function TokenPage({ address, history }) {
             <Panel
               rounded
               style={{
-                border: '1px solid rgba(43, 43, 43, 0.05)',
                 marginTop: '1.5rem',
                 padding: '1.125rem 0 '
               }}
@@ -318,12 +322,7 @@ function TokenPage({ address, history }) {
             <RowBetween mt={40} mb={'1rem'}>
               <TYPE.main fontSize={'1.125rem'}>Transactions</TYPE.main> <div />
             </RowBetween>
-            <Panel
-              rounded
-              style={{
-                border: '1px solid rgba(43, 43, 43, 0.05)'
-              }}
-            >
+            <Panel rounded>
               {transactions ? <TxnList color={backgroundColor} transactions={transactions} /> : <Loader />}
             </Panel>
             <>
@@ -333,7 +332,6 @@ function TokenPage({ address, history }) {
               <Panel
                 rounded
                 style={{
-                  border: '1px solid rgba(43, 43, 43, 0.05)',
                   marginTop: '1.5rem'
                 }}
                 p={20}
@@ -347,16 +345,16 @@ function TokenPage({ address, history }) {
                   </Column>
                   <Column>
                     <TYPE.main>Name</TYPE.main>
-                    <Text style={{ marginTop: '.5rem' }} fontSize={24} fontWeight="500">
+                    <TYPE.main style={{ marginTop: '.5rem' }} fontSize={24} fontWeight="500">
                       <FormattedName text={name} maxCharacters={16} />
-                    </Text>
+                    </TYPE.main>
                   </Column>
                   <Column>
                     <TYPE.main>Address</TYPE.main>
                     <AutoRow align="flex-end">
-                      <Text style={{ marginTop: '.5rem' }} fontSize={24} fontWeight="500">
+                      <TYPE.main style={{ marginTop: '.5rem' }} fontSize={24} fontWeight="500">
                         {address.slice(0, 8) + '...' + address.slice(36, 42)}
-                      </Text>
+                      </TYPE.main>
                       <CopyHelper toCopy={address} />
                     </AutoRow>
                   </Column>

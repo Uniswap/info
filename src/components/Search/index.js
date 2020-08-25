@@ -17,6 +17,7 @@ import { transparentize } from 'polished'
 import { client } from '../../apollo/client'
 import { PAIR_SEARCH, TOKEN_SEARCH } from '../../apollo/queries'
 import FormattedName from '../FormattedName'
+import { TYPE } from '../../Theme'
 
 const Container = styled.div`
   height: 48px;
@@ -36,7 +37,8 @@ const Wrapper = styled.div`
   justify-content: flex-end;
   padding: 12px 16px;
   border-radius: 12px;
-  background: ${({ theme, small, open }) => (small ? (open ? 'white' : 'none') : transparentize(0.4, theme.bg1))};
+  background: ${({ theme, small, open }) =>
+    small ? (open ? transparentize(0.4, theme.bg1) : 'none') : transparentize(0.4, theme.bg1)};
   border-bottom-right-radius: ${({ open }) => (open ? '0px' : '12px')};
   border-bottom-left-radius: ${({ open }) => (open ? '0px' : '12px')};
   z-index: 9999;
@@ -64,11 +66,11 @@ const Input = styled.input`
   border: none;
   outline: none;
   width: 100%;
-  color: ${({ theme }) => theme.textColor};
+  color: ${({ theme }) => theme.text1};
   font-size: ${({ large }) => (large ? '20px' : '14px')};
 
   ::placeholder {
-    color: ${({ theme }) => theme.bg5};
+    color: ${({ theme }) => theme.text3};
     font-size: 16px;
   }
 
@@ -86,7 +88,7 @@ const SearchIconLarge = styled(SearchIcon)`
   position: absolute;
   right: 10px;
   pointer-events: none;
-  color: ${({ theme }) => theme.textColor};
+  color: ${({ theme }) => theme.text3};
 `
 
 const CloseIcon = styled(X)`
@@ -95,7 +97,7 @@ const CloseIcon = styled(X)`
   margin-right: 0.5rem;
   position: absolute;
   right: 10px;
-  color: ${({ theme }) => theme.textColor};
+  color: ${({ theme }) => theme.text3};
   :hover {
     cursor: pointer;
   }
@@ -111,7 +113,7 @@ const Menu = styled.div`
   overflow: scroll;
   left: 0;
   padding-bottom: 20px;
-  background: white;
+  background: ${({ theme }) => theme.bg1};
   border-bottom-right-radius: 12px;
   border-bottom-left-radius: 12px;
   box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.04), 0px 4px 8px rgba(0, 0, 0, 0.04), 0px 16px 24px rgba(0, 0, 0, 0.04),
@@ -127,7 +129,7 @@ const MenuItem = styled(Row)`
   }
   :hover {
     cursor: pointer;
-    background-color: #f7f8fa;
+    background-color: ${({ theme }) => theme.bg2};
   }
 `
 
@@ -450,7 +452,11 @@ export const Search = ({ small = false }) => {
           <Gray>Pairs</Gray>
         </Heading>
         <div>
-          {filteredPairList && Object.keys(filteredPairList).length === 0 && <MenuItem>No results</MenuItem>}
+          {filteredPairList && Object.keys(filteredPairList).length === 0 && (
+            <MenuItem>
+              <TYPE.body>No results</TYPE.body>
+            </MenuItem>
+          )}
           {filteredPairList &&
             filteredPairList.slice(0, pairsShown).map(pair => {
               if (pair?.token0?.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
@@ -465,7 +471,9 @@ export const Search = ({ small = false }) => {
                 <BasicLink to={'/pair/' + pair.id} key={pair.id} onClick={onDismiss}>
                   <MenuItem>
                     <DoubleTokenLogo a0={pair?.token0?.id} a1={pair?.token1?.id} margin={true} />
-                    <span style={{ marginLeft: '10px' }}>{pair.token0.symbol + '-' + pair.token1.symbol} Pair</span>
+                    <TYPE.body style={{ marginLeft: '10px' }}>
+                      {pair.token0.symbol + '-' + pair.token1.symbol} Pair
+                    </TYPE.body>
                   </MenuItem>
                 </BasicLink>
               )
@@ -486,7 +494,11 @@ export const Search = ({ small = false }) => {
           <Gray>Tokens</Gray>
         </Heading>
         <div>
-          {Object.keys(filteredTokenList).length === 0 && <MenuItem>No results</MenuItem>}
+          {Object.keys(filteredTokenList).length === 0 && (
+            <MenuItem>
+              <TYPE.body>No results</TYPE.body>
+            </MenuItem>
+          )}
           {filteredTokenList.slice(0, tokensShown).map(token => {
             return (
               <BasicLink to={'/token/' + token.id} key={token.id} onClick={onDismiss}>

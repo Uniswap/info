@@ -295,8 +295,8 @@ export const isAddress = value => {
   }
 }
 
-export const toK = (num, fixed, cutoff = false) => {
-  return Numeral(num).format('0.00a')
+export const toK = num => {
+  return Numeral(num).format('0.[00]a')
 }
 
 export const setThemeColor = theme => document.documentElement.style.setProperty('--c-token', theme || '#333333')

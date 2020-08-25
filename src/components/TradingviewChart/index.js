@@ -6,6 +6,8 @@ import { formattedNum } from '../../utils'
 import styled from 'styled-components'
 import { usePrevious } from 'react-use'
 import { Play } from 'react-feather'
+import { useDarkModeManager } from '../../contexts/LocalStorage'
+import { IconWrapper } from '..'
 
 dayjs.extend(utc)
 
@@ -16,26 +18,6 @@ export const CHART_TYPES = {
 
 const Wrapper = styled.div`
   position: relative;
-`
-
-const IconWrapper = styled.div`
-  position: absolute;
-  right: 0;
-  /* background-color: white; */
-  border-radius: 3px;
-  height: 16px;
-  width: 16px;
-  padding: 0px;
-  bottom: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  /* box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24); */
-
-  :hover {
-    cursor: pointer;
-    opacity: 0.7;
-  }
 `
 
 // constant height for charts
@@ -80,6 +62,22 @@ const TradingViewChart = ({
   // adjust the scale based on the type of chart
   const topScale = type === CHART_TYPES.AREA ? 0.32 : 0.2
 
+  const [darkMode] = useDarkModeManager()
+  const textColor = darkMode ? 'white' : 'black'
+  const previousTheme = usePrevious(darkMode)
+
+  // reset the chart if them switches
+  useEffect(() => {
+    if (chartCreated && previousTheme !== darkMode) {
+      // remove the tooltip element
+      let tooltip = document.getElementById('tooltip-id' + type)
+      let node = document.getElementById('test-id' + type)
+      node.removeChild(tooltip)
+      chartCreated.resize(0, 0)
+      setChartCreated()
+    }
+  }, [chartCreated, darkMode, previousTheme, type])
+
   // if no chart created yet, create one with options and add to DOM manually
   useEffect(() => {
     if (!chartCreated && formattedData) {
@@ -87,7 +85,8 @@ const TradingViewChart = ({
         width: width,
         height: HEIGHT,
         layout: {
-          backgroundColor: 'transparent'
+          backgroundColor: 'transparent',
+          textColor: textColor
         },
         rightPriceScale: {
           scaleMargins: {
@@ -151,7 +150,7 @@ const TradingViewChart = ({
       series.setData(formattedData)
       var toolTip = document.createElement('div')
       toolTip.setAttribute('id', 'tooltip-id' + type)
-      toolTip.className = 'three-line-legend'
+      toolTip.className = darkMode ? 'three-line-legend-dark' : 'three-line-legend'
       ref.current.appendChild(toolTip)
       toolTip.style.display = 'block'
       toolTip.style.fontWeight = '500'
@@ -167,10 +166,10 @@ const TradingViewChart = ({
       // get the title of the chart
       function setLastBarText() {
         toolTip.innerHTML =
-          `<div style="font-size: 16px; margin: 4px 0px; color: #20262E;">${title} ${
+          `<div style="font-size: 16px; margin: 4px 0px; color: ${textColor};">${title} ${
             type === CHART_TYPES.BAR && !useWeekly ? '(24hr)' : ''
           }</div>` +
-          '<div style="font-size: 22px; margin: 4px 0px; color: #20262E">' +
+          `<div style="font-size: 22px; margin: 4px 0px; color:${textColor}" >` +
           formattedNum(base ?? 0, true) +
           `<span style="margin-left: 10px; font-size: 16px; color: ${color};">${formattedPercentChange}</span>` +
           '</div>'
@@ -201,8 +200,8 @@ const TradingViewChart = ({
           var price = param.seriesPrices.get(series)
 
           toolTip.innerHTML =
-            `<div style="font-size: 16px; margin: 4px 0px; color: #20262E;">${title}</div>` +
-            '<div style="font-size: 22px; margin: 4px 0px; color: #20262E">' +
+            `<div style="font-size: 16px; margin: 4px 0px; color: ${textColor};">${title}</div>` +
+            `<div style="font-size: 22px; margin: 4px 0px; color: ${textColor}">` +
             formattedNum(price, true) +
             '</div>' +
             '<div>' +
@@ -215,7 +214,20 @@ const TradingViewChart = ({
 
       setChartCreated(chart)
     }
-  }, [base, baseChange, chartCreated, data, formattedData, title, topScale, type, useWeekly, width])
+  }, [
+    base,
+    baseChange,
+    chartCreated,
+    darkMode,
+    data,
+    formattedData,
+    textColor,
+    title,
+    topScale,
+    type,
+    useWeekly,
+    width
+  ])
 
   // responsiveness
   useEffect(() => {

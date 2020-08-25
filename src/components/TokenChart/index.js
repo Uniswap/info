@@ -14,6 +14,7 @@ import CandleStickChart from '../CandleChart'
 import LocalLoader from '../LocalLoader'
 import { AutoColumn } from '../Column'
 import { Activity } from 'react-feather'
+import { useDarkModeManager } from '../../contexts/LocalStorage'
 
 const ChartWrapper = styled.div`
   height: 100%;
@@ -45,6 +46,9 @@ const TokenChart = ({ address, color, base }) => {
   // settings for the window and candle width
   const [chartFilter, setChartFilter] = useState(CHART_VIEW.PRICE)
   const [frequency, setFrequency] = useState(DATA_FREQUENCY.HOUR)
+
+  const [darkMode] = useDarkModeManager()
+  const textColor = darkMode ? 'white' : 'black'
 
   // reset view on new address
   const addressPrev = usePrevious(address)
@@ -232,7 +236,7 @@ const TokenChart = ({ address, color, base }) => {
               minTickGap={120}
               tickFormatter={tick => toNiceDate(tick)}
               dataKey="date"
-              tick={{ fill: 'black' }}
+              tick={{ fill: textColor }}
               type={'number'}
               domain={['dataMin', 'dataMax']}
             />
@@ -245,7 +249,7 @@ const TokenChart = ({ address, color, base }) => {
               interval="preserveEnd"
               minTickGap={80}
               yAxisId={0}
-              tick={{ fill: 'black' }}
+              tick={{ fill: textColor }}
             />
             <Tooltip
               cursor={true}
@@ -293,7 +297,7 @@ const TokenChart = ({ address, color, base }) => {
                 minTickGap={120}
                 tickFormatter={tick => toNiceDate(tick)}
                 dataKey="date"
-                tick={{ fill: 'black' }}
+                tick={{ fill: textColor }}
                 type={'number'}
                 domain={domain}
               />
@@ -306,7 +310,7 @@ const TokenChart = ({ address, color, base }) => {
                 interval="preserveEnd"
                 minTickGap={80}
                 yAxisId={0}
-                tick={{ fill: 'black' }}
+                tick={{ fill: textColor }}
               />
               <Tooltip
                 cursor={true}
@@ -354,6 +358,7 @@ const TokenChart = ({ address, color, base }) => {
               tickMargin={14}
               tickFormatter={tick => toNiceDate(tick)}
               dataKey="date"
+              tick={{ fill: textColor }}
               type={'number'}
               domain={['dataMin', 'dataMax']}
             />
@@ -367,7 +372,7 @@ const TokenChart = ({ address, color, base }) => {
               interval="preserveEnd"
               minTickGap={80}
               yAxisId={0}
-              tick={{ fill: 'black' }}
+              tick={{ fill: textColor }}
             />
             <Tooltip
               cursor={{ fill: color, opacity: 0.1 }}

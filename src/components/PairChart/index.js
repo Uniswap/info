@@ -13,6 +13,7 @@ import { EmptyCard } from '..'
 import DropdownSelect from '../DropdownSelect'
 import CandleStickChart from '../CandleChart'
 import LocalLoader from '../LocalLoader'
+import { useDarkModeManager } from '../../contexts/LocalStorage'
 
 const ChartWrapper = styled.div`
   height: 100%;
@@ -41,6 +42,9 @@ const PairChart = ({ address, color, base0, base1 }) => {
   const [chartFilter, setChartFilter] = useState(CHART_VIEW.LIQUIDITY)
 
   const [timeWindow, setTimeWindow] = useState(timeframeOptions.MONTH)
+
+  const [darkMode] = useDarkModeManager()
+  const textColor = darkMode ? 'white' : 'black'
 
   // update the width on a window resize
   const ref = useRef()
@@ -180,7 +184,7 @@ const PairChart = ({ address, color, base0, base1 }) => {
       )}
       {chartFilter === CHART_VIEW.LIQUIDITY && (
         <ResponsiveContainer aspect={aspect}>
-          <AreaChart margin={{ top: 0, right: 0, bottom: 6, left: 0 }} barCategoryGap={1} data={chartData}>
+          <AreaChart margin={{ top: 0, right: 10, bottom: 6, left: 0 }} barCategoryGap={1} data={chartData}>
             <defs>
               <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor={color} stopOpacity={0.35} />
@@ -195,7 +199,7 @@ const PairChart = ({ address, color, base0, base1 }) => {
               minTickGap={80}
               tickFormatter={tick => toNiceDate(tick)}
               dataKey="date"
-              tick={{ fill: 'black' }}
+              tick={{ fill: textColor }}
               type={'number'}
               domain={['dataMin', 'dataMax']}
             />
@@ -208,7 +212,8 @@ const PairChart = ({ address, color, base0, base1 }) => {
               interval="preserveEnd"
               minTickGap={80}
               yAxisId={0}
-              tick={{ fill: 'black' }}
+              tickMargin={16}
+              tick={{ fill: textColor }}
             />
             <Tooltip
               cursor={true}
@@ -282,7 +287,7 @@ const PairChart = ({ address, color, base0, base1 }) => {
               tickMargin={14}
               tickFormatter={tick => toNiceDate(tick)}
               dataKey="date"
-              tick={{ fill: 'black' }}
+              tick={{ fill: textColor }}
               type={'number'}
               domain={['dataMin', 'dataMax']}
             />
@@ -296,7 +301,7 @@ const PairChart = ({ address, color, base0, base1 }) => {
               orientation="right"
               minTickGap={80}
               yAxisId={0}
-              tick={{ fill: 'black' }}
+              tick={{ fill: textColor }}
             />
             <Tooltip
               cursor={{ fill: color, opacity: 0.1 }}

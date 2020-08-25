@@ -30,16 +30,22 @@ const theme = (darkMode, color) => ({
   text4: darkMode ? '#565A69' : '#C3C5CB',
   text5: darkMode ? '#2C2F36' : '#EDEEF2',
 
+  // special case text types
+  white: '#FFFFFF',
+
   // backgrounds / greys
   bg1: darkMode ? '#212429' : '#FFFFFF',
   bg2: darkMode ? '#2C2F36' : '#F7F8FA',
   bg3: darkMode ? '#40444F' : '#EDEEF2',
   bg4: darkMode ? '#565A69' : '#CED0D9',
   bg5: darkMode ? '#565A69' : '#888D9B',
+  bg6: darkMode ? '#000000' : '#FFFFFF',
 
   //specialty colors
   modalBG: darkMode ? 'rgba(0,0,0,0.85)' : 'rgba(0,0,0,0.6)',
   advancedBG: darkMode ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.4)',
+  onlyLight: darkMode ? 'black' : 'transparent',
+  divider: darkMode ? 'rgba(43, 43, 43, 0.435)' : 'rgba(43, 43, 43, 0.035)',
 
   //primary colors
   primary1: darkMode ? '#2172E5' : '#ff007a',
@@ -64,6 +70,7 @@ const theme = (darkMode, color) => ({
   yellow1: '#FFE270',
   yellow2: '#F3841E',
   link: '#2172E5',
+  blue: '2f80ed',
 
   background: darkMode ? 'black' : `radial-gradient(50% 50% at 50% 50%, #ff007a30 0%, #fff 0%)`
 })
@@ -75,6 +82,10 @@ const TextWrapper = styled(Text)`
 export const TYPE = {
   main(props) {
     return <TextWrapper fontWeight={500} fontSize={14} color={'text1'} {...props} />
+  },
+
+  body(props) {
+    return <TextWrapper fontWeight={400} fontSize={14} color={'text1'} {...props} />
   },
 
   small(props) {
@@ -138,8 +149,8 @@ export const ThemedBackground = styled.div`
   position: absolute;
   top: 0px;
   left: 0px;
-  /* z-index: 30; */
-  z-index: 30;
+  z-index: 9999;
+
   transform: translateY(-110vh);
 `
 
@@ -157,6 +168,7 @@ export const GlobalStyle = createGlobalStyle`
     width: 100%;
     height: 100%;
     font-size: 14px;    
+    background-color: ${({ theme }) => theme.bg6};
   }
 
   a {
@@ -175,6 +187,19 @@ export const GlobalStyle = createGlobalStyle`
 	padding: 8px;
 	font-size: 12px;
 	color: #20262E;
+	background-color: rgba(255, 255, 255, 0.23);
+	text-align: left;
+	z-index: 10;
+  pointer-events: none;
+}
+
+.three-line-legend-dark {
+	width: 100%;
+	height: 70px;
+	position: absolute;
+	padding: 8px;
+	font-size: 12px;
+	color: white;
 	background-color: rgba(255, 255, 255, 0.23);
 	text-align: left;
 	z-index: 10;
@@ -204,7 +229,6 @@ export const GlobalStyle = createGlobalStyle`
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-    /* overflow: auto; */
     height: 100%;
   }
 `

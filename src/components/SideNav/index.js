@@ -10,6 +10,8 @@ import { withRouter } from 'react-router-dom'
 import { TrendingUp, List, PieChart, Disc } from 'react-feather'
 import Link from '../Link'
 import { useSessionStart } from '../../contexts/Application'
+import { useDarkModeManager } from '../../contexts/LocalStorage'
+import Toggle from '../Toggle'
 
 const Wrapper = styled.div`
   height: ${({ isMobile }) => (isMobile ? 'initial' : '100vh')};
@@ -104,6 +106,8 @@ function SideNav({ history }) {
 
   const seconds = useSessionStart()
 
+  const [isDark, toggleDarkMode] = useDarkModeManager()
+
   return (
     <Wrapper isMobile={below1080}>
       {!below1080 ? (
@@ -184,6 +188,7 @@ function SideNav({ history }) {
                 Twitter
               </Link>
             </HeaderText>
+            <Toggle isActive={isDark} toggle={toggleDarkMode} />
           </AutoColumn>
           {!below1180 && (
             <Polling style={{ marginLeft: '.5rem' }}>

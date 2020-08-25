@@ -13,6 +13,7 @@ import { formattedNum, formattedPercent } from '../../utils'
 import DoubleTokenLogo from '../DoubleLogo'
 import FormattedName from '../FormattedName'
 import QuestionHelper from '../QuestionHelper'
+import { TYPE } from '../../Theme'
 
 dayjs.extend(utc)
 
@@ -76,6 +77,7 @@ const DashGrid = styled.div`
 const ListWrapper = styled.div``
 
 const ClickableText = styled(Text)`
+  color: ${({ theme }) => theme.text1};
   &:hover {
     cursor: pointer;
     opacity: 0.6;
@@ -87,6 +89,7 @@ const ClickableText = styled(Text)`
 const DataText = styled(Flex)`
   align-items: center;
   text-align: center;
+  color: ${({ theme }) => theme.text1};
 
   & > * {
     font-size: 14px;
@@ -164,6 +167,7 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
                 text={pairData.token0.symbol + '-' + pairData.token1.symbol}
                 maxCharacters={below600 ? 8 : 16}
                 adjustSize={true}
+                link={true}
               />
             </CustomLink>
           </DataText>
@@ -214,9 +218,7 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
         style={{ height: 'fit-content', padding: '0 1.125rem 1rem 1.125rem' }}
       >
         <Flex alignItems="center" justifyContent="flexStart">
-          <Text area="name" fontWeight="500">
-            Name
-          </Text>
+          <TYPE.main area="name">Name</TYPE.main>
         </Flex>
         <Flex alignItems="center" justifyContent="flexEnd">
           <ClickableText
@@ -292,7 +294,7 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
         >
           <Arrow faded={page === 1 ? true : false}>←</Arrow>
         </div>
-        {'Page ' + page + ' of ' + maxPage}
+        <TYPE.body>{'Page ' + page + ' of ' + maxPage}</TYPE.body>
         <div
           onClick={e => {
             setPage(page === maxPage ? page : page + 1)

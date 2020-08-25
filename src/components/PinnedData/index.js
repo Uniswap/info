@@ -44,6 +44,10 @@ const ScrollableDiv = styled(AutoColumn)`
   padding-bottom: 60px;
 `
 
+const StyledIcon = styled.div`
+  color: ${({ theme }) => theme.text2};
+`
+
 function PinnedData({ history, open, setSavedOpen }) {
   const [savedPairs, , removePair] = useSavedPairs()
   const [savedTokens, , removeToken] = useSavedTokens()
@@ -51,17 +55,23 @@ function PinnedData({ history, open, setSavedOpen }) {
   return !open ? (
     <RightColumn open={open} onClick={() => setSavedOpen(true)}>
       <SavedButton open={open}>
-        <Bookmark size={20} />
+        <StyledIcon>
+          <Bookmark size={20} />
+        </StyledIcon>
       </SavedButton>
     </RightColumn>
   ) : (
     <RightColumn gap="1rem" open={open}>
       <SavedButton onClick={() => setSavedOpen(false)} open={open}>
         <RowFixed>
-          <Bookmark size={16} />
+          <StyledIcon>
+            <Bookmark size={16} />
+          </StyledIcon>
           <TYPE.main ml={'4px'}>Saved</TYPE.main>
         </RowFixed>
-        <ChevronRight />
+        <StyledIcon>
+          <ChevronRight />
+        </StyledIcon>
       </SavedButton>
       <AccountSearch small={true} />
       <AutoColumn gap="40px" style={{ marginTop: '2rem' }}>
@@ -86,7 +96,9 @@ function PinnedData({ history, open, setSavedOpen }) {
                       </RowFixed>
                     </ButtonFaded>
                     <Hover onClick={() => removePair(pair.address)}>
-                      <X size={16} />
+                      <StyledIcon>
+                        <X size={16} />
+                      </StyledIcon>
                     </Hover>
                   </RowBetween>
                 )
@@ -117,7 +129,9 @@ function PinnedData({ history, open, setSavedOpen }) {
                       </RowFixed>
                     </ButtonFaded>
                     <Hover onClick={() => removeToken(address)}>
-                      <X size={16} />
+                      <StyledIcon>
+                        <X size={16} />
+                      </StyledIcon>
                     </Hover>
                   </RowBetween>
                 )
