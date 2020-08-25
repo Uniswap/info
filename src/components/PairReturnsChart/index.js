@@ -12,6 +12,7 @@ import { useUserPositionChart } from '../../contexts/User'
 import { useTimeframe } from '../../contexts/Application'
 import LocalLoader from '../LocalLoader'
 import { useColor } from '../../hooks'
+import { useDarkModeManager } from '../../contexts/LocalStorage'
 
 const ChartWrapper = styled.div`
   max-height: 420px;
@@ -49,6 +50,9 @@ const PairReturnsChart = ({ account, position }) => {
   data = data?.filter(entry => entry.date >= utcStartTime)
 
   const aspect = below600 ? 60 / 42 : 60 / 16
+
+  const [darkMode] = useDarkModeManager()
+  const textColor = darkMode ? 'white' : 'black'
 
   return (
     <ChartWrapper>
@@ -106,7 +110,7 @@ const PairReturnsChart = ({ account, position }) => {
               tickMargin={14}
               tickFormatter={tick => toNiceDate(tick)}
               dataKey="date"
-              tick={{ fill: 'black' }}
+              tick={{ fill: textColor }}
               type={'number'}
               domain={['dataMin', 'dataMax']}
             />
@@ -119,7 +123,7 @@ const PairReturnsChart = ({ account, position }) => {
               interval="preserveStartEnd"
               minTickGap={0}
               yAxisId={0}
-              tick={{ fill: 'black' }}
+              tick={{ fill: textColor }}
             />
             <Tooltip
               cursor={true}

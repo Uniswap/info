@@ -4,6 +4,7 @@ import styled from 'styled-components'
 import { Plus, ChevronDown, ChevronUp } from 'react-feather'
 import { darken, transparentize } from 'polished'
 import { RowBetween } from '../Row'
+import { StyledIcon } from '..'
 
 const Base = styled(RebassButton)`
   padding: 8px 12px;
@@ -14,6 +15,8 @@ const Base = styled(RebassButton)`
   outline: none;
   border: 1px solid transparent;
   outline: none;
+  border-bottom-right-radius: ${({ open }) => open && '0'};
+  border-bottom-left-radius: ${({ open }) => open && '0'};
 `
 
 const BaseCustom = styled(RebassButton)`
@@ -76,12 +79,20 @@ export const ButtonLight = styled(Base)`
 
 export function ButtonDropdown({ disabled = false, children, open, ...rest }) {
   return (
-    <Base {...rest} disabled={disabled}>
+    <ButtonFaded {...rest} disabled={disabled} ope={open}>
       <RowBetween>
         <div style={{ display: 'flex', alignItems: 'center' }}>{children}</div>
-        {open ? <ChevronUp size={24} fill="black" /> : <ChevronDown size={24} fill="black" />}
+        {open ? (
+          <StyledIcon>
+            <ChevronUp size={24} />
+          </StyledIcon>
+        ) : (
+          <StyledIcon>
+            <ChevronDown size={24} />
+          </StyledIcon>
+        )}
       </RowBetween>
-    </Base>
+    </ButtonFaded>
   )
 }
 

@@ -4,7 +4,8 @@ import styled from 'styled-components'
 import Row, { RowBetween } from '../Row'
 import { AutoColumn } from '../Column'
 import { ChevronDown as Arrow } from 'react-feather'
-import { Text } from 'rebass'
+import { TYPE } from '../../Theme'
+import { StyledIcon } from '..'
 
 const Wrapper = styled.div`
   z-index: 20;
@@ -54,8 +55,10 @@ const DropdownSelect = ({ options, active, setActive, color }) => {
   return (
     <Wrapper open={showDropdown} color={color}>
       <RowBetween onClick={() => toggleDropdown(!showDropdown)} justify="center">
-        <Text>{active}</Text>
-        <ArrowStyled />
+        <TYPE.main>{active}</TYPE.main>
+        <StyledIcon>
+          <ArrowStyled />
+        </StyledIcon>
       </RowBetween>
       {showDropdown && (
         <Dropdown>
@@ -71,9 +74,7 @@ const DropdownSelect = ({ options, active, setActive, color }) => {
                     }}
                     key={index}
                   >
-                    <Text fontWeight={400} fontSize={14}>
-                      {option}
-                    </Text>
+                    <TYPE.body fontSize={14}>{option}</TYPE.body>
                   </Row>
                 )
               )

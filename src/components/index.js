@@ -66,6 +66,7 @@ const EmptyCard = styled.div`
   justify-content: center;
   height: 200px;
   border-radius: 20px;
+  color: ${({ theme }) => theme.text1};
   height: ${({ height }) => height && height};
 `
 

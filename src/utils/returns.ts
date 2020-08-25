@@ -270,7 +270,7 @@ export async function getLPReturnsOnPair(user: string, pair, ethPrice: number, s
   // get data about the current position
   const currentPosition: Position = {
     pair,
-    liquidityTokenBalance: snapshots[snapshots.length - 1].liquidityTokenBalance,
+    liquidityTokenBalance: snapshots[snapshots.length - 1]?.liquidityTokenBalance,
     liquidityTokenTotalSupply: pair.totalSupply,
     reserve0: pair.reserve0,
     reserve1: pair.reserve1,

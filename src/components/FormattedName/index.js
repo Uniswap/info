@@ -6,6 +6,7 @@ const TextWrapper = styled.div`
   position: relative;
   margin-left: ${({ margin }) => margin && '4px'};
   color: ${({ theme, link }) => (link ? theme.blue : theme.text1)};
+  font-size: ${({ fontSize }) => fontSize};
 
   :hover {
     cursor: pointer;
@@ -16,7 +17,15 @@ const TextWrapper = styled.div`
   }
 `
 
-const FormattedName = ({ text, maxCharacters, margin = false, adjustSize = false, link, ...rest }) => {
+const FormattedName = ({
+  text,
+  maxCharacters,
+  margin = false,
+  adjustSize = false,
+  fontSize = '16px',
+  link,
+  ...rest
+}) => {
   const [showHover, setShowHover] = useState(false)
 
   if (!text) {
@@ -32,6 +41,7 @@ const FormattedName = ({ text, maxCharacters, margin = false, adjustSize = false
           margin={margin}
           adjustSize={adjustSize}
           link={link}
+          fontSize={fontSize}
           {...rest}
         >
           {' ' + text.slice(0, maxCharacters - 1) + '...'}
@@ -41,7 +51,7 @@ const FormattedName = ({ text, maxCharacters, margin = false, adjustSize = false
   }
 
   return (
-    <TextWrapper margin={margin} adjustSize={adjustSize} link={link} {...rest}>
+    <TextWrapper margin={margin} adjustSize={adjustSize} link={link} fontSize={fontSize} {...rest}>
       {text}
     </TextWrapper>
   )
