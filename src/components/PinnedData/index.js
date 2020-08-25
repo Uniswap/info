@@ -91,7 +91,11 @@ function PinnedData({ history, open, setSavedOpen }) {
                     <ButtonFaded onClick={() => history.push('/pair/' + address)}>
                       <RowFixed>
                         <TYPE.header>
-                          <FormattedName text={pair.token0Symbol + '/' + pair.token1Symbol} maxCharacters={12} />
+                          <FormattedName
+                            text={pair.token0Symbol + '/' + pair.token1Symbol}
+                            maxCharacters={12}
+                            fontSize={'12px'}
+                          />
                         </TYPE.header>
                       </RowFixed>
                     </ButtonFaded>
@@ -124,7 +128,7 @@ function PinnedData({ history, open, setSavedOpen }) {
                       <RowFixed>
                         <TokenLogo address={address} size={'14px'} />
                         <TYPE.header ml={'6px'}>
-                          <FormattedName text={token.symbol} maxCharacters={12} />
+                          <FormattedName text={token.symbol} maxCharacters={12} fontSize={'12px'} />
                         </TYPE.header>
                       </RowFixed>
                     </ButtonFaded>
