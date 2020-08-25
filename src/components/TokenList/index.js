@@ -15,6 +15,7 @@ import { withRouter } from 'react-router-dom'
 import { OVERVIEW_TOKEN_BLACKLIST } from '../../constants'
 import FormattedName from '../FormattedName'
 import { TYPE } from '../../Theme'
+import LocalLoader from '../LocalLoader'
 
 dayjs.extend(utc)
 
@@ -121,7 +122,7 @@ const SORT_FIELD = {
 }
 
 // @TODO rework into virtualized list
-function TopTokenList({ tokens, history, itemMax = 10 }) {
+function TopTokenList({ tokens, itemMax = 10 }) {
   // page state
   const [page, setPage] = useState(1)
   const [maxPage, setMaxPage] = useState(1)
@@ -142,9 +143,9 @@ function TopTokenList({ tokens, history, itemMax = 10 }) {
 
   const formattedTokens =
     tokens &&
-    Object.keys(tokens).map(key => {
-      return !OVERVIEW_TOKEN_BLACKLIST.includes(key) && tokens[key]
-    })
+    Object.keys(tokens)
+      .filter(key => !OVERVIEW_TOKEN_BLACKLIST.includes(key))
+      .map(key => tokens[key])
 
   useEffect(() => {
     if (tokens && formattedTokens) {
@@ -156,23 +157,7 @@ function TopTokenList({ tokens, history, itemMax = 10 }) {
     }
   }, [tokens, formattedTokens, ITEMS_PER_PAGE])
 
-  const filteredList =
-    formattedTokens &&
-    formattedTokens
-      .sort((a, b) => {
-        if (sortedColumn === SORT_FIELD.SYMBOL || sortedColumn === SORT_FIELD.NAME) {
-          return a[sortedColumn] > b[sortedColumn] ? (sortDirection ? -1 : 1) * 1 : (sortDirection ? -1 : 1) * -1
-        }
-        return parseFloat(a[sortedColumn]) > parseFloat(b[sortedColumn])
-          ? (sortDirection ? -1 : 1) * 1
-          : (sortDirection ? -1 : 1) * -1
-      })
-      .slice(ITEMS_PER_PAGE * (page - 1), page * ITEMS_PER_PAGE)
-
   const ListItem = ({ item, index }) => {
-    if (!item) {
-      return ''
-    }
     return (
       <DashGrid style={{ height: '48px' }} focus={true}>
         <DataText area="name" fontWeight="500">
@@ -205,6 +190,27 @@ function TopTokenList({ tokens, history, itemMax = 10 }) {
       </DashGrid>
     )
   }
+
+  const filteredList =
+    formattedTokens &&
+    formattedTokens
+      .sort((a, b) => {
+        if (sortedColumn === SORT_FIELD.SYMBOL || sortedColumn === SORT_FIELD.NAME) {
+          return a[sortedColumn] > b[sortedColumn] ? (sortDirection ? -1 : 1) * 1 : (sortDirection ? -1 : 1) * -1
+        }
+        return parseFloat(a[sortedColumn]) > parseFloat(b[sortedColumn])
+          ? (sortDirection ? -1 : 1) * 1
+          : (sortDirection ? -1 : 1) * -1
+      })
+      .slice(ITEMS_PER_PAGE * (page - 1), page * ITEMS_PER_PAGE)
+      .map((item, index) => {
+        return (
+          <div key={index}>
+            <ListItem key={index} index={(page - 1) * 10 + index + 1} item={item} />
+            <Divider />
+          </div>
+        )
+      })
 
   return (
     <ListWrapper>
@@ -288,17 +294,7 @@ function TopTokenList({ tokens, history, itemMax = 10 }) {
         )}
       </DashGrid>
       <Divider />
-      <List p={0}>
-        {filteredList &&
-          filteredList.map((item, index) => {
-            return (
-              <div key={index}>
-                <ListItem key={index} index={(page - 1) * 10 + index + 1} item={item} />
-                <Divider />
-              </div>
-            )
-          })}
-      </List>
+      <List p={0}>{!filteredList ? <LocalLoader /> : filteredList}</List>
       <PageButtons>
         <div
           onClick={e => {
