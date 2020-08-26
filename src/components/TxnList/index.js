@@ -296,10 +296,12 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
         {!below780 && (
           <>
             <DataText area="amountOther">
-              {formattedNum(item.token1Amount) + ' '} <FormattedName text={item.token1Symbol} maxCharacters={5} />
+              {formattedNum(item.token1Amount) + ' '}{' '}
+              <FormattedName text={item.token1Symbol} maxCharacters={5} margin={true} />
             </DataText>
             <DataText area="amountToken">
-              {formattedNum(item.token0Amount) + ' '} <FormattedName text={item.token0Symbol} maxCharacters={5} />
+              {formattedNum(item.token0Amount) + ' '}{' '}
+              <FormattedName text={item.token0Symbol} maxCharacters={5} margin={true} />
             </DataText>
           </>
         )}
