@@ -10,6 +10,8 @@ export const timeframeOptions = {
   ALL_TIME: 'All time'
 }
 
+export const HALF_HOUR_UNIX = 1800
+
 // hide from overview list
 export const OVERVIEW_TOKEN_BLACKLIST = [
   '0x495c7f3a713870f68f8b418b355c085dfdc412c3',

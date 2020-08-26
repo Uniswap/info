@@ -199,7 +199,7 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
         return (
           pairAddress && (
             <div key={index}>
-              <ListItem key={index} index={(page - 1) * 10 + index + 1} pairAddress={pairAddress} />
+              <ListItem key={index} index={(page - 1) * ITEMS_PER_PAGE + index + 1} pairAddress={pairAddress} />
               <Divider />
             </div>
           )
