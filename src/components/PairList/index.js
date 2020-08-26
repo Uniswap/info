@@ -117,7 +117,7 @@ const FIELD_TO_VALUE = {
   [SORT_FIELD.VOL]: 'oneDayVolumeUSD',
   [SORT_FIELD.TXNS]: 'oneDayTxns',
   [SORT_FIELD.VOL_7DAYS]: 'oneWeekVolumeUSD',
-  [SORT_FIELD.FEES]: 'oneDayVolumeUSD'
+  [SORT_FIELD.FEES]: 'oneDayExtraFee'
 }
 
 function PairList({ pairs, color, history, disbaleLinks, maxItems = 10 }) {
