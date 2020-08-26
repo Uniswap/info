@@ -39,15 +39,29 @@ const List = styled(Box)`
   -webkit-overflow-scrolling: touch;
 `
 
+// const OneInchLabel = styled.div`
+//     border: 1px solid #6b7c99;
+//     margin-left: 5px;
+//     padding-left: 3px;
+//     padding-right: 3px;
+//     font-size: 0.65em !important;
+//     border-radius: 5px;
+// }
+// `
+
 const OneInchLabel = styled.div`
     border: 1px solid #6b7c99;
-    margin-left: 5px;
+    margin-left: 20px;
     padding-left: 3px;
     padding-right: 3px;
     font-size: 0.65em !important;
     border-radius: 5px;
+    width: 40px;
+    margin-top: 5px;
+    text-transform: uppercase;
 }
 `
+
 const DashGrid = styled.div`
   display: grid;
   grid-gap: 1em;
@@ -244,12 +258,14 @@ function PairList({ pairs, color, history, disbaleLinks, maxItems = 10 }) {
               a1={pairData.token1.id}
               margin={!below740}
             />
-            <CustomLink style={{ marginLeft: '20px', whiteSpace: 'nowrap' }} to={'/pair/' + pairAddress} color={color}>
-              {pairData.token0.symbol + '-' + pairData.token1.symbol}
-            </CustomLink>
-            {
-              IncentivisedPairUrls[pairUrl] ? <OneInchLabel>1INCH</OneInchLabel> : ''
-            }
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <CustomLink style={{ marginLeft: '20px', whiteSpace: 'nowrap' }} to={'/pair/' + pairAddress} color={color}>
+                {pairData.token0.symbol + '-' + pairData.token1.symbol}
+              </CustomLink>
+              {
+                IncentivisedPairUrls[pairUrl] ? <OneInchLabel>Farming</OneInchLabel> : ''
+              }
+            </div>
           </DataText>
           <DataText area="liq">{liquidity}</DataText>
           <DataText area="vol">{volume}</DataText>
