@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import styled from 'styled-components'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
@@ -118,11 +118,10 @@ const SORT_FIELD = {
 }
 
 // @TODO rework into virtualized list
-function TopTokenList({ tokens, history, itemMax = 10 }) {
+function TopTokenList({ tokens, itemMax = 10 }) {
   // page state
   const [page, setPage] = useState(1)
   const [maxPage, setMaxPage] = useState(1)
-  const ITEMS_PER_PAGE = itemMax
 
   // sorting
   const [sortDirection, setSortDirection] = useState(true)
@@ -137,34 +136,42 @@ function TopTokenList({ tokens, history, itemMax = 10 }) {
     setPage(1)
   }, [tokens])
 
-  const formattedTokens =
-    tokens &&
-    Object.keys(tokens).map(key => {
-      return !OVERVIEW_TOKEN_BLACKLIST.includes(key) && tokens[key]
-    })
+  const formattedTokens = useMemo(() => {
+    return (
+      tokens &&
+      Object.keys(tokens)
+        .filter(key => {
+          return !OVERVIEW_TOKEN_BLACKLIST.includes(key)
+        })
+        .map(key => tokens[key])
+    )
+  }, [tokens])
 
   useEffect(() => {
     if (tokens && formattedTokens) {
       let extraPages = 1
-      if (formattedTokens.length % ITEMS_PER_PAGE === 0) {
+      if (formattedTokens.length % itemMax === 0) {
         extraPages = 0
       }
-      setMaxPage(Math.floor(formattedTokens.length / ITEMS_PER_PAGE) + extraPages)
+      setMaxPage(Math.floor(formattedTokens.length / itemMax) + extraPages)
     }
-  }, [tokens, formattedTokens, ITEMS_PER_PAGE])
+  }, [tokens, formattedTokens, itemMax])
 
-  const filteredList =
-    formattedTokens &&
-    formattedTokens
-      .sort((a, b) => {
-        if (sortedColumn === SORT_FIELD.SYMBOL || sortedColumn === SORT_FIELD.NAME) {
-          return a[sortedColumn] > b[sortedColumn] ? (sortDirection ? -1 : 1) * 1 : (sortDirection ? -1 : 1) * -1
-        }
-        return parseFloat(a[sortedColumn]) > parseFloat(b[sortedColumn])
-          ? (sortDirection ? -1 : 1) * 1
-          : (sortDirection ? -1 : 1) * -1
-      })
-      .slice(ITEMS_PER_PAGE * (page - 1), page * ITEMS_PER_PAGE)
+  const filteredList = useMemo(() => {
+    return (
+      formattedTokens &&
+      formattedTokens
+        .sort((a, b) => {
+          if (sortedColumn === SORT_FIELD.SYMBOL || sortedColumn === SORT_FIELD.NAME) {
+            return a[sortedColumn] > b[sortedColumn] ? (sortDirection ? -1 : 1) * 1 : (sortDirection ? -1 : 1) * -1
+          }
+          return parseFloat(a[sortedColumn]) > parseFloat(b[sortedColumn])
+            ? (sortDirection ? -1 : 1) * 1
+            : (sortDirection ? -1 : 1) * -1
+        })
+        .slice(itemMax * (page - 1), page * itemMax)
+    )
+  }, [formattedTokens, itemMax, page, sortDirection, sortedColumn])
 
   const ListItem = ({ item, index }) => {
     if (!item) {
@@ -289,7 +296,7 @@ function TopTokenList({ tokens, history, itemMax = 10 }) {
           filteredList.map((item, index) => {
             return (
               <div key={index}>
-                <ListItem key={index} index={(page - 1) * 10 + index + 1} item={item} />
+                <ListItem key={index} index={(page - 1) * itemMax + index + 1} item={item} />
                 <Divider />
               </div>
             )
