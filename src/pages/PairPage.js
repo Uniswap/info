@@ -197,12 +197,12 @@ function PairPage({ pairAddress, history }) {
       <ThemedBackground backgroundColor={transparentize(0.6, backgroundColor)} />
       <Warning
         type={'pair'}
-        show={!dismissed && verifiedTokens && !(verifiedTokens.includes(token0?.id) && verifiedTokens.includes(token1?.id))}
+        show={!dismissed && verifiedTokens && (!(verifiedTokens.includes(token0?.id) && verifiedTokens.includes(token1?.id)) && token1 && token0)}
         setShow={markAsDismissed}
         address={pairAddress}
       />
       <WarningGrouping
-        disabled={!dismissed && verifiedTokens && !(verifiedTokens.includes(token0?.id) && verifiedTokens.includes(token1?.id))}
+        disabled={!dismissed && (!verifiedTokens || !(verifiedTokens.includes(token0?.id) && verifiedTokens.includes(token1?.id)))}
       >
         <RowBetween mt={20} style={{ flexWrap: 'wrap' }}>
           <RowFixed style={{ flexWrap: 'wrap' }}>
