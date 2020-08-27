@@ -12,7 +12,7 @@ import TxnList from '../components/TxnList'
 import GlobalChart from '../components/GlobalChart'
 import { Hover, TYPE } from '../Theme'
 import { ETH, formattedNum, formattedPercent } from '../helpers'
-import { useGlobalData, useEthPrice, useGlobalTransactions } from '../contexts/GlobalData'
+import { useEthPrice, useGlobalData, useGlobalTransactions } from '../contexts/GlobalData'
 import { useAllPairData } from '../contexts/PairData'
 import { Search } from '../components/Search'
 import { useMedia } from 'react-use'
@@ -50,7 +50,7 @@ const ThemedBackground = styled.div`
   z-index: -1;
 
   transform: translateY(-70vh);
-  background: ${({ theme }) => theme.background};
+  background: ${ ({ theme }) => theme.background };
 `
 
 const ListOptions = styled(AutoRow)`
@@ -134,48 +134,48 @@ function GlobalPage({ history }) {
 
   return (
     <PageWrapper>
-      <ThemedBackground />
-      <Search small={!!below600} />
-      {below1080 && ( // mobile card
-        <Box mb={20}>
-          <Box mb={20} mt={'1.5rem'}>
+      <ThemedBackground/>
+      <Search small={ !!below600 }/>
+      { below1080 && ( // mobile card
+        <Box mb={ 20 }>
+          <Box mb={ 20 } mt={ '1.5rem' }>
             <Panel>
               <Box>
                 <AutoColumn gap="40px">
                   <AutoColumn gap="20px">
                     <RowBetween>
                       <TYPE.main>Volume (24hrs)</TYPE.main>
-                      <div />
+                      <div/>
                     </RowBetween>
                     <RowBetween align="flex-end">
-                      <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
-                        {volume}
+                      <TYPE.main fontSize={ '1.5rem' } lineHeight={ 1 } fontWeight={ 600 }>
+                        { volume }
                       </TYPE.main>
-                      <TYPE.main fontSize={12}>{volumeChange}</TYPE.main>
+                      <TYPE.main fontSize={ 12 }>{ volumeChange }</TYPE.main>
                     </RowBetween>
                   </AutoColumn>
                   <AutoColumn gap="20px">
                     <RowBetween>
                       <TYPE.main>Total Liquidity</TYPE.main>
-                      <div />
+                      <div/>
                     </RowBetween>
                     <RowBetween align="flex-end">
-                      <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
-                        {liquidity && liquidity}
+                      <TYPE.main fontSize={ '1.5rem' } lineHeight={ 1 } fontWeight={ 600 }>
+                        { liquidity && liquidity }
                       </TYPE.main>
-                      <TYPE.main fontSize={12}>{liquidityChange && liquidityChange}</TYPE.main>
+                      <TYPE.main fontSize={ 12 }>{ liquidityChange && liquidityChange }</TYPE.main>
                     </RowBetween>
                   </AutoColumn>
                   <AutoColumn gap="20px">
                     <RowBetween>
                       <TYPE.main>Transactions (24hrs)</TYPE.main>
-                      <div />
+                      <div/>
                     </RowBetween>
                     <RowBetween align="flex-end">
-                      <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
-                        {!!oneDayTxns ? oneDayTxns : '-'}
+                      <TYPE.main fontSize={ '1.5rem' } lineHeight={ 1 } fontWeight={ 600 }>
+                        { !!oneDayTxns ? oneDayTxns : '-' }
                       </TYPE.main>
-                      <TYPE.main fontSize={12}>{txnChangeFormatted && txnChangeFormatted}</TYPE.main>
+                      <TYPE.main fontSize={ 12 }>{ txnChangeFormatted && txnChangeFormatted }</TYPE.main>
                     </RowBetween>
                   </AutoColumn>
                 </AutoColumn>
@@ -185,36 +185,36 @@ function GlobalPage({ history }) {
           <Box>
             <Panel>
               <ChartWrapper area="fill" rounded>
-                <GlobalChart />
+                <GlobalChart/>
               </ChartWrapper>
             </Panel>
           </Box>
         </Box>
-      )}
-      {!below1080 && ( // desktop
-        <TopGroup style={{ marginTop: '3.5rem' }}>
+      ) }
+      { !below1080 && ( // desktop
+        <TopGroup style={ { marginTop: '3.5rem' } }>
           <TopPanel
-            hover={true}
-            onMouseEnter={() => {
+            hover={ true }
+            onMouseEnter={ () => {
               setShowPriceCard(true)
-            }}
-            onMouseLeave={() => {
+            } }
+            onMouseLeave={ () => {
               setShowPriceCard(false)
-            }}
+            } }
           >
-            {showPriceCard && <UniPrice />}
+            { showPriceCard && <UniPrice/> }
             <AutoColumn gap="20px">
               <RowBetween>
                 <TYPE.main>Mooniswap ETH price</TYPE.main>
-                <TokenLogo address={ETH} />
+                <TokenLogo address={ ETH }/>
               </RowBetween>
               <RowBetween align="flex-end">
-                {formattedEthPrice && (
-                  <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
-                    {formattedEthPrice}
+                { formattedEthPrice && (
+                  <TYPE.main fontSize={ '1.5rem' } lineHeight={ 1 } fontWeight={ 600 }>
+                    { formattedEthPrice }
                   </TYPE.main>
-                )}
-                {formattedPercent(ethPriceChange)}
+                ) }
+                { formattedPercent(ethPriceChange) }
               </RowBetween>
             </AutoColumn>
           </TopPanel>
@@ -222,13 +222,13 @@ function GlobalPage({ history }) {
             <AutoColumn gap="20px">
               <RowBetween>
                 <TYPE.main>Total Liquidity</TYPE.main>
-                <div />
+                <div/>
               </RowBetween>
               <RowBetween align="flex-end">
-                <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
-                  {liquidity && liquidity}
+                <TYPE.main fontSize={ '1.5rem' } lineHeight={ 1 } fontWeight={ 600 }>
+                  { liquidity && liquidity }
                 </TYPE.main>
-                <TYPE.main fontSize={14}>{liquidityChange && liquidityChange}</TYPE.main>
+                <TYPE.main fontSize={ 14 }>{ liquidityChange && liquidityChange }</TYPE.main>
               </RowBetween>
             </AutoColumn>
           </Panel>
@@ -236,13 +236,13 @@ function GlobalPage({ history }) {
             <AutoColumn gap="20px">
               <RowBetween>
                 <TYPE.main>Volume (24hrs)</TYPE.main>
-                <div />
+                <div/>
               </RowBetween>
               <RowBetween align="flex-end">
-                <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
-                  {volume}
+                <TYPE.main fontSize={ '1.5rem' } lineHeight={ 1 } fontWeight={ 600 }>
+                  { volume }
                 </TYPE.main>
-                <TYPE.main fontSize={14}>{volumeChange}</TYPE.main>
+                <TYPE.main fontSize={ 14 }>{ volumeChange }</TYPE.main>
               </RowBetween>
             </AutoColumn>
           </Panel>
@@ -250,68 +250,68 @@ function GlobalPage({ history }) {
             <AutoColumn gap="20px">
               <RowBetween>
                 <TYPE.main>Transactions (24hrs)</TYPE.main>
-                <div />
+                <div/>
               </RowBetween>
               <RowBetween align="flex-end">
-                <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
-                  {oneDayTxns}
+                <TYPE.main fontSize={ '1.5rem' } lineHeight={ 1 } fontWeight={ 600 }>
+                  { oneDayTxns }
                 </TYPE.main>
-                <TYPE.main fontSize={14}>{txnChangeFormatted && txnChangeFormatted}</TYPE.main>
+                <TYPE.main fontSize={ 14 }>{ txnChangeFormatted && txnChangeFormatted }</TYPE.main>
               </RowBetween>
             </AutoColumn>
           </Panel>
         </TopGroup>
-      )}
+      ) }
 
-      {!below1080 && (
-        <GridRow style={{ marginTop: '6px' }}>
-          <Panel style={{ height: '100%', minHeight: '300px' }}>
+      { !below1080 && (
+        <GridRow style={ { marginTop: '6px' } }>
+          <Panel style={ { height: '100%', minHeight: '300px' } }>
             <ChartWrapper area="fill" rounded>
-              <GlobalChart display="liquidity" />
+              <GlobalChart display="liquidity"/>
             </ChartWrapper>
           </Panel>
-          <Panel style={{ height: '100%' }}>
+          <Panel style={ { height: '100%' } }>
             <ChartWrapper area="fill" rounded>
-              <GlobalChart display="volume" />
+              <GlobalChart display="volume"/>
             </ChartWrapper>
           </Panel>
         </GridRow>
-      )}
+      ) }
 
-      <ListOptions gap="10px" style={{ marginTop: '2rem', marginBottom: '.5rem' }}>
+      <ListOptions gap="10px" style={ { marginTop: '2rem', marginBottom: '.5rem' } }>
         <Hover>
           <TYPE.main
-            onClick={() => {
+            onClick={ () => {
               setListView(LIST_VIEW.PAIRS)
-            }}
-            fontSize={'1.125rem'}
-            color={listView === LIST_VIEW.TOKENS ? '#aeaeae' : 'black'}
+            } }
+            fontSize={ '1.125rem' }
+            color={ listView === LIST_VIEW.TOKENS ? '#aeaeae' : 'black' }
           >
             Pairs
           </TYPE.main>
         </Hover>
         <Hover>
           <TYPE.main
-            onClick={() => {
+            onClick={ () => {
               setListView(LIST_VIEW.TOKENS)
-            }}
-            fontSize={'1.125rem'}
-            color={listView === LIST_VIEW.PAIRS ? '#aeaeae' : 'black'}
+            } }
+            fontSize={ '1.125rem' }
+            color={ listView === LIST_VIEW.PAIRS ? '#aeaeae' : 'black' }
           >
             Tokens
           </TYPE.main>
         </Hover>
       </ListOptions>
 
-      <Panel style={{ marginTop: '6px' }}>
-        {listView === LIST_VIEW.PAIRS ? <PairList pairs={allPairs} /> : <TopTokenList tokens={allTokens} />}
+      <Panel style={ { marginTop: '6px' } }>
+        { listView === LIST_VIEW.PAIRS ? <PairList pairs={ allPairs }/> : <TopTokenList tokens={ allTokens }/> }
       </Panel>
 
-      <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '2rem' }}>
+      <TYPE.main fontSize={ '1.125rem' } style={ { marginTop: '2rem' } }>
         Transactions
       </TYPE.main>
-      <Panel style={{ margin: '1rem 0' }}>
-        <TxnList transactions={transactions} />
+      <Panel style={ { margin: '1rem 0' } }>
+        <TxnList transactions={ transactions }/>
       </Panel>
     </PageWrapper>
   )

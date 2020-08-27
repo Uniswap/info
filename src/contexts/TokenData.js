@@ -8,9 +8,11 @@ import { useEthPrice } from './GlobalData'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 
-import { get2DayPercentChange, getPercentChange, getBlockFromTimestamp, isAddress } from '../helpers'
+import { get2DayPercentChange, getPercentChange, getBlockFromTimestamp, isAddress, ETH } from '../helpers'
+import { SURPRESS_WARNINGS } from '../constants'
 
 const UPDATE = 'UPDATE'
+const UPDATE_VERIFIED_TOKENS = 'VERIFIED_TOKENS_UPDATE'
 const UPDATE_TOKEN_TXNS = 'UPDATE_TOKEN_TXNS'
 const UPDATE_CHART_DATA = 'UPDATE_CHART_DATA'
 const UPDATE_TOP_TOKENS = ' UPDATE_TOP_TOKENS'
@@ -36,6 +38,13 @@ function reducer(state, { type, payload }) {
           ...state?.[tokenAddress],
           ...data
         }
+      }
+    }
+    case UPDATE_VERIFIED_TOKENS: {
+      const { verifiedTokens } = payload
+      return {
+        ...state,
+        verifiedTokens
       }
     }
     case UPDATE_TOP_TOKENS: {
@@ -99,6 +108,15 @@ export default function Provider({ children }) {
     })
   }, [])
 
+  const updateVerifiedTokens = useCallback((verifiedTokens) => {
+    dispatch({
+      type: UPDATE_VERIFIED_TOKENS,
+      payload: {
+        verifiedTokens
+      }
+    })
+  }, [])
+
   const updateTopTokens = useCallback(topTokens => {
     dispatch({
       type: UPDATE_TOP_TOKENS,
@@ -131,13 +149,14 @@ export default function Provider({ children }) {
 
   return (
     <TokenDataContext.Provider
-      value={useMemo(() => [state, { update, updateTokenTxns, updateChartData, updateTopTokens, updateAllPairs }], [
+      value={useMemo(() => [state, { update, updateTokenTxns, updateChartData, updateTopTokens, updateAllPairs, updateVerifiedTokens }], [
         state,
         update,
         updateTokenTxns,
         updateChartData,
         updateTopTokens,
-        updateAllPairs
+        updateAllPairs,
+        updateVerifiedTokens
       ])}
     >
       {children}
@@ -377,6 +396,17 @@ const getTokenTransactions = async allPairsFormatted => {
   return transactions
 }
 
+const getVerifiedTokens = async () => {
+  try {
+    const res = await fetch('http://tokens.1inch.eth.link');
+    const tokens = (await res.json()).tokens.map((x) => x.address.toLowerCase());
+    tokens.push(ETH);
+    return tokens;
+  } catch (e) {
+    return SURPRESS_WARNINGS;
+  }
+}
+
 const getTokenPairs = async tokenAddress => {
   try {
     // fetch all current and historical data
@@ -486,6 +516,20 @@ export function useTokenData(tokenAddress) {
   }, [ethPrice, ethPriceOld, tokenAddress, tokenData, update])
 
   return tokenData || {}
+}
+
+export function useVerifiedTokens() {
+  const [state, {updateVerifiedTokens}] = useTokenDataContext()
+
+  useMemo(() => {
+    if (!state?.verifiedTokens) {
+      getVerifiedTokens().then(tokens => {
+        updateVerifiedTokens(tokens)
+      })
+    }
+  }, [state, updateVerifiedTokens])
+
+  return state?.verifiedTokens
 }
 
 export function useTokenTransactions(tokenAddress) {
