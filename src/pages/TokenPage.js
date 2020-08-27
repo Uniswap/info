@@ -17,7 +17,7 @@ import TokenChart from '../components/TokenChart'
 
 import { formattedNum, formattedPercent, getPoolLink, getSwapLink } from '../helpers'
 
-import { useTokenData, useTokenTransactions, useTokenPairs } from '../contexts/TokenData'
+import { useTokenData, useTokenTransactions, useTokenPairs, useVerifiedTokens } from '../contexts/TokenData'
 import { TYPE, ThemedBackground } from '../Theme'
 import { useColor } from '../hooks'
 import CopyHelper from '../components/Copy'
@@ -26,7 +26,6 @@ import { transparentize } from 'polished'
 import { useDataForList } from '../contexts/PairData'
 import { useEffect } from 'react'
 import Warning from '../components/Warning'
-import { SURPRESS_WARNINGS } from '../constants'
 import { usePathDismissed } from '../contexts/LocalStorage'
 
 const PageWrapper = styled.div`
@@ -123,6 +122,8 @@ function TokenPage({ address, history }) {
     txnChange
   } = useTokenData(address)
 
+  const verifiedTokens = useVerifiedTokens()
+
   useEffect(() => {
     document.querySelector('body').scrollTo(0, 0)
   }, [])
@@ -175,11 +176,11 @@ function TokenPage({ address, history }) {
       <ThemedBackground backgroundColor={transparentize(0.6, backgroundColor)} />
       <Warning
         type={'token'}
-        show={!dismissed && !SURPRESS_WARNINGS.includes(address)}
+        show={!dismissed && verifiedTokens && !verifiedTokens.includes(address)}
         setShow={markAsDismissed}
         address={address}
       />
-      <WarningGrouping disabled={!dismissed && !SURPRESS_WARNINGS.includes(address)}>
+      <WarningGrouping disabled={!dismissed && verifiedTokens && !verifiedTokens.includes(address)}>
         <RowBetween mt={20} style={{ flexWrap: 'wrap' }}>
           <RowFixed style={{ flexWrap: 'wrap' }}>
             <RowFixed mb={20} style={{ alignItems: 'baseline' }}>

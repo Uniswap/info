@@ -27,8 +27,8 @@ import TokenLogo from '../components/TokenLogo'
 import { Hover } from '../components'
 import { useEthPrice } from '../contexts/GlobalData'
 import Warning from '../components/Warning'
-import { SURPRESS_WARNINGS } from '../constants'
 import { usePathDismissed } from '../contexts/LocalStorage'
+import { useVerifiedTokens } from '../contexts/TokenData'
 
 const PageWrapper = styled.div`
   display: flex;
@@ -142,6 +142,8 @@ function PairPage({ pairAddress, history }) {
     extraFeeChangeUSD
   } = usePairData(pairAddress)
 
+  const verifiedTokens = useVerifiedTokens()
+
   useEffect(() => {
     document.querySelector('body').scrollTo(0, 0)
   }, [])
@@ -195,12 +197,12 @@ function PairPage({ pairAddress, history }) {
       <ThemedBackground backgroundColor={transparentize(0.6, backgroundColor)} />
       <Warning
         type={'pair'}
-        show={!dismissed && !(SURPRESS_WARNINGS.includes(token0?.id) && SURPRESS_WARNINGS.includes(token1?.id))}
+        show={!dismissed && verifiedTokens && !(verifiedTokens.includes(token0?.id) && verifiedTokens.includes(token1?.id))}
         setShow={markAsDismissed}
         address={pairAddress}
       />
       <WarningGrouping
-        disabled={!dismissed && !(SURPRESS_WARNINGS.includes(token0?.id) && SURPRESS_WARNINGS.includes(token1?.id))}
+        disabled={!dismissed && verifiedTokens && !(verifiedTokens.includes(token0?.id) && verifiedTokens.includes(token1?.id))}
       >
         <RowBetween mt={20} style={{ flexWrap: 'wrap' }}>
           <RowFixed style={{ flexWrap: 'wrap' }}>
