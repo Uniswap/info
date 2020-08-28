@@ -25,11 +25,11 @@ import { useMedia } from 'react-use'
 import { useDataForList } from '../contexts/PairData'
 import { useEffect } from 'react'
 import Warning from '../components/Warning'
-import { SURPRESS_WARNINGS } from '../constants'
 import { usePathDismissed, useSavedTokens } from '../contexts/LocalStorage'
 import { Hover, PageWrapper, ContentWrapper } from '../components'
 import { PlusCircle, Bookmark } from 'react-feather'
 import FormattedName from '../components/FormattedName'
+import { useListedTokens } from '../contexts/Application'
 
 const DashboardWrapper = styled.div`
   width: 100%;
@@ -145,6 +145,7 @@ function TokenPage({ address, history }) {
 
   const [dismissed, markAsDismissed] = usePathDismissed(history.location.pathname)
   const [savedTokens, addToken] = useSavedTokens()
+  const listedTokens = useListedTokens()
 
   useEffect(() => {
     window.scrollTo({
@@ -159,7 +160,7 @@ function TokenPage({ address, history }) {
 
       <Warning
         type={'token'}
-        show={!dismissed && !SURPRESS_WARNINGS.includes(address)}
+        show={!dismissed && listedTokens && !listedTokens.includes(address)}
         setShow={markAsDismissed}
         address={address}
       />
@@ -183,7 +184,7 @@ function TokenPage({ address, history }) {
           {!below600 && <Search small={true} />}
         </RowBetween>
 
-        <WarningGrouping disabled={!dismissed && !SURPRESS_WARNINGS.includes(address)}>
+        <WarningGrouping disabled={!dismissed && listedTokens && !listedTokens.includes(address)}>
           <DashboardWrapper style={{ marginTop: below1080 ? '0' : '1rem' }}>
             <RowBetween style={{ flexWrap: 'wrap', marginBottom: '2rem', alignItems: 'flex-start' }}>
               <RowFixed style={{ flexWrap: 'wrap' }}>
