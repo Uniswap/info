@@ -142,7 +142,7 @@ function PositionList({ positions }) {
     const valueUSD = poolOwnership * position.pair.reserveUSD
 
     return (
-      <DashGrid focus={true}>
+      <DashGrid style={{ opacity: poolOwnership > 0 ? 1 : 0.6 }} focus={true}>
         {!below740 && <DataText area="number">{index}</DataText>}
         <DataText area="name" justifyContent="flex-start" alignItems="flex-start">
           <AutoColumn gap="8px" justify="flex-start" align="flex-start">
@@ -157,17 +157,20 @@ function PositionList({ positions }) {
                 />
               </TYPE.main>
             </CustomLink>
+
             <RowFixed gap="8px" justify="flex-start">
               <Link
                 external
                 href={getPoolLink(position.pair.token0.id, position.pair.token1.id)}
                 style={{ marginRight: '.5rem' }}
               >
-                <ButtonLight style={{ padding: '2px 4px', borderRadius: '4px' }}>Add</ButtonLight>
+                <ButtonLight style={{ padding: '4px 6px', borderRadius: '4px' }}>Add</ButtonLight>
               </Link>
-              <Link external href={getPoolLink(position.pair.token0.id, position.pair.token1.id, true)}>
-                <ButtonLight style={{ padding: '2px 4px', borderRadius: '4px' }}>Remove</ButtonLight>
-              </Link>
+              {poolOwnership > 0 && (
+                <Link external href={getPoolLink(position.pair.token0.id, position.pair.token1.id, true)}>
+                  <ButtonLight style={{ padding: '4px 6px', borderRadius: '4px' }}>Remove</ButtonLight>
+                </Link>
+              )}
             </RowFixed>
           </AutoColumn>
         </DataText>

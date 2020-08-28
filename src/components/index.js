@@ -170,13 +170,8 @@ export const FixedMenu = styled.div`
   z-index: 99;
   width: 100%;
   box-sizing: border-box;
-  /* position: sticky; */
-  /* top: 5.25rem; */
   padding: 1rem;
   box-sizing: border-box;
-  /* background-color: ${({ theme }) => transparentize(0.6, theme.bg1)}; */
-  /* backdrop-filter: blur(20px); */
-  /* border-bottom: 1px solid ${({ theme }) => theme.bg2}; */
   margin-bottom: 2rem;
   max-width: 100vw;
 

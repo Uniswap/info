@@ -1,22 +1,33 @@
 import React from 'react'
 import styled from 'styled-components'
+import { Sun, Moon } from 'react-feather'
 
-const ToggleElement = styled.span<{ isActive?: boolean; isOnSwitch?: boolean }>`
-  padding: 0.25rem 0.5rem;
-  border-radius: 14px;
-  background: ${({ theme, isActive, isOnSwitch }) => (isActive ? (isOnSwitch ? theme.primary1 : theme.text4) : 'none')};
-  color: ${({ theme, isActive, isOnSwitch }) => (isActive ? (isOnSwitch ? theme.white : theme.text2) : theme.text3)};
-  font-size: 0.825rem;
-  font-weight: 400;
+const ToggleElement = styled.span<{ isActive?: boolean; isOnSwitch?: boolean }>``
+
+const StyledSun = styled(Sun)<{ isActive?: boolean; activeElement?: boolean }>`
+  opacity: ${({ theme, isActive }) => (isActive ? 0.8 : 0.4)};
+
+  :hover {
+    opacity: 1;
+  }
+`
+
+const StyledMoon = styled(Moon)<{ isActive?: boolean; activeElement?: boolean }>`
+  opacity: ${({ theme, isActive }) => (isActive ? 0.8 : 0.4)};
+
+  :hover {
+    opacity: 1;
+  }
 `
 
 const StyledToggle = styled.a<{ isActive?: boolean; activeElement?: boolean }>`
-  border-radius: 16px;
-  border: 1px solid ${({ theme, isActive }) => (isActive ? theme.primary5 : theme.text4)};
   display: flex;
   width: fit-content;
   cursor: pointer;
   text-decoration: none;
+  margin-top: 1rem;
+  color: white;
+
   :hover {
     text-decoration: none;
   }
@@ -30,11 +41,12 @@ export interface ToggleProps {
 export default function Toggle({ isActive, toggle }: ToggleProps) {
   return (
     <StyledToggle isActive={isActive} target="_self" onClick={toggle}>
-      <ToggleElement isActive={isActive} isOnSwitch={true}>
-        Dark
-      </ToggleElement>
       <ToggleElement isActive={!isActive} isOnSwitch={false}>
-        Light
+        <StyledSun isActive={!isActive} size={20} />
+      </ToggleElement>
+      <span style={{ padding: '0 .5rem' }}>{' / '}</span>
+      <ToggleElement isOnSwitch={false}>
+        <StyledMoon isActive={isActive} size={20} />
       </ToggleElement>
     </StyledToggle>
   )

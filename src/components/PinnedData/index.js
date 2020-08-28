@@ -17,12 +17,11 @@ const RightColumn = styled.div`
   right: 0;
   top: 0px;
   height: 100vh;
-  width: ${({ open }) => (open ? '160px' : '18px')};
+  width: ${({ open }) => (open ? '160px' : '23px')};
   padding: 1.25rem;
   border-left: ${({ theme, open }) => '1px solid' + theme.bg3};
   background-color: ${({ theme }) => theme.bg1};
   z-index: 9999;
-  transition: width 0.25s ease;
   overflow: scroll;
   :hover {
     cursor: pointer;
