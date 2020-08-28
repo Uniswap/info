@@ -1,15 +1,18 @@
 import React, { createContext, useContext, useReducer, useMemo, useCallback, useState, useEffect } from 'react'
-import { timeframeOptions } from '../constants'
+import { timeframeOptions, SUPPORTED_LIST_URLS__NO_ENS } from '../constants'
 import Web3 from 'web3'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
+import getTokenList from '../utils/tokenLists'
 dayjs.extend(utc)
 
 const UPDATE = 'UPDATE'
 const UPDATE_TIMEFRAME = 'UPDATE_TIMEFRAME'
 const UPDATE_SESSION_START = 'UPDATE_SESSION_START'
 const UPDATE_WEB3 = 'UPDATE_WEB3'
+const UPDATED_SUPPORTED_TOKENS = 'UPDATED_SUPPORTED_TOKENS'
 
+const SUPPORTED_TOKENS = 'SUPPORTED_TOKENS'
 const TIME_KEY = 'TIME_KEY'
 const CURRENCY = 'CURRENCY'
 const SESSION_START = 'SESSION_START'
@@ -27,28 +30,36 @@ function reducer(state, { type, payload }) {
       const { currency } = payload
       return {
         ...state,
-        CURRENCY: currency
+        [CURRENCY]: currency
       }
     }
     case UPDATE_TIMEFRAME: {
       const { newTimeFrame } = payload
       return {
         ...state,
-        TIME_KEY: newTimeFrame
+        [TIME_KEY]: newTimeFrame
       }
     }
     case UPDATE_SESSION_START: {
       const { timestamp } = payload
       return {
         ...state,
-        SESSION_START: timestamp
+        [SESSION_START]: timestamp
       }
     }
     case UPDATE_WEB3: {
       const { web3 } = payload
       return {
         ...state,
-        WEB3: web3
+        [WEB3]: web3
+      }
+    }
+
+    case UPDATED_SUPPORTED_TOKENS: {
+      const { supportedTokens } = payload
+      return {
+        ...state,
+        [SUPPORTED_TOKENS]: supportedTokens
       }
     }
 
@@ -103,15 +114,21 @@ export default function Provider({ children }) {
     })
   }, [])
 
+  const updateSupportedTokens = useCallback(supportedTokens => {
+    dispatch({
+      type: UPDATED_SUPPORTED_TOKENS,
+      payload: {
+        supportedTokens
+      }
+    })
+  }, [])
+
   return (
     <ApplicationContext.Provider
-      value={useMemo(() => [state, { update, updateSessionStart, updateTimeframe, updateWeb3 }], [
-        state,
-        update,
-        updateTimeframe,
-        updateWeb3,
-        updateSessionStart
-      ])}
+      value={useMemo(
+        () => [state, { update, updateSessionStart, updateTimeframe, updateWeb3, updateSupportedTokens }],
+        [state, update, updateTimeframe, updateWeb3, updateSessionStart, updateSupportedTokens]
+      )}
     >
       {children}
     </ApplicationContext.Provider>
@@ -199,4 +216,26 @@ export function useWeb3() {
   })
 
   return web3
+}
+
+export function useListedTokens() {
+  const [state, { updateSupportedTokens }] = useApplicationContext()
+  const supportedTokens = state?.[SUPPORTED_TOKENS]
+
+  useEffect(() => {
+    async function fetchList() {
+      const allFetched = await SUPPORTED_LIST_URLS__NO_ENS.reduce(async (fetchedTokens, url) => {
+        const tokensSoFar = await fetchedTokens
+        const newTokens = await getTokenList(url)
+        return Promise.resolve([...tokensSoFar, ...newTokens.tokens])
+      }, Promise.resolve([]))
+      let formatted = allFetched?.map(t => t.address.toLowerCase())
+      updateSupportedTokens(formatted)
+    }
+    if (!supportedTokens) {
+      fetchList()
+    }
+  }, [updateSupportedTokens, supportedTokens])
+
+  return supportedTokens
 }

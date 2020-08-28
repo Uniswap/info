@@ -28,11 +28,11 @@ import TokenLogo from '../components/TokenLogo'
 import { Hover } from '../components'
 import { useEthPrice } from '../contexts/GlobalData'
 import Warning from '../components/Warning'
-import { SURPRESS_WARNINGS } from '../constants'
 import { usePathDismissed, useSavedPairs } from '../contexts/LocalStorage'
 
 import { Bookmark, PlusCircle } from 'react-feather'
 import FormattedName from '../components/FormattedName'
+import { useListedTokens } from '../contexts/Application'
 
 const DashboardWrapper = styled.div`
   width: 100%;
@@ -182,13 +182,15 @@ function PairPage({ pairAddress, history }) {
 
   const [savedPairs, addPair] = useSavedPairs()
 
+  const listedTokens = useListedTokens()
+
   return (
     <PageWrapper>
       <ThemedBackground backgroundColor={transparentize(0.6, backgroundColor)} />
       <span />
       <Warning
         type={'pair'}
-        show={!dismissed && !(SURPRESS_WARNINGS.includes(token0?.id) && SURPRESS_WARNINGS.includes(token1?.id))}
+        show={!dismissed && listedTokens && !(listedTokens.includes(token0?.id) && listedTokens.includes(token1?.id))}
         setShow={markAsDismissed}
         address={pairAddress}
       />
@@ -200,7 +202,9 @@ function PairPage({ pairAddress, history }) {
           {!below600 && <Search small={true} />}
         </RowBetween>
         <WarningGrouping
-          disabled={!dismissed && !(SURPRESS_WARNINGS.includes(token0?.id) && SURPRESS_WARNINGS.includes(token1?.id))}
+          disabled={
+            !dismissed && listedTokens && !(listedTokens.includes(token0?.id) && listedTokens.includes(token1?.id))
+          }
         >
           <DashboardWrapper>
             <AutoColumn gap="40px" style={{ marginBottom: '1.5rem' }}>
