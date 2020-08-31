@@ -1,7 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
 import { Text, Box } from 'rebass'
-import { transparentize } from 'polished'
 
 import Link from './Link'
 

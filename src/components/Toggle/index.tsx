@@ -2,25 +2,15 @@ import React from 'react'
 import styled from 'styled-components'
 import { Sun, Moon } from 'react-feather'
 
-const ToggleElement = styled.span<{ isActive?: boolean; isOnSwitch?: boolean }>``
-
-const StyledSun = styled(Sun)<{ isActive?: boolean; activeElement?: boolean }>`
-  opacity: ${({ theme, isActive }) => (isActive ? 0.8 : 0.4)};
+const IconWrapper = styled.div<{ isActive?: boolean }>`
+  opacity: ${({ isActive }) => (isActive ? 0.8 : 0.4)};
 
   :hover {
     opacity: 1;
   }
 `
 
-const StyledMoon = styled(Moon)<{ isActive?: boolean; activeElement?: boolean }>`
-  opacity: ${({ theme, isActive }) => (isActive ? 0.8 : 0.4)};
-
-  :hover {
-    opacity: 1;
-  }
-`
-
-const StyledToggle = styled.a<{ isActive?: boolean; activeElement?: boolean }>`
+const StyledToggle = styled.div`
   display: flex;
   width: fit-content;
   cursor: pointer;
@@ -40,14 +30,18 @@ export interface ToggleProps {
 
 export default function Toggle({ isActive, toggle }: ToggleProps) {
   return (
-    <StyledToggle isActive={isActive} target="_self" onClick={toggle}>
-      <ToggleElement isActive={!isActive} isOnSwitch={false}>
-        <StyledSun isActive={!isActive} size={20} />
-      </ToggleElement>
+    <StyledToggle onClick={toggle}>
+      <span>
+        <IconWrapper isActive={!isActive}>
+          <Sun size={20} />
+        </IconWrapper>
+      </span>
       <span style={{ padding: '0 .5rem' }}>{' / '}</span>
-      <ToggleElement isOnSwitch={false}>
-        <StyledMoon isActive={isActive} size={20} />
-      </ToggleElement>
+      <span>
+        <IconWrapper isActive={isActive}>
+          <Moon size={20} />
+        </IconWrapper>
+      </span>
     </StyledToggle>
   )
 }
