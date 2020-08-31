@@ -17,12 +17,11 @@ const RightColumn = styled.div`
   right: 0;
   top: 0px;
   height: 100vh;
-  width: ${({ open }) => (open ? '160px' : '18px')};
+  width: ${({ open }) => (open ? '160px' : '23px')};
   padding: 1.25rem;
   border-left: ${({ theme, open }) => '1px solid' + theme.bg3};
   background-color: ${({ theme }) => theme.bg1};
   z-index: 9999;
-  transition: width 0.25s ease;
   overflow: scroll;
   :hover {
     cursor: pointer;
@@ -44,6 +43,10 @@ const ScrollableDiv = styled(AutoColumn)`
   padding-bottom: 60px;
 `
 
+const StyledIcon = styled.div`
+  color: ${({ theme }) => theme.text2};
+`
+
 function PinnedData({ history, open, setSavedOpen }) {
   const [savedPairs, , removePair] = useSavedPairs()
   const [savedTokens, , removeToken] = useSavedTokens()
@@ -51,17 +54,23 @@ function PinnedData({ history, open, setSavedOpen }) {
   return !open ? (
     <RightColumn open={open} onClick={() => setSavedOpen(true)}>
       <SavedButton open={open}>
-        <Bookmark size={20} />
+        <StyledIcon>
+          <Bookmark size={20} />
+        </StyledIcon>
       </SavedButton>
     </RightColumn>
   ) : (
     <RightColumn gap="1rem" open={open}>
       <SavedButton onClick={() => setSavedOpen(false)} open={open}>
         <RowFixed>
-          <Bookmark size={16} />
+          <StyledIcon>
+            <Bookmark size={16} />
+          </StyledIcon>
           <TYPE.main ml={'4px'}>Saved</TYPE.main>
         </RowFixed>
-        <ChevronRight />
+        <StyledIcon>
+          <ChevronRight />
+        </StyledIcon>
       </SavedButton>
       <AccountSearch small={true} />
       <AutoColumn gap="40px" style={{ marginTop: '2rem' }}>
@@ -81,12 +90,18 @@ function PinnedData({ history, open, setSavedOpen }) {
                     <ButtonFaded onClick={() => history.push('/pair/' + address)}>
                       <RowFixed>
                         <TYPE.header>
-                          <FormattedName text={pair.token0Symbol + '/' + pair.token1Symbol} maxCharacters={12} />
+                          <FormattedName
+                            text={pair.token0Symbol + '/' + pair.token1Symbol}
+                            maxCharacters={12}
+                            fontSize={'12px'}
+                          />
                         </TYPE.header>
                       </RowFixed>
                     </ButtonFaded>
                     <Hover onClick={() => removePair(pair.address)}>
-                      <X size={16} />
+                      <StyledIcon>
+                        <X size={16} />
+                      </StyledIcon>
                     </Hover>
                   </RowBetween>
                 )
@@ -112,12 +127,14 @@ function PinnedData({ history, open, setSavedOpen }) {
                       <RowFixed>
                         <TokenLogo address={address} size={'14px'} />
                         <TYPE.header ml={'6px'}>
-                          <FormattedName text={token.symbol} maxCharacters={12} />
+                          <FormattedName text={token.symbol} maxCharacters={12} fontSize={'12px'} />
                         </TYPE.header>
                       </RowFixed>
                     </ButtonFaded>
                     <Hover onClick={() => removeToken(address)}>
-                      <X size={16} />
+                      <StyledIcon>
+                        <X size={16} />
+                      </StyledIcon>
                     </Hover>
                   </RowBetween>
                 )

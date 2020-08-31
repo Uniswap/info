@@ -1,13 +1,13 @@
 import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect, useState } from 'react'
 import { usePairData } from './PairData'
 import { client } from '../apollo/client'
-import { USER_TRANSACTIONS, USER_POSITIONS, USER_HISTORY, FIRST_SNAPSHOT, POSITIONS_BY_BLOCK } from '../apollo/queries'
+import { USER_TRANSACTIONS, USER_POSITIONS, USER_HISTORY, PAIR_DAY_DATA_BULK } from '../apollo/queries'
 import { useTimeframe, useStartTimestamp } from './Application'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { useEthPrice } from './GlobalData'
 import { getLPReturnsOnPair, getHistoricalPairReturns } from '../utils/returns'
-import { getTimeframe, getBlocksFromTimestamps } from '../utils'
+import { timeframeOptions } from '../constants'
 
 dayjs.extend(utc)
 
@@ -279,6 +279,7 @@ export function useUserPositionChart(position, account) {
  * and usd liquidity value.
  */
 export function useUserLiquidityChart(account) {
+  const history = useUserSnapshots(account)
   // formatetd array to return for chart data
   const [formattedHistory, setFormattedHistory] = useState()
 
@@ -287,79 +288,126 @@ export function useUserLiquidityChart(account) {
 
   // monitor the old date fetched
   useEffect(() => {
-    let startTime = getTimeframe(activeWindow)
+    const utcEndTime = dayjs.utc()
+    // based on window, get starttime
+    let utcStartTime
+    switch (activeWindow) {
+      case timeframeOptions.WEEK:
+        utcStartTime = utcEndTime.subtract(1, 'week').startOf('day')
+        break
+      case timeframeOptions.ALL_TIME:
+        utcStartTime = utcEndTime.subtract(1, 'year')
+        break
+      default:
+        utcStartTime = utcEndTime.subtract(1, 'year').startOf('year')
+        break
+    }
+    let startTime = utcStartTime.unix() - 1
     if ((activeWindow && startTime < startDateTimestamp) || !startDateTimestamp) {
       setStartDateTimestamp(startTime)
     }
   }, [activeWindow, startDateTimestamp])
 
-  // fetch data if we havent yet
   useEffect(() => {
-    async function fetchHistory() {
-      // set default beginning to beginning of time window
-      const utcCurrentTime = dayjs()
-      let startTime = startDateTimestamp
+    async function fetchData() {
+      let dayIndex = parseInt(startDateTimestamp / 86400) // get unique day bucket unix
+      const currentDayIndex = parseInt(dayjs.utc().unix() / 86400)
 
-      // if first position starts after beginning of timestamps, update startime
+      // sort snapshots in order
+      let sortedPositions = history.sort((a, b) => {
+        return parseInt(a.timestamp) > parseInt(b.timestamp) ? 1 : -1
+      })
+      // if UI start time is > first position time - bump start index to this time
+      if (parseInt(sortedPositions[0].timestamp) > dayIndex) {
+        dayIndex = parseInt(parseInt(sortedPositions[0].timestamp) / 86400)
+      }
+
+      const dayTimestamps = []
+      // get date timestamps for all days in view
+      while (dayIndex < currentDayIndex) {
+        dayTimestamps.push(parseInt(dayIndex) * 86400)
+        dayIndex = dayIndex + 1
+      }
+
+      const pairs = history.reduce((pairList, position) => {
+        return [...pairList, position.pair.id]
+      }, [])
+
+      // get all day datas where date is in this list, and pair is in pair list
       let {
-        data: { liquidityPositionSnapshots: results }
+        data: { pairDayDatas }
       } = await client.query({
-        query: FIRST_SNAPSHOT,
-        variables: {
-          user: account
-        }
+        query: PAIR_DAY_DATA_BULK(pairs, startDateTimestamp)
       })
 
-      // catch case with no history
-      if (results?.length === 0) {
-        setFormattedHistory([])
-        return
-      }
+      const formattedHistory = []
 
-      // if first snapshot starts before window, update start of window
-      startTime = results[0].timestamp > startTime ? results[0].timestamp : startTime
+      // map of current pair => ownership %
+      const ownershipPerPair = {}
+      for (const index in dayTimestamps) {
+        const dayTimestamp = dayTimestamps[index]
+        const timestampCeiling = dayTimestamp + 86400
 
-      // create the array of timestamps for every day in the chart
-      const timestamps = []
-      while (startTime < utcCurrentTime.unix()) {
-        timestamps.push(startTime)
-        startTime += 84600
-      }
-
-      // for each day, fetch the block number associated with day timestamp (in bulk)
-      const blocks = await getBlocksFromTimestamps(timestamps)
-
-      // for each block, get the lp positions and pair data for each
-      let { data: dayDatas } = await client.query({
-        query: POSITIONS_BY_BLOCK(account, blocks)
-      })
-
-      // for each day, map over all positions and sum USD, push value to history
-      let newData = []
-      for (var row in dayDatas) {
-        let currentDay = {}
-        let timestamp = row.split('t')[1]
-        let valueUSD = 0
-        if (timestamp) {
-          for (let i = 0; i < dayDatas[row].length; i++) {
-            let pairInfo = dayDatas[row][i]
-            const pairLiquidityValue =
-              (parseFloat(pairInfo.liquidityTokenBalance) / pairInfo.pair.totalSupply) * pairInfo.pair.reserveUSD
-            valueUSD += pairLiquidityValue
-            currentDay[pairInfo.pair.id] = pairLiquidityValue
+        // cycle through relevant positions and update ownership for any that we need to
+        const relevantPositions = history.filter(snapshot => {
+          return snapshot.timestamp < timestampCeiling && snapshot.timestamp > dayTimestamp
+        })
+        for (const index in relevantPositions) {
+          const position = relevantPositions[index]
+          // case where pair not added yet
+          if (!ownershipPerPair[position.pair.id]) {
+            ownershipPerPair[position.pair.id] = {
+              lpTokenBalance: position.liquidityTokenBalance,
+              timestamp: position.timestamp
+            }
           }
-          currentDay.date = timestamp
-          currentDay.valueUSD = valueUSD
+          // case where more recent timestamp is found for pair
+          if (ownershipPerPair[position.pair.id] && ownershipPerPair[position.pair.id].timestamp < position.timestamp) {
+            ownershipPerPair[position.pair.id] = {
+              lpTokenBalance: position.liquidityTokenBalance,
+              timestamp: position.timestamp
+            }
+          }
         }
-        newData.push(currentDay)
+
+        const relavantDayDatas = Object.keys(ownershipPerPair).map(pairAddress => {
+          // find last day data after timestamp update
+          const dayDatasForThisPair = pairDayDatas.filter(dayData => {
+            return dayData.pairAddress === pairAddress
+          })
+          // find the most recent reference to pair liquidity data
+          let mostRecent = dayDatasForThisPair[0]
+          for (const index in dayDatasForThisPair) {
+            const dayData = dayDatasForThisPair[index]
+            if (dayData.date < dayTimestamp && dayData.date > mostRecent.date) {
+              mostRecent = dayData
+            }
+          }
+          return mostRecent
+        })
+
+        // now cycle through pair day datas, for each one find usd value = ownership[address] * reserveUSD
+        const dailyUSD = relavantDayDatas.reduce((totalUSD, dayData) => {
+          return (totalUSD =
+            totalUSD +
+            (ownershipPerPair[dayData.pairAddress]
+              ? (parseFloat(ownershipPerPair[dayData.pairAddress].lpTokenBalance) / parseFloat(dayData.totalSupply)) *
+                parseFloat(dayData.reserveUSD)
+              : 0))
+        }, 0)
+
+        formattedHistory.push({
+          date: dayTimestamp,
+          valueUSD: dailyUSD
+        })
       }
 
-      setFormattedHistory(newData)
+      setFormattedHistory(formattedHistory)
     }
-    if (!formattedHistory && startDateTimestamp) {
-      fetchHistory()
+    if (history && startDateTimestamp && history.length > 0) {
+      fetchData()
     }
-  }, [account, formattedHistory, startDateTimestamp])
+  }, [history, startDateTimestamp])
 
   return formattedHistory
 }
@@ -369,7 +417,6 @@ export function useUserPositions(account) {
   const positions = state?.[account]?.[POSITIONS_KEY]
 
   const snapshots = useUserSnapshots(account)
-
   const [ethPrice] = useEthPrice()
 
   useEffect(() => {

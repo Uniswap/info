@@ -10,7 +10,7 @@ import TopTokenList from '../components/TokenList'
 import TxnList from '../components/TxnList'
 import GlobalChart from '../components/GlobalChart'
 import Search from '../components/Search'
-import NavHeader from '../components/NavHeader'
+import GlobalStats from '../components/GlobalStats'
 
 import { useGlobalData, useGlobalTransactions } from '../contexts/GlobalData'
 import { useAllPairData } from '../contexts/PairData'
@@ -66,15 +66,13 @@ function GlobalPage() {
   return (
     <PageWrapper>
       <ThemedBackground backgroundColor={transparentize(0.8, '#ff007a')} />
-
       <ContentWrapper>
         <div>
           <AutoColumn gap="24px" style={{ paddingBottom: below800 ? '0' : '24px' }}>
             <TYPE.largeHeader>{below800 ? 'Protocol Analytics' : 'Uniswap Protocol Analytics'}</TYPE.largeHeader>
             <Search />
-            <NavHeader />
+            <GlobalStats />
           </AutoColumn>
-
           {below800 && ( // mobile card
             <Box mb={20}>
               <Panel>

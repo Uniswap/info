@@ -62,7 +62,7 @@ export const POSITIONS_BY_BLOCK = (account, blocks) => {
     block => `
       t${block.timestamp}:liquidityPositions(where: {user: "${account}"}, block: { number: ${block.number} }) { 
         liquidityTokenBalance
-        pair {
+        pair  {
           id
           totalSupply
           reserveUSD

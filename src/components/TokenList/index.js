@@ -14,6 +14,7 @@ import { useMedia } from 'react-use'
 import { withRouter } from 'react-router-dom'
 import { OVERVIEW_TOKEN_BLACKLIST } from '../../constants'
 import FormattedName from '../FormattedName'
+import { TYPE } from '../../Theme'
 
 dayjs.extend(utc)
 
@@ -26,7 +27,7 @@ const PageButtons = styled.div`
 `
 
 const Arrow = styled.div`
-  color: #2f80ed;
+  color: ${({ theme }) => theme.primary1};
   opacity: ${props => (props.faded ? 0.3 : 1)};
   padding: 0 20px;
   user-select: none;
@@ -89,6 +90,7 @@ const ClickableText = styled(Text)`
     opacity: 0.6;
   }
   user-select: none;
+  color: ${({ theme }) => theme.text1};
 
   @media screen and (max-width: 640px) {
     font-size: 0.85rem;
@@ -98,6 +100,7 @@ const ClickableText = styled(Text)`
 const DataText = styled(Flex)`
   align-items: center;
   text-align: center;
+  color: ${({ theme }) => theme.text1};
 
   & > * {
     font-size: 14px;
@@ -174,9 +177,6 @@ function TopTokenList({ tokens, itemMax = 10 }) {
   }, [formattedTokens, itemMax, page, sortDirection, sortedColumn])
 
   const ListItem = ({ item, index }) => {
-    if (!item) {
-      return ''
-    }
     return (
       <DashGrid style={{ height: '48px' }} focus={true}>
         <DataText area="name" fontWeight="500">
@@ -188,6 +188,7 @@ function TopTokenList({ tokens, itemMax = 10 }) {
                 text={below680 ? item.symbol : item.name}
                 maxCharacters={below600 ? 8 : 16}
                 adjustSize={true}
+                link={true}
               />
             </CustomLink>
           </Row>
@@ -310,7 +311,7 @@ function TopTokenList({ tokens, itemMax = 10 }) {
         >
           <Arrow faded={page === 1 ? true : false}>←</Arrow>
         </div>
-        {'Page ' + page + ' of ' + maxPage}
+        <TYPE.body>{'Page ' + page + ' of ' + maxPage}</TYPE.body>
         <div
           onClick={e => {
             setPage(page === maxPage ? page : page + 1)

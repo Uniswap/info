@@ -5,11 +5,12 @@ import { formattedNum } from '../../utils'
 import { usePrevious } from 'react-use'
 import styled from 'styled-components'
 import { Play } from 'react-feather'
+import { useDarkModeManager } from '../../contexts/LocalStorage'
 
 const IconWrapper = styled.div`
   position: absolute;
   right: 10px;
-  background-color: white;
+  color: ${({ theme }) => theme.text1}
   border-radius: 3px;
   height: 16px;
   width: 16px;
@@ -18,7 +19,6 @@ const IconWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
 
   :hover {
     cursor: pointer;
@@ -61,6 +61,22 @@ const CandleStickChart = ({
   const [chartCreated, setChartCreated] = useState(false)
   const dataPrev = usePrevious(data)
 
+  const [darkMode] = useDarkModeManager()
+  const textColor = darkMode ? 'white' : 'black'
+  const previousTheme = usePrevious(darkMode)
+
+  // reset the chart if theme switches
+  useEffect(() => {
+    if (chartCreated && previousTheme !== darkMode) {
+      // remove the tooltip element
+      let tooltip = document.getElementById('tooltip-id')
+      let node = document.getElementById('test-id')
+      node.removeChild(tooltip)
+      chartCreated.resize(0, 0)
+      setChartCreated()
+    }
+  }, [chartCreated, darkMode, previousTheme])
+
   useEffect(() => {
     if (data !== dataPrev && chartCreated) {
       // remove the tooltip element
@@ -80,7 +96,7 @@ const CandleStickChart = ({
         height: height,
         layout: {
           backgroundColor: 'transparent',
-          textColor: 'black'
+          textColor: textColor
         },
         grid: {
           vertLines: {
@@ -128,7 +144,7 @@ const CandleStickChart = ({
       // get the title of the chart
       function setLastBarText() {
         toolTip.innerHTML = base
-          ? '<div style="font-size: 22px; margin: 4px 0px; color: #20262E">' + valueFormatter(base) + '</div>'
+          ? `<div style="font-size: 22px; margin: 4px 0px; color: ${textColor}">` + valueFormatter(base) + '</div>'
           : ''
       }
       setLastBarText()
@@ -148,9 +164,9 @@ const CandleStickChart = ({
           var price = param.seriesPrices.get(candleSeries).close
           const time = dayjs.unix(param.time).format('MM/DD h:mm A')
           toolTip.innerHTML =
-            '<div style="font-size: 22px; margin: 4px 0px; color: #20262E">' +
+            `<div style="font-size: 22px; margin: 4px 0px; color: ${textColor}">` +
             valueFormatter(price) +
-            '<span style="font-size: 12px; margin: 4px 6px; color: #20262E">' +
+            `<span style="font-size: 12px; margin: 4px 6px; color: ${textColor}">` +
             time +
             ' UTC' +
             '</span>' +
@@ -162,7 +178,7 @@ const CandleStickChart = ({
 
       setChartCreated(chart)
     }
-  }, [chartCreated, formattedData, width, height, valueFormatter, base, margin])
+  }, [chartCreated, formattedData, width, height, valueFormatter, base, margin, textColor])
 
   // responsiveness
   useEffect(() => {

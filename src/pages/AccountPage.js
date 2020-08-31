@@ -5,14 +5,13 @@ import TxnList from '../components/TxnList'
 import Panel from '../components/Panel'
 import { formattedNum } from '../utils'
 import Row, { AutoRow, RowFixed, RowBetween } from '../components/Row'
-import { Text } from 'rebass'
 import { AutoColumn } from '../components/Column'
 import UserChart from '../components/UserChart'
 import PairReturnsChart from '../components/PairReturnsChart'
 import PositionList from '../components/PositionList'
 import { TYPE } from '../Theme'
 import { ButtonDropdown } from '../components/ButtonStyled'
-import { PageWrapper, ContentWrapper } from '../components'
+import { PageWrapper, ContentWrapper, StyledIcon } from '../components'
 import DoubleTokenLogo from '../components/DoubleLogo'
 import { Bookmark, Activity } from 'react-feather'
 import Link from '../components/Link'
@@ -45,14 +44,14 @@ const DropdownWrapper = styled.div`
 
 const Flyout = styled.div`
   position: absolute;
-  top: 32px;
+  top: 38px;
   left: -1px;
   width: 100%;
-  background-color: white;
+  background-color: ${({ theme }) => theme.bg1};
   z-index: 999;
   border-bottom-right-radius: 10px;
   border-bottom-left-radius: 10px;
-  padding-top: 26px;
+  padding-top: 4px;
   border: 1px solid #edeef2;
   border-top: none;
 `
@@ -64,7 +63,7 @@ const MenuRow = styled(Row)`
 
   :hover {
     cursor: pointer;
-    background-color: #f7f8fa;
+    background-color: ${({ theme }) => theme.bg2};
   }
 `
 
@@ -79,6 +78,7 @@ const PanelWrapper = styled.div`
 
 const Warning = styled.div`
   background-color: ${({ theme }) => theme.bg2};
+  color: ${({ theme }) => theme.text1};
   padding: 1rem;
   font-weight: 600;
   border-radius: 10px;
@@ -154,30 +154,27 @@ function AccountPage({ account }) {
     <PageWrapper>
       <ContentWrapper>
         <RowBetween>
-          <Text>
+          <TYPE.body>
             <BasicLink to="/accounts">{'Accounts '}</BasicLink>→{' '}
             <Link lineHeight={'145.23%'} href={'https://etherscan.io/address/' + account} target="_blank">
               {' '}
               {account?.slice(0, 42)}{' '}
             </Link>
-          </Text>
+          </TYPE.body>
           {!below600 && <Search small={true} />}
         </RowBetween>
         <Header>
           <RowBetween>
             <span>
-              <Text fontSize={24} fontWeight={600}>
-                {account?.slice(0, 6) + '...' + account?.slice(38, 42)}
-              </Text>
-
+              <TYPE.header fontSize={24}>{account?.slice(0, 6) + '...' + account?.slice(38, 42)}</TYPE.header>
               <Link lineHeight={'145.23%'} href={'https://etherscan.io/address/' + account} target="_blank">
-                <Text fontSize={14} fontWeight={500}>
-                  View on Etherscan
-                </Text>
+                <TYPE.main fontSize={14}>View on Etherscan</TYPE.main>
               </Link>
             </span>
             <AccountWrapper>
-              <Bookmark style={{ opacity: 0.4 }} />
+              <StyledIcon>
+                <Bookmark style={{ opacity: 0.4 }} />
+              </StyledIcon>
             </AccountWrapper>
           </RowBetween>
         </Header>
@@ -185,26 +182,21 @@ function AccountPage({ account }) {
           {showWarning && <Warning>Fees cannot currently be calculated for pairs that include AMPL.</Warning>}
           {!hideLPContent && (
             <DropdownWrapper>
-              <ButtonDropdown
-                width="100%"
-                style={{ backgroundColor: 'rgba(255, 255, 255, 0.4)' }}
-                onClick={() => setShowDropdown(!showDropdown)}
-                open={showDropdown}
-              >
+              <ButtonDropdown width="100%" onClick={() => setShowDropdown(!showDropdown)} open={showDropdown}>
                 {!activePosition && (
                   <RowFixed>
-                    <Activity stroke="black" size={16} />
-                    <Text fontSize="16px" color="black" fontWeight={400} ml={'10px'}>
-                      All Positions
-                    </Text>
+                    <StyledIcon>
+                      <Activity size={16} />
+                    </StyledIcon>
+                    <TYPE.body ml={'10px'}>All Positions</TYPE.body>
                   </RowFixed>
                 )}
                 {activePosition && (
                   <RowFixed>
                     <DoubleTokenLogo a0={activePosition.pair.token0.id} a1={activePosition.pair.token1.id} size={16} />
-                    <Text fontWeight={400} color="black" ml={'16px'} fontSize="16px">
+                    <TYPE.body ml={'16px'}>
                       {activePosition.pair.token0.symbol}-{activePosition.pair.token1.symbol} Position
-                    </Text>
+                    </TYPE.body>
                   </RowFixed>
                 )}
               </ButtonDropdown>
@@ -212,6 +204,12 @@ function AccountPage({ account }) {
                 <Flyout>
                   <AutoColumn gap="0px">
                     {positions?.map((p, i) => {
+                      if (p.pair.token1.symbol === 'WETH') {
+                        p.pair.token1.symbol = 'ETH'
+                      }
+                      if (p.pair.token0.symbol === 'WETH') {
+                        p.pair.token0.symbol = 'ETH'
+                      }
                       return (
                         p.pair.id !== activePosition?.pair.id && (
                           <MenuRow
@@ -222,9 +220,9 @@ function AccountPage({ account }) {
                             key={i}
                           >
                             <DoubleTokenLogo a0={p.pair.token0.id} a1={p.pair.token1.id} size={16} />
-                            <Text fontWeight={400} color="black" ml={'16px'} fontSize="16px">
+                            <TYPE.body ml={'16px'}>
                               {p.pair.token0.symbol}-{p.pair.token1.symbol} Position
-                            </Text>
+                            </TYPE.body>
                           </MenuRow>
                         )
                       )
@@ -237,10 +235,10 @@ function AccountPage({ account }) {
                         }}
                       >
                         <RowFixed>
-                          <Activity stroke="black" size={16} />
-                          <Text fontSize="16px" color="black" fontWeight={400} ml={'10px'}>
-                            All Positions
-                          </Text>
+                          <StyledIcon>
+                            <Activity size={16} />
+                          </StyledIcon>
+                          <TYPE.body ml={'10px'}>All Positions</TYPE.body>
                         </RowFixed>
                       </MenuRow>
                     )}
@@ -254,37 +252,28 @@ function AccountPage({ account }) {
               <AutoRow gap="20px">
                 <AutoColumn gap="10px">
                   <RowBetween>
-                    <TYPE.main fontSize={'16px'} fontWeight={400} color="#888D9B">
-                      Liquidity (Including Fees)
-                    </TYPE.main>
+                    <TYPE.body>Liquidity (Including Fees)</TYPE.body>
                     <div />
                   </RowBetween>
                   <RowFixed align="flex-end">
-                    <TYPE.main fontSize={'24px'} lineHeight={1} fontWeight={600}>
+                    <TYPE.header fontSize={'24px'} lineHeight={1}>
                       {positionValue
                         ? formattedNum(positionValue, true)
                         : positionValue === 0
                         ? formattedNum(0, true)
                         : '-'}
-                    </TYPE.main>
+                    </TYPE.header>
                   </RowFixed>
                 </AutoColumn>
                 <AutoColumn gap="10px">
                   <RowBetween>
-                    <TYPE.main fontSize={'16px'} fontWeight={400} color="#888D9B">
-                      Fees Earned (Cumulative)
-                    </TYPE.main>
+                    <TYPE.body>Fees Earned (Cumulative)</TYPE.body>
                     <div />
                   </RowBetween>
                   <RowFixed align="flex-end">
-                    <TYPE.main
-                      fontSize={'24px'}
-                      lineHeight={1}
-                      fontWeight={600}
-                      color={aggregateFees ? 'green' : 'black'}
-                    >
+                    <TYPE.header fontSize={'24px'} lineHeight={1} color={aggregateFees && 'green'}>
                       {aggregateFees ? formattedNum(aggregateFees, true, true) : '-'}
-                    </TYPE.main>
+                    </TYPE.header>
                   </RowFixed>
                 </AutoColumn>
               </AutoRow>
@@ -306,7 +295,6 @@ function AccountPage({ account }) {
           </TYPE.main>{' '}
           <Panel
             style={{
-              border: '1px solid rgba(43, 43, 43, 0.05)',
               marginTop: '1.5rem'
             }}
           >
@@ -317,7 +305,6 @@ function AccountPage({ account }) {
           </TYPE.main>{' '}
           <Panel
             style={{
-              border: '1px solid rgba(43, 43, 43, 0.05)',
               marginTop: '1.5rem'
             }}
           >
@@ -328,28 +315,23 @@ function AccountPage({ account }) {
           </TYPE.main>{' '}
           <Panel
             style={{
-              border: '1px solid rgba(43, 43, 43, 0.05)',
               marginTop: '1.5rem'
             }}
           >
             <AutoRow gap="20px">
               <AutoColumn gap="8px">
-                <Text fontSize={24} fontWeight={600}>
-                  {totalSwappedUSD ? formattedNum(totalSwappedUSD, true) : '-'}
-                </Text>
-                <Text fontSize={16}>Total Value Swapped</Text>
+                <TYPE.header fontSize={24}>{totalSwappedUSD ? formattedNum(totalSwappedUSD, true) : '-'}</TYPE.header>
+                <TYPE.main>Total Value Swapped</TYPE.main>
               </AutoColumn>
               <AutoColumn gap="8px">
-                <Text fontSize={24} fontWeight={600}>
+                <TYPE.header fontSize={24}>
                   {totalSwappedUSD ? formattedNum(totalSwappedUSD * 0.003, true) : '-'}
-                </Text>
-                <Text fontSize={16}>Total Fees Paid</Text>
+                </TYPE.header>
+                <TYPE.main>Total Fees Paid</TYPE.main>
               </AutoColumn>
               <AutoColumn gap="8px">
-                <Text fontSize={24} fontWeight={600}>
-                  {transactionCount ? transactionCount : '-'}
-                </Text>
-                <Text fontSize={16}>Total Transactions</Text>
+                <TYPE.header fontSize={24}>{transactionCount ? transactionCount : '-'}</TYPE.header>
+                <TYPE.main>Total Transactions</TYPE.main>
               </AutoColumn>
             </AutoRow>
           </Panel>

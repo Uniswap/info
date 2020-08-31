@@ -663,34 +663,40 @@ export function useTopLps() {
       let topLpLists = await Promise.all(
         topPairs.map(async pair => {
           // for each one, fetch top LPs
-          const { data: results } = await client.query({
-            query: TOP_LPS_PER_PAIRS,
-            variables: {
-              pair: pair.toString()
-            },
-            fetchPolicy: 'cache-first'
-          })
-          return results.liquidityPositions
+          try {
+            const { data: results } = await client.query({
+              query: TOP_LPS_PER_PAIRS,
+              variables: {
+                pair: pair.toString()
+              },
+              fetchPolicy: 'cache-first'
+            })
+            if (results) {
+              return results.liquidityPositions
+            }
+          } catch (e) {}
         })
       )
 
       // get the top lps from the results formatted
       const topLps = []
-      topLpLists.map(list => {
-        return list.map(entry => {
-          const pairData = allPairs[entry.pair.id]
-          return topLps.push({
-            user: entry.user,
-            pairName: pairData.token0.symbol + '-' + pairData.token1.symbol,
-            pairAddress: entry.pair.id,
-            token0: pairData.token0.id,
-            token1: pairData.token1.id,
-            usd:
-              (parseFloat(entry.liquidityTokenBalance) / parseFloat(pairData.totalSupply)) *
-              parseFloat(pairData.reserveUSD)
+      topLpLists
+        .filter(i => !!i) // check for ones not fetched correctly
+        .map(list => {
+          return list.map(entry => {
+            const pairData = allPairs[entry.pair.id]
+            return topLps.push({
+              user: entry.user,
+              pairName: pairData.token0.symbol + '-' + pairData.token1.symbol,
+              pairAddress: entry.pair.id,
+              token0: pairData.token0.id,
+              token1: pairData.token1.id,
+              usd:
+                (parseFloat(entry.liquidityTokenBalance) / parseFloat(pairData.totalSupply)) *
+                parseFloat(pairData.reserveUSD)
+            })
           })
         })
-      })
 
       const sorted = topLps.sort((a, b) => (a.usd > b.usd ? -1 : 1))
       const shorter = sorted.splice(0, 100)

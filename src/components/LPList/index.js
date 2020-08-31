@@ -3,7 +3,7 @@ import { useMedia } from 'react-use'
 import dayjs from 'dayjs'
 import LocalLoader from '../LocalLoader'
 import utc from 'dayjs/plugin/utc'
-import { Box, Flex, Text } from 'rebass'
+import { Box, Flex } from 'rebass'
 import styled from 'styled-components'
 
 import { CustomLink } from '../Link'
@@ -65,7 +65,7 @@ const ListWrapper = styled.div``
 const DataText = styled(Flex)`
   align-items: center;
   text-align: center;
-
+  color: ${({ theme }) => theme.text1};
   & > * {
     font-size: 14px;
   }
@@ -148,15 +148,11 @@ function LPList({ lps, disbaleLinks, maxItems = 10 }) {
       <DashGrid center={true} disbaleLinks={disbaleLinks} style={{ height: 'fit-content', padding: ' 0 0 1rem 0' }}>
         {!below600 && (
           <Flex alignItems="center" justifyContent="flex-start">
-            <Text area="number" fontWeight="500">
-              #
-            </Text>
+            <TYPE.main area="number">#</TYPE.main>
           </Flex>
         )}
         <Flex alignItems="center" justifyContent="flex-start">
-          <Text area="name" fontWeight="500">
-            Account
-          </Text>
+          <TYPE.main area="name">Account</TYPE.main>
         </Flex>
         {/* {!below1080 && (
           <Flex alignItems="center" justifyContent="flexEnd">

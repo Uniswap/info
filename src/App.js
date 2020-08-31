@@ -6,7 +6,6 @@ import { Route, Switch, BrowserRouter, Redirect } from 'react-router-dom'
 import GlobalPage from './pages/GlobalPage'
 import TokenPage from './pages/TokenPage'
 import PairPage from './pages/PairPage'
-import LocalLoader from './components/LocalLoader'
 import { useGlobalData, useGlobalChartData } from './contexts/GlobalData'
 import { isAddress } from './utils'
 import AccountPage from './pages/AccountPage'
@@ -17,6 +16,7 @@ import PinnedData from './components/PinnedData'
 import SideNav from './components/SideNav'
 import AccountLookup from './pages/AccountLookup'
 import { OVERVIEW_TOKEN_BLACKLIST, PAIR_BLACKLIST } from './constants'
+import LocalLoader from './components/LocalLoader'
 
 const AppWrapper = styled.div`
   position: relative;
@@ -46,7 +46,7 @@ const Right = styled.div`
   width: ${({ open }) => (open ? '220px' : '64px')};
   height: ${({ open }) => (open ? 'fit-content' : '64px')};
   overflow: scroll;
-
+  background-color: ${({ theme }) => theme.bg1};
   @media screen and (max-width: 1400px) {
     display: none;
   }
@@ -56,9 +56,7 @@ const Center = styled.div`
   height: 100%;
   z-index: 9999;
   transition: width 0.25s ease;
-
-  border-radius: 12px;
-  background-color: ${({ theme }) => theme.white};
+  background-color: ${({ theme }) => theme.onlyLight};
 `
 
 /**

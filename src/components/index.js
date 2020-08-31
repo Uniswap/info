@@ -1,7 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
 import { Text, Box } from 'rebass'
-import { transparentize } from 'polished'
 
 import Link from './Link'
 
@@ -9,7 +8,26 @@ import { urls } from '../utils'
 
 const Divider = styled(Box)`
   height: 1px;
-  background-color: rgba(43, 43, 43, 0.035);
+  background-color: ${({ theme }) => theme.divider};
+`
+
+export const IconWrapper = styled.div`
+  position: absolute;
+  right: 0;
+  border-radius: 3px;
+  height: 16px;
+  width: 16px;
+  padding: 0px;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: ${({ theme }) => theme.text1};
+
+  :hover {
+    cursor: pointer;
+    opacity: 0.7;
+  }
 `
 
 const Hint = ({ children, ...rest }) => (
@@ -37,12 +55,17 @@ export const Hover = styled.div`
   }
 `
 
+export const StyledIcon = styled.div`
+  color: ${({ theme }) => theme.text1};
+`
+
 const EmptyCard = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
   height: 200px;
   border-radius: 20px;
+  color: ${({ theme }) => theme.text1};
   height: ${({ height }) => height && height};
 `
 
@@ -146,13 +169,8 @@ export const FixedMenu = styled.div`
   z-index: 99;
   width: 100%;
   box-sizing: border-box;
-  /* position: sticky; */
-  /* top: 5.25rem; */
   padding: 1rem;
   box-sizing: border-box;
-  /* background-color: ${({ theme }) => transparentize(0.6, theme.bg1)}; */
-  /* backdrop-filter: blur(20px); */
-  /* border-bottom: 1px solid ${({ theme }) => theme.bg2}; */
   margin-bottom: 2rem;
   max-width: 100vw;
 

@@ -14,6 +14,7 @@ import Link from '../Link'
 import { Divider, EmptyCard } from '..'
 import DropdownSelect from '../DropdownSelect'
 import FormattedName from '../FormattedName'
+import { TYPE } from '../../Theme'
 
 dayjs.extend(utc)
 
@@ -84,12 +85,14 @@ const DashGrid = styled.div`
 `
 
 const ClickableText = styled(Text)`
+  color: ${({ theme }) => theme.text1};
+  user-select: none;
+  text-align: end;
+
   &:hover {
     cursor: pointer;
     opacity: 0.6;
   }
-  user-select: none;
-  text-align: end;
 
   @media screen and (max-width: 640px) {
     font-size: 14px;
@@ -99,6 +102,7 @@ const ClickableText = styled(Text)`
 const DataText = styled(Flex)`
   align-items: center;
   text-align: right;
+  color: ${({ theme }) => theme.text1};
 
   & > * {
     font-size: 1em;
@@ -406,9 +410,7 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
           )}
           {!below1080 && (
             <Flex alignItems="center">
-              <Text area="account" color="textDim">
-                Account
-              </Text>
+              <TYPE.body area="account">Account</TYPE.body>
             </Flex>
           )}
           <Flex alignItems="center">
@@ -450,7 +452,7 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
         >
           <Arrow faded={page === 1 ? true : false}>←</Arrow>
         </div>
-        {'Page ' + page + ' of ' + maxPage}
+        <TYPE.body>{'Page ' + page + ' of ' + maxPage}</TYPE.body>
         <div
           onClick={e => {
             setPage(page === maxPage ? page : page + 1)

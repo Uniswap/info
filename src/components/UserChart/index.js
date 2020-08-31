@@ -8,9 +8,10 @@ import { darken } from 'polished'
 import { useMedia } from 'react-use'
 import { timeframeOptions } from '../../constants'
 import DropdownSelect from '../DropdownSelect'
-import { Text } from 'rebass'
 import { useUserLiquidityChart } from '../../contexts/User'
 import LocalLoader from '../LocalLoader'
+import { useDarkModeManager } from '../../contexts/LocalStorage'
+import { TYPE } from '../../Theme'
 
 const ChartWrapper = styled.div`
   height: 100%;
@@ -34,6 +35,9 @@ const UserChart = ({ account }) => {
 
   const aspect = above1600 ? 60 / 12 : below600 ? 60 / 42 : 60 / 16
 
+  const [darkMode] = useDarkModeManager()
+  const textColor = darkMode ? 'white' : 'black'
+
   return (
     <ChartWrapper>
       {below600 ? (
@@ -44,7 +48,7 @@ const UserChart = ({ account }) => {
       ) : (
         <RowBetween mb={40}>
           <AutoRow gap="10px">
-            <Text>Liquidity Value</Text>
+            <TYPE.main>Liquidity Value</TYPE.main>
           </AutoRow>
           <AutoRow justify="flex-end" gap="4px">
             <OptionButton
@@ -85,7 +89,7 @@ const UserChart = ({ account }) => {
               minTickGap={0}
               tickFormatter={tick => toNiceDate(tick)}
               dataKey="date"
-              tick={{ fill: 'black' }}
+              tick={{ fill: textColor }}
               type={'number'}
               domain={domain}
             />
@@ -98,7 +102,7 @@ const UserChart = ({ account }) => {
               interval="preserveEnd"
               minTickGap={6}
               yAxisId={0}
-              tick={{ fill: 'black' }}
+              tick={{ fill: textColor }}
             />
             <Tooltip
               cursor={true}

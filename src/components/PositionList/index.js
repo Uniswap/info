@@ -14,6 +14,8 @@ import { AutoColumn } from '../Column'
 import { useEthPrice } from '../../contexts/GlobalData'
 import { RowFixed } from '../Row'
 import { ButtonLight } from '../ButtonStyled'
+import { TYPE } from '../../Theme'
+import FormattedName from '../FormattedName'
 
 dayjs.extend(utc)
 
@@ -67,11 +69,17 @@ const DashGrid = styled.div`
     grid-template-columns: 2.5fr 1fr 1fr;
     grid-template-areas: 'name uniswap return';
   }
+
+  @media screen and (max-width: 500px) {
+    grid-template-columns: 2.5fr 1fr;
+    grid-template-areas: 'name uniswap';
+  }
 `
 
 const ListWrapper = styled.div``
 
 const ClickableText = styled(Text)`
+  color: ${({ theme }) => theme.text1};
   &:hover {
     cursor: pointer;
     opacity: 0.6;
@@ -84,7 +92,7 @@ const ClickableText = styled(Text)`
 const DataText = styled(Flex)`
   align-items: center;
   text-align: center;
-
+  color: ${({ theme }) => theme.text1};
   & > * {
     font-size: 1em;
   }
@@ -100,6 +108,7 @@ const SORT_FIELD = {
 }
 
 function PositionList({ positions }) {
+  const below500 = useMedia('(max-width: 500px)')
   const below740 = useMedia('(max-width: 740px)')
 
   // pagination
@@ -133,74 +142,112 @@ function PositionList({ positions }) {
     const valueUSD = poolOwnership * position.pair.reserveUSD
 
     return (
-      <DashGrid focus={true}>
+      <DashGrid style={{ opacity: poolOwnership > 0 ? 1 : 0.6 }} focus={true}>
         {!below740 && <DataText area="number">{index}</DataText>}
-        <DataText area="name" fontWeight="500" justifyContent="flex-start" alignItems="flex-start">
+        <DataText area="name" justifyContent="flex-start" alignItems="flex-start">
           <AutoColumn gap="8px" justify="flex-start" align="flex-start">
             <DoubleTokenLogo size={16} a0={position.pair.token0.id} a1={position.pair.token1.id} margin={!below740} />
           </AutoColumn>
           <AutoColumn gap="8px" justify="flex-start" style={{ marginLeft: '20px' }}>
             <CustomLink to={'/pair/' + position.pair.id}>
-              <Text style={{ whiteSpace: 'nowrap' }} to={'/pair/'}>
-                {position.pair.token0.symbol + '-' + position.pair.token1.symbol}
-              </Text>
+              <TYPE.main style={{ whiteSpace: 'nowrap' }} to={'/pair/'}>
+                <FormattedName
+                  text={position.pair.token0.symbol + '-' + position.pair.token1.symbol}
+                  maxCharacters={below740 ? 10 : 18}
+                />
+              </TYPE.main>
             </CustomLink>
+
             <RowFixed gap="8px" justify="flex-start">
               <Link
                 external
                 href={getPoolLink(position.pair.token0.id, position.pair.token1.id)}
                 style={{ marginRight: '.5rem' }}
               >
-                <ButtonLight style={{ padding: '2px 4px', borderRadius: '4px' }}>Add</ButtonLight>
+                <ButtonLight style={{ padding: '4px 6px', borderRadius: '4px' }}>Add</ButtonLight>
               </Link>
-              <Link external href={getPoolLink(position.pair.token0.id, position.pair.token1.id, true)}>
-                <ButtonLight style={{ padding: '2px 4px', borderRadius: '4px' }}>Remove</ButtonLight>
-              </Link>
+              {poolOwnership > 0 && (
+                <Link external href={getPoolLink(position.pair.token0.id, position.pair.token1.id, true)}>
+                  <ButtonLight style={{ padding: '4px 6px', borderRadius: '4px' }}>Remove</ButtonLight>
+                </Link>
+              )}
             </RowFixed>
           </AutoColumn>
         </DataText>
         <DataText area="uniswap">
           <AutoColumn gap="12px" justify="flex-end">
-            <Text fontWeight={500}>{formattedNum(valueUSD, true, true)}</Text>
+            <TYPE.main>{formattedNum(valueUSD, true, true)}</TYPE.main>
             <AutoColumn gap="4px" justify="flex-end">
-              <Text fontSize="12px">
-                {formattedNum(poolOwnership * parseFloat(position.pair.reserve0))} {position.pair.token0.symbol}
-              </Text>
-              <Text fontSize="12px">
-                {formattedNum(poolOwnership * parseFloat(position.pair.reserve1))} {position.pair.token1.symbol}
-              </Text>
+              <RowFixed>
+                <TYPE.small fontWeight={400}>
+                  {formattedNum(poolOwnership * parseFloat(position.pair.reserve0))}{' '}
+                </TYPE.small>
+                <FormattedName
+                  text={position.pair.token0.symbol}
+                  maxCharacters={below740 ? 10 : 18}
+                  margin={true}
+                  fontSize={'11px'}
+                />
+              </RowFixed>
+              <RowFixed>
+                <TYPE.small fontWeight={400}>
+                  {formattedNum(poolOwnership * parseFloat(position.pair.reserve1))}{' '}
+                </TYPE.small>
+                <FormattedName
+                  text={position.pair.token1.symbol}
+                  maxCharacters={below740 ? 10 : 18}
+                  margin={true}
+                  fontSize={'11px'}
+                />
+              </RowFixed>
             </AutoColumn>
           </AutoColumn>
         </DataText>
-        <DataText area="return">
-          <AutoColumn gap="12px" justify="flex-end">
-            <Text fontWeight={500} color={'green'}>
-              <RowFixed>{formattedNum(position?.fees.sum, true, true)}</RowFixed>
-            </Text>
-            <AutoColumn gap="4px" justify="flex-end">
-              <Text fontSize="12px">
-                {parseFloat(position.pair.token0.derivedETH)
-                  ? formattedNum(
-                      position?.fees.sum / (parseFloat(position.pair.token0.derivedETH) * ethPrice) / 2,
-                      false,
-                      true
-                    )
-                  : 0}{' '}
-                {position.pair.token0.symbol}
-              </Text>
-              <Text fontSize="12px">
-                {parseFloat(position.pair.token1.derivedETH)
-                  ? formattedNum(
-                      position?.fees.sum / (parseFloat(position.pair.token1.derivedETH) * ethPrice) / 2,
-                      false,
-                      true
-                    )
-                  : 0}{' '}
-                {position.pair.token1.symbol}
-              </Text>
+        {!below500 && (
+          <DataText area="return">
+            <AutoColumn gap="12px" justify="flex-end">
+              <TYPE.main color={'green'}>
+                <RowFixed>{formattedNum(position?.fees.sum, true, true)}</RowFixed>
+              </TYPE.main>
+              <AutoColumn gap="4px" justify="flex-end">
+                <RowFixed>
+                  <TYPE.small fontWeight={400}>
+                    {parseFloat(position.pair.token0.derivedETH)
+                      ? formattedNum(
+                          position?.fees.sum / (parseFloat(position.pair.token0.derivedETH) * ethPrice) / 2,
+                          false,
+                          true
+                        )
+                      : 0}{' '}
+                  </TYPE.small>
+                  <FormattedName
+                    text={position.pair.token0.symbol}
+                    maxCharacters={below740 ? 10 : 18}
+                    margin={true}
+                    fontSize={'11px'}
+                  />
+                </RowFixed>
+                <RowFixed>
+                  <TYPE.small fontWeight={400}>
+                    {parseFloat(position.pair.token1.derivedETH)
+                      ? formattedNum(
+                          position?.fees.sum / (parseFloat(position.pair.token1.derivedETH) * ethPrice) / 2,
+                          false,
+                          true
+                        )
+                      : 0}{' '}
+                  </TYPE.small>
+                  <FormattedName
+                    text={position.pair.token1.symbol}
+                    maxCharacters={below740 ? 10 : 18}
+                    margin={true}
+                    fontSize={'11px'}
+                  />
+                </RowFixed>
+              </AutoColumn>
             </AutoColumn>
-          </AutoColumn>
-        </DataText>
+          </DataText>
+        )}
       </DashGrid>
     )
   }
@@ -241,15 +288,11 @@ function PositionList({ positions }) {
       <DashGrid center={true} style={{ height: '32px', padding: 0 }}>
         {!below740 && (
           <Flex alignItems="flex-start" justifyContent="flexStart">
-            <Text area="number" fontWeight="500">
-              #
-            </Text>
+            <TYPE.main area="number">#</TYPE.main>
           </Flex>
         )}
         <Flex alignItems="flex-start" justifyContent="flex-start">
-          <Text area="name" fontWeight="500">
-            Name
-          </Text>
+          <TYPE.main area="number">Name</TYPE.main>
         </Flex>
         <Flex alignItems="center" justifyContent="flexEnd">
           <ClickableText
@@ -262,35 +305,29 @@ function PositionList({ positions }) {
             {below740 ? 'Value' : 'Liquidity'} {sortedColumn === SORT_FIELD.VALUE ? (!sortDirection ? '↑' : '↓') : ''}
           </ClickableText>
         </Flex>
-        <Flex alignItems="center" justifyContent="flexEnd">
-          <ClickableText
-            area="return"
-            onClick={() => {
-              setSortedColumn(SORT_FIELD.UNISWAP_RETURN)
-              setSortDirection(sortedColumn !== SORT_FIELD.UNISWAP_RETURN ? true : !sortDirection)
-            }}
-          >
-            {below740 ? 'Fees' : 'Total Fees Earned'}{' '}
-            {sortedColumn === SORT_FIELD.UNISWAP_RETURN ? (!sortDirection ? '↑' : '↓') : ''}
-          </ClickableText>
-        </Flex>
+        {!below500 && (
+          <Flex alignItems="center" justifyContent="flexEnd">
+            <ClickableText
+              area="return"
+              onClick={() => {
+                setSortedColumn(SORT_FIELD.UNISWAP_RETURN)
+                setSortDirection(sortedColumn !== SORT_FIELD.UNISWAP_RETURN ? true : !sortDirection)
+              }}
+            >
+              {below740 ? 'Fees' : 'Total Fees Earned'}{' '}
+              {sortedColumn === SORT_FIELD.UNISWAP_RETURN ? (!sortDirection ? '↑' : '↓') : ''}
+            </ClickableText>
+          </Flex>
+        )}
       </DashGrid>
       <Divider />
       <List p={0}>{!positionsSorted ? <LocalLoader /> : positionsSorted}</List>
       <PageButtons>
-        <div
-          onClick={e => {
-            setPage(page === 1 ? page : page - 1)
-          }}
-        >
+        <div onClick={() => setPage(page === 1 ? page : page - 1)}>
           <Arrow faded={page === 1 ? true : false}>←</Arrow>
         </div>
-        {'Page ' + page + ' of ' + maxPage}
-        <div
-          onClick={e => {
-            setPage(page === maxPage ? page : page + 1)
-          }}
-        >
+        <TYPE.body>{'Page ' + page + ' of ' + maxPage}</TYPE.body>
+        <div onClick={() => setPage(page === maxPage ? page : page + 1)}>
           <Arrow faded={page === maxPage ? true : false}>→</Arrow>
         </div>
       </PageButtons>

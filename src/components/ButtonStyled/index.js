@@ -4,6 +4,7 @@ import styled from 'styled-components'
 import { Plus, ChevronDown, ChevronUp } from 'react-feather'
 import { darken, transparentize } from 'polished'
 import { RowBetween } from '../Row'
+import { StyledIcon } from '..'
 
 const Base = styled(RebassButton)`
   padding: 8px 12px;
@@ -14,6 +15,8 @@ const Base = styled(RebassButton)`
   outline: none;
   border: 1px solid transparent;
   outline: none;
+  border-bottom-right-radius: ${({ open }) => open && '0'};
+  border-bottom-left-radius: ${({ open }) => open && '0'};
 `
 
 const BaseCustom = styled(RebassButton)`
@@ -76,12 +79,20 @@ export const ButtonLight = styled(Base)`
 
 export function ButtonDropdown({ disabled = false, children, open, ...rest }) {
   return (
-    <Base {...rest} disabled={disabled}>
+    <ButtonFaded {...rest} disabled={disabled} ope={open}>
       <RowBetween>
         <div style={{ display: 'flex', alignItems: 'center' }}>{children}</div>
-        {open ? <ChevronUp size={24} fill="black" /> : <ChevronDown size={24} fill="black" />}
+        {open ? (
+          <StyledIcon>
+            <ChevronUp size={24} />
+          </StyledIcon>
+        ) : (
+          <StyledIcon>
+            <ChevronDown size={24} />
+          </StyledIcon>
+        )}
       </RowBetween>
-    </Base>
+    </ButtonFaded>
   )
 }
 
@@ -98,7 +109,7 @@ export const ButtonDark = styled(Base)`
 `
 
 export const ButtonFaded = styled(Base)`
-  background-color: rgba(0, 0, 0, 0.02);
+  background-color: ${({ theme }) => theme.bg2};
   color: (255, 255, 255, 0.5);
   white-space: nowrap;
 
@@ -133,7 +144,8 @@ export const OptionButton = styled.div`
   padding: 6px;
   border-radius: 6px;
   border: 1px solid ${({ theme }) => theme.bg4};
-  background-color: ${({ active }) => active && 'rgba(0, 0, 0, 0.06)'};
+  background-color: ${({ active, theme }) => active && theme.bg3};
+  color: ${({ theme }) => theme.text1};
 
   :hover {
     cursor: ${({ disabled }) => !disabled && 'pointer'};

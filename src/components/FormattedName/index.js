@@ -4,7 +4,10 @@ import { Tooltip } from '../QuestionHelper'
 
 const TextWrapper = styled.div`
   position: relative;
-  margin-left: ${({ margin }) => margin && '4px'}
+  margin-left: ${({ margin }) => margin && '4px'};
+  color: ${({ theme, link }) => (link ? theme.blue : theme.text1)};
+  font-size: ${({ fontSize }) => fontSize ?? 'inherit'};
+
   :hover {
     cursor: pointer;
   }
@@ -14,7 +17,7 @@ const TextWrapper = styled.div`
   }
 `
 
-const FormattedName = ({ text, maxCharacters, margin = false, adjustSize = false, ...rest }) => {
+const FormattedName = ({ text, maxCharacters, margin = false, adjustSize = false, fontSize, link, ...rest }) => {
   const [showHover, setShowHover] = useState(false)
 
   if (!text) {
@@ -29,6 +32,8 @@ const FormattedName = ({ text, maxCharacters, margin = false, adjustSize = false
           onMouseLeave={() => setShowHover(false)}
           margin={margin}
           adjustSize={adjustSize}
+          link={link}
+          fontSize={fontSize}
           {...rest}
         >
           {' ' + text.slice(0, maxCharacters - 1) + '...'}
@@ -38,7 +43,7 @@ const FormattedName = ({ text, maxCharacters, margin = false, adjustSize = false
   }
 
   return (
-    <TextWrapper margin={margin} adjustSize={adjustSize} {...rest}>
+    <TextWrapper margin={margin} adjustSize={adjustSize} link={link} fontSize={fontSize} {...rest}>
       {text}
     </TextWrapper>
   )

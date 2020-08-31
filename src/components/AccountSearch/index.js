@@ -8,7 +8,7 @@ import { isAddress } from '../../utils'
 import { useSavedAccounts } from '../../contexts/LocalStorage'
 import { AutoColumn } from '../Column'
 import { TYPE } from '../../Theme'
-import { Hover } from '..'
+import { Hover, StyledIcon } from '..'
 import Panel from '../Panel'
 import { Divider } from '..'
 import { Flex } from 'rebass'
@@ -35,8 +35,8 @@ const Input = styled.input`
   outline: none;
   padding: 12px 16px;
   border-radius: 12px;
-  color: ${({ theme }) => theme.textColor};
-  background-color: ${({ theme }) => theme.white};
+  color: ${({ theme }) => theme.text1};
+  background-color: ${({ theme }) => theme.bg1};
   font-size: 16px;
   margin-right: 1rem;
   border: 1px solid ${({ theme }) => theme.bg3};
@@ -73,7 +73,7 @@ const DashGrid = styled.div`
   }
 `
 
-function AccountLookup({ history, small }) {
+function AccountSearch({ history, small }) {
   const [accountValue, setAccountValue] = useState()
   const [savedAccounts, addAccount, removeAccount] = useSavedAccounts()
 
@@ -122,14 +122,16 @@ function AccountLookup({ history, small }) {
                     >
                       <AccountLink>{account?.slice(0, 42)}</AccountLink>
                       <Hover onClick={() => removeAccount(account)}>
-                        <X size={16} />
+                        <StyledIcon>
+                          <X size={16} />
+                        </StyledIcon>
                       </Hover>
                     </Flex>
                   </DashGrid>
                 )
               })
             ) : (
-              <div style={{ marginTop: '1rem' }}>No saved accounts</div>
+              <TYPE.light style={{ marginTop: '1rem' }}>No saved accounts</TYPE.light>
             )}
           </Panel>
         )}
@@ -149,7 +151,9 @@ function AccountLookup({ history, small }) {
                       )}
                     </ButtonFaded>
                     <Hover onClick={() => removeAccount(account)}>
-                      <X size={16} />
+                      <StyledIcon>
+                        <X size={16} />
+                      </StyledIcon>
                     </Hover>
                   </RowBetween>
                 )
@@ -164,4 +168,4 @@ function AccountLookup({ history, small }) {
   )
 }
 
-export default withRouter(AccountLookup)
+export default withRouter(AccountSearch)
