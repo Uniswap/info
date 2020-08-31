@@ -278,7 +278,7 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
             >
               1y Fees / Liquidity {sortedColumn === SORT_FIELD.APY ? (!sortDirection ? '↑' : '↓') : ''}
             </ClickableText>
-            <QuestionHelper text={'Based on 24hr volume anualized'} />
+            <QuestionHelper text={'Based on 24hr volume annualized'} />
           </Flex>
         )}
       </DashGrid>
