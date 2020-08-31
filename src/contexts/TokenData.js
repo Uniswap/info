@@ -23,7 +23,7 @@ import {
   getBlocksFromTimestamps,
   splitQuery
 } from '../utils'
-import { timeframeOptions } from '../constants'
+import { timeframeOptions, HALF_HOUR_UNIX } from '../constants'
 
 const UPDATE = 'UPDATE'
 const UPDATE_TOKEN_TXNS = 'UPDATE_TOKEN_TXNS'
@@ -454,8 +454,9 @@ const getIntervalTokenData = async (tokenAddress, startTime, interval = 3600) =>
   let time = startTime
 
   // create an array of hour start times until we reach current hour
+  // buffer by half hour to catch case where graph isnt synced to latest block
   const timestamps = []
-  while (time < utcEndTime.unix()) {
+  while (time < utcEndTime.unix() - HALF_HOUR_UNIX) {
     timestamps.push(time)
     time += interval
   }

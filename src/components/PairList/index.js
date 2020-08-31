@@ -203,7 +203,7 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
         return (
           pairAddress && (
             <div key={index}>
-              <ListItem key={index} index={(page - 1) * 10 + index + 1} pairAddress={pairAddress} />
+              <ListItem key={index} index={(page - 1) * ITEMS_PER_PAGE + index + 1} pairAddress={pairAddress} />
               <Divider />
             </div>
           )
@@ -280,7 +280,7 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
             >
               1y Fees / Liquidity {sortedColumn === SORT_FIELD.APY ? (!sortDirection ? '↑' : '↓') : ''}
             </ClickableText>
-            <QuestionHelper text={'Based on 24hr volume anualized'} />
+            <QuestionHelper text={'Based on 24hr volume annualized'} />
           </Flex>
         )}
       </DashGrid>
