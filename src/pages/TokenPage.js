@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import 'feather-icons'
 import { withRouter } from 'react-router-dom'
 import { Text } from 'rebass'
@@ -97,6 +97,8 @@ function TokenPage({ address, history }) {
     oneDayVolumeUSD,
     totalLiquidityUSD,
     volumeChangeUSD,
+    oneDayVolumeUT,
+    volumeChangeUT,
     priceChangeUSD,
     liquidityChangeUSD,
     oneDayTxns,
@@ -123,9 +125,20 @@ function TokenPage({ address, history }) {
   const priceChange = priceChangeUSD ? formattedPercent(priceChangeUSD) : ''
 
   // volume
-  const volume = oneDayVolumeUSD ? formattedNum(oneDayVolumeUSD, true) : oneDayVolumeUSD === 0 ? '$0' : '-'
+  const volume =
+    oneDayVolumeUSD || oneDayVolumeUSD === 0
+      ? formattedNum(oneDayVolumeUSD === 0 ? oneDayVolumeUT : oneDayVolumeUSD, true)
+      : oneDayVolumeUSD === 0
+      ? '$0'
+      : '-'
 
-  const volumeChange = formattedPercent(volumeChangeUSD)
+  // mark if using untracked volume
+  const [usingUtVolume, setUsingUtVolume] = useState(false)
+  useEffect(() => {
+    setUsingUtVolume(oneDayVolumeUSD === 0 ? true : false)
+  }, [oneDayVolumeUSD])
+
+  const volumeChange = formattedPercent(!usingUtVolume ? volumeChangeUSD : volumeChangeUT)
 
   // liquidity
   const liquidity = totalLiquidityUSD ? formattedNum(totalLiquidityUSD, true) : totalLiquidityUSD === 0 ? '$0' : '-'
@@ -270,7 +283,7 @@ function TokenPage({ address, history }) {
                 <Panel>
                   <AutoColumn gap="20px">
                     <RowBetween>
-                      <TYPE.main>Volume (24hrs)</TYPE.main>
+                      <TYPE.main>Volume (24hrs) {usingUtVolume && '(Untracked)'}</TYPE.main>
                       <div />
                     </RowBetween>
                     <RowBetween align="flex-end">
