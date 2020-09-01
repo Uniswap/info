@@ -10,8 +10,6 @@ export const timeframeOptions = {
   ALL_TIME: 'All time'
 }
 
-export const HALF_HOUR_UNIX = 1800
-
 // token list urls to fetch tokens from - use for warnings on tokens and pairs
 export const SUPPORTED_LIST_URLS__NO_ENS = [
   'https://gateway.ipfs.io/ipns/tokens.uniswap.org',

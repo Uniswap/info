@@ -8,6 +8,7 @@ import { useAllTokenData } from '../contexts/TokenData'
 import { PageWrapper, FullWrapper } from '../components'
 import { RowBetween } from '../components/Row'
 import Search from '../components/Search'
+import { useMedia } from 'react-use'
 
 function AllTokensPage() {
   const allTokens = useAllTokenData()
@@ -16,14 +17,16 @@ function AllTokensPage() {
     window.scrollTo(0, 0)
   }, [])
 
+  const below600 = useMedia('(max-width: 800px)')
+
   return (
     <PageWrapper>
       <FullWrapper>
         <RowBetween>
           <TYPE.largeHeader>Top Tokens</TYPE.largeHeader>
-          <Search small={true} />
+          {!below600 && <Search small={true} />}
         </RowBetween>
-        <Panel style={{ marginTop: '6px' }}>
+        <Panel style={{ marginTop: '6px', padding: below600 && '1rem 0 0 0 ' }}>
           <TopTokenList tokens={allTokens} itemMax={50} />
         </Panel>
       </FullWrapper>

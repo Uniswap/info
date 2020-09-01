@@ -25,6 +25,7 @@ import {
   splitQuery
 } from '../utils'
 import { timeframeOptions } from '../constants'
+import { useLatestBlock } from './Application'
 
 const UPDATE = 'UPDATE'
 const UPDATE_PAIR_TXNS = 'UPDATE_PAIR_TXNS'
@@ -102,7 +103,7 @@ function reducer(state, { type, payload }) {
         [address]: {
           ...state?.[address],
           hourlyData: {
-            ...state?.[address].hourlyData,
+            ...state?.[address]?.hourlyData,
             [timeWindow]: hourlyData
           }
         }
@@ -382,67 +383,76 @@ const getPairChartData = async pairAddress => {
   return data
 }
 
-const getHourlyRateData = async (pairAddress, startTime) => {
-  const utcEndTime = dayjs.utc()
-  let time = startTime
-
-  // create an array of hour start times until we reach current hour
-  const timestamps = []
-  while (time <= utcEndTime.unix() - 3600) {
-    timestamps.push(time)
-    time += 3600
-  }
-
-  // backout if invalid timestamp format
-  if (timestamps.length === 0) {
-    return []
-  }
-
-  // once you have all the timestamps, get the blocks for each timestamp in a bulk query
-  let blocks
+const getHourlyRateData = async (pairAddress, startTime, latestBlock) => {
   try {
-    blocks = await getBlocksFromTimestamps(timestamps)
-  } catch (e) {
-    console.log('error fetching blocks')
-  }
-  // catch failing case
-  if (!blocks || blocks?.length === 0) {
-    return []
-  }
+    const utcEndTime = dayjs.utc()
+    let time = startTime
 
-  const result = await splitQuery(HOURLY_PAIR_RATES, client, [pairAddress], blocks, 500)
+    // create an array of hour start times until we reach current hour
+    const timestamps = []
+    while (time <= utcEndTime.unix() - 3600) {
+      timestamps.push(time)
+      time += 3600
+    }
 
-  // format token ETH price results
-  let values = []
-  for (var row in result) {
-    let timestamp = row.split('t')[1]
-    if (timestamp) {
-      values.push({
-        timestamp,
-        rate0: parseFloat(result[row]?.token0Price),
-        rate1: parseFloat(result[row]?.token1Price)
+    // backout if invalid timestamp format
+    if (timestamps.length === 0) {
+      return []
+    }
+
+    // once you have all the timestamps, get the blocks for each timestamp in a bulk query
+    let blocks
+
+    blocks = await getBlocksFromTimestamps(timestamps, 100)
+
+    // catch failing case
+    if (!blocks || blocks?.length === 0) {
+      return []
+    }
+
+    if (latestBlock) {
+      blocks = blocks.filter(b => {
+        return parseFloat(b.number) <= parseFloat(latestBlock)
       })
     }
+
+    const result = await splitQuery(HOURLY_PAIR_RATES, client, [pairAddress], blocks, 100)
+
+    // format token ETH price results
+    let values = []
+    for (var row in result) {
+      let timestamp = row.split('t')[1]
+      if (timestamp) {
+        values.push({
+          timestamp,
+          rate0: parseFloat(result[row]?.token0Price),
+          rate1: parseFloat(result[row]?.token1Price)
+        })
+      }
+    }
+
+    let formattedHistoryRate0 = []
+    let formattedHistoryRate1 = []
+
+    // for each hour, construct the open and close price
+    for (let i = 0; i < values.length - 1; i++) {
+      formattedHistoryRate0.push({
+        timestamp: values[i].timestamp,
+        open: parseFloat(values[i].rate0),
+        close: parseFloat(values[i + 1].rate0)
+      })
+      formattedHistoryRate1.push({
+        timestamp: values[i].timestamp,
+        open: parseFloat(values[i].rate1),
+        close: parseFloat(values[i + 1].rate1)
+      })
+    }
+
+    return [formattedHistoryRate0, formattedHistoryRate1]
+  } catch (e) {
+    console.log(e)
+    return [[], []]
   }
-
-  let formattedHistoryRate0 = []
-  let formattedHistoryRate1 = []
-
-  // for each hour, construct the open and close price
-  for (let i = 0; i < values.length - 1; i++) {
-    formattedHistoryRate0.push({
-      timestamp: values[i].timestamp,
-      open: parseFloat(values[i].rate0),
-      close: parseFloat(values[i + 1].rate0)
-    })
-    formattedHistoryRate1.push({
-      timestamp: values[i].timestamp,
-      open: parseFloat(values[i].rate1),
-      close: parseFloat(values[i + 1].rate1)
-    })
-  }
-
-  return [formattedHistoryRate0, formattedHistoryRate1]
 }
 
 export function Updater() {
@@ -475,6 +485,7 @@ export function Updater() {
 export function useHourlyRateData(pairAddress, timeWindow) {
   const [state, { updateHourlyData }] = usePairDataContext()
   const chartData = state?.[pairAddress]?.hourlyData?.[timeWindow]
+  const latestBlock = useLatestBlock()
 
   useEffect(() => {
     const currentTime = dayjs.utc()
@@ -488,13 +499,13 @@ export function useHourlyRateData(pairAddress, timeWindow) {
             .unix()
 
     async function fetch() {
-      let data = await getHourlyRateData(pairAddress, startTime)
+      let data = await getHourlyRateData(pairAddress, startTime, latestBlock)
       updateHourlyData(pairAddress, data, timeWindow)
     }
     if (!chartData) {
       fetch()
     }
-  }, [chartData, timeWindow, pairAddress, updateHourlyData])
+  }, [chartData, timeWindow, pairAddress, updateHourlyData, latestBlock])
 
   return chartData
 }

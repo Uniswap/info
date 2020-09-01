@@ -8,6 +8,7 @@ import PairList from '../components/PairList'
 import { PageWrapper, FullWrapper } from '../components'
 import { RowBetween } from '../components/Row'
 import Search from '../components/Search'
+import { useMedia } from 'react-use'
 
 function AllPairsPage() {
   const allPairs = useAllPairData()
@@ -16,14 +17,16 @@ function AllPairsPage() {
     window.scrollTo(0, 0)
   }, [])
 
+  const below800 = useMedia('(max-width: 800px)')
+
   return (
     <PageWrapper>
       <FullWrapper>
         <RowBetween>
           <TYPE.largeHeader>Top Pairs</TYPE.largeHeader>
-          <Search small={true} />
+          {!below800 && <Search small={true} />}
         </RowBetween>
-        <Panel>
+        <Panel style={{ padding: below800 && '1rem 0 0 0 ' }}>
           <PairList pairs={allPairs} disbaleLinks={true} maxItems={50} />
         </Panel>
       </FullWrapper>

@@ -4,6 +4,8 @@ import Web3 from 'web3'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import getTokenList from '../utils/tokenLists'
+import { healthClient } from '../apollo/client'
+import { SUBGRAPH_HEALTH } from '../apollo/queries'
 dayjs.extend(utc)
 
 const UPDATE = 'UPDATE'
@@ -11,12 +13,14 @@ const UPDATE_TIMEFRAME = 'UPDATE_TIMEFRAME'
 const UPDATE_SESSION_START = 'UPDATE_SESSION_START'
 const UPDATE_WEB3 = 'UPDATE_WEB3'
 const UPDATED_SUPPORTED_TOKENS = 'UPDATED_SUPPORTED_TOKENS'
+const UPDATE_LATEST_BLOCK = 'UPDATE_LATEST_BLOCK'
 
 const SUPPORTED_TOKENS = 'SUPPORTED_TOKENS'
 const TIME_KEY = 'TIME_KEY'
 const CURRENCY = 'CURRENCY'
 const SESSION_START = 'SESSION_START'
 const WEB3 = 'WEB3'
+const LATEST_BLOCK = 'LATEST_BLOCK'
 
 const ApplicationContext = createContext()
 
@@ -52,6 +56,14 @@ function reducer(state, { type, payload }) {
       return {
         ...state,
         [WEB3]: web3
+      }
+    }
+
+    case UPDATE_LATEST_BLOCK: {
+      const { block } = payload
+      return {
+        ...state,
+        [LATEST_BLOCK]: block
       }
     }
 
@@ -123,16 +135,55 @@ export default function Provider({ children }) {
     })
   }, [])
 
+  const updateLatestBlock = useCallback(block => {
+    dispatch({
+      type: UPDATE_LATEST_BLOCK,
+      payload: {
+        block
+      }
+    })
+  }, [])
+
   return (
     <ApplicationContext.Provider
       value={useMemo(
-        () => [state, { update, updateSessionStart, updateTimeframe, updateWeb3, updateSupportedTokens }],
-        [state, update, updateTimeframe, updateWeb3, updateSessionStart, updateSupportedTokens]
+        () => [
+          state,
+          { update, updateSessionStart, updateTimeframe, updateWeb3, updateSupportedTokens, updateLatestBlock }
+        ],
+        [state, update, updateTimeframe, updateWeb3, updateSessionStart, updateSupportedTokens, updateLatestBlock]
       )}
     >
       {children}
     </ApplicationContext.Provider>
   )
+}
+
+export function useLatestBlock() {
+  const [state, { updateLatestBlock }] = useApplicationContext()
+
+  const latestBlock = state?.[LATEST_BLOCK]
+
+  useEffect(() => {
+    async function fetch() {
+      try {
+        const res = await healthClient.query({
+          query: SUBGRAPH_HEALTH
+        })
+        const block = res.data.indexingStatusForCurrentVersion.chains[0].latestBlock.number
+        if (block) {
+          updateLatestBlock(block)
+        }
+      } catch (e) {
+        console.log(e)
+      }
+    }
+    if (!latestBlock) {
+      fetch()
+    }
+  }, [latestBlock, updateLatestBlock])
+
+  return latestBlock
 }
 
 export function useCurrentCurrency() {
