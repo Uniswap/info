@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect, useState } from 'react'
-import { client } from '../apollo/client'
+import { client, client3 } from '../apollo/client'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { useTimeframe } from './Application'
@@ -14,6 +14,7 @@ import {
   GLOBAL_DATA,
   GLOBAL_TXNS,
   GLOBAL_CHART,
+  GLOBAL_DATA_NEW,
   ETH_PRICE,
   ALL_PAIRS,
   ALL_TOKENS,
@@ -215,7 +216,6 @@ async function getGlobalData(ethPrice, oldEthPrice) {
   let data = {}
   let oneDayData = {}
   let twoDayData = {}
-  let oneWeekData = {}
 
   try {
     // get timestamps for the days
@@ -253,29 +253,47 @@ async function getGlobalData(ethPrice, oldEthPrice) {
     })
     twoDayData = twoDayResult.data.uniswapFactories[0]
 
-    let oneWeekResult = await client.query({
-      query: GLOBAL_DATA(oneWeekBlock?.number),
-      fetchPolicy: 'cache-first'
-    })
-    oneWeekData = oneWeekResult.data.uniswapFactories[0]
-
     let twoWeekResult = await client.query({
       query: GLOBAL_DATA(twoWeekBlock?.number),
       fetchPolicy: 'cache-first'
     })
     const twoWeekData = twoWeekResult.data.uniswapFactories[0]
 
+    const tempDataResult = await client3.query({
+      query: GLOBAL_DATA_NEW(),
+      fetchPolicy: 'cache-first'
+    })
+    const tempData = tempDataResult.data.uniswapFactories[0]
+
+    const tempDataOldResult = await client3.query({
+      query: GLOBAL_DATA_NEW(oneDayBlock?.number),
+      fetchPolicy: 'cache-first'
+    })
+    const tempDataOld = tempDataOldResult.data.uniswapFactories[0]
+
+    const tempDataOldWeekResult = await client3.query({
+      query: GLOBAL_DATA_NEW(oneWeekBlock?.number),
+      fetchPolicy: 'cache-first'
+    })
+    const tempDataOldWeek = tempDataOldWeekResult.data.uniswapFactories[0]
+
+    const tempDataOldTwoWeekResult = await client3.query({
+      query: GLOBAL_DATA_NEW(twoWeekBlock?.number),
+      fetchPolicy: 'cache-first'
+    })
+    const tempDataOldTwoWeek = tempDataOldTwoWeekResult.data.uniswapFactories[0]
+
     if (data && oneDayData && twoDayData && twoWeekData) {
       let [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentChange(
-        data.totalVolumeUSD,
-        oneDayData.totalVolumeUSD ? oneDayData.totalVolumeUSD : 0,
-        twoDayData.totalVolumeUSD ? twoDayData.totalVolumeUSD : 0
+        tempData.untrackedVolumeUSD,
+        tempDataOld.untrackedVolumeUSD ? tempDataOld.untrackedVolumeUSD : 0,
+        tempDataOldWeek.untrackedVolumeUSD ? tempDataOldWeek.untrackedVolumeUSD : 0
       )
 
       const [oneWeekVolume, weeklyVolumeChange] = get2DayPercentChange(
-        data.totalVolumeUSD,
-        oneWeekData.totalVolumeUSD,
-        twoWeekData.totalVolumeUSD
+        tempData.untrackedVolumeUSD,
+        tempDataOldWeek.untrackedVolumeUSD,
+        tempDataOldTwoWeek.untrackedVolumeUSD
       )
 
       const [oneDayTxns, txnChange] = get2DayPercentChange(

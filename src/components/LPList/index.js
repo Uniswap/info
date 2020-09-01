@@ -169,19 +169,11 @@ function LPList({ lps, disbaleLinks, maxItems = 10 }) {
       <Divider />
       <List p={0}>{!lpList ? <LocalLoader /> : lpList}</List>
       <PageButtons>
-        <div
-          onClick={e => {
-            setPage(page === 1 ? page : page - 1)
-          }}
-        >
+        <div onClick={() => setPage(page === 1 ? page : page - 1)}>
           <Arrow faded={page === 1 ? true : false}>←</Arrow>
         </div>
-        {'Page ' + page + ' of ' + maxPage}
-        <div
-          onClick={e => {
-            setPage(page === maxPage ? page : page + 1)
-          }}
-        >
+        <TYPE.body>{'Page ' + page + ' of ' + maxPage}</TYPE.body>
+        <div onClick={() => setPage(page === maxPage ? page : page + 1)}>
           <Arrow faded={page === maxPage ? true : false}>→</Arrow>
         </div>
       </PageButtons>
