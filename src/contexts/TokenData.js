@@ -23,7 +23,8 @@ import {
   getBlocksFromTimestamps,
   splitQuery
 } from '../utils'
-import { timeframeOptions, HALF_HOUR_UNIX } from '../constants'
+import { timeframeOptions } from '../constants'
+import { useLatestBlock } from './Application'
 
 const UPDATE = 'UPDATE'
 const UPDATE_TOKEN_TXNS = 'UPDATE_TOKEN_TXNS'
@@ -449,14 +450,14 @@ const getTokenPairs = async tokenAddress => {
   }
 }
 
-const getIntervalTokenData = async (tokenAddress, startTime, interval = 3600) => {
+const getIntervalTokenData = async (tokenAddress, startTime, interval = 3600, latestBlock) => {
   const utcEndTime = dayjs.utc()
   let time = startTime
 
   // create an array of hour start times until we reach current hour
   // buffer by half hour to catch case where graph isnt synced to latest block
   const timestamps = []
-  while (time < utcEndTime.unix() - HALF_HOUR_UNIX) {
+  while (time < utcEndTime.unix()) {
     timestamps.push(time)
     time += interval
   }
@@ -474,6 +475,12 @@ const getIntervalTokenData = async (tokenAddress, startTime, interval = 3600) =>
     // catch failing case
     if (!blocks || blocks.length === 0) {
       return []
+    }
+
+    if (latestBlock) {
+      blocks = blocks.filter(b => {
+        return parseFloat(b.number) <= parseFloat(latestBlock)
+      })
     }
 
     let result = await splitQuery(PRICES_BY_BLOCK, client, [tokenAddress], blocks, 50)
@@ -684,6 +691,7 @@ export function useTokenChartData(tokenAddress) {
 export function useTokenPriceData(tokenAddress, timeWindow, interval = 3600) {
   const [state, { updatePriceData }] = useTokenDataContext()
   const chartData = state?.[tokenAddress]?.[timeWindow]?.[interval]
+  const latestBlock = useLatestBlock()
 
   useEffect(() => {
     const currentTime = dayjs.utc()
@@ -697,13 +705,13 @@ export function useTokenPriceData(tokenAddress, timeWindow, interval = 3600) {
             .unix()
 
     async function fetch() {
-      let data = await getIntervalTokenData(tokenAddress, startTime, interval)
+      let data = await getIntervalTokenData(tokenAddress, startTime, interval, latestBlock)
       updatePriceData(tokenAddress, data, timeWindow, interval)
     }
     if (!chartData) {
       fetch()
     }
-  }, [chartData, interval, timeWindow, tokenAddress, updatePriceData])
+  }, [chartData, interval, timeWindow, tokenAddress, updatePriceData, latestBlock])
 
   return chartData
 }

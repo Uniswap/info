@@ -17,6 +17,7 @@ import SideNav from './components/SideNav'
 import AccountLookup from './pages/AccountLookup'
 import { OVERVIEW_TOKEN_BLACKLIST, PAIR_BLACKLIST } from './constants'
 import LocalLoader from './components/LocalLoader'
+import { useLatestBlock } from './contexts/Application'
 
 const AppWrapper = styled.div`
   position: relative;
@@ -81,11 +82,13 @@ function App() {
 
   const globalData = useGlobalData()
   const globalChartData = useGlobalChartData()
+  const latestBlock = useLatestBlock()
 
   return (
     <ApolloProvider client={client}>
       <AppWrapper>
-        {globalData &&
+        {latestBlock &&
+        globalData &&
         Object.keys(globalData).length > 0 &&
         globalChartData &&
         Object.keys(globalChartData).length > 0 ? (
