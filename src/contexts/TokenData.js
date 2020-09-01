@@ -469,14 +469,14 @@ const getIntervalTokenData = async (tokenAddress, startTime, interval = 3600) =>
   // once you have all the timestamps, get the blocks for each timestamp in a bulk query
   let blocks
   try {
-    blocks = await getBlocksFromTimestamps(timestamps)
+    blocks = await getBlocksFromTimestamps(timestamps, 100)
 
     // catch failing case
     if (!blocks || blocks.length === 0) {
       return []
     }
 
-    let result = await splitQuery(PRICES_BY_BLOCK, client, [tokenAddress], blocks, 100)
+    let result = await splitQuery(PRICES_BY_BLOCK, client, [tokenAddress], blocks, 50)
 
     // format token ETH price results
     let values = []

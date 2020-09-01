@@ -170,20 +170,22 @@ export async function getBlockFromTimestamp(timestamp) {
  * @dev timestamps are returns as they were provided; not the block time.
  * @param {Array} timestamps
  */
-export async function getBlocksFromTimestamps(timestamps) {
+export async function getBlocksFromTimestamps(timestamps, skipCount = 500) {
   if (timestamps?.length === 0) {
     return []
   }
 
-  const fetchedData = await splitQuery(GET_BLOCKS, blockClient, [], timestamps, 500)
+  let fetchedData = await splitQuery(GET_BLOCKS, blockClient, [], timestamps, skipCount)
 
   let blocks = []
   if (fetchedData) {
     for (var t in fetchedData) {
-      blocks.push({
-        timestamp: t.split('t')[1],
-        number: fetchedData[t][0]['number']
-      })
+      if (fetchedData[t].length > 0) {
+        blocks.push({
+          timestamp: t.split('t')[1],
+          number: fetchedData[t][0]['number']
+        })
+      }
     }
   }
   return blocks
