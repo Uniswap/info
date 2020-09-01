@@ -432,6 +432,24 @@ export const GLOBAL_DATA = block => {
   return gql(queryString)
 }
 
+export const GLOBAL_DATA_NEW = block => {
+  const queryString = ` query uniswapFactories {
+      uniswapFactories(
+       ${block ? `block: { number: ${block}}` : ``} 
+       where: { id: "${FACTORY_ADDRESS}" }) {
+        id
+        totalVolumeUSD
+        totalVolumeETH
+        totalLiquidityUSD
+        untrackedVolumeUSD
+        totalLiquidityETH
+        txCount
+        pairCount
+      }
+    }`
+  return gql(queryString)
+}
+
 export const GLOBAL_TXNS = gql`
   query transactions {
     transactions(first: 100, orderBy: timestamp, orderDirection: desc) {
