@@ -1,17 +1,17 @@
 import React, { useEffect } from 'react'
 import 'feather-icons'
 
-import TopTokenList from '../components/TokenList'
+import TopMarketList from '../components/MarketList'
 import { TYPE } from '../Theme'
 import Panel from '../components/Panel'
-import { useAllTokenData } from '../contexts/TokenData'
 import { PageWrapper, FullWrapper } from '../components'
 import { RowBetween } from '../components/Row'
 import Search from '../components/Search'
 import { useMedia } from 'react-use'
+import { useAllMarketData } from '../contexts/Markets'
 
-function AllTokensPage() {
-  const allTokens = useAllTokenData()
+function AllMarketsPage() {
+  const { markets } = useAllMarketData()
 
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -23,15 +23,15 @@ function AllTokensPage() {
     <PageWrapper>
       <FullWrapper>
         <RowBetween>
-          <TYPE.largeHeader>ParaAugur Tokens</TYPE.largeHeader>
+          <TYPE.largeHeader>Top Markets</TYPE.largeHeader>
           {!below600 && <Search small={true} />}
         </RowBetween>
         <Panel style={{ marginTop: '6px', padding: below600 && '1rem 0 0 0 ' }}>
-          <TopTokenList tokens={allTokens} itemMax={50} />
+          <TopMarketList markets={markets} itemMax={50} />
         </Panel>
       </FullWrapper>
     </PageWrapper>
   )
 }
 
-export default AllTokensPage
+export default AllMarketsPage

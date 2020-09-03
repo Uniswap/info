@@ -9,6 +9,7 @@ import GlobalDataContextProvider from './contexts/GlobalData'
 import PairDataContextProvider, { Updater as PairDataContextUpdater } from './contexts/PairData'
 import ApplicationContextProvider from './contexts/Application'
 import UserContextProvider from './contexts/User'
+import MarketsProvider, { Updater as MarketsProviderContextUpdater } from './contexts/Markets'
 import App from './App'
 
 // initialize GA
@@ -29,7 +30,9 @@ function ContextProviders({ children }) {
         <TokenDataContextProvider>
           <GlobalDataContextProvider>
             <PairDataContextProvider>
-              <UserContextProvider>{children}</UserContextProvider>
+              <MarketsProvider>
+                <UserContextProvider>{children}</UserContextProvider>
+              </MarketsProvider>
             </PairDataContextProvider>
           </GlobalDataContextProvider>
         </TokenDataContextProvider>
@@ -44,6 +47,7 @@ function Updaters() {
       <LocalStorageContextUpdater />
       <PairDataContextUpdater />
       <TokenDataContextUpdater />
+      <MarketsProviderContextUpdater />
     </>
   )
 }

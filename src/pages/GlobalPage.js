@@ -7,6 +7,7 @@ import { AutoRow, RowBetween } from '../components/Row'
 import { AutoColumn } from '../components/Column'
 import PairList from '../components/PairList'
 import TopTokenList from '../components/TokenList'
+import TopMarketList from '../components/MarketList'
 import TxnList from '../components/TxnList'
 import GlobalChart from '../components/GlobalChart'
 import Search from '../components/Search'
@@ -17,6 +18,7 @@ import { useAllPairData } from '../contexts/PairData'
 import { useMedia } from 'react-use'
 import Panel from '../components/Panel'
 import { useAllTokenData } from '../contexts/TokenData'
+import { useAllMarketData } from '../contexts/Markets'
 import { formattedNum, formattedPercent } from '../utils'
 import { TYPE, ThemedBackground } from '../Theme'
 import { transparentize } from 'polished'
@@ -48,6 +50,7 @@ function GlobalPage() {
   // get data for lists and totals
   const allPairs = useAllPairData()
   const allTokens = useAllTokenData()
+  const { markets } = useAllMarketData()
   const transactions = useGlobalTransactions()
   const { totalLiquidityUSD, oneDayVolumeUSD, volumeChangeUSD, liquidityChangeUSD } = useGlobalData()
 
@@ -73,41 +76,41 @@ function GlobalPage() {
             <Search />
             <GlobalStats />
           </AutoColumn>
-          {below800 && ( // mobile card
-            <Box mb={20}>
-              <Panel>
-                <Box>
-                  <AutoColumn gap="36px">
-                    <AutoColumn gap="20px">
-                      <RowBetween>
-                        <TYPE.main>Volume (24hrs)</TYPE.main>
-                        <div />
-                      </RowBetween>
-                      <RowBetween align="flex-end">
-                        <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
-                          {formattedNum(oneDayVolumeUSD, true)}
-                        </TYPE.main>
-                        <TYPE.main fontSize={12}>{formattedPercent(volumeChangeUSD)}</TYPE.main>
-                      </RowBetween>
-                    </AutoColumn>
-                    <AutoColumn gap="20px">
-                      <RowBetween>
-                        <TYPE.main>Total Liquidity</TYPE.main>
-                        <div />
-                      </RowBetween>
-                      <RowBetween align="flex-end">
-                        <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
-                          {formattedNum(totalLiquidityUSD, true)}
-                        </TYPE.main>
-                        <TYPE.main fontSize={12}>{formattedPercent(liquidityChangeUSD)}</TYPE.main>
-                      </RowBetween>
-                    </AutoColumn>
+          {true /* {below800 && ( // mobile card */}
+          <Box mb={20}>
+            <Panel>
+              <Box>
+                <AutoColumn gap="36px">
+                  <AutoColumn gap="20px">
+                    <RowBetween>
+                      <TYPE.main>Volume (24hrs)</TYPE.main>
+                      <div />
+                    </RowBetween>
+                    <RowBetween align="flex-end">
+                      <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
+                        {formattedNum(oneDayVolumeUSD, true)}
+                      </TYPE.main>
+                      <TYPE.main fontSize={12}>{formattedPercent(volumeChangeUSD)}</TYPE.main>
+                    </RowBetween>
                   </AutoColumn>
-                </Box>
-              </Panel>
-            </Box>
-          )}
-          {!below800 && (
+                  <AutoColumn gap="20px">
+                    <RowBetween>
+                      <TYPE.main>Total Liquidity</TYPE.main>
+                      <div />
+                    </RowBetween>
+                    <RowBetween align="flex-end">
+                      <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
+                        {formattedNum(totalLiquidityUSD, true)}
+                      </TYPE.main>
+                      <TYPE.main fontSize={12}>{formattedPercent(liquidityChangeUSD)}</TYPE.main>
+                    </RowBetween>
+                  </AutoColumn>
+                </AutoColumn>
+              </Box>
+            </Panel>
+          </Box>
+          {/* )} */}
+          {/* {!below800 && (
             <GridRow>
               <Panel style={{ height: '100%', minHeight: '300px' }}>
                 <GlobalChart display="liquidity" />
@@ -116,15 +119,25 @@ function GlobalPage() {
                 <GlobalChart display="volume" />
               </Panel>
             </GridRow>
-          )}
-          {below800 && (
+          )} */}
+          {/* {below800 && (
             <AutoColumn style={{ marginTop: '6px' }} gap="24px">
               <Panel style={{ height: '100%', minHeight: '300px' }}>
                 <GlobalChart display="liquidity" />
               </Panel>
             </AutoColumn>
-          )}
+          )} */}
+
           <ListOptions gap="10px" style={{ marginTop: '2rem', marginBottom: '.5rem' }}>
+            <RowBetween>
+              <TYPE.main fontSize={'1.125rem'}>All Markets</TYPE.main>
+              <CustomLink to={'/tokens'}>See All</CustomLink>
+            </RowBetween>
+          </ListOptions>
+          <Panel style={{ marginTop: '6px', padding: '1.125rem 0 ' }}>
+            <TopMarketList markets={markets || []} />
+          </Panel>
+          {/* <ListOptions gap="10px" style={{ marginTop: '2rem', marginBottom: '.5rem' }}>
             <RowBetween>
               <TYPE.main fontSize={'1.125rem'}>Top Tokens</TYPE.main>
               <CustomLink to={'/tokens'}>See All</CustomLink>
@@ -138,19 +151,18 @@ function GlobalPage() {
               <TYPE.main fontSize={'1rem'}>Top Pairs</TYPE.main>
               <CustomLink to={'/pairs'}>See All</CustomLink>
             </RowBetween>
-          </ListOptions>
-          <Panel style={{ marginTop: '6px', padding: '1.125rem 0 ' }}>
+          </ListOptions> */}
+          {/* <Panel style={{ marginTop: '6px', padding: '1.125rem 0 ' }}>
             <PairList pairs={allPairs} />
-          </Panel>
-
-          <span>
+          </Panel> */}
+          {/* <span>
             <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '2rem' }}>
               Transactions
             </TYPE.main>
           </span>
           <Panel style={{ margin: '1rem 0' }}>
             <TxnList transactions={transactions} />
-          </Panel>
+          </Panel> */}
         </div>
       </ContentWrapper>
     </PageWrapper>

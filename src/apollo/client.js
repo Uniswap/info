@@ -32,3 +32,11 @@ export const blockClient = new ApolloClient({
   }),
   cache: new InMemoryCache()
 })
+
+export const augurV2Client = new ApolloClient({
+  link: new HttpLink({
+    uri: 'https://api.thegraph.com/subgraphs/name/protofire/augur-v2'
+  }),
+  cache: new InMemoryCache(),
+  shouldBatch: true
+})

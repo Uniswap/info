@@ -122,6 +122,18 @@ function SideNav({ history }) {
                     Overview
                   </Option>
                 </BasicLink>
+                <BasicLink to="/markets">
+                  <Option
+                    activeText={
+                      (history.location.pathname.split('/')[1] === 'markets' ||
+                        history.location.pathname.split('/')[1] === 'maarket') ??
+                      undefined
+                    }
+                  >
+                    <Disc size={20} style={{ marginRight: '.75rem' }} />
+                    Markets
+                  </Option>
+                </BasicLink>
                 <BasicLink to="/tokens">
                   <Option
                     activeText={
