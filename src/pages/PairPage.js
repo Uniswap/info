@@ -312,14 +312,18 @@ function PairPage({ pairAddress, history }) {
                   <RowBetween align="flex-end">
                     <TYPE.main fontSize={'2rem'} lineHeight={1} fontWeight={600}>
                       {oneDayVolumeUSD
-                        ? formattedNum(oneDayExtraFee, true)
+                        ? !oneDayExtraFee || oneDayExtraFee <= 0
+                          ? formattedNum(oneDayVolumeUSD * 0.0015, true)
+                          : formattedNum(oneDayVolumeUSD * 0.0015, true) + ' + ' + formattedNum(oneDayExtraFee, true)
                         : oneDayVolumeUSD === 0
                         ? '$0'
                         : '-'}
                     </TYPE.main>
                     <TYPE.main>
                       {
-                        feePercentChange
+                        !oneDayExtraFee || oneDayExtraFee <= 0
+                          ? volumeChange
+                          : feePercentChange
                       }
                     </TYPE.main>
                   </RowBetween>
