@@ -3,6 +3,7 @@ import { BigNumber } from 'bignumber.js'
 import dayjs from 'dayjs'
 import { ethers } from 'ethers'
 import utc from 'dayjs/plugin/utc'
+import relativeTime from 'dayjs/plugin/relativeTime'
 import { client, blockClient } from '../apollo/client'
 import { GET_BLOCK, GET_BLOCKS, SHARE_VALUE } from '../apollo/queries'
 import { Text } from 'rebass'
@@ -15,6 +16,7 @@ import Numeral from 'numeral'
 const Decimal = toFormat(_Decimal)
 BigNumber.set({ EXPONENTIAL_AT: 50 })
 dayjs.extend(utc)
+dayjs.extend(relativeTime)
 
 export function getTimeframe(timeWindow) {
   const utcEndTime = dayjs.utc()
@@ -321,14 +323,20 @@ export const formatTime = unix => {
   const inHours = now.diff(timestamp, 'hour')
   const inDays = now.diff(timestamp, 'day')
 
-  if (inHours >= 24) {
-    return `${inDays} ${inDays === 1 ? 'day' : 'days'} ago`
-  } else if (inMinutes >= 60) {
-    return `${inHours} ${inHours === 1 ? 'hour' : 'hours'} ago`
-  } else if (inSeconds >= 60) {
-    return `${inMinutes} ${inMinutes === 1 ? 'minute' : 'minutes'} ago`
+  if (inSeconds < 0) {
+    var currentTime = dayjs()
+    var endtime = dayjs(timestamp)
+    return currentTime.to(endtime)
   } else {
-    return `${inSeconds} ${inSeconds === 1 ? 'second' : 'seconds'} ago`
+    if (inHours >= 24) {
+      return `${inDays} ${inDays === 1 ? 'day' : 'days'} ago`
+    } else if (inMinutes >= 60) {
+      return `${inHours} ${inHours === 1 ? 'hour' : 'hours'} ago`
+    } else if (inSeconds >= 60) {
+      return `${inMinutes} ${inMinutes === 1 ? 'minute' : 'minutes'} ago`
+    } else {
+      return `${inSeconds} ${inSeconds === 1 ? 'second' : 'seconds'} ago`
+    }
   }
 }
 

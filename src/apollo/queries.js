@@ -66,6 +66,8 @@ export const GET_MARKETS = gql`
     markets {
       description
       id
+      endTimestamp
+      status
     }
   }
 `

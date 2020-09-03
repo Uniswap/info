@@ -4,16 +4,11 @@ import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 
 import { Box, Flex, Text } from 'rebass'
-import TokenLogo from '../TokenLogo'
-import { CustomLink } from '../Link'
-import Row from '../Row'
 import { Divider } from '..'
 
-import { formattedNum, formattedPercent } from '../../utils'
+import { formatTime } from '../../utils'
 import { useMedia } from 'react-use'
 import { withRouter } from 'react-router-dom'
-import { OVERVIEW_TOKEN_BLACKLIST } from '../../constants'
-import FormattedName from '../FormattedName'
 import { TYPE } from '../../Theme'
 
 dayjs.extend(utc)
@@ -41,49 +36,26 @@ const List = styled(Box)`
 `
 
 const DashGrid = styled.div`
-  display: grid;
-  grid-gap: 1em;
+  grid-template-columns: 70% 1fr 1fr;
+  grid-template-areas: 'name status timestamp';
+  padding: 0 1.125rem;
 
-  div {
-    text-align: left;
+  > * {
+    justify-content: flex-end;
+
+    &:first-child {
+      justify-content: flex-start;
+      text-align: left;
+      width: 100px;
+    }
   }
 
-  // grid-template-columns: 100px 1fr 1fr;
-  // grid-template-areas: 'name liq vol';
-  // padding: 0 1.125rem;
-
-  // > * {
-  //   justify-content: flex-end;
-
-  //   &:first-child {
-  //     justify-content: flex-start;
-  //     text-align: left;
-  //     width: 100px;
-  //   }
-  // }
-
-  // @media screen and (min-width: 680px) {
-  //   display: grid;
-  //   grid-gap: 1em;
-  //   grid-template-columns: 180px 1fr 1fr 1fr;
-  //   grid-template-areas: 'name symbol liq vol ';
-
-  //   > * {
-  //     justify-content: flex-end;
-  //     width: 100%;
-
-  //     &:first-child {
-  //       justify-content: flex-start;
-  //     }
-  //   }
-  // }
-
-  // @media screen and (min-width: 1080px) {
-  //   display: grid;
-  //   grid-gap: 0.5em;
-  //   grid-template-columns: 1.5fr 0.6fr 1fr 1fr 1fr 1fr;
-  //   grid-template-areas: 'name symbol liq vol price change';
-  // }
+  @media screen and (min-width: 1080px) {
+    display: grid;
+    grid-gap: 0.5em;
+    grid-template-columns: 5fr 1fr 1fr;
+    grid-template-areas: 'name status timestamp';
+  }
 `
 
 const ListWrapper = styled.div``
@@ -123,18 +95,19 @@ const SORT_FIELD = {
   NAME: 'name',
   PRICE: 'priceUSD',
   CHANGE: 'priceChangeUSD',
-  DESCRIPTION: 'description'
+  DESCRIPTION: 'description',
+  STATUS: 'status',
+  ENDTIMESTAMP: 'endTimestamp'
 }
 
-// @TODO rework into virtualized list
-function TopTokenList({ markets, tokens, itemMax = 10 }) {
+function Marketist({ markets, itemMax = 10 }) {
   // page state
   const [page, setPage] = useState(1)
   const [maxPage, setMaxPage] = useState(1)
 
   // sorting
   const [sortDirection, setSortDirection] = useState(true)
-  const [sortedColumn, setSortedColumn] = useState(SORT_FIELD.LIQ)
+  const [sortedColumn, setSortedColumn] = useState(SORT_FIELD.STATUS)
 
   const below1080 = useMedia('(max-width: 1080px)')
   const below680 = useMedia('(max-width: 680px)')
@@ -143,18 +116,7 @@ function TopTokenList({ markets, tokens, itemMax = 10 }) {
   useEffect(() => {
     setMaxPage(1) // edit this to do modular
     setPage(1)
-  }, [tokens, markets])
-
-  const formattedTokens = useMemo(() => {
-    return (
-      tokens &&
-      Object.keys(tokens)
-        .filter(key => {
-          return !OVERVIEW_TOKEN_BLACKLIST.includes(key)
-        })
-        .map(key => tokens[key])
-    )
-  }, [tokens])
+  }, [markets])
 
   useEffect(() => {
     if (markets) {
@@ -164,7 +126,7 @@ function TopTokenList({ markets, tokens, itemMax = 10 }) {
       }
       setMaxPage(Math.floor(markets.length / itemMax) + extraPages)
     }
-  }, [tokens, markets, itemMax])
+  }, [markets, itemMax])
 
   const filteredList = useMemo(() => {
     return markets
@@ -182,34 +144,27 @@ function TopTokenList({ markets, tokens, itemMax = 10 }) {
   const ListItem = ({ item, index }) => {
     return (
       <DashGrid style={{ height: '48px' }} focus={true}>
-        <DataText area="name" fontWeight="500">
+        <DataText style={{ width: '100%' }} area="name" fontWeight="500">
           {item.description}
-          {/* <Row>
-            {!below680 && <div style={{ marginRight: '1rem', width: '10px' }}>{index}</div>}
-            <TokenLogo address={item.id} />
-            <CustomLink style={{ marginLeft: '16px', whiteSpace: 'nowrap' }} to={'/token/' + item.id}>
-              <FormattedName
-                text={below680 ? item.symbol : item.name}
-                maxCharacters={below600 ? 8 : 16}
-                adjustSize={true}
-                link={true}
-              />
-            </CustomLink>
-          </Row> */}
         </DataText>
-        {/* {!below680 && (
-          <DataText area="symbol" color="text" fontWeight="500">
-            <FormattedName text={item.symbol} maxCharacters={5} />
-          </DataText>
-        )} */}
-        {/* <DataText area="liq">{formattedNum(item.totalLiquidityUSD, true)}</DataText>
-        <DataText area="vol">{formattedNum(item.oneDayVolumeUSD, true)}</DataText> */}
-        {/* {!below1080 && (
-          <DataText area="price" color="text" fontWeight="500">
-            {formattedNum(item.priceUSD, true)}
-          </DataText>
-        )}
-        {!below1080 && <DataText area="change">{formattedPercent(item.priceChangeUSD)}</DataText>} */}
+        <DataText area="status">
+          <span
+            style={
+              item.status === 'TRADING'
+                ? { color: '#7DFFA8' }
+                : item.status === 'DISPUTING'
+                ? { color: '#F1E700' }
+                : item.status === 'REPORTING'
+                ? { color: '#F1E700' }
+                : item.status === 'FINALIZED'
+                ? { color: '#F12B00' }
+                : {}
+            }
+          >
+            {item.status}
+          </span>
+        </DataText>
+        <DataText area="timestamp">{formatTime(item.endTimestamp)}</DataText>
       </DashGrid>
     )
   }
@@ -231,70 +186,30 @@ function TopTokenList({ markets, tokens, itemMax = 10 }) {
             {sortedColumn === SORT_FIELD.DESCRIPTION ? (!sortDirection ? '↑' : '↓') : ''}
           </ClickableText>
         </Flex>
-        {/* {!below680 && (
-          <Flex alignItems="center">
-            <ClickableText
-              area="symbol"
-              onClick={e => {
-                setSortedColumn(SORT_FIELD.SYMBOL)
-                setSortDirection(sortedColumn !== SORT_FIELD.SYMBOL ? true : !sortDirection)
-              }}
-            >
-              Symbol {sortedColumn === SORT_FIELD.SYMBOL ? (!sortDirection ? '↑' : '↓') : ''}
-            </ClickableText>
-          </Flex>
-        )} */}
 
-        {/* <Flex alignItems="center">
+        <Flex alignItems="center">
           <ClickableText
-            area="liq"
+            area="status"
             onClick={e => {
-              setSortedColumn(SORT_FIELD.LIQ)
-              setSortDirection(sortedColumn !== SORT_FIELD.LIQ ? true : !sortDirection)
+              setSortedColumn(SORT_FIELD.STATUS)
+              setSortDirection(sortedColumn !== SORT_FIELD.STATUS ? true : !sortDirection)
             }}
           >
-            Liquidity {sortedColumn === SORT_FIELD.LIQ ? (!sortDirection ? '↑' : '↓') : ''}
+            Status {sortedColumn === SORT_FIELD.STATUS ? (!sortDirection ? '↑' : '↓') : ''}
           </ClickableText>
         </Flex>
         <Flex alignItems="center">
           <ClickableText
-            area="vol"
+            area="timestamp"
             onClick={e => {
-              setSortedColumn(SORT_FIELD.VOL)
-              setSortDirection(sortedColumn !== SORT_FIELD.VOL ? true : !sortDirection)
+              setSortedColumn(SORT_FIELD.ENDTIMESTAMP)
+              setSortDirection(sortedColumn !== SORT_FIELD.ENDTIMESTAMP ? true : !sortDirection)
             }}
           >
-            Volume (24hrs)
-            {sortedColumn === SORT_FIELD.VOL ? (!sortDirection ? '↑' : '↓') : ''}
+            Market Ends
+            {sortedColumn === SORT_FIELD.ENDTIMESTAMP ? (!sortDirection ? '↑' : '↓') : ''}
           </ClickableText>
         </Flex>
-        {!below1080 && (
-          <Flex alignItems="center">
-            <ClickableText
-              area="price"
-              onClick={e => {
-                setSortedColumn(SORT_FIELD.PRICE)
-                setSortDirection(sortedColumn !== SORT_FIELD.PRICE ? true : !sortDirection)
-              }}
-            >
-              Price {sortedColumn === SORT_FIELD.PRICE ? (!sortDirection ? '↑' : '↓') : ''}
-            </ClickableText>
-          </Flex>
-        )}
-        {!below1080 && (
-          <Flex alignItems="center">
-            <ClickableText
-              area="change"
-              onClick={e => {
-                setSortedColumn(SORT_FIELD.CHANGE)
-                setSortDirection(sortedColumn !== SORT_FIELD.CHANGE ? true : !sortDirection)
-              }}
-            >
-              Price Change (24hrs)
-              {sortedColumn === SORT_FIELD.CHANGE ? (!sortDirection ? '↑' : '↓') : ''}
-            </ClickableText>
-          </Flex>
-        )}*/}
       </DashGrid>
       <Divider />
       <List p={0}>
@@ -321,4 +236,4 @@ function TopTokenList({ markets, tokens, itemMax = 10 }) {
   )
 }
 
-export default withRouter(TopTokenList)
+export default withRouter(Marketist)
