@@ -5,7 +5,7 @@ import utc from 'dayjs/plugin/utc'
 
 import { Box, Flex, Text } from 'rebass'
 import { Divider } from '..'
-
+import { useDarkModeManager } from '../../contexts/LocalStorage'
 import { formatTime } from '../../utils'
 import { useMedia } from 'react-use'
 import { withRouter } from 'react-router-dom'
@@ -104,6 +104,7 @@ function Marketist({ markets, itemMax = 10 }) {
   // page state
   const [page, setPage] = useState(1)
   const [maxPage, setMaxPage] = useState(1)
+  const [darkMode] = useDarkModeManager()
 
   // sorting
   const [sortDirection, setSortDirection] = useState(true)
@@ -150,7 +151,9 @@ function Marketist({ markets, itemMax = 10 }) {
         <DataText area="status">
           <span
             style={
-              item.status === 'TRADING'
+              !darkMode
+                ? {}
+                : item.status === 'TRADING'
                 ? { color: '#7DFFA8' }
                 : item.status === 'DISPUTING'
                 ? { color: '#F1E700' }

@@ -32,7 +32,7 @@ export default function Title() {
     <TitleWrapper onClick={() => history.push('/')}>
       <Flex alignItems="center">
         <RowFixed>
-          <svg class="menu__StyledLogo-cnp8x7-1 fhvRHR" width="120" height="40" viewBox="0 0 120 40" fill="none">
+          <svg width="120" height="40" viewBox="0 0 120 40" fill="none">
             <path
               fillRule="evenodd"
               clipRule="evenodd"

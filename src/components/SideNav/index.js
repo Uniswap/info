@@ -7,10 +7,10 @@ import { useMedia } from 'react-use'
 import { transparentize } from 'polished'
 import { TYPE } from '../../Theme'
 import { withRouter } from 'react-router-dom'
-import { TrendingUp, List, PieChart, Disc } from 'react-feather'
-import Link from '../Link'
+import { TrendingUp, List, User, DollarSign, PieChart, Disc } from 'react-feather'
 import { useSessionStart } from '../../contexts/Application'
 import { useDarkModeManager } from '../../contexts/LocalStorage'
+import { useGetWeb3 } from '../../contexts/Account'
 import Toggle from '../Toggle'
 
 const Wrapper = styled.div`
@@ -108,6 +108,9 @@ function SideNav({ history }) {
 
   const [isDark, toggleDarkMode] = useDarkModeManager()
 
+  const [web3, getWeb3, clearWeb3] = useGetWeb3()
+  const { address, provider, signer } = web3
+
   return (
     <Wrapper isMobile={below1080}>
       {!below1080 ? (
@@ -126,11 +129,11 @@ function SideNav({ history }) {
                   <Option
                     activeText={
                       (history.location.pathname.split('/')[1] === 'markets' ||
-                        history.location.pathname.split('/')[1] === 'maarket') ??
+                        history.location.pathname.split('/')[1] === 'market') ??
                       undefined
                     }
                   >
-                    <Disc size={20} style={{ marginRight: '.75rem' }} />
+                    <DollarSign size={20} style={{ marginRight: '.75rem' }} />
                     Markets
                   </Option>
                 </BasicLink>
@@ -175,31 +178,23 @@ function SideNav({ history }) {
             )}
           </AutoColumn>
           <AutoColumn gap="0.5rem" style={{ marginLeft: '.75rem', marginBottom: '4rem' }}>
-            <HeaderText>
-              <Link href="https://uniswap.org" target="_blank">
-                Uniswap.org
-              </Link>
-            </HeaderText>
-            <HeaderText>
-              <Link href="https://v1.uniswap.info" target="_blank">
-                V1 Analytics
-              </Link>
-            </HeaderText>
-            <HeaderText>
-              <Link href="https://uniswap.org/docs/v2" target="_blank">
-                Docs
-              </Link>
-            </HeaderText>
-            <HeaderText>
-              <Link href="https://discord.com/invite/XErMcTq" target="_blank">
-                Discord
-              </Link>
-            </HeaderText>
-            <HeaderText>
-              <Link href="https://twitter.com/UniswapProtocol" target="_blank">
-                Twitter
-              </Link>
-            </HeaderText>
+            {address && address.length > 0 && (
+              <div>
+                <Option style={{ cursor: 'pointer' }} onClick={async () => clearWeb3()}>
+                  <User size={20} style={{ marginRight: '.75rem' }} />
+                  {`${address.substr(0, 6)}...${address.substr(address.length - 6, address.length)}`}
+                </Option>
+              </div>
+            )}
+            {!address && (
+              <div>
+                <Option style={{ cursor: 'pointer' }} onClick={async () => getWeb3()}>
+                  <User size={20} style={{ marginRight: '.75rem' }} />
+                  Connect
+                </Option>
+              </div>
+            )}
+
             <Toggle isActive={isDark} toggle={toggleDarkMode} />
           </AutoColumn>
           {!below1180 && (

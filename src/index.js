@@ -4,6 +4,7 @@ import ReactGA from 'react-ga'
 import { isMobile } from 'react-device-detect'
 import ThemeProvider, { GlobalStyle } from './Theme'
 import LocalStorageContextProvider, { Updater as LocalStorageContextUpdater } from './contexts/LocalStorage'
+import AccountContextProvider from './contexts/Account'
 import TokenDataContextProvider, { Updater as TokenDataContextUpdater } from './contexts/TokenData'
 import GlobalDataContextProvider from './contexts/GlobalData'
 import PairDataContextProvider, { Updater as PairDataContextUpdater } from './contexts/PairData'
@@ -27,15 +28,17 @@ function ContextProviders({ children }) {
   return (
     <LocalStorageContextProvider>
       <ApplicationContextProvider>
-        <TokenDataContextProvider>
-          <GlobalDataContextProvider>
-            <PairDataContextProvider>
-              <MarketsProvider>
-                <UserContextProvider>{children}</UserContextProvider>
-              </MarketsProvider>
-            </PairDataContextProvider>
-          </GlobalDataContextProvider>
-        </TokenDataContextProvider>
+        <AccountContextProvider>
+          <TokenDataContextProvider>
+            <GlobalDataContextProvider>
+              <PairDataContextProvider>
+                <MarketsProvider>
+                  <UserContextProvider>{children}</UserContextProvider>
+                </MarketsProvider>
+              </PairDataContextProvider>
+            </GlobalDataContextProvider>
+          </TokenDataContextProvider>
+        </AccountContextProvider>
       </ApplicationContextProvider>
     </LocalStorageContextProvider>
   )
