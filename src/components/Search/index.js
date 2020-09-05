@@ -407,7 +407,7 @@ export const Search = ({ small = false }) => {
       // existing cursor, increment down the length of the list
       setCursor(cursor + 1)
     }
-    // @ts-ignore
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showMenu, downKeyPressed, pairsShown, tokensShown])
 
   useEffect(() => {
@@ -424,7 +424,7 @@ export const Search = ({ small = false }) => {
       // continue down the list
       setCursor(cursor - 1)
     }
-    // @ts-ignore
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pairsShown, showMenu, tokensShown, upKeyPressed])
 
   useEffect(() => {
