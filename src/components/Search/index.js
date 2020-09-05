@@ -111,6 +111,7 @@ const Blue = styled.span`
     cursor: pointer;
   }
 `
+const eeeeeAddress = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
 
 export const Search = ({ small = false }) => {
   const allTokens = useAllTokensInMooniswap()
@@ -351,25 +352,34 @@ export const Search = ({ small = false }) => {
         </Heading>
         <div>
           {filteredPairList && Object.keys(filteredPairList).length === 0 && <MenuItem>No results</MenuItem>}
-          {filteredPairList &&
-          filteredPairList.slice(0, pairsShown).map(pair => {
-            if (pair?.token0?.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
-              pair.token0.name = 'ETH (Wrapped)'
-              pair.token0.symbol = 'ETH'
-            }
-            if (pair?.token1.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
-              pair.token1.name = 'ETH (Wrapped)'
-              pair.token1.symbol = 'ETH'
-            }
-            return (
-              <BasicLink to={'/pair/' + pair.id} key={pair.id} onClick={onDismiss}>
-                <MenuItem>
-                  <DoubleTokenLogo a0={pair?.token0?.id} a1={pair?.token1?.id} margin={true} />
-                  <span style={{ marginLeft: '10px' }}>{pair.token0.symbol + '-' + pair.token1.symbol} Pair</span>
-                </MenuItem>
-              </BasicLink>
-            )
-          })}
+          {
+            filteredPairList && filteredPairList.slice(0, pairsShown)
+              .filter((pair) => {
+                  // we had some pool that use this '0xeeee...' instead of '0x00000'
+                  return pair?.token0?.id?.toLowerCase() !== eeeeeAddress && pair?.token1?.id?.toLowerCase() !== eeeeeAddress;
+              })
+              .map(pair => {
+
+                if (pair?.token0?.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
+                  pair.token0.name = 'ETH (Wrapped)'
+                  pair.token0.symbol = 'ETH'
+                }
+
+                if (pair?.token1.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
+                  pair.token1.name = 'ETH (Wrapped)'
+                  pair.token1.symbol = 'ETH'
+                }
+
+                return (
+                  <BasicLink to={'/pair/' + pair.id} key={pair.id} onClick={onDismiss}>
+                    <MenuItem>
+                      <DoubleTokenLogo a0={pair?.token0?.id} a1={pair?.token1?.id} margin={true} />
+                      <span style={{ marginLeft: '10px' }}>{pair.token0.symbol + '-' + pair.token1.symbol} Pair</span>
+                    </MenuItem>
+                  </BasicLink>
+                )
+            })
+          }
           <Heading
             hide={!(Object.keys(filteredPairList).length > 3 && Object.keys(filteredPairList).length >= pairsShown)}
           >
