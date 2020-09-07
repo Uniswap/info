@@ -4,14 +4,14 @@ import 'feather-icons'
 import TopTokenList from '../components/TokenList'
 import { TYPE } from '../Theme'
 import Panel from '../components/Panel'
-import { useAllTokenData } from '../contexts/TokenData'
 import { PageWrapper, FullWrapper } from '../components'
 import { RowBetween } from '../components/Row'
 import Search from '../components/Search'
 import { useMedia } from 'react-use'
+import { useAllTokens } from '../contexts/TokenData2'
 
 function AllTokensPage() {
-  const allTokens = useAllTokenData()
+  const tokens = useAllTokens()
 
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -23,11 +23,11 @@ function AllTokensPage() {
     <PageWrapper>
       <FullWrapper>
         <RowBetween>
-          <TYPE.largeHeader>Top Tokens</TYPE.largeHeader>
+          <TYPE.largeHeader>Top Assets</TYPE.largeHeader>
           {!below600 && <Search small={true} />}
         </RowBetween>
         <Panel style={{ marginTop: '6px', padding: below600 && '1rem 0 0 0 ' }}>
-          <TopTokenList tokens={allTokens} itemMax={50} />
+          <TopTokenList tokens={Object.values(tokens)} itemMax={50} />
         </Panel>
       </FullWrapper>
     </PageWrapper>

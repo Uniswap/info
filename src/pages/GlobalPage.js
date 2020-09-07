@@ -5,24 +5,22 @@ import styled from 'styled-components'
 
 import { AutoRow, RowBetween } from '../components/Row'
 import { AutoColumn } from '../components/Column'
-import PairList from '../components/PairList'
 import TopTokenList from '../components/TokenList'
 import TxnList from '../components/TxnList'
 import GlobalChart from '../components/GlobalChart'
-import Search from '../components/Search'
 import GlobalStats from '../components/GlobalStats'
 
 import { useGlobalData, useGlobalTransactions } from '../contexts/GlobalData'
-import { useAllPairData } from '../contexts/PairData'
+import { useHistory } from '../contexts/History'
 import { useMedia } from 'react-use'
 import Panel from '../components/Panel'
-import { useAllTokenData } from '../contexts/TokenData'
 import { formattedNum, formattedPercent } from '../utils'
 import { TYPE, ThemedBackground } from '../Theme'
 import { transparentize } from 'polished'
 import { CustomLink } from '../components/Link'
 
 import { PageWrapper, ContentWrapper } from '../components'
+import { useAllTokens } from '../contexts/TokenData2'
 
 const ListOptions = styled(AutoRow)`
   height: 40px;
@@ -38,7 +36,7 @@ const ListOptions = styled(AutoRow)`
 const GridRow = styled.div`
   display: grid;
   width: 100%;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   column-gap: 6px;
   align-items: start;
   justify-content: space-between;
@@ -46,9 +44,12 @@ const GridRow = styled.div`
 
 function GlobalPage() {
   // get data for lists and totals
-  const allPairs = useAllPairData()
-  const allTokens = useAllTokenData()
+  // const allPairs = useAllPairData();
+  const tokens = useAllTokens()
+
   const transactions = useGlobalTransactions()
+  const history = useHistory()
+  console.log(history)
   const { totalLiquidityUSD, oneDayVolumeUSD, volumeChangeUSD, liquidityChangeUSD } = useGlobalData()
 
   // breakpoints
@@ -69,8 +70,8 @@ function GlobalPage() {
       <ContentWrapper>
         <div>
           <AutoColumn gap="24px" style={{ paddingBottom: below800 ? '0' : '24px' }}>
-            <TYPE.largeHeader>{below800 ? 'Protocol Analytics' : 'Uniswap Protocol Analytics'}</TYPE.largeHeader>
-            <Search />
+            <TYPE.largeHeader>{below800 ? 'Protocol Analytics' : 'JellySwap Protocol Analytics'}</TYPE.largeHeader>
+            {/* <Search /> */}
             <GlobalStats />
           </AutoColumn>
           {below800 && ( // mobile card
@@ -112,9 +113,9 @@ function GlobalPage() {
               <Panel style={{ height: '100%', minHeight: '300px' }}>
                 <GlobalChart display="liquidity" />
               </Panel>
-              <Panel style={{ height: '100%' }}>
+              {/* <Panel style={{ height: '100%' }}>
                 <GlobalChart display="volume" />
-              </Panel>
+              </Panel> */}
             </GridRow>
           )}
           {below800 && (
@@ -124,23 +125,15 @@ function GlobalPage() {
               </Panel>
             </AutoColumn>
           )}
+
           <ListOptions gap="10px" style={{ marginTop: '2rem', marginBottom: '.5rem' }}>
             <RowBetween>
-              <TYPE.main fontSize={'1.125rem'}>Top Tokens</TYPE.main>
+              <TYPE.main fontSize={'1.125rem'}>Top Assets</TYPE.main>
               <CustomLink to={'/tokens'}>See All</CustomLink>
             </RowBetween>
           </ListOptions>
           <Panel style={{ marginTop: '6px', padding: '1.125rem 0 ' }}>
-            <TopTokenList tokens={allTokens} />
-          </Panel>
-          <ListOptions gap="10px" style={{ marginTop: '2rem', marginBottom: '.5rem' }}>
-            <RowBetween>
-              <TYPE.main fontSize={'1rem'}>Top Pairs</TYPE.main>
-              <CustomLink to={'/pairs'}>See All</CustomLink>
-            </RowBetween>
-          </ListOptions>
-          <Panel style={{ marginTop: '6px', padding: '1.125rem 0 ' }}>
-            <PairList pairs={allPairs} />
+            <TopTokenList tokens={Object.values(tokens)} />
           </Panel>
 
           <span>
@@ -148,8 +141,9 @@ function GlobalPage() {
               Transactions
             </TYPE.main>
           </span>
+
           <Panel style={{ margin: '1rem 0' }}>
-            <TxnList transactions={transactions} />
+            <TxnList transactions={transactions} history={history} />
           </Panel>
         </div>
       </ContentWrapper>
