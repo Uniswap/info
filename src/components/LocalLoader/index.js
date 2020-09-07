@@ -17,7 +17,7 @@ const Loader = styled.div`
   width: 100%;
   animation: ${rotate} 800ms linear infinite;
   & > * {
-    width: 72px;
+    width: 102px;
   }
   ${props =>
     props.fill && !props.height

@@ -59,6 +59,8 @@ const TradingViewChart = ({
     }
   })
 
+  console.log(formattedData)
+
   // adjust the scale based on the type of chart
   const topScale = type === CHART_TYPES.AREA ? 0.32 : 0.2
 
@@ -159,7 +161,7 @@ const TradingViewChart = ({
       toolTip.style.backgroundColor = 'transparent'
 
       // format numbers
-      let percentChange = baseChange?.toFixed(2)
+      let percentChange = baseChange?.toFixed(2) || 0
       let formattedPercentChange = (percentChange > 0 ? '+' : '') + percentChange + '%'
       let color = percentChange >= 0 ? 'green' : 'red'
 
@@ -174,6 +176,7 @@ const TradingViewChart = ({
           `<span style="margin-left: 10px; font-size: 16px; color: ${color};">${formattedPercentChange}</span>` +
           '</div>'
       }
+
       setLastBarText()
 
       // update the title when hovering on the chart

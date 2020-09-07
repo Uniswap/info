@@ -9,6 +9,9 @@ import { RowFixed } from '../Row'
 import { OptionButton } from '../ButtonStyled'
 import { getTimeframe } from '../../utils'
 import { TYPE } from '../../Theme'
+import { useAllPrices } from '../../contexts/Price'
+import { useLiquidity } from '../../contexts/Liquidity'
+import { ASSETS } from '../../constants/assets'
 
 const CHART_VIEW = {
   VOLUME: 'Volume',
@@ -21,21 +24,39 @@ const VOLUME_WINDOW = {
 }
 const GlobalChart = ({ display }) => {
   // chart options
+  const [totalLiquidity, setTotalLiquidity] = useState(0)
   const [chartView, setChartView] = useState(display === 'volume' ? CHART_VIEW.VOLUME : CHART_VIEW.LIQUIDITY)
 
   // time window and window size for chart
   const timeWindow = timeframeOptions.ALL_TIME
   const [volumeWindow, setVolumeWindow] = useState(VOLUME_WINDOW.DAYS)
 
+  const prices = useAllPrices()
+  const liquidity = useLiquidity()
+
+  useEffect(() => {
+    let _totalLiquidity = 0
+    ASSETS.forEach(token => {
+      if (prices && liquidity) {
+        const p = prices[token.symbol] || 0
+        const l = liquidity[token.symbol] || 0
+
+        _totalLiquidity += l * p
+      }
+    })
+    setTotalLiquidity(_totalLiquidity)
+  }, [prices, liquidity])
+
   // global historical data
   const [dailyData, weeklyData] = useGlobalChartData()
+
   const {
-    totalLiquidityUSD,
-    oneDayVolumeUSD,
-    volumeChangeUSD,
-    liquidityChangeUSD,
-    oneWeekVolume,
-    weeklyVolumeChange
+    totalLiquidityUSD
+    // oneDayVolumeUSD,
+    // volumeChangeUSD,
+    // liquidityChangeUSD,
+    // oneWeekVolume,
+    // weeklyVolumeChange
   } = useGlobalData()
 
   // based on window, get starttim
@@ -61,6 +82,8 @@ const GlobalChart = ({ display }) => {
   }, [dailyData, utcStartTime, volumeWindow, weeklyData])
   const below800 = useMedia('(max-width: 800px)')
 
+  console.log(chartDataFiltered)
+
   // update the width on a window resize
   const ref = useRef()
   const isClient = typeof window === 'object'
@@ -85,9 +108,39 @@ const GlobalChart = ({ display }) => {
       {chartDataFiltered && chartView === CHART_VIEW.LIQUIDITY && (
         <ResponsiveContainer aspect={60 / 28} ref={ref}>
           <TradingViewChart
-            data={dailyData}
-            base={totalLiquidityUSD}
-            baseChange={liquidityChangeUSD}
+            data={[
+              {
+                date: '1598572800',
+                totalLiquidityUSD: '17043.42886349621537016424864454717'
+              },
+              {
+                date: '1598659200',
+                totalLiquidityUSD: '18043.42886349621537016424864454717'
+              },
+              {
+                date: '1598745600',
+                totalLiquidityUSD: '17043.42886349621537016424864454717'
+              },
+              {
+                date: '1598832000',
+                totalLiquidityUSD: '57043.42886349621537016424864454717'
+              },
+              {
+                date: '1598918400',
+                totalLiquidityUSD: '67043.42886349621537016424864454717'
+              },
+              {
+                date: '1599004800',
+                totalLiquidityUSD: '77043.42886349621537016424864454717'
+              },
+              {
+                date: '1599091200',
+                totalLiquidityUSD: '87043.42886349621537016424864454717'
+              }
+            ]}
+            // data={dailyData}
+            base={Number(totalLiquidity)}
+            baseChange={0}
             title="Liquidity"
             field="totalLiquidityUSD"
             width={width}
@@ -95,7 +148,7 @@ const GlobalChart = ({ display }) => {
           />
         </ResponsiveContainer>
       )}
-      {chartDataFiltered && chartView === CHART_VIEW.VOLUME && (
+      {/* {chartDataFiltered && chartView === CHART_VIEW.VOLUME && (
         <ResponsiveContainer aspect={60 / 28}>
           <TradingViewChart
             data={chartDataFiltered}
@@ -108,7 +161,7 @@ const GlobalChart = ({ display }) => {
             useWeekly={volumeWindow === VOLUME_WINDOW.WEEKLY}
           />
         </ResponsiveContainer>
-      )}
+      )} */}
       {display === 'volume' && (
         <RowFixed style={{ bottom: '70px', position: 'absolute', left: '20px', zIndex: 10 }}>
           <OptionButton

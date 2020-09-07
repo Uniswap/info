@@ -134,7 +134,7 @@ function SideNav({ history }) {
                     Tokens
                   </Option>
                 </BasicLink>
-                <BasicLink to="/pairs">
+                {/* <BasicLink to="/pairs">
                   <Option
                     activeText={
                       (history.location.pathname.split('/')[1] === 'pairs' ||
@@ -145,7 +145,7 @@ function SideNav({ history }) {
                     <PieChart size={20} style={{ marginRight: '.75rem' }} />
                     Pairs
                   </Option>
-                </BasicLink>
+                </BasicLink> */}
 
                 <BasicLink to="/accounts">
                   <Option
@@ -164,27 +164,17 @@ function SideNav({ history }) {
           </AutoColumn>
           <AutoColumn gap="0.5rem" style={{ marginLeft: '.75rem', marginBottom: '4rem' }}>
             <HeaderText>
-              <Link href="https://uniswap.org" target="_blank">
-                Uniswap.org
+              <Link href="https://jelly.market/" target="_blank">
+                jelly.market
               </Link>
             </HeaderText>
             <HeaderText>
-              <Link href="https://v1.uniswap.info" target="_blank">
-                V1 Analytics
-              </Link>
-            </HeaderText>
-            <HeaderText>
-              <Link href="https://uniswap.org/docs/v2" target="_blank">
-                Docs
-              </Link>
-            </HeaderText>
-            <HeaderText>
-              <Link href="https://discord.com/invite/XErMcTq" target="_blank">
+              <Link href="https://discordapp.com/invite/C9mYrWM" target="_blank">
                 Discord
               </Link>
             </HeaderText>
             <HeaderText>
-              <Link href="https://twitter.com/UniswapProtocol" target="_blank">
+              <Link href="https://twitter.com/jelly_swap" target="_blank">
                 Twitter
               </Link>
             </HeaderText>
