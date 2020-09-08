@@ -28,7 +28,7 @@ export const v1Client = new ApolloClient({
 
 export const blockClient = new ApolloClient({
   link: new HttpLink({
-    uri: 'https://api.thegraph.com/subgraphs/name/1hive/ethereum-blocks'
+    uri: 'https://api.thegraph.com/subgraphs/name/1hive/xdai-blocks'
   }),
   cache: new InMemoryCache()
 })
