@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect, useState } from 'react'
 import { client } from '../apollo/client'
+import axios from 'axios'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { useTimeframe } from './Application'
@@ -319,21 +320,9 @@ const getChartData = async oldestDateToFetch => {
   let allFound = false
 
   try {
-    while (!allFound) {
-      let result = await client.query({
-        query: GLOBAL_CHART,
-        variables: {
-          startTime: oldestDateToFetch,
-          skip
-        },
-        fetchPolicy: 'cache-first'
-      })
-      skip += 1000
-      data = data.concat(result.data.uniswapDayDatas)
-      if (result.data.uniswapDayDatas.length < 1000) {
-        allFound = true
-      }
-    }
+    const response = await axios.get('https://spacejelly.network/candy/api/v1/stats/get')
+
+    const data = response.data
 
     if (data) {
       let dayIndexSet = new Set()
@@ -582,13 +571,28 @@ export function useGlobalChartData() {
    * Fetch data if none fetched or older data is needed
    */
   useEffect(() => {
+    let stale = false
+    let intervalRef
+
     async function fetchData() {
       // historical stuff for chart
-      let [newChartData, newWeeklyData] = await getChartData(oldestDateFetch)
-      updateChart(newChartData, newWeeklyData)
+
+      if (!stale) {
+        let [newChartData, newWeeklyData] = await getChartData(oldestDateFetch)
+        updateChart(newChartData, newWeeklyData)
+      }
     }
     if (oldestDateFetch && !(chartDataDaily && chartDataWeekly)) {
       fetchData()
+    }
+
+    intervalRef = setInterval(() => {
+      fetchData()
+    }, 15000)
+
+    return () => {
+      stale = true
+      clearInterval(intervalRef)
     }
   }, [chartDataDaily, chartDataWeekly, oldestDateFetch, updateChart])
 

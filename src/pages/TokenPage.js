@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import 'feather-icons'
 import { withRouter } from 'react-router-dom'
 import { Text } from 'rebass'
@@ -6,30 +6,31 @@ import styled from 'styled-components'
 import Link from '../components/Link'
 import Panel from '../components/Panel'
 import TokenLogo from '../components/TokenLogo'
-import PairList from '../components/PairList'
+
 import Loader from '../components/LocalLoader'
 import { AutoRow, RowBetween, RowFixed } from '../components/Row'
-import Column, { AutoColumn } from '../components/Column'
+import { AutoColumn } from '../components/Column'
 import { ButtonLight, ButtonDark } from '../components/ButtonStyled'
 import TxnList from '../components/TxnList'
 import TokenChart from '../components/TokenChart'
 import { BasicLink } from '../components/Link'
 import Search from '../components/Search'
-import { formattedNum, formattedPercent, getPoolLink, getSwapLink, localNumber } from '../utils'
-import { useTokenData, useTokenTransactions, useTokenPairs } from '../contexts/TokenData'
+import { getPoolLink, getSwapLink, localNumber, safeAccess } from '../utils'
+
 import { TYPE, ThemedBackground } from '../Theme'
 import { transparentize } from 'polished'
-import { useColor } from '../hooks'
-import CopyHelper from '../components/Copy'
+
 import { useMedia } from 'react-use'
-import { useDataForList } from '../contexts/PairData'
-import { useEffect } from 'react'
-import Warning from '../components/Warning'
-import { usePathDismissed, useSavedTokens } from '../contexts/LocalStorage'
-import { Hover, PageWrapper, ContentWrapper, StyledIcon } from '../components'
-import { PlusCircle, Bookmark } from 'react-feather'
+
+import { PageWrapper, ContentWrapper } from '../components'
+
 import FormattedName from '../components/FormattedName'
-import { useListedTokens } from '../contexts/Application'
+import { useToken } from '../contexts/TokenData2'
+import { useHistoryForAsset } from '../contexts/History'
+import { useLiquidityForAsset } from '../contexts/Liquidity'
+import { useProviders } from '../contexts/Providers'
+import TokenList from '../components/TokenList'
+import ProvidersList from '../components/ProvidersList'
 
 const DashboardWrapper = styled.div`
   width: 100%;
@@ -57,108 +58,47 @@ const PanelWrapper = styled.div`
   }
 `
 
-const TokenDetailsLayout = styled.div`
-  display: inline-grid;
-  width: 100%;
-  grid-template-columns: auto auto auto 1fr;
-  column-gap: 30px;
-  align-items: start;
-
-  &:last-child {
-    align-items: center;
-    justify-items: end;
-  }
-  @media screen and (max-width: 1024px) {
-    grid-template-columns: 1fr;
-    align-items: stretch;
-    > * {
-      grid-column: 1 / 4;
-      margin-bottom: 1rem;
-    }
-
-    &:last-child {
-      align-items: start;
-      justify-items: start;
-    }
-  }
-`
-
 const WarningGrouping = styled.div`
   opacity: ${({ disabled }) => disabled && '0.4'};
   pointer-events: ${({ disabled }) => disabled && 'none'};
 `
 
-function TokenPage({ address, history }) {
-  const {
-    id,
-    name,
-    symbol,
-    priceUSD,
-    oneDayVolumeUSD,
-    totalLiquidityUSD,
-    volumeChangeUSD,
-    oneDayVolumeUT,
-    volumeChangeUT,
-    priceChangeUSD,
-    liquidityChangeUSD,
-    oneDayTxns,
-    txnChange
-  } = useTokenData(address)
-
+function TokenPage({ asset }) {
   useEffect(() => {
     document.querySelector('body').scrollTo(0, 0)
   }, [])
+  const [data, setData] = useState([])
 
-  // detect color from token
-  const backgroundColor = useColor(id, symbol)
+  const token = useToken(asset)
+  const transactions = useHistoryForAsset(asset)
+  const liquidity = useLiquidityForAsset(asset)
+  const providers = useProviders()
 
-  const allPairs = useTokenPairs(address)
-
-  // pairs to show in pair list
-  const fetchedPairsList = useDataForList(allPairs)
-
-  // all transactions with this token
-  const transactions = useTokenTransactions(address)
-
-  // price
-  const price = priceUSD ? formattedNum(priceUSD, true) : ''
-  const priceChange = priceChangeUSD ? formattedPercent(priceChangeUSD) : ''
-
-  // volume
-  const volume =
-    oneDayVolumeUSD || oneDayVolumeUSD === 0
-      ? formattedNum(oneDayVolumeUSD === 0 ? oneDayVolumeUT : oneDayVolumeUSD, true)
-      : oneDayVolumeUSD === 0
-      ? '$0'
-      : '-'
-
-  // mark if using untracked volume
-  const [usingUtVolume, setUsingUtVolume] = useState(false)
   useEffect(() => {
-    setUsingUtVolume(oneDayVolumeUSD === 0 ? true : false)
-  }, [oneDayVolumeUSD])
+    if (!providers) {
+      setData([])
+      return
+    }
 
-  const volumeChange = formattedPercent(!usingUtVolume ? volumeChangeUSD : volumeChangeUT)
+    const providersData = []
 
-  // liquidity
-  const liquidity = totalLiquidityUSD ? formattedNum(totalLiquidityUSD, true) : totalLiquidityUSD === 0 ? '$0' : '-'
-  const liquidityChange = formattedPercent(liquidityChangeUSD)
+    Object.keys(providers).forEach(provider => {
+      if (safeAccess(providers[provider], ['balances', asset])) {
+        const { address, balance } = providers[provider].balances[asset]
 
-  // transactions
-  const txnChangeFormatted = formattedPercent(txnChange)
+        providersData.push({ name: address, value: +balance })
+      }
+    })
+
+    setData([...providersData])
+  }, [providers])
+
+  const { symbol, priceUSD, totalLiquidityUSD } = token
 
   const below1080 = useMedia('(max-width: 1080px)')
   const below800 = useMedia('(max-width: 800px)')
   const below600 = useMedia('(max-width: 600px)')
   const below500 = useMedia('(max-width: 500px)')
-
-  // format for long symbol
-  const LENGTH = below1080 ? 10 : 16
-  const formattedSymbol = symbol?.length > LENGTH ? symbol.slice(0, LENGTH) + '...' : symbol
-
-  const [dismissed, markAsDismissed] = usePathDismissed(history.location.pathname)
-  const [savedTokens, addToken] = useSavedTokens()
-  const listedTokens = useListedTokens()
 
   useEffect(() => {
     window.scrollTo({
@@ -169,14 +109,8 @@ function TokenPage({ address, history }) {
 
   return (
     <PageWrapper>
-      <ThemedBackground backgroundColor={transparentize(0.6, backgroundColor)} />
+      <ThemedBackground backgroundColor={transparentize(0.6, '#ff007a')} />
 
-      <Warning
-        type={'token'}
-        show={!dismissed && listedTokens && !listedTokens.includes(address)}
-        setShow={markAsDismissed}
-        address={address}
-      />
       <ContentWrapper>
         <RowBetween style={{ flexWrap: 'wrap', alingItems: 'start' }}>
           <AutoRow align="flex-end" style={{ width: 'fit-content' }}>
@@ -186,60 +120,50 @@ function TokenPage({ address, history }) {
             </TYPE.body>
             <Link
               style={{ width: 'fit-content' }}
-              color={backgroundColor}
+              color={'#ff007a'}
               external
-              href={'https://etherscan.io/address/' + address}
+              href={'https://etherscan.io/asset/' + asset}
             >
               <Text style={{ marginLeft: '.15rem' }} fontSize={'14px'} fontWeight={400}>
-                ({address.slice(0, 8) + '...' + address.slice(36, 42)})
+                ({asset.slice(0, 8) + '...' + asset.slice(36, 42)})
               </Text>
             </Link>
           </AutoRow>
           {!below600 && <Search small={true} />}
         </RowBetween>
 
-        <WarningGrouping disabled={!dismissed && listedTokens && !listedTokens.includes(address)}>
+        <WarningGrouping>
           <DashboardWrapper style={{ marginTop: below1080 ? '0' : '1rem' }}>
             <RowBetween style={{ flexWrap: 'wrap', marginBottom: '2rem', alignItems: 'flex-start' }}>
               <RowFixed style={{ flexWrap: 'wrap' }}>
                 <RowFixed style={{ alignItems: 'baseline' }}>
-                  <TokenLogo address={address} size="32px" style={{ alignSelf: 'center' }} />
+                  <TokenLogo asset={asset} size="32px" style={{ alignSelf: 'center' }} />
                   <TYPE.main fontSize={below1080 ? '1.5rem' : '2rem'} fontWeight={500} style={{ margin: '0 1rem' }}>
                     <RowFixed gap="6px">
-                      <FormattedName text={name ? name + ' ' : ''} maxCharacters={16} style={{ marginRight: '6px' }} />{' '}
-                      {formattedSymbol ? `(${formattedSymbol})` : ''}
+                      <FormattedName
+                        text={asset ? asset + ' ' : ''}
+                        maxCharacters={16}
+                        style={{ marginRight: '6px' }}
+                      />{' '}
+                      {symbol ? `(${symbol})` : ''}
                     </RowFixed>
                   </TYPE.main>{' '}
                   {!below1080 && (
                     <>
                       <TYPE.main fontSize={'1.5rem'} fontWeight={500} style={{ marginRight: '1rem' }}>
-                        {price}
+                        {priceUSD}
                       </TYPE.main>
-                      {priceChange}
                     </>
                   )}
                 </RowFixed>
               </RowFixed>
               <span>
                 <RowFixed ml={below500 ? '0' : '2.5rem'} mt={below500 ? '1rem' : '0'}>
-                  {!!!savedTokens[address] && !below800 ? (
-                    <Hover onClick={() => addToken(address, symbol)}>
-                      <StyledIcon>
-                        <PlusCircle style={{ marginRight: '0.5rem' }} />
-                      </StyledIcon>
-                    </Hover>
-                  ) : !below1080 ? (
-                    <StyledIcon>
-                      <Bookmark style={{ marginRight: '0.5rem', opacity: 0.4 }} />
-                    </StyledIcon>
-                  ) : (
-                    <></>
-                  )}
-                  <Link href={getPoolLink(address)} target="_blank">
-                    <ButtonLight color={backgroundColor}>+ Add Liquidity</ButtonLight>
+                  <Link href={getPoolLink(asset)} target="_blank">
+                    <ButtonLight color={'#ff007a'}>+ Add Liquidity</ButtonLight>
                   </Link>
-                  <Link href={getSwapLink(address)} target="_blank">
-                    <ButtonDark ml={'.5rem'} mr={below1080 && '.5rem'} color={backgroundColor}>
+                  <Link href={getSwapLink(asset)} target="_blank">
+                    <ButtonDark ml={'.5rem'} mr={below1080 && '.5rem'} color={'#ff007a'}>
                       Trade
                     </ButtonDark>
                   </Link>
@@ -249,19 +173,18 @@ function TokenPage({ address, history }) {
 
             <>
               <PanelWrapper style={{ marginTop: below1080 ? '0' : '1rem' }}>
-                {below1080 && price && (
+                {below1080 && priceUSD && (
                   <Panel>
                     <AutoColumn gap="20px">
                       <RowBetween>
-                        <TYPE.main>Price</TYPE.main>
+                        <TYPE.main>priceUSD</TYPE.main>
                         <div />
                       </RowBetween>
                       <RowBetween align="flex-end">
                         {' '}
                         <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={500}>
-                          {price}
+                          {priceUSD}
                         </TYPE.main>
-                        <TYPE.main>{priceChange}</TYPE.main>
                       </RowBetween>
                     </AutoColumn>
                   </Panel>
@@ -276,110 +199,38 @@ function TokenPage({ address, history }) {
                       <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={500}>
                         {liquidity}
                       </TYPE.main>
-                      <TYPE.main>{liquidityChange}</TYPE.main>
                     </RowBetween>
                   </AutoColumn>
                 </Panel>
                 <Panel>
                   <AutoColumn gap="20px">
                     <RowBetween>
-                      <TYPE.main>Volume (24hrs) {usingUtVolume && '(Untracked)'}</TYPE.main>
+                      <TYPE.main>Total USD</TYPE.main>
                       <div />
                     </RowBetween>
                     <RowBetween align="flex-end">
                       <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={500}>
-                        {volume}
+                        {totalLiquidityUSD.toFixed(2)}
                       </TYPE.main>
-                      <TYPE.main>{volumeChange}</TYPE.main>
                     </RowBetween>
                   </AutoColumn>
                 </Panel>
 
-                <Panel>
-                  <AutoColumn gap="20px">
-                    <RowBetween>
-                      <TYPE.main>Transactions (24hrs)</TYPE.main>
-                      <div />
-                    </RowBetween>
-                    <RowBetween align="flex-end">
-                      <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={500}>
-                        {oneDayTxns ? localNumber(oneDayTxns) : oneDayTxns === 0 ? 0 : '-'}
-                      </TYPE.main>
-                      <TYPE.main>{txnChangeFormatted}</TYPE.main>
-                    </RowBetween>
-                  </AutoColumn>
-                </Panel>
                 <Panel style={{ gridColumn: below1080 ? '1' : '2/4', gridRow: below1080 ? '' : '1/4' }}>
-                  <TokenChart address={address} color={backgroundColor} base={priceUSD} />
+                  <TokenChart data={data} />
                 </Panel>
               </PanelWrapper>
             </>
 
-            <span>
-              <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
-                Top Pairs
-              </TYPE.main>
-            </span>
-            <Panel
-              rounded
-              style={{
-                marginTop: '1.5rem',
-                padding: '1.125rem 0 '
-              }}
-            >
-              {address && fetchedPairsList ? (
-                <PairList color={backgroundColor} address={address} pairs={fetchedPairsList} />
-              ) : (
-                <Loader />
-              )}
-            </Panel>
+            <RowBetween mt={40} mb={'1rem'}>
+              <TYPE.main fontSize={'1.125rem'}>Providers</TYPE.main> <div />
+            </RowBetween>
+            <Panel rounded>{data ? <ProvidersList color={'#ff007a'} providers={data} /> : <Loader />}</Panel>
+
             <RowBetween mt={40} mb={'1rem'}>
               <TYPE.main fontSize={'1.125rem'}>Transactions</TYPE.main> <div />
             </RowBetween>
-            <Panel rounded>
-              {transactions ? <TxnList color={backgroundColor} transactions={transactions} /> : <Loader />}
-            </Panel>
-            <>
-              <RowBetween style={{ marginTop: '3rem' }}>
-                <TYPE.main fontSize={'1.125rem'}>Token Information</TYPE.main>{' '}
-              </RowBetween>
-              <Panel
-                rounded
-                style={{
-                  marginTop: '1.5rem'
-                }}
-                p={20}
-              >
-                <TokenDetailsLayout>
-                  <Column>
-                    <TYPE.main>Symbol</TYPE.main>
-                    <Text style={{ marginTop: '.5rem' }} fontSize={24} fontWeight="500">
-                      <FormattedName text={symbol} maxCharacters={12} />
-                    </Text>
-                  </Column>
-                  <Column>
-                    <TYPE.main>Name</TYPE.main>
-                    <TYPE.main style={{ marginTop: '.5rem' }} fontSize={24} fontWeight="500">
-                      <FormattedName text={name} maxCharacters={16} />
-                    </TYPE.main>
-                  </Column>
-                  <Column>
-                    <TYPE.main>Address</TYPE.main>
-                    <AutoRow align="flex-end">
-                      <TYPE.main style={{ marginTop: '.5rem' }} fontSize={24} fontWeight="500">
-                        {address.slice(0, 8) + '...' + address.slice(36, 42)}
-                      </TYPE.main>
-                      <CopyHelper toCopy={address} />
-                    </AutoRow>
-                  </Column>
-                  <ButtonLight color={backgroundColor}>
-                    <Link color={backgroundColor} external href={'https://etherscan.io/address/' + address}>
-                      View on Etherscan ↗
-                    </Link>
-                  </ButtonLight>
-                </TokenDetailsLayout>
-              </Panel>
-            </>
+            <Panel rounded>{transactions ? <TxnList color={'#ff007a'} history={transactions} /> : <Loader />}</Panel>
           </DashboardWrapper>
         </WarningGrouping>
       </ContentWrapper>

@@ -1,61 +1,61 @@
-import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect } from 'react';
-import axios from 'axios';
+import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect } from 'react'
+import axios from 'axios'
 
-const UPDATE = 'UPDATE';
+const UPDATE = 'UPDATE'
 
-const HistoryContext = createContext();
+const HistoryContext = createContext()
 
 const TIMESTAMP_FORMAT = {
   AE: true
-};
+}
 
 function useHistoryContext() {
-  return useContext(HistoryContext);
+  return useContext(HistoryContext)
 }
 
 function reducer(state, { type, payload }) {
   switch (type) {
     case UPDATE: {
-      let swaps = payload;
+      let swaps = payload
 
-      if (!swaps) return;
+      if (!swaps) return
 
       swaps = swaps.map(s => {
         if (TIMESTAMP_FORMAT[s.network]) {
-          s.expiration = s.expiration / 1000;
+          s.expiration = s.expiration / 1000
         }
-        return s;
-      });
+        return s
+      })
 
       swaps = swaps.sort((a, b) => {
-        return b.expiration - a.expiration;
-      });
+        return b.expiration - a.expiration
+      })
 
-      return [...state, ...swaps];
+      return [...state, ...swaps]
     }
     default: {
-      throw Error(`Unexpected action type in HistoryContext reducer: '${type}'.`);
+      throw Error(`Unexpected action type in HistoryContext reducer: '${type}'.`)
     }
   }
 }
 
 export default function Provider({ children }) {
-  const [state, dispatch] = useReducer(reducer, []);
+  const [state, dispatch] = useReducer(reducer, [])
 
   const update = useCallback(swaps => {
-    dispatch({ type: UPDATE, payload: swaps });
-  }, []);
+    dispatch({ type: UPDATE, payload: swaps })
+  }, [])
 
   useEffect(() => {
     function get() {
       getHistory().then(swaps => {
-        update(swaps);
-      });
+        update(swaps)
+      })
     }
 
-    get();
+    get()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [])
 
   return (
     <HistoryContext.Provider
@@ -63,26 +63,37 @@ export default function Provider({ children }) {
         return {
           state,
           update
-        };
+        }
       }, [state, update])}
     >
       {children}
     </HistoryContext.Provider>
-  );
+  )
 }
 
 export function useHistory() {
-  const { state } = useHistoryContext();
-  return state;
+  const { state } = useHistoryContext()
+
+  console.log(state)
+
+  return state
+}
+
+export function useHistoryForAsset(asset) {
+  const { state } = useHistoryContext()
+
+  const txIncludingAsset = state.filter(tx => tx.network === asset || tx.outputNetwork === asset)
+
+  return txIncludingAsset
 }
 
 export const getHistory = async () => {
   try {
     const res = await axios.get(`
-      https://jelly-tracker.herokuapp.com/api/v1/swaps/all`);
-    return res.data;
+      https://jelly-tracker.herokuapp.com/api/v1/swaps/all`)
+    return res.data
   } catch (error) {
-    console.log('LIQUIDITY_ERR: ', error);
-    return {};
+    console.log('LIQUIDITY_ERR: ', error)
+    return {}
   }
-};
+}
