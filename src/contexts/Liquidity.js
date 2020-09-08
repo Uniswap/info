@@ -1,36 +1,36 @@
-import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect } from 'react';
-import axios from 'axios';
+import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect } from 'react'
+import axios from 'axios'
 
-const UPDATE = 'UPDATE';
+const UPDATE = 'UPDATE'
 
-const LiquidityContext = createContext();
+const LiquidityContext = createContext()
 
 function useLiquidityContext() {
-  return useContext(LiquidityContext);
+  return useContext(LiquidityContext)
 }
 
 function reducer(state, { type, payload }) {
   switch (type) {
     case UPDATE: {
-      const liquidity = payload;
+      const liquidity = payload
 
       return {
         ...state,
         ...liquidity
-      };
+      }
     }
     default: {
-      throw Error(`Unexpected action type in LiquidityContext reducer: '${type}'.`);
+      throw Error(`Unexpected action type in LiquidityContext reducer: '${type}'.`)
     }
   }
 }
 
 export default function Provider({ children }) {
-  const [state, dispatch] = useReducer(reducer, {});
+  const [state, dispatch] = useReducer(reducer, {})
 
   const update = useCallback(liquidity => {
-    dispatch({ type: UPDATE, payload: liquidity });
-  }, []);
+    dispatch({ type: UPDATE, payload: liquidity })
+  }, [])
 
   return (
     <LiquidityContext.Provider
@@ -38,54 +38,61 @@ export default function Provider({ children }) {
         return {
           state,
           update
-        };
+        }
       }, [state, update])}
     >
       {children}
     </LiquidityContext.Provider>
-  );
+  )
 }
 
 export function Updater() {
-  const { update } = useLiquidityContext();
+  const { update } = useLiquidityContext()
 
   useEffect(() => {
-    let stale = false;
+    let stale = false
 
     function get() {
       if (!stale) {
         getLiquidity().then(liquidity => {
-          update(liquidity);
-        });
+          update(liquidity)
+        })
       }
     }
 
-    get();
+    get()
 
     const pricePoll = setInterval(() => {
-      get();
-    }, 15000);
+      get()
+    }, 15000)
 
     return () => {
-      stale = true;
-      clearInterval(pricePoll);
-    };
-  }, [update]);
+      stale = true
+      clearInterval(pricePoll)
+    }
+  }, [update])
 
-  return null;
+  return null
 }
 
 export function useLiquidity() {
-  const { state } = useLiquidityContext();
-  return state;
+  const { state } = useLiquidityContext()
+
+  return state
+}
+
+export function useLiquidityForAsset(asset) {
+  const { state } = useLiquidityContext()
+
+  return state[asset]
 }
 
 export const getLiquidity = async () => {
   try {
-    const res = await axios.get(`https://network.jelly.market/api/v1/liquidity/get`);
-    return res.data;
+    const res = await axios.get(`https://network.jelly.market/api/v1/liquidity/get`)
+    return res.data
   } catch (error) {
-    console.log('LIQUIDITY_ERR: ', error);
-    return {};
+    console.log('LIQUIDITY_ERR: ', error)
+    return {}
   }
-};
+}
