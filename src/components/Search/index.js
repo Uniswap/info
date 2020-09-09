@@ -8,6 +8,7 @@ import { BasicLink } from '../Link'
 
 import { useAllTokenData, useTokenData } from '../../contexts/TokenData'
 import { useAllPairData, usePairData } from '../../contexts/PairData'
+import { useAllMarketData } from '../../contexts/Markets'
 import DoubleTokenLogo from '../DoubleLogo'
 import { useMedia } from 'react-use'
 import { useAllPairsInUniswap, useAllTokensInUniswap } from '../../contexts/GlobalData'
@@ -155,6 +156,7 @@ export const Search = ({ small = false }) => {
 
   let allPairs = useAllPairsInUniswap()
   const allPairData = useAllPairData()
+  const { markets } = useAllMarketData()
 
   const [showMenu, toggleMenu] = useState(false)
   const [value, setValue] = useState('')
@@ -262,6 +264,19 @@ export const Search = ({ small = false }) => {
       }
       return true
     })
+
+  // TODO Add better market filtering / searching
+  const filteredMarketsList = useMemo(() => {
+    return markets.filter(market => {
+      if (value !== '') {
+        const re = new RegExp(value, 'i')
+        if ((value.length === 42 && re.test(market.id)) || re.test(market.description)) {
+          return true
+        }
+      }
+      return false
+    })
+  })
 
   const filteredTokenList = useMemo(() => {
     return uniqueTokens
@@ -387,10 +402,12 @@ export const Search = ({ small = false }) => {
 
   const [tokensShown, setTokensShown] = useState(3)
   const [pairsShown, setPairsShown] = useState(3)
+  const [marketsShown, setMarketsShown] = useState(3)
 
   function onDismiss() {
     setPairsShown(3)
     setTokensShown(3)
+    setMarketsShown(3)
     toggleMenu(false)
     setValue('')
   }
@@ -405,6 +422,7 @@ export const Search = ({ small = false }) => {
       !(wrapperRef.current && wrapperRef.current.contains(e.target))
     ) {
       setPairsShown(3)
+      setMarketsShown(3)
       setTokensShown(3)
       toggleMenu(false)
     }
@@ -448,6 +466,54 @@ export const Search = ({ small = false }) => {
         {!showMenu ? <SearchIconLarge /> : <CloseIcon onClick={() => toggleMenu(false)} />}
       </Wrapper>
       <Menu hide={!showMenu} ref={menuRef}>
+        <Heading>
+          <Gray>Markets</Gray>
+        </Heading>
+        <div>
+          {Object.keys(filteredMarketsList).length === 0 && (
+            <MenuItem>
+              <TYPE.body>No results</TYPE.body>
+            </MenuItem>
+          )}
+          {filteredMarketsList.slice(0, marketsShown).map(market => {
+            return (
+              <div key={market.id}>
+                <BasicLink to={'/market/' + market.id} onClick={onDismiss}>
+                  <MenuItem>
+                    <RowFixed>
+                      <TokenLogo address={market.id} style={{ marginRight: '10px' }} />
+                      <FormattedName text={market.description} maxCharacters={20} style={{ marginRight: '6px' }} />
+                      (<FormattedName text={'ETH'} maxCharacters={6} />)
+                    </RowFixed>
+                  </MenuItem>
+                </BasicLink>
+                <BasicLink to={'/market/' + market.id} onClick={onDismiss}>
+                  <MenuItem>
+                    <RowFixed>
+                      <TokenLogo address={market.id} style={{ marginRight: '10px' }} />
+                      <FormattedName text={market.description} maxCharacters={20} style={{ marginRight: '6px' }} />
+                      (<FormattedName text={'DAI'} maxCharacters={6} />)
+                    </RowFixed>
+                  </MenuItem>
+                </BasicLink>
+              </div>
+            )
+          })}
+
+          <Heading
+            hide={
+              !(Object.keys(filteredMarketsList).length > 3 && Object.keys(filteredMarketsList).length >= marketsShown)
+            }
+          >
+            <Blue
+              onClick={() => {
+                setMarketsShown(marketsShown + 5)
+              }}
+            >
+              See more...
+            </Blue>
+          </Heading>
+        </div>
         <Heading>
           <Gray>Pairs</Gray>
         </Heading>

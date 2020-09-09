@@ -42,8 +42,8 @@ const List = styled(Box)`
 const DashGrid = styled.div`
   display: grid;
   grid-gap: 1em;
-  grid-template-columns: 100px 1fr 1fr;
-  grid-template-areas: 'name liq vol';
+  grid-template-columns: 100px;
+  grid-template-areas: 'name';
   padding: 0 1.125rem;
 
   > * {
@@ -58,19 +58,19 @@ const DashGrid = styled.div`
 
   @media screen and (min-width: 740px) {
     padding: 0 1.125rem;
-    grid-template-columns: 1.5fr 1fr 1fr};
-    grid-template-areas: ' name liq vol pool ';
+    grid-template-columns: 1.5fr;
+    grid-template-areas: ' name';
   }
 
   @media screen and (min-width: 1080px) {
     padding: 0 1.125rem;
-    grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr 1fr;
-    grid-template-areas: ' name liq vol volWeek fees apy';
+    grid-template-columns: 1.5fr;
+    grid-template-areas: ' name';
   }
 
   @media screen and (min-width: 1200px) {
-    grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr 1fr;
-    grid-template-areas: ' name liq vol volWeek fees apy';
+    grid-template-columns: 1.5fr;
+    grid-template-areas: ' name';
   }
 `
 
@@ -165,17 +165,12 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
             <CustomLink style={{ marginLeft: '20px', whiteSpace: 'nowrap' }} to={'/pair/' + pairAddress} color={color}>
               <FormattedName
                 text={pairData.token0.symbol + '-' + pairData.token1.symbol}
-                maxCharacters={below600 ? 8 : 16}
+                maxCharacters={below600 ? 75 : 100}
                 adjustSize={true}
                 link={true}
               />
             </CustomLink>
           </DataText>
-          <DataText area="liq">{liquidity}</DataText>
-          <DataText area="vol">{volume}</DataText>
-          {!below1080 && <DataText area="volWeek">{formattedNum(pairData.oneWeekVolumeUSD, true)}</DataText>}
-          {!below1080 && <DataText area="fees">{formattedNum(pairData.oneDayVolumeUSD * 0.003, true)}</DataText>}
-          {!below1080 && <DataText area="apy">{apy}</DataText>}
         </DashGrid>
       )
     } else {
@@ -220,69 +215,6 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
         <Flex alignItems="center" justifyContent="flexStart">
           <TYPE.main area="name">Name</TYPE.main>
         </Flex>
-        <Flex alignItems="center" justifyContent="flexEnd">
-          <ClickableText
-            area="liq"
-            onClick={e => {
-              setSortedColumn(SORT_FIELD.LIQ)
-              setSortDirection(sortedColumn !== SORT_FIELD.LIQ ? true : !sortDirection)
-            }}
-          >
-            Liquidity {sortedColumn === SORT_FIELD.LIQ ? (!sortDirection ? '↑' : '↓') : ''}
-          </ClickableText>
-        </Flex>
-        <Flex alignItems="center">
-          <ClickableText
-            area="vol"
-            onClick={e => {
-              setSortedColumn(SORT_FIELD.VOL)
-              setSortDirection(sortedColumn !== SORT_FIELD.VOL ? true : !sortDirection)
-            }}
-          >
-            Volume (24hrs)
-            {sortedColumn === SORT_FIELD.VOL ? (!sortDirection ? '↑' : '↓') : ''}
-          </ClickableText>
-        </Flex>
-        {!below1080 && (
-          <Flex alignItems="center" justifyContent="flexEnd">
-            <ClickableText
-              area="volWeek"
-              onClick={e => {
-                setSortedColumn(SORT_FIELD.VOL_7DAYS)
-                setSortDirection(sortedColumn !== SORT_FIELD.VOL_7DAYS ? true : !sortDirection)
-              }}
-            >
-              Volume (7d) {sortedColumn === SORT_FIELD.VOL_7DAYS ? (!sortDirection ? '↑' : '↓') : ''}
-            </ClickableText>
-          </Flex>
-        )}
-        {!below1080 && (
-          <Flex alignItems="center" justifyContent="flexEnd">
-            <ClickableText
-              area="fees"
-              onClick={e => {
-                setSortedColumn(SORT_FIELD.FEES)
-                setSortDirection(sortedColumn !== SORT_FIELD.FEES ? true : !sortDirection)
-              }}
-            >
-              Fees (24hr) {sortedColumn === SORT_FIELD.FEES ? (!sortDirection ? '↑' : '↓') : ''}
-            </ClickableText>
-          </Flex>
-        )}
-        {!below1080 && (
-          <Flex alignItems="center" justifyContent="flexEnd">
-            <ClickableText
-              area="apy"
-              onClick={e => {
-                setSortedColumn(SORT_FIELD.APY)
-                setSortDirection(sortedColumn !== SORT_FIELD.APY ? true : !sortDirection)
-              }}
-            >
-              1y Fees / Liquidity {sortedColumn === SORT_FIELD.APY ? (!sortDirection ? '↑' : '↓') : ''}
-            </ClickableText>
-            <QuestionHelper text={'Based on 24hr volume annualized'} />
-          </Flex>
-        )}
       </DashGrid>
       <Divider />
       <List p={0}>{!pairList ? <LocalLoader /> : pairList}</List>

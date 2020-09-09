@@ -27,7 +27,7 @@ import { timeframeOptions } from '../constants'
 import { useLatestBlock } from './Application'
 
 // TODO move to config
-const PARA_AUGUR_TOKENS = [
+export const PARA_AUGUR_TOKENS = [
   '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2', // WETH
   '0x6b175474e89094c44da98b954eedeac495271d0f' // DAI
 ]
