@@ -3,10 +3,7 @@ import { useHistory } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { Flex } from 'rebass'
-import Link from '../Link'
 import { RowFixed } from '../Row'
-import Logo from '../../assets/logo_white.svg'
-import Wordmark from '../../assets/wordmark_white.svg'
 
 const TitleWrapper = styled.div`
   text-decoration: none;
@@ -16,13 +13,6 @@ const TitleWrapper = styled.div`
   }
 
   z-index: 10;
-`
-
-const UniIcon = styled(Link)`
-  transition: transform 0.3s ease;
-  :hover {
-    transform: rotate(-5deg);
-  }
 `
 
 export default function Title() {

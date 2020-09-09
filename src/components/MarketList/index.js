@@ -110,9 +110,7 @@ function Marketist({ markets, itemMax = 10 }) {
   const [sortDirection, setSortDirection] = useState(true)
   const [sortedColumn, setSortedColumn] = useState(SORT_FIELD.STATUS)
 
-  const below1080 = useMedia('(max-width: 1080px)')
   const below680 = useMedia('(max-width: 680px)')
-  const below600 = useMedia('(max-width: 600px)')
 
   useEffect(() => {
     setMaxPage(1) // edit this to do modular

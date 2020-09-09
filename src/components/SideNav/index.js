@@ -60,21 +60,6 @@ const MobileWrapper = styled.div`
   align-items: center;
 `
 
-const HeaderText = styled.div`
-  margin-right: 0.75rem;
-  font-size: 0.825rem;
-  font-weight: 500;
-  display: inline-box;
-  display: -webkit-inline-box;
-  opacity: 0.8;
-  :hover {
-    opacity: 1;
-  }
-  a {
-    color: ${({ theme }) => theme.white};
-  }
-`
-
 const Polling = styled.div`
   position: fixed;
   display: flex;
@@ -109,7 +94,7 @@ function SideNav({ history }) {
   const [isDark, toggleDarkMode] = useDarkModeManager()
 
   const [web3, getWeb3, clearWeb3] = useGetWeb3()
-  const { address, provider, signer } = web3
+  const { address } = web3
 
   return (
     <Wrapper isMobile={below1080}>

@@ -5,19 +5,13 @@ import styled from 'styled-components'
 
 import { AutoRow, RowBetween } from '../components/Row'
 import { AutoColumn } from '../components/Column'
-import PairList from '../components/PairList'
-import TopTokenList from '../components/TokenList'
 import TopMarketList from '../components/MarketList'
-import TxnList from '../components/TxnList'
-import GlobalChart from '../components/GlobalChart'
 import Search from '../components/Search'
 import GlobalStats from '../components/GlobalStats'
 
-import { useGlobalData, useGlobalTransactions } from '../contexts/GlobalData'
-import { useAllPairData } from '../contexts/PairData'
+import { useGlobalData } from '../contexts/GlobalData'
 import { useMedia } from 'react-use'
 import Panel from '../components/Panel'
-import { useAllTokenData } from '../contexts/TokenData'
 import { useAllMarketData } from '../contexts/Markets'
 import { formattedNum, formattedPercent } from '../utils'
 import { TYPE, ThemedBackground } from '../Theme'
@@ -37,21 +31,9 @@ const ListOptions = styled(AutoRow)`
   }
 `
 
-const GridRow = styled.div`
-  display: grid;
-  width: 100%;
-  grid-template-columns: 1fr 1fr;
-  column-gap: 6px;
-  align-items: start;
-  justify-content: space-between;
-`
-
 function GlobalPage() {
   // get data for lists and totals
-  const allPairs = useAllPairData()
-  const allTokens = useAllTokenData()
   const { markets } = useAllMarketData()
-  const transactions = useGlobalTransactions()
   const { totalLiquidityUSD, oneDayVolumeUSD, volumeChangeUSD, liquidityChangeUSD } = useGlobalData()
 
   // breakpoints
