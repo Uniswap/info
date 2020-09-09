@@ -287,8 +287,8 @@ const getTopTokens = async (ethPrice, ethPriceOld) => {
           }
 
           if (data.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
-            data.name = 'Ether (Wrapped)'
-            data.symbol = 'ETH'
+            data.name = 'xDai (Wrapped)'
+            data.symbol = 'xDai'
           }
           return data
         })
@@ -409,8 +409,8 @@ const getTokenData = async (address, ethPrice, ethPriceOld) => {
 
     // fix for WETH
     if (data.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
-      data.name = 'ETH (Wrapped)'
-      data.symbol = 'ETH'
+      data.name = 'xDai (Wrapped)'
+      data.symbol = 'xDai'
     }
   } catch (e) {
     console.log(e)
