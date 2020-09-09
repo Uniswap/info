@@ -3,16 +3,14 @@ import { useMedia } from 'react-use'
 import dayjs from 'dayjs'
 import LocalLoader from '../LocalLoader'
 import utc from 'dayjs/plugin/utc'
-import { Box, Flex, Text } from 'rebass'
+import { Box, Flex } from 'rebass'
 import styled from 'styled-components'
 
 import { CustomLink } from '../Link'
 import { Divider } from '../../components'
 import { withRouter } from 'react-router-dom'
-import { formattedNum, formattedPercent } from '../../utils'
 import DoubleTokenLogo from '../DoubleLogo'
 import FormattedName from '../FormattedName'
-import QuestionHelper from '../QuestionHelper'
 import { TYPE } from '../../Theme'
 
 dayjs.extend(utc)
@@ -76,16 +74,6 @@ const DashGrid = styled.div`
 
 const ListWrapper = styled.div``
 
-const ClickableText = styled(Text)`
-  color: ${({ theme }) => theme.text1};
-  &:hover {
-    cursor: pointer;
-    opacity: 0.6;
-  }
-  text-align: end;
-  user-select: none;
-`
-
 const DataText = styled(Flex)`
   align-items: center;
   text-align: center;
@@ -118,7 +106,6 @@ const FIELD_TO_VALUE = {
 function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
   const below600 = useMedia('(max-width: 600px)')
   const below740 = useMedia('(max-width: 740px)')
-  const below1080 = useMedia('(max-width: 1080px)')
 
   // pagination
   const [page, setPage] = useState(1)
@@ -126,8 +113,8 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
   const ITEMS_PER_PAGE = maxItems
 
   // sorting
-  const [sortDirection, setSortDirection] = useState(true)
-  const [sortedColumn, setSortedColumn] = useState(SORT_FIELD.LIQ)
+  const [sortDirection] = useState(true)
+  const [sortedColumn] = useState(SORT_FIELD.LIQ)
 
   useEffect(() => {
     setMaxPage(1) // edit this to do modular
@@ -148,9 +135,6 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
     const pairData = pairs[pairAddress]
 
     if (pairData && pairData.token0 && pairData.token1) {
-      const liquidity = formattedNum(pairData.reserveUSD, true)
-      const volume = formattedNum(pairData.oneDayVolumeUSD, true)
-      const apy = formattedPercent((pairData.oneDayVolumeUSD * 0.003 * 365 * 100) / pairData.reserveUSD)
 
       return (
         <DashGrid style={{ height: '48px' }} disbaleLinks={disbaleLinks} focus={true}>
