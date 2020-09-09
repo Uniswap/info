@@ -266,7 +266,7 @@ export const Search = ({ small = false }) => {
     })
 
   // TODO Add better market filtering / searching
-  const filteredMarketsList = useMemo(() => {
+  const filteredMarketsList = () => {
     return markets.filter(market => {
       if (value !== '') {
         const re = new RegExp(value, 'i')
@@ -276,7 +276,7 @@ export const Search = ({ small = false }) => {
       }
       return false
     })
-  })
+  }
 
   const filteredTokenList = useMemo(() => {
     return uniqueTokens
