@@ -72,7 +72,7 @@ export default function Warning({ type, show, setShow, address }) {
                 fontWeight={500}
                 lineHeight={'145.23%'}
                 color={'#2172E5'}
-                href={'https://etherscan.io/address/' + address}
+                href={'https://blockscout.com/poa/xdai/address/' + address}
                 target="_blank"
               >
                 View {type === 'token' ? 'token' : 'pair'} contract on Etherscan
@@ -92,7 +92,7 @@ export default function Warning({ type, show, setShow, address }) {
                 fontWeight={500}
                 lineHeight={'145.23%'}
                 color={'#2172E5'}
-                href={'https://etherscan.io/address/' + address}
+                href={'https://blockscout.com/poa/xdai/address/' + address}
                 target="_blank"
               >
                 View {type === 'token' ? 'token' : 'pair'} contract on Etherscan
