@@ -266,17 +266,15 @@ export const Search = ({ small = false }) => {
     })
 
   // TODO Add better market filtering / searching
-  const filteredMarketsList = () => {
-    return markets.filter(market => {
-      if (value !== '') {
-        const re = new RegExp(value, 'i')
-        if ((value.length === 42 && re.test(market.id)) || re.test(market.description)) {
-          return true
-        }
+  const filteredMarketsList = markets.filter(market => {
+    if (value !== '') {
+      const re = new RegExp(value, 'i')
+      if ((value.length === 42 && re.test(market.id)) || re.test(market.description)) {
+        return true
       }
-      return false
-    })
-  }
+    }
+    return false
+  })
 
   const filteredTokenList = useMemo(() => {
     return uniqueTokens
