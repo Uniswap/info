@@ -476,7 +476,7 @@ export const Search = ({ small = false }) => {
           {filteredMarketsList.slice(0, marketsShown).map(market => {
             return (
               <div key={market.id}>
-                <BasicLink to={'/market/' + market.id} onClick={onDismiss}>
+                <BasicLink to={'/pair/' + market.id} onClick={onDismiss}>
                   <MenuItem>
                     <RowFixed>
                       <TokenLogo address={market.id} style={{ marginRight: '10px' }} />
@@ -485,7 +485,7 @@ export const Search = ({ small = false }) => {
                     </RowFixed>
                   </MenuItem>
                 </BasicLink>
-                <BasicLink to={'/market/' + market.id} onClick={onDismiss}>
+                <BasicLink to={'/pair/' + market.id} onClick={onDismiss}>
                   <MenuItem>
                     <RowFixed>
                       <TokenLogo address={market.id} style={{ marginRight: '10px' }} />

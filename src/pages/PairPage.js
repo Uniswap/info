@@ -30,6 +30,7 @@ import { usePathDismissed, useSavedPairs } from '../contexts/LocalStorage'
 import { Bookmark, PlusCircle } from 'react-feather'
 import FormattedName from '../components/FormattedName'
 import { useListedTokens } from '../contexts/Application'
+import { useAllMarketData } from '../contexts/Markets'
 
 const DashboardWrapper = styled.div`
   width: 100%;
@@ -106,8 +107,11 @@ const WarningGrouping = styled.div`
   pointer-events: ${({ disabled }) => disabled && 'none'};
 `
 
+// TODO currently using mock data for market pairs
+const TEMP_PAIR_ADDRESS = '0xbb2b8038a1640196fbe3e38816f3e67cba72d940'
+
 function PairPage({ pairAddress, history }) {
-  const {
+  let {
     token0,
     token1,
     reserve0,
@@ -119,14 +123,22 @@ function PairPage({ pairAddress, history }) {
     oneDayVolumeUntracked,
     volumeChangeUntracked,
     liquidityChangeUSD
-  } = usePairData(pairAddress)
+  } = usePairData(TEMP_PAIR_ADDRESS)
 
   useEffect(() => {
     document.querySelector('body').scrollTo(0, 0)
   }, [])
+  const transactions = usePairTransactions(TEMP_PAIR_ADDRESS)
+  const backgroundColor = useColor(TEMP_PAIR_ADDRESS)
+  const { markets } = useAllMarketData()
 
-  const transactions = usePairTransactions(pairAddress)
-  const backgroundColor = useColor(pairAddress)
+  // Overwrite token0 data with market date
+  const selectedMarket = markets.find(market => market.id === pairAddress)
+  if (selectedMarket && token0) {
+    token0.id = selectedMarket?.id
+    token0.name = selectedMarket?.description
+    token0.symbol = selectedMarket?.description
+  }
 
   // liquidity
   const liquidity = trackedReserveUSD
@@ -207,7 +219,7 @@ function PairPage({ pairAddress, history }) {
         type={'pair'}
         show={!dismissed && listedTokens && !(listedTokens.includes(token0?.id) && listedTokens.includes(token1?.id))}
         setShow={markAsDismissed}
-        address={pairAddress}
+        address={TEMP_PAIR_ADDRESS}
       />
       <ContentWrapperLarge>
         <RowBetween>
@@ -250,8 +262,10 @@ function PairPage({ pairAddress, history }) {
                   mt={below1080 && '1rem'}
                   style={{ flexDirection: below1080 ? 'row-reverse' : 'initial' }}
                 >
-                  {!!!savedPairs[pairAddress] && !below1080 ? (
-                    <Hover onClick={() => addPair(pairAddress, token0.id, token1.id, token0.symbol, token1.symbol)}>
+                  {!!!savedPairs[TEMP_PAIR_ADDRESS] && !below1080 ? (
+                    <Hover
+                      onClick={() => addPair(TEMP_PAIR_ADDRESS, token0.id, token1.id, token0.symbol, token1.symbol)}
+                    >
                       <StyledIcon>
                         <PlusCircle style={{ marginRight: '0.5rem' }} />
                       </StyledIcon>
@@ -387,7 +401,7 @@ function PairPage({ pairAddress, history }) {
                 </Panel>
                 <Panel style={{ gridColumn: below1080 ? '1' : '2/4', gridRow: below1080 ? '' : '1/5' }}>
                   <PairChart
-                    address={pairAddress}
+                    address={TEMP_PAIR_ADDRESS}
                     color={backgroundColor}
                     base0={reserve1 / reserve0}
                     base1={reserve0 / reserve1}
@@ -428,9 +442,9 @@ function PairPage({ pairAddress, history }) {
                     <TYPE.main>Pair Address</TYPE.main>
                     <AutoRow align="flex-end">
                       <TYPE.main style={{ marginTop: '.5rem' }}>
-                        {pairAddress.slice(0, 6) + '...' + pairAddress.slice(38, 42)}
+                        {TEMP_PAIR_ADDRESS.slice(0, 6) + '...' + TEMP_PAIR_ADDRESS.slice(38, 42)}
                       </TYPE.main>
-                      <CopyHelper toCopy={pairAddress} />
+                      <CopyHelper toCopy={TEMP_PAIR_ADDRESS} />
                     </AutoRow>
                   </Column>
                   <Column>
@@ -462,7 +476,7 @@ function PairPage({ pairAddress, history }) {
                     </AutoRow>
                   </Column>
                   <ButtonLight color={backgroundColor}>
-                    <Link color={backgroundColor} external href={'https://etherscan.io/address/' + pairAddress}>
+                    <Link color={backgroundColor} external href={'https://etherscan.io/address/' + TEMP_PAIR_ADDRESS}>
                       View on Etherscan ↗
                     </Link>
                   </ButtonLight>

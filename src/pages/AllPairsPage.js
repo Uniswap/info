@@ -19,7 +19,7 @@ function AllPairsPage() {
     markets.forEach(market => {
       PARA_AUGUR_TOKENS.forEach(token => {
         marketTokenPairObject[`${market.id}${token}`] = {
-          id: `${market.id}${token}`,
+          id: `${market.id}`,
           token0: {
             id: token,
             symbol: token === PARA_AUGUR_TOKENS[0] ? 'ETH' : 'DAI',

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { withRouter } from 'react-router-dom'
-import { Box } from 'rebass'
+// import { Box } from 'rebass'
 import styled from 'styled-components'
 
 import { AutoRow, RowBetween } from '../components/Row'
@@ -9,11 +9,11 @@ import TopMarketList from '../components/MarketList'
 import Search from '../components/Search'
 import GlobalStats from '../components/GlobalStats'
 
-import { useGlobalData } from '../contexts/GlobalData'
+// import { useGlobalData } from '../contexts/GlobalData'
 import { useMedia } from 'react-use'
 import Panel from '../components/Panel'
 import { useAllMarketData } from '../contexts/Markets'
-import { formattedNum, formattedPercent } from '../utils'
+// import { formattedNum, formattedPercent } from '../utils'
 import { TYPE, ThemedBackground } from '../Theme'
 import { transparentize } from 'polished'
 import { CustomLink } from '../components/Link'
@@ -34,7 +34,7 @@ const ListOptions = styled(AutoRow)`
 function GlobalPage() {
   // get data for lists and totals
   const { markets } = useAllMarketData()
-  const { totalLiquidityUSD, oneDayVolumeUSD, volumeChangeUSD, liquidityChangeUSD } = useGlobalData()
+  // const { totalLiquidityUSD, oneDayVolumeUSD, volumeChangeUSD, liquidityChangeUSD } = useGlobalData()
 
   // breakpoints
   const below800 = useMedia('(max-width: 800px)')
@@ -59,7 +59,7 @@ function GlobalPage() {
             <GlobalStats />
           </AutoColumn>
           {true /* {below800 && ( // mobile card */}
-          <Box mb={20}>
+          {/* <Box mb={20}>
             <Panel>
               <Box>
                 <AutoColumn gap="36px">
@@ -90,7 +90,7 @@ function GlobalPage() {
                 </AutoColumn>
               </Box>
             </Panel>
-          </Box>
+          </Box> */}
           {/* )} */}
           {/* {!below800 && (
             <GridRow>

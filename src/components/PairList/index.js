@@ -135,7 +135,6 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
     const pairData = pairs[pairAddress]
 
     if (pairData && pairData.token0 && pairData.token1) {
-
       return (
         <DashGrid style={{ height: '48px' }} disbaleLinks={disbaleLinks} focus={true}>
           <DataText area="name" fontWeight="500">
@@ -146,7 +145,11 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
               a1={pairData.token1.id}
               margin={!below740}
             />
-            <CustomLink style={{ marginLeft: '20px', whiteSpace: 'nowrap' }} to={'/pair/' + pairAddress} color={color}>
+            <CustomLink
+              style={{ marginLeft: '20px', whiteSpace: 'nowrap' }}
+              to={'/pair/' + pairs[pairAddress].id} // Placeholder
+              color={color}
+            >
               <FormattedName
                 text={pairData.token0.symbol + '-' + pairData.token1.symbol}
                 maxCharacters={below600 ? 75 : 100}
