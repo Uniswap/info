@@ -69,7 +69,7 @@ function App() {
   useLayoutEffect(() => {
     const root = document.getElementById('root')
 
-    root.style.height = '100%'
+    root.style.height = '100px'
   }, [])
 
   return (
