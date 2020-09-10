@@ -1,35 +1,22 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react'
 import { ResponsiveContainer } from 'recharts'
 import { timeframeOptions } from '../../constants'
-import { useMedia } from 'react-use'
-import DropdownSelect from '../DropdownSelect'
 import TradingViewChart, { CHART_TYPES } from '../TradingviewChart'
-import { RowFixed } from '../Row'
-import { OptionButton } from '../ButtonStyled'
 import { getTimeframe } from '../../utils'
-import { TYPE } from '../../Theme'
-import { useAllPrices } from '../../contexts/Price'
-import { useLiquidity } from '../../contexts/Liquidity'
-import { ASSETS } from '../../constants/assets'
 import { useLiquidityChart } from '../../contexts/LiquidityChart'
-import { useTotalLiquidity } from '../../contexts/TokenData2'
+import { useTotalLiquidity } from '../../contexts/TokenData'
 
 const CHART_VIEW = {
   VOLUME: 'Volume',
   LIQUIDITY: 'Liquidity'
 }
 
-const VOLUME_WINDOW = {
-  WEEKLY: 'WEEKLY',
-  DAYS: 'DAYS'
-}
 const GlobalChart = ({ display }) => {
   // chart options
-  const [chartView, setChartView] = useState(display === 'volume' ? CHART_VIEW.VOLUME : CHART_VIEW.LIQUIDITY)
+  const [chartView] = useState(display === 'volume' ? CHART_VIEW.VOLUME : CHART_VIEW.LIQUIDITY)
 
   // time window and window size for chart
   const timeWindow = timeframeOptions.ALL_TIME
-  const [volumeWindow, setVolumeWindow] = useState(VOLUME_WINDOW.DAYS)
 
   const totalLiquidity = useTotalLiquidity()
   const dailyData = useLiquidityChart()
@@ -55,7 +42,6 @@ const GlobalChart = ({ display }) => {
         })
     )
   }, [dailyData, utcStartTime])
-  const below800 = useMedia('(max-width: 800px)')
 
   // update the width on a window resize
   const ref = useRef()

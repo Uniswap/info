@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import styled from 'styled-components'
 import { PieChart, Pie, Cell, Tooltip } from 'recharts'
-import { formattedNum, toNiceDateYear } from '../../utils'
+import { formattedNum } from '../../utils'
 
 const ChartWrapper = styled.div`
   height: 100%;

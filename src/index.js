@@ -4,16 +4,11 @@ import ReactGA from 'react-ga'
 import { isMobile } from 'react-device-detect'
 import ThemeProvider, { GlobalStyle } from './Theme'
 import LocalStorageContextProvider, { Updater as LocalStorageContextUpdater } from './contexts/LocalStorage'
-import TokenDataContextProvider, { Updater as TokenDataContextUpdater } from './contexts/TokenData'
-import GlobalDataContextProvider from './contexts/GlobalData'
-import PairDataContextProvider, { Updater as PairDataContextUpdater } from './contexts/PairData'
-import ApplicationContextProvider from './contexts/Application'
-import UserContextProvider from './contexts/User'
 import ProvidersContextProvider, { Updater as ProvidersUpdater } from './contexts/Providers'
 import PriceContextProvider, { Updater as PriceContextUpdater } from './contexts/Price'
 import LiquidityContextProvider, { Updater as LiquidityContextUpdater } from './contexts/Liquidity'
 import HistoryContextProvider from './contexts/History'
-import TokenData2ContextProvider, { Updater as TokenData2ContextUpdater } from './contexts/TokenData2'
+import TokenDataContextProvider, { Updater as TokenDataContextUpdater } from './contexts/TokenData'
 import LiquidityChartContextProvider, { Updater as LiquidityChartContextUpdater } from './contexts/LiquidityChart'
 import RewardsChartContextProvider, { Updater as RewardsChartContextUpdater } from './contexts/Rewards'
 
@@ -36,23 +31,14 @@ function ContextProviders({ children }) {
       <RewardsChartContextProvider>
         <LiquidityChartContextProvider>
           <ProvidersContextProvider>
-            <TokenData2ContextProvider>
+            <TokenDataContextProvider>
               <PriceContextProvider>
                 <LiquidityContextProvider>
-                  <HistoryContextProvider>
-                    <ApplicationContextProvider>
-                      <TokenDataContextProvider>
-                        <GlobalDataContextProvider>
-                          <PairDataContextProvider>
-                            <UserContextProvider>{children}</UserContextProvider>
-                          </PairDataContextProvider>
-                        </GlobalDataContextProvider>
-                      </TokenDataContextProvider>
-                    </ApplicationContextProvider>
-                  </HistoryContextProvider>
+                  <HistoryContextProvider>{children}</HistoryContextProvider>
                 </LiquidityContextProvider>
               </PriceContextProvider>
-            </TokenData2ContextProvider>
+              F
+            </TokenDataContextProvider>
           </ProvidersContextProvider>
         </LiquidityChartContextProvider>
       </RewardsChartContextProvider>
@@ -65,11 +51,9 @@ function Updaters() {
     <>
       <LocalStorageContextUpdater />
       <LiquidityChartContextUpdater />
-      <PairDataContextUpdater />
       <TokenDataContextUpdater />
       <PriceContextUpdater />
       <LiquidityContextUpdater />
-      <TokenData2ContextUpdater />
       <ProvidersUpdater />
       <RewardsChartContextUpdater />
     </>

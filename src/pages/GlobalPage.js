@@ -9,7 +9,6 @@ import TxnList from '../components/TxnList'
 import GlobalChart from '../components/GlobalChart'
 import GlobalStats from '../components/GlobalStats'
 
-import { useGlobalTransactions } from '../contexts/GlobalData'
 import { useHistory } from '../contexts/History'
 import { useMedia } from 'react-use'
 import Panel from '../components/Panel'
@@ -18,7 +17,7 @@ import { transparentize } from 'polished'
 import { CustomLink } from '../components/Link'
 
 import { PageWrapper, ContentWrapper } from '../components'
-import { useAllTokens } from '../contexts/TokenData2'
+import { useAllTokens } from '../contexts/TokenData'
 
 const ListOptions = styled(AutoRow)`
   height: 40px;
@@ -45,7 +44,6 @@ function GlobalPage() {
   // const allPairs = useAllPairData();
   const tokens = useAllTokens()
 
-  const transactions = useGlobalTransactions()
   const history = useHistory()
 
   // breakpoints
@@ -101,7 +99,7 @@ function GlobalPage() {
           </span>
 
           <Panel style={{ margin: '1rem 0' }}>
-            <TxnList transactions={transactions} history={history} />
+            <TxnList history={history} />
           </Panel>
         </div>
       </ContentWrapper>

@@ -3,15 +3,13 @@ import styled from 'styled-components'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 
-import { formatDate, formattedNum, parseRawNumber } from '../../utils'
+import { formatDate } from '../../utils'
 import { useMedia } from 'react-use'
-import { RowBetween } from '../Row'
 
 import LocalLoader from '../LocalLoader'
 import { Box, Flex, Text } from 'rebass'
 import Link from '../Link'
 import { Divider, EmptyCard } from '..'
-import DropdownSelect from '../DropdownSelect'
 import FormattedName from '../FormattedName'
 import { TYPE } from '../../Theme'
 import { ASSETS_MAP } from '../../constants/assets'
@@ -138,7 +136,7 @@ function TxnList({ history, color }) {
   // sorting
   const [sortDirection, setSortDirection] = useState(true)
   const [sortedColumn, setSortedColumn] = useState(SORT_FIELD.TIMESTAMP)
-  const [txFilter, setTxFilter] = useState(TXN_TYPE.ALL)
+  const [txFilter] = useState(TXN_TYPE.ALL)
 
   useEffect(() => {
     setMaxPage(1) // edit this to do modular

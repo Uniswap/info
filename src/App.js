@@ -1,7 +1,5 @@
 import React from 'react'
 import styled from 'styled-components'
-import { ApolloProvider } from 'react-apollo'
-import { client } from './apollo/client'
 import { Route, Switch, BrowserRouter, Redirect } from 'react-router-dom'
 import GlobalPage from './pages/GlobalPage'
 import TokenPage from './pages/TokenPage'
@@ -15,7 +13,7 @@ import { useLiquidityChart } from './contexts/LiquidityChart'
 import { useLiquidity } from './contexts/Liquidity'
 import { useAllPrices } from './contexts/Price'
 import RewardsPage from './pages/RewardsPage'
-import { useTotalLiquidity } from './contexts/TokenData2'
+import { useTotalLiquidity } from './contexts/TokenData'
 
 const AppWrapper = styled.div`
   position: relative;
@@ -67,66 +65,64 @@ function App() {
   const totalLiquidity = useTotalLiquidity()
 
   return (
-    <ApolloProvider client={client}>
-      <AppWrapper>
-        {totalLiquidity && liquidityData && prices && globalChartData && Object.keys(globalChartData).length > 0 ? (
-          <BrowserRouter>
-            <Switch>
-              <Route
-                exacts
-                strict
-                path="/asset/:asset"
-                render={({ match }) => {
+    <AppWrapper>
+      {totalLiquidity && liquidityData && prices && globalChartData && Object.keys(globalChartData).length > 0 ? (
+        <BrowserRouter>
+          <Switch>
+            <Route
+              exacts
+              strict
+              path="/asset/:asset"
+              render={({ match }) => {
+                return (
+                  <LayoutWrapper>
+                    <TokenPage asset={match.params.asset} />
+                  </LayoutWrapper>
+                )
+              }}
+            />
+            <Route
+              exacts
+              strict
+              path="/account/:accountAddress"
+              render={({ match }) => {
+                if (isAddress(match.params.accountAddress.toLowerCase())) {
                   return (
                     <LayoutWrapper>
-                      <TokenPage asset={match.params.asset} />
+                      <AccountPage account={match.params.accountAddress.toLowerCase()} />
                     </LayoutWrapper>
                   )
-                }}
-              />
-              <Route
-                exacts
-                strict
-                path="/account/:accountAddress"
-                render={({ match }) => {
-                  if (isAddress(match.params.accountAddress.toLowerCase())) {
-                    return (
-                      <LayoutWrapper>
-                        <AccountPage account={match.params.accountAddress.toLowerCase()} />
-                      </LayoutWrapper>
-                    )
-                  } else {
-                    return <Redirect to="/home" />
-                  }
-                }}
-              />
+                } else {
+                  return <Redirect to="/home" />
+                }
+              }}
+            />
 
-              <Route path="/home">
-                <LayoutWrapper>
-                  <GlobalPage />
-                </LayoutWrapper>
-              </Route>
+            <Route path="/home">
+              <LayoutWrapper>
+                <GlobalPage />
+              </LayoutWrapper>
+            </Route>
 
-              <Route path="/assets">
-                <LayoutWrapper>
-                  <AllTokensPage />
-                </LayoutWrapper>
-              </Route>
+            <Route path="/assets">
+              <LayoutWrapper>
+                <AllTokensPage />
+              </LayoutWrapper>
+            </Route>
 
-              <Route path="/rewards">
-                <LayoutWrapper>
-                  <RewardsPage />
-                </LayoutWrapper>
-              </Route>
+            <Route path="/rewards">
+              <LayoutWrapper>
+                <RewardsPage />
+              </LayoutWrapper>
+            </Route>
 
-              <Redirect to="/home" />
-            </Switch>
-          </BrowserRouter>
-        ) : (
-          <LocalLoader fill="true" />
-        )}
-      </AppWrapper>
-    </ApolloProvider>
+            <Redirect to="/home" />
+          </Switch>
+        </BrowserRouter>
+      ) : (
+        <LocalLoader fill="true" />
+      )}
+    </AppWrapper>
   )
 }
 

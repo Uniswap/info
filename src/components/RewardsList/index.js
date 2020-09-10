@@ -3,18 +3,15 @@ import styled from 'styled-components'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 
-import { formatDate, formattedNum, parseRawNumber } from '../../utils'
+import { formattedNum } from '../../utils'
 import { useMedia } from 'react-use'
-import { RowBetween } from '../Row'
 
 import LocalLoader from '../LocalLoader'
 import { Box, Flex, Text } from 'rebass'
 import Link from '../Link'
 import { Divider, EmptyCard } from '..'
-import DropdownSelect from '../DropdownSelect'
 import FormattedName from '../FormattedName'
 import { TYPE } from '../../Theme'
-import { ASSETS_MAP } from '../../constants/assets'
 
 dayjs.extend(utc)
 
@@ -160,7 +157,6 @@ function RewardsList({ rewards, color }) {
       })
       .slice(ITEMS_PER_PAGE * (page - 1), page * ITEMS_PER_PAGE)
 
-  const below1080 = useMedia('(max-width: 1080px)')
   const below780 = useMedia('(max-width: 780px)')
 
   const ListItem = ({ item }) => {

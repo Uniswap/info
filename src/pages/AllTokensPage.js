@@ -6,9 +6,8 @@ import { TYPE } from '../Theme'
 import Panel from '../components/Panel'
 import { PageWrapper, FullWrapper } from '../components'
 import { RowBetween } from '../components/Row'
-import Search from '../components/Search'
 import { useMedia } from 'react-use'
-import { useAllTokens } from '../contexts/TokenData2'
+import { useAllTokens } from '../contexts/TokenData'
 
 function AllTokensPage() {
   const tokens = useAllTokens()
@@ -24,7 +23,6 @@ function AllTokensPage() {
       <FullWrapper>
         <RowBetween>
           <TYPE.largeHeader>Top Assets</TYPE.largeHeader>
-          {!below600 && <Search small={true} />}
         </RowBetween>
         <Panel style={{ marginTop: '6px', padding: below600 && '1rem 0 0 0 ' }}>
           <TopTokenList tokens={Object.values(tokens)} itemMax={50} />

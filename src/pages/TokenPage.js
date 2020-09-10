@@ -12,7 +12,6 @@ import { AutoColumn } from '../components/Column'
 import TxnList from '../components/TxnList'
 import TokenChart from '../components/TokenChart'
 import { BasicLink } from '../components/Link'
-import Search from '../components/Search'
 import { safeAccess } from '../utils'
 
 import { TYPE, ThemedBackground } from '../Theme'
@@ -23,7 +22,7 @@ import { useMedia } from 'react-use'
 import { PageWrapper, ContentWrapper } from '../components'
 
 import FormattedName from '../components/FormattedName'
-import { useToken } from '../contexts/TokenData2'
+import { useToken } from '../contexts/TokenData'
 import { useHistoryForAsset } from '../contexts/History'
 import { useLiquidityForAsset } from '../contexts/Liquidity'
 import { useProviders } from '../contexts/Providers'
@@ -93,9 +92,6 @@ function TokenPage({ asset }) {
   const { symbol, priceUSD, totalLiquidityUSD } = token
 
   const below1080 = useMedia('(max-width: 1080px)')
-  const below800 = useMedia('(max-width: 800px)')
-  const below600 = useMedia('(max-width: 600px)')
-  const below500 = useMedia('(max-width: 500px)')
 
   useEffect(() => {
     window.scrollTo({
@@ -118,7 +114,6 @@ function TokenPage({ asset }) {
 
             <Text style={{ marginLeft: '.15rem' }} fontSize={'14px'} fontWeight={400}></Text>
           </AutoRow>
-          {!below600 && <Search small={true} />}
         </RowBetween>
 
         <WarningGrouping>
