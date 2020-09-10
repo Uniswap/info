@@ -112,7 +112,7 @@ function SideNav({ history }) {
     <Wrapper isMobile={below1080}>
       {!below1080 ? (
         <DesktopWrapper>
-          <AutoColumn gap="1rem" style={{ marginLeft: '.75rem', marginTop: '1.5rem' }}>
+          <AutoColumn gap="3.5rem" style={{ marginLeft: '.75rem', marginTop: '1.5rem' }}>
             <Title />
             {!below1080 && (
               <AutoColumn gap="1.25rem" style={{ marginTop: '1rem' }}>
@@ -122,7 +122,7 @@ function SideNav({ history }) {
                     Overview
                   </Option>
                 </BasicLink>
-                <BasicLink to="/tokens">
+                <BasicLink to="/assets">
                   <Option
                     activeText={
                       (history.location.pathname.split('/')[1] === 'tokens' ||
@@ -131,32 +131,13 @@ function SideNav({ history }) {
                     }
                   >
                     <Disc size={20} style={{ marginRight: '.75rem' }} />
-                    Tokens
+                    Assets
                   </Option>
                 </BasicLink>
-                {/* <BasicLink to="/pairs">
-                  <Option
-                    activeText={
-                      (history.location.pathname.split('/')[1] === 'pairs' ||
-                        history.location.pathname.split('/')[1] === 'pair') ??
-                      undefined
-                    }
-                  >
-                    <PieChart size={20} style={{ marginRight: '.75rem' }} />
-                    Pairs
-                  </Option>
-                </BasicLink> */}
-
-                <BasicLink to="/accounts">
-                  <Option
-                    activeText={
-                      (history.location.pathname.split('/')[1] === 'accounts' ||
-                        history.location.pathname.split('/')[1] === 'account') ??
-                      undefined
-                    }
-                  >
-                    <List size={20} style={{ marginRight: '.75rem' }} />
-                    Accounts
+                <BasicLink to="/rewards">
+                  <Option activeText={history.location.pathname === '/rewards' ?? undefined}>
+                    <TrendingUp size={20} style={{ marginRight: '.75rem' }} />
+                    Rewards
                   </Option>
                 </BasicLink>
               </AutoColumn>

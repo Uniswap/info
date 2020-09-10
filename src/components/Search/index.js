@@ -501,7 +501,7 @@ export const Search = ({ small = false }) => {
           )}
           {filteredTokenList.slice(0, tokensShown).map(token => {
             return (
-              <BasicLink to={'/token/' + token.id} key={token.id} onClick={onDismiss}>
+              <BasicLink to={'/asset/' + token.id} key={token.id} onClick={onDismiss}>
                 <MenuItem>
                   <RowFixed>
                     <TokenLogo address={token.id} style={{ marginRight: '10px' }} />

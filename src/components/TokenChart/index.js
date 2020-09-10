@@ -1,10 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import styled from 'styled-components'
-import { PieChart, Pie, Cell } from 'recharts'
-
-import { OptionButton } from '../ButtonStyled'
-import { useProviders } from '../../contexts/Providers'
-import { safeAccess } from '../../utils'
+import { PieChart, Pie, Cell, Tooltip } from 'recharts'
+import { formattedNum, toNiceDateYear } from '../../utils'
 
 const ChartWrapper = styled.div`
   height: 100%;
@@ -30,7 +27,7 @@ const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, per
   )
 }
 
-const TokenChart = ({ data }) => {
+const TokenChart = ({ data, color, asset }) => {
   const ref = useRef()
   const isClient = typeof window === 'object'
   const [width, setWidth] = useState(ref?.current?.container?.clientWidth)
@@ -50,6 +47,7 @@ const TokenChart = ({ data }) => {
     <ChartWrapper>
       <PieChart width={650} height={400}>
         <Pie
+          dataKey="value"
           data={data}
           cx={300}
           cy={200}
@@ -58,10 +56,24 @@ const TokenChart = ({ data }) => {
           outerRadius={180}
           fill="#8884d8"
         >
-          {data.map((entry, index) => (
-            <Cell fill={COLORS[index % COLORS.length]} />
-          ))}
+          {data.map((entry, index) => {
+            return <Cell key={entry.name} fill={COLORS[index % COLORS.length]} />
+          })}
         </Pie>{' '}
+        <Tooltip
+          cursor={true}
+          formatter={val => {
+            return <strong>{`${formattedNum(val)} ${asset}`}</strong>
+          }}
+          labelFormatter={label => label}
+          labelStyle={{ paddingTop: 4 }}
+          contentStyle={{
+            padding: '10px 14px',
+            borderRadius: 10,
+            color: 'black'
+          }}
+          wrapperStyle={{ top: -70, left: -10 }}
+        />
       </PieChart>
     </ChartWrapper>
   )

@@ -1,7 +1,6 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react'
 import { ResponsiveContainer } from 'recharts'
 import { timeframeOptions } from '../../constants'
-import { useGlobalChartData, useGlobalData } from '../../contexts/GlobalData'
 import { useMedia } from 'react-use'
 import DropdownSelect from '../DropdownSelect'
 import TradingViewChart, { CHART_TYPES } from '../TradingviewChart'
@@ -12,6 +11,8 @@ import { TYPE } from '../../Theme'
 import { useAllPrices } from '../../contexts/Price'
 import { useLiquidity } from '../../contexts/Liquidity'
 import { ASSETS } from '../../constants/assets'
+import { useLiquidityChart } from '../../contexts/LiquidityChart'
+import { useTotalLiquidity } from '../../contexts/TokenData2'
 
 const CHART_VIEW = {
   VOLUME: 'Volume',
@@ -24,46 +25,20 @@ const VOLUME_WINDOW = {
 }
 const GlobalChart = ({ display }) => {
   // chart options
-  const [totalLiquidity, setTotalLiquidity] = useState(0)
   const [chartView, setChartView] = useState(display === 'volume' ? CHART_VIEW.VOLUME : CHART_VIEW.LIQUIDITY)
 
   // time window and window size for chart
   const timeWindow = timeframeOptions.ALL_TIME
   const [volumeWindow, setVolumeWindow] = useState(VOLUME_WINDOW.DAYS)
 
-  const prices = useAllPrices()
-  const liquidity = useLiquidity()
-
-  useEffect(() => {
-    let _totalLiquidity = 0
-    ASSETS.forEach(token => {
-      if (prices && liquidity) {
-        const p = prices[token.symbol] || 0
-        const l = liquidity[token.symbol] || 0
-
-        _totalLiquidity += l * p
-      }
-    })
-    setTotalLiquidity(_totalLiquidity)
-  }, [prices, liquidity])
-
-  // global historical data
-  const [dailyData, weeklyData] = useGlobalChartData()
-
-  const {
-    totalLiquidityUSD
-    // oneDayVolumeUSD,
-    // volumeChangeUSD,
-    // liquidityChangeUSD,
-    // oneWeekVolume,
-    // weeklyVolumeChange
-  } = useGlobalData()
+  const totalLiquidity = useTotalLiquidity()
+  const dailyData = useLiquidityChart()
 
   // based on window, get starttim
   let utcStartTime = getTimeframe(timeWindow)
 
   const chartDataFiltered = useMemo(() => {
-    let currentData = volumeWindow === VOLUME_WINDOW.DAYS ? dailyData : weeklyData
+    let currentData = dailyData
     return (
       currentData &&
       Object.keys(currentData)
@@ -79,10 +54,8 @@ const GlobalChart = ({ display }) => {
           return !!item
         })
     )
-  }, [dailyData, utcStartTime, volumeWindow, weeklyData])
+  }, [dailyData, utcStartTime])
   const below800 = useMedia('(max-width: 800px)')
-
-  console.log(chartDataFiltered)
 
   // update the width on a window resize
   const ref = useRef()
@@ -101,83 +74,18 @@ const GlobalChart = ({ display }) => {
 
   return chartDataFiltered ? (
     <>
-      {below800 && (
-        <DropdownSelect options={CHART_VIEW} active={chartView} setActive={setChartView} color={'#ff007a'} />
-      )}
-
       {chartDataFiltered && chartView === CHART_VIEW.LIQUIDITY && (
         <ResponsiveContainer aspect={60 / 28} ref={ref}>
           <TradingViewChart
-            data={[
-              {
-                date: '1598572800',
-                totalLiquidityUSD: '17043.42886349621537016424864454717'
-              },
-              {
-                date: '1598659200',
-                totalLiquidityUSD: '18043.42886349621537016424864454717'
-              },
-              {
-                date: '1598745600',
-                totalLiquidityUSD: '17043.42886349621537016424864454717'
-              },
-              {
-                date: '1598832000',
-                totalLiquidityUSD: '57043.42886349621537016424864454717'
-              },
-              {
-                date: '1598918400',
-                totalLiquidityUSD: '67043.42886349621537016424864454717'
-              },
-              {
-                date: '1599004800',
-                totalLiquidityUSD: '77043.42886349621537016424864454717'
-              },
-              {
-                date: '1599091200',
-                totalLiquidityUSD: '87043.42886349621537016424864454717'
-              }
-            ]}
-            // data={dailyData}
+            data={dailyData}
             base={Number(totalLiquidity)}
             baseChange={0}
             title="Liquidity"
-            field="totalLiquidityUSD"
+            field="totalLiquidityUsd"
             width={width}
             type={CHART_TYPES.AREA}
           />
         </ResponsiveContainer>
-      )}
-      {/* {chartDataFiltered && chartView === CHART_VIEW.VOLUME && (
-        <ResponsiveContainer aspect={60 / 28}>
-          <TradingViewChart
-            data={chartDataFiltered}
-            base={volumeWindow === VOLUME_WINDOW.WEEKLY ? oneWeekVolume : oneDayVolumeUSD}
-            baseChange={volumeWindow === VOLUME_WINDOW.WEEKLY ? weeklyVolumeChange : volumeChangeUSD}
-            title={volumeWindow === VOLUME_WINDOW.WEEKLY ? 'Volume (7d)' : 'Volume'}
-            field={volumeWindow === VOLUME_WINDOW.WEEKLY ? 'weeklyVolumeUSD' : 'dailyVolumeUSD'}
-            width={width}
-            type={CHART_TYPES.BAR}
-            useWeekly={volumeWindow === VOLUME_WINDOW.WEEKLY}
-          />
-        </ResponsiveContainer>
-      )} */}
-      {display === 'volume' && (
-        <RowFixed style={{ bottom: '70px', position: 'absolute', left: '20px', zIndex: 10 }}>
-          <OptionButton
-            active={volumeWindow === VOLUME_WINDOW.DAYS}
-            onClick={() => setVolumeWindow(VOLUME_WINDOW.DAYS)}
-          >
-            <TYPE.body>D</TYPE.body>
-          </OptionButton>
-          <OptionButton
-            style={{ marginLeft: '4px' }}
-            active={volumeWindow === VOLUME_WINDOW.WEEKLY}
-            onClick={() => setVolumeWindow(VOLUME_WINDOW.WEEKLY)}
-          >
-            <TYPE.body>W</TYPE.body>
-          </OptionButton>
-        </RowFixed>
       )}
     </>
   ) : (

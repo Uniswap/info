@@ -3,19 +3,17 @@ import 'feather-icons'
 import { withRouter } from 'react-router-dom'
 import { Text } from 'rebass'
 import styled from 'styled-components'
-import Link from '../components/Link'
 import Panel from '../components/Panel'
 import TokenLogo from '../components/TokenLogo'
 
 import Loader from '../components/LocalLoader'
 import { AutoRow, RowBetween, RowFixed } from '../components/Row'
 import { AutoColumn } from '../components/Column'
-import { ButtonLight, ButtonDark } from '../components/ButtonStyled'
 import TxnList from '../components/TxnList'
 import TokenChart from '../components/TokenChart'
 import { BasicLink } from '../components/Link'
 import Search from '../components/Search'
-import { getPoolLink, getSwapLink, localNumber, safeAccess } from '../utils'
+import { safeAccess } from '../utils'
 
 import { TYPE, ThemedBackground } from '../Theme'
 import { transparentize } from 'polished'
@@ -29,7 +27,6 @@ import { useToken } from '../contexts/TokenData2'
 import { useHistoryForAsset } from '../contexts/History'
 import { useLiquidityForAsset } from '../contexts/Liquidity'
 import { useProviders } from '../contexts/Providers'
-import TokenList from '../components/TokenList'
 import ProvidersList from '../components/ProvidersList'
 
 const DashboardWrapper = styled.div`
@@ -91,7 +88,7 @@ function TokenPage({ asset }) {
     })
 
     setData([...providersData])
-  }, [providers])
+  }, [providers, asset])
 
   const { symbol, priceUSD, totalLiquidityUSD } = token
 
@@ -115,19 +112,11 @@ function TokenPage({ asset }) {
         <RowBetween style={{ flexWrap: 'wrap', alingItems: 'start' }}>
           <AutoRow align="flex-end" style={{ width: 'fit-content' }}>
             <TYPE.body>
-              <BasicLink to="/tokens">{'Tokens '}</BasicLink>→ {symbol}
+              <BasicLink to="/assets">{'Assets '}</BasicLink>→ {symbol}
               {'  '}
             </TYPE.body>
-            <Link
-              style={{ width: 'fit-content' }}
-              color={'#ff007a'}
-              external
-              href={'https://etherscan.io/asset/' + asset}
-            >
-              <Text style={{ marginLeft: '.15rem' }} fontSize={'14px'} fontWeight={400}>
-                ({asset.slice(0, 8) + '...' + asset.slice(36, 42)})
-              </Text>
-            </Link>
+
+            <Text style={{ marginLeft: '.15rem' }} fontSize={'14px'} fontWeight={400}></Text>
           </AutoRow>
           {!below600 && <Search small={true} />}
         </RowBetween>
@@ -137,7 +126,7 @@ function TokenPage({ asset }) {
             <RowBetween style={{ flexWrap: 'wrap', marginBottom: '2rem', alignItems: 'flex-start' }}>
               <RowFixed style={{ flexWrap: 'wrap' }}>
                 <RowFixed style={{ alignItems: 'baseline' }}>
-                  <TokenLogo asset={asset} size="32px" style={{ alignSelf: 'center' }} />
+                  <TokenLogo token={asset} size="32px" style={{ alignSelf: 'center' }} />
                   <TYPE.main fontSize={below1080 ? '1.5rem' : '2rem'} fontWeight={500} style={{ margin: '0 1rem' }}>
                     <RowFixed gap="6px">
                       <FormattedName
@@ -157,18 +146,6 @@ function TokenPage({ asset }) {
                   )}
                 </RowFixed>
               </RowFixed>
-              <span>
-                <RowFixed ml={below500 ? '0' : '2.5rem'} mt={below500 ? '1rem' : '0'}>
-                  <Link href={getPoolLink(asset)} target="_blank">
-                    <ButtonLight color={'#ff007a'}>+ Add Liquidity</ButtonLight>
-                  </Link>
-                  <Link href={getSwapLink(asset)} target="_blank">
-                    <ButtonDark ml={'.5rem'} mr={below1080 && '.5rem'} color={'#ff007a'}>
-                      Trade
-                    </ButtonDark>
-                  </Link>
-                </RowFixed>
-              </span>
             </RowBetween>
 
             <>
@@ -217,7 +194,7 @@ function TokenPage({ asset }) {
                 </Panel>
 
                 <Panel style={{ gridColumn: below1080 ? '1' : '2/4', gridRow: below1080 ? '' : '1/4' }}>
-                  <TokenChart data={data} />
+                  <TokenChart data={data} asset={asset} />
                 </Panel>
               </PanelWrapper>
             </>
@@ -225,7 +202,9 @@ function TokenPage({ asset }) {
             <RowBetween mt={40} mb={'1rem'}>
               <TYPE.main fontSize={'1.125rem'}>Providers</TYPE.main> <div />
             </RowBetween>
-            <Panel rounded>{data ? <ProvidersList color={'#ff007a'} providers={data} /> : <Loader />}</Panel>
+            <Panel rounded>
+              {data ? <ProvidersList color={'#ff007a'} providers={data} asset={asset} /> : <Loader />}
+            </Panel>
 
             <RowBetween mt={40} mb={'1rem'}>
               <TYPE.main fontSize={'1.125rem'}>Transactions</TYPE.main> <div />

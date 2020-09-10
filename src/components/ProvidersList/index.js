@@ -6,14 +6,15 @@ import utc from 'dayjs/plugin/utc'
 import { Flex, Text } from 'rebass'
 import Link from '../Link'
 import { Divider } from '..'
+import { ASSETS_MAP } from '../../constants/assets'
 
 dayjs.extend(utc)
 
 const DashGrid = styled.div`
   display: grid;
   grid-gap: 1em;
-  grid-template-columns: 100px 1fr 1fr;
-  grid-template-areas: 'txn value time';
+  grid-template-columns: 100px 1fr;
+  grid-template-areas: 'address value';
 
   > * {
     justify-content: flex-end;
@@ -37,7 +38,7 @@ const DashGrid = styled.div`
   @media screen and (min-width: 780px) {
     max-width: 1320px;
     grid-template-columns: 3fr 1fr;
-    grid-template-areas: 'txn value amountToken amountOther time';
+    grid-template-areas: 'address value';
 
     > * {
       &:first-child {
@@ -49,7 +50,7 @@ const DashGrid = styled.div`
   @media screen and (min-width: 1080px) {
     max-width: 1320px;
     grid-template-columns: 3fr 1fr;
-    grid-template-areas: 'txn value amountToken amountOther account time';
+    grid-template-areas: 'address value';
   }
 `
 
@@ -82,15 +83,17 @@ const DataText = styled(Flex)`
   }
 `
 
-function ProviderList({ providers }) {
+function ProvidersList({ providers, asset }) {
+  const explorer = ASSETS_MAP[asset].addressExplorer
   const ListItem = ({ item }) => {
     return (
       <DashGrid style={{ height: '48px' }}>
-        <DataText area="txn" fontWeight="500">
-          <Link external>{`${item.name}`}</Link>
+        <DataText area="address" fontWeight="500">
+          <Link external href={`${explorer}${item.name}`}>{`${item.name}`}</Link>
         </DataText>
-        <DataText area="txn" fontWeight="500">
-          <Link external>{`${item.value}`}</Link>
+
+        <DataText area="value" fontWeight="500">
+          <Link external>{`${item.value} ${asset}`}</Link>
         </DataText>
       </DashGrid>
     )
@@ -100,10 +103,11 @@ function ProviderList({ providers }) {
     <>
       <DashGrid center={true} style={{ height: 'fit-content', padding: '0 0 1rem 0' }}>
         <Flex alignItems="center" justifyContent="flexStart">
-          <ClickableText color="textDim" area="value">
+          <ClickableText color="textDim" area="address">
             Address
           </ClickableText>
         </Flex>
+
         <Flex alignItems="center" justifyContent="flexStart">
           <ClickableText color="textDim" area="value">
             Balance
@@ -123,4 +127,4 @@ function ProviderList({ providers }) {
   )
 }
 
-export default ProviderList
+export default ProvidersList

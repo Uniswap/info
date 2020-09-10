@@ -123,7 +123,7 @@ function PinnedData({ history, open, setSavedOpen }) {
                 const token = savedTokens[address]
                 return (
                   <RowBetween key={address}>
-                    <ButtonFaded onClick={() => history.push('/token/' + address)}>
+                    <ButtonFaded onClick={() => history.push('/asset/' + address)}>
                       <RowFixed>
                         <TokenLogo address={address} size={'14px'} />
                         <TYPE.header ml={'6px'}>

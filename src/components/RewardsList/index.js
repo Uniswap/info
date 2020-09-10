@@ -44,7 +44,7 @@ const DashGrid = styled.div`
   display: grid;
   grid-gap: 1em;
   grid-template-columns: 100px 1fr 1fr;
-  grid-template-areas: 'txn amountToken time';
+  grid-template-areas: 'provider reward time';
 
   > * {
     justify-content: flex-end;
@@ -68,7 +68,7 @@ const DashGrid = styled.div`
   @media screen and (min-width: 780px) {
     max-width: 1320px;
     grid-template-columns: 1.2fr 1fr 1fr 1fr;
-    grid-template-areas: 'txn amountToken amountOther time';
+    grid-template-areas: 'provider liquidity reward time';
 
     > * {
       &:first-child {
@@ -79,8 +79,8 @@ const DashGrid = styled.div`
 
   @media screen and (min-width: 1080px) {
     max-width: 1320px;
-    grid-template-columns: 1.2fr 1fr 1fr 1fr 1fr 1fr;
-    grid-template-areas: 'txn amountToken amountOther from to time';
+    grid-template-columns: 1.2fr 1fr 1fr 1fr;
+    grid-template-areas: 'provider liquidity reward time';
   }
 `
 
@@ -120,17 +120,10 @@ const SORT_FIELD = {
   TIMESTAMP: 'expiration'
 }
 
-const TXN_TYPE = {
-  ALL: 'All',
-  SWAP: 'Swaps',
-  ADD: 'Adds',
-  REMOVE: 'Removes'
-}
-
 const ITEMS_PER_PAGE = 10
 
 // @TODO rework into virtualized list
-function TxnList({ history, color }) {
+function RewardsList({ rewards, color }) {
   // page state
   const [page, setPage] = useState(1)
   const [maxPage, setMaxPage] = useState(1)
@@ -138,33 +131,28 @@ function TxnList({ history, color }) {
   // sorting
   const [sortDirection, setSortDirection] = useState(true)
   const [sortedColumn, setSortedColumn] = useState(SORT_FIELD.TIMESTAMP)
-  const [txFilter, setTxFilter] = useState(TXN_TYPE.ALL)
 
   useEffect(() => {
     setMaxPage(1) // edit this to do modular
     setPage(1)
-  }, [history])
+  }, [rewards])
 
   // parse the txns and format for UI
   useEffect(() => {
     let extraPages = 1
-    if (history.length % ITEMS_PER_PAGE === 0) {
+    if (rewards.length % ITEMS_PER_PAGE === 0) {
       extraPages = 0
     }
-    if (history.length === 0) {
+    if (rewards.length === 0) {
       setMaxPage(1)
     } else {
-      setMaxPage(Math.floor(history.length / ITEMS_PER_PAGE) + extraPages)
+      setMaxPage(Math.floor(rewards.length / ITEMS_PER_PAGE) + extraPages)
     }
-  }, [history, txFilter])
-
-  useEffect(() => {
-    setPage(1)
-  }, [txFilter])
+  }, [rewards])
 
   const filteredList =
-    history &&
-    history
+    rewards &&
+    rewards
       .sort((a, b) => {
         return parseFloat(a[sortedColumn]) > parseFloat(b[sortedColumn])
           ? (sortDirection ? -1 : 1) * 1
@@ -178,42 +166,24 @@ function TxnList({ history, color }) {
   const ListItem = ({ item }) => {
     return (
       <DashGrid style={{ height: '48px' }}>
-        <DataText area="txn" fontWeight="500">
-          <Link color={color} external href={`${ASSETS_MAP[item.network].txExplorer}${item.transactionHash}`}>
-            {`Swap ${item.network} for ${item.outputNetwork}`}
+        <DataText area="provider" fontWeight="500">
+          <Link color={color} external>
+            {item.name}
           </Link>
         </DataText>
 
-        <DataText area="amountToken">
-          {item.inputAmountNum} <FormattedName text={item.network} maxCharacters={5} margin={true} />
+        {!below780 && (
+          <DataText area="liquidity">
+            {formattedNum(item.usd, true)} <FormattedName text={item.network} maxCharacters={5} margin={true} />
+          </DataText>
+        )}
+
+        <DataText area="reward">
+          {formattedNum(item.reward, true)}
+          <FormattedName text={item.outputNetwork} maxCharacters={5} margin={true} />
         </DataText>
 
-        {!below780 && (
-          <DataText area="amountOther">
-            {item.outputAmountNum}
-            <FormattedName text={item.outputNetwork} maxCharacters={5} margin={true} />
-          </DataText>
-        )}
-
-        {!below1080 && (
-          <>
-            <DataText area="from">
-              <Link color={color} external href={'https://etherscan.io/address/' + item.account}>
-                {item.sender && item.sender.slice(0, 6) + '...' + item.sender.slice(38, 42)}
-              </Link>
-            </DataText>
-          </>
-        )}
-
-        {!below1080 && (
-          <DataText area="to">
-            <Link color={color} external href={'https://etherscan.io/address/' + item.account}>
-              {item.outputAddress && item.outputAddress.slice(0, 6) + '...' + item.outputAddress.slice(38, 42)}
-            </Link>
-          </DataText>
-        )}
-
-        <DataText area="time">{formatDate(item.expiration)}</DataText>
+        <DataText area="time">{item.date}</DataText>
       </DashGrid>
     )
   }
@@ -222,51 +192,39 @@ function TxnList({ history, color }) {
     <>
       <DashGrid center={true} style={{ height: 'fit-content', padding: '0 0 1rem 0' }}>
         <Flex alignItems="center" justifyContent="flexStart">
-          <TYPE.main area="txn">Pair</TYPE.main>
+          <TYPE.main area="provider">Provider</TYPE.main>
         </Flex>
 
-        <Flex alignItems="center">
-          <ClickableText
-            area="amountToken"
-            color="textDim"
-            onClick={() => {
-              setSortedColumn(SORT_FIELD.AMOUNT0)
-              setSortDirection(sortedColumn !== SORT_FIELD.AMOUNT0 ? true : !sortDirection)
-            }}
-          >
-            Coin Amount
-            {sortedColumn === SORT_FIELD.AMOUNT0 ? (sortDirection ? '↑' : '↓') : ''}
-          </ClickableText>
-        </Flex>
+        {!below780 && (
+          <Flex alignItems="center">
+            <ClickableText
+              area="liquidity"
+              color="textDim"
+              onClick={() => {
+                setSortedColumn(SORT_FIELD.AMOUNT0)
+                setSortDirection(sortedColumn !== SORT_FIELD.AMOUNT0 ? true : !sortDirection)
+              }}
+            >
+              Liquidity
+              {sortedColumn === SORT_FIELD.AMOUNT0 ? (sortDirection ? '↑' : '↓') : ''}
+            </ClickableText>
+          </Flex>
+        )}
 
         <>
-          {!below780 && (
-            <Flex alignItems="center">
-              <ClickableText
-                area="amountOther"
-                color="textDim"
-                onClick={() => {
-                  setSortedColumn(SORT_FIELD.AMOUNT1)
-                  setSortDirection(sortedColumn !== SORT_FIELD.AMOUNT1 ? true : !sortDirection)
-                }}
-              >
-                Coin Amount
-                {sortedColumn === SORT_FIELD.AMOUNT1 ? (sortDirection ? '↑' : '↓') : ''}
-              </ClickableText>
-            </Flex>
-          )}
-
-          {!below1080 && (
-            <Flex alignItems="center">
-              <TYPE.body area="account">From</TYPE.body>
-            </Flex>
-          )}
-
-          {!below1080 && (
-            <Flex alignItems="center">
-              <TYPE.body area="account">To</TYPE.body>
-            </Flex>
-          )}
+          <Flex alignItems="center">
+            <ClickableText
+              area="reward"
+              color="textDim"
+              onClick={() => {
+                setSortedColumn(SORT_FIELD.AMOUNT1)
+                setSortDirection(sortedColumn !== SORT_FIELD.AMOUNT1 ? true : !sortDirection)
+              }}
+            >
+              Reward
+              {sortedColumn === SORT_FIELD.AMOUNT1 ? (sortDirection ? '↑' : '↓') : ''}
+            </ClickableText>
+          </Flex>
 
           <Flex alignItems="center">
             <ClickableText
@@ -277,7 +235,7 @@ function TxnList({ history, color }) {
                 setSortDirection(sortedColumn !== SORT_FIELD.TIMESTAMP ? true : !sortDirection)
               }}
             >
-              Expiration {sortedColumn === SORT_FIELD.TIMESTAMP ? (!sortDirection ? '↑' : '↓') : ''}
+              Date {sortedColumn === SORT_FIELD.TIMESTAMP ? (!sortDirection ? '↑' : '↓') : ''}
             </ClickableText>
           </Flex>
         </>
@@ -320,4 +278,4 @@ function TxnList({ history, color }) {
   )
 }
 
-export default TxnList
+export default RewardsList

@@ -11,15 +11,7 @@ import {
   get2DayPercentChange,
   getTimeframe
 } from '../utils'
-import {
-  GLOBAL_DATA,
-  GLOBAL_TXNS,
-  GLOBAL_CHART,
-  ETH_PRICE,
-  ALL_PAIRS,
-  ALL_TOKENS,
-  TOP_LPS_PER_PAIRS
-} from '../apollo/queries'
+import { GLOBAL_DATA, GLOBAL_TXNS, ETH_PRICE, ALL_PAIRS, ALL_TOKENS, TOP_LPS_PER_PAIRS } from '../apollo/queries'
 import weekOfYear from 'dayjs/plugin/weekOfYear'
 import { useAllPairData } from './PairData'
 const UPDATE = 'UPDATE'
@@ -308,81 +300,6 @@ async function getGlobalData(ethPrice, oldEthPrice) {
 }
 
 /**
- * Get historical data for volume and liquidity used in global charts
- * on main page
- * @param {*} oldestDateToFetch // start of window to fetch from
- */
-const getChartData = async oldestDateToFetch => {
-  let data = []
-  let weeklyData = []
-  const utcEndTime = dayjs.utc()
-  let skip = 0
-  let allFound = false
-
-  try {
-    const response = await axios.get('https://spacejelly.network/candy/api/v1/stats/get')
-
-    const data = response.data
-
-    if (data) {
-      let dayIndexSet = new Set()
-      let dayIndexArray = []
-      const oneDay = 24 * 60 * 60
-
-      // for each day, parse the daily volume and format for chart array
-      data.forEach((dayData, i) => {
-        // add the day index to the set of days
-        dayIndexSet.add((data[i].date / oneDay).toFixed(0))
-        dayIndexArray.push(data[i])
-        dayData.dailyVolumeUSD = parseFloat(dayData.dailyVolumeUSD)
-      })
-
-      // fill in empty days ( there will be no day datas if no trades made that day )
-      let timestamp = data[0].date ? data[0].date : oldestDateToFetch
-      let latestLiquidityUSD = data[0].totalLiquidityUSD
-      let latestDayDats = data[0].mostLiquidTokens
-      let index = 1
-      while (timestamp < utcEndTime.unix() - oneDay) {
-        const nextDay = timestamp + oneDay
-        let currentDayIndex = (nextDay / oneDay).toFixed(0)
-        if (!dayIndexSet.has(currentDayIndex)) {
-          data.push({
-            date: nextDay,
-            dailyVolumeUSD: 0,
-            totalLiquidityUSD: latestLiquidityUSD,
-            mostLiquidTokens: latestDayDats
-          })
-        } else {
-          latestLiquidityUSD = dayIndexArray[index].totalLiquidityUSD
-          latestDayDats = dayIndexArray[index].mostLiquidTokens
-          index = index + 1
-        }
-        timestamp = nextDay
-      }
-    }
-
-    // format weekly data for weekly sized chunks
-    data = data.sort((a, b) => (parseInt(a.date) > parseInt(b.date) ? 1 : -1))
-    let startIndexWeekly = -1
-    let currentWeek = -1
-    data.forEach((entry, i) => {
-      const week = dayjs.utc(dayjs.unix(data[i].date)).week()
-      if (week !== currentWeek) {
-        currentWeek = week
-        startIndexWeekly++
-      }
-      weeklyData[startIndexWeekly] = weeklyData[startIndexWeekly] || {}
-      weeklyData[startIndexWeekly].date = data[i].date
-      weeklyData[startIndexWeekly].weeklyVolumeUSD =
-        (weeklyData[startIndexWeekly].weeklyVolumeUSD ?? 0) + data[i].dailyVolumeUSD
-    })
-  } catch (e) {
-    console.log(e)
-  }
-  return [data, weeklyData]
-}
-
-/**
  * Get and format transactions for global page
  */
 const getGlobalTransactions = async () => {
@@ -578,8 +495,8 @@ export function useGlobalChartData() {
       // historical stuff for chart
 
       if (!stale) {
-        let [newChartData, newWeeklyData] = await getChartData(oldestDateFetch)
-        updateChart(newChartData, newWeeklyData)
+        // let [newChartData, newWeeklyData] = await getChartData(oldestDateFetch)
+        // updateChart(newChartData, newWeeklyData)
       }
     }
     if (oldestDateFetch && !(chartDataDaily && chartDataWeekly)) {

@@ -12,8 +12,10 @@ import UserContextProvider from './contexts/User'
 import ProvidersContextProvider, { Updater as ProvidersUpdater } from './contexts/Providers'
 import PriceContextProvider, { Updater as PriceContextUpdater } from './contexts/Price'
 import LiquidityContextProvider, { Updater as LiquidityContextUpdater } from './contexts/Liquidity'
-import HistoryContextProvider, { Updater as HistoryContextUpdater } from './contexts/History'
+import HistoryContextProvider from './contexts/History'
 import TokenData2ContextProvider, { Updater as TokenData2ContextUpdater } from './contexts/TokenData2'
+import LiquidityChartContextProvider, { Updater as LiquidityChartContextUpdater } from './contexts/LiquidityChart'
+import RewardsChartContextProvider, { Updater as RewardsChartContextUpdater } from './contexts/Rewards'
 
 import App from './App'
 
@@ -31,25 +33,29 @@ if (typeof GOOGLE_ANALYTICS_ID === 'string') {
 function ContextProviders({ children }) {
   return (
     <LocalStorageContextProvider>
-      <ProvidersContextProvider>
-        <TokenData2ContextProvider>
-          <PriceContextProvider>
-            <LiquidityContextProvider>
-              <HistoryContextProvider>
-                <ApplicationContextProvider>
-                  <TokenDataContextProvider>
-                    <GlobalDataContextProvider>
-                      <PairDataContextProvider>
-                        <UserContextProvider>{children}</UserContextProvider>
-                      </PairDataContextProvider>
-                    </GlobalDataContextProvider>
-                  </TokenDataContextProvider>
-                </ApplicationContextProvider>
-              </HistoryContextProvider>
-            </LiquidityContextProvider>
-          </PriceContextProvider>
-        </TokenData2ContextProvider>
-      </ProvidersContextProvider>
+      <RewardsChartContextProvider>
+        <LiquidityChartContextProvider>
+          <ProvidersContextProvider>
+            <TokenData2ContextProvider>
+              <PriceContextProvider>
+                <LiquidityContextProvider>
+                  <HistoryContextProvider>
+                    <ApplicationContextProvider>
+                      <TokenDataContextProvider>
+                        <GlobalDataContextProvider>
+                          <PairDataContextProvider>
+                            <UserContextProvider>{children}</UserContextProvider>
+                          </PairDataContextProvider>
+                        </GlobalDataContextProvider>
+                      </TokenDataContextProvider>
+                    </ApplicationContextProvider>
+                  </HistoryContextProvider>
+                </LiquidityContextProvider>
+              </PriceContextProvider>
+            </TokenData2ContextProvider>
+          </ProvidersContextProvider>
+        </LiquidityChartContextProvider>
+      </RewardsChartContextProvider>
     </LocalStorageContextProvider>
   )
 }
@@ -58,12 +64,14 @@ function Updaters() {
   return (
     <>
       <LocalStorageContextUpdater />
+      <LiquidityChartContextUpdater />
       <PairDataContextUpdater />
       <TokenDataContextUpdater />
       <PriceContextUpdater />
       <LiquidityContextUpdater />
       <TokenData2ContextUpdater />
       <ProvidersUpdater />
+      <RewardsChartContextUpdater />
     </>
   )
 }

@@ -43,7 +43,7 @@ const DashGrid = styled.div`
   display: grid;
   grid-gap: 1em;
   grid-template-columns: 100px 1fr 1fr;
-  grid-template-areas: 'name liq vol';
+  grid-template-areas: 'name liq price';
   padding: 0 1.125rem;
 
   > * {
@@ -60,7 +60,7 @@ const DashGrid = styled.div`
     display: grid;
     grid-gap: 1em;
     grid-template-columns: 180px 1fr 1fr 1fr;
-    grid-template-areas: 'name symbol liq vol ';
+    grid-template-areas: 'name symbol liq';
 
     > * {
       justify-content: flex-end;
@@ -76,7 +76,7 @@ const DashGrid = styled.div`
     display: grid;
     grid-gap: 0.5em;
     grid-template-columns: 1.5fr 0.6fr 1fr 1fr;
-    grid-template-areas: 'name symbol liq vol price change';
+    grid-template-areas: 'name symbol liq price change';
   }
 `
 
@@ -112,7 +112,6 @@ const DataText = styled(Flex)`
 
 const SORT_FIELD = {
   LIQ: 'totalLiquidityUSD',
-  // VOL: 'oneDayVolumeUSD',
   SYMBOL: 'symbol',
   NAME: 'name',
   PRICE: 'priceUSD'
@@ -128,7 +127,6 @@ function TopTokenList({ tokens, itemMax = 10 }) {
   const [sortDirection, setSortDirection] = useState(true)
   const [sortedColumn, setSortedColumn] = useState(SORT_FIELD.LIQ)
 
-  const below1080 = useMedia('(max-width: 1080px)')
   const below680 = useMedia('(max-width: 680px)')
   const below600 = useMedia('(max-width: 600px)')
 
@@ -170,7 +168,7 @@ function TopTokenList({ tokens, itemMax = 10 }) {
           <Row>
             {!below680 && <div style={{ marginRight: '1rem', width: '10px' }}>{index}</div>}
             <TokenLogo token={item.symbol} />
-            <CustomLink style={{ marginLeft: '16px', whiteSpace: 'nowrap' }} to={'/token/' + item.symbol}>
+            <CustomLink style={{ marginLeft: '16px', whiteSpace: 'nowrap' }} to={'/asset/' + item.symbol}>
               <FormattedName
                 text={below680 ? item.symbol : item.name}
                 maxCharacters={below600 ? 8 : 16}
@@ -180,17 +178,18 @@ function TopTokenList({ tokens, itemMax = 10 }) {
             </CustomLink>
           </Row>
         </DataText>
+
         {!below680 && (
           <DataText area="symbol" color="text" fontWeight="500">
             <FormattedName text={item.symbol} maxCharacters={5} />
           </DataText>
         )}
+
         <DataText area="liq">{formattedNum(item.totalLiquidityUSD, true)}</DataText>
-        {!below1080 && (
-          <DataText area="price" color="text" fontWeight="500">
-            {formattedNum(item.priceUSD, true)}
-          </DataText>
-        )}
+
+        <DataText area="price" color="text" fontWeight="500">
+          {formattedNum(item.priceUSD, true)}
+        </DataText>
       </DashGrid>
     )
   }
@@ -211,6 +210,7 @@ function TopTokenList({ tokens, itemMax = 10 }) {
             {below680 ? 'Symbol' : 'Name'} {sortedColumn === SORT_FIELD.NAME ? (!sortDirection ? '↑' : '↓') : ''}
           </ClickableText>
         </Flex>
+
         {!below680 && (
           <Flex alignItems="center">
             <ClickableText
@@ -236,21 +236,22 @@ function TopTokenList({ tokens, itemMax = 10 }) {
             Liquidity {sortedColumn === SORT_FIELD.LIQ ? (!sortDirection ? '↑' : '↓') : ''}
           </ClickableText>
         </Flex>
-        {!below1080 && (
-          <Flex alignItems="center">
-            <ClickableText
-              area="price"
-              onClick={e => {
-                setSortedColumn(SORT_FIELD.PRICE)
-                setSortDirection(sortedColumn !== SORT_FIELD.PRICE ? true : !sortDirection)
-              }}
-            >
-              Price {sortedColumn === SORT_FIELD.PRICE ? (!sortDirection ? '↑' : '↓') : ''}
-            </ClickableText>
-          </Flex>
-        )}
+
+        <Flex alignItems="center">
+          <ClickableText
+            area="price"
+            onClick={e => {
+              setSortedColumn(SORT_FIELD.PRICE)
+              setSortDirection(sortedColumn !== SORT_FIELD.PRICE ? true : !sortDirection)
+            }}
+          >
+            Price {sortedColumn === SORT_FIELD.PRICE ? (!sortDirection ? '↑' : '↓') : ''}
+          </ClickableText>
+        </Flex>
       </DashGrid>
+
       <Divider />
+
       <List p={0}>
         {filteredList &&
           filteredList.map((item, index) => {
@@ -262,6 +263,7 @@ function TopTokenList({ tokens, itemMax = 10 }) {
             )
           })}
       </List>
+
       <PageButtons>
         <div onClick={() => setPage(page === 1 ? page : page - 1)}>
           <Arrow faded={page === 1 ? true : false}>←</Arrow>

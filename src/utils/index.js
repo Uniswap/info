@@ -16,6 +16,9 @@ const Decimal = toFormat(_Decimal)
 BigNumber.set({ EXPONENTIAL_AT: 50 })
 dayjs.extend(utc)
 
+export const parseRawNumber = (amount, decimals) =>
+  ethers.utils.formatUnits(new ethers.utils.BigNumber(amount), decimals)
+
 export function getTimeframe(timeWindow) {
   const utcEndTime = dayjs.utc()
   // based on window, get starttime
@@ -310,6 +313,11 @@ export const urls = {
   showAddress: address => `https://www.etherscan.io/address/${address}/`,
   showToken: address => `https://www.etherscan.io/token/${address}/`,
   showBlock: block => `https://etherscan.io/block/${block}/`
+}
+
+export const formatDate = unix => {
+  const timestamp = dayjs.unix(unix)
+  return dayjs(timestamp).format('DD MMM YYYY h:mm A')
 }
 
 export const formatTime = unix => {

@@ -232,9 +232,9 @@ function PairPage({ pairAddress, history }) {
                     <TYPE.main fontSize={below1080 ? '1.5rem' : '2rem'} style={{ margin: '0 1rem' }}>
                       {token0 && token1 ? (
                         <>
-                          <HoverSpan onClick={() => history.push(`/token/${token0?.id}`)}>{token0.symbol}</HoverSpan>
+                          <HoverSpan onClick={() => history.push(`/asset/${token0?.id}`)}>{token0.symbol}</HoverSpan>
                           <span>-</span>
-                          <HoverSpan onClick={() => history.push(`/token/${token1?.id}`)}>
+                          <HoverSpan onClick={() => history.push(`/asset/${token1?.id}`)}>
                             {token1.symbol}
                           </HoverSpan>{' '}
                           Pair
@@ -284,7 +284,7 @@ function PairPage({ pairAddress, history }) {
                 flexWrap: 'wrap'
               }}
             >
-              <FixedPanel onClick={() => history.push(`/token/${token0?.id}`)}>
+              <FixedPanel onClick={() => history.push(`/asset/${token0?.id}`)}>
                 <RowFixed>
                   <TokenLogo address={token0?.id} size={'16px'} />
                   <TYPE.main fontSize={'16px'} lineHeight={1} fontWeight={500} ml={'4px'}>
@@ -296,7 +296,7 @@ function PairPage({ pairAddress, history }) {
                   </TYPE.main>
                 </RowFixed>
               </FixedPanel>
-              <FixedPanel onClick={() => history.push(`/token/${token1?.id}`)}>
+              <FixedPanel onClick={() => history.push(`/asset/${token1?.id}`)}>
                 <RowFixed>
                   <TokenLogo address={token1?.id} size={'16px'} />
                   <TYPE.main fontSize={'16px'} lineHeight={1} fontWeight={500} ml={'4px'}>
@@ -361,7 +361,7 @@ function PairPage({ pairAddress, history }) {
                       <TYPE.main>Pooled Tokens</TYPE.main>
                       <div />
                     </RowBetween>
-                    <Hover onClick={() => history.push(`/token/${token0?.id}`)} fade={true}>
+                    <Hover onClick={() => history.push(`/asset/${token0?.id}`)} fade={true}>
                       <AutoRow gap="4px">
                         <TokenLogo address={token0?.id} />
                         <TYPE.main fontSize={20} lineHeight={1} fontWeight={500}>
@@ -372,7 +372,7 @@ function PairPage({ pairAddress, history }) {
                         </TYPE.main>
                       </AutoRow>
                     </Hover>
-                    <Hover onClick={() => history.push(`/token/${token1?.id}`)} fade={true}>
+                    <Hover onClick={() => history.push(`/asset/${token1?.id}`)} fade={true}>
                       <AutoRow gap="4px">
                         <TokenLogo address={token1?.id} />
                         <TYPE.main fontSize={20} lineHeight={1} fontWeight={500}>

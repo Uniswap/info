@@ -1,41 +1,37 @@
 import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect } from 'react'
 import axios from 'axios'
-import { safeAccess } from '../utils'
 
-const MINUTES_1 = 1 * 60 * 1000
+const MINUTES_5 = 5 * 60 * 1000
 const UPDATE = 'UPDATE'
 
-const ProviderContext = createContext()
+const LiquidityChartContext = createContext()
 
-function usePriceContext() {
-  return useContext(ProviderContext)
+function useLiquidityChartContext() {
+  return useContext(LiquidityChartContext)
 }
 
-function reducer(state, { type, payload }) {
+function reducer(__state, { type, payload }) {
   switch (type) {
     case UPDATE: {
-      const providers = payload
-
-      return {
-        ...state,
-        providers
-      }
+      const chartData = payload
+      const result = chartData.sort((a, b) => a.date - b.date)
+      return [...result]
     }
     default: {
-      throw Error(`Unexpected action type in ProviderContext reducer: '${type}'.`)
+      throw Error(`Unexpected action type in LiquidityChartContext reducer: '${type}'.`)
     }
   }
 }
 
 export default function Provider({ children }) {
-  const [state, dispatch] = useReducer(reducer, {})
+  const [state, dispatch] = useReducer(reducer, [])
 
   const update = useCallback(providers => {
     dispatch({ type: UPDATE, payload: providers })
   }, [])
 
   return (
-    <ProviderContext.Provider
+    <LiquidityChartContext.Provider
       value={useMemo(() => {
         return {
           state,
@@ -44,19 +40,19 @@ export default function Provider({ children }) {
       }, [state, update])}
     >
       {children}
-    </ProviderContext.Provider>
+    </LiquidityChartContext.Provider>
   )
 }
 
 export function Updater() {
-  const { update } = usePriceContext()
+  const { update } = useLiquidityChartContext()
 
   useEffect(() => {
     let stale = false
 
     const get = async () => {
       if (!stale) {
-        const result = await getProviders()
+        const result = await getLiquidityChartData()
         update(result)
       }
     }
@@ -65,7 +61,7 @@ export function Updater() {
 
     const pricePoll = setInterval(() => {
       get()
-    }, MINUTES_1)
+    }, MINUTES_5)
 
     return () => {
       stale = true
@@ -76,17 +72,17 @@ export function Updater() {
   return null
 }
 
-export function useProviders() {
-  const { state } = usePriceContext()
-  return safeAccess(state, ['providers'])
+export function useLiquidityChart() {
+  const { state } = useLiquidityChartContext()
+  return state
 }
 
-const getProviders = async () => {
+const getLiquidityChartData = async () => {
   try {
-    const res = await axios.get(`https://network.jelly.market/api/v1/info/get`)
+    const res = await axios.get(`https://spacejelly.network/candy/api/v1/stats/get`)
     return res.data
   } catch (error) {
-    console.log('PROVIDERS_ERROR: ', error)
+    console.log('LIQUIDITY_CHART_DATA_ERROR: ', error)
     return {}
   }
 }

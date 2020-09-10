@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect } from 'react'
 import axios from 'axios'
 
+const MINUTES_1 = 1 * 60 * 1000
 const UPDATE = 'UPDATE'
 
 const LiquidityContext = createContext()
@@ -62,13 +63,13 @@ export function Updater() {
 
     get()
 
-    const pricePoll = setInterval(() => {
+    const poll = setInterval(() => {
       get()
-    }, 15000)
+    }, MINUTES_1)
 
     return () => {
       stale = true
-      clearInterval(pricePoll)
+      clearInterval(poll)
     }
   }, [update])
 

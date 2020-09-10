@@ -1,31 +1,30 @@
-import React, { useState } from 'react'
+import React from 'react'
 import styled from 'styled-components'
 import { ApolloProvider } from 'react-apollo'
 import { client } from './apollo/client'
 import { Route, Switch, BrowserRouter, Redirect } from 'react-router-dom'
 import GlobalPage from './pages/GlobalPage'
 import TokenPage from './pages/TokenPage'
-import PairPage from './pages/PairPage'
-import { useGlobalData, useGlobalChartData } from './contexts/GlobalData'
 import { isAddress } from './utils'
 import AccountPage from './pages/AccountPage'
 import AllTokensPage from './pages/AllTokensPage'
-import AllPairsPage from './pages/AllPairsPage'
-import PinnedData from './components/PinnedData'
 
 import SideNav from './components/SideNav'
-import AccountLookup from './pages/AccountLookup'
-import { OVERVIEW_TOKEN_BLACKLIST, PAIR_BLACKLIST } from './constants'
 import LocalLoader from './components/LocalLoader'
-import { useLatestBlock } from './contexts/Application'
+import { useLiquidityChart } from './contexts/LiquidityChart'
+import { useLiquidity } from './contexts/Liquidity'
+import { useAllPrices } from './contexts/Price'
+import RewardsPage from './pages/RewardsPage'
+import { useTotalLiquidity } from './contexts/TokenData2'
 
 const AppWrapper = styled.div`
   position: relative;
   width: 100%;
 `
+
 const ContentWrapper = styled.div`
   display: grid;
-  grid-template-columns: ${({ open }) => (open ? '220px 1fr 200px' : '220px 1fr 64px')};
+  grid-template-columns: 220px 1fr;
 
   @media screen and (max-width: 1400px) {
     grid-template-columns: 220px 1fr;
@@ -36,20 +35,6 @@ const ContentWrapper = styled.div`
     max-width: 100vw;
     overflow: hidden;
     grid-gap: 0;
-  }
-`
-
-const Right = styled.div`
-  position: fixed;
-  right: 0;
-  bottom: 0rem;
-  z-index: 99;
-  width: ${({ open }) => (open ? '220px' : '64px')};
-  height: ${({ open }) => (open ? 'fit-content' : '64px')};
-  overflow: scroll;
-  background-color: ${({ theme }) => theme.bg1};
-  @media screen and (max-width: 1400px) {
-    display: none;
   }
 `
 
@@ -66,65 +51,39 @@ const Center = styled.div`
 const LayoutWrapper = ({ children, savedOpen, setSavedOpen }) => {
   return (
     <>
-      <ContentWrapper open={savedOpen}>
+      <ContentWrapper>
         <SideNav />
         <Center id="center">{children}</Center>
-        <Right open={savedOpen}>
-          <PinnedData open={savedOpen} setSavedOpen={setSavedOpen} />
-        </Right>
       </ContentWrapper>
     </>
   )
 }
 
 function App() {
-  const [savedOpen, setSavedOpen] = useState(false)
-
-  const globalData = useGlobalData()
-  const globalChartData = useGlobalChartData()
-  const latestBlock = useLatestBlock()
+  // const globalData = useGlobalData()
+  const globalChartData = useLiquidityChart()
+  const liquidityData = useLiquidity()
+  const prices = useAllPrices()
+  const totalLiquidity = useTotalLiquidity()
 
   return (
     <ApolloProvider client={client}>
       <AppWrapper>
-        {latestBlock &&
-        globalData &&
-        Object.keys(globalData).length > 0 &&
-        globalChartData &&
-        Object.keys(globalChartData).length > 0 ? (
+        {totalLiquidity && liquidityData && prices && globalChartData && Object.keys(globalChartData).length > 0 ? (
           <BrowserRouter>
             <Switch>
               <Route
                 exacts
                 strict
-                path="/token/:asset"
+                path="/asset/:asset"
                 render={({ match }) => {
                   return (
-                    <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
+                    <LayoutWrapper>
                       <TokenPage asset={match.params.asset} />
                     </LayoutWrapper>
                   )
                 }}
               />
-              {/* <Route
-                exacts
-                strict
-                path="/pair/:pairAddress"
-                render={({ match }) => {
-                  if (PAIR_BLACKLIST.includes(match.params.pairAddress.toLowerCase())) {
-                    return <Redirect to="/home" />;
-                  }
-                  if (isAddress(match.params.pairAddress.toLowerCase())) {
-                    return (
-                      <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
-                        <PairPage pairAddress={match.params.pairAddress.toLowerCase()} />
-                      </LayoutWrapper>
-                    );
-                  } else {
-                    return <Redirect to="/home" />;
-                  }
-                }}
-              /> */}
               <Route
                 exacts
                 strict
@@ -132,7 +91,7 @@ function App() {
                 render={({ match }) => {
                   if (isAddress(match.params.accountAddress.toLowerCase())) {
                     return (
-                      <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
+                      <LayoutWrapper>
                         <AccountPage account={match.params.accountAddress.toLowerCase()} />
                       </LayoutWrapper>
                     )
@@ -143,26 +102,20 @@ function App() {
               />
 
               <Route path="/home">
-                <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
+                <LayoutWrapper>
                   <GlobalPage />
                 </LayoutWrapper>
               </Route>
 
-              <Route path="/tokens">
-                <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
+              <Route path="/assets">
+                <LayoutWrapper>
                   <AllTokensPage />
                 </LayoutWrapper>
               </Route>
 
-              <Route path="/pairs">
-                <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
-                  <AllPairsPage />
-                </LayoutWrapper>
-              </Route>
-
-              <Route path="/accounts">
-                <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
-                  <AccountLookup />
+              <Route path="/rewards">
+                <LayoutWrapper>
+                  <RewardsPage />
                 </LayoutWrapper>
               </Route>
 
