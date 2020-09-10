@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useLayoutEffect } from 'react'
 import styled from 'styled-components'
 import { Route, Switch, BrowserRouter, Redirect } from 'react-router-dom'
 import GlobalPage from './pages/GlobalPage'
@@ -16,6 +16,7 @@ import RewardsPage from './pages/RewardsPage'
 import { useTotalLiquidity } from './contexts/TokenData'
 
 const AppWrapper = styled.div`
+  height: 100%
   position: relative;
   width: 100%;
 `
@@ -23,6 +24,7 @@ const AppWrapper = styled.div`
 const ContentWrapper = styled.div`
   display: grid;
   grid-template-columns: 220px 1fr;
+  overflow-x: hidden;
 
   @media screen and (max-width: 1400px) {
     grid-template-columns: 220px 1fr;
@@ -63,6 +65,12 @@ function App() {
   const liquidityData = useLiquidity()
   const prices = useAllPrices()
   const totalLiquidity = useTotalLiquidity()
+
+  useLayoutEffect(() => {
+    const root = document.getElementById('root')
+
+    root.style.height = '100%'
+  }, [])
 
   return (
     <AppWrapper>
