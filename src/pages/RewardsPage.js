@@ -56,7 +56,7 @@ function RewardsPage() {
         <WarningGrouping>
           <DashboardWrapper style={{ marginTop: below1080 ? '0' : '1rem' }}>
             <RowBetween mt={40} mb={'1rem'}>
-              <TYPE.main fontSize={'1.125rem'}>Providers</TYPE.main> <div />
+              <TYPE.main fontSize={'1.125rem'}>Rewards</TYPE.main> <div />
             </RowBetween>
             <Panel rounded>{data ? <RewardsList color={'#ff007a'} rewards={data} /> : <Loader />}</Panel>
           </DashboardWrapper>

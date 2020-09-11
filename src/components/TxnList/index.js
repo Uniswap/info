@@ -196,7 +196,7 @@ function TxnList({ history, color }) {
         {!below1080 && (
           <>
             <DataText area="from">
-              <Link color={color} external href={'https://etherscan.io/address/' + item.account}>
+              <Link color={color} external href={`${ASSETS_MAP[item.network].addressExplorer}${item.sender}`}>
                 {item.sender && item.sender.slice(0, 6) + '...' + item.sender.slice(38, 42)}
               </Link>
             </DataText>
@@ -205,7 +205,11 @@ function TxnList({ history, color }) {
 
         {!below1080 && (
           <DataText area="to">
-            <Link color={color} external href={'https://etherscan.io/address/' + item.account}>
+            <Link
+              color={color}
+              external
+              href={`${ASSETS_MAP[item.outputNetwork].addressExplorer}${item.outputAddress}`}
+            >
               {item.outputAddress && item.outputAddress.slice(0, 6) + '...' + item.outputAddress.slice(38, 42)}
             </Link>
           </DataText>

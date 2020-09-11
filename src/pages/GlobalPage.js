@@ -18,6 +18,8 @@ import { CustomLink } from '../components/Link'
 
 import { PageWrapper, ContentWrapper } from '../components'
 import { useAllTokens } from '../contexts/TokenData'
+import { useRewards } from '../contexts/Rewards'
+import RewardsList from '../components/RewardsList'
 
 const ListOptions = styled(AutoRow)`
   height: 40px;
@@ -45,6 +47,8 @@ function GlobalPage() {
   const tokens = useAllTokens()
 
   const history = useHistory()
+
+  const rewards = useRewards()
 
   // breakpoints
   const below800 = useMedia('(max-width: 800px)')
@@ -101,6 +105,20 @@ function GlobalPage() {
           <Panel style={{ margin: '1rem 0' }}>
             <TxnList history={history} />
           </Panel>
+
+          {below800 && (
+            <>
+              <span>
+                <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '2rem' }}>
+                  Rewards
+                </TYPE.main>
+              </span>
+
+              <Panel style={{ margin: '1rem 0' }}>
+                <RewardsList rewards={rewards} />
+              </Panel>
+            </>
+          )}
         </div>
       </ContentWrapper>
     </PageWrapper>
