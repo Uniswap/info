@@ -12,6 +12,7 @@ import { useLiquidity } from './contexts/Liquidity'
 import { useAllPrices } from './contexts/Price'
 import RewardsPage from './pages/RewardsPage'
 import { useTotalLiquidity } from './contexts/TokenData'
+import { useRewards } from './contexts/Rewards'
 
 const AppWrapper = styled.div`
   position: relative;
@@ -61,10 +62,16 @@ function App() {
   const liquidityData = useLiquidity()
   const prices = useAllPrices()
   const totalLiquidity = useTotalLiquidity()
+  const rewards = useRewards()
 
   return (
     <AppWrapper>
-      {totalLiquidity && liquidityData && prices && globalChartData && Object.keys(globalChartData).length > 0 ? (
+      {rewards &&
+      totalLiquidity &&
+      liquidityData &&
+      prices &&
+      globalChartData &&
+      Object.keys(globalChartData).length > 0 ? (
         <BrowserRouter>
           <Switch>
             <Route
