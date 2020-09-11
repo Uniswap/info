@@ -1,4 +1,4 @@
-import React, { useLayoutEffect } from 'react'
+import React from 'react'
 import styled from 'styled-components'
 import { Route, Switch, BrowserRouter, Redirect } from 'react-router-dom'
 import GlobalPage from './pages/GlobalPage'
@@ -25,6 +25,7 @@ const ContentWrapper = styled.div`
   display: grid;
   grid-template-columns: 220px 1fr;
   overflow-x: hidden;
+  height: 100%;
 
   @media screen and (max-width: 1400px) {
     grid-template-columns: 220px 1fr;
@@ -43,6 +44,7 @@ const Center = styled.div`
   z-index: 9999;
   transition: width 0.25s ease;
   background-color: ${({ theme }) => theme.onlyLight};
+  overflow-y: auto;
 `
 
 /**
@@ -65,12 +67,6 @@ function App() {
   const liquidityData = useLiquidity()
   const prices = useAllPrices()
   const totalLiquidity = useTotalLiquidity()
-
-  useLayoutEffect(() => {
-    const root = document.getElementById('root')
-
-    root.style.height = '100px'
-  }, [])
 
   return (
     <AppWrapper>

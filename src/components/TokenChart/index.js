@@ -1,21 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react'
-import styled from 'styled-components'
-import { PieChart, Pie, Cell, Tooltip } from 'recharts'
+
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts'
 import { formattedNum } from '../../utils'
-
-const ChartWrapper = styled.div`
-  height: 100%;
-  min-height: 300px;
-
-  @media screen and (max-width: 600px) {
-    min-height: 200px;
-  }
-`
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042']
 const RADIAN = Math.PI / 180
 
-const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index }) => {
+const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius = 10, outerRadius, percent, index }) => {
   const radius = innerRadius + (outerRadius - innerRadius) * 0.5
   const x = cx + radius * Math.cos(-midAngle * RADIAN)
   const y = cy + radius * Math.sin(-midAngle * RADIAN)
@@ -44,16 +35,17 @@ const TokenChart = ({ data, color, asset }) => {
   }, [isClient, width]) // Empty array ensures that effect is only run on mount and unmount
 
   return (
-    <ChartWrapper>
-      <PieChart width={650} height={400}>
+    <ResponsiveContainer height={300} width="100%">
+      <PieChart>
         <Pie
           dataKey="value"
           data={data}
-          cx={300}
-          cy={200}
+          innerRadius={0}
+          outerRadius={140}
+          startAngle={90}
+          endAngle={450}
           labelLine={false}
           label={renderCustomizedLabel}
-          outerRadius={180}
           fill="#8884d8"
         >
           {data.map((entry, index) => {
@@ -75,7 +67,7 @@ const TokenChart = ({ data, color, asset }) => {
           wrapperStyle={{ top: -70, left: -10 }}
         />
       </PieChart>
-    </ChartWrapper>
+    </ResponsiveContainer>
   )
 }
 

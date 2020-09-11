@@ -23,6 +23,7 @@ const Wrapper = styled.div`
   /* background-color: #1b1c22; */
   background: linear-gradient(193.68deg, #1b1c22 0.68%, #000000 100.48%);
   color: ${({ theme }) => theme.bg2};
+  height: 100%;
 
   @media screen and (max-width: 800px) {
     grid-template-columns: 1fr;

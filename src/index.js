@@ -37,7 +37,6 @@ function ContextProviders({ children }) {
                   <HistoryContextProvider>{children}</HistoryContextProvider>
                 </LiquidityContextProvider>
               </PriceContextProvider>
-              F
             </TokenDataContextProvider>
           </ProvidersContextProvider>
         </LiquidityChartContextProvider>

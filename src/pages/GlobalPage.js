@@ -62,7 +62,7 @@ function GlobalPage() {
     <PageWrapper>
       <ThemedBackground backgroundColor={transparentize(0.8, '#ff007a')} />
       <ContentWrapper>
-        <div>
+        <div style={{ height: '100%', overflowY: 'auto' }}>
           <AutoColumn gap="24px" style={{ paddingBottom: below800 ? '0' : '24px' }}>
             <TYPE.largeHeader>{below800 ? 'Protocol Analytics' : 'JellySwap Protocol Analytics'}</TYPE.largeHeader>
             <GlobalStats />

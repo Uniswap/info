@@ -82,7 +82,7 @@ function TokenPage({ asset }) {
       if (safeAccess(providers[provider], ['balances', asset])) {
         const { address, balance } = providers[provider].balances[asset]
 
-        providersData.push({ name: address, value: +balance })
+        providersData.push({ name: address.slice(0, 5) + '...' + address.slice(-5), value: +balance })
       }
     })
 
@@ -188,7 +188,7 @@ function TokenPage({ asset }) {
                   </AutoColumn>
                 </Panel>
 
-                <Panel style={{ gridColumn: below1080 ? '1' : '2/4', gridRow: below1080 ? '' : '1/4' }}>
+                <Panel style={{ gridColumn: below1080 ? '' : '2/4', gridRow: below1080 ? '' : '1/4', width: '100%' }}>
                   <TokenChart data={data} asset={asset} />
                 </Panel>
               </PanelWrapper>
