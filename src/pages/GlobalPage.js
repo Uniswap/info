@@ -52,6 +52,7 @@ function GlobalPage() {
 
   // breakpoints
   const below800 = useMedia('(max-width: 800px)')
+  const below1080 = useMedia('(max-width: 1080px)')
 
   // scrolling refs
 
@@ -66,7 +67,7 @@ function GlobalPage() {
     <PageWrapper>
       <ThemedBackground backgroundColor={transparentize(0.8, '#ff007a')} />
       <ContentWrapper>
-        <div style={{ height: '100%', overflowY: 'auto' }}>
+        <div>
           <AutoColumn gap="24px" style={{ paddingBottom: below800 ? '0' : '24px' }}>
             <TYPE.largeHeader>{below800 ? 'Protocol Analytics' : 'JellySwap Protocol Analytics'}</TYPE.largeHeader>
             <GlobalStats />
@@ -106,7 +107,7 @@ function GlobalPage() {
             <TxnList history={history} />
           </Panel>
 
-          {below800 && (
+          {below1080 && (
             <>
               <span>
                 <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '2rem' }}>
@@ -115,7 +116,7 @@ function GlobalPage() {
               </span>
 
               <Panel style={{ margin: '1rem 0' }}>
-                <RewardsList rewards={rewards} />
+                <RewardsList rewards={rewards} itemMax={10} />
               </Panel>
             </>
           )}

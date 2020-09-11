@@ -3,8 +3,6 @@ import styled from 'styled-components'
 import { Route, Switch, BrowserRouter, Redirect } from 'react-router-dom'
 import GlobalPage from './pages/GlobalPage'
 import TokenPage from './pages/TokenPage'
-import { isAddress } from './utils'
-import AccountPage from './pages/AccountPage'
 import AllTokensPage from './pages/AllTokensPage'
 
 import SideNav from './components/SideNav'
@@ -16,7 +14,6 @@ import RewardsPage from './pages/RewardsPage'
 import { useTotalLiquidity } from './contexts/TokenData'
 
 const AppWrapper = styled.div`
-  height: 100%
   position: relative;
   width: 100%;
 `
@@ -24,8 +21,6 @@ const AppWrapper = styled.div`
 const ContentWrapper = styled.div`
   display: grid;
   grid-template-columns: 220px 1fr;
-  overflow-x: hidden;
-  height: 100%;
 
   @media screen and (max-width: 1400px) {
     grid-template-columns: 220px 1fr;
@@ -44,7 +39,6 @@ const Center = styled.div`
   z-index: 9999;
   transition: width 0.25s ease;
   background-color: ${({ theme }) => theme.onlyLight};
-  overflow-y: auto;
 `
 
 /**
@@ -83,22 +77,6 @@ function App() {
                     <TokenPage asset={match.params.asset} />
                   </LayoutWrapper>
                 )
-              }}
-            />
-            <Route
-              exacts
-              strict
-              path="/account/:accountAddress"
-              render={({ match }) => {
-                if (isAddress(match.params.accountAddress.toLowerCase())) {
-                  return (
-                    <LayoutWrapper>
-                      <AccountPage account={match.params.accountAddress.toLowerCase()} />
-                    </LayoutWrapper>
-                  )
-                } else {
-                  return <Redirect to="/home" />
-                }
               }}
             />
 

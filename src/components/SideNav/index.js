@@ -15,7 +15,7 @@ const Wrapper = styled.div`
   height: ${({ isMobile }) => (isMobile ? 'initial' : '100vh')};
   background-color: ${({ theme }) => transparentize(0.4, theme.bg1)};
   color: ${({ theme }) => theme.text1};
-  padding: 0.5rem 0.5rem 0 0.75rem;
+  padding: 0.5rem 0.5rem 0.5rem 0.75rem;
   position: sticky;
   top: 0px;
   z-index: 9999;
@@ -23,7 +23,6 @@ const Wrapper = styled.div`
   /* background-color: #1b1c22; */
   background: linear-gradient(193.68deg, #1b1c22 0.68%, #000000 100.48%);
   color: ${({ theme }) => theme.bg2};
-  height: 100%;
 
   @media screen and (max-width: 800px) {
     grid-template-columns: 1fr;
@@ -50,8 +49,7 @@ const DesktopWrapper = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 100%;
-  position: fixed;
+  height: 100vh;
 `
 
 const MobileWrapper = styled.div`
@@ -97,8 +95,8 @@ function SideNav({ history }) {
                 <BasicLink to="/assets">
                   <Option
                     activeText={
-                      (history.location.pathname.split('/')[1] === 'tokens' ||
-                        history.location.pathname.split('/')[1] === 'token') ??
+                      (history.location.pathname.split('/')[1] === 'assets' ||
+                        history.location.pathname.split('/')[1] === 'asset') ??
                       undefined
                     }
                   >

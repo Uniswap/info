@@ -117,10 +117,8 @@ const SORT_FIELD = {
   TIMESTAMP: 'expiration'
 }
 
-const ITEMS_PER_PAGE = 10
-
 // @TODO rework into virtualized list
-function RewardsList({ rewards, color }) {
+function RewardsList({ rewards, color, itemMax = 20 }) {
   // page state
   const [page, setPage] = useState(1)
   const [maxPage, setMaxPage] = useState(1)
@@ -137,15 +135,15 @@ function RewardsList({ rewards, color }) {
   // parse the txns and format for UI
   useEffect(() => {
     let extraPages = 1
-    if (rewards.length % ITEMS_PER_PAGE === 0) {
+    if (rewards.length % itemMax === 0) {
       extraPages = 0
     }
     if (rewards.length === 0) {
       setMaxPage(1)
     } else {
-      setMaxPage(Math.floor(rewards.length / ITEMS_PER_PAGE) + extraPages)
+      setMaxPage(Math.floor(rewards.length / itemMax) + extraPages)
     }
-  }, [rewards])
+  }, [rewards, itemMax])
 
   const filteredList =
     rewards &&
@@ -155,7 +153,7 @@ function RewardsList({ rewards, color }) {
           ? (sortDirection ? -1 : 1) * 1
           : (sortDirection ? -1 : 1) * -1
       })
-      .slice(ITEMS_PER_PAGE * (page - 1), page * ITEMS_PER_PAGE)
+      .slice(itemMax * (page - 1), page * itemMax)
 
   const below780 = useMedia('(max-width: 780px)')
 
