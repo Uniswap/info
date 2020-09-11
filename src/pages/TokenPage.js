@@ -82,7 +82,7 @@ function TokenPage({ asset }) {
       if (safeAccess(providers[provider], ['balances', asset])) {
         const { address, balance } = providers[provider].balances[asset]
 
-        providersData.push({ name: address.slice(0, 5) + '...' + address.slice(-5), value: +balance })
+        providersData.push({ name: address, value: +balance })
       }
     })
 

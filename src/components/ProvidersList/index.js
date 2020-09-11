@@ -7,6 +7,7 @@ import { Flex, Text } from 'rebass'
 import Link from '../Link'
 import { Divider } from '..'
 import { ASSETS_MAP } from '../../constants/assets'
+import { useMedia } from 'react-use'
 
 dayjs.extend(utc)
 
@@ -85,12 +86,27 @@ const DataText = styled(Flex)`
 
 function ProvidersList({ providers, asset }) {
   const explorer = ASSETS_MAP[asset].addressExplorer
+
+  const below1080 = useMedia('(max-width: 1080px)')
+
   const ListItem = ({ item }) => {
     return (
       <DashGrid style={{ height: '48px' }}>
-        <DataText area="address" fontWeight="500">
-          <Link external href={`${explorer}${item.name}`}>{`${item.name}`}</Link>
-        </DataText>
+        {!below1080 && (
+          <DataText area="to">
+            <Link external href={`${explorer}${item.name}`}>
+              {item.name}
+            </Link>
+          </DataText>
+        )}
+
+        {below1080 && (
+          <DataText area="to">
+            <Link external href={`${explorer}${item.name}`}>
+              {item.name.slice(0, 5) + '...' + item.name.slice(-5)}
+            </Link>
+          </DataText>
+        )}
 
         <DataText area="value" fontWeight="500">
           <Link external>{`${item.value} ${asset}`}</Link>
