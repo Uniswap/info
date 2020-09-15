@@ -11,6 +11,7 @@ import { TrendingUp, User, DollarSign, PieChart, Disc } from 'react-feather'
 import { useSessionStart } from '../../contexts/Application'
 import { useDarkModeManager } from '../../contexts/LocalStorage'
 import { useGetWeb3 } from '../../contexts/Account'
+import { isMain } from '../../constants'
 import Toggle from '../Toggle'
 
 const Wrapper = styled.div`
@@ -187,7 +188,7 @@ function SideNav({ history }) {
               <PollingDot />
               <a href="/" style={{ color: 'white' }}>
                 <TYPE.small color={'white'}>
-                  Updated {!!seconds ? seconds + 's' : '-'} ago <br />
+                  Updated {!!seconds ? seconds + 's' : '-'} ago {isMain() ? '[Mainnet]' : '[Kovan]'} <br />
                 </TYPE.small>
               </a>
             </Polling>

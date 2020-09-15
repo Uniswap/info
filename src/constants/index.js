@@ -1,3 +1,5 @@
+import abi from './abi.json'
+
 export const FACTORY_ADDRESS = '0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f'
 
 export const BUNDLE_ID = '1'
@@ -31,3 +33,10 @@ export const PAIR_BLACKLIST = ['0xb6a741f37d6e455ebcc9f17e2c16d0586c3f57a5']
  * For tokens that cause erros on fee calculations
  */
 export const FEE_WARNING_TOKENS = ['0xd46ba6d942050d489dbd938a2c909a5d5039a161']
+
+export const AMMExchangeAbi = abi.AMMExchange
+export const AMMFactoryAbi = abi.AMMFactory
+
+export const isMain = () => {
+  return window.localStorage.getItem('mainnet') || false
+}
