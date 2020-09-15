@@ -3,7 +3,6 @@ import styled from 'styled-components'
 import { isAddress } from '../../utils/index.js'
 import wEthLogo from '../../assets/weth.svg'
 import market from '../../assets/market.png'
-import { useDarkModeManager } from '../../contexts/LocalStorage'
 
 const BAD_IMAGES = {}
 
