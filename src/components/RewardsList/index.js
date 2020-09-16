@@ -111,10 +111,9 @@ const DataText = styled(Flex)`
 `
 
 const SORT_FIELD = {
-  NETWORK: 'network',
-  AMOUNT0: 'inputAmount',
-  AMOUNT1: 'outputAmount',
-  TIMESTAMP: 'expiration'
+  LIQUIDITY: 'usd',
+  REWARD: 'reward',
+  DATE: 'date'
 }
 
 // @TODO rework into virtualized list
@@ -125,7 +124,7 @@ function RewardsList({ rewards, color, itemMax = 20 }) {
 
   // sorting
   const [sortDirection, setSortDirection] = useState(true)
-  const [sortedColumn, setSortedColumn] = useState(SORT_FIELD.TIMESTAMP)
+  const [sortedColumn, setSortedColumn] = useState(SORT_FIELD.DATE)
 
   useEffect(() => {
     setMaxPage(1) // edit this to do modular
@@ -149,9 +148,9 @@ function RewardsList({ rewards, color, itemMax = 20 }) {
     rewards &&
     rewards
       .sort((a, b) => {
-        return parseFloat(a[sortedColumn]) > parseFloat(b[sortedColumn])
-          ? (sortDirection ? -1 : 1) * 1
-          : (sortDirection ? -1 : 1) * -1
+        const sortA = sortedColumn === SORT_FIELD.DATE ? dayjs(a[sortedColumn]).valueOf() : a[sortedColumn]
+        const sortB = sortedColumn === SORT_FIELD.DATE ? dayjs(b[sortedColumn]).valueOf() : b[sortedColumn]
+        return parseFloat(sortA) > parseFloat(sortB) ? (sortDirection ? -1 : 1) * 1 : (sortDirection ? -1 : 1) * -1
       })
       .slice(itemMax * (page - 1), page * itemMax)
 
@@ -195,12 +194,12 @@ function RewardsList({ rewards, color, itemMax = 20 }) {
               area="liquidity"
               color="textDim"
               onClick={() => {
-                setSortedColumn(SORT_FIELD.AMOUNT0)
-                setSortDirection(sortedColumn !== SORT_FIELD.AMOUNT0 ? true : !sortDirection)
+                setSortedColumn(SORT_FIELD.LIQUIDITY)
+                setSortDirection(sortedColumn !== SORT_FIELD.LIQUIDITY ? true : !sortDirection)
               }}
             >
               Liquidity
-              {sortedColumn === SORT_FIELD.AMOUNT0 ? (sortDirection ? '↑' : '↓') : ''}
+              {sortedColumn === SORT_FIELD.LIQUIDITY ? (sortDirection ? '↑' : '↓') : ''}
             </ClickableText>
           </Flex>
         )}
@@ -211,12 +210,12 @@ function RewardsList({ rewards, color, itemMax = 20 }) {
               area="reward"
               color="textDim"
               onClick={() => {
-                setSortedColumn(SORT_FIELD.AMOUNT1)
-                setSortDirection(sortedColumn !== SORT_FIELD.AMOUNT1 ? true : !sortDirection)
+                setSortedColumn(SORT_FIELD.REWARD)
+                setSortDirection(sortedColumn !== SORT_FIELD.REWARD ? true : !sortDirection)
               }}
             >
               Reward
-              {sortedColumn === SORT_FIELD.AMOUNT1 ? (sortDirection ? '↑' : '↓') : ''}
+              {sortedColumn === SORT_FIELD.REWARD ? (sortDirection ? '↑' : '↓') : ''}
             </ClickableText>
           </Flex>
 
@@ -225,11 +224,11 @@ function RewardsList({ rewards, color, itemMax = 20 }) {
               area="time"
               color="textDim"
               onClick={() => {
-                setSortedColumn(SORT_FIELD.TIMESTAMP)
-                setSortDirection(sortedColumn !== SORT_FIELD.TIMESTAMP ? true : !sortDirection)
+                setSortedColumn(SORT_FIELD.DATE)
+                setSortDirection(sortedColumn !== SORT_FIELD.DATE ? true : !sortDirection)
               }}
             >
-              Date {sortedColumn === SORT_FIELD.TIMESTAMP ? (!sortDirection ? '↑' : '↓') : ''}
+              Date {sortedColumn === SORT_FIELD.DATE ? (!sortDirection ? '↑' : '↓') : ''}
             </ClickableText>
           </Flex>
         </>
