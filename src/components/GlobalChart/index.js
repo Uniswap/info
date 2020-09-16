@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect, useRef } from 'react'
 import { ResponsiveContainer } from 'recharts'
 import { timeframeOptions } from '../../constants'
 import TradingViewChart, { CHART_TYPES } from '../TradingviewChart'
-import { getTimeframe } from '../../utils'
+import { getPercentChange, getTimeframe } from '../../utils'
 import { useLiquidityChart } from '../../contexts/LiquidityChart'
 import { useTotalLiquidity } from '../../contexts/TokenData'
 
@@ -20,6 +20,8 @@ const GlobalChart = ({ display }) => {
 
   const totalLiquidity = useTotalLiquidity()
   const dailyData = useLiquidityChart()
+
+  const liquidityChange = getPercentChange(totalLiquidity, dailyData[dailyData.length - 2].totalLiquidityUsd)
 
   // based on window, get starttim
   let utcStartTime = getTimeframe(timeWindow)
@@ -65,7 +67,7 @@ const GlobalChart = ({ display }) => {
           <TradingViewChart
             data={dailyData}
             base={Number(totalLiquidity)}
-            baseChange={0}
+            baseChange={liquidityChange}
             title="Liquidity"
             field="totalLiquidityUsd"
             width={width}
