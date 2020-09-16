@@ -5,7 +5,7 @@ import LocalLoader from '../LocalLoader'
 import utc from 'dayjs/plugin/utc'
 import { Box, Flex } from 'rebass'
 import styled from 'styled-components'
-
+import { checkIfDeployed } from '../../utils/contractCalls'
 import { CustomLink } from '../Link'
 import { Divider } from '../../components'
 import { withRouter } from 'react-router-dom'
@@ -133,12 +133,24 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
 
   const ListItem = ({ pairAddress, index }) => {
     const pairData = pairs[pairAddress]
+    const isDeployed = checkIfDeployed(pairData.token0, pairData.token1)
 
     if (pairData && pairData.token0 && pairData.token1) {
       return (
         <DashGrid style={{ height: '48px' }} disbaleLinks={disbaleLinks} focus={true}>
           <DataText area="name" fontWeight="500">
-            {!below600 && <div style={{ marginRight: '20px', width: '10px' }}>{index}</div>}
+            {!below600 && (
+              <div
+                style={{
+                  textAlign: 'center',
+                  marginRight: '20px',
+                  fontSize: '9px',
+                  color: isDeployed ? 'lime' : 'tomato'
+                }}
+              >
+                {isDeployed ? 'LIVE' : 'NEEDS DEPLOY'}
+              </div>
+            )}
             <DoubleTokenLogo
               size={below600 ? 16 : 20}
               a0={pairData.token0.id}
@@ -198,11 +210,7 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
         center={true}
         disbaleLinks={disbaleLinks}
         style={{ height: 'fit-content', padding: '0 1.125rem 1rem 1.125rem' }}
-      >
-        <Flex alignItems="center" justifyContent="flexStart">
-          <TYPE.main area="name">Name</TYPE.main>
-        </Flex>
-      </DashGrid>
+      ></DashGrid>
       <Divider />
       <List p={0}>{!pairList ? <LocalLoader /> : pairList}</List>
       <PageButtons>

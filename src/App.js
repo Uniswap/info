@@ -9,11 +9,12 @@ import PairPage from './pages/PairPage'
 import { useGlobalData, useGlobalChartData } from './contexts/GlobalData'
 import { isAddress } from './utils'
 import AccountPage from './pages/AccountPage'
+import TradePage from './pages/TradePage'
+import LiquidityPage from './pages/LiquidityPage'
 import AllTokensPage from './pages/AllTokensPage'
 import AllMarketsPage from './pages/AllMarketsPage'
 import AllPairsPage from './pages/AllPairsPage'
 import PinnedData from './components/PinnedData'
-
 import SideNav from './components/SideNav'
 import AccountLookup from './pages/AccountLookup'
 import { OVERVIEW_TOKEN_BLACKLIST, PAIR_BLACKLIST } from './constants'
@@ -84,7 +85,6 @@ function App() {
   const globalData = useGlobalData()
   const globalChartData = useGlobalChartData()
   const latestBlock = useLatestBlock()
-
   return (
     <ApolloProvider client={client}>
       <AppWrapper>
@@ -126,6 +126,42 @@ function App() {
                     return (
                       <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
                         <PairPage pairAddress={match.params.pairAddress.toLowerCase()} />
+                      </LayoutWrapper>
+                    )
+                  } else {
+                    return <Redirect to="/home" />
+                  }
+                }}
+              />
+              <Route
+                exacts
+                strict
+                path="/trade/:pairAddress"
+                render={({ match }) => {
+                  const { pairAddress } = match.params
+
+                  if (isAddress(match.params.pairAddress.toLowerCase())) {
+                    return (
+                      <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
+                        <TradePage pairAddress={pairAddress} />
+                      </LayoutWrapper>
+                    )
+                  } else {
+                    return <Redirect to="/home" />
+                  }
+                }}
+              />
+              <Route
+                exacts
+                strict
+                path="/liquidity/:pairAddress"
+                render={({ match }) => {
+                  const { pairAddress } = match.params
+
+                  if (isAddress(match.params.pairAddress.toLowerCase())) {
+                    return (
+                      <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
+                        <LiquidityPage pairAddress={pairAddress} />
                       </LayoutWrapper>
                     )
                   } else {
