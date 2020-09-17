@@ -48,14 +48,6 @@ export const ASSETS_MAP = {
     addressExplorer: 'https://etherscan.io/address/'
   },
 
-  'BTC++': {
-    name: 'BTC++',
-    symbol: 'BTC++',
-    decimals: 18,
-    txExplorer: 'https://etherscan.io/tx/',
-    addressExplorer: 'https://etherscan.io/address/'
-  },
-
   USDC: {
     name: 'USDC Stablecoin',
     symbol: 'USDC',
@@ -78,6 +70,14 @@ export const ASSETS_MAP = {
     decimals: 18,
     txExplorer: 'https://explorer.matic.network/tx/',
     addressExplorer: 'https://explorer.matic.network/address/'
+  },
+
+  AVAX: {
+    name: 'Avalanche',
+    symbol: 'AVAX',
+    decimals: 18,
+    txExplorer: 'https://cchain.explorer.avax.network/tx/',
+    addressExplorer: 'https://cchain.explorer.avax.network/address/'
   }
 }
 

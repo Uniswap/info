@@ -135,7 +135,7 @@ function TokenPage({ asset }) {
                   {!below1080 && (
                     <>
                       <TYPE.main fontSize={'1.5rem'} fontWeight={500} style={{ marginRight: '1rem' }}>
-                        {priceUSD}
+                        ${priceUSD}
                       </TYPE.main>
                     </>
                   )}
@@ -182,7 +182,7 @@ function TokenPage({ asset }) {
                     </RowBetween>
                     <RowBetween align="flex-end">
                       <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={500}>
-                        {totalLiquidityUSD.toFixed(2)}
+                        ${totalLiquidityUSD.toFixed(2)}
                       </TYPE.main>
                     </RowBetween>
                   </AutoColumn>
