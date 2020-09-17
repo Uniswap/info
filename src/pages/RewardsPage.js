@@ -61,17 +61,53 @@ function RewardsPage() {
       setData(rewards)
     } else {
       let startDate = dayjs(START_DAY)
-      let endDate = dayjs(START_DAY).add(14, 'day')
+      let endDate = startDate.add(14, 'day')
 
-      const result = rewards.reduce((p, c) => {
-        if (dayjs(c.date).isBefore(endDate)) {
-        } else {
-          startDate = endDate
-          endDate = startDate.add(14, 'day')
-        }
+      const result = rewards
+        .sort((a, b) => {
+          return dayjs(a.date).valueOf() - dayjs(b.date).valueOf()
+        })
+        .reduce((result, currentRecord) => {
+          if (dayjs(currentRecord.date).isBefore(endDate)) {
+            const period = `From ${dayjs(startDate).format('YYYY-MM-DD')} to ${dayjs(endDate).format('YYYY-MM-DD')}`
+            const key = `${currentRecord.name}_${period}`
+            if (result[key]) {
+              result[key] = {
+                ...result[key],
+                reward: result[key].reward + currentRecord.reward,
+                usd: result[key].usd + currentRecord.usd,
+                date: period
+              }
+            } else {
+              result[key] = {
+                ...currentRecord,
+                date: period
+              }
+            }
+          } else {
+            startDate = endDate
+            endDate = startDate.add(14, 'day')
 
-        return getReward(startDate, endDate, c, p)
-      }, {})
+            const period = `From ${dayjs(startDate).format('YYYY-MM-DD')} to ${dayjs(endDate).format('YYYY-MM-DD')}`
+            const key = `${currentRecord.name}_${period}`
+
+            if (result[key]) {
+              result[key] = {
+                ...result[key],
+                reward: result[key].reward + currentRecord.reward,
+                usd: result[key].usd + currentRecord.usd,
+                date: period
+              }
+            } else {
+              result[key] = {
+                ...currentRecord,
+                date: period
+              }
+            }
+          }
+
+          return result
+        }, {})
 
       setData(Object.values(result))
     }
