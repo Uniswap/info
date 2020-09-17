@@ -67,46 +67,12 @@ function RewardsPage() {
         .sort((a, b) => {
           return dayjs(a.date).valueOf() - dayjs(b.date).valueOf()
         })
-        .reduce((result, currentRecord) => {
-          if (dayjs(currentRecord.date).isBefore(endDate)) {
-            const period = `From ${dayjs(startDate).format('YYYY-MM-DD')} to ${dayjs(endDate).format('YYYY-MM-DD')}`
-            const key = `${currentRecord.name}_${period}`
-            if (result[key]) {
-              result[key] = {
-                ...result[key],
-                reward: result[key].reward + currentRecord.reward,
-                usd: result[key].usd + currentRecord.usd,
-                date: period
-              }
-            } else {
-              result[key] = {
-                ...currentRecord,
-                date: period
-              }
-            }
-          } else {
+        .reduce((summary, currentRecord) => {
+          if (!dayjs(currentRecord.date).isBefore(endDate)) {
             startDate = endDate
             endDate = startDate.add(14, 'day')
-
-            const period = `From ${dayjs(startDate).format('YYYY-MM-DD')} to ${dayjs(endDate).format('YYYY-MM-DD')}`
-            const key = `${currentRecord.name}_${period}`
-
-            if (result[key]) {
-              result[key] = {
-                ...result[key],
-                reward: result[key].reward + currentRecord.reward,
-                usd: result[key].usd + currentRecord.usd,
-                date: period
-              }
-            } else {
-              result[key] = {
-                ...currentRecord,
-                date: period
-              }
-            }
           }
-
-          return result
+          return getReward(startDate, endDate, currentRecord, summary)
         }, {})
 
       setData(Object.values(result))
