@@ -399,7 +399,7 @@ const getTokenTransactions = async allPairsFormatted => {
 const getVerifiedTokens = async () => {
   try {
     // const res = await fetch('http://tokens.1inch.eth.link');
-    const res = await fetch('https://gateway.ipfs.io/ipfs/QmXen3f5Ar5TFxf538dCG3WF1tmbhi7WGA2yJz6iwbskMd');
+    const res = await fetch('https://gateway.ipfs.io/ipfs/QmbrAQYoLLUxQcDyVLyJ2mcUYRFVQai3u4eLWJkBj9C8pU');
     const tokens = (await res.json()).tokens.map((x) => x.address.toLowerCase());
     tokens.push(ETH);
     return tokens;
