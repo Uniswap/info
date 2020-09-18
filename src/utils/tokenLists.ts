@@ -1,6 +1,7 @@
 import { TokenList } from '@uniswap/token-lists'
 import schema from '@uniswap/token-lists/src/tokenlist.schema.json'
 import Ajv from 'ajv'
+import defi100 from '../constants/defi100.json'
 
 /**
  * Given a URI that may be ipfs, ipns, http, or https protocol, return the fetch-able http(s) URLs for the same content
@@ -39,13 +40,12 @@ export default async function getTokenList(listUrl: string): Promise<TokenList> 
     try {
       response = await fetch(url)
     } catch (error) {
-      console.debug('Failed to fetch list', listUrl, error)
-      if (isLast) throw new Error(`Failed to download list ${listUrl}`)
+      if (isLast) console.error(`Failed to download list ${listUrl}`)
       continue
     }
 
     if (!response.ok) {
-      if (isLast) throw new Error(`Failed to download list ${listUrl}`)
+      if (isLast) console.error(`Failed to download list ${listUrl}`)
       continue
     }
 
@@ -60,5 +60,6 @@ export default async function getTokenList(listUrl: string): Promise<TokenList> 
     }
     return json
   }
-  throw new Error('Unrecognized list URL protocol.')
+  console.error('Unrecognized list URL protocol.')
+  return defi100
 }
