@@ -130,14 +130,28 @@ function PairPage({ pairAddress, history }) {
   }, [])
   const transactions = usePairTransactions(TEMP_PAIR_ADDRESS)
   const backgroundColor = useColor(TEMP_PAIR_ADDRESS)
-  const { markets } = useAllMarketData()
+  const { markets, marketPairs } = useAllMarketData()
 
   // Overwrite token0 data with market date
-  const selectedMarket = markets.find(market => market.id === pairAddress)
-  if (selectedMarket && token0) {
-    token0.id = selectedMarket?.id
-    token0.name = selectedMarket?.description
-    token0.symbol = selectedMarket?.description
+  const getMetaDataForAMM = (ammAddress, marketPairs) => {
+    return (
+      Object.keys(marketPairs)
+        .map(pair => marketPairs[pair])
+        .find(pair => pair.id.toUpperCase() === ammAddress.toUpperCase()) || {}
+    )
+  }
+
+  let selectedMarket = null
+  if (marketPairs && pairAddress) {
+    const metaData = getMetaDataForAMM(pairAddress, marketPairs)
+
+    selectedMarket = markets.find(market => market.id === metaData.token1.id)
+
+    if (selectedMarket && token0) {
+      token0.id = selectedMarket?.id
+      token0.name = selectedMarket?.description
+      token0.symbol = selectedMarket?.description
+    }
   }
 
   // liquidity
