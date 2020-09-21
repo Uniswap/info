@@ -291,3 +291,5 @@ export function safeAccess(object, path) {
       )
     : null
 }
+
+export const formatAddress = address => address.slice(0, 6) + '...' + address.slice(38, 42)
