@@ -6,7 +6,7 @@ import Link from '../Link'
 
 import { formatAddress, formatDate } from '../../utils'
 
-import { STATUS } from '../../constants'
+import { STATUS, STATUS_COLOR } from '../../constants'
 import { ASSETS_MAP } from '../../constants/assets'
 import FormattedName from '../FormattedName'
 import TokenLogo from '../TokenLogo'
@@ -31,15 +31,21 @@ const TransactionWrapper = styled.div`
     a {
       display: flex;
       justify-content: space-between;
+      align-items: center;
       transition: height 1s;
       width: 300px;
-      height: 24px;
+      height: 28px;
 
       .label {
         color: #ff007a;
         width: 134px;
         text-align: left;
       }
+    }
+
+    img {
+      width: 20px;
+      height: 20px;
     }
 
     a {
@@ -125,7 +131,11 @@ export default ({ transaction }) => {
         </div>
         <div>
           <span className="label">Status:</span>
-          <DataText>{STATUS[status]}</DataText>
+          <DataText>
+            <span style={{ textTransform: 'capitalize', color: STATUS_COLOR[STATUS[status]] }}>
+              {STATUS[status].toLowerCase()}
+            </span>
+          </DataText>
         </div>
         <div>
           <span className="label">Sent:</span>
@@ -142,20 +152,30 @@ export default ({ transaction }) => {
           </DataText>
         </div>
         <div>
-          <span className="label">From: </span>
-          <span>{formatAddress(sender)}</span>
+          <Link color={'#ff007a'} external href={`${ASSETS_MAP[network].addressExplorer}${sender}`}>
+            {
+              <>
+                <span>From: </span> {formatAddress(sender)}
+              </>
+            }
+          </Link>
         </div>
         <div>
-          <span className="label">To: </span>
-          <span>{formatAddress(outputAddress)}</span>
+          <Link color={'#ff007a'} external href={`${ASSETS_MAP[outputNetwork].addressExplorer}${outputAddress}`}>
+            {
+              <>
+                <span>To: </span> {formatAddress(outputAddress)}
+              </>
+            }
+          </Link>
         </div>
         <div>
           <span className="label">Block: </span>
-          <span>{blockNumber}</span>
+          <DataText>{blockNumber}</DataText>
         </div>
         <div>
           <span className="label">Expiration: </span>
-          <span>{formatDate(expiration)}</span>
+          <DataText>{formatDate(expiration)}</DataText>
         </div>
 
         {completenessTransactionHash && (

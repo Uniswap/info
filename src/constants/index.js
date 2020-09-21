@@ -13,3 +13,11 @@ export const STATUS = {
   3: 'COMPLETED', // Swap is withdrawn -> final state.
   4: 'EXPIRED' // Swap is expired -> can go to REFUNDED
 }
+
+export const STATUS_COLOR = {
+  INVALID: 'grey',
+  COMPLETED: 'green',
+  ACTIVE: 'yellow',
+  EXPIRED: 'grey',
+  REFUNDED: 'green'
+}

@@ -237,7 +237,7 @@ function TxnList({ history, color }) {
               external
               href={`${ASSETS_MAP[item.outputNetwork].addressExplorer}${item.outputAddress}`}
             >
-              {item.outputAddress && iformatAddress(item.outputAddress)}
+              {item.outputAddress && formatAddress(item.outputAddress)}
             </Link>
           </DataText>
         )}
