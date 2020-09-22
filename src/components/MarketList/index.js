@@ -10,6 +10,7 @@ import { formatTime } from '../../utils'
 import { useMedia } from 'react-use'
 import { withRouter } from 'react-router-dom'
 import { TYPE } from '../../Theme'
+import { BasicLink } from '../Link'
 
 dayjs.extend(utc)
 
@@ -143,9 +144,9 @@ function MarketList({ markets, itemMax = 10 }) {
   const ListItem = ({ item, index }) => {
     return (
       <DashGrid style={{ height: '48px' }} focus={true}>
-        <DataText style={{ width: '100%' }} area="name" fontWeight="500">
+        <BasicLink style={{ width: '100%' }} to={'/token/' + item.id} key={item.id}>
           {item.description}
-        </DataText>
+        </BasicLink>
         <DataText area="status">
           <span
             style={
