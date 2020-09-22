@@ -11,7 +11,6 @@ import { TrendingUp, User, DollarSign, PieChart, Disc } from 'react-feather'
 import { useSessionStart, useConfig } from '../../contexts/Application'
 import { useDarkModeManager } from '../../contexts/LocalStorage'
 import { useAccountWeb3 } from '../../contexts/Account'
-import { isMain } from '../../constants'
 import Toggle from '../Toggle'
 
 const Wrapper = styled.div`

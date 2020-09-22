@@ -24,7 +24,6 @@ import CopyHelper from '../components/Copy'
 import { useMedia } from 'react-use'
 import { useDataForList } from '../contexts/PairData'
 import { useEffect } from 'react'
-import Warning from '../components/Warning'
 import { usePathDismissed, useSavedTokens } from '../contexts/LocalStorage'
 import { Hover, PageWrapper, ContentWrapper, StyledIcon } from '../components'
 import { PlusCircle, Bookmark } from 'react-feather'
@@ -156,9 +155,7 @@ function TokenPage({ address, history }) {
   const LENGTH = below1080 ? 10 : 16
   const formattedSymbol = symbol?.length > LENGTH ? symbol.slice(0, LENGTH) + '...' : symbol
 
-  const [dismissed, markAsDismissed] = usePathDismissed(history.location.pathname)
   const [savedTokens, addToken] = useSavedTokens()
-  const listedTokens = useListedTokens()
 
   useEffect(() => {
     window.scrollTo({
@@ -170,13 +167,6 @@ function TokenPage({ address, history }) {
   return (
     <PageWrapper>
       <ThemedBackground backgroundColor={transparentize(0.6, backgroundColor)} />
-
-      <Warning
-        type={'token'}
-        show={!dismissed && listedTokens && !listedTokens.includes(address)}
-        setShow={markAsDismissed}
-        address={address}
-      />
       <ContentWrapper>
         <RowBetween style={{ flexWrap: 'wrap', alingItems: 'start' }}>
           <AutoRow align="flex-end" style={{ width: 'fit-content' }}>
@@ -198,7 +188,7 @@ function TokenPage({ address, history }) {
           {!below600 && <Search small={true} />}
         </RowBetween>
 
-        <WarningGrouping disabled={!dismissed && listedTokens && !listedTokens.includes(address)}>
+        <WarningGrouping>
           <DashboardWrapper style={{ marginTop: below1080 ? '0' : '1rem' }}>
             <RowBetween style={{ flexWrap: 'wrap', marginBottom: '2rem', alignItems: 'flex-start' }}>
               <RowFixed style={{ flexWrap: 'wrap' }}>
@@ -222,19 +212,6 @@ function TokenPage({ address, history }) {
               </RowFixed>
               <span>
                 <RowFixed ml={below500 ? '0' : '2.5rem'} mt={below500 ? '1rem' : '0'}>
-                  {!!!savedTokens[address] && !below800 ? (
-                    <Hover onClick={() => addToken(address, symbol)}>
-                      <StyledIcon>
-                        <PlusCircle style={{ marginRight: '0.5rem' }} />
-                      </StyledIcon>
-                    </Hover>
-                  ) : !below1080 ? (
-                    <StyledIcon>
-                      <Bookmark style={{ marginRight: '0.5rem', opacity: 0.4 }} />
-                    </StyledIcon>
-                  ) : (
-                    <></>
-                  )}
                   <Link href={getPoolLink(address)} target="_blank">
                     <ButtonLight color={backgroundColor}>+ Add Liquidity</ButtonLight>
                   </Link>

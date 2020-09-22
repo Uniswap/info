@@ -36,7 +36,7 @@ const Wrapper = styled.div`
   flex-direction: row;
   align-items: center;
   justify-content: flex-end;
-  padding: 12px 16px;
+  padding: 0;
   border-radius: 12px;
   background: ${({ theme, small, open }) =>
     small ? (open ? transparentize(0.4, theme.bg1) : 'none') : transparentize(0.4, theme.bg6)};
@@ -67,8 +67,13 @@ const Input = styled.input`
   border: none;
   outline: none;
   width: 100%;
-  color: ${({ theme }) => theme.text1};
+  background-color: ${({ theme }) => theme.background};
+  padding: 1rem;
   font-size: ${({ large }) => (large ? '20px' : '14px')};
+  color: ${({ theme }) => theme.text3};
+
+  box-shadow: 0px 8px 12px rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
 
   ::placeholder {
     color: ${({ theme }) => theme.text3};
@@ -89,6 +94,7 @@ const SearchIconLarge = styled(SearchIcon)`
   position: absolute;
   right: 10px;
   pointer-events: none;
+  padding: 0.25rem;
   color: ${({ theme }) => theme.text3};
 `
 
@@ -440,17 +446,7 @@ export const Search = ({ small = false }) => {
           large={!small}
           type={'text'}
           ref={wrapperRef}
-          placeholder={
-            small
-              ? ''
-              : below410
-              ? 'Search...'
-              : below470
-              ? 'Search ..'
-              : below700
-              ? 'Search pairs and markets...'
-              : 'Search pairs, tokens and markets...'
-          }
+          placeholder={'Search markets ...'}
           value={value}
           onChange={e => {
             setValue(e.target.value)

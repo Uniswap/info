@@ -112,7 +112,7 @@ function GlobalPage() {
 
           <ListOptions gap="10px" style={{ marginTop: '2rem', marginBottom: '.5rem' }}>
             <RowBetween>
-              <TYPE.main fontSize={'1.125rem'}>All Markets</TYPE.main>
+              <TYPE.main fontSize={'1.125rem'}>Augur Markets</TYPE.main>
               <CustomLink to={'/tokens'}>See All</CustomLink>
             </RowBetween>
           </ListOptions>

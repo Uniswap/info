@@ -24,7 +24,6 @@ import DoubleTokenLogo from '../components/DoubleLogo'
 import TokenLogo from '../components/TokenLogo'
 import { Hover } from '../components'
 import { useEthPrice } from '../contexts/GlobalData'
-import Warning from '../components/Warning'
 import { usePathDismissed, useSavedPairs } from '../contexts/LocalStorage'
 
 import { Bookmark, PlusCircle } from 'react-feather'
@@ -212,8 +211,6 @@ function PairPage({ pairAddress, history }) {
   const below900 = useMedia('(max-width: 900px)')
   const below600 = useMedia('(max-width: 600px)')
 
-  const [dismissed, markAsDismissed] = usePathDismissed(history.location.pathname)
-
   useEffect(() => {
     window.scrollTo({
       behavior: 'smooth',
@@ -223,30 +220,13 @@ function PairPage({ pairAddress, history }) {
 
   const [savedPairs, addPair] = useSavedPairs()
 
-  const listedTokens = useListedTokens()
-
   return (
     <PageWrapper>
       <ThemedBackground backgroundColor={transparentize(0.6, backgroundColor)} />
       <span />
-      <Warning
-        type={'pair'}
-        show={!dismissed && listedTokens && !(listedTokens.includes(token0?.id) && listedTokens.includes(token1?.id))}
-        setShow={markAsDismissed}
-        address={TEMP_PAIR_ADDRESS}
-      />
       <ContentWrapperLarge>
-        <RowBetween>
-          <TYPE.body>
-            <BasicLink to="/pairs">{'Pairs '}</BasicLink>→ {token0?.symbol}-{token1?.symbol}
-          </TYPE.body>
-          {!below600 && <Search small={true} />}
-        </RowBetween>
-        <WarningGrouping
-          disabled={
-            !dismissed && listedTokens && !(listedTokens.includes(token0?.id) && listedTokens.includes(token1?.id))
-          }
-        >
+        <RowBetween style={{ justifyContent: 'flex-end' }}>{!below600 && <Search small={true} />}</RowBetween>
+        <WarningGrouping>
           <DashboardWrapper>
             <AutoColumn gap="40px" style={{ marginBottom: '1.5rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', width: '100%' }}>
@@ -276,22 +256,6 @@ function PairPage({ pairAddress, history }) {
                   mt={below1080 && '1rem'}
                   style={{ flexDirection: below1080 ? 'row-reverse' : 'initial' }}
                 >
-                  {!!!savedPairs[TEMP_PAIR_ADDRESS] && !below1080 ? (
-                    <Hover
-                      onClick={() => addPair(TEMP_PAIR_ADDRESS, token0.id, token1.id, token0.symbol, token1.symbol)}
-                    >
-                      <StyledIcon>
-                        <PlusCircle style={{ marginRight: '0.5rem' }} />
-                      </StyledIcon>
-                    </Hover>
-                  ) : !below1080 ? (
-                    <StyledIcon>
-                      <Bookmark style={{ marginRight: '0.5rem', opacity: 0.4 }} />
-                    </StyledIcon>
-                  ) : (
-                    <></>
-                  )}
-
                   <CustomLink
                     style={{ marginLeft: '20px', whiteSpace: 'nowrap' }}
                     to={'/liquidity/' + selectedMarket?.id}
