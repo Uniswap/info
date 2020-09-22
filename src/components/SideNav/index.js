@@ -10,7 +10,7 @@ import { withRouter } from 'react-router-dom'
 import { TrendingUp, User, DollarSign, PieChart, Disc } from 'react-feather'
 import { useSessionStart } from '../../contexts/Application'
 import { useDarkModeManager } from '../../contexts/LocalStorage'
-import { useGetWeb3 } from '../../contexts/Account'
+import { useAccountWeb3 } from '../../contexts/Account'
 import { isMain } from '../../constants'
 import Toggle from '../Toggle'
 
@@ -94,7 +94,7 @@ function SideNav({ history }) {
 
   const [isDark, toggleDarkMode] = useDarkModeManager()
 
-  const [web3, getWeb3, clearWeb3] = useGetWeb3()
+  const [web3, getWeb3, clearWeb3] = useAccountWeb3()
   const { address } = web3
 
   return (

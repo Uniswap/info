@@ -1,11 +1,13 @@
 import React, { createContext, useContext, useReducer, useMemo, useCallback, useState, useEffect } from 'react'
 import { timeframeOptions, SUPPORTED_LIST_URLS__NO_ENS } from '../constants'
-import Web3 from 'web3'
+
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import getTokenList from '../utils/tokenLists'
 import { healthClient } from '../apollo/client'
 import { SUBGRAPH_HEALTH } from '../apollo/queries'
+import config from '../config.json'
+import { ethers } from 'ethers'
 dayjs.extend(utc)
 
 const UPDATE = 'UPDATE'
@@ -14,6 +16,7 @@ const UPDATE_SESSION_START = 'UPDATE_SESSION_START'
 const UPDATE_WEB3 = 'UPDATE_WEB3'
 const UPDATED_SUPPORTED_TOKENS = 'UPDATED_SUPPORTED_TOKENS'
 const UPDATE_LATEST_BLOCK = 'UPDATE_LATEST_BLOCK'
+const UPDATE_CONTRACTS = 'UPDATE_CONTRACTS'
 
 const SUPPORTED_TOKENS = 'SUPPORTED_TOKENS'
 const TIME_KEY = 'TIME_KEY'
@@ -21,6 +24,7 @@ const CURRENCY = 'CURRENCY'
 const SESSION_START = 'SESSION_START'
 const WEB3 = 'WEB3'
 const LATEST_BLOCK = 'LATEST_BLOCK'
+const CONTRACTS = 'CONTRACTS'
 
 const ApplicationContext = createContext()
 
@@ -72,6 +76,14 @@ function reducer(state, { type, payload }) {
       return {
         ...state,
         [SUPPORTED_TOKENS]: supportedTokens
+      }
+    }
+
+    case UPDATE_CONTRACTS: {
+      const { contracts } = payload
+      return {
+        ...state,
+        [CONTRACTS]: contracts
       }
     }
 
@@ -144,14 +156,40 @@ export default function Provider({ children }) {
     })
   }, [])
 
+  const updateContracts = useCallback(contracts => {
+    dispatch({
+      type: UPDATE_CONTRACTS,
+      payload: {
+        contracts
+      }
+    })
+  }, [])
+
   return (
     <ApplicationContext.Provider
       value={useMemo(
         () => [
           state,
-          { update, updateSessionStart, updateTimeframe, updateWeb3, updateSupportedTokens, updateLatestBlock }
+          {
+            update,
+            updateSessionStart,
+            updateTimeframe,
+            updateWeb3,
+            updateSupportedTokens,
+            updateLatestBlock,
+            updateContracts
+          }
         ],
-        [state, update, updateTimeframe, updateWeb3, updateSessionStart, updateSupportedTokens, updateLatestBlock]
+        [
+          state,
+          update,
+          updateTimeframe,
+          updateWeb3,
+          updateSessionStart,
+          updateSupportedTokens,
+          updateLatestBlock,
+          updateContracts
+        ]
       )}
     >
       {children}
@@ -251,24 +289,6 @@ export function useSessionStart() {
   return parseInt(seconds / 1000)
 }
 
-/**
- * @todo this isnt used now - if ever needed probably better to use
- * web3-react instead of this custom hook
- */
-export function useWeb3() {
-  const [state, { updateWeb3 }] = useApplicationContext()
-  const web3 = state?.[WEB3]
-
-  useEffect(() => {
-    if (!web3) {
-      const web3 = new Web3(new Web3.providers.HttpProvider(process.env.REACT_APP_NETWORK_URL))
-      updateWeb3(web3)
-    }
-  })
-
-  return web3
-}
-
 export function useListedTokens() {
   const [state, { updateSupportedTokens }] = useApplicationContext()
   const supportedTokens = state?.[SUPPORTED_TOKENS]
@@ -289,4 +309,27 @@ export function useListedTokens() {
   }, [updateSupportedTokens, supportedTokens])
 
   return supportedTokens
+}
+
+export async function useContracts() {
+  const [state, { updateWeb3, updateContracts }] = useApplicationContext()
+  let web3 = state?.[WEB3]
+  let contracts = state?.[CONTRACTS]
+
+  const setup = async () => {
+    const address = await window.ethereum.enable()
+    const provider = new ethers.providers.Web3Provider(window.web3.currentProvider)
+    const signer = provider.getSigner()
+    const network = await provider.getNetwork()
+    web3 = { address, provider, signer, network }
+    updateWeb3(web3)
+    contracts = config[String(network.chainId)]
+    updateContracts(contracts)
+  }
+
+  if (!web3 || !contracts) {
+    await setup()
+  }
+
+  return { web3, contracts }
 }

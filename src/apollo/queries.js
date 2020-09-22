@@ -64,7 +64,7 @@ export const GET_BLOCK = gql`
 // Get all markets except CATEGORICAL
 export const GET_MARKETS = gql`
   {
-    markets(where: { marketType_not: CATEGORICAL }) {
+    markets(where: { marketType: YES_NO }) {
       description
       id
       endTimestamp

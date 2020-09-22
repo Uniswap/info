@@ -65,7 +65,7 @@ export default function Provider({ children }) {
   )
 }
 
-export function useGetWeb3() {
+export function useAccountWeb3() {
   const [state, { updateWeb3 }] = useAccountContext()
   const clearWeb3 = () => {
     updateWeb3({})

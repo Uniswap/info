@@ -100,7 +100,7 @@ const SORT_FIELD = {
   ENDTIMESTAMP: 'endTimestamp'
 }
 
-function Marketist({ markets, itemMax = 10 }) {
+function MarketList({ markets, itemMax = 10 }) {
   // page state
   const [page, setPage] = useState(1)
   const [maxPage, setMaxPage] = useState(1)
@@ -115,7 +115,7 @@ function Marketist({ markets, itemMax = 10 }) {
   useEffect(() => {
     setMaxPage(1) // edit this to do modular
     setPage(1)
-  }, [markets])
+  }, [])
 
   useEffect(() => {
     if (markets) {
@@ -237,4 +237,4 @@ function Marketist({ markets, itemMax = 10 }) {
   )
 }
 
-export default withRouter(Marketist)
+export default withRouter(MarketList)
