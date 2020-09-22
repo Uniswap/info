@@ -4,6 +4,7 @@ export const FACTORY_ADDRESS = '0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f'
 export const AMM_FACTORY_ADDRESS = '0x2966D979e66FcEA3ED9c41281149836bB420d15D'
 
 export const BUNDLE_ID = '1'
+export const DEFAULT_NETWORK = '42' // 1 is mainnet
 
 export const timeframeOptions = {
   WEEK: '1 week',
@@ -37,7 +38,3 @@ export const FEE_WARNING_TOKENS = ['0xd46ba6d942050d489dbd938a2c909a5d5039a161']
 
 export const AMMExchangeAbi = abi.AMMExchange
 export const AMMFactoryAbi = abi.AMMFactory
-
-export const isMain = () => {
-  return window.localStorage.getItem('mainnet') || false
-}

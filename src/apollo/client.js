@@ -1,7 +1,6 @@
 import { ApolloClient } from 'apollo-client'
 import { InMemoryCache } from 'apollo-cache-inmemory'
 import { HttpLink } from 'apollo-link-http'
-import { isMain } from '../constants'
 
 export const client = new ApolloClient({
   link: new HttpLink({
@@ -34,12 +33,12 @@ export const blockClient = new ApolloClient({
   cache: new InMemoryCache()
 })
 
-export const augurV2Client = new ApolloClient({
-  link: new HttpLink({
-    uri: !isMain()
-      ? 'https://api.thegraph.com/subgraphs/name/protofire/augur-v2-kovan'
-      : 'https://api.thegraph.com/subgraphs/name/protofire/augur-v2'
-  }),
-  cache: new InMemoryCache(),
-  shouldBatch: true
-})
+export function augurV2Client(uri) {
+  return new ApolloClient({
+    link: new HttpLink({
+      uri
+    }),
+    cache: new InMemoryCache(),
+    shouldBatch: true
+  })
+}

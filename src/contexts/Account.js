@@ -75,7 +75,8 @@ export function useAccountWeb3() {
     const login = async address => {
       const provider = new ethers.providers.Web3Provider(window.web3.currentProvider)
       const signer = provider.getSigner()
-      updateWeb3({ address, provider, signer })
+      const network = await provider.getNetwork()
+      updateWeb3({ address, provider, signer, network })
     }
 
     const address = await window.ethereum.enable()

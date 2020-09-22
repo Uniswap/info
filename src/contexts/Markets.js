@@ -7,6 +7,7 @@ import { augurV2Client } from '../apollo/client'
 import { GET_MARKETS } from '../apollo/queries'
 import { getAMMAddressForMarketShareToken } from '../utils/contractCalls'
 import { PARA_AUGUR_TOKENS } from '../contexts/TokenData'
+import { useConfig } from '../contexts/Application'
 
 const UPDATE = 'UPDATE'
 const UPDATE_MARKETS = ' UPDATE_MARKETS'
@@ -142,10 +143,11 @@ async function getAMMExchangePairs({ markets }) {
 }
 
 export function Updater() {
+  const config = useConfig()
   const [, { updateMarkets, updateMarketPairs }] = useMarketDataContext()
   useEffect(() => {
     async function getData() {
-      const response = await augurV2Client.query({ query: GET_MARKETS })
+      const response = await augurV2Client(config.augurClient).query({ query: GET_MARKETS })
 
       if (response) {
         updateMarkets(response.data)
@@ -154,7 +156,7 @@ export function Updater() {
       }
     }
     getData()
-  }, [updateMarkets, updateMarketPairs])
+  }, [updateMarkets, updateMarketPairs, config])
   return null
 }
 

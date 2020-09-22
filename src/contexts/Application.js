@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useReducer, useMemo, useCallback, useState, useEffect } from 'react'
-import { timeframeOptions, SUPPORTED_LIST_URLS__NO_ENS } from '../constants'
+import { timeframeOptions, SUPPORTED_LIST_URLS__NO_ENS, DEFAULT_NETWORK } from '../constants'
 
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
@@ -7,7 +7,6 @@ import getTokenList from '../utils/tokenLists'
 import { healthClient } from '../apollo/client'
 import { SUBGRAPH_HEALTH } from '../apollo/queries'
 import config from '../config.json'
-import { ethers } from 'ethers'
 dayjs.extend(utc)
 
 const UPDATE = 'UPDATE'
@@ -311,25 +310,7 @@ export function useListedTokens() {
   return supportedTokens
 }
 
-export async function useContracts() {
-  const [state, { updateWeb3, updateContracts }] = useApplicationContext()
-  let web3 = state?.[WEB3]
-  let contracts = state?.[CONTRACTS]
-
-  const setup = async () => {
-    const address = await window.ethereum.enable()
-    const provider = new ethers.providers.Web3Provider(window.web3.currentProvider)
-    const signer = provider.getSigner()
-    const network = await provider.getNetwork()
-    web3 = { address, provider, signer, network }
-    updateWeb3(web3)
-    contracts = config[String(network.chainId)]
-    updateContracts(contracts)
-  }
-
-  if (!web3 || !contracts) {
-    await setup()
-  }
-
-  return { web3, contracts }
+export function useConfig() {
+  const network = process.env.network || DEFAULT_NETWORK
+  return config[String(network)]
 }
