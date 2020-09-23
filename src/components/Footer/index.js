@@ -5,7 +5,7 @@ import Link from '../Link'
 
 const links = [
   { url: 'https://honeyswap.org', text: 'About' },
-  { url: 'https://github.com/1Hive/honeyswap/', text: 'Docs' },
+  { url: 'https://about.1hive.org/docs/honeyswap', text: 'Docs' },
   { url: 'https://github.com/1Hive/uniswap-info', text: 'Code' }
 ]
 

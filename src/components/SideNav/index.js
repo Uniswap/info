@@ -169,7 +169,7 @@ function SideNav({ history }) {
               </Link>
             </HeaderText>
             <HeaderText>
-              <Link href="https://github.com/1hive/honeyswap" target="_blank">
+              <Link href="https://about.1hive.org/docs/honeyswap" target="_blank">
                 Docs
               </Link>
             </HeaderText>
