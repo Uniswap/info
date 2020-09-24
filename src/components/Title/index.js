@@ -21,8 +21,8 @@ export default function Title() {
 
   return (
     <TitleWrapper onClick={() => history.push('/')}>
-      <Flex alignItems="end">
-        <RowFixed>
+      <Flex alignItems="start">
+        <RowFixed style={{ justifyContent: 'flex-start', alignItems: 'end' }}>
           <svg width="96" height="32" viewBox="0 0 120 40" fill="none">
             <path
               fillRule="evenodd"
@@ -44,8 +44,8 @@ export default function Title() {
               <path d="M0 0H36.52V40H0V0Z" fill="white"></path>
             </defs>
           </svg>
+          <TYPE.largeHeader style={{ fontWeight: '400' }}>AMM</TYPE.largeHeader>
         </RowFixed>
-        <TYPE.largeHeader style={{ fontWeight: '400' }}>AMM</TYPE.largeHeader>
       </Flex>
     </TitleWrapper>
   )

@@ -84,14 +84,10 @@ const LargeBoxTextWrapper = styled(Text)`
   box-sizing: border-box;
   border-radius: 12px;
   padding: 0.25rem 0;
-  margin: 0 0.5rem;
   width: 300px;
   display: flex;
   flex-flow: column;
-
-  > div {
-    justify-content: space-between;
-  }
+  margin: 0.5rem 0;
 `
 const BoxedRow = styled(Text)`
   display: flex;

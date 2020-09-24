@@ -39,51 +39,33 @@ export default function GlobalStats() {
     <Header>
       <RowBetween>
         <RowFixed>
-          {!below400 && (
-            <TYPE.boxed
-              mr={'1rem'}
-              onMouseEnter={() => {
-                setShowPriceCard(true)
-              }}
-              onMouseLeave={() => {
-                setShowPriceCard(false)
-              }}
-              style={{ position: 'relative' }}
-            >
-              <TYPE.boxedRow>
-                <span>ETH price: </span>
-              </TYPE.boxedRow>
-              <TYPE.boxedRow>
-                <TYPE.largeHeader>{formattedEthPrice}</TYPE.largeHeader>
-                {showPriceCard && <UniPrice />}
-              </TYPE.boxedRow>
-            </TYPE.boxed>
-          )}
-
-          {!below1180 && (
-            <TYPE.boxed mr={'1rem'}>
-              <TYPE.boxedRow>Total Liquidity</TYPE.boxedRow>
-              <TYPE.boxedRow>
-                <TYPE.largeHeader>{localNumber(totalLiquidity)}</TYPE.largeHeader>
-              </TYPE.boxedRow>
-            </TYPE.boxed>
-          )}
-          {!below1024 && (
-            <TYPE.boxed mr={'1rem'}>
-              <TYPE.boxedRow>Volume (24 hrs): </TYPE.boxedRow>
-              <TYPE.boxedRow>
-                <TYPE.largeHeader>${localNumber(oneDayVolumeUSD)}</TYPE.largeHeader>
-              </TYPE.boxedRow>
-            </TYPE.boxed>
-          )}
-          {!below1295 && (
-            <TYPE.boxed>
-              <TYPE.boxedRow>Transactions (24 hrs):</TYPE.boxedRow>
-              <TYPE.boxedRow>
-                <TYPE.largeHeader>{oneDayTxns}</TYPE.largeHeader>
-              </TYPE.boxedRow>
-            </TYPE.boxed>
-          )}
+          <TYPE.boxed mb={'0.5rem'}>
+            <TYPE.boxedRow>
+              <span>ETH price: </span>
+            </TYPE.boxedRow>
+            <TYPE.boxedRow>
+              <TYPE.largeHeader>{formattedEthPrice}</TYPE.largeHeader>
+              {showPriceCard && <UniPrice />}
+            </TYPE.boxedRow>
+          </TYPE.boxed>
+          <TYPE.boxed mb={'0.5rem'}>
+            <TYPE.boxedRow>Total Liquidity</TYPE.boxedRow>
+            <TYPE.boxedRow>
+              <TYPE.largeHeader>{localNumber(totalLiquidity)}</TYPE.largeHeader>
+            </TYPE.boxedRow>
+          </TYPE.boxed>
+          <TYPE.boxed mb={'0.5rem'}>
+            <TYPE.boxedRow>Volume (24 hrs): </TYPE.boxedRow>
+            <TYPE.boxedRow>
+              <TYPE.largeHeader>${localNumber(oneDayVolumeUSD)}</TYPE.largeHeader>
+            </TYPE.boxedRow>
+          </TYPE.boxed>
+          <TYPE.boxed mb={'0.5rem'}>
+            <TYPE.boxedRow>Transactions (24 hrs):</TYPE.boxedRow>
+            <TYPE.boxedRow>
+              <TYPE.largeHeader>{oneDayTxns}</TYPE.largeHeader>
+            </TYPE.boxedRow>
+          </TYPE.boxed>
         </RowFixed>
       </RowBetween>
     </Header>

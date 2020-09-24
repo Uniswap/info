@@ -31,7 +31,10 @@ export const AutoRow = styled(Row)`
 `
 
 export const RowFixed = styled(Row)`
-  width: fit-content;
+  /*width: fit-content;*/
+  justify-content: space-between;
+  flex-flow: row wrap;
+  align-items: center;
 `
 
 export default Row
