@@ -84,8 +84,9 @@ const LargeBoxTextWrapper = styled(Text)`
   box-sizing: border-box;
   border-radius: 12px;
   padding: 0.25rem 0;
-  width: 300px;
   display: flex;
+  flex-grow: 1;
+  flex-shrink: 0;
   flex-flow: column;
   margin: 0.5rem 0;
 `

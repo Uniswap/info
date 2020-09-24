@@ -268,9 +268,11 @@ function TokenPage({ address, history }) {
                     </RowBetween>
                   </AutoColumn>
                 </Panel>
+                {/*
                 <Panel style={{ gridColumn: below1080 ? '1' : '2/4', gridRow: below1080 ? '' : '1/4' }}>
                   <TokenChart address={address} color={backgroundColor} base={priceUSD} />
                 </Panel>
+                */}
               </PanelWrapper>
             </>
 
@@ -299,6 +301,7 @@ function TokenPage({ address, history }) {
               {transactions ? <TxnList color={backgroundColor} transactions={transactions} /> : <Loader />}
             </Panel>
             <>
+              {/* 
               <RowBetween style={{ marginTop: '3rem' }}>
                 <TYPE.main fontSize={'1.125rem'}>Token Information</TYPE.main>{' '}
               </RowBetween>
@@ -338,6 +341,7 @@ function TokenPage({ address, history }) {
                   </ButtonLight>
                 </TokenDetailsLayout>
               </Panel>
+             */}
             </>
           </DashboardWrapper>
         </WarningGrouping>

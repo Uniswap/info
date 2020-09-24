@@ -38,8 +38,12 @@ export default function GlobalStats() {
   return (
     <Header>
       <RowBetween>
-        <RowFixed>
-          <TYPE.boxed mb={'0.5rem'}>
+        <RowFixed
+          style={
+            below816 ? { flexFlow: 'column', alignItems: 'stretch', justifyContent: 'flex-start' } : { flexFlow: 'row' }
+          }
+        >
+          <TYPE.boxed mb={'0.5rem'} mr={'0.25rem'}>
             <TYPE.boxedRow>
               <span>ETH price: </span>
             </TYPE.boxedRow>
@@ -48,13 +52,13 @@ export default function GlobalStats() {
               {showPriceCard && <UniPrice />}
             </TYPE.boxedRow>
           </TYPE.boxed>
-          <TYPE.boxed mb={'0.5rem'}>
+          <TYPE.boxed mb={'0.5rem'} mr={'0.25rem'}>
             <TYPE.boxedRow>Total Liquidity</TYPE.boxedRow>
             <TYPE.boxedRow>
               <TYPE.largeHeader>{localNumber(totalLiquidity)}</TYPE.largeHeader>
             </TYPE.boxedRow>
           </TYPE.boxed>
-          <TYPE.boxed mb={'0.5rem'}>
+          <TYPE.boxed mb={'0.5rem'} mr={'0.25rem'}>
             <TYPE.boxedRow>Volume (24 hrs): </TYPE.boxedRow>
             <TYPE.boxedRow>
               <TYPE.largeHeader>${localNumber(oneDayVolumeUSD)}</TYPE.largeHeader>

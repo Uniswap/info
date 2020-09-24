@@ -149,6 +149,7 @@ export function Updater() {
     async function getData() {
       let response = null
       try {
+        console.log('call the graph to get market data')
         response = await augurV2Client(config.augurClient).query({ query: GET_MARKETS })
       } catch (e) {
         console.error(e)
