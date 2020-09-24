@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useReducer, useMemo, useCallback, useState, useEffect } from 'react'
-import { timeframeOptions, SUPPORTED_LIST_URLS__NO_ENS, DEFAULT_NETWORK, WETH } from '../constants'
+import { timeframeOptions, SUPPORTED_LIST_URLS__NO_ENS, DEFAULT_NETWORK } from '../constants'
 
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'

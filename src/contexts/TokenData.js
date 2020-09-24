@@ -309,7 +309,7 @@ const getTopTokens = async (ethPrice, ethPriceOld) => {
     console.log(e)
   }
 }
-
+/*
 const getTokenData = async (market, address, ethPrice, ethPriceOld) => {
   const utcCurrentTime = dayjs()
   const utcOneDayBack = utcCurrentTime
@@ -425,7 +425,7 @@ const getTokenData = async (market, address, ethPrice, ethPriceOld) => {
   }
   return data
 }
-
+*/
 const getTokenTransactions = async allPairsFormatted => {
   const transactions = {}
   try {
@@ -444,7 +444,7 @@ const getTokenTransactions = async allPairsFormatted => {
   }
   return transactions
 }
-
+/*
 const getTokenPairs = async tokenAddress => {
   try {
     // fetch all current and historical data
@@ -457,7 +457,7 @@ const getTokenPairs = async tokenAddress => {
     console.log(e)
   }
 }
-
+*/
 const getIntervalTokenData = async (tokenAddress, startTime, interval = 3600, latestBlock) => {
   const utcEndTime = dayjs.utc()
   let time = startTime

@@ -1,36 +1,36 @@
 import React, { useState } from 'react'
 import 'feather-icons'
 import { withRouter } from 'react-router-dom'
-import { Text } from 'rebass'
+//import { Text } from 'rebass'
 import styled from 'styled-components'
-import Link from '../components/Link'
+//import Link from '../components/Link'
 import Panel from '../components/Panel'
 import TokenLogo from '../components/TokenLogo'
 import PairList from '../components/PairList'
 import Loader from '../components/LocalLoader'
-import { AutoRow, RowBetween, RowFixed } from '../components/Row'
-import Column, { AutoColumn } from '../components/Column'
+import { RowBetween, RowFixed } from '../components/Row'
+import { AutoColumn } from '../components/Column'
 import { ButtonLight, ButtonDark } from '../components/ButtonStyled'
 import TxnList from '../components/TxnList'
-import TokenChart from '../components/TokenChart'
-import { BasicLink } from '../components/Link'
+//import TokenChart from '../components/TokenChart'
+//import { BasicLink } from '../components/Link'
 import Search from '../components/Search'
-import { formattedNum, formattedPercent, getPoolLink, getSwapLink, localNumber } from '../utils'
+import { formattedNum, formattedPercent, localNumber } from '../utils'
 import { useTokenData, useTokenTransactions, useTokenPairs } from '../contexts/TokenData'
 import { TYPE, ThemedBackground } from '../Theme'
 import { transparentize } from 'polished'
 import { useColor } from '../hooks'
-import CopyHelper from '../components/Copy'
+//import CopyHelper from '../components/Copy'
 import { useMedia } from 'react-use'
-import { useDataForList } from '../contexts/PairData'
+//import { useDataForList } from '../contexts/PairData'
 import { useEffect } from 'react'
-import { usePathDismissed, useSavedTokens } from '../contexts/LocalStorage'
-import { Hover, PageWrapper, ContentWrapper, StyledIcon } from '../components'
-import { PlusCircle, Bookmark } from 'react-feather'
+//import { usePathDismissed, useSavedTokens } from '../contexts/LocalStorage'
+import { PageWrapper, ContentWrapper } from '../components'
+//import { PlusCircle, Bookmark } from 'react-feather'
 import FormattedName from '../components/FormattedName'
-import { getCashAddress } from '../contexts/Application'
-import { WETH } from '../constants'
-import { useAllMarketData } from '../contexts/Markets'
+//import { getCashAddress } from '../contexts/Application'
+//import { WETH } from '../constants'
+//import { useAllMarketData } from '../contexts/Markets'
 
 const DashboardWrapper = styled.div`
   width: 100%;
@@ -57,7 +57,7 @@ const PanelWrapper = styled.div`
     }
   }
 `
-
+/*
 const TokenDetailsLayout = styled.div`
   display: inline-grid;
   width: 100%;
@@ -83,7 +83,7 @@ const TokenDetailsLayout = styled.div`
     }
   }
 `
-
+*/
 const WarningGrouping = styled.div`
   opacity: ${({ disabled }) => disabled && '0.4'};
   pointer-events: ${({ disabled }) => disabled && 'none'};
@@ -151,7 +151,6 @@ function TokenPage({ address, history }) {
   const below1080 = useMedia('(max-width: 1080px)')
   const below800 = useMedia('(max-width: 800px)')
   const below600 = useMedia('(max-width: 600px)')
-  const below500 = useMedia('(max-width: 500px)')
 
   // format for long symbol
   const LENGTH = below1080 ? 10 : 16

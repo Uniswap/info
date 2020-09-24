@@ -11,10 +11,7 @@ import { isAddress } from './utils'
 import AccountPage from './pages/AccountPage'
 import TradePage from './pages/TradePage'
 import LiquidityPage from './pages/LiquidityPage'
-import AllTokensPage from './pages/AllTokensPage'
 import AllMarketsPage from './pages/AllMarketsPage'
-import AllPairsPage from './pages/AllPairsPage'
-import PinnedData from './components/PinnedData'
 import SideNav from './components/SideNav'
 import AccountLookup from './pages/AccountLookup'
 import { OVERVIEW_TOKEN_BLACKLIST, PAIR_BLACKLIST } from './constants'
@@ -40,7 +37,7 @@ const ContentWrapper = styled.div`
     grid-gap: 0;
   }
 `
-
+/*
 const Right = styled.div`
   position: fixed;
   right: 0;
@@ -54,7 +51,7 @@ const Right = styled.div`
     display: none;
   }
 `
-
+*/
 const Center = styled.div`
   height: 100%;
   z-index: 9999;

@@ -7,28 +7,28 @@ import { formattedNum, localNumber } from '../../utils'
 
 import UniPrice from '../UniPrice'
 import { TYPE } from '../../Theme'
-import TokenLogo from '../TokenLogo'
-import { getCashAddress } from '../../contexts/Application'
-import { WETH } from '../../constants'
+//import TokenLogo from '../TokenLogo'
+//import { getCashAddress } from '../../contexts/Application'
+//import { WETH } from '../../constants'
 
 const Header = styled.div`
   width: 100%;
   position: sticky;
   top: 0;
 `
-
+/*
 const Medium = styled.span`
   font-weight: 500;
 `
-
+*/
 export default function GlobalStats() {
-  const below1295 = useMedia('(max-width: 1295px)')
-  const below1180 = useMedia('(max-width: 1180px)')
-  const below1024 = useMedia('(max-width: 1024px)')
-  const below400 = useMedia('(max-width: 400px)')
+  //  const below1295 = useMedia('(max-width: 1295px)')
+  //  const below1180 = useMedia('(max-width: 1180px)')
+  //  const below1024 = useMedia('(max-width: 1024px)')
+  //  const below400 = useMedia('(max-width: 400px)')
   const below816 = useMedia('(max-width: 816px)')
 
-  const [showPriceCard, setShowPriceCard] = useState(false)
+  const [showPriceCard] = useState(false)
 
   const { oneDayVolumeUSD, oneDayTxns } = useGlobalData()
   const [ethPrice] = useEthPrice()

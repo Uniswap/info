@@ -10,7 +10,7 @@ import { useAllTokenData, useTokenData } from '../../contexts/TokenData'
 import { useAllPairData, usePairData } from '../../contexts/PairData'
 import { useAllMarketData } from '../../contexts/Markets'
 import DoubleTokenLogo from '../DoubleLogo'
-import { useMedia } from 'react-use'
+//import { useMedia } from 'react-use'
 import { useAllPairsInUniswap, useAllTokensInUniswap } from '../../contexts/GlobalData'
 import { useConfig } from '../../contexts/Application'
 import { OVERVIEW_TOKEN_BLACKLIST, PAIR_BLACKLIST } from '../../constants'
@@ -175,9 +175,9 @@ export const Search = ({ small = false }) => {
   useTokenData(value)
   usePairData(value)
 
-  const below700 = useMedia('(max-width: 700px)')
-  const below470 = useMedia('(max-width: 470px)')
-  const below410 = useMedia('(max-width: 410px)')
+  //const below700 = useMedia('(max-width: 700px)')
+  //const below470 = useMedia('(max-width: 470px)')
+  //const below410 = useMedia('(max-width: 410px)')
 
   useEffect(() => {
     if (value !== '') {

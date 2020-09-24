@@ -3,17 +3,17 @@ import { useMedia } from 'react-use'
 import dayjs from 'dayjs'
 import LocalLoader from '../LocalLoader'
 import utc from 'dayjs/plugin/utc'
-import { Box, Flex } from 'rebass'
+import { Box } from 'rebass'
 import styled from 'styled-components'
-import { checkIfDeployed } from '../../utils/contractCalls'
-import { CustomLink } from '../Link'
+//import { checkIfDeployed } from '../../utils/contractCalls'
+//import { CustomLink } from '../Link'
 import { Divider } from '../../components'
 import { withRouter } from 'react-router-dom'
 import DoubleTokenLogo from '../DoubleLogo'
 import FormattedName from '../FormattedName'
 import { TYPE } from '../../Theme'
-import { Type } from 'react-feather'
-import { Row, RowFixed } from '../Row'
+//import { Type } from 'react-feather'
+import { RowFixed } from '../Row'
 import { ButtonLight, ButtonDark } from '../ButtonStyled'
 
 dayjs.extend(utc)
@@ -77,6 +77,7 @@ const DashGrid = styled.div`
 
 const ListWrapper = styled.div``
 
+/*
 const DataText = styled(Flex)`
   align-items: center;
   text-align: center;
@@ -90,6 +91,7 @@ const DataText = styled(Flex)`
     font-size: 12px;
   }
 `
+*/
 
 const SORT_FIELD = {
   LIQ: 0,
@@ -109,7 +111,7 @@ const FIELD_TO_VALUE = {
 function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
   const below600 = useMedia('(max-width: 600px)')
   const below740 = useMedia('(max-width: 740px)')
-  const below1080 = useMedia('(max-width: 1080px)')
+  //  const below1080 = useMedia('(max-width: 1080px)')
 
   // pagination
   const [page, setPage] = useState(1)

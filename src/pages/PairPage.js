@@ -3,7 +3,7 @@ import { withRouter } from 'react-router-dom'
 import 'feather-icons'
 import styled from 'styled-components'
 import Panel from '../components/Panel'
-import { PageWrapper, ContentWrapperLarge, StyledIcon } from '../components/index'
+import { PageWrapper, ContentWrapperLarge } from '../components/index'
 import { AutoRow, RowBetween, RowFixed } from '../components/Row'
 import Column, { AutoColumn } from '../components/Column'
 import { ButtonLight, ButtonDark } from '../components/ButtonStyled'
@@ -11,7 +11,7 @@ import PairChart from '../components/PairChart'
 import Link, { CustomLink } from '../components/Link'
 import TxnList from '../components/TxnList'
 import Loader from '../components/LocalLoader'
-import { BasicLink } from '../components/Link'
+//import { BasicLink } from '../components/Link'
 import Search from '../components/Search'
 import { formattedNum, formattedPercent } from '../utils'
 import { useColor } from '../hooks'
@@ -24,11 +24,10 @@ import DoubleTokenLogo from '../components/DoubleLogo'
 import TokenLogo from '../components/TokenLogo'
 import { Hover } from '../components'
 import { useEthPrice } from '../contexts/GlobalData'
-import { usePathDismissed, useSavedPairs } from '../contexts/LocalStorage'
 
-import { Bookmark, PlusCircle } from 'react-feather'
+//import { Bookmark, PlusCircle } from 'react-feather'
 import FormattedName from '../components/FormattedName'
-import { useListedTokens } from '../contexts/Application'
+//import { useListedTokens } from '../contexts/Application'
 import { useAllMarketData } from '../contexts/Markets'
 
 const DashboardWrapper = styled.div`
@@ -217,8 +216,6 @@ function PairPage({ pairAddress, history }) {
       top: 0
     })
   }, [])
-
-  const [savedPairs, addPair] = useSavedPairs()
 
   return (
     <PageWrapper>
