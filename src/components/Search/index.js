@@ -12,6 +12,7 @@ import { useAllMarketData } from '../../contexts/Markets'
 import DoubleTokenLogo from '../DoubleLogo'
 import { useMedia } from 'react-use'
 import { useAllPairsInUniswap, useAllTokensInUniswap } from '../../contexts/GlobalData'
+import { useConfig } from '../../contexts/Application'
 import { OVERVIEW_TOKEN_BLACKLIST, PAIR_BLACKLIST } from '../../constants'
 
 import { transparentize } from 'polished'
@@ -159,7 +160,8 @@ const Blue = styled.span`
 export const Search = ({ small = false }) => {
   let allTokens = useAllTokensInUniswap()
   const allTokenData = useAllTokenData()
-
+  const contracts = useConfig()
+  const { Cashes } = contracts
   let allPairs = useAllPairsInUniswap()
   const allPairData = useAllPairData()
   const { markets } = useAllMarketData()
@@ -519,13 +521,15 @@ export const Search = ({ small = false }) => {
           )}
           {filteredPairList &&
             filteredPairList.slice(0, pairsShown).map(pair => {
-              if (pair?.token0?.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
-                pair.token0.name = 'ETH (Wrapped)'
-                pair.token0.symbol = 'ETH'
+              const cash0 = Cashes.find(c => c.address === pair?.token0?.id)
+              if (cash0) {
+                pair.token0.name = cash0.name
+                pair.token0.symbol = cash0.symbol
               }
-              if (pair?.token1.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
-                pair.token1.name = 'ETH (Wrapped)'
-                pair.token1.symbol = 'ETH'
+              const cash1 = Cashes.find(c => c.address === pair?.token0?.id)
+              if (cash1) {
+                pair.token1.name = cash1.name
+                pair.token1.symbol = cash1.symbol
               }
               return (
                 <BasicLink to={'/pair/' + pair.id} key={pair.id} onClick={onDismiss}>

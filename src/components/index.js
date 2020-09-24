@@ -168,7 +168,6 @@ export const FullWrapper = styled.div`
 export const FixedMenu = styled.div`
   z-index: 99;
   width: 100%;
-  box-sizing: border-box;
   padding: 1rem;
   box-sizing: border-box;
   margin-bottom: 2rem;

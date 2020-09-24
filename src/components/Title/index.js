@@ -4,6 +4,7 @@ import styled from 'styled-components'
 
 import { Flex } from 'rebass'
 import { RowFixed } from '../Row'
+import { TYPE } from '../../Theme'
 
 const TitleWrapper = styled.div`
   text-decoration: none;
@@ -20,9 +21,9 @@ export default function Title() {
 
   return (
     <TitleWrapper onClick={() => history.push('/')}>
-      <Flex alignItems="center">
+      <Flex alignItems="end">
         <RowFixed>
-          <svg width="120" height="40" viewBox="0 0 120 40" fill="none">
+          <svg width="96" height="32" viewBox="0 0 120 40" fill="none">
             <path
               fillRule="evenodd"
               clipRule="evenodd"
@@ -40,12 +41,11 @@ export default function Title() {
               ></path>
             </g>
             <defs>
-              <clipPath id="clip0">
-                <path d="M0 0H36.52V40H0V0Z" fill="white"></path>
-              </clipPath>
+              <path d="M0 0H36.52V40H0V0Z" fill="white"></path>
             </defs>
           </svg>
         </RowFixed>
+        <TYPE.largeHeader style={{ fontWeight: '400' }}>AMM</TYPE.largeHeader>
       </Flex>
     </TitleWrapper>
   )

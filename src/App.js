@@ -197,19 +197,19 @@ function App() {
                   <AllMarketsPage />
                 </LayoutWrapper>
               </Route>
-
+              {/* 
               <Route path="/tokens">
                 <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
                   <AllTokensPage />
                 </LayoutWrapper>
               </Route>
-
+              
               <Route path="/pairs">
                 <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
                   <AllPairsPage />
                 </LayoutWrapper>
               </Route>
-
+              */}
               <Route path="/accounts">
                 <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
                   <AccountLookup />

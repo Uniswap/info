@@ -7,6 +7,9 @@ import { formattedNum, localNumber } from '../../utils'
 
 import UniPrice from '../UniPrice'
 import { TYPE } from '../../Theme'
+import TokenLogo from '../TokenLogo'
+import { getCashAddress } from '../../contexts/Application'
+import { WETH } from '../../constants'
 
 const Header = styled.div`
   width: 100%;
@@ -27,17 +30,17 @@ export default function GlobalStats() {
 
   const [showPriceCard, setShowPriceCard] = useState(false)
 
-  const { oneDayVolumeUSD, oneDayTxns, pairCount } = useGlobalData()
+  const { oneDayVolumeUSD, oneDayTxns } = useGlobalData()
   const [ethPrice] = useEthPrice()
   const formattedEthPrice = ethPrice ? formattedNum(ethPrice, true) : '-'
-  const oneDayFees = oneDayVolumeUSD ? formattedNum(oneDayVolumeUSD * 0.003, true) : ''
+  const totalLiquidity = 0 // TODO get this or calculate this
 
   return (
     <Header>
-      <RowBetween style={{ padding: below816 ? '0.5rem' : '.5rem' }}>
+      <RowBetween>
         <RowFixed>
           {!below400 && (
-            <TYPE.main
+            <TYPE.boxed
               mr={'1rem'}
               onMouseEnter={() => {
                 setShowPriceCard(true)
@@ -47,25 +50,39 @@ export default function GlobalStats() {
               }}
               style={{ position: 'relative' }}
             >
-              ETH Price: <Medium>{formattedEthPrice}</Medium>
-              {showPriceCard && <UniPrice />}
-            </TYPE.main>
+              <TYPE.boxedRow>
+                <span>ETH price: </span>
+              </TYPE.boxedRow>
+              <TYPE.boxedRow>
+                <TYPE.largeHeader>{formattedEthPrice}</TYPE.largeHeader>
+                {showPriceCard && <UniPrice />}
+              </TYPE.boxedRow>
+            </TYPE.boxed>
           )}
 
           {!below1180 && (
-            <TYPE.main mr={'1rem'}>
-              Transactions (24H): <Medium>{localNumber(oneDayTxns)}</Medium>
-            </TYPE.main>
+            <TYPE.boxed mr={'1rem'}>
+              <TYPE.boxedRow>Total Liquidity</TYPE.boxedRow>
+              <TYPE.boxedRow>
+                <TYPE.largeHeader>{localNumber(totalLiquidity)}</TYPE.largeHeader>
+              </TYPE.boxedRow>
+            </TYPE.boxed>
           )}
           {!below1024 && (
-            <TYPE.main mr={'1rem'}>
-              Pairs: <Medium>{localNumber(pairCount)}</Medium>
-            </TYPE.main>
+            <TYPE.boxed mr={'1rem'}>
+              <TYPE.boxedRow>Volume (24 hrs): </TYPE.boxedRow>
+              <TYPE.boxedRow>
+                <TYPE.largeHeader>${localNumber(oneDayVolumeUSD)}</TYPE.largeHeader>
+              </TYPE.boxedRow>
+            </TYPE.boxed>
           )}
           {!below1295 && (
-            <TYPE.main mr={'1rem'}>
-              Fees (24H): <Medium>{oneDayFees}</Medium>&nbsp;
-            </TYPE.main>
+            <TYPE.boxed>
+              <TYPE.boxedRow>Transactions (24 hrs):</TYPE.boxedRow>
+              <TYPE.boxedRow>
+                <TYPE.largeHeader>{oneDayTxns}</TYPE.largeHeader>
+              </TYPE.boxedRow>
+            </TYPE.boxed>
           )}
         </RowFixed>
       </RowBetween>

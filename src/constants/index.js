@@ -14,6 +14,8 @@ export const timeframeOptions = {
   ALL_TIME: 'All time'
 }
 
+export const WETH = 'wETH'
+export const DAI = 'DAI'
 // token list urls to fetch tokens from - use for warnings on tokens and pairs
 export const SUPPORTED_LIST_URLS__NO_ENS = [
   'https://gateway.ipfs.io/ipns/tokens.uniswap.org',

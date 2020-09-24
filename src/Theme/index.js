@@ -63,7 +63,7 @@ const theme = (darkMode, color) => ({
   secondary3: darkMode ? '#17000b26' : '#FDEAF1',
 
   shadow1: darkMode ? '#000' : '#2F80ED',
-
+  outline: darkMode ? '#575A68' : '#888D9B',
   // other
   red1: '#FF6871',
   green1: '#27AE60',
@@ -78,8 +78,35 @@ const theme = (darkMode, color) => ({
 const TextWrapper = styled(Text)`
   color: ${({ color, theme }) => theme[color]};
 `
+const LargeBoxTextWrapper = styled(Text)`
+  color: ${({ color, theme }) => theme[color]};
+  border: 1px solid #575a68;
+  box-sizing: border-box;
+  border-radius: 12px;
+  padding: 0.25rem 0;
+  margin: 0 0.5rem;
+  width: 300px;
+  display: flex;
+  flex-flow: column;
 
+  > div {
+    justify-content: space-between;
+  }
+`
+const BoxedRow = styled(Text)`
+  display: flex;
+  flex-flow: row;
+  padding: 0.5rem 1.25rem;
+`
 export const TYPE = {
+  boxedRow(props) {
+    return <BoxedRow {...props} />
+  },
+
+  boxed(props) {
+    return <LargeBoxTextWrapper fontWeight={500} fontSize={14} color={'text1'} {...props} />
+  },
+
   main(props) {
     return <TextWrapper fontWeight={500} fontSize={14} color={'text1'} {...props} />
   },

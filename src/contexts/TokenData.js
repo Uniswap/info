@@ -24,7 +24,7 @@ import {
   splitQuery
 } from '../utils'
 import { timeframeOptions } from '../constants'
-import { useLatestBlock } from './Application'
+import { useConfig, useLatestBlock } from './Application'
 
 // TODO move to config
 export const PARA_AUGUR_TOKENS = [
@@ -65,11 +65,9 @@ function reducer(state, { type, payload }) {
       const { topTokens } = payload
       let added = {}
       topTokens &&
-        topTokens
-          .filter(token => PARA_AUGUR_TOKENS.includes(token.id))
-          .map(token => {
-            return (added[token.id] = token)
-          })
+        topTokens.map(token => {
+          return (added[token.id] = token)
+        })
 
       return {
         ...state,
@@ -259,12 +257,12 @@ const getTopTokens = async (ethPrice, ethPriceOld) => {
 
           // calculate percentage changes and daily changes
           const [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentChange(
-            data.tradeVolumeUSD,
+            data?.tradeVolumeUSD ?? 0,
             oneDayHistory?.tradeVolumeUSD ?? 0,
             twoDayHistory?.tradeVolumeUSD ?? 0
           )
           const [oneDayTxns, txnChange] = get2DayPercentChange(
-            data.txCount,
+            data?.txCount ?? 0,
             oneDayHistory?.txCount ?? 0,
             twoDayHistory?.txCount ?? 0
           )
@@ -274,8 +272,8 @@ const getTopTokens = async (ethPrice, ethPriceOld) => {
 
           // percent changes
           const priceChangeUSD = getPercentChange(
-            data?.derivedETH * ethPrice,
-            oneDayHistory?.derivedETH ? oneDayHistory?.derivedETH * ethPriceOld : 0
+            data?.derivedETH ?? 0 * ethPrice,
+            oneDayHistory?.derivedETH ? oneDayHistory?.derivedETH ?? 0 * ethPriceOld : 0
           )
 
           // set data
@@ -290,9 +288,9 @@ const getTopTokens = async (ethPrice, ethPriceOld) => {
 
           // new tokens
           if (!oneDayHistory && data) {
-            data.oneDayVolumeUSD = data.tradeVolumeUSD
-            data.oneDayVolumeETH = data.tradeVolume * data.derivedETH
-            data.oneDayTxns = data.txCount
+            data.oneDayVolumeUSD = data?.tradeVolumeUSD ?? 0
+            data.oneDayVolumeETH = (data?.tradeVolume ?? 0) * (data?.derivedETH ?? 0)
+            data.oneDayTxns = data?.txCount ?? 0
           }
 
           if (data.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
@@ -607,14 +605,19 @@ const getTokenChartData = async tokenAddress => {
 export function Updater() {
   const [, { updateTopTokens }] = useTokenDataContext()
   const [ethPrice, ethPriceOld] = useEthPrice()
+  const config = useConfig()
   useEffect(() => {
     async function getData() {
       // get top pairs for overview list
       let topTokens = await getTopTokens(ethPrice, ethPriceOld)
-      topTokens && updateTopTokens(topTokens)
+      if (topTokens) {
+        const addresses = config.Cashes.map(c => c.address)
+        const filteredTokens = topTokens.filter(token => addresses.includes(token.id))
+        updateTopTokens(filteredTokens)
+      }
     }
     ethPrice && ethPriceOld && getData()
-  }, [ethPrice, ethPriceOld, updateTopTokens])
+  }, [ethPrice, ethPriceOld, updateTopTokens, config])
   return null
 }
 

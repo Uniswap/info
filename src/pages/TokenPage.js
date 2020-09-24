@@ -155,8 +155,6 @@ function TokenPage({ address, history }) {
   const LENGTH = below1080 ? 10 : 16
   const formattedSymbol = symbol?.length > LENGTH ? symbol.slice(0, LENGTH) + '...' : symbol
 
-  const [savedTokens, addToken] = useSavedTokens()
-
   useEffect(() => {
     window.scrollTo({
       behavior: 'smooth',
@@ -168,23 +166,7 @@ function TokenPage({ address, history }) {
     <PageWrapper>
       <ThemedBackground backgroundColor={transparentize(0.6, backgroundColor)} />
       <ContentWrapper>
-        <RowBetween style={{ flexWrap: 'wrap', alingItems: 'start' }}>
-          <AutoRow align="flex-end" style={{ width: 'fit-content' }}>
-            <TYPE.body>
-              <BasicLink to="/tokens">{'Tokens '}</BasicLink>→ {symbol}
-              {'  '}
-            </TYPE.body>
-            <Link
-              style={{ width: 'fit-content' }}
-              color={backgroundColor}
-              external
-              href={'https://etherscan.io/address/' + address}
-            >
-              <Text style={{ marginLeft: '.15rem' }} fontSize={'14px'} fontWeight={400}>
-                ({address.slice(0, 8) + '...' + address.slice(36, 42)})
-              </Text>
-            </Link>
-          </AutoRow>
+        <RowBetween style={{ flexWrap: 'wrap', alingItems: 'start', justifyContent: 'flex-end' }}>
           {!below600 && <Search small={true} />}
         </RowBetween>
 
@@ -294,7 +276,7 @@ function TokenPage({ address, history }) {
 
             <span>
               <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
-                Top Pairs
+                Outcomes
               </TYPE.main>
             </span>
             <Panel

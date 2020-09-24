@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useReducer, useMemo, useCallback, useState, useEffect } from 'react'
-import { timeframeOptions, SUPPORTED_LIST_URLS__NO_ENS, DEFAULT_NETWORK } from '../constants'
+import { timeframeOptions, SUPPORTED_LIST_URLS__NO_ENS, DEFAULT_NETWORK, WETH } from '../constants'
 
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
@@ -310,7 +310,16 @@ export function useListedTokens() {
   return supportedTokens
 }
 
-export function useConfig() {
+function getConfig() {
   const network = process.env.network || DEFAULT_NETWORK
   return config[String(network)]
+}
+export function useConfig() {
+  return getConfig()
+}
+
+export function getCashAddress(symbol) {
+  const contracts = getConfig()
+  const weth = contracts.Cashes.find(c => c.symbol === symbol)
+  return weth.address
 }

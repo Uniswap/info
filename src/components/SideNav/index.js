@@ -123,6 +123,7 @@ function SideNav({ history }) {
                     Markets
                   </Option>
                 </BasicLink>
+                {/*
                 <BasicLink to="/tokens">
                   <Option
                     activeText={
@@ -135,6 +136,7 @@ function SideNav({ history }) {
                     Tokens
                   </Option>
                 </BasicLink>
+
                 <BasicLink to="/pairs">
                   <Option
                     activeText={
@@ -148,7 +150,7 @@ function SideNav({ history }) {
                   </Option>
                 </BasicLink>
 
-                {/* <BasicLink to="/accounts">
+                <BasicLink to="/accounts">
                   <Option
                     activeText={
                       (history.location.pathname.split('/')[1] === 'accounts' ||

@@ -54,7 +54,6 @@ function GlobalPage() {
       <ContentWrapper>
         <div>
           <AutoColumn gap="24px" style={{ paddingBottom: below800 ? '0' : '24px' }}>
-            <TYPE.largeHeader>{below800 ? 'ParaAugur AMM' : 'ParaAugur AMM'}</TYPE.largeHeader>
             <Search />
             <GlobalStats />
           </AutoColumn>
@@ -113,7 +112,7 @@ function GlobalPage() {
           <ListOptions gap="10px" style={{ marginTop: '2rem', marginBottom: '.5rem' }}>
             <RowBetween>
               <TYPE.main fontSize={'1.125rem'}>Augur Markets</TYPE.main>
-              <CustomLink to={'/tokens'}>See All</CustomLink>
+              <CustomLink to={'/markets'}>Top Markets</CustomLink>
             </RowBetween>
           </ListOptions>
           <Panel style={{ marginTop: '6px', padding: '1.125rem 0 ' }}>
