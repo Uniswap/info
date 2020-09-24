@@ -160,7 +160,7 @@ export function Updater() {
         const ammExchangePairs = await getAMMExchangePairs(response.data)
         updateMarketPairs(ammExchangePairs)
       } else {
-        // TODO test data when theGraph barfs
+        // TODO remove this, hopefully mainnet theGraph is more reliable
         const data = {
           markets: [
             {

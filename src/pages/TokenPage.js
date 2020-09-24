@@ -174,14 +174,18 @@ function TokenPage({ address, history }) {
           <DashboardWrapper style={{ marginTop: below1080 ? '0' : '1rem' }}>
             <RowBetween style={{ flexWrap: 'wrap', marginBottom: '2rem', alignItems: 'flex-start' }}>
               <RowFixed style={{ flexWrap: 'wrap' }}>
-                <RowFixed style={{ alignItems: 'baseline' }}>
-                  <TokenLogo address={address} size="32px" style={{ alignSelf: 'center' }} />
+                <RowFixed style={{ flexFlow: 'row nowrap', alignItems: 'flex-start', justifyContent: 'flex-start' }}>
+                  <TokenLogo address={address} />
                   <TYPE.main fontSize={below1080 ? '1.5rem' : '2rem'} fontWeight={500} style={{ margin: '0 1rem' }}>
                     <RowFixed gap="6px">
-                      <FormattedName text={name ? name + ' ' : ''} maxCharacters={16} style={{ marginRight: '6px' }} />{' '}
+                      <FormattedName
+                        text={name ? name + ' ' : ''}
+                        maxCharacters={below800 ? 120 : 220}
+                        style={{ marginRight: '6px' }}
+                      />
                       {formattedSymbol ? `(${formattedSymbol})` : ''}
                     </RowFixed>
-                  </TYPE.main>{' '}
+                  </TYPE.main>
                   {!below1080 && (
                     <>
                       <TYPE.main fontSize={'1.5rem'} fontWeight={500} style={{ marginRight: '1rem' }}>
@@ -191,11 +195,14 @@ function TokenPage({ address, history }) {
                     </>
                   )}
                 </RowFixed>
-              </RowFixed>
-              <span>
-                <RowFixed ml={below500 ? '0' : '2.5rem'} mt={below500 ? '1rem' : '0'}>
+                <RowFixed style={{ flexFlow: 'row nowrap', justifyContent: 'flex-end', marginTop: '0.5rem' }}>
+                  <Link href={getPoolLink(address)} target="_blank" mr={'.5rem'}>
+                    <ButtonLight color={backgroundColor}>- Remove Liquidity</ButtonLight>
+                  </Link>
                   <Link href={getPoolLink(address)} target="_blank">
-                    <ButtonLight color={backgroundColor}>+ Add Liquidity</ButtonLight>
+                    <ButtonLight color={backgroundColor} mr={below1080 && '.5rem'}>
+                      + Add Liquidity
+                    </ButtonLight>
                   </Link>
                   <Link href={getSwapLink(address)} target="_blank">
                     <ButtonDark ml={'.5rem'} mr={below1080 && '.5rem'} color={backgroundColor}>
@@ -203,7 +210,7 @@ function TokenPage({ address, history }) {
                     </ButtonDark>
                   </Link>
                 </RowFixed>
-              </span>
+              </RowFixed>
             </RowBetween>
 
             <>

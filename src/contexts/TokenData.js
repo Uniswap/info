@@ -25,6 +25,7 @@ import {
 } from '../utils'
 import { timeframeOptions } from '../constants'
 import { useConfig, useLatestBlock } from './Application'
+import { useAllMarketData } from './Markets'
 
 // TODO move to config
 export const PARA_AUGUR_TOKENS = [
@@ -309,7 +310,7 @@ const getTopTokens = async (ethPrice, ethPriceOld) => {
   }
 }
 
-const getTokenData = async (address, ethPrice, ethPriceOld) => {
+const getTokenData = async (market, address, ethPrice, ethPriceOld) => {
   const utcCurrentTime = dayjs()
   const utcOneDayBack = utcCurrentTime
     .subtract(1, 'day')
@@ -624,15 +625,38 @@ export function Updater() {
 export function useTokenData(tokenAddress) {
   const [state, { update }] = useTokenDataContext()
   const [ethPrice, ethPriceOld] = useEthPrice()
+  const { markets } = useAllMarketData()
   const tokenData = state?.[tokenAddress]
 
   useEffect(() => {
     if (!tokenData && ethPrice && ethPriceOld && isAddress(tokenAddress)) {
-      getTokenData(tokenAddress, ethPrice, ethPriceOld).then(data => {
+      console.log('get token data', tokenAddress)
+      const market = markets.find(m => m.id.toLowerCase() === tokenAddress.toLowerCase())
+      if (market) {
+        const data = {
+          id: market.id,
+          name: market.description,
+          symbol: null,
+          priceUSD: 0,
+          oneDayVolumeUSD: 0,
+          totalLiquidityUSD: 0,
+          volumeChangeUSD: 0,
+          oneDayVolumeUT: 0,
+          volumeChangeUT: 0,
+          priceChangeUSD: 0,
+          liquidityChangeUSD: 0,
+          oneDayTxns: 0,
+          txnChange: 0
+        }
+        update(tokenAddress, data)
+      }
+      /* should have all the data needed on markets context
+      getTokenData(market, tokenAddress, ethPrice, ethPriceOld).then(data => {
         update(tokenAddress, data)
       })
+      */
     }
-  }, [ethPrice, ethPriceOld, tokenAddress, tokenData, update])
+  }, [ethPrice, ethPriceOld, tokenAddress, tokenData, update, markets])
 
   return tokenData || {}
 }
