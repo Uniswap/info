@@ -23,8 +23,8 @@ import {
   getBlocksFromTimestamps,
   splitQuery
 } from '../utils'
-import { timeframeOptions } from '../constants'
-import { useConfig, useLatestBlock } from './Application'
+import { timeframeOptions, WETH } from '../constants'
+import { useConfig, useLatestBlock, getCashAddress } from './Application'
 import { useAllMarketData } from './Markets'
 
 // TODO move to config
@@ -686,18 +686,42 @@ export function useTokenTransactions(tokenAddress) {
 }
 
 export function useTokenPairs(tokenAddress) {
+  const { markets } = useAllMarketData()
   const [state, { updateAllPairs }] = useTokenDataContext()
   const tokenPairs = state?.[tokenAddress]?.[TOKEN_PAIRS_KEY]
 
   useEffect(() => {
     async function fetchData() {
-      let allPairs = await getTokenPairs(tokenAddress)
-      updateAllPairs(tokenAddress, allPairs)
+      const market = markets.find(m => m.id.toLowerCase() === tokenAddress.toLowerCase())
+      if (market) {
+        //let allPairs = await getTokenPairs(tokenAddress)
+        // TODO: figure out if market is trading in ETH and other currencies. market data should have this info
+        const allPairs = [
+          {
+            token0: { id: tokenAddress, symbol: 'Yes' },
+            token1: { id: getCashAddress(WETH), symbol: WETH },
+            oneDayVolumeUSD: 1,
+            reserveUSD: 2,
+            trackedReserveUSD: 3,
+            oneWeekVolumeUSD: 4
+          },
+          {
+            token0: { id: tokenAddress, symbol: 'No' },
+            token1: { id: getCashAddress(WETH), symbol: WETH },
+            oneDayVolumeUSD: 1,
+            reserveUSD: 2,
+            trackedReserveUSD: 3,
+            oneWeekVolumeUSD: 4
+          }
+        ]
+
+        updateAllPairs(tokenAddress, allPairs)
+      }
     }
     if (!tokenPairs && isAddress(tokenAddress)) {
       fetchData()
     }
-  }, [tokenAddress, tokenPairs, updateAllPairs])
+  }, [tokenAddress, tokenPairs, updateAllPairs, markets])
 
   return tokenPairs || []
 }

@@ -28,7 +28,9 @@ import { usePathDismissed, useSavedTokens } from '../contexts/LocalStorage'
 import { Hover, PageWrapper, ContentWrapper, StyledIcon } from '../components'
 import { PlusCircle, Bookmark } from 'react-feather'
 import FormattedName from '../components/FormattedName'
-import { useListedTokens } from '../contexts/Application'
+import { getCashAddress } from '../contexts/Application'
+import { WETH } from '../constants'
+import { useAllMarketData } from '../contexts/Markets'
 
 const DashboardWrapper = styled.div`
   width: 100%;
@@ -114,7 +116,7 @@ function TokenPage({ address, history }) {
   const allPairs = useTokenPairs(address)
 
   // pairs to show in pair list
-  const fetchedPairsList = useDataForList(allPairs)
+  //const fetchedPairsList = useDataForList(allPairs)
 
   // all transactions with this token
   const transactions = useTokenTransactions(address)
@@ -196,19 +198,13 @@ function TokenPage({ address, history }) {
                   )}
                 </RowFixed>
                 <RowFixed style={{ flexFlow: 'row nowrap', justifyContent: 'flex-end', marginTop: '0.5rem' }}>
-                  <Link href={getPoolLink(address)} target="_blank" mr={'.5rem'}>
-                    <ButtonLight color={backgroundColor}>- Remove Liquidity</ButtonLight>
-                  </Link>
-                  <Link href={getPoolLink(address)} target="_blank">
-                    <ButtonLight color={backgroundColor} mr={below1080 && '.5rem'}>
-                      + Add Liquidity
-                    </ButtonLight>
-                  </Link>
-                  <Link href={getSwapLink(address)} target="_blank">
-                    <ButtonDark ml={'.5rem'} mr={below1080 && '.5rem'} color={backgroundColor}>
-                      Trade
-                    </ButtonDark>
-                  </Link>
+                  <ButtonLight color={backgroundColor}>- Remove Liquidity</ButtonLight>
+                  <ButtonLight color={backgroundColor} mr={below1080 && '.5rem'}>
+                    + Add Liquidity
+                  </ButtonLight>
+                  <ButtonDark ml={'.5rem'} mr={below1080 && '.5rem'} color={backgroundColor}>
+                    Trade
+                  </ButtonDark>
                 </RowFixed>
               </RowFixed>
             </RowBetween>
@@ -295,8 +291,8 @@ function TokenPage({ address, history }) {
                 padding: '1.125rem 0 '
               }}
             >
-              {address && fetchedPairsList ? (
-                <PairList color={backgroundColor} address={address} pairs={fetchedPairsList} />
+              {address && allPairs ? (
+                <PairList color={backgroundColor} address={address} pairs={allPairs} />
               ) : (
                 <Loader />
               )}

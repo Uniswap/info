@@ -12,6 +12,9 @@ import { withRouter } from 'react-router-dom'
 import DoubleTokenLogo from '../DoubleLogo'
 import FormattedName from '../FormattedName'
 import { TYPE } from '../../Theme'
+import { Type } from 'react-feather'
+import { Row, RowFixed } from '../Row'
+import { ButtonLight, ButtonDark } from '../ButtonStyled'
 
 dayjs.extend(utc)
 
@@ -40,7 +43,7 @@ const List = styled(Box)`
 const DashGrid = styled.div`
   display: grid;
   grid-gap: 1em;
-  grid-template-columns: 100px;
+  grid-template-columns: 50px 1fr 1fr 1fr 1fr 1.5fr;
   grid-template-areas: 'name';
   padding: 0 1.125rem;
 
@@ -56,18 +59,18 @@ const DashGrid = styled.div`
 
   @media screen and (min-width: 740px) {
     padding: 0 1.125rem;
-    grid-template-columns: 1.5fr;
+    grid-template-columns: 50px 1fr 1fr 1fr 1fr 1.5fr;
     grid-template-areas: ' name';
   }
 
   @media screen and (min-width: 1080px) {
     padding: 0 1.125rem;
-    grid-template-columns: 1.5fr;
+    grid-template-columns: 50px 1fr 1fr 1fr 1fr 1.5fr;
     grid-template-areas: ' name';
   }
 
   @media screen and (min-width: 1200px) {
-    grid-template-columns: 1.5fr;
+    grid-template-columns: 50px 1fr 1fr 1fr 1fr 1.5fr;
     grid-template-areas: ' name';
   }
 `
@@ -106,6 +109,7 @@ const FIELD_TO_VALUE = {
 function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
   const below600 = useMedia('(max-width: 600px)')
   const below740 = useMedia('(max-width: 740px)')
+  const below1080 = useMedia('(max-width: 1080px)')
 
   // pagination
   const [page, setPage] = useState(1)
@@ -133,43 +137,41 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
 
   const ListItem = ({ pairAddress, index }) => {
     const pairData = pairs[pairAddress]
-    const isDeployed = checkIfDeployed(pairData.token0, pairData.token1)
+    //const isDeployed = checkIfDeployed(pairData.token0, pairData.token1)
 
     if (pairData && pairData.token0 && pairData.token1) {
       return (
-        <DashGrid style={{ height: '48px' }} disbaleLinks={disbaleLinks} focus={true}>
-          <DataText area="name" fontWeight="500">
-            {!below600 && (
-              <div
-                style={{
-                  textAlign: 'center',
-                  marginRight: '20px',
-                  fontSize: '9px',
-                  color: isDeployed ? 'lime' : 'tomato'
-                }}
-              >
-                {isDeployed ? 'LIVE' : 'NEEDS DEPLOY'}
-              </div>
-            )}
-            <DoubleTokenLogo
-              size={below600 ? 16 : 20}
-              a0={pairData.token0.id}
-              a1={pairData.token1.id}
-              margin={!below740}
+        <DashGrid style={{ height: '48px', alignItems: 'center' }} disbaleLinks={disbaleLinks} focus={true}>
+          <DoubleTokenLogo
+            size={below600 ? 16 : 24}
+            a0={pairData.token0.id}
+            a1={pairData.token1.id}
+            margin={!below740}
+          />
+          <TYPE.header style={{ marginLeft: '20px', whiteSpace: 'nowrap' }}>
+            <FormattedName
+              text={pairData.token0.symbol + ' - ' + pairData.token1.symbol}
+              maxCharacters={below600 ? 75 : 100}
+              adjustSize={true}
+              link={false}
             />
-            <CustomLink
-              style={{ marginLeft: '20px', whiteSpace: 'nowrap' }}
-              to={'/pair/' + pairs[pairAddress].id} // Placeholder
-              color={color}
-            >
-              <FormattedName
-                text={pairData.token0.symbol + '-' + pairData.token1.symbol}
-                maxCharacters={below600 ? 75 : 100}
-                adjustSize={true}
-                link={true}
-              />
-            </CustomLink>
-          </DataText>
+          </TYPE.header>
+          <TYPE.header area="name" fontWeight="500">
+            $0
+          </TYPE.header>
+          <TYPE.header area="name" fontWeight="500">
+            $0
+          </TYPE.header>
+          <TYPE.header area="name" fontWeight="500">
+            $0
+          </TYPE.header>
+          <TYPE.header area="name" fontWeight="500">
+            <RowFixed style={{ flexFlow: 'row nowrap', justifyContent: 'flex-end', marginTop: '0.5rem' }}>
+              <ButtonLight mr={'.5rem'}>remove</ButtonLight>
+              <ButtonLight mr={'.5rem'}>add</ButtonLight>
+              <ButtonDark>Trade</ButtonDark>
+            </RowFixed>
+          </TYPE.header>
         </DashGrid>
       )
     } else {
@@ -210,7 +212,14 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
         center={true}
         disbaleLinks={disbaleLinks}
         style={{ height: 'fit-content', padding: '0 1.125rem 1rem 1.125rem' }}
-      ></DashGrid>
+      >
+        <TYPE.header area="uniswap"></TYPE.header>
+        <TYPE.header area="uniswap"></TYPE.header>
+        <TYPE.header area="uniswap">Liquidity</TYPE.header>
+        <TYPE.header area="uniswap">Volume (24 hour)</TYPE.header>
+        <TYPE.header area="uniswap">Volume (7 day)</TYPE.header>
+        <TYPE.header area="uniswap"></TYPE.header>
+      </DashGrid>
       <Divider />
       <List p={0}>{!pairList ? <LocalLoader /> : pairList}</List>
       <PageButtons>
