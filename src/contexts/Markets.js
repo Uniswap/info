@@ -107,7 +107,7 @@ export default function Provider({ children }) {
   )
 }
 
-async function getAMMExchangePairs({ markets }) {
+async function getAMMExchangePairs(network, { markets }) {
   let marketPairs = {}
 
   if (markets) {
@@ -116,7 +116,7 @@ async function getAMMExchangePairs({ markets }) {
     const slicedMarkets = markets.slice(0, 5)
     for (const market of slicedMarkets) {
       for (const token of PARA_AUGUR_TOKENS) {
-        const ammExchange = await getAMMAddressForMarketShareToken(market.id, token)
+        const ammExchange = await getAMMAddressForMarketShareToken(network, market.id, token)
         marketPairs[ammExchange] = {
           id: ammExchange,
           token0: {
@@ -157,7 +157,7 @@ export function Updater() {
 
       if (response) {
         updateMarkets(response.data)
-        const ammExchangePairs = await getAMMExchangePairs(response.data)
+        const ammExchangePairs = await getAMMExchangePairs(config.network, response.data)
         updateMarketPairs(ammExchangePairs)
       } else {
         // TODO remove this, hopefully mainnet theGraph is more reliable
@@ -266,7 +266,7 @@ export function Updater() {
           ]
         }
         updateMarkets(data)
-        const ammExchangePairs = await getAMMExchangePairs(data)
+        const ammExchangePairs = await getAMMExchangePairs(config.network, data)
         updateMarketPairs(ammExchangePairs)
       }
     }

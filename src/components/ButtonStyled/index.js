@@ -17,6 +17,9 @@ const Base = styled(RebassButton)`
   outline: none;
   border-bottom-right-radius: ${({ open }) => open && '0'};
   border-bottom-left-radius: ${({ open }) => open && '0'};
+
+  opacity: ${({ disabled }) => disabled && '0.4'};
+  pointer-events: ${({ disabled }) => disabled && 'none'};
 `
 
 const BaseCustom = styled(RebassButton)`

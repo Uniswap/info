@@ -10,7 +10,7 @@ import PairList from '../components/PairList'
 import Loader from '../components/LocalLoader'
 import { RowBetween, RowFixed } from '../components/Row'
 import { AutoColumn } from '../components/Column'
-import { ButtonLight, ButtonDark } from '../components/ButtonStyled'
+//import { ButtonLight, ButtonDark } from '../components/ButtonStyled'
 import TxnList from '../components/TxnList'
 //import TokenChart from '../components/TokenChart'
 //import { BasicLink } from '../components/Link'
@@ -196,7 +196,7 @@ function TokenPage({ address, history }) {
                     </>
                   )}
                 </RowFixed>
-                <RowFixed style={{ flexFlow: 'row nowrap', justifyContent: 'flex-end', marginTop: '0.5rem' }}>
+                {/*<RowFixed style={{ flexFlow: 'row nowrap', justifyContent: 'flex-end', marginTop: '0.5rem' }}>
                   <ButtonLight color={backgroundColor}>- Remove Liquidity</ButtonLight>
                   <ButtonLight ml={'.5rem'} color={backgroundColor}>
                     + Add Liquidity
@@ -205,6 +205,7 @@ function TokenPage({ address, history }) {
                     Trade
                   </ButtonDark>
                 </RowFixed>
+                  */}
               </RowFixed>
             </RowBetween>
 

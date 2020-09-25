@@ -5,7 +5,7 @@ import LocalLoader from '../LocalLoader'
 import utc from 'dayjs/plugin/utc'
 import { Box } from 'rebass'
 import styled from 'styled-components'
-//import { checkIfDeployed } from '../../utils/contractCalls'
+import { userLPBalanceOf } from '../../utils/contractCalls'
 //import { CustomLink } from '../Link'
 import { Divider } from '../../components'
 import { withRouter } from 'react-router-dom'
@@ -15,6 +15,9 @@ import { TYPE } from '../../Theme'
 //import { Type } from 'react-feather'
 import { RowFixed } from '../Row'
 import { ButtonLight, ButtonDark } from '../ButtonStyled'
+import { useAccountWeb3 } from '../../contexts/Account'
+import { useConfig } from '../../contexts/Application'
+import { greaterThanZero } from '../../utils'
 
 dayjs.extend(utc)
 
@@ -112,7 +115,8 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
   const below600 = useMedia('(max-width: 600px)')
   const below740 = useMedia('(max-width: 740px)')
   const below800 = useMedia('(max-width: 800px)')
-
+  const { address } = useAccountWeb3()
+  const config = useConfig()
   // pagination
   const [page, setPage] = useState(1)
   const [maxPage, setMaxPage] = useState(1)
@@ -121,11 +125,20 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
   // sorting
   const [sortDirection] = useState(true)
   const [sortedColumn] = useState(SORT_FIELD.LIQ)
+  const [hasLPTokens, setHasLpTokens] = useState(false)
 
   useEffect(() => {
+    const getHasLPTokens = async () => {
+      // TODO get AMM exchange address from theGraph call
+      const balance = await userLPBalanceOf(config.network, '', address)
+      if (greaterThanZero(balance)) {
+        setHasLpTokens(true)
+      }
+    }
     setMaxPage(1) // edit this to do modular
     setPage(1)
-  }, [pairs])
+    getHasLPTokens()
+  }, [config, address])
 
   useEffect(() => {
     if (pairs) {
@@ -171,8 +184,10 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
           )}
           <TYPE.header area="name" fontWeight="500">
             <RowFixed style={{ flexFlow: 'row nowrap', justifyContent: 'flex-end', marginTop: '0.5rem' }}>
-              <ButtonLight mr={'.5rem'}>remove</ButtonLight>
-              <ButtonLight mr={'.5rem'}>add</ButtonLight>
+              <ButtonLight disabled={!hasLPTokens} mr={'.5rem'}>
+                Remove
+              </ButtonLight>
+              <ButtonLight mr={'.5rem'}>Add</ButtonLight>
               <ButtonDark>Trade</ButtonDark>
             </RowFixed>
           </TYPE.header>

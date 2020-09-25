@@ -493,3 +493,8 @@ export function isEquivalent(a, b) {
   }
   return true
 }
+
+export function greaterThanZero(num) {
+  if (num === null || num === undefined) return false
+  return Big(num).gt(0)
+}
