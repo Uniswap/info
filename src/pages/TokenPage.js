@@ -198,10 +198,10 @@ function TokenPage({ address, history }) {
                 </RowFixed>
                 <RowFixed style={{ flexFlow: 'row nowrap', justifyContent: 'flex-end', marginTop: '0.5rem' }}>
                   <ButtonLight color={backgroundColor}>- Remove Liquidity</ButtonLight>
-                  <ButtonLight color={backgroundColor} mr={below1080 && '.5rem'}>
+                  <ButtonLight ml={'.5rem'} color={backgroundColor}>
                     + Add Liquidity
                   </ButtonLight>
-                  <ButtonDark ml={'.5rem'} mr={below1080 && '.5rem'} color={backgroundColor}>
+                  <ButtonDark ml={'.5rem'} color={backgroundColor}>
                     Trade
                   </ButtonDark>
                 </RowFixed>
@@ -270,6 +270,7 @@ function TokenPage({ address, history }) {
                     </RowBetween>
                   </AutoColumn>
                 </Panel>
+
                 {/*
                 <Panel style={{ gridColumn: below1080 ? '1' : '2/4', gridRow: below1080 ? '' : '1/4' }}>
                   <TokenChart address={address} color={backgroundColor} base={priceUSD} />

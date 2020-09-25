@@ -57,9 +57,9 @@ const DashGrid = styled.div`
     }
   }
 
-  @media screen and (min-width: 740px) {
+  @media screen and (max-width: 800px) {
     padding: 0 1.125rem;
-    grid-template-columns: 50px 1fr 1fr 1fr 1fr 1.5fr;
+    grid-template-columns: 50px 1fr 1fr 1fr 1.5fr;
     grid-template-areas: ' name';
   }
 
@@ -111,7 +111,7 @@ const FIELD_TO_VALUE = {
 function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
   const below600 = useMedia('(max-width: 600px)')
   const below740 = useMedia('(max-width: 740px)')
-  //  const below1080 = useMedia('(max-width: 1080px)')
+  const below800 = useMedia('(max-width: 800px)')
 
   // pagination
   const [page, setPage] = useState(1)
@@ -164,9 +164,11 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
           <TYPE.header area="name" fontWeight="500">
             $0
           </TYPE.header>
-          <TYPE.header area="name" fontWeight="500">
-            $0
-          </TYPE.header>
+          {!below800 && (
+            <TYPE.header area="name" fontWeight="500">
+              $0
+            </TYPE.header>
+          )}
           <TYPE.header area="name" fontWeight="500">
             <RowFixed style={{ flexFlow: 'row nowrap', justifyContent: 'flex-end', marginTop: '0.5rem' }}>
               <ButtonLight mr={'.5rem'}>remove</ButtonLight>
@@ -219,7 +221,7 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
         <TYPE.header area="uniswap"></TYPE.header>
         <TYPE.header area="uniswap">Liquidity</TYPE.header>
         <TYPE.header area="uniswap">Volume (24 hour)</TYPE.header>
-        <TYPE.header area="uniswap">Volume (7 day)</TYPE.header>
+        {!below800 && <TYPE.header area="uniswap">Volume (7 day)</TYPE.header>}
         <TYPE.header area="uniswap"></TYPE.header>
       </DashGrid>
       <Divider />
