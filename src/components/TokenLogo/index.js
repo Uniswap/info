@@ -37,7 +37,7 @@ export default function TokenLogo({ address, header = false, size = '24px', ...r
 
   useEffect(() => {
     setError(false)
-  }, [address])
+  }, [address, listedTokensMap])
 
   if (error || BAD_IMAGES[address]) {
     return (
