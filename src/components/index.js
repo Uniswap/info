@@ -111,6 +111,10 @@ export const PageWrapper = styled.div`
     }
   }
 `
+export const DetailPageWrapper = styled(PageWrapper)`
+  justify-content: center;
+  align-content: center;
+`
 
 export const ContentWrapper = styled.div`
   display: grid;

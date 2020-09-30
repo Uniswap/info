@@ -9,7 +9,7 @@ import { Hover } from '..'
 import TokenLogo from '../TokenLogo'
 import AccountSearch from '../AccountSearch'
 import { Bookmark, ChevronRight, X } from 'react-feather'
-import { ButtonFaded } from '../ButtonStyled'
+import { ButtonGray } from '../ButtonStyled'
 import FormattedName from '../FormattedName'
 
 const RightColumn = styled.div`
@@ -87,7 +87,7 @@ function PinnedData({ history, open, setSavedOpen }) {
                 const pair = savedPairs[address]
                 return (
                   <RowBetween key={pair.address}>
-                    <ButtonFaded onClick={() => history.push('/pair/' + address)}>
+                    <ButtonGray onClick={() => history.push('/pair/' + address)}>
                       <RowFixed>
                         <TYPE.header>
                           <FormattedName
@@ -97,7 +97,7 @@ function PinnedData({ history, open, setSavedOpen }) {
                           />
                         </TYPE.header>
                       </RowFixed>
-                    </ButtonFaded>
+                    </ButtonGray>
                     <Hover onClick={() => removePair(pair.address)}>
                       <StyledIcon>
                         <X size={16} />
@@ -123,14 +123,14 @@ function PinnedData({ history, open, setSavedOpen }) {
                 const token = savedTokens[address]
                 return (
                   <RowBetween key={address}>
-                    <ButtonFaded onClick={() => history.push('/token/' + address)}>
+                    <ButtonGray onClick={() => history.push('/token/' + address)}>
                       <RowFixed>
                         <TokenLogo address={address} size={'14px'} />
                         <TYPE.header ml={'6px'}>
                           <FormattedName text={token.symbol} maxCharacters={12} fontSize={'12px'} />
                         </TYPE.header>
                       </RowFixed>
-                    </ButtonFaded>
+                    </ButtonGray>
                     <Hover onClick={() => removeToken(address)}>
                       <StyledIcon>
                         <X size={16} />

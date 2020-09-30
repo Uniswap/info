@@ -201,9 +201,9 @@ function TokenPage({ address, history }) {
                   <ButtonLight ml={'.5rem'} color={backgroundColor}>
                     + Add Liquidity
                   </ButtonLight>
-                  <ButtonDark ml={'.5rem'} color={backgroundColor}>
+                  <ButtonSecondary ml={'.5rem'} color={backgroundColor}>
                     Trade
-                  </ButtonDark>
+                  </ButtonSecondary>
                 </RowFixed>
                   */}
               </RowFixed>

@@ -23,7 +23,7 @@ import {
   getBlocksFromTimestamps,
   splitQuery
 } from '../utils'
-import { timeframeOptions, WETH } from '../constants'
+import { timeframeOptions, LABEL_WETH } from '../constants'
 import { useConfig, useLatestBlock, getCashAddress } from './Application'
 import { useAllMarketData } from './Markets'
 
@@ -630,7 +630,6 @@ export function useTokenData(tokenAddress) {
 
   useEffect(() => {
     if (!tokenData && ethPrice && ethPriceOld && isAddress(tokenAddress)) {
-      console.log('get token data', tokenAddress)
       const market = markets.find(m => m.id.toLowerCase() === tokenAddress.toLowerCase())
       if (market) {
         const data = {
@@ -699,7 +698,7 @@ export function useTokenPairs(tokenAddress) {
         const allPairs = [
           {
             token0: { id: tokenAddress, symbol: 'Yes' },
-            token1: { id: getCashAddress(WETH), symbol: WETH },
+            token1: { id: getCashAddress(LABEL_WETH), symbol: LABEL_WETH },
             oneDayVolumeUSD: 1,
             reserveUSD: 2,
             trackedReserveUSD: 3,
@@ -707,7 +706,7 @@ export function useTokenPairs(tokenAddress) {
           },
           {
             token0: { id: tokenAddress, symbol: 'No' },
-            token1: { id: getCashAddress(WETH), symbol: WETH },
+            token1: { id: getCashAddress(LABEL_WETH), symbol: LABEL_WETH },
             oneDayVolumeUSD: 1,
             reserveUSD: 2,
             trackedReserveUSD: 3,

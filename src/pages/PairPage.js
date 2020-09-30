@@ -6,7 +6,7 @@ import Panel from '../components/Panel'
 import { PageWrapper, ContentWrapperLarge } from '../components/index'
 import { AutoRow, RowBetween, RowFixed } from '../components/Row'
 import Column, { AutoColumn } from '../components/Column'
-import { ButtonLight, ButtonDark } from '../components/ButtonStyled'
+import { ButtonLight, ButtonSecondary } from '../components/ButtonStyled'
 import PairChart from '../components/PairChart'
 import Link, { CustomLink } from '../components/Link'
 import TxnList from '../components/TxnList'
@@ -230,7 +230,7 @@ function PairPage({ pairAddress, history }) {
                 <RowFixed style={{ flexWrap: 'wrap', minWidth: '100px' }}>
                   <RowFixed>
                     {token0 && token1 && (
-                      <DoubleTokenLogo a0={token0?.id || ''} a1={token1?.id || ''} size={32} margin={true} />
+                      <DoubleTokenLogo token0={token0?.id || ''} token1={token1?.id || ''} size={32} margin={true} />
                     )}{' '}
                     <TYPE.main fontSize={below1080 ? '1.5rem' : '2rem'} style={{ margin: '0 1rem' }}>
                       {token0 && token1 ? (
@@ -261,9 +261,9 @@ function PairPage({ pairAddress, history }) {
                   </CustomLink>
 
                   <CustomLink style={{ marginLeft: '20px', whiteSpace: 'nowrap' }} to={'/trade/' + selectedMarket?.id}>
-                    <ButtonDark ml={!below1080 && '.5rem'} mr={below1080 && '.5rem'} color={backgroundColor}>
+                    <ButtonSecondary ml={!below1080 && '.5rem'} mr={below1080 && '.5rem'} color={backgroundColor}>
                       Trade
-                    </ButtonDark>
+                    </ButtonSecondary>
                   </CustomLink>
                 </RowFixed>
               </div>

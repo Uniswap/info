@@ -323,3 +323,9 @@ export function getCashAddress(symbol) {
   const weth = contracts.Cashes.find(c => c.symbol === symbol)
   return weth.address
 }
+
+export function getAmmFactoryAddress() {
+  const contracts = getConfig()
+  const ammFactory = contracts.ammFactory
+  return ammFactory
+}

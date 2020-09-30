@@ -4,7 +4,7 @@ import styled from 'styled-components'
 import { Text } from 'rebass'
 import { AlertTriangle } from 'react-feather'
 import { RowBetween, RowFixed } from '../Row'
-import { ButtonDark } from '../ButtonStyled'
+import { ButtonSecondary } from '../ButtonStyled'
 import { AutoColumn } from '../Column'
 import { Hover } from '..'
 import Link from '../Link'
@@ -80,9 +80,9 @@ export default function Warning({ type, show, setShow, address }) {
             </Hover>
             <RowBetween style={{ marginTop: '20px' }}>
               <div />
-              <ButtonDark color={'#f82d3a'} style={{ minWidth: '140px' }} onClick={() => setShow(false)}>
+              <ButtonSecondary color={'#f82d3a'} style={{ minWidth: '140px' }} onClick={() => setShow(false)}>
                 I understand
-              </ButtonDark>
+              </ButtonSecondary>
             </RowBetween>
           </div>
         ) : (
@@ -98,9 +98,9 @@ export default function Warning({ type, show, setShow, address }) {
                 View {type === 'token' ? 'token' : 'pair'} contract on Etherscan
               </Link>
             </Hover>
-            <ButtonDark color={'#f82d3a'} style={{ minWidth: '140px' }} onClick={() => setShow(false)}>
+            <ButtonSecondary color={'#f82d3a'} style={{ minWidth: '140px' }} onClick={() => setShow(false)}>
               I understand
-            </ButtonDark>
+            </ButtonSecondary>
           </RowBetween>
         )}
       </AutoColumn>

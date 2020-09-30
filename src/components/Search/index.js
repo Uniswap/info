@@ -536,7 +536,7 @@ export const Search = ({ small = false }) => {
               return (
                 <BasicLink to={'/pair/' + pair.id} key={pair.id} onClick={onDismiss}>
                   <MenuItem>
-                    <DoubleTokenLogo a0={pair?.token0?.id} a1={pair?.token1?.id} margin={true} />
+                    <DoubleTokenLogo token0={pair?.token0?.id} token1={pair?.token1?.id} margin={true} />
                     <TYPE.body style={{ marginLeft: '10px' }}>
                       {pair.token0.symbol + '-' + pair.token1.symbol} Pair
                     </TYPE.body>

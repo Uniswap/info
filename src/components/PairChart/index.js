@@ -4,7 +4,7 @@ import { Area, XAxis, YAxis, ResponsiveContainer, Tooltip, AreaChart, BarChart, 
 import { RowBetween, AutoRow } from '../Row'
 
 import { toK, toNiceDate, toNiceDateYear, formattedNum, getTimeframe } from '../../utils'
-import { OptionButton } from '../ButtonStyled'
+import { ButtonRadio } from '../ButtonStyled'
 import { darken } from 'polished'
 import { usePairChartData, useHourlyRateData, usePairData } from '../../contexts/PairData'
 import { timeframeOptions } from '../../constants'
@@ -123,7 +123,7 @@ const PairChart = ({ address, color, base0, base1 }) => {
       ) : (
         <OptionsRow>
           <AutoRow gap="6px" style={{ flexWrap: 'nowrap' }}>
-            <OptionButton
+            <ButtonRadio
               active={chartFilter === CHART_VIEW.LIQUIDITY}
               onClick={() => {
                 setTimeWindow(timeframeOptions.ALL_TIME)
@@ -131,8 +131,8 @@ const PairChart = ({ address, color, base0, base1 }) => {
               }}
             >
               Liquidity
-            </OptionButton>
-            <OptionButton
+            </ButtonRadio>
+            <ButtonRadio
               active={chartFilter === CHART_VIEW.VOLUME}
               onClick={() => {
                 setTimeWindow(timeframeOptions.ALL_TIME)
@@ -140,8 +140,8 @@ const PairChart = ({ address, color, base0, base1 }) => {
               }}
             >
               Volume
-            </OptionButton>
-            <OptionButton
+            </ButtonRadio>
+            <ButtonRadio
               active={chartFilter === CHART_VIEW.RATE0}
               onClick={() => {
                 setTimeWindow(timeframeOptions.WEEK)
@@ -149,8 +149,8 @@ const PairChart = ({ address, color, base0, base1 }) => {
               }}
             >
               {pairData.token0 ? formattedSymbol1 + '/' + formattedSymbol0 : '-'}
-            </OptionButton>
-            <OptionButton
+            </ButtonRadio>
+            <ButtonRadio
               active={chartFilter === CHART_VIEW.RATE1}
               onClick={() => {
                 setTimeWindow(timeframeOptions.WEEK)
@@ -158,27 +158,27 @@ const PairChart = ({ address, color, base0, base1 }) => {
               }}
             >
               {pairData.token0 ? formattedSymbol0 + '/' + formattedSymbol1 : '-'}
-            </OptionButton>
+            </ButtonRadio>
           </AutoRow>
           <AutoRow justify="flex-end" gap="6px">
-            <OptionButton
+            <ButtonRadio
               active={timeWindow === timeframeOptions.WEEK}
               onClick={() => setTimeWindow(timeframeOptions.WEEK)}
             >
               1W
-            </OptionButton>
-            <OptionButton
+            </ButtonRadio>
+            <ButtonRadio
               active={timeWindow === timeframeOptions.MONTH}
               onClick={() => setTimeWindow(timeframeOptions.MONTH)}
             >
               1M
-            </OptionButton>
-            <OptionButton
+            </ButtonRadio>
+            <ButtonRadio
               active={timeWindow === timeframeOptions.ALL_TIME}
               onClick={() => setTimeWindow(timeframeOptions.ALL_TIME)}
             >
               All
-            </OptionButton>
+            </ButtonRadio>
           </AutoRow>
         </OptionsRow>
       )}

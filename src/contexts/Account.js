@@ -3,6 +3,7 @@ import { ethers } from 'ethers'
 
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
+import getLibrary from '../utils/getLibrary'
 
 const WEB3 = 'web3'
 const UPDATE_WEB3 = ' UPDATE_WEB3'
@@ -72,15 +73,30 @@ export function useAccountWeb3() {
   }
 
   async function getWeb3() {
-    const login = async address => {
+    const login = async addresses => {
+      console.log('login', addresses[0])
+      const address = addresses[0]
       const provider = new ethers.providers.Web3Provider(window.web3.currentProvider)
       const signer = provider.getSigner()
       const network = await provider.getNetwork()
-      updateWeb3({ address, provider, signer, network })
+      const library = null //getLibrary(provider)
+      let chainId = 42 // default to kovan for testing
+      // provide chainId here
+      if (network === 'mainnet') chainId = 1
+      updateWeb3({ address, provider, signer, network, chainId, library })
     }
 
-    const address = await window.ethereum.enable()
-    login(address[0])
+    window.ethereum
+      .request({ method: 'eth_requestAccounts' })
+      .then(login)
+      .catch(error => {
+        if (error.code === 4001) {
+          // EIP-1193 userRejectedRequest error
+          console.log('Please connect to MetaMask.')
+        } else {
+          console.error(error)
+        }
+      })
 
     window.ethereum.on('accountsChanged', async accounts => {
       login(accounts[0])

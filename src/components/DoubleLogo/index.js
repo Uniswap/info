@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import TokenLogo from '../TokenLogo'
 import { useDarkModeManager } from '../../contexts/LocalStorage'
 
-export default function DoubleTokenLogo({ a0, a1, size = 24, margin = false }) {
+export default function DoubleTokenLogo({ token0, token1, size = 24, margin = false }) {
   const [darkMode] = useDarkModeManager()
   const TokenWrapper = styled.div`
     position: relative;
@@ -27,8 +27,8 @@ export default function DoubleTokenLogo({ a0, a1, size = 24, margin = false }) {
 
   return (
     <TokenWrapper darkMode={darkMode} sizeraw={size} margin={margin}>
-      <HigherLogo darkMode={darkMode} address={a0} size={size.toString() + 'px'} sizeraw={size} />
-      <CoveredLogo darkMode={darkMode} address={a1} size={size.toString() + 'px'} sizeraw={size} />
+      <HigherLogo darkMode={darkMode} address={token0} size={size.toString() + 'px'} sizeraw={size} />
+      <CoveredLogo darkMode={darkMode} address={token1} size={size.toString() + 'px'} sizeraw={size} />
     </TokenWrapper>
   )
 }

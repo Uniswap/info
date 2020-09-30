@@ -146,7 +146,12 @@ function PositionList({ positions }) {
         {!below740 && <DataText area="number">{index}</DataText>}
         <DataText area="name" justifyContent="flex-start" alignItems="flex-start">
           <AutoColumn gap="8px" justify="flex-start" align="flex-start">
-            <DoubleTokenLogo size={16} a0={position.pair.token0.id} a1={position.pair.token1.id} margin={!below740} />
+            <DoubleTokenLogo
+              size={16}
+              token0={position.pair.token0.id}
+              token1={position.pair.token1.id}
+              margin={!below740}
+            />
           </AutoColumn>
           <AutoColumn gap="8px" justify="flex-start" style={{ marginLeft: '20px' }}>
             <CustomLink to={'/pair/' + position.pair.id}>

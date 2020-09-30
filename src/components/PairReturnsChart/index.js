@@ -4,7 +4,7 @@ import { XAxis, YAxis, ResponsiveContainer, Tooltip, LineChart, Line, CartesianG
 import { AutoRow, RowBetween } from '../Row'
 
 import { toK, toNiceDate, toNiceDateYear, formattedNum, getTimeframe } from '../../utils'
-import { OptionButton } from '../ButtonStyled'
+import { ButtonRadio } from '../ButtonStyled'
 import { useMedia } from 'react-use'
 import { timeframeOptions } from '../../constants'
 import DropdownSelect from '../DropdownSelect'
@@ -64,32 +64,32 @@ const PairReturnsChart = ({ account, position }) => {
       ) : (
         <OptionsRow>
           <AutoRow gap="6px" style={{ flexWrap: 'nowrap' }}>
-            <OptionButton active={chartView === CHART_VIEW.VALUE} onClick={() => setChartView(CHART_VIEW.VALUE)}>
+            <ButtonRadio active={chartView === CHART_VIEW.VALUE} onClick={() => setChartView(CHART_VIEW.VALUE)}>
               Liquidity
-            </OptionButton>
-            <OptionButton active={chartView === CHART_VIEW.FEES} onClick={() => setChartView(CHART_VIEW.FEES)}>
+            </ButtonRadio>
+            <ButtonRadio active={chartView === CHART_VIEW.FEES} onClick={() => setChartView(CHART_VIEW.FEES)}>
               Fees
-            </OptionButton>
+            </ButtonRadio>
           </AutoRow>
           <AutoRow justify="flex-end" gap="6px">
-            <OptionButton
+            <ButtonRadio
               active={timeWindow === timeframeOptions.WEEK}
               onClick={() => setTimeWindow(timeframeOptions.WEEK)}
             >
               1W
-            </OptionButton>
-            <OptionButton
+            </ButtonRadio>
+            <ButtonRadio
               active={timeWindow === timeframeOptions.MONTH}
               onClick={() => setTimeWindow(timeframeOptions.MONTH)}
             >
               1M
-            </OptionButton>
-            <OptionButton
+            </ButtonRadio>
+            <ButtonRadio
               active={timeWindow === timeframeOptions.ALL_TIME}
               onClick={() => setTimeWindow(timeframeOptions.ALL_TIME)}
             >
               All
-            </OptionButton>
+            </ButtonRadio>
           </AutoRow>
         </OptionsRow>
       )}

@@ -15,6 +15,7 @@ import LocalLoader from '../LocalLoader'
 import { AutoColumn } from '../Column'
 import { Activity } from 'react-feather'
 import { useDarkModeManager } from '../../contexts/LocalStorage'
+import { ButtonRadio } from '../ButtonStyled'
 
 const ChartWrapper = styled.div`
   height: 100%;
@@ -148,28 +149,28 @@ const TokenChart = ({ address, color, base }) => {
         >
           <AutoColumn gap="8px">
             <RowFixed>
-              <OptionButton
+              <ButtonRadio
                 active={chartFilter === CHART_VIEW.LIQUIDITY}
                 onClick={() => setChartFilter(CHART_VIEW.LIQUIDITY)}
                 style={{ marginRight: '6px' }}
               >
                 Liquidity
-              </OptionButton>
-              <OptionButton
+              </ButtonRadio>
+              <ButtonRadio
                 active={chartFilter === CHART_VIEW.VOLUME}
                 onClick={() => setChartFilter(CHART_VIEW.VOLUME)}
                 style={{ marginRight: '6px' }}
               >
                 Volume
-              </OptionButton>
-              <OptionButton
+              </ButtonRadio>
+              <ButtonRadio
                 active={chartFilter === CHART_VIEW.PRICE}
                 onClick={() => {
                   setChartFilter(CHART_VIEW.PRICE)
                 }}
               >
                 Price
-              </OptionButton>
+              </ButtonRadio>
             </RowFixed>
             {chartFilter === CHART_VIEW.PRICE && (
               <AutoRow gap="4px">
@@ -198,24 +199,24 @@ const TokenChart = ({ address, color, base }) => {
             )}
           </AutoColumn>
           <AutoRow justify="flex-end" gap="6px" align="flex-start">
-            <OptionButton
+            <ButtonRadio
               active={timeWindow === timeframeOptions.WEEK}
               onClick={() => setTimeWindow(timeframeOptions.WEEK)}
             >
               1W
-            </OptionButton>
-            <OptionButton
+            </ButtonRadio>
+            <ButtonRadio
               active={timeWindow === timeframeOptions.MONTH}
               onClick={() => setTimeWindow(timeframeOptions.MONTH)}
             >
               1M
-            </OptionButton>
-            <OptionButton
+            </ButtonRadio>
+            <ButtonRadio
               active={timeWindow === timeframeOptions.ALL_TIME}
               onClick={() => setTimeWindow(timeframeOptions.ALL_TIME)}
             >
               All
-            </OptionButton>
+            </ButtonRadio>
           </AutoRow>
         </RowBetween>
       )}

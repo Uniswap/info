@@ -11,13 +11,13 @@ import { Divider } from '../../components'
 import { withRouter } from 'react-router-dom'
 import DoubleTokenLogo from '../DoubleLogo'
 import FormattedName from '../FormattedName'
-import { TYPE } from '../../Theme'
+import { TYPE, StyledInternalLink } from '../../Theme'
 //import { Type } from 'react-feather'
 import { RowFixed } from '../Row'
-import { ButtonLight, ButtonDark } from '../ButtonStyled'
 import { useAccountWeb3 } from '../../contexts/Account'
 import { useConfig } from '../../contexts/Application'
 import { greaterThanZero } from '../../utils'
+import { Text } from 'rebass'
 
 dayjs.extend(utc)
 
@@ -31,7 +31,7 @@ const PageButtons = styled.div`
 
 const Arrow = styled.div`
   color: ${({ theme }) => theme.primary1};
-  opacity: ${props => (props.faded ? 0.3 : 1)};
+  opacity: ${faded => (faded ? 0.3 : 1)};
   padding: 0 20px;
   user-select: none;
   :hover {
@@ -159,8 +159,8 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
         <DashGrid style={{ height: '48px', alignItems: 'center' }} disbaleLinks={disbaleLinks} focus={true}>
           <DoubleTokenLogo
             size={below600 ? 16 : 24}
-            a0={pairData.token0.id}
-            a1={pairData.token1.id}
+            token0={pairData.token0.id}
+            token1={pairData.token1.id}
             margin={!below740}
           />
           <TYPE.header style={{ marginLeft: '20px', whiteSpace: 'nowrap' }}>
@@ -184,11 +184,15 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
           )}
           <TYPE.header area="name" fontWeight="500">
             <RowFixed style={{ flexFlow: 'row nowrap', justifyContent: 'flex-end', marginTop: '0.5rem' }}>
-              <ButtonLight disabled={!hasLPTokens} mr={'.5rem'}>
-                Remove
-              </ButtonLight>
-              <ButtonLight mr={'.5rem'}>Add</ButtonLight>
-              <ButtonDark>Trade</ButtonDark>
+              <StyledInternalLink disabled={!hasLPTokens} to={`/remove/${pairData.token0.id}/${pairData.token1.id}`}>
+                <Text textAlign="center">Remove</Text>
+              </StyledInternalLink>
+              <StyledInternalLink to={`/add/${pairData.token0.id}/${pairData.token1.id}`}>
+                <Text textAlign="center">Add</Text>
+              </StyledInternalLink>
+              <StyledInternalLink to={`/swap/${pairData.token0.id}/${pairData.token1.id}`}>
+                <Text textAlign="center">Trade</Text>
+              </StyledInternalLink>
             </RowFixed>
           </TYPE.header>
         </DashGrid>

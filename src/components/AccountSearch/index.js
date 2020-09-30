@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import 'feather-icons'
 import { withRouter } from 'react-router-dom'
 import styled from 'styled-components'
-import { ButtonLight, ButtonFaded } from '../ButtonStyled'
+import { ButtonLight, ButtonGray } from '../ButtonStyled'
 import { AutoRow, RowBetween } from '../Row'
 import { isAddress } from '../../utils'
 import { useSavedAccounts } from '../../contexts/LocalStorage'
@@ -143,13 +143,13 @@ function AccountSearch({ history, small }) {
               savedAccounts.map(account => {
                 return (
                   <RowBetween key={account}>
-                    <ButtonFaded onClick={() => history.push('/account/' + account)}>
+                    <ButtonGray onClick={() => history.push('/account/' + account)}>
                       {small ? (
                         <TYPE.header>{account?.slice(0, 6) + '...' + account?.slice(38, 42)}</TYPE.header>
                       ) : (
                         <AccountLink>{account?.slice(0, 42)}</AccountLink>
                       )}
-                    </ButtonFaded>
+                    </ButtonGray>
                     <Hover onClick={() => removeAccount(account)}>
                       <StyledIcon>
                         <X size={16} />

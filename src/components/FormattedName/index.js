@@ -17,7 +17,15 @@ const TextWrapper = styled.div`
   }
 `
 
-const FormattedName = ({ text, maxCharacters, margin = false, adjustSize = false, fontSize, link, ...rest }) => {
+const FormattedName = ({
+  text,
+  maxCharacters,
+  margin = false,
+  adjustSize = false,
+  fontSize = '12px',
+  link,
+  ...rest
+}) => {
   const [showHover, setShowHover] = useState(false)
 
   if (!text) {

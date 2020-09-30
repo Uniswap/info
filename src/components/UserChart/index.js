@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import { Area, XAxis, YAxis, ResponsiveContainer, Tooltip, AreaChart } from 'recharts'
 import { AutoRow, RowBetween } from '../Row'
 import { toK, toNiceDate, toNiceDateYear, formattedNum, getTimeframe } from '../../utils'
-import { OptionButton } from '../ButtonStyled'
+import { ButtonRadio } from '../ButtonStyled'
 import { darken } from 'polished'
 import { useMedia } from 'react-use'
 import { timeframeOptions } from '../../constants'
@@ -51,24 +51,24 @@ const UserChart = ({ account }) => {
             <TYPE.main>Liquidity Value</TYPE.main>
           </AutoRow>
           <AutoRow justify="flex-end" gap="4px">
-            <OptionButton
+            <ButtonRadio
               active={timeWindow === timeframeOptions.MONTH}
               onClick={() => setTimeWindow(timeframeOptions.MONTH)}
             >
               1M
-            </OptionButton>
-            <OptionButton
+            </ButtonRadio>
+            <ButtonRadio
               active={timeWindow === timeframeOptions.WEEK}
               onClick={() => setTimeWindow(timeframeOptions.WEEK)}
             >
               1W
-            </OptionButton>
-            <OptionButton
+            </ButtonRadio>
+            <ButtonRadio
               active={timeWindow === timeframeOptions.ALL_TIME}
               onClick={() => setTimeWindow(timeframeOptions.ALL_TIME)}
             >
               All
-            </OptionButton>
+            </ButtonRadio>
           </AutoRow>
         </RowBetween>
       )}
