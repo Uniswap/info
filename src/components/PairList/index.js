@@ -17,7 +17,7 @@ import { RowFixed } from '../Row'
 import { useAccountWeb3 } from '../../contexts/Account'
 import { useConfig } from '../../contexts/Application'
 import { greaterThanZero } from '../../utils'
-import { Text } from 'rebass'
+import { ButtonLight, ButtonPrimary } from '../ButtonStyled'
 
 dayjs.extend(utc)
 
@@ -111,7 +111,7 @@ const FIELD_TO_VALUE = {
   [SORT_FIELD.FEES]: 'oneDayVolumeUSD'
 }
 
-function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
+function PairList({ pairs, color, disbaleLinks, marketId, maxItems = 10 }) {
   const below600 = useMedia('(max-width: 600px)')
   const below740 = useMedia('(max-width: 740px)')
   const below800 = useMedia('(max-width: 800px)')
@@ -183,15 +183,20 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
             </TYPE.header>
           )}
           <TYPE.header area="name" fontWeight="500">
-            <RowFixed style={{ flexFlow: 'row nowrap', justifyContent: 'flex-end', marginTop: '0.5rem' }}>
-              <StyledInternalLink disabled={!hasLPTokens} to={`/remove/${pairData.token0.id}/${pairData.token1.id}`}>
-                <Text textAlign="center">Remove</Text>
+            <RowFixed style={{ flexFlow: 'row nowrap', justifyContent: 'space-between', marginTop: '0.5rem' }}>
+              <StyledInternalLink
+                disabled={!hasLPTokens}
+                to={`/remove/${marketId}/${pairData.token0.id}/${pairData.token1.id}`}
+              >
+                <ButtonLight disabled={!hasLPTokens} textAlign="center">
+                  Remove
+                </ButtonLight>
               </StyledInternalLink>
-              <StyledInternalLink to={`/add/${pairData.token0.id}/${pairData.token1.id}`}>
-                <Text textAlign="center">Add</Text>
+              <StyledInternalLink to={`/add/${marketId}/${pairData.token0.id}/${pairData.token1.id}`}>
+                <ButtonLight textAlign="center">Add</ButtonLight>
               </StyledInternalLink>
-              <StyledInternalLink to={`/swap/${pairData.token0.id}/${pairData.token1.id}`}>
-                <Text textAlign="center">Trade</Text>
+              <StyledInternalLink to={`/swap/${marketId}/${pairData.token0.id}/${pairData.token1.id}`}>
+                <ButtonPrimary textAlign="center">Trade</ButtonPrimary>
               </StyledInternalLink>
             </RowFixed>
           </TYPE.header>

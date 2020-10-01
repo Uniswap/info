@@ -116,8 +116,8 @@ export function useActiveWeb3React() {
 
   // using existing web3 context
   const KOVAN = 42 // default network for testing
-  const [web3] = useAccountWeb3()
-  return { account: web3?.address, library: web3?.library, chainId: web3?.chainId ? web3?.chainId : KOVAN }
+  const [web3, getWeb3] = useAccountWeb3()
+  return { getWeb3, account: web3?.address, library: web3?.library, chainId: web3?.chainId ? web3?.chainId : KOVAN }
 }
 
 interface CallResult {

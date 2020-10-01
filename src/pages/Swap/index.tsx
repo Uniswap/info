@@ -5,7 +5,7 @@ import ReactGA from 'react-ga'
 import { Text } from 'rebass'
 import { ThemeContext } from 'styled-components'
 import AddressInputPanel from '../../components/AddressInputPanel'
-import { ButtonError, ButtonLight, ButtonPrimary, ButtonConfirmed } from '../../components/ButtonStyled'
+import { ButtonError, ButtonGray, ButtonPrimary, ButtonConfirmed } from '../../components/ButtonStyled'
 import Card, { GreyCard } from '../../components/Card'
 import Column, { AutoColumn } from '../../components/Column'
 import ConfirmSwapModal from '../../components/swap/ConfirmSwapModal'
@@ -20,14 +20,13 @@ import TokenWarningModal from '../../components/TokenWarningModal'
 import ProgressSteps from '../../components/ProgressSteps'
 import { withRouter } from 'react-router-dom'
 
-import { INITIAL_ALLOWED_SLIPPAGE } from '../../constants'
 import { useActiveWeb3React } from '../../hooks'
 import { useCurrency } from '../../hooks/Tokens'
 import { ApprovalState, useApproveCallbackFromTrade } from '../../hooks/useApproveCallback'
 import useENSAddress from '../../hooks/useENSAddress'
 import { useSwapCallback } from '../../hooks/useSwapCallback'
 import useWrapCallback, { WrapType } from '../../hooks/useWrapCallback'
-import { useToggleSettingsMenu, useWalletModalToggle } from '../../state/application/hooks'
+import { useToggleSettingsMenu } from '../../state/application/hooks'
 import { Field } from '../../state/swap/actions'
 import { useDerivedSwapInfo, useSwapActionHandlers, useSwapState } from '../../state/swap/hooks'
 import { useExpertModeManager, useUserSlippageTolerance } from '../../state/user/hooks'
@@ -59,13 +58,12 @@ function Swap({
     setDismissTokenWarning(true)
   }, [])
 
-  const { account } = useActiveWeb3React()
   const theme = useContext(ThemeContext)
 
   // toggle wallet when disconnected
   //  const toggleWalletModal = useWalletModalToggle()
-  const [web3, getWeb3] = useAccountWeb3()
-  console.log('web3 account', web3?.address)
+  const { account, getWeb3 } = useActiveWeb3React()
+
   // for expert mode
   const toggleSettings = useToggleSettingsMenu()
   const [isExpertMode] = useExpertModeManager()
@@ -246,7 +244,7 @@ function Swap({
         onConfirm={handleConfirmTokenWarning}
       />
       <AppBody>
-        <SwapPoolTabs active={'swap'} />
+        <SwapPoolTabs token={marketId} />
         <Wrapper id="swap-page">
           <ConfirmSwapModal
             isOpen={showConfirm}
@@ -347,7 +345,7 @@ function Swap({
           </AutoColumn>
           <BottomGrouping>
             {!account ? (
-              <ButtonLight onClick={getWeb3}>Connect Wallet</ButtonLight>
+              <ButtonGray onClick={getWeb3}>Connect Wallet</ButtonGray>
             ) : showWrap ? (
               <ButtonPrimary disabled={Boolean(wrapInputError)} onClick={onWrap}>
                 {wrapInputError ??

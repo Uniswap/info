@@ -81,7 +81,7 @@ const theme = (darkMode, color = 'white') => ({
   primaryText1: darkMode ? '#6da8ff' : '#ff007a',
 
   // secondary colors
-  secondary1: darkMode ? '#2172E5' : '#ff007a',
+  secondary1: darkMode ? '#D7DDE0' : '#ff007a',
   secondary2: darkMode ? '#17000b26' : '#F6DDE8',
   secondary3: darkMode ? '#17000b26' : '#FDEAF1',
 
@@ -94,6 +94,7 @@ const theme = (darkMode, color = 'white') => ({
   yellow2: '#F3841E',
   link: '#2172E5',
   blue: '2f80ed',
+  primary: '#09CFE1',
 
   background: darkMode ? 'black' : `radial-gradient(50% 50% at 50% 50%, #ff007a30 0%, #fff 0%)`
 })
@@ -328,12 +329,12 @@ export const StyledInternalLink = styled(Link)`
   font-weight: 500;
 
   :hover {
-    text-decoration: underline;
+    text-decoration: none;
   }
 
   :focus {
     outline: none;
-    text-decoration: underline;
+    text-decoration: none;
   }
 
   :active {
@@ -387,17 +388,20 @@ export const HideSmall = styled.span`
 `
 
 // A button that triggers some onClick result, but looks like a link.
-export const LinkStyledButton = styled.button<{ disabled?: boolean }>`
-  border: none;
+export const LinkStyledButton = styled.button<{ disabled?: boolean; primary?: boolean }>`
   text-decoration: none;
-  background: none;
+  background: ${({ primary }) => (primary ? '#09CFE1' : 'none')};
+  color: ${({ theme, primary }) => (primary ? theme.text1 : theme.text2)};
+  border: 1px solid #575a68;
+  box-sizing: border-box;
+  border-radius: 12px;
+  padding: 9px 12px;
 
   cursor: ${({ disabled }) => (disabled ? 'default' : 'pointer')};
-  color: ${({ theme, disabled }) => (disabled ? theme.text2 : theme.primary1)};
   font-weight: 500;
 
   :hover {
-    text-decoration: ${({ disabled }) => (disabled ? null : 'underline')};
+    text-decoration: none;
   }
 
   :focus {

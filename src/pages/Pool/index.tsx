@@ -12,7 +12,7 @@ import Card from '../../components/Card'
 import { RowBetween, RowFixed } from '../../components/Row'
 import { ButtonPrimary, ButtonSecondary } from '../../components/ButtonStyled'
 import { AutoColumn } from '../../components/Column'
-
+import { withRouter } from 'react-router-dom'
 import { useActiveWeb3React } from '../../hooks'
 import { usePairs } from '../../data/Reserves'
 import { toV2LiquidityToken, useTrackedTokenPairs } from '../../state/user/hooks'
@@ -71,10 +71,10 @@ const EmptyProposals = styled.div`
   align-items: center;
 `
 
-export default function Pool() {
+function Pool({ history }) {
   const theme = useContext(ThemeContext)
   const { account } = useActiveWeb3React()
-
+  const marketId = 'bobIsYouUncle'
   // fetch the user's balances of all tracked V2 LP tokens
   const trackedTokenPairs = useTrackedTokenPairs()
   const tokenPairsWithLiquidityTokens = useMemo(
@@ -107,7 +107,7 @@ export default function Pool() {
   return (
     <>
       <PageWrapper>
-        <SwapPoolTabs active={'token'} />
+        <SwapPoolTabs token={marketId} />
 
         <VoteCard>
           <CardBGImage />
@@ -195,3 +195,5 @@ export default function Pool() {
     </>
   )
 }
+
+export default withRouter(Pool)

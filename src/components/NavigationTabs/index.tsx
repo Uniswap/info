@@ -1,7 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
 import { darken } from 'polished'
-import { useTranslation } from 'react-i18next'
 import { NavLink, Link as HistoryLink } from 'react-router-dom'
 
 import { ArrowLeft } from 'react-feather'
@@ -14,7 +13,7 @@ const Tabs = styled.div`
   border-radius: 3rem;
   justify-content: space-evenly;
 `
-
+/*
 const activeClassName = 'ACTIVE'
 
 const StyledNavLink = styled(NavLink).attrs({
@@ -42,6 +41,7 @@ const StyledNavLink = styled(NavLink).attrs({
     color: ${({ theme }) => darken(0.1, theme.text1)};
   }
 `
+*/
 
 const ActiveText = styled.div`
   font-weight: 500;
@@ -53,16 +53,20 @@ const StyledArrowLeft = styled(ArrowLeft)`
   color: ${({ theme }) => theme.text1};
 `
 
-export function SwapPoolTabs({ active }: { active: 'swap' | 'token' }) {
-  const { t } = useTranslation()
+export function SwapPoolTabs({ token }: { token: string }) {
   return (
-    <Tabs style={{ marginBottom: '20px', display: 'none' }}>
-      <StyledNavLink id={`swap-nav-link`} to={'/swap'} isActive={() => active === 'swap'}>
-        {t('swap')}
-      </StyledNavLink>
-      <StyledNavLink id={`pool-nav-link`} to={'/token'} isActive={() => active === 'token'}>
-        {t('token')}
-      </StyledNavLink>
+    <Tabs>
+      <RowBetween style={{ padding: '1rem' }}>
+        <HistoryLink to={`/token/${token}`}>
+          <StyledArrowLeft />
+        </HistoryLink>
+        <ActiveText>Swap</ActiveText>
+        <QuestionHelper
+          text={
+            'Swap market cash (weth, dai, ...) for market shares or vice versa. It is also possible to swap Yes shares for No shares and vice versa.'
+          }
+        />
+      </RowBetween>
     </Tabs>
   )
 }

@@ -293,7 +293,7 @@ function TokenPage({ address, history }) {
               }}
             >
               {address && allPairs ? (
-                <PairList color={backgroundColor} address={address} pairs={allPairs} />
+                <PairList color={backgroundColor} marketId={address} pairs={allPairs} />
               ) : (
                 <Loader />
               )}

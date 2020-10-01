@@ -101,9 +101,12 @@ export const SubNavEl = styled.li`
 
 export const PageWrapper = styled.div`
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   padding-top: 36px;
   padding-bottom: 80px;
+  width: 100%;
+  align-content: center;
+  justify-content: center;
 
   @media screen and (max-width: 600px) {
     & > * {

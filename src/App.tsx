@@ -9,14 +9,13 @@ import PairPage from './pages/PairPage'
 import { useGlobalData, useGlobalChartData } from './contexts/GlobalData'
 import { isAddress } from './utils'
 import AccountPage from './pages/AccountPage'
-import TradePage from './pages/TradePage'
 import AllMarketsPage from './pages/AllMarketsPage'
 import SideNav from './components/SideNav'
 import AccountLookup from './pages/AccountLookup'
 import { OVERVIEW_TOKEN_BLACKLIST, PAIR_BLACKLIST } from './constants'
 import LocalLoader from './components/LocalLoader'
 import { useLatestBlock } from './contexts/Application'
-import { RedirectDuplicateTokenIds, RedirectOldAddLiquidityPathStructure } from './pages/AddLiquidity/redirects'
+import { RedirectDuplicateTokenIds } from './pages/AddLiquidity/redirects'
 import RemoveLiquidity from './pages/RemoveLiquidity'
 import Swap from './pages/Swap'
 
@@ -141,24 +140,6 @@ function App() {
               <Route
                 exacts
                 strict
-                path="/trade/:pairAddress"
-                render={({ match }) => {
-                  const { pairAddress } = match.params
-
-                  if (isAddress(match.params.pairAddress.toLowerCase())) {
-                    return (
-                      <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
-                        <TradePage pairAddress={pairAddress} />
-                      </LayoutWrapper>
-                    )
-                  } else {
-                    return <Redirect to="/home" />
-                  }
-                }}
-              />
-              <Route
-                exacts
-                strict
                 path="/account/:accountAddress"
                 render={({ match }) => {
                   if (isAddress(match.params.accountAddress.toLowerCase())) {
@@ -172,7 +153,6 @@ function App() {
                   }
                 }}
               />
-
               <Route path="/home">
                 <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
                   <GlobalPage />
@@ -187,32 +167,18 @@ function App() {
               <Route
                 exacts
                 strict
-                path="/add/:currencyIdA"
+                path="/add/:marketId/:currencyIdA/:currencyIdB"
                 render={({ match }) => {
-                  const { currencyIdA } = match.params
-
-                  if (isAddress(currencyIdA.toLowerCase())) {
-                    return (
-                      <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
-                        <RedirectOldAddLiquidityPathStructure currencyIdA={currencyIdA} />
-                      </LayoutWrapper>
-                    )
-                  } else {
-                    return <Redirect to="/home" />
-                  }
-                }}
-              />
-              <Route
-                exacts
-                strict
-                path="/add/:currencyIdA/:currencyIdB"
-                render={({ match }) => {
-                  const { currencyIdA, currencyIdB } = match.params
+                  const { marketId, currencyIdA, currencyIdB } = match.params
 
                   if (isAddress(currencyIdA.toLowerCase()) && isAddress(currencyIdB.toLowerCase())) {
                     return (
                       <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
-                        <RedirectDuplicateTokenIds currencyIdA={currencyIdA} currencyIdB={currencyIdB} />
+                        <RedirectDuplicateTokenIds
+                          marketId={marketId}
+                          currencyIdA={currencyIdA}
+                          currencyIdB={currencyIdB}
+                        />
                       </LayoutWrapper>
                     )
                   } else {
@@ -223,14 +189,14 @@ function App() {
               <Route
                 exacts
                 strict
-                path="/remove/:currencyIdA/:currencyIdB"
+                path="/remove/:marketId/:currencyIdA/:currencyIdB"
                 render={({ match }) => {
-                  const { currencyIdA, currencyIdB } = match.params
+                  const { marketId, currencyIdA, currencyIdB } = match.params
 
                   if (isAddress(currencyIdA.toLowerCase()) && isAddress(currencyIdB.toLowerCase())) {
                     return (
                       <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
-                        <RemoveLiquidity currencyIdA={currencyIdA} currencyIdB={currencyIdB} />
+                        <RemoveLiquidity marketId={marketId} currencyIdA={currencyIdA} currencyIdB={currencyIdB} />
                       </LayoutWrapper>
                     )
                   } else {
@@ -241,14 +207,18 @@ function App() {
               <Route
                 exacts
                 strict
-                path="/swap/:inputCurrencyId/:outputCurrencyId"
+                path="/swap/:marketId/:inputCurrencyId/:outputCurrencyId"
                 render={({ match }) => {
-                  const { inputCurrencyId, outputCurrencyId } = match.params
+                  const { marketId, inputCurrencyId, outputCurrencyId } = match.params
 
-                  if (isAddress(inputCurrencyId.toLowerCase()) && isAddress(outputCurrencyId.toLowerCase())) {
+                  if (isAddress(marketId.toLowerCase())) {
                     return (
                       <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
-                        <Swap inputCurrencyId={inputCurrencyId} outputCurrencyId={outputCurrencyId} />
+                        <Swap
+                          marketId={marketId}
+                          inputCurrencyId={inputCurrencyId}
+                          outputCurrencyId={outputCurrencyId}
+                        />
                       </LayoutWrapper>
                     )
                   } else {
