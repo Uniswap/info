@@ -62,13 +62,29 @@ export const GET_BLOCK = gql`
 `
 
 // Get all markets except CATEGORICAL
+// https://thegraph.com/explorer/subgraph/augurproject/augur-v2-staging
 export const GET_MARKETS = gql`
   {
-    markets(where: { marketType: YES_NO }) {
+    markets(where: { marketType: YES_NO, description_not: null }) {
       description
       id
       endTimestamp
       status
+      amms {
+        id
+        shareToken {
+          id
+          cash {
+            id
+          }
+        }
+      }
+    }
+    paraShareTokens {
+      id
+      cash {
+        id
+      }
     }
   }
 `

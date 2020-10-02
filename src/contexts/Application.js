@@ -320,8 +320,14 @@ export function useConfig() {
 
 export function getCashAddress(symbol) {
   const contracts = getConfig()
-  const weth = contracts.Cashes.find(c => c.symbol === symbol)
-  return weth.address
+  const cash = contracts.Cashes.find(c => c.symbol === symbol)
+  return cash?.address
+}
+
+export function getCashInfo(address) {
+  const contracts = getConfig()
+  const cash = contracts.Cashes.find(c => c.address.toLowerCase() === address.toLowerCase())
+  return cash
 }
 
 export function getAmmFactoryAddress() {

@@ -148,6 +148,10 @@ export const TYPE = {
     return <TextWrapper fontWeight={500} color={'text1'} fontSize={24} {...props} />
   },
 
+  veryLargeHeader(props: TextProps) {
+    return <TextWrapper fontWeight={500} color={'text1'} fontSize={32} {...props} />
+  },
+
   light(props: TextProps) {
     return <TextWrapper fontWeight={400} color={'text3'} fontSize={14} {...props} />
   },

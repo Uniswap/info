@@ -1,6 +1,6 @@
 import { BigNumber } from '@ethersproject/bignumber'
 import { TransactionResponse } from '@ethersproject/providers'
-import { Currency, currencyEquals, ETHER, TokenAmount, WETH } from '@uniswap/sdk'
+import { Currency, ETHER, TokenAmount } from '@uniswap/sdk'
 import React, { useCallback, useContext, useState } from 'react'
 import { Plus } from 'react-feather'
 import ReactGA from 'react-ga'
@@ -14,7 +14,7 @@ import TransactionConfirmationModal, { ConfirmationModalContent } from '../../co
 import CurrencyInputPanel from '../../components/CurrencyInputPanel'
 import DoubleCurrencyLogo from '../../components/DoubleLogo'
 import { AddRemoveTabs } from '../../components/NavigationTabs'
-import { MinimalPositionCard } from '../../components/PositionCard'
+//import { MinimalPositionCard } from '../../components/PositionCard'
 import Row, { RowBetween, RowFlat } from '../../components/Row'
 
 import { ROUTER_ADDRESS } from '../../constants'
@@ -33,31 +33,32 @@ import { calculateGasMargin, calculateSlippageAmount } from '../../utils'
 import { maxAmountSpend } from '../../utils/maxAmountSpend'
 import { wrappedCurrency } from '../../utils/wrappedCurrency'
 import AppBody from '../AppBody'
-import { Dots, Wrapper } from '../Pool/styleds'
+import { Dots, Wrapper } from '../../components/swap/styleds'
 import { ConfirmAddModalBottom } from './ConfirmAddModalBottom'
 import { currencyId } from '../../utils/currencyId'
 import { PoolPriceBar } from './PoolPriceBar'
 import { getAmmFactoryAddress } from '../../contexts/Application'
 import { withRouter } from 'react-router-dom'
 import LiquidityPage from '../LiquidityPage'
+import { useMarketAmm, useShareTokens } from '../../contexts/Markets'
 
 function AddLiquidity({
-  currencyIdA,
-  currencyIdB,
+  amm,
   marketId,
+  cash,
   history
-}: RouteComponentProps<{ currencyIdA?: string; currencyIdB?: string; marketId: string }>) {
+}: RouteComponentProps<{ amm?: string; marketId: string; cash: string }>) {
   const { account, chainId, getWeb3 } = useActiveWeb3React()
   const theme = useContext(ThemeContext)
+  const sharetoken = useShareTokens(cash)
+  const ammData = useMarketAmm(marketId, amm)
+  const isCreate = !ammData.id
+  console.log('amm data', JSON.stringify(ammData))
 
-  const currencyA = useCurrency(currencyIdA)
-  const currencyB = useCurrency(currencyIdB)
-
-  const oneCurrencyIsWETH = Boolean(
-    chainId &&
-      ((currencyA && currencyEquals(currencyA, WETH[chainId])) ||
-        (currencyB && currencyEquals(currencyB, WETH[chainId])))
-  )
+  const currencyA = useCurrency(cash)
+  const currencyB = useCurrency(sharetoken)
+  const currencyIdA = cash
+  const currencyIdB = sharetoken
 
   const expertMode = useIsExpertMode()
 
@@ -66,7 +67,6 @@ function AddLiquidity({
   const {
     dependentField,
     currencies,
-    pair,
     pairState,
     currencyBalances,
     parsedAmounts,
@@ -294,8 +294,6 @@ function AddLiquidity({
     setTxHash('')
   }, [onFieldAInput, txHash])
 
-  const isCreate = history.location.pathname.includes('/create')
-
   return (
     <LiquidityPage>
       <AppBody>
@@ -338,6 +336,7 @@ function AddLiquidity({
             <CurrencyInputPanel
               value={formattedAmounts[Field.CURRENCY_A]}
               onUserInput={onFieldAInput}
+              label={'How much do you want to put in?'}
               onMax={() => {
                 onFieldAInput(maxAmounts[Field.CURRENCY_A]?.toExact() ?? '')
               }}
@@ -436,12 +435,6 @@ function AddLiquidity({
           </AutoColumn>
         </Wrapper>
       </AppBody>
-
-      {pair && !noLiquidity && pairState !== PairState.INVALID ? (
-        <AutoColumn style={{ minWidth: '20rem', width: '100%', maxWidth: '400px', marginTop: '1rem' }}>
-          <MinimalPositionCard showUnwrapped={oneCurrencyIsWETH} pair={pair} />
-        </AutoColumn>
-      ) : null}
     </LiquidityPage>
   )
 }

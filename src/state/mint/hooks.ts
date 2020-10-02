@@ -33,6 +33,7 @@ export function useDerivedMintInfo(
   poolTokenPercentage?: Percent
   error?: string
 } {
+  console.log('useDerivedMintInfo', currencyA, currencyB)
   const { account, chainId } = useActiveWeb3React()
 
   const { independentField, typedValue, otherTypedValue } = useMintState()

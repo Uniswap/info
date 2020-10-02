@@ -9,15 +9,15 @@ import { BasicLink } from '../Link'
 import { useAllTokenData, useTokenData } from '../../contexts/TokenData'
 import { useAllPairData, usePairData } from '../../contexts/PairData'
 import { useAllMarketData } from '../../contexts/Markets'
-import DoubleTokenLogo from '../DoubleLogo'
+//import DoubleTokenLogo from '../DoubleLogo'
 //import { useMedia } from 'react-use'
-import { useAllPairsInUniswap, useAllTokensInUniswap } from '../../contexts/GlobalData'
-import { useConfig } from '../../contexts/Application'
+import { useAllTokensInUniswap } from '../../contexts/GlobalData'
+//import { useConfig } from '../../contexts/Application'
 import { OVERVIEW_TOKEN_BLACKLIST, PAIR_BLACKLIST } from '../../constants'
 
 import { transparentize } from 'polished'
 import { client } from '../../apollo/client'
-import { PAIR_SEARCH, TOKEN_SEARCH } from '../../apollo/queries'
+import { TOKEN_SEARCH } from '../../apollo/queries'
 import FormattedName from '../FormattedName'
 import { TYPE } from '../../Theme'
 
@@ -160,9 +160,6 @@ const Blue = styled.span`
 export const Search = ({ small = false }) => {
   let allTokens = useAllTokensInUniswap()
   const allTokenData = useAllTokenData()
-  const contracts = useConfig()
-  const { Cashes } = contracts
-  let allPairs = useAllPairsInUniswap()
   const allPairData = useAllPairData()
   const { markets } = useAllMarketData()
 
@@ -188,7 +185,7 @@ export const Search = ({ small = false }) => {
   }, [value])
 
   const [searchedTokens, setSearchedTokens] = useState([])
-  const [searchedPairs, setSearchedPairs] = useState([])
+  //const [searchedPairs, setSearchedPairs] = useState([])
 
   useEffect(() => {
     async function fetchData() {
@@ -201,7 +198,7 @@ export const Search = ({ small = false }) => {
             },
             query: TOKEN_SEARCH
           })
-
+          /*
           let pairs = await client.query({
             query: PAIR_SEARCH,
             variables: {
@@ -210,6 +207,7 @@ export const Search = ({ small = false }) => {
             }
           })
           setSearchedPairs(pairs.data.as0.concat(pairs.data.as1).concat(pairs.data.asAddress))
+          */
           let foundTokens = tokens.data.asSymbol.concat(tokens.data.asAddress).concat(tokens.data.asName)
           setSearchedTokens(foundTokens)
         }
@@ -249,29 +247,7 @@ export const Search = ({ small = false }) => {
       return true
     })
 
-  allPairs = allPairs.concat(
-    searchedPairs.filter(searchedPair => {
-      let included = false
-      allPairs.map(pair => {
-        if (pair.id === searchedPair.id) {
-          included = true
-        }
-        return true
-      })
-      return !included
-    })
-  )
-
   let uniquePairs = []
-  let pairsFound = {}
-  allPairs &&
-    allPairs.map(pair => {
-      if (!pairsFound[pair.id]) {
-        pairsFound[pair.id] = true
-        uniquePairs.push(pair)
-      }
-      return true
-    })
 
   // TODO Add better market filtering / searching
   const filteredMarketsList = markets
@@ -408,13 +384,13 @@ export const Search = ({ small = false }) => {
     }
   }, [filteredPairList])
 
-  const [tokensShown, setTokensShown] = useState(3)
-  const [pairsShown, setPairsShown] = useState(3)
+  //const [tokensShown, setTokensShown] = useState(3)
+  //const [pairsShown, setPairsShown] = useState(3)
   const [marketsShown, setMarketsShown] = useState(3)
 
   function onDismiss() {
-    setPairsShown(3)
-    setTokensShown(3)
+    //setPairsShown(3)
+    //setTokensShown(3)
     setMarketsShown(3)
     toggleMenu(false)
     setValue('')
@@ -429,9 +405,9 @@ export const Search = ({ small = false }) => {
       !(menuRef.current && menuRef.current.contains(e.target)) &&
       !(wrapperRef.current && wrapperRef.current.contains(e.target))
     ) {
-      setPairsShown(3)
+      //setPairsShown(3)
       setMarketsShown(3)
-      setTokensShown(3)
+      //setTokensShown(3)
       toggleMenu(false)
     }
   }
@@ -476,21 +452,16 @@ export const Search = ({ small = false }) => {
           {filteredMarketsList.slice(0, marketsShown).map(market => {
             return (
               <div key={market.id}>
-                <BasicLink to={'/pair/' + market.id} onClick={onDismiss}>
+                <BasicLink to={'/token/' + market.id} onClick={onDismiss}>
                   <MenuItem>
                     <RowFixed>
                       <TokenLogo address={market.id} style={{ marginRight: '10px' }} />
-                      <FormattedName text={market.description} maxCharacters={20} style={{ marginRight: '6px' }} />
-                      (<FormattedName text={'ETH'} maxCharacters={6} />)
-                    </RowFixed>
-                  </MenuItem>
-                </BasicLink>
-                <BasicLink to={'/pair/' + market.id} onClick={onDismiss}>
-                  <MenuItem>
-                    <RowFixed>
-                      <TokenLogo address={market.id} style={{ marginRight: '10px' }} />
-                      <FormattedName text={market.description} maxCharacters={20} style={{ marginRight: '6px' }} />
-                      (<FormattedName text={'DAI'} maxCharacters={6} />)
+                      <FormattedName
+                        text={market.description}
+                        maxCharacters={180}
+                        style={{ marginRight: '6px', flexGrow: '1', paddingLeft: '0.5rem' }}
+                      />
+                      <FormattedName text={'ETH'} maxCharacters={6} />
                     </RowFixed>
                   </MenuItem>
                 </BasicLink>
@@ -506,85 +477,6 @@ export const Search = ({ small = false }) => {
             <Blue
               onClick={() => {
                 setMarketsShown(marketsShown + 5)
-              }}
-            >
-              See more...
-            </Blue>
-          </Heading>
-        </div>
-        <Heading>
-          <Gray>Pairs</Gray>
-        </Heading>
-        <div>
-          {filteredPairList && Object.keys(filteredPairList).length === 0 && (
-            <MenuItem>
-              <TYPE.body>No results</TYPE.body>
-            </MenuItem>
-          )}
-          {filteredPairList &&
-            filteredPairList.slice(0, pairsShown).map(pair => {
-              const cash0 = Cashes.find(c => c.address === pair?.token0?.id)
-              if (cash0) {
-                pair.token0.name = cash0.name
-                pair.token0.symbol = cash0.symbol
-              }
-              const cash1 = Cashes.find(c => c.address === pair?.token0?.id)
-              if (cash1) {
-                pair.token1.name = cash1.name
-                pair.token1.symbol = cash1.symbol
-              }
-              return (
-                <BasicLink to={'/pair/' + pair.id} key={pair.id} onClick={onDismiss}>
-                  <MenuItem>
-                    <DoubleTokenLogo token0={pair?.token0?.id} token1={pair?.token1?.id} margin={true} />
-                    <TYPE.body style={{ marginLeft: '10px' }}>
-                      {pair.token0.symbol + '-' + pair.token1.symbol} Pair
-                    </TYPE.body>
-                  </MenuItem>
-                </BasicLink>
-              )
-            })}
-          <Heading
-            hide={!(Object.keys(filteredPairList).length > 3 && Object.keys(filteredPairList).length >= pairsShown)}
-          >
-            <Blue
-              onClick={() => {
-                setPairsShown(pairsShown + 5)
-              }}
-            >
-              See more...
-            </Blue>
-          </Heading>
-        </div>
-        <Heading>
-          <Gray>Tokens</Gray>
-        </Heading>
-        <div>
-          {Object.keys(filteredTokenList).length === 0 && (
-            <MenuItem>
-              <TYPE.body>No results</TYPE.body>
-            </MenuItem>
-          )}
-          {filteredTokenList.slice(0, tokensShown).map(token => {
-            return (
-              <BasicLink to={'/token/' + token.id} key={token.id} onClick={onDismiss}>
-                <MenuItem>
-                  <RowFixed>
-                    <TokenLogo address={token.id} style={{ marginRight: '10px' }} />
-                    <FormattedName text={token.name} maxCharacters={20} style={{ marginRight: '6px' }} />
-                    (<FormattedName text={token.symbol} maxCharacters={6} />)
-                  </RowFixed>
-                </MenuItem>
-              </BasicLink>
-            )
-          })}
-
-          <Heading
-            hide={!(Object.keys(filteredTokenList).length > 3 && Object.keys(filteredTokenList).length >= tokensShown)}
-          >
-            <Blue
-              onClick={() => {
-                setTokensShown(tokensShown + 5)
               }}
             >
               See more...

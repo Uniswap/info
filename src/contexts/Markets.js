@@ -5,13 +5,13 @@ import utc from 'dayjs/plugin/utc'
 
 import { augurV2Client } from '../apollo/client'
 import { GET_MARKETS } from '../apollo/queries'
-import { getAMMAddressForMarketShareToken } from '../utils/contractCalls'
-import { PARA_AUGUR_TOKENS } from '../contexts/TokenData'
+//import { getAMMAddressForMarketShareToken } from '../utils/contractCalls'
+//import { PARA_AUGUR_TOKENS } from '../contexts/TokenData'
 import { useConfig } from '../contexts/Application'
 
 const UPDATE = 'UPDATE'
 const UPDATE_MARKETS = ' UPDATE_MARKETS'
-const UPDATE_MARKET_PAIRS = ' UPDATE_MARKET_PAIRS'
+const UPDATE_PARA_SHARE_TOKENS = ' UPDATE_PARA_SHARE_TOKENS'
 
 dayjs.extend(utc)
 
@@ -42,13 +42,13 @@ function reducer(state, { type, payload }) {
       }
     }
 
-    case UPDATE_MARKET_PAIRS: {
-      const { marketPairs } = payload
+    case UPDATE_PARA_SHARE_TOKENS: {
+      const { paraShareTokens } = payload
 
       return {
         ...state,
-        marketPairs: {
-          ...marketPairs
+        paraShareTokens: {
+          ...paraShareTokens
         }
       }
     }
@@ -79,11 +79,11 @@ export default function Provider({ children }) {
     })
   }, [])
 
-  const updateMarketPairs = useCallback(marketPairs => {
+  const updateParaShareTokens = useCallback(paraShareTokens => {
     dispatch({
-      type: UPDATE_MARKET_PAIRS,
+      type: UPDATE_PARA_SHARE_TOKENS,
       payload: {
-        marketPairs
+        paraShareTokens
       }
     })
   }, [])
@@ -96,20 +96,19 @@ export default function Provider({ children }) {
           {
             update,
             updateMarkets,
-            updateMarketPairs
+            updateParaShareTokens
           }
         ],
-        [state, update, updateMarkets, updateMarketPairs]
+        [state, update, updateMarkets, updateParaShareTokens]
       )}
     >
       {children}
     </MarketDataaContext.Provider>
   )
 }
-
+/*
 async function getAMMExchangePairs(network, { markets }) {
-  let marketPairs = {}
-
+  let paraShareTokens = {}
   if (markets) {
     // Currently slicing the markets due the the number of ETH calls required for the below
     // TODO wrap all these getAMMAddressForMarketShareToken calls in multiCall
@@ -117,7 +116,7 @@ async function getAMMExchangePairs(network, { markets }) {
     for (const market of slicedMarkets) {
       for (const token of PARA_AUGUR_TOKENS) {
         const ammExchange = await getAMMAddressForMarketShareToken(network, market.id, token)
-        marketPairs[ammExchange] = {
+        paraShareTokens[ammExchange] = {
           id: ammExchange,
           token0: {
             id: token,
@@ -139,12 +138,12 @@ async function getAMMExchangePairs(network, { markets }) {
       }
     }
   }
-  return marketPairs
+  return paraShareTokens
 }
-
+*/
 export function Updater() {
   const config = useConfig()
-  const [, { updateMarkets, updateMarketPairs }] = useMarketDataContext()
+  const [, { updateMarkets, updateParaShareTokens }] = useMarketDataContext()
   useEffect(() => {
     async function getData() {
       let response = null
@@ -156,126 +155,67 @@ export function Updater() {
       }
 
       if (response) {
+        console.log(JSON.stringify(response.data, null, 1))
         updateMarkets(response.data)
-        const ammExchangePairs = await getAMMExchangePairs(config.network, response.data)
-        updateMarketPairs(ammExchangePairs)
-      } else {
-        // TODO remove this, hopefully mainnet theGraph is more reliable
-        const data = {
-          markets: [
-            {
-              __typename: 'Market',
-              description:
-                'Will the price of BTC/EUR open at or above 120 on September 30, 2020, according to TradingView.com "BTCEUR (crypto - Bitfinex)"?',
-              endTimestamp: '1601510400',
-              id: '0x02593d76bdc8a0f5629e47c52f6296e36f4d10d2',
-              status: 'TRADING'
-            },
-            {
-              __typename: 'Market',
-              description:
-                'Will the price of BTC/EUR open at or above 120 on September 30, 2020, according to TradingView.com "BTCEUR (crypto - Bitfinex)"?',
-              endTimestamp: '1601510400',
-              id: '0x029fa34c6b6a5bbcb1a06d8269b9eabb6acc5e42',
-              status: 'TRADING'
-            },
-            {
-              __typename: 'Market',
-              description: 'will it rain today?',
-              endTimestamp: '1587281040',
-              id: '0x02c2daa78c6d27ba90b475811bbc1a32e23eeef7',
-              status: 'REPORTING'
-            },
-            {
-              __typename: 'Market',
-              description:
-                'Will the price of BTC/EUR open at or above 120 on September 30, 2020, according to TradingView.com "BTCEUR (crypto - Bitfinex)"?',
-              endTimestamp: '1601510400',
-              id: '0x0330eb8c966b51a0fd87f1f31c5539bb5fccb846',
-              status: 'TRADING'
-            },
-            {
-              __typename: 'Market',
-              description: 'is the sky blue',
-              endTimestamp: '1588291200',
-              id: '0x03c7bea8926225d48c2a7280b61f28f7861a2bbc',
-              status: 'TRADING'
-            },
-            {
-              __typename: 'Market',
-              description:
-                'Will the price of BTC/EUR open at or above 120 on September 30, 2020, according to TradingView.com "BTCEUR (crypto - Bitfinex)"?',
-              endTimestamp: '1601510400',
-              id: '0x045fb8330dfb9213dce7da72f39987f9c29f2da1',
-              status: 'TRADING'
-            },
-            {
-              __typename: 'Market',
-              description: "Women's Singles Tennis: Will Serena Williams win the 2020 Roland Garros?",
-              endTimestamp: '1589724000',
-              id: '0x056950a05dc4d0fb0c8a4900b04e37c02e3260ac',
-              status: 'REPORTING'
-            },
-            {
-              __typename: 'Market',
-              description:
-                'Will the price of BTC/EUR open at or above 120 on September 30, 2020, according to TradingView.com "BTCEUR (crypto - Bitfinex)"?',
-              endTimestamp: '1601510400',
-              id: '0x057bdc6949450a897769f8c1597c84cf28ff6cd1',
-              status: 'TRADING'
-            },
-            {
-              __typename: 'Market',
-              description: 'Will the All Ordinaries close on or above 5500 on April 30, 2020?',
-              endTimestamp: '1588227120',
-              id: '0x077e31d3fb93f04bd14f1137f1490a99cf335e21',
-              status: 'FINALIZED'
-            },
-            {
-              __typename: 'Market',
-              description:
-                'Will the price of BTC/EUR open at or above 120 on October 28, 2020, according to TradingView.com "BTCEUR (crypto - Bitfinex)"?',
-              endTimestamp: '1604534400',
-              id: '0x09b4851d137d76ad8406be8642c2dd7fbb758119',
-              status: 'TRADING'
-            },
-            {
-              __typename: 'Market',
-              description:
-                'Will the price of BTC/EUR open at or above 120 on September 30, 2020, according to TradingView.com "BTCEUR (crypto - Bitfinex)"?',
-              endTimestamp: '1601510400',
-              id: '0x0b01f1076cb78f276ffb5a59f374bb158d8be155',
-              status: 'TRADING'
-            },
-            {
-              __typename: 'Market',
-              description:
-                'Will the price of BTC/EUR open at or above 120 on September 30, 2020, according to TradingView.com "BTCEUR (crypto - Bitfinex)"?',
-              endTimestamp: '1601510400',
-              id: '0x0bc907fb265fd4c21e4f167a333e3b12e08a1260',
-              status: 'TRADING'
-            },
-            {
-              __typename: 'Market',
-              description:
-                'Will the price of BTC/EUR open at or above 120 on September 30, 2020, according to TradingView.com "BTCEUR (crypto - Bitfinex)"?',
-              endTimestamp: '1601510400',
-              id: '0x0ccd706beb59eb93578d33781112ddb8bb24b311',
-              status: 'TRADING'
-            }
-          ]
-        }
-        updateMarkets(data)
-        const ammExchangePairs = await getAMMExchangePairs(config.network, data)
-        updateMarketPairs(ammExchangePairs)
+        //const ammExchangePairs = await getAMMExchangePairs(config.network, response.data)
+        //updateParaShareTokens(ammExchangePairs)
       }
     }
     getData()
-  }, [updateMarkets, updateMarketPairs, config])
+  }, [updateMarkets, updateParaShareTokens, config])
   return null
 }
 
 export function useAllMarketData() {
   const [state] = useMarketDataContext()
   return state
+}
+
+export function useMarket(marketId) {
+  const [state] = useMarketDataContext()
+  const markets = state?.markets
+  return markets ? markets.find(m => m.id === marketId) : null
+}
+
+export function useAllMarketCashes() {
+  const [state] = useMarketDataContext()
+  const shareTokens = state?.paraShareTokens
+  if (!shareTokens) return []
+  const cashes = shareTokens.map(s => s.cash.id)
+  return cashes
+}
+
+export function useShareTokens(cash) {
+  const [state] = useMarketDataContext()
+  const shareToken = state?.paraShareTokens ?? state?.paraShareTokens.find(s => s.cash.id === cash)
+  return shareToken?.id
+}
+
+export function useMarketAmm(marketId, amm) {
+  const market = useMarket(marketId)
+  let ammExchange = null
+  let doesExist = !market.amms || market.amms.length === 0
+  if (doesExist) {
+    ammExchange = market.amms.find(a => a.id === amm)
+  }
+
+  return { id: ammExchange?.id, cash: ammExchange?.shareToken?.cash?.id, sharetoken: ammExchange?.shareToken?.id }
+}
+
+export function useMarketNonExistingAmms(marketId) {
+  const [state] = useMarketDataContext()
+  const market = useMarket(marketId)
+  const ammCashes = market.amms && market.amms.length > 0 ? market.amms.map(a => a.shareToken.cash.id) : []
+  const uncreatedAmms =
+    state?.paraShareTokens && state.paraShareTokens.length > 0
+      ? state.paraShareTokens.reduce((p, s) => (ammCashes.includes(s.cash.id) ? p : [...p, s.cash.id]), [])
+      : []
+
+  return uncreatedAmms
+}
+
+export function useMarketCashes() {
+  const [state] = useMarketDataContext()
+  const cashes = state?.paraShareTokens ? state?.paraShareTokens.reduce((p, s) => [...p, s.cash.id], []) : []
+  return cashes
 }

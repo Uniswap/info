@@ -24,8 +24,9 @@
     "FillOrder": "0x5915A2Fbe674e77e6FE673FC6Aad000C32E860F2",
     "Orders": "0x59B57CD6aBDF79cc4836C63b095943e13Ea45B5E",
     "AmmFactory": "0x667C97e2783fc2A014fA8Bca82bf0Bd9bbb38E4d",
+    "ParaShareToken": "0x17ec401a3466a93E8B736722ac1DA54AbE83Fd11",
     "Cashes": [
-      { "address": "0xf68B100D9Acd8421F7f04E4548a604Ff3f0254E4", "name": "wrapped ETH", "symbol": "wETH" },
+      { "address": "0xede64699532c2b19cf12eb58b4cc7f977de43112", "name": "wrapped ETH", "symbol": "wETH" },
       {
         "address": "0x5bc0ceB4d813282C4468288C8AB42Af5e7a43B27",
         "name": "DAI",

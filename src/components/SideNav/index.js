@@ -7,7 +7,7 @@ import { useMedia } from 'react-use'
 import { transparentize } from 'polished'
 import { TYPE } from '../../Theme'
 import { withRouter } from 'react-router-dom'
-import { TrendingUp, User, DollarSign } from 'react-feather'
+import { TrendingUp, User } from 'react-feather'
 import { useSessionStart, useConfig } from '../../contexts/Application'
 import { useDarkModeManager } from '../../contexts/LocalStorage'
 import { useAccountWeb3 } from '../../contexts/Account'
@@ -111,6 +111,7 @@ function SideNav({ history }) {
                     Overview
                   </Option>
                 </BasicLink>
+                {/*
                 <BasicLink to="/markets">
                   <Option
                     activeText={
@@ -123,7 +124,7 @@ function SideNav({ history }) {
                     Markets
                   </Option>
                 </BasicLink>
-                {/*
+                
                 <BasicLink to="/tokens">
                   <Option
                     activeText={

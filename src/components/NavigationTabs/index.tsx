@@ -1,7 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
-import { darken } from 'polished'
-import { NavLink, Link as HistoryLink } from 'react-router-dom'
+import { Link as HistoryLink } from 'react-router-dom'
 
 import { ArrowLeft } from 'react-feather'
 import { RowBetween } from '../Row'
@@ -92,7 +91,7 @@ export function AddRemoveTabs({ adding, creating, token }: { adding: boolean; cr
         <HistoryLink to={`/token/${token}`}>
           <StyledArrowLeft />
         </HistoryLink>
-        <ActiveText>{creating ? 'Create a pair' : adding ? 'Add Liquidity' : 'Remove Liquidity'}</ActiveText>
+        <ActiveText>{creating ? 'Add Initial Liquidity' : adding ? 'Add Liquidity' : 'Remove Liquidity'}</ActiveText>
         <QuestionHelper
           text={
             adding

@@ -35,7 +35,7 @@ const StyledEthereumLogo = styled.div<{ size }>`
   }
 `
 
-export default function TokenLogo({ address, header = false, size = '24px', ...rest }) {
+export default function TokenLogo({ address, showSymbol = false, size = '24px', ...rest }) {
   const weth_address = getCashAddress(LABEL_WETH)
   const dai_address = getCashAddress(LABEL_DAI)
   const [error, setError] = useState(false)
@@ -44,7 +44,7 @@ export default function TokenLogo({ address, header = false, size = '24px', ...r
     setError(false)
   }, [address])
 
-  if (address?.toLowerCase() === weth_address.toLowerCase()) {
+  if (weth_address && address?.toLowerCase() === weth_address.toLowerCase()) {
     return (
       <StyledEthereumLogo size={size} {...rest}>
         <img src={wEthLogo} style={{ borderRadius: '24px' }} alt="Trading token" />
@@ -52,7 +52,7 @@ export default function TokenLogo({ address, header = false, size = '24px', ...r
     )
   }
 
-  if (address?.toLowerCase() === dai_address.toLowerCase()) {
+  if (dai_address && address?.toLowerCase() === dai_address.toLowerCase()) {
     return (
       <StyledEthereumLogo size={size} {...rest}>
         <img src={daiLogo} style={{ borderRadius: '24px' }} alt="Trading token" />

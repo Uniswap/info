@@ -16,6 +16,7 @@ import { TYPE, StyledInternalLink } from '../../Theme'
 import { RowFixed } from '../Row'
 import { useAccountWeb3 } from '../../contexts/Account'
 import { useConfig } from '../../contexts/Application'
+import { useMarketAmm } from '../../contexts/Markets'
 import { greaterThanZero } from '../../utils'
 import { ButtonLight, ButtonPrimary } from '../ButtonStyled'
 
@@ -120,6 +121,7 @@ function PairList({ pairs, color, disbaleLinks, marketId, maxItems = 10 }) {
   // pagination
   const [page, setPage] = useState(1)
   const [maxPage, setMaxPage] = useState(1)
+  const amm = useMarketAmm(marketId)
   const ITEMS_PER_PAGE = maxItems
 
   // sorting
@@ -155,6 +157,7 @@ function PairList({ pairs, color, disbaleLinks, marketId, maxItems = 10 }) {
     //const isDeployed = checkIfDeployed(pairData.token0, pairData.token1)
 
     if (pairData && pairData.token0 && pairData.token1) {
+      console.log('pairData', pairData)
       return (
         <DashGrid style={{ height: '48px', alignItems: 'center' }} disbaleLinks={disbaleLinks} focus={true}>
           <DoubleTokenLogo
@@ -184,19 +187,18 @@ function PairList({ pairs, color, disbaleLinks, marketId, maxItems = 10 }) {
           )}
           <TYPE.header area="name" fontWeight="500">
             <RowFixed style={{ flexFlow: 'row nowrap', justifyContent: 'space-between', marginTop: '0.5rem' }}>
-              <StyledInternalLink
-                disabled={!hasLPTokens}
-                to={`/remove/${marketId}/${pairData.token0.id}/${pairData.token1.id}`}
-              >
+              <StyledInternalLink disabled={!hasLPTokens} to={`/remove/${marketId}/${pairData.token0.id}/${amm.id}`}>
                 <ButtonLight disabled={!hasLPTokens} textAlign="center">
                   Remove
                 </ButtonLight>
               </StyledInternalLink>
-              <StyledInternalLink to={`/add/${marketId}/${pairData.token0.id}/${pairData.token1.id}`}>
+              <StyledInternalLink to={`/add/${marketId}/${pairData.token0.id}/${amm.id}`}>
                 <ButtonLight textAlign="center">Add</ButtonLight>
               </StyledInternalLink>
-              <StyledInternalLink to={`/swap/${marketId}/${pairData.token0.id}/${pairData.token1.id}`}>
-                <ButtonPrimary textAlign="center">Trade</ButtonPrimary>
+              <StyledInternalLink disabled={!amm.id} to={`/swap/${marketId}/${pairData.token0.id}/${amm.id}`}>
+                <ButtonPrimary disabled={!amm.id} textAlign="center">
+                  Trade
+                </ButtonPrimary>
               </StyledInternalLink>
             </RowFixed>
           </TYPE.header>

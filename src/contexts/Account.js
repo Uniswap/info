@@ -3,7 +3,7 @@ import { ethers } from 'ethers'
 
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
-import getLibrary from '../utils/getLibrary'
+//import getLibrary from '../utils/getLibrary'
 
 const WEB3 = 'web3'
 const UPDATE_WEB3 = ' UPDATE_WEB3'

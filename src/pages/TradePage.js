@@ -3,11 +3,10 @@ import 'feather-icons'
 import { TYPE } from '../Theme'
 import { PageWrapper, ContentWrapper } from '../components'
 import { RowBetween } from '../components/Row'
-import { useAllMarketData } from '../contexts/Markets'
+import { useMarket } from '../contexts/Markets'
 
 function TradePage({ pairAddress }) {
-  const { markets } = useAllMarketData()
-  const selectedMarket = markets.find(market => market.id === pairAddress)
+  const { selectedMarket } = useMarket(pairAddress)
 
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -17,9 +16,9 @@ function TradePage({ pairAddress }) {
     <PageWrapper>
       <ContentWrapper>
         <RowBetween>
-          <TYPE.largeHeader style={{ margin: '2rem  4rem', textAlign: 'center' }}>
+          <TYPE.veryLargeHeader style={{ margin: '2rem  4rem', textAlign: 'center' }}>
             {selectedMarket.description}
-          </TYPE.largeHeader>
+          </TYPE.veryLargeHeader>
         </RowBetween>
       </ContentWrapper>
     </PageWrapper>

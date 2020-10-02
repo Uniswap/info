@@ -3,7 +3,7 @@ import React, { useCallback, useContext, useEffect, useMemo, useState } from 're
 import { ArrowDown } from 'react-feather'
 import ReactGA from 'react-ga'
 import { Text } from 'rebass'
-import { ThemeContext } from 'styled-components'
+import styled, { ThemeContext } from 'styled-components'
 import AddressInputPanel from '../../components/AddressInputPanel'
 import { ButtonError, ButtonGray, ButtonPrimary, ButtonConfirmed } from '../../components/ButtonStyled'
 import Card, { GreyCard } from '../../components/Card'
@@ -34,10 +34,22 @@ import { LinkStyledButton, TYPE } from '../../Theme'
 import { maxAmountSpend } from '../../utils/maxAmountSpend'
 import { computeTradePriceBreakdown, warningSeverity } from '../../utils/prices'
 import AppBody from '../AppBody'
-import { ClickableText } from '../Pool/styleds'
 import Loader from '../../components/Loader'
 import { RouteComponentProps } from 'react-router-dom'
-import { useAccountWeb3 } from '../../contexts/Account'
+
+const ClickableText = styled(Text)`
+  text-align: end;
+  &:hover {
+    cursor: pointer;
+    opacity: 0.6;
+  }
+  user-select: none;
+  color: ${({ theme }) => theme.text1};
+
+  @media screen and (max-width: 640px) {
+    font-size: 0.85rem;
+  }
+`
 
 function Swap({
   inputCurrencyId,

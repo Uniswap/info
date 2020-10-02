@@ -15,7 +15,7 @@ import Loader from '../components/LocalLoader'
 import Search from '../components/Search'
 import { formattedNum, formattedPercent } from '../utils'
 import { useColor } from '../hooks'
-import { usePairData, usePairTransactions } from '../contexts/PairData'
+import { usePairData } from '../contexts/PairData'
 import { TYPE, ThemedBackground } from '../Theme'
 import { transparentize } from 'polished'
 import CopyHelper from '../components/Copy'
@@ -126,7 +126,8 @@ function PairPage({ pairAddress, history }) {
   useEffect(() => {
     document.querySelector('body').scrollTo(0, 0)
   }, [])
-  const transactions = usePairTransactions(TEMP_PAIR_ADDRESS)
+  //const transactions = usePairTransactions(TEMP_PAIR_ADDRESS)
+  const transactions = null
   const backgroundColor = useColor(TEMP_PAIR_ADDRESS)
   const { markets, marketPairs } = useAllMarketData()
 

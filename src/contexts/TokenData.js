@@ -24,8 +24,8 @@ import {
   splitQuery
 } from '../utils'
 import { timeframeOptions, LABEL_WETH } from '../constants'
-import { useConfig, useLatestBlock, getCashAddress } from './Application'
-import { useAllMarketData } from './Markets'
+import { useConfig, useLatestBlock, getCashInfo } from './Application'
+import { useMarket, useAllMarketData } from './Markets'
 
 // TODO move to config
 export const PARA_AUGUR_TOKENS = [
@@ -625,12 +625,11 @@ export function Updater() {
 export function useTokenData(tokenAddress) {
   const [state, { update }] = useTokenDataContext()
   const [ethPrice, ethPriceOld] = useEthPrice()
-  const { markets } = useAllMarketData()
+  const market = useMarket(tokenAddress)
   const tokenData = state?.[tokenAddress]
 
   useEffect(() => {
     if (!tokenData && ethPrice && ethPriceOld && isAddress(tokenAddress)) {
-      const market = markets.find(m => m.id.toLowerCase() === tokenAddress.toLowerCase())
       if (market) {
         const data = {
           id: market.id,
@@ -655,7 +654,7 @@ export function useTokenData(tokenAddress) {
       })
       */
     }
-  }, [ethPrice, ethPriceOld, tokenAddress, tokenData, update, markets])
+  }, [ethPrice, ethPriceOld, tokenAddress, tokenData, update, market])
 
   return tokenData || {}
 }
@@ -685,34 +684,39 @@ export function useTokenTransactions(tokenAddress) {
 }
 
 export function useTokenPairs(tokenAddress) {
-  const { markets } = useAllMarketData()
+  const market = useMarket(tokenAddress)
+  const { amms } = market
   const [state, { updateAllPairs }] = useTokenDataContext()
   const tokenPairs = state?.[tokenAddress]?.[TOKEN_PAIRS_KEY]
 
   useEffect(() => {
     async function fetchData() {
-      const market = markets.find(m => m.id.toLowerCase() === tokenAddress.toLowerCase())
-      if (market) {
-        //let allPairs = await getTokenPairs(tokenAddress)
-        // TODO: figure out if market is trading in ETH and other currencies. market data should have this info
-        const allPairs = [
-          {
-            token0: { id: tokenAddress, symbol: 'Yes' },
-            token1: { id: getCashAddress(LABEL_WETH), symbol: LABEL_WETH },
-            oneDayVolumeUSD: 1,
-            reserveUSD: 2,
-            trackedReserveUSD: 3,
-            oneWeekVolumeUSD: 4
-          },
-          {
-            token0: { id: tokenAddress, symbol: 'No' },
-            token1: { id: getCashAddress(LABEL_WETH), symbol: LABEL_WETH },
-            oneDayVolumeUSD: 1,
-            reserveUSD: 2,
-            trackedReserveUSD: 3,
-            oneWeekVolumeUSD: 4
-          }
-        ]
+      let allPairs = []
+      if (amms && amms.length > 0) {
+        allPairs = amms.reduce((p, amm) => {
+          const { shareToken } = amm
+          const { id, cash } = shareToken
+          console.log('cash.id', cash.id)
+          return [
+            ...p,
+            {
+              token0: { id: cash.id, symbol: getCashInfo(cash.id)?.symbol },
+              token1: { id, symbol: 'Yes' },
+              oneDayVolumeUSD: 1, // this comes from amm stats
+              reserveUSD: 2,
+              trackedReserveUSD: 3,
+              oneWeekVolumeUSD: 4
+            },
+            {
+              token0: { id: cash.id, symbol: getCashInfo(cash.id)?.symbol },
+              token1: { id, symbol: 'No' },
+              oneDayVolumeUSD: 1,
+              reserveUSD: 2,
+              trackedReserveUSD: 3,
+              oneWeekVolumeUSD: 4
+            }
+          ]
+        }, [])
 
         updateAllPairs(tokenAddress, allPairs)
       }
@@ -720,7 +724,7 @@ export function useTokenPairs(tokenAddress) {
     if (!tokenPairs && isAddress(tokenAddress)) {
       fetchData()
     }
-  }, [tokenAddress, tokenPairs, updateAllPairs, markets])
+  }, [tokenAddress, tokenPairs, updateAllPairs, amms])
 
   return tokenPairs || []
 }

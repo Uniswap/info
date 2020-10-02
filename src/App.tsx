@@ -5,19 +5,18 @@ import { client } from './apollo/client'
 import { Route, Switch, BrowserRouter, Redirect } from 'react-router-dom'
 import GlobalPage from './pages/GlobalPage'
 import TokenPage from './pages/TokenPage'
-import PairPage from './pages/PairPage'
 import { useGlobalData, useGlobalChartData } from './contexts/GlobalData'
 import { isAddress } from './utils'
 import AccountPage from './pages/AccountPage'
 import AllMarketsPage from './pages/AllMarketsPage'
 import SideNav from './components/SideNav'
 import AccountLookup from './pages/AccountLookup'
-import { OVERVIEW_TOKEN_BLACKLIST, PAIR_BLACKLIST } from './constants'
+import { OVERVIEW_TOKEN_BLACKLIST } from './constants'
 import LocalLoader from './components/LocalLoader'
 import { useLatestBlock } from './contexts/Application'
-import { RedirectDuplicateTokenIds } from './pages/AddLiquidity/redirects'
 import RemoveLiquidity from './pages/RemoveLiquidity'
 import Swap from './pages/Swap'
+import AddLiquidity from './pages/AddLiquidity'
 
 const AppWrapper = styled.div`
   position: relative;
@@ -102,34 +101,13 @@ function App() {
               <Route
                 exacts
                 strict
-                path="/token/:tokenAddress"
+                path="/token/:marketId"
                 render={({ match }) => {
-                  if (OVERVIEW_TOKEN_BLACKLIST.includes(match.params.tokenAddress.toLowerCase())) {
-                    return <Redirect to="/home" />
-                  }
-                  if (isAddress(match.params.tokenAddress.toLowerCase())) {
+                  const { marketId } = match.params
+                  if (marketId && isAddress(marketId.toLowerCase())) {
                     return (
                       <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
-                        <TokenPage address={match.params.tokenAddress.toLowerCase()} />
-                      </LayoutWrapper>
-                    )
-                  } else {
-                    return <Redirect to="/home" />
-                  }
-                }}
-              />
-              <Route
-                exacts
-                strict
-                path="/pair/:pairAddress"
-                render={({ match }) => {
-                  if (PAIR_BLACKLIST.includes(match.params.pairAddress.toLowerCase())) {
-                    return <Redirect to="/home" />
-                  }
-                  if (isAddress(match.params.pairAddress.toLowerCase())) {
-                    return (
-                      <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
-                        <PairPage pairAddress={match.params.pairAddress.toLowerCase()} />
+                        <TokenPage marketId={marketId} />
                       </LayoutWrapper>
                     )
                   } else {
@@ -167,18 +145,14 @@ function App() {
               <Route
                 exacts
                 strict
-                path="/add/:marketId/:currencyIdA/:currencyIdB"
+                path="/add/:marketId/:cash/:amm"
                 render={({ match }) => {
-                  const { marketId, currencyIdA, currencyIdB } = match.params
+                  const { marketId, amm, cash } = match.params
 
-                  if (isAddress(currencyIdA.toLowerCase()) && isAddress(currencyIdB.toLowerCase())) {
+                  if (isAddress(marketId.toLowerCase()) && isAddress(cash.toLowerCase())) {
                     return (
                       <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
-                        <RedirectDuplicateTokenIds
-                          marketId={marketId}
-                          currencyIdA={currencyIdA}
-                          currencyIdB={currencyIdB}
-                        />
+                        <AddLiquidity marketId={marketId} amm={amm} cash={cash} />
                       </LayoutWrapper>
                     )
                   } else {
@@ -189,14 +163,14 @@ function App() {
               <Route
                 exacts
                 strict
-                path="/remove/:marketId/:currencyIdA/:currencyIdB"
+                path="/remove/:marketId/:amm"
                 render={({ match }) => {
-                  const { marketId, currencyIdA, currencyIdB } = match.params
+                  const { marketId, amm } = match.params
 
-                  if (isAddress(currencyIdA.toLowerCase()) && isAddress(currencyIdB.toLowerCase())) {
+                  if (isAddress(marketId.toLowerCase()) && isAddress(amm.toLowerCase())) {
                     return (
                       <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
-                        <RemoveLiquidity marketId={marketId} currencyIdA={currencyIdA} currencyIdB={currencyIdB} />
+                        <RemoveLiquidity marketId={marketId} amm={amm} />
                       </LayoutWrapper>
                     )
                   } else {
@@ -207,18 +181,14 @@ function App() {
               <Route
                 exacts
                 strict
-                path="/swap/:marketId/:inputCurrencyId/:outputCurrencyId"
+                path="/swap/:marketId/:amm"
                 render={({ match }) => {
-                  const { marketId, inputCurrencyId, outputCurrencyId } = match.params
+                  const { marketId, amm } = match.params
 
                   if (isAddress(marketId.toLowerCase())) {
                     return (
                       <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
-                        <Swap
-                          marketId={marketId}
-                          inputCurrencyId={inputCurrencyId}
-                          outputCurrencyId={outputCurrencyId}
-                        />
+                        <Swap marketId={marketId} amm={amm} />
                       </LayoutWrapper>
                     )
                   } else {
