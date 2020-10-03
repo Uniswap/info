@@ -153,7 +153,7 @@ export const TYPE = {
   },
 
   light(props: TextProps) {
-    return <TextWrapper fontWeight={400} color={'text3'} fontSize={14} {...props} />
+    return <TextWrapper fontWeight={400} color={'secondary1'} fontSize={14} {...props} />
   },
 
   pink(props: TextProps) {

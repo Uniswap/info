@@ -23,9 +23,9 @@ import {
   getBlocksFromTimestamps,
   splitQuery
 } from '../utils'
-import { timeframeOptions, LABEL_WETH } from '../constants'
+import { timeframeOptions } from '../constants'
 import { useConfig, useLatestBlock, getCashInfo } from './Application'
-import { useMarket, useAllMarketData } from './Markets'
+import { useMarket } from './Markets'
 
 // TODO move to config
 export const PARA_AUGUR_TOKENS = [

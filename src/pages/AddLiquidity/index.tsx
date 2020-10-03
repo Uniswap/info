@@ -41,6 +41,7 @@ import { getAmmFactoryAddress } from '../../contexts/Application'
 import { withRouter } from 'react-router-dom'
 import LiquidityPage from '../LiquidityPage'
 import { useMarketAmm, useShareTokens } from '../../contexts/Markets'
+import CashInputPanel from '../../components/CashInputPanel'
 
 function AddLiquidity({
   amm,
@@ -333,19 +334,35 @@ function AddLiquidity({
                   </BlueCard>
                 </ColumnCenter>
               ))}
-            <CurrencyInputPanel
-              value={formattedAmounts[Field.CURRENCY_A]}
-              onUserInput={onFieldAInput}
-              label={'How much do you want to put in?'}
-              onMax={() => {
-                onFieldAInput(maxAmounts[Field.CURRENCY_A]?.toExact() ?? '')
-              }}
-              onCurrencySelect={handleCurrencyASelect}
-              showMaxButton={!atMaxAmounts[Field.CURRENCY_A]}
-              currency={currencies[Field.CURRENCY_A]}
-              id="add-liquidity-input-tokena"
-              showCommonBases
-            />
+            {isCreate && (
+              <CashInputPanel
+                value={formattedAmounts[Field.CURRENCY_A]}
+                onUserInput={onFieldAInput}
+                label={'How much do you want to put in?'}
+                onMax={() => {
+                  onFieldAInput(maxAmounts[Field.CURRENCY_A]?.toExact() ?? '')
+                }}
+                showMaxButton={!atMaxAmounts[Field.CURRENCY_A]}
+                cash={cash}
+                id="add-liquidity-input-tokena"
+                showCommonBases
+              />
+            )}
+            {!isCreate && (
+              <CurrencyInputPanel
+                value={formattedAmounts[Field.CURRENCY_A]}
+                onUserInput={onFieldAInput}
+                label={'How much do you want to put in?'}
+                onMax={() => {
+                  onFieldAInput(maxAmounts[Field.CURRENCY_A]?.toExact() ?? '')
+                }}
+                onCurrencySelect={handleCurrencyASelect}
+                showMaxButton={!atMaxAmounts[Field.CURRENCY_A]}
+                currency={currencies[Field.CURRENCY_A]}
+                id="add-liquidity-input-tokena"
+                showCommonBases
+              />
+            )}
             <ColumnCenter>
               <Plus size="16" color={theme.text2} />
             </ColumnCenter>

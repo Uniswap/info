@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import { isAddress } from '../../utils'
-import wEthLogo from '../../assets/weth.svg'
-import daiLogo from '../../assets/dai.svg'
 import market from '../../assets/market.png'
-import { LABEL_WETH, LABEL_DAI } from '../../constants'
-import { getCashAddress } from '../../contexts/Application'
+import { getCashInfo } from '../../contexts/Application'
+import { TYPE } from '../../Theme'
 
 const BAD_IMAGES = {}
 
@@ -36,26 +34,20 @@ const StyledEthereumLogo = styled.div<{ size }>`
 `
 
 export default function TokenLogo({ address, showSymbol = false, size = '24px', ...rest }) {
-  const weth_address = getCashAddress(LABEL_WETH)
-  const dai_address = getCashAddress(LABEL_DAI)
+  const cashtoken = getCashInfo(address)
   const [error, setError] = useState(false)
 
   useEffect(() => {
     setError(false)
   }, [address])
 
-  if (weth_address && address?.toLowerCase() === weth_address.toLowerCase()) {
+  if (cashtoken && cashtoken.address) {
     return (
       <StyledEthereumLogo size={size} {...rest}>
-        <img src={wEthLogo} style={{ borderRadius: '24px' }} alt="Trading token" />
-      </StyledEthereumLogo>
-    )
-  }
-
-  if (dai_address && address?.toLowerCase() === dai_address.toLowerCase()) {
-    return (
-      <StyledEthereumLogo size={size} {...rest}>
-        <img src={daiLogo} style={{ borderRadius: '24px' }} alt="Trading token" />
+        <img src={require(`../../assets/${cashtoken.asset}`)} style={{ borderRadius: '24px' }} alt="Trading token" />
+        <TYPE.light style={{ fontSize: size, paddingLeft: '0.25rem', fontWeight: '500' }}>
+          {showSymbol ? cashtoken.symbol : ''}
+        </TYPE.light>
       </StyledEthereumLogo>
     )
   }

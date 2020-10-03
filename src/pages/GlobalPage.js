@@ -155,6 +155,7 @@ function GlobalPage() {
                     <TokenLogo
                       address={cash}
                       size={'20px'}
+                      showSymbol
                       style={{ paddingRight: '0.25rem', opacity: cash === cashFilter ? '1' : '0.4' }}
                     />
                   </ClickableText>
