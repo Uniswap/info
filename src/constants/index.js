@@ -11,9 +11,7 @@ export const timeframeOptions = {
 }
 
 // token list urls to fetch tokens from - use for warnings on tokens and pairs
-export const SUPPORTED_LIST_URLS__NO_ENS = [
-  'https://raw.githubusercontent.com/1Hive-tulip/default-token-list/master/uniswap-xdai.tokenlist.json'
-]
+export const SUPPORTED_LIST_URLS__NO_ENS = ['https://tokens.honeyswap.org']
 
 // hide from overview list
 export const OVERVIEW_TOKEN_BLACKLIST = [
