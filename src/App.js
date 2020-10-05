@@ -1,32 +1,31 @@
-import React, { useState } from "react";
-import styled from "styled-components";
-import { ApolloProvider } from "react-apollo";
-import { client } from "./apollo/client";
-import { Route, Switch, BrowserRouter, Redirect } from "react-router-dom";
-import GlobalPage from "./pages/GlobalPage";
-import TokenPage from "./pages/TokenPage";
-import PairPage from "./pages/PairPage";
-import { useGlobalData, useGlobalChartData } from "./contexts/GlobalData";
-import { isAddress } from "./utils";
-import AccountPage from "./pages/AccountPage";
-import AllTokensPage from "./pages/AllTokensPage";
-import AllPairsPage from "./pages/AllPairsPage";
-import PinnedData from "./components/PinnedData";
+import React, { useState } from 'react'
+import styled from 'styled-components'
+import { ApolloProvider } from 'react-apollo'
+import { client } from './apollo/client'
+import { Route, Switch, BrowserRouter, Redirect } from 'react-router-dom'
+import GlobalPage from './pages/GlobalPage'
+import TokenPage from './pages/TokenPage'
+import PairPage from './pages/PairPage'
+import { useGlobalData, useGlobalChartData } from './contexts/GlobalData'
+import { isAddress } from './utils'
+import AccountPage from './pages/AccountPage'
+import AllTokensPage from './pages/AllTokensPage'
+import AllPairsPage from './pages/AllPairsPage'
+import PinnedData from './components/PinnedData'
 
-import SideNav from "./components/SideNav";
-import AccountLookup from "./pages/AccountLookup";
-import { OVERVIEW_TOKEN_BLACKLIST, PAIR_BLACKLIST } from "./constants";
-import LocalLoader from "./components/LocalLoader";
-import { useLatestBlock } from "./contexts/Application";
+import SideNav from './components/SideNav'
+import AccountLookup from './pages/AccountLookup'
+import { OVERVIEW_TOKEN_BLACKLIST, PAIR_BLACKLIST } from './constants'
+import LocalLoader from './components/LocalLoader'
+import { useLatestBlock } from './contexts/Application'
 
 const AppWrapper = styled.div`
   position: relative;
   width: 100%;
-`;
+`
 const ContentWrapper = styled.div`
   display: grid;
-  grid-template-columns: ${({ open }) =>
-    open ? "220px 1fr 200px" : "220px 1fr 64px"};
+  grid-template-columns: ${({ open }) => (open ? '220px 1fr 200px' : '220px 1fr 64px')};
 
   @media screen and (max-width: 1400px) {
     grid-template-columns: 220px 1fr;
@@ -38,28 +37,28 @@ const ContentWrapper = styled.div`
     overflow: hidden;
     grid-gap: 0;
   }
-`;
+`
 
 const Right = styled.div`
   position: fixed;
   right: 0;
   bottom: 0rem;
   z-index: 99;
-  width: ${({ open }) => (open ? "220px" : "64px")};
-  height: ${({ open }) => (open ? "fit-content" : "64px")};
+  width: ${({ open }) => (open ? '220px' : '64px')};
+  height: ${({ open }) => (open ? 'fit-content' : '64px')};
   overflow: scroll;
   background-color: ${({ theme }) => theme.bg1};
   @media screen and (max-width: 1400px) {
     display: none;
   }
-`;
+`
 
 const Center = styled.div`
   height: 100%;
   z-index: 9999;
   transition: width 0.25s ease;
   background-color: ${({ theme }) => theme.onlyLight};
-`;
+`
 
 /**
  * Wrap the component with the header and sidebar pinned tab
@@ -75,15 +74,15 @@ const LayoutWrapper = ({ children, savedOpen, setSavedOpen }) => {
         </Right>
       </ContentWrapper>
     </>
-  );
-};
+  )
+}
 
 function App() {
-  const [savedOpen, setSavedOpen] = useState(false);
+  const [savedOpen, setSavedOpen] = useState(false)
 
-  const globalData = useGlobalData();
-  const globalChartData = useGlobalChartData();
-  const latestBlock = useLatestBlock();
+  const globalData = useGlobalData()
+  const globalChartData = useGlobalChartData()
+  const latestBlock = useLatestBlock()
 
   return (
     <ApolloProvider client={client}>
@@ -100,26 +99,17 @@ function App() {
                 strict
                 path="/token/:tokenAddress"
                 render={({ match }) => {
-                  if (
-                    OVERVIEW_TOKEN_BLACKLIST.includes(
-                      match.params.tokenAddress.toLowerCase()
-                    )
-                  ) {
-                    return <Redirect to="/home" />;
+                  if (OVERVIEW_TOKEN_BLACKLIST.includes(match.params.tokenAddress.toLowerCase())) {
+                    return <Redirect to="/home" />
                   }
                   if (isAddress(match.params.tokenAddress.toLowerCase())) {
                     return (
-                      <LayoutWrapper
-                        savedOpen={savedOpen}
-                        setSavedOpen={setSavedOpen}
-                      >
-                        <TokenPage
-                          address={match.params.tokenAddress.toLowerCase()}
-                        />
+                      <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
+                        <TokenPage address={match.params.tokenAddress.toLowerCase()} />
                       </LayoutWrapper>
-                    );
+                    )
                   } else {
-                    return <Redirect to="/home" />;
+                    return <Redirect to="/home" />
                   }
                 }}
               />
@@ -128,26 +118,17 @@ function App() {
                 strict
                 path="/pair/:pairAddress"
                 render={({ match }) => {
-                  if (
-                    PAIR_BLACKLIST.includes(
-                      match.params.pairAddress.toLowerCase()
-                    )
-                  ) {
-                    return <Redirect to="/home" />;
+                  if (PAIR_BLACKLIST.includes(match.params.pairAddress.toLowerCase())) {
+                    return <Redirect to="/home" />
                   }
                   if (isAddress(match.params.pairAddress.toLowerCase())) {
                     return (
-                      <LayoutWrapper
-                        savedOpen={savedOpen}
-                        setSavedOpen={setSavedOpen}
-                      >
-                        <PairPage
-                          pairAddress={match.params.pairAddress.toLowerCase()}
-                        />
+                      <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
+                        <PairPage pairAddress={match.params.pairAddress.toLowerCase()} />
                       </LayoutWrapper>
-                    );
+                    )
                   } else {
-                    return <Redirect to="/home" />;
+                    return <Redirect to="/home" />
                   }
                 }}
               />
@@ -158,53 +139,36 @@ function App() {
                 render={({ match }) => {
                   if (isAddress(match.params.accountAddress.toLowerCase())) {
                     return (
-                      <LayoutWrapper
-                        savedOpen={savedOpen}
-                        setSavedOpen={setSavedOpen}
-                      >
-                        <AccountPage
-                          account={match.params.accountAddress.toLowerCase()}
-                        />
+                      <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
+                        <AccountPage account={match.params.accountAddress.toLowerCase()} />
                       </LayoutWrapper>
-                    );
+                    )
                   } else {
-                    return <Redirect to="/home" />;
+                    return <Redirect to="/home" />
                   }
                 }}
               />
 
               <Route path="/home">
-                <LayoutWrapper
-                  savedOpen={savedOpen}
-                  setSavedOpen={setSavedOpen}
-                >
+                <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
                   <GlobalPage />
                 </LayoutWrapper>
               </Route>
 
               <Route path="/tokens">
-                <LayoutWrapper
-                  savedOpen={savedOpen}
-                  setSavedOpen={setSavedOpen}
-                >
+                <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
                   <AllTokensPage />
                 </LayoutWrapper>
               </Route>
 
               <Route path="/pairs">
-                <LayoutWrapper
-                  savedOpen={savedOpen}
-                  setSavedOpen={setSavedOpen}
-                >
+                <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
                   <AllPairsPage />
                 </LayoutWrapper>
               </Route>
 
               <Route path="/accounts">
-                <LayoutWrapper
-                  savedOpen={savedOpen}
-                  setSavedOpen={setSavedOpen}
-                >
+                <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
                   <AccountLookup />
                 </LayoutWrapper>
               </Route>
@@ -217,7 +181,7 @@ function App() {
         )}
       </AppWrapper>
     </ApolloProvider>
-  );
+  )
 }
 
-export default App;
+export default App

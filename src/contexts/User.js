@@ -1,75 +1,62 @@
-import React, {
-  createContext,
-  useContext,
-  useReducer,
-  useMemo,
-  useCallback,
-  useEffect,
-  useState,
-} from "react";
-import { usePairData } from "./PairData";
-import { client } from "../apollo/client";
-import {
-  USER_TRANSACTIONS,
-  USER_POSITIONS,
-  USER_HISTORY,
-  PAIR_DAY_DATA_BULK,
-} from "../apollo/queries";
-import { useTimeframe, useStartTimestamp } from "./Application";
-import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
-import { useEthPrice } from "./GlobalData";
-import { getLPReturnsOnPair, getHistoricalPairReturns } from "../utils/returns";
-import { timeframeOptions } from "../constants";
+import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect, useState } from 'react'
+import { usePairData } from './PairData'
+import { client } from '../apollo/client'
+import { USER_TRANSACTIONS, USER_POSITIONS, USER_HISTORY, PAIR_DAY_DATA_BULK } from '../apollo/queries'
+import { useTimeframe, useStartTimestamp } from './Application'
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
+import { useEthPrice } from './GlobalData'
+import { getLPReturnsOnPair, getHistoricalPairReturns } from '../utils/returns'
+import { timeframeOptions } from '../constants'
 
-dayjs.extend(utc);
+dayjs.extend(utc)
 
-const UPDATE_TRANSACTIONS = "UPDATE_TRANSACTIONS";
-const UPDATE_POSITIONS = "UPDATE_POSITIONS ";
-const UPDATE_USER_POSITION_HISTORY = "UPDATE_USER_POSITION_HISTORY";
-const UPDATE_USER_PAIR_RETURNS = "UPDATE_USER_PAIR_RETURNS";
+const UPDATE_TRANSACTIONS = 'UPDATE_TRANSACTIONS'
+const UPDATE_POSITIONS = 'UPDATE_POSITIONS '
+const UPDATE_USER_POSITION_HISTORY = 'UPDATE_USER_POSITION_HISTORY'
+const UPDATE_USER_PAIR_RETURNS = 'UPDATE_USER_PAIR_RETURNS'
 
-const TRANSACTIONS_KEY = "TRANSACTIONS_KEY";
-const POSITIONS_KEY = "POSITIONS_KEY";
-const USER_SNAPSHOTS = "USER_SNAPSHOTS";
-const USER_PAIR_RETURNS_KEY = "USER_PAIR_RETURNS_KEY";
+const TRANSACTIONS_KEY = 'TRANSACTIONS_KEY'
+const POSITIONS_KEY = 'POSITIONS_KEY'
+const USER_SNAPSHOTS = 'USER_SNAPSHOTS'
+const USER_PAIR_RETURNS_KEY = 'USER_PAIR_RETURNS_KEY'
 
-const UserContext = createContext();
+const UserContext = createContext()
 
 function useUserContext() {
-  return useContext(UserContext);
+  return useContext(UserContext)
 }
 
 function reducer(state, { type, payload }) {
   switch (type) {
     case UPDATE_TRANSACTIONS: {
-      const { account, transactions } = payload;
+      const { account, transactions } = payload
       return {
         ...state,
         [account]: {
           ...state?.[account],
           [TRANSACTIONS_KEY]: transactions,
         },
-      };
+      }
     }
     case UPDATE_POSITIONS: {
-      const { account, positions } = payload;
+      const { account, positions } = payload
       return {
         ...state,
         [account]: { ...state?.[account], [POSITIONS_KEY]: positions },
-      };
+      }
     }
 
     case UPDATE_USER_POSITION_HISTORY: {
-      const { account, historyData } = payload;
+      const { account, historyData } = payload
       return {
         ...state,
         [account]: { ...state?.[account], [USER_SNAPSHOTS]: historyData },
-      };
+      }
     }
 
     case UPDATE_USER_PAIR_RETURNS: {
-      const { account, pairAddress, data } = payload;
+      const { account, pairAddress, data } = payload
       return {
         ...state,
         [account]: {
@@ -79,19 +66,19 @@ function reducer(state, { type, payload }) {
             [pairAddress]: data,
           },
         },
-      };
+      }
     }
 
     default: {
-      throw Error(`Unexpected action type in DataContext reducer: '${type}'.`);
+      throw Error(`Unexpected action type in DataContext reducer: '${type}'.`)
     }
   }
 }
 
-const INITIAL_STATE = {};
+const INITIAL_STATE = {}
 
 export default function Provider({ children }) {
-  const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
+  const [state, dispatch] = useReducer(reducer, INITIAL_STATE)
 
   const updateTransactions = useCallback((account, transactions) => {
     dispatch({
@@ -100,8 +87,8 @@ export default function Provider({ children }) {
         account,
         transactions,
       },
-    });
-  }, []);
+    })
+  }, [])
 
   const updatePositions = useCallback((account, positions) => {
     dispatch({
@@ -110,8 +97,8 @@ export default function Provider({ children }) {
         account,
         positions,
       },
-    });
-  }, []);
+    })
+  }, [])
 
   const updateUserSnapshots = useCallback((account, historyData) => {
     dispatch({
@@ -120,8 +107,8 @@ export default function Provider({ children }) {
         account,
         historyData,
       },
-    });
-  }, []);
+    })
+  }, [])
 
   const updateUserPairReturns = useCallback((account, pairAddress, data) => {
     dispatch({
@@ -131,8 +118,8 @@ export default function Provider({ children }) {
         pairAddress,
         data,
       },
-    });
-  }, []);
+    })
+  }, [])
 
   return (
     <UserContext.Provider
@@ -146,23 +133,17 @@ export default function Provider({ children }) {
             updateUserPairReturns,
           },
         ],
-        [
-          state,
-          updateTransactions,
-          updatePositions,
-          updateUserSnapshots,
-          updateUserPairReturns,
-        ]
+        [state, updateTransactions, updatePositions, updateUserSnapshots, updateUserPairReturns]
       )}
     >
       {children}
     </UserContext.Provider>
-  );
+  )
 }
 
 export function useUserTransactions(account) {
-  const [state, { updateTransactions }] = useUserContext();
-  const transactions = state?.[account]?.[TRANSACTIONS_KEY];
+  const [state, { updateTransactions }] = useUserContext()
+  const transactions = state?.[account]?.[TRANSACTIONS_KEY]
   useEffect(() => {
     async function fetchData(account) {
       try {
@@ -171,21 +152,21 @@ export function useUserTransactions(account) {
           variables: {
             user: account,
           },
-          fetchPolicy: "no-cache",
-        });
+          fetchPolicy: 'no-cache',
+        })
         if (result?.data) {
-          updateTransactions(account, result?.data);
+          updateTransactions(account, result?.data)
         }
       } catch (e) {
-        console.log(e);
+        console.log(e)
       }
     }
     if (!transactions && account) {
-      fetchData(account);
+      fetchData(account)
     }
-  }, [account, transactions, updateTransactions]);
+  }, [account, transactions, updateTransactions])
 
-  return transactions || {};
+  return transactions || {}
 }
 
 /**
@@ -194,15 +175,15 @@ export function useUserTransactions(account) {
  * @param {*} account
  */
 export function useUserSnapshots(account) {
-  const [state, { updateUserSnapshots }] = useUserContext();
-  const snapshots = state?.[account]?.[USER_SNAPSHOTS];
+  const [state, { updateUserSnapshots }] = useUserContext()
+  const snapshots = state?.[account]?.[USER_SNAPSHOTS]
 
   useEffect(() => {
     async function fetchData() {
       try {
-        let skip = 0;
-        let allResults = [];
-        let found = false;
+        let skip = 0
+        let allResults = []
+        let found = false
         while (!found) {
           let result = await client.query({
             query: USER_HISTORY,
@@ -210,30 +191,28 @@ export function useUserSnapshots(account) {
               skip: skip,
               user: account,
             },
-            fetchPolicy: "cache-first",
-          });
-          allResults = allResults.concat(
-            result.data.liquidityPositionSnapshots
-          );
+            fetchPolicy: 'cache-first',
+          })
+          allResults = allResults.concat(result.data.liquidityPositionSnapshots)
           if (result.data.liquidityPositionSnapshots.length < 1000) {
-            found = true;
+            found = true
           } else {
-            skip += 1000;
+            skip += 1000
           }
         }
         if (allResults) {
-          updateUserSnapshots(account, allResults);
+          updateUserSnapshots(account, allResults)
         }
       } catch (e) {
-        console.log(e);
+        console.log(e)
       }
     }
     if (!snapshots && account) {
-      fetchData();
+      fetchData()
     }
-  }, [account, snapshots, updateUserSnapshots]);
+  }, [account, snapshots, updateUserSnapshots])
 
-  return snapshots;
+  return snapshots
 }
 
 /**
@@ -243,28 +222,27 @@ export function useUserSnapshots(account) {
  * @param {*} account
  */
 export function useUserPositionChart(position, account) {
-  const pairAddress = position?.pair?.id;
-  const [state, { updateUserPairReturns }] = useUserContext();
+  const pairAddress = position?.pair?.id
+  const [state, { updateUserPairReturns }] = useUserContext()
 
   // get oldest date of data to fetch
-  const startDateTimestamp = useStartTimestamp();
+  const startDateTimestamp = useStartTimestamp()
 
   // get users adds and removes on this pair
-  const snapshots = useUserSnapshots(account);
+  const snapshots = useUserSnapshots(account)
   const pairSnapshots =
     snapshots &&
     position &&
     snapshots.filter((currentSnapshot) => {
-      return currentSnapshot.pair.id === position.pair.id;
-    });
+      return currentSnapshot.pair.id === position.pair.id
+    })
 
   // get data needed for calculations
-  const currentPairData = usePairData(pairAddress);
-  const [currentETHPrice] = useEthPrice();
+  const currentPairData = usePairData(pairAddress)
+  const [currentETHPrice] = useEthPrice()
 
   // formatetd array to return for chart data
-  const formattedHistory =
-    state?.[account]?.[USER_PAIR_RETURNS_KEY]?.[pairAddress];
+  const formattedHistory = state?.[account]?.[USER_PAIR_RETURNS_KEY]?.[pairAddress]
 
   useEffect(() => {
     async function fetchData() {
@@ -273,8 +251,8 @@ export function useUserPositionChart(position, account) {
         currentPairData,
         pairSnapshots,
         currentETHPrice
-      );
-      updateUserPairReturns(account, pairAddress, fetchedData);
+      )
+      updateUserPairReturns(account, pairAddress, fetchedData)
     }
     if (
       account &&
@@ -286,7 +264,7 @@ export function useUserPositionChart(position, account) {
       pairAddress &&
       currentETHPrice
     ) {
-      fetchData();
+      fetchData()
     }
   }, [
     account,
@@ -298,9 +276,9 @@ export function useUserPositionChart(position, account) {
     currentETHPrice,
     updateUserPairReturns,
     position.pair.id,
-  ]);
+  ])
 
-  return formattedHistory;
+  return formattedHistory
 }
 
 /**
@@ -309,162 +287,145 @@ export function useUserPositionChart(position, account) {
  * and usd liquidity value.
  */
 export function useUserLiquidityChart(account) {
-  const history = useUserSnapshots(account);
+  const history = useUserSnapshots(account)
   // formatetd array to return for chart data
-  const [formattedHistory, setFormattedHistory] = useState();
+  const [formattedHistory, setFormattedHistory] = useState()
 
-  const [startDateTimestamp, setStartDateTimestamp] = useState();
-  const [activeWindow] = useTimeframe();
+  const [startDateTimestamp, setStartDateTimestamp] = useState()
+  const [activeWindow] = useTimeframe()
 
   // monitor the old date fetched
   useEffect(() => {
-    const utcEndTime = dayjs.utc();
+    const utcEndTime = dayjs.utc()
     // based on window, get starttime
-    let utcStartTime;
+    let utcStartTime
     switch (activeWindow) {
       case timeframeOptions.WEEK:
-        utcStartTime = utcEndTime.subtract(1, "week").startOf("day");
-        break;
+        utcStartTime = utcEndTime.subtract(1, 'week').startOf('day')
+        break
       case timeframeOptions.ALL_TIME:
-        utcStartTime = utcEndTime.subtract(1, "year");
-        break;
+        utcStartTime = utcEndTime.subtract(1, 'year')
+        break
       default:
-        utcStartTime = utcEndTime.subtract(1, "year").startOf("year");
-        break;
+        utcStartTime = utcEndTime.subtract(1, 'year').startOf('year')
+        break
     }
-    let startTime = utcStartTime.unix() - 1;
-    if (
-      (activeWindow && startTime < startDateTimestamp) ||
-      !startDateTimestamp
-    ) {
-      setStartDateTimestamp(startTime);
+    let startTime = utcStartTime.unix() - 1
+    if ((activeWindow && startTime < startDateTimestamp) || !startDateTimestamp) {
+      setStartDateTimestamp(startTime)
     }
-  }, [activeWindow, startDateTimestamp]);
+  }, [activeWindow, startDateTimestamp])
 
   useEffect(() => {
     async function fetchData() {
-      let dayIndex = parseInt(startDateTimestamp / 86400); // get unique day bucket unix
-      const currentDayIndex = parseInt(dayjs.utc().unix() / 86400);
+      let dayIndex = parseInt(startDateTimestamp / 86400) // get unique day bucket unix
+      const currentDayIndex = parseInt(dayjs.utc().unix() / 86400)
 
       // sort snapshots in order
       let sortedPositions = history.sort((a, b) => {
-        return parseInt(a.timestamp) > parseInt(b.timestamp) ? 1 : -1;
-      });
+        return parseInt(a.timestamp) > parseInt(b.timestamp) ? 1 : -1
+      })
       // if UI start time is > first position time - bump start index to this time
       if (parseInt(sortedPositions[0].timestamp) > dayIndex) {
-        dayIndex = parseInt(parseInt(sortedPositions[0].timestamp) / 86400);
+        dayIndex = parseInt(parseInt(sortedPositions[0].timestamp) / 86400)
       }
 
-      const dayTimestamps = [];
+      const dayTimestamps = []
       // get date timestamps for all days in view
       while (dayIndex < currentDayIndex) {
-        dayTimestamps.push(parseInt(dayIndex) * 86400);
-        dayIndex = dayIndex + 1;
+        dayTimestamps.push(parseInt(dayIndex) * 86400)
+        dayIndex = dayIndex + 1
       }
 
       const pairs = history.reduce((pairList, position) => {
-        return [...pairList, position.pair.id];
-      }, []);
+        return [...pairList, position.pair.id]
+      }, [])
 
       // get all day datas where date is in this list, and pair is in pair list
       let {
         data: { pairDayDatas },
       } = await client.query({
         query: PAIR_DAY_DATA_BULK(pairs, startDateTimestamp),
-      });
+      })
 
-      const formattedHistory = [];
+      const formattedHistory = []
 
       // map of current pair => ownership %
-      const ownershipPerPair = {};
+      const ownershipPerPair = {}
       for (const index in dayTimestamps) {
-        const dayTimestamp = dayTimestamps[index];
-        const timestampCeiling = dayTimestamp + 86400;
+        const dayTimestamp = dayTimestamps[index]
+        const timestampCeiling = dayTimestamp + 86400
 
         // cycle through relevant positions and update ownership for any that we need to
         const relevantPositions = history.filter((snapshot) => {
-          return (
-            snapshot.timestamp < timestampCeiling &&
-            snapshot.timestamp > dayTimestamp
-          );
-        });
+          return snapshot.timestamp < timestampCeiling && snapshot.timestamp > dayTimestamp
+        })
         for (const index in relevantPositions) {
-          const position = relevantPositions[index];
+          const position = relevantPositions[index]
           // case where pair not added yet
           if (!ownershipPerPair[position.pair.id]) {
             ownershipPerPair[position.pair.id] = {
               lpTokenBalance: position.liquidityTokenBalance,
               timestamp: position.timestamp,
-            };
+            }
           }
           // case where more recent timestamp is found for pair
-          if (
-            ownershipPerPair[position.pair.id] &&
-            ownershipPerPair[position.pair.id].timestamp < position.timestamp
-          ) {
+          if (ownershipPerPair[position.pair.id] && ownershipPerPair[position.pair.id].timestamp < position.timestamp) {
             ownershipPerPair[position.pair.id] = {
               lpTokenBalance: position.liquidityTokenBalance,
               timestamp: position.timestamp,
-            };
+            }
           }
         }
 
-        const relavantDayDatas = Object.keys(ownershipPerPair).map(
-          (pairAddress) => {
-            // find last day data after timestamp update
-            const dayDatasForThisPair = pairDayDatas.filter((dayData) => {
-              return dayData.pairAddress === pairAddress;
-            });
-            // find the most recent reference to pair liquidity data
-            let mostRecent = dayDatasForThisPair[0];
-            for (const index in dayDatasForThisPair) {
-              const dayData = dayDatasForThisPair[index];
-              if (
-                dayData.date < dayTimestamp &&
-                dayData.date > mostRecent.date
-              ) {
-                mostRecent = dayData;
-              }
+        const relavantDayDatas = Object.keys(ownershipPerPair).map((pairAddress) => {
+          // find last day data after timestamp update
+          const dayDatasForThisPair = pairDayDatas.filter((dayData) => {
+            return dayData.pairAddress === pairAddress
+          })
+          // find the most recent reference to pair liquidity data
+          let mostRecent = dayDatasForThisPair[0]
+          for (const index in dayDatasForThisPair) {
+            const dayData = dayDatasForThisPair[index]
+            if (dayData.date < dayTimestamp && dayData.date > mostRecent.date) {
+              mostRecent = dayData
             }
-            return mostRecent;
           }
-        );
+          return mostRecent
+        })
 
         // now cycle through pair day datas, for each one find usd value = ownership[address] * reserveUSD
         const dailyUSD = relavantDayDatas.reduce((totalUSD, dayData) => {
           return (totalUSD =
             totalUSD +
             (ownershipPerPair[dayData.pairAddress]
-              ? (parseFloat(
-                  ownershipPerPair[dayData.pairAddress].lpTokenBalance
-                ) /
-                  parseFloat(dayData.totalSupply)) *
+              ? (parseFloat(ownershipPerPair[dayData.pairAddress].lpTokenBalance) / parseFloat(dayData.totalSupply)) *
                 parseFloat(dayData.reserveUSD)
-              : 0));
-        }, 0);
+              : 0))
+        }, 0)
 
         formattedHistory.push({
           date: dayTimestamp,
           valueUSD: dailyUSD,
-        });
+        })
       }
 
-      setFormattedHistory(formattedHistory);
+      setFormattedHistory(formattedHistory)
     }
     if (history && startDateTimestamp && history.length > 0) {
-      fetchData();
+      fetchData()
     }
-  }, [history, startDateTimestamp]);
+  }, [history, startDateTimestamp])
 
-  return formattedHistory;
+  return formattedHistory
 }
 
 export function useUserPositions(account) {
-  const [state, { updatePositions }] = useUserContext();
-  const positions = state?.[account]?.[POSITIONS_KEY];
+  const [state, { updatePositions }] = useUserContext()
+  const positions = state?.[account]?.[POSITIONS_KEY]
 
-  const snapshots = useUserSnapshots(account);
-  const [ethPrice] = useEthPrice();
+  const snapshots = useUserSnapshots(account)
+  const [ethPrice] = useEthPrice()
 
   useEffect(() => {
     async function fetchData(account) {
@@ -474,33 +435,28 @@ export function useUserPositions(account) {
           variables: {
             user: account,
           },
-          fetchPolicy: "no-cache",
-        });
+          fetchPolicy: 'no-cache',
+        })
         if (result?.data?.liquidityPositions) {
           let formattedPositions = await Promise.all(
             result?.data?.liquidityPositions.map(async (positionData) => {
-              const returnData = await getLPReturnsOnPair(
-                account,
-                positionData.pair,
-                ethPrice,
-                snapshots
-              );
+              const returnData = await getLPReturnsOnPair(account, positionData.pair, ethPrice, snapshots)
               return {
                 ...positionData,
                 ...returnData,
-              };
+              }
             })
-          );
-          updatePositions(account, formattedPositions);
+          )
+          updatePositions(account, formattedPositions)
         }
       } catch (e) {
-        console.log(e);
+        console.log(e)
       }
     }
     if (!positions && account && ethPrice && snapshots) {
-      fetchData(account);
+      fetchData(account)
     }
-  }, [account, positions, updatePositions, ethPrice, snapshots]);
+  }, [account, positions, updatePositions, ethPrice, snapshots])
 
-  return positions;
+  return positions
 }

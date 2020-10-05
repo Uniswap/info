@@ -1,20 +1,20 @@
-import React, { Component } from "react";
-import { Button } from "rebass";
-import styled from "styled-components";
+import React, { Component } from 'react'
+import { Button } from 'rebass'
+import styled from 'styled-components'
 
-import Select from "react-select";
+import Select from 'react-select'
 
 const selectStyles = {
   control: (styles) => ({
     ...styles,
-    padding: "1rem",
-    border: "none",
-    backgroundColor: "transparent",
-    borderBottom: "1px solid #e1e1e1",
-    boxShadow: "none",
+    padding: '1rem',
+    border: 'none',
+    backgroundColor: 'transparent',
+    borderBottom: '1px solid #e1e1e1',
+    boxShadow: 'none',
     borderRadius: 0,
-    ":hover": {
-      borderColor: "#e1e1e1",
+    ':hover': {
+      borderColor: '#e1e1e1',
     },
   }),
   valueContainer: (styles) => ({
@@ -22,21 +22,21 @@ const selectStyles = {
     padding: 0,
   }),
   menu: () => null,
-};
+}
 
 export default class Popout extends Component {
-  state = { isOpen: false, value: undefined };
+  state = { isOpen: false, value: undefined }
   toggleOpen = () => {
-    this.setState((state) => ({ isOpen: !state.isOpen }));
-  };
+    this.setState((state) => ({ isOpen: !state.isOpen }))
+  }
 
   onSelectChange = (value) => {
-    this.toggleOpen();
-    this.setState({ value });
-  };
+    this.toggleOpen()
+    this.setState({ value })
+  }
 
   render() {
-    const { isOpen, value } = this.state;
+    const { isOpen, value } = this.state
     return (
       <Dropdown
         isOpen={isOpen}
@@ -48,12 +48,12 @@ export default class Popout extends Component {
             variant="outline"
             onClick={this.toggleOpen}
             style={{
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
             }}
           >
-            {value ? value.label : "Select..."}
+            {value ? value.label : 'Select...'}
           </Button>
         }
       >
@@ -73,7 +73,7 @@ export default class Popout extends Component {
           value={value}
         />
       </Dropdown>
-    );
+    )
   }
 }
 
@@ -103,9 +103,9 @@ const Wrapper = styled.div`
   border-top-left-radius: 1rem;
   border-top-right-radius: 1rem;
   transition: 0.25s ease-in-out;
-`;
+`
 
-const Menu = (props) => <Wrapper {...props} />;
+const Menu = (props) => <Wrapper {...props} />
 
 const Blanket = (props) => (
   <div
@@ -114,13 +114,13 @@ const Blanket = (props) => (
       left: 0,
       top: 0,
       right: 0,
-      backgroundColor: "rgba(0,0,0,0.6)",
-      position: "fixed",
+      backgroundColor: 'rgba(0,0,0,0.6)',
+      position: 'fixed',
       zIndex: 1,
     }}
     {...props}
   />
-);
+)
 
 const Dropdown = ({ children, isOpen, target, onClose }) => (
   <>
@@ -128,10 +128,10 @@ const Dropdown = ({ children, isOpen, target, onClose }) => (
     {isOpen ? <Menu>{children}</Menu> : null}
     {isOpen ? <Blanket onClick={onClose} /> : null}
   </>
-);
+)
 
 const DropdownIndicator = () => (
   <span role="img" aria-label="Search">
     🔎
   </span>
-);
+)
