@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useReducer, useMemo, useCallback, useState, useEffect } from 'react'
 import { timeframeOptions, SUPPORTED_LIST_URLS__NO_ENS } from '../constants'
-import Web3 from 'web3'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import getTokenList from '../utils/tokenLists'
@@ -11,7 +10,6 @@ dayjs.extend(utc)
 const UPDATE = 'UPDATE'
 const UPDATE_TIMEFRAME = 'UPDATE_TIMEFRAME'
 const UPDATE_SESSION_START = 'UPDATE_SESSION_START'
-const UPDATE_WEB3 = 'UPDATE_WEB3'
 const UPDATED_SUPPORTED_TOKENS = 'UPDATED_SUPPORTED_TOKENS'
 const UPDATE_LATEST_BLOCK = 'UPDATE_LATEST_BLOCK'
 
@@ -19,7 +17,6 @@ const SUPPORTED_TOKENS = 'SUPPORTED_TOKENS'
 const TIME_KEY = 'TIME_KEY'
 const CURRENCY = 'CURRENCY'
 const SESSION_START = 'SESSION_START'
-const WEB3 = 'WEB3'
 const LATEST_BLOCK = 'LATEST_BLOCK'
 
 const ApplicationContext = createContext()
@@ -49,13 +46,6 @@ function reducer(state, { type, payload }) {
       return {
         ...state,
         [SESSION_START]: timestamp,
-      }
-    }
-    case UPDATE_WEB3: {
-      const { web3 } = payload
-      return {
-        ...state,
-        [WEB3]: web3,
       }
     }
 
@@ -117,15 +107,6 @@ export default function Provider({ children }) {
     })
   }, [])
 
-  const updateWeb3 = useCallback((web3) => {
-    dispatch({
-      type: UPDATE_WEB3,
-      payload: {
-        web3,
-      },
-    })
-  }, [])
-
   const updateSupportedTokens = useCallback((supportedTokens) => {
     dispatch({
       type: UPDATED_SUPPORTED_TOKENS,
@@ -153,12 +134,11 @@ export default function Provider({ children }) {
             update,
             updateSessionStart,
             updateTimeframe,
-            updateWeb3,
             updateSupportedTokens,
             updateLatestBlock,
           },
         ],
-        [state, update, updateTimeframe, updateWeb3, updateSessionStart, updateSupportedTokens, updateLatestBlock]
+        [state, update, updateTimeframe, updateSessionStart, updateSupportedTokens, updateLatestBlock]
       )}
     >
       {children}
@@ -256,24 +236,6 @@ export function useSessionStart() {
   }, [seconds, sessionStart])
 
   return parseInt(seconds / 1000)
-}
-
-/**
- * @todo this isnt used now - if ever needed probably better to use
- * web3-react instead of this custom hook
- */
-export function useWeb3() {
-  const [state, { updateWeb3 }] = useApplicationContext()
-  const web3 = state?.[WEB3]
-
-  useEffect(() => {
-    if (!web3) {
-      const web3 = new Web3(new Web3.providers.HttpProvider(process.env.REACT_APP_NETWORK_URL))
-      updateWeb3(web3)
-    }
-  })
-
-  return web3
 }
 
 export function useListedTokens() {
