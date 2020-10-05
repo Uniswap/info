@@ -14,7 +14,6 @@
     "@typescript-eslint/eslint-plugin": "^4.4.0",
     "@typescript-eslint/parser": "^4.4.0",
     "@uniswap/token-lists": "^1.0.0-beta.15",
-    "@web3-react/core": "^6.1.1",
     "ajv": "^6.12.4",
     "animated-number-react": "^0.1.1",
     "apollo-cache-inmemory": "^1.6.3",
@@ -69,9 +68,7 @@
     "typeface-inter": "^3.10.0",
     "typescript": "^3.9.5",
     "unstated": "^2.1.1",
-    "wcag-contrast": "^3.0.0",
-    "web3": "^1.2.11",
-    "web3-react": "^5.0.5"
+    "wcag-contrast": "^3.0.0"
   },
   "scripts": {
     "start": "react-scripts start",
