@@ -1,23 +1,21 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react'
-import styled from 'styled-components'
-
-import Row, { RowFixed } from '../Row'
-import TokenLogo from '../TokenLogo'
-import { Search as SearchIcon, X } from 'react-feather'
-import { BasicLink } from '../Link'
-
-import { useAllTokenData, useTokenData } from '../../contexts/TokenData'
-import { useAllPairData, usePairData } from '../../contexts/PairData'
-import DoubleTokenLogo from '../DoubleLogo'
-import { useMedia } from 'react-use'
-import { useAllPairsInUniswap, useAllTokensInUniswap } from '../../contexts/GlobalData'
-import { OVERVIEW_TOKEN_BLACKLIST, PAIR_BLACKLIST } from '../../constants'
-
 import { transparentize } from 'polished'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
+import { Search as SearchIcon, X } from 'react-feather'
+import { useMedia } from 'react-use'
+import styled from 'styled-components'
 import { client } from '../../apollo/client'
 import { PAIR_SEARCH, TOKEN_SEARCH } from '../../apollo/queries'
-import FormattedName from '../FormattedName'
+import { OVERVIEW_TOKEN_BLACKLIST, PAIR_BLACKLIST } from '../../constants'
+import { useAllPairsInUniswap, useAllTokensInUniswap } from '../../contexts/GlobalData'
+import { useAllPairData, usePairData } from '../../contexts/PairData'
+import { useAllTokenData, useTokenData } from '../../contexts/TokenData'
+import { useKeyPress } from '../../hooks'
 import { TYPE } from '../../Theme'
+import DoubleTokenLogo from '../DoubleLogo'
+import FormattedName from '../FormattedName'
+import { BasicLink } from '../Link'
+import Row, { RowFixed } from '../Row'
+import TokenLogo from '../TokenLogo'
 
 const Container = styled.div`
   height: 48px;
@@ -110,7 +108,7 @@ const Menu = styled.div`
   width: 100%;
   top: 50px;
   max-height: 540px;
-  overflow: scroll;
+  overflow-y: scroll;
   left: 0;
   padding-bottom: 20px;
   background: ${({ theme }) => theme.bg6};
@@ -130,6 +128,10 @@ const MenuItem = styled(Row)`
   :hover {
     cursor: pointer;
     background-color: ${({ theme }) => theme.bg2};
+  }
+  :focus {
+    background-color: #f7f8fa;
+    outline: black auto 1px;
   }
 `
 
@@ -156,7 +158,13 @@ export const Search = ({ small = false }) => {
   let allPairs = useAllPairsInUniswap()
   const allPairData = useAllPairData()
 
-  const [showMenu, toggleMenu] = useState(false)
+  const [cursor, setCursor] = useState(null)
+  const downKeyPressed = useKeyPress('ArrowDown')
+  const escapeKeyPressed = useKeyPress('Escape')
+  const tabKeyPressed = useKeyPress('Tab')
+  const upKeyPressed = useKeyPress('ArrowUp')
+
+  const [showMenu, setShowMenu] = useState(false)
   const [value, setValue] = useState('')
   const [, toggleShadow] = useState(false)
   const [, toggleBottomShadow] = useState(false)
@@ -171,9 +179,9 @@ export const Search = ({ small = false }) => {
 
   useEffect(() => {
     if (value !== '') {
-      toggleMenu(true)
+      setShowMenu(true)
     } else {
-      toggleMenu(false)
+      setShowMenu(false)
     }
   }, [value])
 
@@ -388,10 +396,59 @@ export const Search = ({ small = false }) => {
   const [tokensShown, setTokensShown] = useState(3)
   const [pairsShown, setPairsShown] = useState(3)
 
+  useEffect(() => {
+    if (pairsShown + tokensShown === 0) {
+      // no results, so do nothing
+      setCursor(undefined)
+    } else if (showMenu && downKeyPressed && cursor === undefined) {
+      // no active cursor, start from the top of the list
+      setCursor(0)
+    } else if (showMenu && downKeyPressed && cursor < pairsShown + tokensShown - 1) {
+      // existing cursor, increment down the length of the list
+      setCursor(cursor + 1)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showMenu, downKeyPressed, pairsShown, tokensShown])
+
+  useEffect(() => {
+    if (pairsShown + tokensShown === 0) {
+      // no results, so do nothing
+      setCursor(undefined)
+    } else if (showMenu && upKeyPressed && cursor === undefined) {
+      // start from the bottom of the list
+      setCursor(pairsShown + tokensShown - 1)
+    } else if (showMenu && upKeyPressed && cursor === 0) {
+      // the user clicked up from index 0, so loop them to the bottom of the list
+      setCursor(pairsShown + tokensShown - 1)
+    } else if (showMenu && upKeyPressed && cursor > 0) {
+      // continue down the list
+      setCursor(cursor - 1)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pairsShown, showMenu, tokensShown, upKeyPressed])
+
+  useEffect(() => {
+    setCursor(undefined)
+  }, [tabKeyPressed])
+
+  useEffect(() => {
+    setCursor(undefined)
+    setShowMenu(false)
+  }, [escapeKeyPressed])
+
+  useEffect(() => {
+    const canUseCursor = Boolean(
+      Number.isInteger(cursor) && menuRef.current && menuRef.current.querySelectorAll('a')[cursor]
+    )
+    if (canUseCursor) {
+      menuRef.current.querySelectorAll('a')[cursor].focus()
+    }
+  }, [cursor])
+
   function onDismiss() {
     setPairsShown(3)
     setTokensShown(3)
-    toggleMenu(false)
+    setShowMenu(false)
     setValue('')
   }
 
@@ -406,7 +463,7 @@ export const Search = ({ small = false }) => {
     ) {
       setPairsShown(3)
       setTokensShown(3)
-      toggleMenu(false)
+      setShowMenu(false)
     }
   }
 
@@ -433,7 +490,7 @@ export const Search = ({ small = false }) => {
               ? 'Search Uniswap...'
               : below700
               ? 'Search pairs and tokens...'
-              : 'Search Uniswap pairs and tokens...'
+              : `Search Uniswap pairs and tokens... ${cursor}`
           }
           value={value}
           onChange={(e) => {
@@ -441,11 +498,11 @@ export const Search = ({ small = false }) => {
           }}
           onFocus={() => {
             if (!showMenu) {
-              toggleMenu(true)
+              setShowMenu(true)
             }
           }}
         />
-        {!showMenu ? <SearchIconLarge /> : <CloseIcon onClick={() => toggleMenu(false)} />}
+        {!showMenu ? <SearchIconLarge /> : <CloseIcon onClick={() => setShowMenu(false)} />}
       </Wrapper>
       <Menu hide={!showMenu} ref={menuRef}>
         <Heading>
