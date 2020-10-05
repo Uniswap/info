@@ -41,6 +41,7 @@
     "node-vibrant": "^3.1.5",
     "numeral": "^2.0.6",
     "polished": "^3.4.4",
+    "prettier": "^2.1.2",
     "react": "^16.9.0",
     "react-apollo": "^3.1.1",
     "react-device-detect": "^1.9.10",
