@@ -1,12 +1,12 @@
-import React from 'react'
-import styled from 'styled-components'
-import PropTypes from 'prop-types'
-import { default as ReactSelect } from 'react-select'
-import { isMobile } from 'react-device-detect'
+import React from "react";
+import styled from "styled-components";
+import PropTypes from "prop-types";
+import { default as ReactSelect } from "react-select";
+import { isMobile } from "react-device-detect";
 
-import Popout from './popout'
+import Popout from "./popout";
 
-import { customStyles, customStylesMobile, customStylesTime } from './styles'
+import { customStyles, customStylesMobile, customStylesTime } from "./styles";
 
 const MenuLabel = styled.div`
   display: flex;
@@ -14,9 +14,9 @@ const MenuLabel = styled.div`
   width: 100%;
   justify-content: flex-start;
   flex-direction: row;
-`
+`;
 
-const LabelBox = styled.div``
+const LabelBox = styled.div``;
 
 const LogoBox = styled.div`
   width: 30px;
@@ -24,7 +24,7 @@ const LogoBox = styled.div`
   justify-content: center;
   align-items: flex-start;
   margin-right: 8px;
-`
+`;
 
 const CustomMenu = styled.div`
   background-color: white;
@@ -37,7 +37,7 @@ const CustomMenu = styled.div`
   z-index: 5;
   margin-top: 10px;
   padding-top: 36px;
-`
+`;
 
 const FixedToggle = styled.div`
   position: absolute;
@@ -52,24 +52,32 @@ const FixedToggle = styled.div`
   & > input {
     margin-right: 8px;
   }
-`
+`;
 
-let addressStart = new RegExp('^0x')
+let addressStart = new RegExp("^0x");
 function customFilter(option, searchText) {
-  const isAddress = addressStart.test(searchText)
+  const isAddress = addressStart.test(searchText);
   if (isAddress) {
     return option.data.tokenAddress
       .toString()
       .toLowerCase()
-      .includes(searchText.toString().toLowerCase())
+      .includes(searchText.toString().toLowerCase());
   }
   return option.data.label
     .toString()
     .toLowerCase()
-    .includes(searchText.toString().toLowerCase())
+    .includes(searchText.toString().toLowerCase());
 }
 
-const Select = ({ options, onChange, setCapEth, capEth, tokenSelect = false, placeholder, ...rest }) => {
+const Select = ({
+  options,
+  onChange,
+  setCapEth,
+  capEth,
+  tokenSelect = false,
+  placeholder,
+  ...rest
+}) => {
   return tokenSelect ? (
     <ReactSelect
       placeholder={placeholder}
@@ -78,7 +86,7 @@ const Select = ({ options, onChange, setCapEth, capEth, tokenSelect = false, pla
       options={options}
       value={placeholder}
       filterOption={customFilter}
-      getOptionLabel={option => (
+      getOptionLabel={(option) => (
         <MenuLabel>
           <LogoBox>{option.logo}</LogoBox>
           <LabelBox>{option.label}</LabelBox>
@@ -88,7 +96,7 @@ const Select = ({ options, onChange, setCapEth, capEth, tokenSelect = false, pla
       {...rest}
       components={{
         DropdownIndicator: () => (
-          <span role="img" aria-label={'viewer'} style={{ marginRight: '8px' }}>
+          <span role="img" aria-label={"viewer"} style={{ marginRight: "8px" }}>
             🔎
           </span>
         ),
@@ -101,15 +109,15 @@ const Select = ({ options, onChange, setCapEth, capEth, tokenSelect = false, pla
                   type="checkbox"
                   checked={capEth}
                   onChange={() => {
-                    setCapEth(!capEth)
+                    setCapEth(!capEth);
                   }}
                 />
                 Hide Low Liquidity
               </FixedToggle>
               {children}
             </CustomMenu>
-          )
-        }
+          );
+        },
       }}
     />
   ) : (
@@ -121,14 +129,14 @@ const Select = ({ options, onChange, setCapEth, capEth, tokenSelect = false, pla
       styles={customStylesTime}
       {...rest}
     />
-  )
-}
+  );
+};
 
 Select.propTypes = {
   options: PropTypes.array.isRequired,
-  onChange: PropTypes.func
-}
+  onChange: PropTypes.func,
+};
 
-export default Select
+export default Select;
 
-export { Popout }
+export { Popout };

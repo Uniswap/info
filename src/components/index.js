@@ -1,15 +1,15 @@
-import React from 'react'
-import styled from 'styled-components'
-import { Text, Box } from 'rebass'
+import React from "react";
+import styled from "styled-components";
+import { Text, Box } from "rebass";
 
-import Link from './Link'
+import Link from "./Link";
 
-import { urls } from '../utils'
+import { urls } from "../utils";
 
 const Divider = styled(Box)`
   height: 1px;
   background-color: ${({ theme }) => theme.divider};
-`
+`;
 
 export const IconWrapper = styled.div`
   position: absolute;
@@ -28,36 +28,36 @@ export const IconWrapper = styled.div`
     cursor: pointer;
     opacity: 0.7;
   }
-`
+`;
 
 const Hint = ({ children, ...rest }) => (
   <Text fontSize={16} weight={500} {...rest}>
     {children}
   </Text>
-)
+);
 
 const Address = ({ address, token, ...rest }) => (
   <Link
     color="button"
     href={token ? urls.showToken(address) : urls.showAddress(address)}
     external
-    style={{ wordBreak: 'break-all' }}
+    style={{ wordBreak: "break-all" }}
     {...rest}
   >
     {address}
   </Link>
-)
+);
 
 export const Hover = styled.div`
   :hover {
     cursor: pointer;
-    opacity: ${({ fade }) => fade && '0.7'};
+    opacity: ${({ fade }) => fade && "0.7"};
   }
-`
+`;
 
 export const StyledIcon = styled.div`
   color: ${({ theme }) => theme.text1};
-`
+`;
 
 const EmptyCard = styled.div`
   display: flex;
@@ -67,14 +67,14 @@ const EmptyCard = styled.div`
   border-radius: 20px;
   color: ${({ theme }) => theme.text1};
   height: ${({ height }) => height && height};
-`
+`;
 
 export const SideBar = styled.span`
   display: grid;
   grid-gap: 24px;
   position: sticky;
   top: 4rem;
-`
+`;
 
 export const SubNav = styled.ul`
   list-style: none;
@@ -84,7 +84,7 @@ export const SubNav = styled.ul`
   align-items: flex-start;
   padding: 0;
   margin-bottom: 2rem;
-`
+`;
 export const SubNavEl = styled.li`
   list-style: none;
   display: flex;
@@ -97,7 +97,7 @@ export const SubNavEl = styled.li`
     cursor: pointer;
     border-bottom: 1px solid ${({ theme }) => theme.bg3};
   }
-`
+`;
 
 export const PageWrapper = styled.div`
   display: flex;
@@ -110,7 +110,7 @@ export const PageWrapper = styled.div`
       padding: 0 12px;
     }
   }
-`
+`;
 
 export const ContentWrapper = styled.div`
   display: grid;
@@ -127,7 +127,7 @@ export const ContentWrapper = styled.div`
     grid-template-columns: 1fr;
     padding: 0 1rem;
   }
-`
+`;
 
 export const ContentWrapperLarge = styled.div`
   display: grid;
@@ -145,7 +145,7 @@ export const ContentWrapperLarge = styled.div`
     grid-template-columns: 1fr;
     padding: 0 1rem;
   }
-`
+`;
 
 export const FullWrapper = styled.div`
   display: grid;
@@ -163,7 +163,7 @@ export const FullWrapper = styled.div`
     grid-template-columns: 1fr;
     padding: 0 1rem;
   }
-`
+`;
 
 export const FixedMenu = styled.div`
   z-index: 99;
@@ -177,6 +177,6 @@ export const FixedMenu = styled.div`
   @media screen and (max-width: 800px) {
     margin-bottom: 0;
   }
-`
+`;
 
-export { Hint, Divider, Address, EmptyCard }
+export { Hint, Divider, Address, EmptyCard };

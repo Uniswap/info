@@ -1,10 +1,10 @@
-import React, { useState } from 'react'
-import styled from 'styled-components'
+import React, { useState } from "react";
+import styled from "styled-components";
 
-import { useCurrentCurrency } from '../../contexts/Application'
+import { useCurrentCurrency } from "../../contexts/Application";
 
-import Row from '../Row'
-import { ChevronDown as Arrow } from 'react-feather'
+import Row from "../Row";
+import { ChevronDown as Arrow } from "react-feather";
 
 const Select = styled.div`
   position: relative;
@@ -27,30 +27,30 @@ const Select = styled.div`
   @media screen and (max-width: 40em) {
     display: none;
   }
-`
+`;
 
 const ArrowStyled = styled(Arrow)`
   height: 20px;
   width: 20px;
   margin-left: 6px;
-`
+`;
 
 const Option = styled(Row)`
   position: absolute;
   top: 40px;
-`
+`;
 
 const CurrencySelect = () => {
-  const [showDropdown, toggleDropdown] = useState(false)
-  const [currency, toggleCurrency] = useCurrentCurrency()
+  const [showDropdown, toggleDropdown] = useState(false);
+  const [currency, toggleCurrency] = useCurrentCurrency();
 
   const getOther = () => {
-    if (currency === 'USD') {
-      return 'ETH'
+    if (currency === "USD") {
+      return "ETH";
     } else {
-      return 'USD'
+      return "USD";
     }
-  }
+  };
 
   return (
     <>
@@ -61,8 +61,8 @@ const CurrencySelect = () => {
         {showDropdown && (
           <Option
             onClick={() => {
-              toggleDropdown(!showDropdown)
-              toggleCurrency()
+              toggleDropdown(!showDropdown);
+              toggleCurrency();
             }}
           >
             {getOther()}
@@ -70,7 +70,7 @@ const CurrencySelect = () => {
         )}
       </Select>
     </>
-  )
-}
+  );
+};
 
-export default CurrencySelect
+export default CurrencySelect;
