@@ -110,7 +110,7 @@ const Menu = styled.div`
   width: 100%;
   top: 50px;
   max-height: 540px;
-  overflow: scroll;
+  overflow: auto;
   left: 0;
   padding-bottom: 20px;
   background: ${({ theme }) => theme.bg6};
