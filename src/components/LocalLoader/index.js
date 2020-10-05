@@ -16,7 +16,7 @@ const Wrapper = styled.div`
   height: 100%;
   width: 100%;
 
-  ${props =>
+  ${(props) =>
     props.fill && !props.height
       ? css`
           height: 100vh;
