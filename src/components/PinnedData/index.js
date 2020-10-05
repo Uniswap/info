@@ -22,7 +22,7 @@ const RightColumn = styled.div`
   border-left: ${({ theme, open }) => '1px solid' + theme.bg3};
   background-color: ${({ theme }) => theme.bg1};
   z-index: 9999;
-  overflow: scroll;
+  overflow: auto;
   :hover {
     cursor: pointer;
   }
@@ -39,7 +39,7 @@ const SavedButton = styled(RowBetween)`
 `
 
 const ScrollableDiv = styled(AutoColumn)`
-  overflow: scroll;
+  overflow: auto;
   padding-bottom: 60px;
 `
 
