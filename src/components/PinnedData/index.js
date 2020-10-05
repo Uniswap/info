@@ -22,7 +22,7 @@ const RightColumn = styled.div`
   border-left: ${({ theme, open }) => '1px solid' + theme.bg3};
   background-color: ${({ theme }) => theme.bg1};
   z-index: 9999;
-  overflow: scroll;
+  overflow: auto;
   :hover {
     cursor: pointer;
   }
@@ -39,7 +39,7 @@ const SavedButton = styled(RowBetween)`
 `
 
 const ScrollableDiv = styled(AutoColumn)`
-  overflow: scroll;
+  overflow: auto;
   padding-bottom: 60px;
 `
 
@@ -76,14 +76,14 @@ function PinnedData({ history, open, setSavedOpen }) {
       <AutoColumn gap="40px" style={{ marginTop: '2rem' }}>
         <AutoColumn gap={'12px'}>
           <TYPE.main>Pinned Pairs</TYPE.main>
-          {Object.keys(savedPairs).filter((key) => {
+          {Object.keys(savedPairs).filter(key => {
             return !!savedPairs[key]
           }).length > 0 ? (
             Object.keys(savedPairs)
-              .filter((address) => {
+              .filter(address => {
                 return !!savedPairs[address]
               })
-              .map((address) => {
+              .map(address => {
                 const pair = savedPairs[address]
                 return (
                   <RowBetween key={pair.address}>
@@ -112,14 +112,14 @@ function PinnedData({ history, open, setSavedOpen }) {
         </AutoColumn>
         <ScrollableDiv gap={'12px'}>
           <TYPE.main>Pinned Tokens</TYPE.main>
-          {Object.keys(savedTokens).filter((key) => {
+          {Object.keys(savedTokens).filter(key => {
             return !!savedTokens[key]
           }).length > 0 ? (
             Object.keys(savedTokens)
-              .filter((address) => {
+              .filter(address => {
                 return !!savedTokens[address]
               })
-              .map((address) => {
+              .map(address => {
                 const token = savedTokens[address]
                 return (
                   <RowBetween key={address}>
