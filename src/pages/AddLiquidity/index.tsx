@@ -2,7 +2,6 @@ import { BigNumber } from '@ethersproject/bignumber'
 import { TransactionResponse } from '@ethersproject/providers'
 import { Currency, ETHER, TokenAmount } from '@uniswap/sdk'
 import React, { useCallback, useContext, useState } from 'react'
-import { Plus } from 'react-feather'
 import ReactGA from 'react-ga'
 import { RouteComponentProps } from 'react-router-dom'
 import { Text } from 'rebass'
@@ -42,6 +41,7 @@ import { withRouter } from 'react-router-dom'
 import LiquidityPage from '../LiquidityPage'
 import { useMarketAmm, useShareTokens } from '../../contexts/Markets'
 import CashInputPanel from '../../components/CashInputPanel'
+import DistributionPanel from '../../components/DistributionPanel'
 
 function AddLiquidity({
   amm,
@@ -90,6 +90,7 @@ function AddLiquidity({
   const deadline = useTransactionDeadline() // custom from users settings
   const [allowedSlippage] = useUserSlippageTolerance() // custom from users
   const [txHash, setTxHash] = useState<string>('')
+  const [currentDistribution, setCurrentDistribution] = useState<number[]>([50, 50])
 
   // get formatted amounts
   const formattedAmounts = {
@@ -296,6 +297,9 @@ function AddLiquidity({
     setTxHash('')
   }, [onFieldAInput, txHash])
 
+  const updateDistribution = (distriubtions: number[]) => {
+    console.log(distriubtions)
+  }
   return (
     <LiquidityPage>
       <AppBody>
@@ -368,17 +372,11 @@ function AddLiquidity({
             <ColumnCenter>
               <TYPE.small>Distribution</TYPE.small>
             </ColumnCenter>
-            <CurrencyInputPanel
-              value={formattedAmounts[Field.CURRENCY_B]}
-              onUserInput={onFieldBInput}
-              onCurrencySelect={handleCurrencyBSelect}
-              onMax={() => {
-                onFieldBInput(maxAmounts[Field.CURRENCY_B]?.toExact() ?? '')
-              }}
-              showMaxButton={!atMaxAmounts[Field.CURRENCY_B]}
-              currency={currencies[Field.CURRENCY_B]}
-              id="add-liquidity-input-tokenb"
-              showCommonBases
+            <DistributionPanel
+              updateDistribution={updateDistribution}
+              disableDistributionInputs={!isCreate}
+              currentDistribution={currentDistribution}
+              id={marketId}
             />
             {currencies[Field.CURRENCY_A] && currencies[Field.CURRENCY_B] && pairState !== PairState.INVALID && (
               <>
