@@ -374,7 +374,7 @@ function AddLiquidity({
             </ColumnCenter>
             <DistributionPanel
               updateDistribution={updateDistribution}
-              disableDistributionInputs={!isCreate}
+              disableInputs={!isCreate}
               currentDistribution={currentDistribution}
               id={marketId}
             />

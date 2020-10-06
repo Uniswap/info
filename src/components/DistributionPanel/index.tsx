@@ -1,35 +1,15 @@
-import React, { useContext, useState } from 'react'
-import styled, { ThemeContext } from 'styled-components'
+import React, { useState } from 'react'
+import styled from 'styled-components'
 import { darken } from 'polished'
 import { RowBetween } from '../Row'
 import { TYPE } from '../../Theme'
 import { Input as NumericalInput } from '../NumericalInput'
-import { useTranslation } from 'react-i18next'
 import { AutoColumn } from '../Column'
 
-const InputRow = styled.div<{ disabled: boolean }>`
-  ${({ theme }) => theme.flexRowNoWrap}
-  align-items: center;
-  color: ${({ disabled, theme }) => (disabled ? darken(0.2, theme.text2) : theme.text2)};
-  padding: 0.25rem;
-`
-
-const LabelRow = styled.div`
-  ${({ theme }) => theme.flexRowNoWrap}
-  align-items: center;
-  color: ${({ theme }) => theme.text1};
-  font-size: 0.75rem;
-  line-height: 1rem;
-  padding: 0.75rem 1rem 0 1rem;
-  span:hover {
-    cursor: pointer;
-    color: ${({ theme }) => darken(0.2, theme.text2)};
-  }
-`
-
-const InputPanel = styled.div<{ hideInput?: boolean }>`
+const InputPanel = styled.div<{ disabled?: boolean }>`
   ${({ theme }) => theme.flexColumnNoWrap}
-  border-radius: ${({ hideInput }) => (hideInput ? '8px' : '20px')};
+  border-radius: 20px;
+  color: ${({ disabled, theme }) => (disabled ? darken(0.5, theme.text2) : theme.text2)};
   border: ${({ theme }) => `1px solid ${theme.bg2}`};
   z-index: 1;
   height: 78px;
@@ -38,14 +18,14 @@ const InputPanel = styled.div<{ hideInput?: boolean }>`
 
 interface DistributionPanelProps {
   updateDistribution: Function
-  disableDistributionInputs?: boolean
+  disableInputs?: boolean
   currentDistribution: number[]
   id: string
 }
 
 export default function DistributionPanel({
   updateDistribution,
-  disableDistributionInputs = false,
+  disableInputs = false,
   currentDistribution = [50, 50],
   id
 }: DistributionPanelProps) {
@@ -53,15 +33,16 @@ export default function DistributionPanel({
   const YES_ID = 0
   const NO = 'NO'
   const NO_ID = 1
-  const { t } = useTranslation()
-  const theme = useContext(ThemeContext)
+
   const [yesInput, setYesInput] = useState(currentDistribution[YES_ID])
   const [noInput, setNoInput] = useState(currentDistribution[NO_ID])
 
   const setDistributionInput = (value: number, type) => {
-    if (isNaN(value)) {
+    console.log(value)
+    if (isNaN(value) || value > 100) {
       setYesInput(0)
       setNoInput(0)
+      return
     }
     if (type === YES) {
       setYesInput(value)
@@ -79,35 +60,45 @@ export default function DistributionPanel({
       <RowBetween>
         <AutoColumn>
           <InputPanel>
-            <TYPE.light fontSize={12} style={{ padding: '0.75rem' }}>
+            <TYPE.light fontSize={12} style={{ padding: '0.75rem' }} disabled={disableInputs}>
               Yes
             </TYPE.light>
             <RowBetween style={{ padding: '0.25rem 0.75rem' }}>
               <NumericalInput
-                style={{ fontSize: '24px' }}
+                disabled={disableInputs}
+                style={disableInputs ? { color: 'grey', fontSize: '24px' } : { fontSize: '24px' }}
                 value={yesInput}
+                min={0}
+                max={100}
                 onUserInput={val => {
                   if (!isNaN(Number(val))) setDistributionInput(Number(val), YES)
                 }}
               />
-              <TYPE.light fontSize={18}>%</TYPE.light>
+              <TYPE.light fontSize={18} disabled={disableInputs}>
+                %
+              </TYPE.light>
             </RowBetween>
           </InputPanel>
         </AutoColumn>
         <AutoColumn>
           <InputPanel>
-            <TYPE.light fontSize={12} style={{ padding: '0.75rem' }}>
+            <TYPE.light fontSize={12} style={{ padding: '0.75rem' }} disabled={disableInputs}>
               No
             </TYPE.light>
             <RowBetween style={{ padding: '0.25rem 0.75rem' }}>
               <NumericalInput
-                style={{ fontSize: '24px' }}
+                disabled={disableInputs}
+                style={disableInputs ? { color: 'grey', fontSize: '24px' } : { fontSize: '24px' }}
                 value={noInput}
+                min={0}
+                max={100}
                 onUserInput={val => {
                   if (!isNaN(Number(val))) setDistributionInput(Number(val), NO)
                 }}
               />
-              <TYPE.light fontSize={18}>%</TYPE.light>
+              <TYPE.light fontSize={18} disabled={disableInputs}>
+                %
+              </TYPE.light>
             </RowBetween>
           </InputPanel>
         </AutoColumn>

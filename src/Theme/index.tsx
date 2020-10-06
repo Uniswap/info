@@ -5,6 +5,7 @@ import { Text, TextProps } from 'rebass'
 import { Link } from 'react-router-dom'
 import { ArrowLeft, X } from 'react-feather'
 import styled, { keyframes } from 'styled-components'
+import { darken } from 'polished'
 
 export default function ThemeProvider({ children }) {
   const [darkMode] = useDarkModeManager()
@@ -99,9 +100,10 @@ const theme = (darkMode, color = 'white') => ({
   background: darkMode ? 'black' : `radial-gradient(50% 50% at 50% 50%, #ff007a30 0%, #fff 0%)`
 })
 
-const TextWrapper = styled(Text)`
-  color: ${({ color, theme }) => theme[color]};
+const TextWrapper = styled(Text)<{ disabled }>`
+  color: ${({ color, theme, disabled }) => (disabled ? darken(0.2, theme[color]) : theme[color])};
 `
+
 const LargeBoxTextWrapper = styled(Text)`
   color: ${({ color, theme }) => theme[color]};
   border: 1px solid #575a68;
