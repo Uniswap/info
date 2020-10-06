@@ -17,7 +17,7 @@ import { RowFixed } from '../Row'
 import { useAccountWeb3 } from '../../contexts/Account'
 import { useConfig } from '../../contexts/Application'
 import { useMarketAmm } from '../../contexts/Markets'
-import { greaterThanZero } from '../../utils'
+import { formatNumber, greaterThanZero } from '../../utils'
 import { ButtonLight, ButtonPrimary } from '../ButtonStyled'
 
 dayjs.extend(utc)
@@ -153,10 +153,9 @@ function PairList({ pairs, color, disbaleLinks, marketId, maxItems = 10 }) {
 
   const ListItem = ({ pairAddress, index }) => {
     const pairData = pairs[pairAddress]
-    //const isDeployed = checkIfDeployed(pairData.token0, pairData.token1)
-
+    const amm = useMarketAmm(marketId, pairData.ammId)
+    console.log(amm)
     if (pairData && pairData.token0 && pairData.token1) {
-      console.log('pairData', pairData)
       return (
         <DashGrid style={{ height: '48px', alignItems: 'center' }} disbaleLinks={disbaleLinks} focus={true}>
           <DoubleTokenLogo

@@ -200,7 +200,12 @@ export function useMarketAmm(marketId, amm) {
     ammExchange = market.amms.find(a => a.id.toLowerCase() === amm?.toLowerCase())
   }
 
-  return { id: ammExchange?.id, cash: ammExchange?.shareToken?.cash?.id, sharetoken: ammExchange?.shareToken?.id }
+  return {
+    ...ammExchange,
+    id: ammExchange?.id,
+    cash: ammExchange?.shareToken?.cash?.id,
+    sharetoken: ammExchange?.shareToken?.id
+  }
 }
 
 export function useMarketNonExistingAmms(marketId) {

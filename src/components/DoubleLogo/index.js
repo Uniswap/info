@@ -14,21 +14,19 @@ export default function DoubleTokenLogo({ token0, token1, size = 24, margin = fa
 
   const HigherLogo = styled(TokenLogo)`
     z-index: 2;
-    background-color: ${({ darkMode }) => (darkMode ? 'white' : '#2b2c2c')};
     border-radius: 50%;
   `
 
   const CoveredLogo = styled(TokenLogo)`
     position: absolute;
     left: ${({ sizeraw }) => (sizeraw / 2).toString() + 'px'};
-    background-color: ${({ darkMode }) => (darkMode ? '#2b2c2c' : '#2b2c2c')};
     border-radius: 50%;
   `
 
   return (
     <TokenWrapper darkMode={darkMode} sizeraw={size} margin={margin}>
-      <HigherLogo darkMode={darkMode} address={token0} size={size.toString() + 'px'} sizeraw={size} />
-      <CoveredLogo darkMode={darkMode} address={token1} size={size.toString() + 'px'} sizeraw={size} />
+      <HigherLogo darkMode={darkMode} tokenInfo={token0} size={size.toString() + 'px'} sizeraw={size} />
+      <CoveredLogo darkMode={darkMode} tokenInfo={token1} size={size.toString() + 'px'} sizeraw={size} />
     </TokenWrapper>
   )
 }

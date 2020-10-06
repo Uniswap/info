@@ -631,6 +631,7 @@ export function useTokenData(tokenAddress) {
   useEffect(() => {
     if (!tokenData && ethPrice && ethPriceOld && isAddress(tokenAddress)) {
       if (market) {
+        // process market data here
         const data = {
           id: market.id,
           name: market.description,
