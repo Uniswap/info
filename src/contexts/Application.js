@@ -31,21 +31,21 @@ function reducer(state, { type, payload }) {
       const { currency } = payload
       return {
         ...state,
-        [CURRENCY]: currency
+        [CURRENCY]: currency,
       }
     }
     case UPDATE_TIMEFRAME: {
       const { newTimeFrame } = payload
       return {
         ...state,
-        [TIME_KEY]: newTimeFrame
+        [TIME_KEY]: newTimeFrame,
       }
     }
     case UPDATE_SESSION_START: {
       const { timestamp } = payload
       return {
         ...state,
-        [SESSION_START]: timestamp
+        [SESSION_START]: timestamp,
       }
     }
 
@@ -53,7 +53,7 @@ function reducer(state, { type, payload }) {
       const { block } = payload
       return {
         ...state,
-        [LATEST_BLOCK]: block
+        [LATEST_BLOCK]: block,
       }
     }
 
@@ -61,7 +61,7 @@ function reducer(state, { type, payload }) {
       const { supportedTokens } = payload
       return {
         ...state,
-        [SUPPORTED_TOKENS]: supportedTokens
+        [SUPPORTED_TOKENS]: supportedTokens,
       }
     }
 
@@ -73,55 +73,55 @@ function reducer(state, { type, payload }) {
 
 const INITIAL_STATE = {
   CURRENCY: 'USD',
-  TIME_KEY: timeframeOptions.ALL_TIME
+  TIME_KEY: timeframeOptions.ALL_TIME,
 }
 
 export default function Provider({ children }) {
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE)
-  const update = useCallback(currency => {
+  const update = useCallback((currency) => {
     dispatch({
       type: UPDATE,
       payload: {
-        currency
-      }
+        currency,
+      },
     })
   }, [])
 
   // global time window for charts - see timeframe options in constants
-  const updateTimeframe = useCallback(newTimeFrame => {
+  const updateTimeframe = useCallback((newTimeFrame) => {
     dispatch({
       type: UPDATE_TIMEFRAME,
       payload: {
-        newTimeFrame
-      }
+        newTimeFrame,
+      },
     })
   }, [])
 
   // used for refresh button
-  const updateSessionStart = useCallback(timestamp => {
+  const updateSessionStart = useCallback((timestamp) => {
     dispatch({
       type: UPDATE_SESSION_START,
       payload: {
-        timestamp
-      }
+        timestamp,
+      },
     })
   }, [])
 
-  const updateSupportedTokens = useCallback(supportedTokens => {
+  const updateSupportedTokens = useCallback((supportedTokens) => {
     dispatch({
       type: UPDATED_SUPPORTED_TOKENS,
       payload: {
-        supportedTokens
-      }
+        supportedTokens,
+      },
     })
   }, [])
 
-  const updateLatestBlock = useCallback(block => {
+  const updateLatestBlock = useCallback((block) => {
     dispatch({
       type: UPDATE_LATEST_BLOCK,
       payload: {
-        block
-      }
+        block,
+      },
     })
   }, [])
 
@@ -135,8 +135,8 @@ export default function Provider({ children }) {
             updateSessionStart,
             updateTimeframe,
             updateSupportedTokens,
-            updateLatestBlock
-          }
+            updateLatestBlock,
+          },
         ],
         [state, update, updateTimeframe, updateSessionStart, updateSupportedTokens, updateLatestBlock]
       )}
@@ -155,7 +155,7 @@ export function useLatestBlock() {
     async function fetch() {
       try {
         const res = await healthClient.query({
-          query: SUBGRAPH_HEALTH
+          query: SUBGRAPH_HEALTH,
         })
         const block = res.data.indexingStatusForCurrentVersion.chains[0].latestBlock.number
         if (block) {
@@ -249,7 +249,7 @@ export function useListedTokens() {
         const newTokens = await getTokenList(url)
         return Promise.resolve([...tokensSoFar, ...newTokens.tokens])
       }, Promise.resolve([]))
-      let formatted = allFetched?.map(t => t.address.toLowerCase())
+      let formatted = allFetched?.map((t) => t.address.toLowerCase())
       updateSupportedTokens(formatted)
     }
     if (!supportedTokens) {
