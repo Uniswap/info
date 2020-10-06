@@ -194,7 +194,7 @@ export default function CashInputPanel({
             />
           </>
           {account && currency && <StyledBalanceMax onClick={onMax}>MAX</StyledBalanceMax>}
-          <Aligner>{currency ? <TokenLogo address={currencyAddress} showSymbol size={'24px'} /> : null}</Aligner>
+          <Aligner>{currency ? <TokenLogo tokenInfo={currency} showSymbol size={'24px'} /> : null}</Aligner>
         </InputRow>
       </Container>
     </InputPanel>

@@ -1,5 +1,5 @@
 import { Currency, Pair } from '@uniswap/sdk'
-import React, { useContext } from 'react'
+import React, { useCallback, useContext, useState } from 'react'
 import styled, { ThemeContext } from 'styled-components'
 import { darken } from 'polished'
 import { useCurrencyBalance } from '../../state/wallet/hooks'
@@ -9,7 +9,6 @@ import { RowBetween } from '../Row'
 import { TYPE } from '../../Theme'
 import { Input as NumericalInput } from '../NumericalInput'
 import { ReactComponent as DropDown } from '../../assets/dropdown.svg'
-
 import { useActiveWeb3React } from '../../hooks'
 import { useTranslation } from 'react-i18next'
 
@@ -154,11 +153,12 @@ export default function CurrencyInputPanel({
   const { account } = useActiveWeb3React()
   const selectedCurrencyBalance = useCurrencyBalance(account ?? undefined, currency ?? undefined)
   const theme = useContext(ThemeContext)
+  const [modalOpen, setModalOpen] = useState(false)
 
-  /*  const handleDismissSearch = useCallback(() => {
+  const handleDismissSearch = useCallback(() => {
     setModalOpen(false)
   }, [setModalOpen])
-*/
+
   return (
     <InputPanel id={id}>
       <Container hideInput={hideInput}>
@@ -203,17 +203,17 @@ export default function CurrencyInputPanel({
             selected={!!currency}
             className="open-currency-select-button"
             onClick={() => {
-              console.log('on click is disabled, CurrencyInputPanel')
-              //if (!disableCurrencySelect) {
-              //  setModalOpen(true)
-              //}
+              console.log('on click bring up modal')
+              if (!disableCurrencySelect) {
+                setModalOpen(true)
+              }
             }}
           >
             <Aligner>
               {pair ? (
                 <DoubleCurrencyLogo token0={pair.token0} token1={pair.token1} size={18} margin={true} />
               ) : currency ? (
-                <TokenLogo address={currency} size={'18px'} />
+                <TokenLogo tokenInfo={currency} size={'18px'} />
               ) : null}
               {pair ? (
                 <StyledTokenName className="pair-name-container">
@@ -228,7 +228,6 @@ export default function CurrencyInputPanel({
                     : currency?.symbol) || t('selectToken')}
                 </StyledTokenName>
               )}
-              {!disableCurrencySelect && <StyledDropDown selected={!!currency} />}
             </Aligner>
           </CurrencySelect>
         </InputRow>

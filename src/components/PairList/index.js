@@ -121,7 +121,6 @@ function PairList({ pairs, color, disbaleLinks, marketId, maxItems = 10 }) {
   // pagination
   const [page, setPage] = useState(1)
   const [maxPage, setMaxPage] = useState(1)
-  const amm = useMarketAmm(marketId)
   const ITEMS_PER_PAGE = maxItems
 
   // sorting
@@ -187,16 +186,22 @@ function PairList({ pairs, color, disbaleLinks, marketId, maxItems = 10 }) {
           )}
           <TYPE.header area="name" fontWeight="500">
             <RowFixed style={{ flexFlow: 'row nowrap', justifyContent: 'space-between', marginTop: '0.5rem' }}>
-              <StyledInternalLink disabled={!hasLPTokens} to={`/remove/${marketId}/${pairData.token0.id}/${amm.id}`}>
+              <StyledInternalLink
+                disabled={!hasLPTokens}
+                to={`/remove/${marketId}/${pairData.token0.id}/${pairData.ammId}`}
+              >
                 <ButtonLight disabled={!hasLPTokens} textAlign="center">
                   Remove
                 </ButtonLight>
               </StyledInternalLink>
-              <StyledInternalLink to={`/add/${marketId}/${pairData.token0.id}/${amm.id}`}>
+              <StyledInternalLink to={`/add/${marketId}/${pairData.token0.id}/${pairData.ammId}`}>
                 <ButtonLight textAlign="center">Add</ButtonLight>
               </StyledInternalLink>
-              <StyledInternalLink disabled={!amm.id} to={`/swap/${marketId}/${pairData.token0.id}/${amm.id}`}>
-                <ButtonPrimary disabled={!amm.id} textAlign="center">
+              <StyledInternalLink
+                disabled={!pairData.ammId}
+                to={`/swap/${marketId}/${pairData.token0.id}/${pairData.ammId}`}
+              >
+                <ButtonPrimary disabled={!pairData.ammId} textAlign="center">
                   Trade
                 </ButtonPrimary>
               </StyledInternalLink>

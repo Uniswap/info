@@ -153,7 +153,7 @@ function GlobalPage() {
                 cashes.map(cash => (
                   <ClickableText key={cash} onClick={() => updateCashFilter(cash)}>
                     <TokenLogo
-                      address={cash}
+                      tokenInfo={cash}
                       size={'20px'}
                       showSymbol
                       style={{ paddingRight: '0.25rem', opacity: cash === cashFilter ? '1' : '0.4' }}

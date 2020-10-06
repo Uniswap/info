@@ -135,11 +135,11 @@ export function useDerivedMintInfo(
   if (!account) {
     error = 'Connect Wallet'
   }
-
+  /*
   if (pairState === PairState.INVALID) {
     error = error ?? 'Invalid pair'
   }
-
+*/
   if (!parsedAmounts[Field.CURRENCY_A] || !parsedAmounts[Field.CURRENCY_B]) {
     error = error ?? 'Enter an amount'
   }

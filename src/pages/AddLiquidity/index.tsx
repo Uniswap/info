@@ -339,36 +339,19 @@ function AddLiquidity({
                   </BlueCard>
                 </ColumnCenter>
               ))}
-            {isCreate && (
-              <CashInputPanel
-                value={formattedAmounts[Field.CURRENCY_A]}
-                onUserInput={onFieldAInput}
-                label={'How much do you want to put in?'}
-                onMax={() => {
-                  onFieldAInput(maxAmounts[Field.CURRENCY_A]?.toExact() ?? '')
-                }}
-                showMaxButton={!atMaxAmounts[Field.CURRENCY_A]}
-                currency={currencies[Field.CURRENCY_A]}
-                currencyAddress={cash}
-                id="add-liquidity-input-tokena"
-                showCommonBases
-              />
-            )}
-            {!isCreate && (
-              <CurrencyInputPanel
-                value={formattedAmounts[Field.CURRENCY_A]}
-                onUserInput={onFieldAInput}
-                label={'How much do you want to put in?'}
-                onMax={() => {
-                  onFieldAInput(maxAmounts[Field.CURRENCY_A]?.toExact() ?? '')
-                }}
-                onCurrencySelect={handleCurrencyASelect}
-                showMaxButton={!atMaxAmounts[Field.CURRENCY_A]}
-                currency={currencies[Field.CURRENCY_A]}
-                id="add-liquidity-input-tokena"
-                showCommonBases
-              />
-            )}
+            <CashInputPanel
+              value={formattedAmounts[Field.CURRENCY_A]}
+              onUserInput={onFieldAInput}
+              label={'How much do you want to put in?'}
+              onMax={() => {
+                onFieldAInput(maxAmounts[Field.CURRENCY_A]?.toExact() ?? '')
+              }}
+              showMaxButton={!atMaxAmounts[Field.CURRENCY_A]}
+              currency={currencies[Field.CURRENCY_A]}
+              currencyAddress={cash}
+              id="add-liquidity-input-tokena"
+              showCommonBases
+            />
             <ColumnCenter>
               <TYPE.small>Distribution</TYPE.small>
             </ColumnCenter>

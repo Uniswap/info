@@ -152,7 +152,7 @@ function TokenPage({ marketId, history }) {
             <RowBetween style={{ flexWrap: 'wrap', marginBottom: '2rem', alignItems: 'flex-start' }}>
               <RowFixed style={{ flexWrap: 'wrap' }}>
                 <RowFixed style={{ flexFlow: 'row nowrap', alignItems: 'flex-start', justifyContent: 'flex-start' }}>
-                  <TokenLogo marketId={marketId} />
+                  <TokenLogo tokenInfo={marketId} />
                   <TYPE.main fontSize={below1080 ? '1.5rem' : '2rem'} fontWeight={500} style={{ margin: '0 1rem' }}>
                     <RowFixed gap="6px">
                       <FormattedName
@@ -177,7 +177,7 @@ function TokenPage({ marketId, history }) {
                     cashes.map(cash => (
                       <StyledInternalLink key={cash} to={`/add/${marketId}/${cash}/undefined`}>
                         <ButtonOutlined textAlign="center" style={{ alignItems: 'flex-end', borderRadius: '3px' }}>
-                          <TokenLogo address={cash} size={'18px'} style={{ paddingRight: '0.25rem' }} />
+                          <TokenLogo tokenInfo={cash} size={'18px'} style={{ paddingRight: '0.25rem' }} />
                           Create Liquidity
                         </ButtonOutlined>
                       </StyledInternalLink>

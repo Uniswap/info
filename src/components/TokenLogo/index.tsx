@@ -33,8 +33,9 @@ const StyledEthereumLogo = styled.div<{ size }>`
   }
 `
 
-export default function TokenLogo({ address, showSymbol = false, size = '24px', ...rest }) {
-  const cashtoken = getCashInfo(address)
+export default function TokenLogo({ tokenInfo, showSymbol = false, size = '24px', ...rest }) {
+  const cashtoken = getCashInfo(typeof tokenInfo === 'string' ? tokenInfo : tokenInfo ? tokenInfo.address : null)
+  const address = cashtoken ? cashtoken.address : tokenInfo
   const [error, setError] = useState(false)
 
   useEffect(() => {

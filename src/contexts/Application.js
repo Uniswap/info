@@ -328,7 +328,8 @@ export function getCashAddress(symbol) {
 export function getCashInfo(address) {
   if (!address) return null
   const contracts = getConfig()
-  const cash = contracts.Cashes.find(c => c.address.toLowerCase() === address.toLowerCase())
+  console.log('getCashInfo(address)', address)
+  const cash = contracts.Cashes.find(c => c.address?.toLowerCase() === address?.toLowerCase())
   return cash
 }
 

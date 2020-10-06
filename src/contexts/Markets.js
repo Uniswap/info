@@ -187,7 +187,8 @@ export function useAllMarketCashes() {
 
 export function useShareTokens(cash) {
   const [state] = useMarketDataContext()
-  const shareToken = state?.paraShareTokens ?? state?.paraShareTokens.find(s => s.cash.id === cash)
+  const shareToken =
+    state?.paraShareTokens ?? state?.paraShareTokens.find(s => s.cash.id.toLowerCase() === cash?.toLowerCase())
   return shareToken?.id
 }
 
@@ -196,7 +197,7 @@ export function useMarketAmm(marketId, amm) {
   let ammExchange = null
   let doesExist = market && market.amms && market.amms.length > 0
   if (doesExist) {
-    ammExchange = market.amms.find(a => a.id === amm)
+    ammExchange = market.amms.find(a => a.id.toLowerCase() === amm?.toLowerCase())
   }
 
   return { id: ammExchange?.id, cash: ammExchange?.shareToken?.cash?.id, sharetoken: ammExchange?.shareToken?.id }

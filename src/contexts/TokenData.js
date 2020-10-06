@@ -683,25 +683,25 @@ export function useTokenTransactions(tokenAddress) {
   return tokenTxns || []
 }
 
-export function useTokenPairs(tokenAddress) {
-  const market = useMarket(tokenAddress)
+export function useTokenPairs(marketId) {
+  const market = useMarket(marketId)
   const { amms } = market
   const [state, { updateAllPairs }] = useTokenDataContext()
-  const tokenPairs = state?.[tokenAddress]?.[TOKEN_PAIRS_KEY]
+  const tokenPairs = state?.[marketId]?.[TOKEN_PAIRS_KEY]
 
   useEffect(() => {
     async function fetchData() {
       let allPairs = []
       if (amms && amms.length > 0) {
         allPairs = amms.reduce((p, amm) => {
-          const { shareToken } = amm
+          const { shareToken, id: ammId } = amm
           const { id, cash } = shareToken
-          console.log('cash.id', cash.id)
           return [
             ...p,
             {
               token0: { id: cash.id, symbol: getCashInfo(cash.id)?.symbol },
               token1: { id, symbol: 'Yes' },
+              ammId,
               oneDayVolumeUSD: 1, // this comes from amm stats
               reserveUSD: 2,
               trackedReserveUSD: 3,
@@ -710,6 +710,7 @@ export function useTokenPairs(tokenAddress) {
             {
               token0: { id: cash.id, symbol: getCashInfo(cash.id)?.symbol },
               token1: { id, symbol: 'No' },
+              ammId,
               oneDayVolumeUSD: 1,
               reserveUSD: 2,
               trackedReserveUSD: 3,
@@ -717,14 +718,13 @@ export function useTokenPairs(tokenAddress) {
             }
           ]
         }, [])
-
-        updateAllPairs(tokenAddress, allPairs)
+        updateAllPairs(marketId, allPairs)
       }
     }
-    if (!tokenPairs && isAddress(tokenAddress)) {
+    if (!tokenPairs && isAddress(marketId)) {
       fetchData()
     }
-  }, [tokenAddress, tokenPairs, updateAllPairs, amms])
+  }, [marketId, tokenPairs, updateAllPairs, amms])
 
   return tokenPairs || []
 }

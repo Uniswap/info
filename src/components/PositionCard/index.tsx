@@ -243,7 +243,7 @@ export default function FullPositionCard({ pair, border }: PositionCardProps) {
                   <Text fontSize={16} fontWeight={500} marginLeft={'6px'}>
                     {token0Deposited?.toSignificant(6)}
                   </Text>
-                  <TokenLogo size="20px" style={{ marginLeft: '8px' }} address={currency0} />
+                  <TokenLogo size="20px" style={{ marginLeft: '8px' }} tokenInfo={currency0} />
                 </RowFixed>
               ) : (
                 '-'
@@ -261,7 +261,7 @@ export default function FullPositionCard({ pair, border }: PositionCardProps) {
                   <Text fontSize={16} fontWeight={500} marginLeft={'6px'}>
                     {token1Deposited?.toSignificant(6)}
                   </Text>
-                  <TokenLogo size="20px" style={{ marginLeft: '8px' }} address={currency1} />
+                  <TokenLogo size="20px" style={{ marginLeft: '8px' }} tokenInfo={currency1} />
                 </RowFixed>
               ) : (
                 '-'
