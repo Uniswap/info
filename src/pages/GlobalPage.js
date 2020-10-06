@@ -64,7 +64,7 @@ function GlobalPage() {
     }
     const newMarkets = markets.reduce((p, m) => {
       if (!m.amms || m.amms.length === 0) return p
-      if (m.amms.find(m => m.shareTokens.cash.id === cash)) {
+      if (m.amms.find(m => m.shareToken.cash.id === cash)) {
         return [...p, m]
       }
       return p
@@ -147,7 +147,7 @@ function GlobalPage() {
                 fontSize={'1.125rem'}
                 onClick={() => updateCashFilter(null)}
               >
-                All
+                All Markets
               </ClickableText>
               {cashes &&
                 cashes.map(cash => (

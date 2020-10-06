@@ -580,7 +580,7 @@ export function getContract(address: string, ABI: any, library: Web3Provider, ac
   if (!isAddress(address) || address === AddressZero) {
     throw Error(`Invalid 'address' parameter '${address}'.`)
   }
-
+  console.log('get contract', address, account)
   return new Contract(address, ABI, getProviderOrSigner(library, account) as any)
 }
 

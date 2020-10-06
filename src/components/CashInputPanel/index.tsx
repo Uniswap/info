@@ -118,7 +118,8 @@ interface CashInputPanelProps {
   onMax?: () => void
   showMaxButton: boolean
   label?: string
-  cash?: Currency | null
+  currency?: Currency | null
+  currencyAddress: string
   disableCurrencySelect?: boolean
   hideBalance?: boolean
   pair?: Pair | null
@@ -135,7 +136,8 @@ export default function CashInputPanel({
   onMax,
   showMaxButton,
   label = 'Input',
-  cash,
+  currency,
+  currencyAddress,
   disableCurrencySelect = false,
   hideBalance = false,
   pair = null, // used for double token logo
@@ -149,7 +151,7 @@ export default function CashInputPanel({
 
   //const [modalOpen, setModalOpen] = useState(false)
   const { account } = useActiveWeb3React()
-  const selectedCurrencyBalance = useCurrencyBalance(account ?? undefined, cash ?? undefined)
+  const selectedCurrencyBalance = useCurrencyBalance(account ?? undefined, currency ?? undefined)
   const theme = useContext(ThemeContext)
 
   /*  const handleDismissSearch = useCallback(() => {
@@ -173,7 +175,7 @@ export default function CashInputPanel({
                   fontSize={14}
                   style={{ display: 'inline', cursor: 'pointer' }}
                 >
-                  {!hideBalance && !!cash && selectedCurrencyBalance
+                  {!hideBalance && !!currency && selectedCurrencyBalance
                     ? (customBalanceText ?? 'Balance: ') + selectedCurrencyBalance?.toSignificant(6)
                     : ' -'}
                 </TYPE.body>
@@ -191,8 +193,8 @@ export default function CashInputPanel({
               }}
             />
           </>
-          {account && cash && <StyledBalanceMax onClick={onMax}>MAX</StyledBalanceMax>}
-          <Aligner>{cash ? <TokenLogo address={cash} showSymbol size={'24px'} /> : null}</Aligner>
+          {account && currency && <StyledBalanceMax onClick={onMax}>MAX</StyledBalanceMax>}
+          <Aligner>{currency ? <TokenLogo address={currencyAddress} showSymbol size={'24px'} /> : null}</Aligner>
         </InputRow>
       </Container>
     </InputPanel>

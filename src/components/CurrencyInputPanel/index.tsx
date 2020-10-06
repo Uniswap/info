@@ -165,7 +165,7 @@ export default function CurrencyInputPanel({
         {!hideInput && (
           <LabelRow>
             <RowBetween>
-              <TYPE.body color={theme.text2} fontWeight={500} fontSize={14}>
+              <TYPE.body color={theme.text2} fontWeight={500} fontSize={12}>
                 {label}
               </TYPE.body>
               {account && (
@@ -211,9 +211,9 @@ export default function CurrencyInputPanel({
           >
             <Aligner>
               {pair ? (
-                <DoubleCurrencyLogo token0={pair.token0} token1={pair.token1} size={24} margin={true} />
+                <DoubleCurrencyLogo token0={pair.token0} token1={pair.token1} size={18} margin={true} />
               ) : currency ? (
-                <TokenLogo address={currency} size={'24px'} />
+                <TokenLogo address={currency} size={'18px'} />
               ) : null}
               {pair ? (
                 <StyledTokenName className="pair-name-container">

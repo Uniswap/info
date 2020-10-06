@@ -79,11 +79,10 @@ export function useAccountWeb3() {
       const provider = new ethers.providers.Web3Provider(window.web3.currentProvider)
       const signer = provider.getSigner()
       const network = await provider.getNetwork()
-      const library = null //getLibrary(provider)
       let chainId = 42 // default to kovan for testing
       // provide chainId here
       if (network === 'mainnet') chainId = 1
-      updateWeb3({ address, provider, signer, network, chainId, library })
+      updateWeb3({ address, provider, signer, network, chainId, library: provider })
     }
 
     window.ethereum

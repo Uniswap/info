@@ -194,7 +194,7 @@ export function useShareTokens(cash) {
 export function useMarketAmm(marketId, amm) {
   const market = useMarket(marketId)
   let ammExchange = null
-  let doesExist = !market.amms || market.amms.length === 0
+  let doesExist = market && market.amms && market.amms.length > 0
   if (doesExist) {
     ammExchange = market.amms.find(a => a.id === amm)
   }

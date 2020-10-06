@@ -17,6 +17,10 @@ import { NetworkContextName } from './constants'
 import getLibrary from './utils/getLibrary'
 import { Provider } from 'react-redux'
 import store from './state'
+import MulticallUpdater from './state/multicall/updater'
+import TransactionUpdater from './state/transactions/updater'
+import ApplicationUpdater from './state/application/updater'
+import UserUpdater from './state/user/updater'
 
 const Web3ProviderNetwork = createWeb3ReactRoot(NetworkContextName)
 
@@ -58,6 +62,10 @@ function Updaters() {
       <PairDataContextUpdater />
       <TokenDataContextUpdater />
       <MarketsProviderContextUpdater />
+      <TransactionUpdater />
+      <MulticallUpdater />
+      <ApplicationUpdater />
+      <UserUpdater />
     </>
   )
 }

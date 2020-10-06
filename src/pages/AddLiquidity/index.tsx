@@ -51,13 +51,14 @@ function AddLiquidity({
 }: RouteComponentProps<{ amm?: string; marketId: string; cash: string }>) {
   const { account, chainId, getWeb3 } = useActiveWeb3React()
   const theme = useContext(ThemeContext)
+  // share token is undefined for isCreate
   const sharetoken = useShareTokens(cash)
   const ammData = useMarketAmm(marketId, amm)
-  const isCreate = !ammData.id
-  console.log('amm data', JSON.stringify(ammData))
+  const isCreate = !ammData.id && !sharetoken
 
   const currencyA = useCurrency(cash)
   const currencyB = useCurrency(sharetoken)
+  console.log('add liq, currencies', cash, sharetoken)
   const currencyIdA = cash
   const currencyIdB = sharetoken
 
@@ -317,7 +318,7 @@ function AddLiquidity({
           />
           <AutoColumn gap="20px">
             {noLiquidity ||
-              (isCreate && (
+              (false && (
                 <ColumnCenter>
                   <BlueCard>
                     <AutoColumn gap="10px">
@@ -343,7 +344,8 @@ function AddLiquidity({
                   onFieldAInput(maxAmounts[Field.CURRENCY_A]?.toExact() ?? '')
                 }}
                 showMaxButton={!atMaxAmounts[Field.CURRENCY_A]}
-                cash={cash}
+                currency={currencies[Field.CURRENCY_A]}
+                currencyAddress={cash}
                 id="add-liquidity-input-tokena"
                 showCommonBases
               />
@@ -364,7 +366,7 @@ function AddLiquidity({
               />
             )}
             <ColumnCenter>
-              <Plus size="16" color={theme.text2} />
+              <TYPE.small>Distribution</TYPE.small>
             </ColumnCenter>
             <CurrencyInputPanel
               value={formattedAmounts[Field.CURRENCY_B]}

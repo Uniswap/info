@@ -1,10 +1,6 @@
 {
   "1": {
     "Multicall": "0xeefba1e63905ef1d7acba5a8513c70307c1ce441",
-    "HotLoading": "",
-    "Augur": "",
-    "FillOrder": "",
-    "Orders": "",
     "AmmFactory": "",
     "Cashes": [
       { "address": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2", "name": "wrapped ETH", "symbol": "wETH" },
@@ -19,15 +15,10 @@
   },
   "42": {
     "Multicall": "0x2cc8688c5f75e365aaeeb4ea8d6a480405a48d2a",
-    "HotLoading": "0xb8E3699f13ca0A9c09BD4025f09B4327A565aC59",
-    "Augur": "0xD3475Ef17aA02CB534c1320717338D25C921d12D",
-    "FillOrder": "0x5915A2Fbe674e77e6FE673FC6Aad000C32E860F2",
-    "Orders": "0x59B57CD6aBDF79cc4836C63b095943e13Ea45B5E",
     "AmmFactory": "0x667C97e2783fc2A014fA8Bca82bf0Bd9bbb38E4d",
-    "ParaShareToken": "0x17ec401a3466a93E8B736722ac1DA54AbE83Fd11",
     "Cashes": [
       {
-        "address": "0xede64699532c2b19cf12eb58b4cc7f977de43112",
+        "address": "0x7290c2b7D5Fc91a112d462fe06aBBB8948668f56",
         "name": "wrapped ETH",
         "symbol": "wETH",
         "asset": "weth.svg"

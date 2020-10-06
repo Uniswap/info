@@ -78,6 +78,26 @@ export const GET_MARKETS = gql`
             id
           }
         }
+        volumeYes
+        volumeNo
+        liquidity
+        swaps {
+          id
+          yesShares
+          noShares
+        }
+        enters {
+          id
+          yesShares
+          noShares
+          cash
+        }
+        exits {
+          id
+          yesShares
+          noShares
+          cash
+        }
       }
     }
     paraShareTokens {

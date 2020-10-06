@@ -208,6 +208,7 @@ export function useLatestBlock() {
           query: SUBGRAPH_HEALTH
         })
         const block = res.data.indexingStatusForCurrentVersion.chains[0].latestBlock.number
+        console.log('block', block)
         if (block) {
           updateLatestBlock(block)
         }
@@ -291,7 +292,7 @@ export function useSessionStart() {
 export function useListedTokens() {
   const [state, { updateSupportedTokens }] = useApplicationContext()
   const supportedTokens = state?.[SUPPORTED_TOKENS]
-
+  console.error('useListedTokens not used')
   useEffect(() => {
     async function fetchList() {
       const allFetched = await SUPPORTED_LIST_URLS__NO_ENS.reduce(async (fetchedTokens, url) => {
