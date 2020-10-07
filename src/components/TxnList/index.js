@@ -225,23 +225,11 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
             newTxn.token1Symbol = swap.pair.token1.symbol
             newTxn.token0Amount = Math.abs(netToken0)
             newTxn.token1Amount = Math.abs(netToken1)
-
-            // HOTFIX for AAVE
-            if (swap.pair.token0.id === '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9') {
-              newTxn.token0Symbol = 'AAVE'
-              newTxn.token0Amount = Math.abs(netToken0) / 10 ** 18
-            }
           } else if (netToken1 < 0) {
             newTxn.token0Symbol = swap.pair.token1.symbol
             newTxn.token1Symbol = swap.pair.token0.symbol
             newTxn.token0Amount = Math.abs(netToken1)
             newTxn.token1Amount = Math.abs(netToken0)
-
-            // HOTFIX for AAVE
-            if (swap.pair.token0.id === '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9') {
-              newTxn.token1Symbol = 'AAVE'
-              newTxn.token1Amount = Math.abs(netToken0) / 10 ** 18
-            }
           }
 
           newTxn.hash = swap.transaction.id

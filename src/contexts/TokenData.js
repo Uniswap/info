@@ -8,6 +8,7 @@ import {
   TOKENS_CURRENT,
   TOKENS_DYNAMIC,
   PRICES_BY_BLOCK,
+  PAIR_DATA,
 } from '../apollo/queries'
 
 import { useEthPrice } from './GlobalData'
@@ -291,6 +292,18 @@ const getTopTokens = async (ethPrice, ethPriceOld) => {
             data.symbol = 'ETH'
           }
 
+          // HOTFIX for Aave
+          if (data.id === '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9') {
+            const aaveData = await client.query({
+              query: PAIR_DATA('0xdfc14d2af169b0d36c4eff567ada9b2e0cae044f'),
+              fetchPolicy: 'cache-first',
+            })
+            const result = aaveData.data.pairs[0]
+            data.totalLiquidityUSD = parseFloat(result.reserveUSD) / 2
+            data.liquidityChangeUSD = 0
+            data.priceChangeUSD = 0
+          }
+
           return data
         })
     )
@@ -410,11 +423,14 @@ const getTokenData = async (address, ethPrice, ethPriceOld) => {
 
     // HOTFIX for Aave
     if (data.id === '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9') {
-      data.name = 'Aave Token'
-      data.symbol = 'Aave'
-      data.derivedETH = parseFloat(data.derivedETH) * 10 ** 18
-      data.priceUSD = data?.derivedETH * ethPrice
-      console.log(data)
+      const aaveData = await client.query({
+        query: PAIR_DATA('0xdfc14d2af169b0d36c4eff567ada9b2e0cae044f'),
+        fetchPolicy: 'cache-first',
+      })
+      const result = aaveData.data.pairs[0]
+      data.totalLiquidityUSD = parseFloat(result.reserveUSD) / 2
+      data.liquidityChangeUSD = 0
+      data.priceChangeUSD = 0
     }
   } catch (e) {
     console.log(e)
