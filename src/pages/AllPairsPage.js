@@ -30,14 +30,14 @@ function AllPairsPage() {
             <TYPE.largeHeader style={{ marginRight: '1rem' }}>Top Pairs</TYPE.largeHeader>
             <RowFixed>
               <OptionButton active={period === PERIODS.DAY} onClick={() => setPeriod(PERIODS.DAY)}>
-                <TYPE.body>24hrs</TYPE.body>
+                <TYPE.body>24h</TYPE.body>
               </OptionButton>
               <OptionButton
                 style={{ marginLeft: '4px' }}
                 active={period === PERIODS.WEEKLY}
                 onClick={() => setPeriod(PERIODS.WEEKLY)}
               >
-                <TYPE.body>Week</TYPE.body>
+                <TYPE.body>7d</TYPE.body>
               </OptionButton>
             </RowFixed>
           </RowFixed>

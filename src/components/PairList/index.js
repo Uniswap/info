@@ -157,7 +157,8 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10, period }) {
       const liquidity = formattedNum(pairData.reserveUSD, true)
       const volume = formattedNum(periodVolume, true)
       const dailyVolume = period === PERIODS.DAY ? periodVolume : periodVolume / 7
-      const apy = formattedPercent((dailyVolume * PROVIDER_FEE * 365 * 100) / pairData.reserveUSD)
+      const reserve = period === PERIODS.WEEK ? pairData.reserveUSDWeekAgo : pairData.reserveUSDDayAgo
+      const apy = formattedPercent((dailyVolume * PROVIDER_FEE * 365 * 100) / reserve)
 
       return (
         <DashGrid style={{ height: '48px' }} disbaleLinks={disbaleLinks} focus={true}>
@@ -286,7 +287,7 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10, period }) {
       <List p={0}>{!pairList ? <LocalLoader /> : pairList}</List>
       <PageButtons>
         <div
-          onClick={(e) => {
+          onClick={() => {
             setPage(page === 1 ? page : page - 1)
           }}
         >
@@ -294,7 +295,7 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10, period }) {
         </div>
         <TYPE.body>{'Page ' + page + ' of ' + maxPage}</TYPE.body>
         <div
-          onClick={(e) => {
+          onClick={() => {
             setPage(page === maxPage ? page : page + 1)
           }}
         >
