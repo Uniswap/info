@@ -407,6 +407,15 @@ const getTokenData = async (address, ethPrice, ethPriceOld) => {
       data.name = 'ETH (Wrapped)'
       data.symbol = 'ETH'
     }
+
+    // HOTFIX for Aave
+    if (data.id === '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9') {
+      data.name = 'Aave Token'
+      data.symbol = 'Aave'
+      data.derivedETH = parseFloat(data.derivedETH) * 10 ** 18
+      data.priceUSD = data?.derivedETH * ethPrice
+      console.log(data)
+    }
   } catch (e) {
     console.log(e)
   }
