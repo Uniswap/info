@@ -183,29 +183,31 @@ function PositionList({ positions }) {
         </DataText>
         {!below740 && (
           <DataText area="initial">
-            <AutoColumn gap="12px" justify="flex-end">
-              <TYPE.main>{formattedNum(position.principal.usd, true, true)}</TYPE.main>
-              <AutoColumn gap="4px" justify="flex-end">
-                <RowFixed>
-                  <TYPE.small fontWeight={400}>{formattedNum(parseFloat(position.principal.amount0))} </TYPE.small>
-                  <FormattedName
-                    text={position.pair.token0.symbol}
-                    maxCharacters={below740 ? 10 : 18}
-                    margin={true}
-                    fontSize={'11px'}
-                  />
-                </RowFixed>
-                <RowFixed>
-                  <TYPE.small fontWeight={400}>{formattedNum(parseFloat(position.principal.amount1))} </TYPE.small>
-                  <FormattedName
-                    text={position.pair.token1.symbol}
-                    maxCharacters={below740 ? 10 : 18}
-                    margin={true}
-                    fontSize={'11px'}
-                  />
-                </RowFixed>
+            {poolOwnership > 0 && (
+              <AutoColumn gap="12px" justify="flex-end">
+                <TYPE.main>{formattedNum(position.principal.usd, true, true)}</TYPE.main>
+                <AutoColumn gap="4px" justify="flex-end">
+                  <RowFixed>
+                    <TYPE.small fontWeight={400}>{formattedNum(parseFloat(position.principal.amount0))} </TYPE.small>
+                    <FormattedName
+                      text={position.pair.token0.symbol}
+                      maxCharacters={below740 ? 10 : 18}
+                      margin={true}
+                      fontSize={'11px'}
+                    />
+                  </RowFixed>
+                  <RowFixed>
+                    <TYPE.small fontWeight={400}>{formattedNum(parseFloat(position.principal.amount1))} </TYPE.small>
+                    <FormattedName
+                      text={position.pair.token1.symbol}
+                      maxCharacters={below740 ? 10 : 18}
+                      margin={true}
+                      fontSize={'11px'}
+                    />
+                  </RowFixed>
+                </AutoColumn>
               </AutoColumn>
-            </AutoColumn>
+            )}
           </DataText>
         )}
         <DataText area="uniswap">
@@ -239,17 +241,19 @@ function PositionList({ positions }) {
         </DataText>
         {!below740 && (
           <DataText area="change_percent">
-            <AutoColumn gap="12px" justify="flex-end">
-              <TYPE.main>{formattedPercent(percentageChange)}</TYPE.main>
-              <AutoColumn gap="4px" justify="flex-end">
-                <RowFixed>
-                  <TYPE.small fontWeight={400}>{formattedPercent(percentageChangePair0)}</TYPE.small>
-                </RowFixed>
-                <RowFixed>
-                  <TYPE.small fontWeight={400}>{formattedPercent(percentageChangePair1)}</TYPE.small>
-                </RowFixed>
+            {poolOwnership > 0 && (
+              <AutoColumn gap="12px" justify="flex-end">
+                <TYPE.main>{formattedPercent(percentageChange)}</TYPE.main>
+                <AutoColumn gap="4px" justify="flex-end">
+                  <RowFixed>
+                    <TYPE.small fontWeight={400}>{formattedPercent(percentageChangePair0)}</TYPE.small>
+                  </RowFixed>
+                  <RowFixed>
+                    <TYPE.small fontWeight={400}>{formattedPercent(percentageChangePair1)}</TYPE.small>
+                  </RowFixed>
+                </AutoColumn>
               </AutoColumn>
-            </AutoColumn>
+            )}
           </DataText>
         )}
         {!below500 && (
