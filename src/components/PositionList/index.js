@@ -9,7 +9,7 @@ import Link, { CustomLink } from '../Link'
 import { Divider } from '../../components'
 import DoubleTokenLogo from '../DoubleLogo'
 import { withRouter } from 'react-router-dom'
-import { formattedNum, getPoolLink } from '../../utils'
+import { formattedNum, formattedPercent, getPoolLink } from '../../utils'
 import { AutoColumn } from '../Column'
 import { useEthPrice } from '../../contexts/GlobalData'
 import { RowFixed } from '../Row'
@@ -44,8 +44,8 @@ const List = styled(Box)`
 const DashGrid = styled.div`
   display: grid;
   grid-gap: 1em;
-  grid-template-columns: 5px 0.5fr 1fr 1fr;
-  grid-template-areas: 'number name uniswap return';
+  grid-template-columns: 5px 0.5fr 1fr 1fr 1fr 1fr;
+  grid-template-areas: 'number name initial uniswap change_percent return';
   align-items: flex-start;
   padding: 20px 0;
 
@@ -61,8 +61,8 @@ const DashGrid = styled.div`
   }
 
   @media screen and (min-width: 1200px) {
-    grid-template-columns: 35px 2.5fr 1fr 1fr;
-    grid-template-areas: 'number name uniswap return';
+    grid-template-columns: 35px 2.5fr 1fr 1fr 1fr 1fr;
+    grid-template-areas: 'number name initial uniswap change_percent return';
   }
 
   @media screen and (max-width: 740px) {
@@ -104,7 +104,10 @@ const DataText = styled(Flex)`
 
 const SORT_FIELD = {
   VALUE: 'VALUE',
+  VALUE_INITAL: 'VALUE_INITIAL',
   UNISWAP_RETURN: 'UNISWAP_RETURN',
+  CHANGE: 'CHANGE',
+  CHANGE_PERCENTAGE: 'CHANGE_PERCENTAGE',
 }
 
 function PositionList({ positions }) {
@@ -140,6 +143,9 @@ function PositionList({ positions }) {
   const ListItem = ({ position, index }) => {
     const poolOwnership = position.liquidityTokenBalance / position.pair.totalSupply
     const valueUSD = poolOwnership * position.pair.reserveUSD
+    const percentageChange = position.net.return / (position.principal.usd / 100)
+    const percentageChangePair0 = (poolOwnership * position.pair.reserve0) / (position.principal.amount0 / 100) - 100
+    const percentageChangePair1 = (poolOwnership * position.pair.reserve1) / (position.principal.amount1 / 100) - 100
 
     return (
       <DashGrid style={{ opacity: poolOwnership > 0 ? 1 : 0.6 }} focus={true}>
@@ -174,6 +180,33 @@ function PositionList({ positions }) {
             </RowFixed>
           </AutoColumn>
         </DataText>
+        {!below740 && (
+          <DataText area="initial">
+            <AutoColumn gap="12px" justify="flex-end">
+              <TYPE.main>{formattedNum(position.principal.usd, true, true)}</TYPE.main>
+              <AutoColumn gap="4px" justify="flex-end">
+                <RowFixed>
+                  <TYPE.small fontWeight={400}>{formattedNum(parseFloat(position.principal.amount0))} </TYPE.small>
+                  <FormattedName
+                    text={position.pair.token0.symbol}
+                    maxCharacters={below740 ? 10 : 18}
+                    margin={true}
+                    fontSize={'11px'}
+                  />
+                </RowFixed>
+                <RowFixed>
+                  <TYPE.small fontWeight={400}>{formattedNum(parseFloat(position.principal.amount1))} </TYPE.small>
+                  <FormattedName
+                    text={position.pair.token1.symbol}
+                    maxCharacters={below740 ? 10 : 18}
+                    margin={true}
+                    fontSize={'11px'}
+                  />
+                </RowFixed>
+              </AutoColumn>
+            </AutoColumn>
+          </DataText>
+        )}
         <DataText area="uniswap">
           <AutoColumn gap="12px" justify="flex-end">
             <TYPE.main>{formattedNum(valueUSD, true, true)}</TYPE.main>
@@ -203,6 +236,21 @@ function PositionList({ positions }) {
             </AutoColumn>
           </AutoColumn>
         </DataText>
+        {!below740 && (
+          <DataText area="change_percent">
+            <AutoColumn gap="12px" justify="flex-end">
+              <TYPE.main>{formattedPercent(percentageChange)}</TYPE.main>
+              <AutoColumn gap="4px" justify="flex-end">
+                <RowFixed>
+                  <TYPE.small fontWeight={400}>{formattedPercent(percentageChangePair0)}</TYPE.small>
+                </RowFixed>
+                <RowFixed>
+                  <TYPE.small fontWeight={400}>{formattedPercent(percentageChangePair1)}</TYPE.small>
+                </RowFixed>
+              </AutoColumn>
+            </AutoColumn>
+          </DataText>
+        )}
         {!below500 && (
           <DataText area="return">
             <AutoColumn gap="12px" justify="flex-end">
@@ -271,6 +319,17 @@ function PositionList({ positions }) {
           const bal1 = (p1.liquidityTokenBalance / p1.pair.totalSupply) * p1.pair.reserveUSD
           return bal0 > bal1 ? (sortDirection ? -1 : 1) : sortDirection ? 1 : -1
         }
+        if (sortedColumn === SORT_FIELD.VALUE_INITAL) {
+          const bal0 = (p0.liquidityTokenBalance / p0.pair.totalSupply) * p0.principal.usd
+          const bal1 = (p1.liquidityTokenBalance / p1.pair.totalSupply) * p1.principal.usd
+          console.log('bal0', bal0, 'bal1', bal1)
+          return bal0 > bal1 ? (sortDirection ? -1 : 1) : sortDirection ? 1 : -1
+        }
+        if (sortedColumn === SORT_FIELD.CHANGE_PERCENTAGE) {
+          const bal0 = p0.net.return / (p0.principal.usd / 100)
+          const bal1 = p1.net.return / (p1.principal.usd / 100)
+          return bal0 > bal1 ? (sortDirection ? -1 : 1) : sortDirection ? 1 : -1
+        }
         return 1
       })
       .slice(ITEMS_PER_PAGE * (page - 1), page * ITEMS_PER_PAGE)
@@ -294,6 +353,20 @@ function PositionList({ positions }) {
         <Flex alignItems="flex-start" justifyContent="flex-start">
           <TYPE.main area="number">Name</TYPE.main>
         </Flex>
+        {!below740 && (
+          <Flex alignItems="center" justifyContent="flexEnd">
+            <ClickableText
+              area="initial"
+              onClick={(e) => {
+                setSortedColumn(SORT_FIELD.VALUE_INITIAL)
+                setSortDirection(sortedColumn !== SORT_FIELD.VALUE_INITIAL ? true : !sortDirection)
+              }}
+            >
+              {below740 ? 'Initial' : 'Initial liquidity'}{' '}
+              {sortedColumn === SORT_FIELD.VALUE_INITAL ? (!sortDirection ? '↑' : '↓') : ''}
+            </ClickableText>
+          </Flex>
+        )}
         <Flex alignItems="center" justifyContent="flexEnd">
           <ClickableText
             area="uniswap"
@@ -305,6 +378,19 @@ function PositionList({ positions }) {
             {below740 ? 'Value' : 'Liquidity'} {sortedColumn === SORT_FIELD.VALUE ? (!sortDirection ? '↑' : '↓') : ''}
           </ClickableText>
         </Flex>
+        {!below740 && (
+          <Flex alignItems="center" justifyContent="flexEnd">
+            <ClickableText
+              area="change_percent"
+              onClick={() => {
+                setSortedColumn(SORT_FIELD.CHANGE_PERCENTAGE)
+                setSortDirection(sortedColumn !== SORT_FIELD.CHANGE_PERCENTAGE ? true : !sortDirection)
+              }}
+            >
+              Change % {sortedColumn === SORT_FIELD.CHANGE_PERCENTAGE ? (!sortDirection ? '↑' : '↓') : ''}
+            </ClickableText>
+          </Flex>
+        )}
         {!below500 && (
           <Flex alignItems="center" justifyContent="flexEnd">
             <ClickableText
