@@ -298,16 +298,6 @@ function parseData(data, oneDayData, twoDayData, oneWeekData, ethPrice, oneDayBl
     data.token1.symbol = 'ETH'
   }
 
-  // HOTFIX for Aave
-  if (data?.token0?.id === '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9' && data.token0.name !== 'Aave Token') {
-    data.token0.name = 'Aave Token'
-    data.token0.symbol = 'AAVE'
-    data.token0.derivedETH = data.token0.derivedETH * 10 ** 18
-    data.token0Price = parseFloat(data.token0Price) * 10 ** 18
-    data.token1Price = parseFloat(data.token1Price) * 10 ** 18
-    data.reserve0 = parseFloat(data.reserve0) / 10 ** 18
-  }
-
   return data
 }
 
