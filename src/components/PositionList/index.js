@@ -108,6 +108,7 @@ const SORT_FIELD = {
   UNISWAP_RETURN: 'UNISWAP_RETURN',
   CHANGE: 'CHANGE',
   CHANGE_PERCENTAGE: 'CHANGE_PERCENTAGE',
+  FEES_ACCRUED: 'FEES_ACCRUED',
 }
 
 function PositionList({ positions }) {
@@ -303,7 +304,6 @@ function PositionList({ positions }) {
   const positionsSorted =
     positions &&
     positions
-
       .sort((p0, p1) => {
         if (sortedColumn === SORT_FIELD.PRINCIPAL) {
           return p0?.principal?.usd > p1?.principal?.usd ? (sortDirection ? -1 : 1) : sortDirection ? 1 : -1
@@ -329,6 +329,9 @@ function PositionList({ positions }) {
           const bal0 = p0.net.return / (p0.principal.usd / 100)
           const bal1 = p1.net.return / (p1.principal.usd / 100)
           return bal0 > bal1 ? (sortDirection ? -1 : 1) : sortDirection ? 1 : -1
+        }
+        if (sortedColumn === SORT_FIELD.FEES_ACCRUED) {
+          return p0?.fees?.sum > p1?.fees?.sum ? (sortDirection ? -1 : 1) : sortDirection ? 1 : -1
         }
         return 1
       })
@@ -396,12 +399,12 @@ function PositionList({ positions }) {
             <ClickableText
               area="return"
               onClick={() => {
-                setSortedColumn(SORT_FIELD.UNISWAP_RETURN)
-                setSortDirection(sortedColumn !== SORT_FIELD.UNISWAP_RETURN ? true : !sortDirection)
+                setSortedColumn(SORT_FIELD.FEES_ACCRUED)
+                setSortDirection(sortedColumn !== SORT_FIELD.FEES_ACCRUED ? true : !sortDirection)
               }}
             >
               {below740 ? 'Fees' : 'Total Fees Earned'}{' '}
-              {sortedColumn === SORT_FIELD.UNISWAP_RETURN ? (!sortDirection ? '↑' : '↓') : ''}
+              {sortedColumn === SORT_FIELD.FEES_ACCRUED ? (!sortDirection ? '↑' : '↓') : ''}
             </ClickableText>
           </Flex>
         )}
