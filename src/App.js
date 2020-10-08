@@ -104,7 +104,7 @@ function App() {
       <AppWrapper>
         <WarningWrapper>
           <WarningBanner>
-            Warning: The data on this site has not been updated since 10/09/20, 10:26AM UTC. Please check back soon.
+            Warning: The data on this site has not been updated since 10/08/20, 10:26AM UTC. Please check back soon.
           </WarningBanner>
         </WarningWrapper>
         {latestBlock &&
