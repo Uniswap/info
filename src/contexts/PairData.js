@@ -25,7 +25,7 @@ import {
   splitQuery,
 } from '../utils'
 import { timeframeOptions } from '../constants'
-import { useLatestBlock } from './Application'
+import { useLatestBlocks } from './Application'
 
 const UPDATE = 'UPDATE'
 const UPDATE_PAIR_TXNS = 'UPDATE_PAIR_TXNS'
@@ -491,7 +491,7 @@ export function Updater() {
 export function useHourlyRateData(pairAddress, timeWindow) {
   const [state, { updateHourlyData }] = usePairDataContext()
   const chartData = state?.[pairAddress]?.hourlyData?.[timeWindow]
-  const latestBlock = useLatestBlock()
+  const [latestBlock] = useLatestBlocks()
 
   useEffect(() => {
     const currentTime = dayjs.utc()

@@ -25,7 +25,7 @@ import {
   splitQuery,
 } from '../utils'
 import { timeframeOptions } from '../constants'
-import { useLatestBlock } from './Application'
+import { useLatestBlocks } from './Application'
 
 const UPDATE = 'UPDATE'
 const UPDATE_TOKEN_TXNS = 'UPDATE_TOKEN_TXNS'
@@ -711,7 +711,7 @@ export function useTokenChartData(tokenAddress) {
 export function useTokenPriceData(tokenAddress, timeWindow, interval = 3600) {
   const [state, { updatePriceData }] = useTokenDataContext()
   const chartData = state?.[tokenAddress]?.[timeWindow]?.[interval]
-  const latestBlock = useLatestBlock()
+  const [latestBlock] = useLatestBlocks()
 
   useEffect(() => {
     const currentTime = dayjs.utc()

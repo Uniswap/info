@@ -17,7 +17,7 @@ import SideNav from './components/SideNav'
 import AccountLookup from './pages/AccountLookup'
 import { OVERVIEW_TOKEN_BLACKLIST, PAIR_BLACKLIST } from './constants'
 import LocalLoader from './components/LocalLoader'
-import { useLatestBlock } from './contexts/Application'
+import { useLatestBlocks } from './contexts/Application'
 
 const AppWrapper = styled.div`
   position: relative;
@@ -92,21 +92,28 @@ const LayoutWrapper = ({ children, savedOpen, setSavedOpen }) => {
   )
 }
 
+const BLOCK_DIFFERENCE_THRESHOLD = 30
+
 function App() {
   const [savedOpen, setSavedOpen] = useState(false)
 
   const globalData = useGlobalData()
   const globalChartData = useGlobalChartData()
-  const latestBlock = useLatestBlock()
+  const [latestBlock, headBlock] = useLatestBlocks()
+
+  // show warning
+  const showWarning = headBlock && latestBlock ? headBlock - latestBlock > BLOCK_DIFFERENCE_THRESHOLD : false
 
   return (
     <ApolloProvider client={client}>
       <AppWrapper>
-        <WarningWrapper>
-          <WarningBanner>
-            Warning: The data on this site has not been updated since 10/08/20, 10:26AM UTC. Please check back soon.
-          </WarningBanner>
-        </WarningWrapper>
+        {showWarning && (
+          <WarningWrapper>
+            <WarningBanner>
+              {`Warning: The data on this site has only synced to Ethereum block ${latestBlock} (out of ${headBlock}). Please check back soon.`}
+            </WarningBanner>
+          </WarningWrapper>
+        )}
         {latestBlock &&
         globalData &&
         Object.keys(globalData).length > 0 &&
