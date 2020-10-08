@@ -60,6 +60,21 @@ const Center = styled.div`
   background-color: ${({ theme }) => theme.onlyLight};
 `
 
+const WarningWrapper = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: center;
+`
+
+const WarningBanner = styled.div`
+  background-color: #ff6871;
+  padding: 1.5rem;
+  color: white;
+  width: 100%;
+  text-align: center;
+  font-weight: 500;
+`
+
 /**
  * Wrap the component with the header and sidebar pinned tab
  */
@@ -87,6 +102,11 @@ function App() {
   return (
     <ApolloProvider client={client}>
       <AppWrapper>
+        <WarningWrapper>
+          <WarningBanner>
+            Warning: The data on this site has not been updated since 10/09/20, 10:26AM UTC. Please check back soon.
+          </WarningBanner>
+        </WarningWrapper>
         {latestBlock &&
         globalData &&
         Object.keys(globalData).length > 0 &&
