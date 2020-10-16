@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react'
 import styled from 'styled-components'
-import { useUserTransactions, useUserPositions } from '../contexts/User'
+import { useUserTransactions, useUserPositions, useMiningPositions } from '../contexts/User'
 import TxnList from '../components/TxnList'
 import Panel from '../components/Panel'
 import { formattedNum } from '../utils'
@@ -9,6 +9,7 @@ import { AutoColumn } from '../components/Column'
 import UserChart from '../components/UserChart'
 import PairReturnsChart from '../components/PairReturnsChart'
 import PositionList from '../components/PositionList'
+import MiningPositionList from '../components/MiningPositionList'
 import { TYPE } from '../Theme'
 import { ButtonDropdown } from '../components/ButtonStyled'
 import { PageWrapper, ContentWrapper, StyledIcon } from '../components'
@@ -90,6 +91,7 @@ function AccountPage({ account }) {
   // get data for this account
   const transactions = useUserTransactions(account)
   const positions = useUserPositions(account)
+  const miningPositions = useMiningPositions(account)
 
   // get data for user stats
   const transactionCount = transactions?.swaps?.length + transactions?.burns?.length + transactions?.mints?.length
@@ -299,6 +301,16 @@ function AccountPage({ account }) {
             }}
           >
             <PositionList positions={positions} />
+          </Panel>
+          <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
+            Mining Pool
+          </TYPE.main>
+          <Panel
+            style={{
+              marginTop: '1.5rem'
+            }}
+          >
+            <MiningPositionList miningPositions={miningPositions} />
           </Panel>
           <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
             Transactions
