@@ -668,6 +668,30 @@ export const PAIR_DATA = (pairAddress, block) => {
   return gql(queryString)
 }
 
+export const MINING_POSITIONS = (account) => {
+  const queryString = `
+    query users {
+      user(id: "${account}") {
+        miningPosition {
+          id
+          user {
+            id
+          }
+          miningPool {
+              pair {
+                id
+                token0
+                token1
+              }
+          }
+          balance
+        }
+      }
+    }
+`
+  return gql(queryString)
+}
+
 export const PAIRS_BULK = gql`
   ${PairFields}
   query pairs($allPairs: [Bytes]!) {
