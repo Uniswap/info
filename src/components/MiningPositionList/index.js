@@ -135,16 +135,15 @@ function MiningPositionList({ miningPositions }) {
   }, [miningPositions])
 
   const ListItem = ({ miningPosition, index }) => {
-  const pairPercentage = miningPosition.balance / 1e18 / miningPosition.pairData.totalSupply
-  const valueUSD = miningPosition.pairData.reserveUSD
-  const valueFirstPair = miningPosition.pairData.reserve0
-  const valueSecondPair = miningPosition.pairData.reserve1
-  const firstPairName = miningPosition.miningPool.pair.token0
-  const secondPairName = miningPosition.miningPool.pair.token1
-  const pairAddress = miningPosition.miningPool.pair.id
-  const firstPairAddress = miningPosition.pairData.token0.id
-  const secondPairAddress = miningPosition.pairData.token1.id
-
+    const pairPercentage = miningPosition.balance / 1e18 / miningPosition.pairData.totalSupply
+    const valueUSD = miningPosition.pairData.reserveUSD
+    const valueFirstPair = miningPosition.pairData.reserve0
+    const valueSecondPair = miningPosition.pairData.reserve1
+    const firstPairName = miningPosition.miningPool.pair.token0
+    const secondPairName = miningPosition.miningPool.pair.token1
+    const pairAddress = miningPosition.miningPool.pair.id
+    const firstPairAddress = miningPosition.pairData.token0.id
+    const secondPairAddress = miningPosition.pairData.token1.id
 
     return (
       <DashGrid style={{ opacity: pairPercentage > 0 ? 1 : 0.6 }} focus={true}>
@@ -156,19 +155,12 @@ function MiningPositionList({ miningPositions }) {
           <AutoColumn gap="8px" justify="flex-start" style={{ marginLeft: '20px' }}>
             <CustomLink to={'/pair/' + pairAddress}>
               <TYPE.main style={{ whiteSpace: 'nowrap' }} to={'/pair/'}>
-                <FormattedName
-                  text={firstPairName + '-' + secondPairName}
-                  maxCharacters={below740 ? 10 : 18}
-                />
+                <FormattedName text={firstPairName + '-' + secondPairName} maxCharacters={below740 ? 10 : 18} />
               </TYPE.main>
             </CustomLink>
 
             <RowFixed gap="8px" justify="flex-start">
-              <Link
-                external
-                href={getMiningPoolLink(firstPairAddress)}
-                style={{ marginRight: '.5rem' }}
-              >
+              <Link external href={getMiningPoolLink(firstPairAddress)} style={{ marginRight: '.5rem' }}>
                 <ButtonLight style={{ padding: '4px 6px', borderRadius: '4px' }}>Stake</ButtonLight>
               </Link>
               {pairPercentage > 0 && (
@@ -184,9 +176,7 @@ function MiningPositionList({ miningPositions }) {
             <TYPE.main>{formattedNum(pairPercentage * valueUSD, true, true)}</TYPE.main>
             <AutoColumn gap="4px" justify="flex-end">
               <RowFixed>
-                <TYPE.small fontWeight={400}>
-                  {formattedNum(pairPercentage * parseFloat(valueFirstPair))}{' '}
-                </TYPE.small>
+                <TYPE.small fontWeight={400}>{formattedNum(pairPercentage * parseFloat(valueFirstPair))} </TYPE.small>
                 <FormattedName
                   text={firstPairName}
                   maxCharacters={below740 ? 10 : 18}
@@ -195,9 +185,7 @@ function MiningPositionList({ miningPositions }) {
                 />
               </RowFixed>
               <RowFixed>
-                <TYPE.small fontWeight={400}>
-                  {formattedNum(pairPercentage * parseFloat(valueSecondPair))}{' '}
-                </TYPE.small>
+                <TYPE.small fontWeight={400}>{formattedNum(pairPercentage * parseFloat(valueSecondPair))} </TYPE.small>
                 <FormattedName
                   text={secondPairName}
                   maxCharacters={below740 ? 10 : 18}
@@ -256,7 +244,6 @@ function MiningPositionList({ miningPositions }) {
             {below740 ? 'Value' : 'Liquidity'} {sortedColumn === SORT_FIELD.VALUE ? (!sortDirection ? '↑' : '↓') : ''}
           </ClickableText>
         </Flex>
-
       </DashGrid>
       <Divider />
       <List p={0}>{!miningPositionsSorted ? <LocalLoader /> : miningPositionsSorted}</List>

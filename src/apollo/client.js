@@ -26,7 +26,6 @@ export const v1Client = new ApolloClient({
   shouldBatch: true
 })
 
-
 export const stakingClient = new ApolloClient({
   link: new HttpLink({
     uri: 'https://api.thegraph.com/subgraphs/name/way2rach/talisman'

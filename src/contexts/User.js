@@ -6,7 +6,8 @@ import {
   USER_POSITIONS,
   USER_HISTORY,
   PAIR_DAY_DATA_BULK,
-  MINING_POSITIONS, PAIR_DATA
+  MINING_POSITIONS,
+  PAIR_DATA
 } from '../apollo/queries'
 import { useTimeframe, useStartTimestamp } from './Application'
 import dayjs from 'dayjs'
@@ -148,8 +149,11 @@ export default function Provider({ children }) {
   return (
     <UserContext.Provider
       value={useMemo(
-        () => [state, { updateTransactions, updatePositions, updateMiningPositions, updateUserSnapshots, updateUserPairReturns }],
-        [state, updateTransactions, updatePositions, updateMiningPositions,updateUserSnapshots, updateUserPairReturns]
+        () => [
+          state,
+          { updateTransactions, updatePositions, updateMiningPositions, updateUserSnapshots, updateUserPairReturns }
+        ],
+        [state, updateTransactions, updatePositions, updateMiningPositions, updateUserSnapshots, updateUserPairReturns]
       )}
     >
       {children}
@@ -486,7 +490,7 @@ export function useMiningPositions(account) {
   useEffect(() => {
     async function fetchData(account) {
       try {
-        let miningPositionData = [];
+        let miningPositionData = []
         let result = await stakingClient.query({
           query: MINING_POSITIONS(account),
           fetchPolicy: 'no-cache'
@@ -504,7 +508,7 @@ export function useMiningPositions(account) {
           if (!resultPair?.data?.pairs[0]) {
             return
           }
-          miningPosition.pairData = resultPair.data.pairs[0];
+          miningPosition.pairData = resultPair.data.pairs[0]
         }
         updateMiningPositions(account, miningPositionData)
       } catch (e) {
