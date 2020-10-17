@@ -310,7 +310,8 @@ function AccountPage({ account }) {
               marginTop: '1.5rem'
             }}
           >
-            <MiningPositionList miningPositions={miningPositions} />
+            {miningPositions && <MiningPositionList miningPositions={miningPositions} />}
+            {!miningPositions && <TYPE.main>No Staked Liquidity</TYPE.main>}
           </Panel>
           <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
             Transactions
