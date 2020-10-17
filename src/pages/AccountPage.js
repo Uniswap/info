@@ -303,7 +303,7 @@ function AccountPage({ account }) {
             <PositionList positions={positions} />
           </Panel>
           <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
-            Mining Pool
+            Liquidity Mining Pools
           </TYPE.main>
           <Panel
             style={{

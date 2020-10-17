@@ -161,7 +161,7 @@ function MiningPositionList({ miningPositions }) {
 
             <RowFixed gap="8px" justify="flex-start">
               <Link external href={getMiningPoolLink(firstPairAddress)} style={{ marginRight: '.5rem' }}>
-                <ButtonLight style={{ padding: '4px 6px', borderRadius: '4px' }}>Stake</ButtonLight>
+                <ButtonLight style={{ padding: '4px 6px', borderRadius: '4px' }}>Stake More</ButtonLight>
               </Link>
               {pairPercentage > 0 && (
                 <Link external href={getMiningPoolLink(firstPairAddress)}>
@@ -216,7 +216,7 @@ function MiningPositionList({ miningPositions }) {
       .map((miningPosition, index) => {
         return (
           <div key={index}>
-            <ListItem key={index} index={(page - 1) * 10 + index + 1} miningPosition={miningPosition} />
+            <ListItem key={index} index={(page - 1) * ITEMS_PER_PAGE + index + 1} miningPosition={miningPosition} />
             <Divider />
           </div>
         )
