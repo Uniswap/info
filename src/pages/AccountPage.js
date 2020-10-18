@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import { useUserTransactions, useUserPositions, useMiningPositions } from '../contexts/User'
 import TxnList from '../components/TxnList'
 import Panel from '../components/Panel'
-import { formattedNum } from '../utils'
+import { formattedNum, getUniswapAppLink } from '../utils'
 import Row, { AutoRow, RowFixed, RowBetween } from '../components/Row'
 import { AutoColumn } from '../components/Column'
 import UserChart from '../components/UserChart'
@@ -11,7 +11,7 @@ import PairReturnsChart from '../components/PairReturnsChart'
 import PositionList from '../components/PositionList'
 import MiningPositionList from '../components/MiningPositionList'
 import { TYPE } from '../Theme'
-import { ButtonDropdown } from '../components/ButtonStyled'
+import { ButtonDropdown, ButtonLight } from '../components/ButtonStyled'
 import { PageWrapper, ContentWrapper, StyledIcon } from '../components'
 import DoubleTokenLogo from '../components/DoubleLogo'
 import { Bookmark, Activity } from 'react-feather'
@@ -311,7 +311,14 @@ function AccountPage({ account }) {
             }}
           >
             {miningPositions && <MiningPositionList miningPositions={miningPositions} />}
-            {!miningPositions && <TYPE.main>No Staked Liquidity</TYPE.main>}
+            {!miningPositions && (
+              <AutoColumn gap="8px" justify="flex-start">
+                <TYPE.main>No Staked Liquidity.</TYPE.main>
+                <AutoRow gap="8px" justify="flex-start">
+                  <ButtonLight style={{ padding: '4px 6px', borderRadius: '4px' }}>Learn More</ButtonLight>{' '}
+                </AutoRow>{' '}
+              </AutoColumn>
+            )}
           </Panel>
           <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
             Transactions
