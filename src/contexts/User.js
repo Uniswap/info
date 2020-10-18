@@ -1,13 +1,12 @@
 import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect, useState } from 'react'
-import { usePairData } from './PairData'
+import { useAllPairData, usePairData } from './PairData'
 import { client, stakingClient } from '../apollo/client'
 import {
   USER_TRANSACTIONS,
   USER_POSITIONS,
   USER_HISTORY,
   PAIR_DAY_DATA_BULK,
-  MINING_POSITIONS,
-  PAIR_DATA
+  MINING_POSITIONS
 } from '../apollo/queries'
 import { useTimeframe, useStartTimestamp } from './Application'
 import dayjs from 'dayjs'
@@ -483,6 +482,7 @@ export function useUserPositions(account) {
 
 export function useMiningPositions(account) {
   const [state, { updateMiningPositions }] = useUserContext()
+  const allPairData = useAllPairData()
   const miningPositions = state?.[account]?.[MINING_POSITIONS_KEY]
 
   const snapshots = useUserSnapshots(account)
@@ -501,14 +501,7 @@ export function useMiningPositions(account) {
         miningPositionData = result.data.user.miningPosition
         for (const miningPosition of miningPositionData) {
           const pairAddress = miningPosition.miningPool.pair.id
-          let resultPair = await client.query({
-            query: PAIR_DATA(pairAddress),
-            fetchPolicy: 'cache-first'
-          })
-          if (!resultPair?.data?.pairs[0]) {
-            return
-          }
-          miningPosition.pairData = resultPair.data.pairs[0]
+          miningPosition.pairData = allPairData[pairAddress]
         }
         updateMiningPositions(account, miningPositionData)
       } catch (e) {
@@ -519,6 +512,6 @@ export function useMiningPositions(account) {
     if (!miningPositions && account && snapshots) {
       fetchData(account)
     }
-  }, [account, miningPositions, updateMiningPositions, snapshots])
+  }, [account, miningPositions, updateMiningPositions, snapshots, allPairData])
   return miningPositions
 }
