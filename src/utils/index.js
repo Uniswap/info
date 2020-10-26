@@ -273,7 +273,7 @@ export const isAddress = (value) => {
 }
 
 export const toK = (num) => {
-  return Numeral(num).format('0.[00]a')
+  return Numeral(num).format('0.[00]a').toLocaleString()
 }
 
 export const setThemeColor = (theme) => document.documentElement.style.setProperty('--c-token', theme || '#333333')
@@ -312,11 +312,14 @@ export const formatNumber = (num) => {
 }
 
 // using a currency library here in case we want to add more in future
-var priceFormatter = new Intl.NumberFormat('en-US', {
-  style: 'currency',
-  currency: 'USD',
-  minimumFractionDigits: 2,
-})
+export const priceFormatter = (digits) => {
+  return new Intl.NumberFormat([], {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: digits,
+    maximumFractionDigits: digits,
+  })
+}
 
 export const toSignificant = (number, significantDigits) => {
   Decimal.set({ precision: significantDigits + 1, rounding: Decimal.ROUND_UP })
@@ -347,20 +350,19 @@ export const formattedNum = (number, usd = false, acceptNegatives = false) => {
 
   if (num > 1000) {
     return usd
-      ? '$' + Number(parseFloat(num).toFixed(0)).toLocaleString()
-      : '' + Number(parseFloat(num).toFixed(0)).toLocaleString()
+      ? priceFormatter(0).format(num)
+      : Number(parseFloat(num).toFixed(0)).toLocaleString()
   }
 
   if (usd) {
     if (num < 0.1) {
-      return '$' + Number(parseFloat(num).toFixed(4))
+      return priceFormatter(4).format(num)
     } else {
-      let usdString = priceFormatter.format(num)
-      return '$' + usdString.slice(1, usdString.length)
+      return priceFormatter(2).format(num)
     }
   }
 
-  return Number(parseFloat(num).toFixed(5))
+  return Number(parseFloat(num).toFixed(5)).toLocaleString()
 }
 
 export function rawPercent(percentRaw) {
