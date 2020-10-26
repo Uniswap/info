@@ -273,7 +273,7 @@ export const isAddress = (value) => {
 }
 
 export const toK = (num) => {
-  return Numeral(num).format('0.[00]a').toLocaleString()
+  return Numeral(num).format('0.[00]a')
 }
 
 export const setThemeColor = (theme) => document.documentElement.style.setProperty('--c-token', theme || '#333333')
@@ -312,13 +312,14 @@ export const formatNumber = (num) => {
 }
 
 // using a currency library here in case we want to add more in future
-export const priceFormatter = (digits) => {
-  return new Intl.NumberFormat([], {
+export const formatDollarAmount = (num, digits) => {
+  const formatter = new Intl.NumberFormat([], {
     style: 'currency',
     currency: 'USD',
     minimumFractionDigits: digits,
     maximumFractionDigits: digits,
   })
+  return formatter.format(num)
 }
 
 export const toSignificant = (number, significantDigits) => {
@@ -350,15 +351,15 @@ export const formattedNum = (number, usd = false, acceptNegatives = false) => {
 
   if (num > 1000) {
     return usd
-      ? priceFormatter(0).format(num)
+      ? formatDollarAmount(num, 0)
       : Number(parseFloat(num).toFixed(0)).toLocaleString()
   }
 
   if (usd) {
     if (num < 0.1) {
-      return priceFormatter(4).format(num)
+      return formatDollarAmount(num, 4)
     } else {
-      return priceFormatter(2).format(num)
+      return formatDollarAmount(num, 2)
     }
   }
 
