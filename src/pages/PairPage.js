@@ -106,6 +106,21 @@ const WarningGrouping = styled.div`
   pointer-events: ${({ disabled }) => disabled && 'none'};
 `
 
+const AdvancedDataGroup = styled.div`
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin-top: 20px;
+  font-family: 'Inter var', sans-serif;
+`
+
+const AdvancedDataBox = styled.div`
+  width: calc(50% - 10px);
+  margin-bottom: 20px;
+  box-sizing: border-box;
+  box-shadow: none;
+`
+
 function PairPage({ pairAddress, history }) {
   const {
     token0,
@@ -118,7 +133,7 @@ function PairPage({ pairAddress, history }) {
     volumeChangeUSD,
     oneDayVolumeUntracked,
     volumeChangeUntracked,
-    liquidityChangeUSD,
+    liquidityChangeUSD
   } = usePairData(pairAddress)
 
   useEffect(() => {
@@ -188,12 +203,28 @@ function PairPage({ pairAddress, history }) {
 
   const [dismissed, markAsDismissed] = usePathDismissed(history.location.pathname)
 
+  // on page load
   useEffect(() => {
     window.scrollTo({
       behavior: 'smooth',
-      top: 0,
+      top: 0
     })
-  }, [])
+
+    window.itb_widget.init({
+      apiKey: '0hWAaw2SsW1YyaNKcBXEV6LIkRk4HZ0o23dP6AV9',
+      options: {
+        colors: {
+          series: ['#ff007a']
+        },
+        protocol: 'uniswap',
+        pairAddress: pairAddress,
+        granularity: 'hourly',
+        loader: false,
+        darkMode: true,
+        hideNavigator: true
+      }
+    })
+  }, [pairAddress])
 
   const [savedPairs, addPair] = useSavedPairs()
 
@@ -228,7 +259,7 @@ function PairPage({ pairAddress, history }) {
                   display: 'flex',
                   justifyContent: 'space-between',
                   flexWrap: 'wrap',
-                  width: '100%',
+                  width: '100%'
                 }}
               >
                 <RowFixed style={{ flexWrap: 'wrap', minWidth: '100px' }}>
@@ -256,7 +287,7 @@ function PairPage({ pairAddress, history }) {
                   ml={below900 ? '0' : '2.5rem'}
                   mt={below1080 && '1rem'}
                   style={{
-                    flexDirection: below1080 ? 'row-reverse' : 'initial',
+                    flexDirection: below1080 ? 'row-reverse' : 'initial'
                   }}
                 >
                   {!!!savedPairs[pairAddress] && !below1080 ? (
@@ -290,7 +321,7 @@ function PairPage({ pairAddress, history }) {
                 width: 'fit-content',
                 marginTop: below900 ? '1rem' : '0',
                 marginBottom: below900 ? '0' : '2rem',
-                flexWrap: 'wrap',
+                flexWrap: 'wrap'
               }}
             >
               <FixedPanel onClick={() => history.push(`/token/${token0?.id}`)}>
@@ -318,172 +349,195 @@ function PairPage({ pairAddress, history }) {
                 </RowFixed>
               </FixedPanel>
             </AutoRow>
-            <>
-              {!below1080 && <TYPE.main fontSize={'1.125rem'}>Pair Stats</TYPE.main>}
-              <PanelWrapper style={{ marginTop: '1.5rem' }}>
-                <Panel style={{ height: '100%' }}>
-                  <AutoColumn gap="20px">
-                    <RowBetween>
-                      <TYPE.main>Total Liquidity {!usingTracked ? '(Untracked)' : ''}</TYPE.main>
-                      <div />
-                    </RowBetween>
-                    <RowBetween align="flex-end">
-                      <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={500}>
-                        {liquidity}
-                      </TYPE.main>
-                      <TYPE.main>{liquidityChange}</TYPE.main>
-                    </RowBetween>
-                  </AutoColumn>
-                </Panel>
-                <Panel style={{ height: '100%' }}>
-                  <AutoColumn gap="20px">
-                    <RowBetween>
-                      <TYPE.main>Volume (24hrs) {usingUtVolume && '(Untracked)'}</TYPE.main>
-                      <div />
-                    </RowBetween>
-                    <RowBetween align="flex-end">
-                      <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={500}>
-                        {volume}
-                      </TYPE.main>
-                      <TYPE.main>{volumeChange}</TYPE.main>
-                    </RowBetween>
-                  </AutoColumn>
-                </Panel>
-                <Panel style={{ height: '100%' }}>
-                  <AutoColumn gap="20px">
-                    <RowBetween>
-                      <TYPE.main>Fees (24hrs)</TYPE.main>
-                      <div />
-                    </RowBetween>
-                    <RowBetween align="flex-end">
-                      <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={500}>
-                        {fees}
-                      </TYPE.main>
-                      <TYPE.main>{volumeChange}</TYPE.main>
-                    </RowBetween>
-                  </AutoColumn>
-                </Panel>
+            {!below1080 && <TYPE.main fontSize={'1.125rem'}>Pair Stats</TYPE.main>}
+            <PanelWrapper style={{ marginTop: '1.5rem' }}>
+              <Panel style={{ height: '100%' }}>
+                <AutoColumn gap="20px">
+                  <RowBetween>
+                    <TYPE.main>Total Liquidity {!usingTracked ? '(Untracked)' : ''}</TYPE.main>
+                    <div />
+                  </RowBetween>
+                  <RowBetween align="flex-end">
+                    <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={500}>
+                      {liquidity}
+                    </TYPE.main>
+                    <TYPE.main>{liquidityChange}</TYPE.main>
+                  </RowBetween>
+                </AutoColumn>
+              </Panel>
+              <Panel style={{ height: '100%' }}>
+                <AutoColumn gap="20px">
+                  <RowBetween>
+                    <TYPE.main>Volume (24hrs) {usingUtVolume && '(Untracked)'}</TYPE.main>
+                    <div />
+                  </RowBetween>
+                  <RowBetween align="flex-end">
+                    <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={500}>
+                      {volume}
+                    </TYPE.main>
+                    <TYPE.main>{volumeChange}</TYPE.main>
+                  </RowBetween>
+                </AutoColumn>
+              </Panel>
+              <Panel style={{ height: '100%' }}>
+                <AutoColumn gap="20px">
+                  <RowBetween>
+                    <TYPE.main>Fees (24hrs)</TYPE.main>
+                    <div />
+                  </RowBetween>
+                  <RowBetween align="flex-end">
+                    <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={500}>
+                      {fees}
+                    </TYPE.main>
+                    <TYPE.main>{volumeChange}</TYPE.main>
+                  </RowBetween>
+                </AutoColumn>
+              </Panel>
 
-                <Panel style={{ height: '100%' }}>
-                  <AutoColumn gap="20px">
-                    <RowBetween>
-                      <TYPE.main>Pooled Tokens</TYPE.main>
-                      <div />
-                    </RowBetween>
-                    <Hover onClick={() => history.push(`/token/${token0?.id}`)} fade={true}>
-                      <AutoRow gap="4px">
-                        <TokenLogo address={token0?.id} />
-                        <TYPE.main fontSize={20} lineHeight={1} fontWeight={500}>
-                          <RowFixed>
-                            {reserve0 ? formattedNum(reserve0) : ''}{' '}
-                            <FormattedName text={token0?.symbol ?? ''} maxCharacters={8} margin={true} />
-                          </RowFixed>
-                        </TYPE.main>
-                      </AutoRow>
-                    </Hover>
-                    <Hover onClick={() => history.push(`/token/${token1?.id}`)} fade={true}>
-                      <AutoRow gap="4px">
-                        <TokenLogo address={token1?.id} />
-                        <TYPE.main fontSize={20} lineHeight={1} fontWeight={500}>
-                          <RowFixed>
-                            {reserve1 ? formattedNum(reserve1) : ''}{' '}
-                            <FormattedName text={token1?.symbol ?? ''} maxCharacters={8} margin={true} />
-                          </RowFixed>
-                        </TYPE.main>
-                      </AutoRow>
-                    </Hover>
-                  </AutoColumn>
-                </Panel>
-                <Panel
-                  style={{
-                    gridColumn: below1080 ? '1' : '2/4',
-                    gridRow: below1080 ? '' : '1/5',
-                  }}
-                >
-                  <PairChart
-                    address={pairAddress}
-                    color={backgroundColor}
-                    base0={reserve1 / reserve0}
-                    base1={reserve0 / reserve1}
-                  />
-                </Panel>
-              </PanelWrapper>
-              <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
-                Transactions
-              </TYPE.main>{' '}
-              <Panel
-                style={{
-                  marginTop: '1.5rem',
-                }}
-              >
-                {transactions ? <TxnList transactions={transactions} /> : <Loader />}
+              <Panel style={{ height: '100%' }}>
+                <AutoColumn gap="20px">
+                  <RowBetween>
+                    <TYPE.main>Pooled Tokens</TYPE.main>
+                    <div />
+                  </RowBetween>
+                  <Hover onClick={() => history.push(`/token/${token0?.id}`)} fade={true}>
+                    <AutoRow gap="4px">
+                      <TokenLogo address={token0?.id} />
+                      <TYPE.main fontSize={20} lineHeight={1} fontWeight={500}>
+                        <RowFixed>
+                          {reserve0 ? formattedNum(reserve0) : ''}{' '}
+                          <FormattedName text={token0?.symbol ?? ''} maxCharacters={8} margin={true} />
+                        </RowFixed>
+                      </TYPE.main>
+                    </AutoRow>
+                  </Hover>
+                  <Hover onClick={() => history.push(`/token/${token1?.id}`)} fade={true}>
+                    <AutoRow gap="4px">
+                      <TokenLogo address={token1?.id} />
+                      <TYPE.main fontSize={20} lineHeight={1} fontWeight={500}>
+                        <RowFixed>
+                          {reserve1 ? formattedNum(reserve1) : ''}{' '}
+                          <FormattedName text={token1?.symbol ?? ''} maxCharacters={8} margin={true} />
+                        </RowFixed>
+                      </TYPE.main>
+                    </AutoRow>
+                  </Hover>
+                </AutoColumn>
               </Panel>
-              <RowBetween style={{ marginTop: '3rem' }}>
-                <TYPE.main fontSize={'1.125rem'}>Pair Information</TYPE.main>{' '}
-              </RowBetween>
               <Panel
-                rounded
                 style={{
-                  marginTop: '1.5rem',
+                  gridColumn: below1080 ? '1' : '2/4',
+                  gridRow: below1080 ? '' : '1/5'
                 }}
-                p={20}
               >
-                <TokenDetailsLayout>
-                  <Column>
-                    <TYPE.main>Pair Name</TYPE.main>
+                <PairChart
+                  address={pairAddress}
+                  color={backgroundColor}
+                  base0={reserve1 / reserve0}
+                  base1={reserve0 / reserve1}
+                />
+              </Panel>
+            </PanelWrapper>
+            <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
+              Transactions
+            </TYPE.main>{' '}
+            <Panel
+              style={{
+                marginTop: '1.5rem'
+              }}
+            >
+              {transactions ? <TxnList transactions={transactions} /> : <Loader />}
+            </Panel>
+            <RowBetween style={{ marginTop: '3rem' }}>
+              <TYPE.main fontSize={'1.125rem'}>Pair Information</TYPE.main>{' '}
+            </RowBetween>
+            <Panel
+              rounded
+              style={{
+                marginTop: '1.5rem'
+              }}
+              p={20}
+            >
+              <TokenDetailsLayout>
+                <Column>
+                  <TYPE.main>Pair Name</TYPE.main>
+                  <TYPE.main style={{ marginTop: '.5rem' }}>
+                    <RowFixed>
+                      <FormattedName text={token0?.symbol ?? ''} maxCharacters={8} />
+                      -
+                      <FormattedName text={token1?.symbol ?? ''} maxCharacters={8} />
+                    </RowFixed>
+                  </TYPE.main>
+                </Column>
+                <Column>
+                  <TYPE.main>Pair Address</TYPE.main>
+                  <AutoRow align="flex-end">
                     <TYPE.main style={{ marginTop: '.5rem' }}>
-                      <RowFixed>
-                        <FormattedName text={token0?.symbol ?? ''} maxCharacters={8} />
-                        -
-                        <FormattedName text={token1?.symbol ?? ''} maxCharacters={8} />
-                      </RowFixed>
+                      {pairAddress.slice(0, 6) + '...' + pairAddress.slice(38, 42)}
                     </TYPE.main>
-                  </Column>
-                  <Column>
-                    <TYPE.main>Pair Address</TYPE.main>
-                    <AutoRow align="flex-end">
-                      <TYPE.main style={{ marginTop: '.5rem' }}>
-                        {pairAddress.slice(0, 6) + '...' + pairAddress.slice(38, 42)}
-                      </TYPE.main>
-                      <CopyHelper toCopy={pairAddress} />
-                    </AutoRow>
-                  </Column>
-                  <Column>
-                    <TYPE.main>
-                      <RowFixed>
-                        <FormattedName text={token0?.symbol ?? ''} maxCharacters={8} />{' '}
-                        <span style={{ marginLeft: '4px' }}>Address</span>
-                      </RowFixed>
+                    <CopyHelper toCopy={pairAddress} />
+                  </AutoRow>
+                </Column>
+                <Column>
+                  <TYPE.main>
+                    <RowFixed>
+                      <FormattedName text={token0?.symbol ?? ''} maxCharacters={8} />{' '}
+                      <span style={{ marginLeft: '4px' }}>Address</span>
+                    </RowFixed>
+                  </TYPE.main>
+                  <AutoRow align="flex-end">
+                    <TYPE.main style={{ marginTop: '.5rem' }}>
+                      {token0 && token0.id.slice(0, 6) + '...' + token0.id.slice(38, 42)}
                     </TYPE.main>
-                    <AutoRow align="flex-end">
-                      <TYPE.main style={{ marginTop: '.5rem' }}>
-                        {token0 && token0.id.slice(0, 6) + '...' + token0.id.slice(38, 42)}
-                      </TYPE.main>
-                      <CopyHelper toCopy={token0?.id} />
-                    </AutoRow>
-                  </Column>
-                  <Column>
-                    <TYPE.main>
-                      <RowFixed>
-                        <FormattedName text={token1?.symbol ?? ''} maxCharacters={8} />{' '}
-                        <span style={{ marginLeft: '4px' }}>Address</span>
-                      </RowFixed>
+                    <CopyHelper toCopy={token0?.id} />
+                  </AutoRow>
+                </Column>
+                <Column>
+                  <TYPE.main>
+                    <RowFixed>
+                      <FormattedName text={token1?.symbol ?? ''} maxCharacters={8} />{' '}
+                      <span style={{ marginLeft: '4px' }}>Address</span>
+                    </RowFixed>
+                  </TYPE.main>
+                  <AutoRow align="flex-end">
+                    <TYPE.main style={{ marginTop: '.5rem' }} fontSize={16}>
+                      {token1 && token1.id.slice(0, 6) + '...' + token1.id.slice(38, 42)}
                     </TYPE.main>
-                    <AutoRow align="flex-end">
-                      <TYPE.main style={{ marginTop: '.5rem' }} fontSize={16}>
-                        {token1 && token1.id.slice(0, 6) + '...' + token1.id.slice(38, 42)}
-                      </TYPE.main>
-                      <CopyHelper toCopy={token1?.id} />
-                    </AutoRow>
-                  </Column>
-                  <ButtonLight color={backgroundColor}>
-                    <Link color={backgroundColor} external href={'https://etherscan.io/address/' + pairAddress}>
-                      View on Etherscan ↗
-                    </Link>
-                  </ButtonLight>
-                </TokenDetailsLayout>
-              </Panel>
-            </>
+                    <CopyHelper toCopy={token1?.id} />
+                  </AutoRow>
+                </Column>
+                <ButtonLight color={backgroundColor}>
+                  <Link color={backgroundColor} external href={'https://etherscan.io/address/' + pairAddress}>
+                    View on Etherscan ↗
+                  </Link>
+                </ButtonLight>
+              </TokenDetailsLayout>
+            </Panel>
+            <RowBetween style={{ marginTop: '3rem' }}>
+              <TYPE.main fontSize={'1.125rem'}>More Insights</TYPE.main>{' '}
+            </RowBetween>
+            <Panel
+              rounded
+              style={{
+                marginTop: '1.5rem'
+              }}
+              p={20}
+            >
+              <AdvancedDataGroup>
+                <AdvancedDataBox data-target="itb-widget" data-type="protocol-fees-per-liquidity" />
+                <AdvancedDataBox data-target="itb-widget" data-type="protocol-transactions-breakdown" />
+                <AdvancedDataBox
+                  data-target="itb-widget"
+                  data-type="protocol-liquidity-variation"
+                  data-options='{ "pairTokenIndex": 0 }'
+                />
+                <AdvancedDataBox
+                  data-target="itb-widget"
+                  data-type="protocol-liquidity-variation"
+                  data-options='{ "pairTokenIndex": 1 }'
+                />
+              </AdvancedDataGroup>
+            </Panel>
           </DashboardWrapper>
         </WarningGrouping>
       </ContentWrapperLarge>

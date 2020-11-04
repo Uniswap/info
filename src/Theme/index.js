@@ -72,7 +72,7 @@ const theme = (darkMode, color) => ({
   link: '#2172E5',
   blue: '2f80ed',
 
-  background: darkMode ? 'black' : `radial-gradient(50% 50% at 50% 50%, #ff007a30 0%, #fff 0%)`,
+  background: darkMode ? 'black' : `radial-gradient(50% 50% at 50% 50%, #ff007a30 0%, #fff 0%)`
 })
 
 const TextWrapper = styled(Text)`
@@ -106,7 +106,7 @@ export const TYPE = {
 
   pink(props) {
     return <TextWrapper fontWeight={props.faded ? 400 : 600} color={props.faded ? 'text1' : 'text1'} {...props} />
-  },
+  }
 }
 
 export const Hover = styled.div`
@@ -117,7 +117,7 @@ export const Hover = styled.div`
 
 export const Link = styled.a.attrs({
   target: '_blank',
-  rel: 'noopener noreferrer',
+  rel: 'noopener noreferrer'
 })`
   text-decoration: none;
   cursor: pointer;

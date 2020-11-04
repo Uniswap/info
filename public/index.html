@@ -15,6 +15,21 @@
     <script src="https://unpkg.com/react-dom/umd/react-dom.production.min.js" crossorigin></script>
 
     <script src="https://unpkg.com/react-bootstrap@next/dist/react-bootstrap.min.js" crossorigin></script>
+
+    <script>
+      window.itb_widget = window.itb_widget || {
+        init: t => {
+          const e = document.createElement('script')
+          ;(e.async = !0),
+            (e.type = 'text/javascript'),
+            (e.src = 'https://app.intotheblock.com/widget.js'),
+            (e.onload = function() {
+              window.itbWidgetInit(t)
+            }),
+            document.getElementsByTagName('head')[0].appendChild(e)
+        }
+      }
+    </script>
     <!--
       Notice the use of %PUBLIC_URL% in the tags above.
       It will be replaced with the URL of the `public` folder during the build.
