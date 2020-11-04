@@ -11,7 +11,7 @@ import PairReturnsChart from '../components/PairReturnsChart'
 import PositionList from '../components/PositionList'
 import MiningPositionList from '../components/MiningPositionList'
 import { TYPE } from '../Theme'
-import { ButtonDropdown } from '../components/ButtonStyled'
+import { ButtonDropdown, ButtonLight } from '../components/ButtonStyled'
 import { PageWrapper, ContentWrapper, StyledIcon } from '../components'
 import DoubleTokenLogo from '../components/DoubleLogo'
 import { Bookmark, Activity } from 'react-feather'
@@ -303,14 +303,22 @@ function AccountPage({ account }) {
             <PositionList positions={positions} />
           </Panel>
           <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
-            Mining Pool
+            Liquidity Mining Pools
           </TYPE.main>
           <Panel
             style={{
               marginTop: '1.5rem'
             }}
           >
-            <MiningPositionList miningPositions={miningPositions} />
+            {miningPositions && <MiningPositionList miningPositions={miningPositions} />}
+            {!miningPositions && (
+              <AutoColumn gap="8px" justify="flex-start">
+                <TYPE.main>No Staked Liquidity.</TYPE.main>
+                <AutoRow gap="8px" justify="flex-start">
+                  <ButtonLight style={{ padding: '4px 6px', borderRadius: '4px' }}>Learn More</ButtonLight>{' '}
+                </AutoRow>{' '}
+              </AutoColumn>
+            )}
           </Panel>
           <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
             Transactions

@@ -9,7 +9,7 @@ import Link, { CustomLink } from '../Link'
 import { Divider } from '..'
 import DoubleTokenLogo from '../DoubleLogo'
 import { withRouter } from 'react-router-dom'
-import { formattedNum, getMiningPoolLink } from '../../utils'
+import { formattedNum, getUniswapAppLink } from '../../utils'
 import { AutoColumn } from '../Column'
 import { RowFixed } from '../Row'
 import { ButtonLight } from '../ButtonStyled'
@@ -135,7 +135,7 @@ function MiningPositionList({ miningPositions }) {
   }, [miningPositions])
 
   const ListItem = ({ miningPosition, index }) => {
-    const pairPercentage = miningPosition.balance / 1e18 / miningPosition.pairData.totalSupply
+    const pairPercentage = miningPosition.balance / miningPosition.pairData.totalSupply
     const valueUSD = miningPosition.pairData.reserveUSD
     const valueFirstPair = miningPosition.pairData.reserve0
     const valueSecondPair = miningPosition.pairData.reserve1
@@ -158,13 +158,12 @@ function MiningPositionList({ miningPositions }) {
                 <FormattedName text={firstPairName + '-' + secondPairName} maxCharacters={below740 ? 10 : 18} />
               </TYPE.main>
             </CustomLink>
-
             <RowFixed gap="8px" justify="flex-start">
-              <Link external href={getMiningPoolLink(firstPairAddress)} style={{ marginRight: '.5rem' }}>
-                <ButtonLight style={{ padding: '4px 6px', borderRadius: '4px' }}>Stake</ButtonLight>
+              <Link external href={getUniswapAppLink(firstPairAddress)} style={{ marginRight: '.5rem' }}>
+                <ButtonLight style={{ padding: '4px 6px', borderRadius: '4px' }}>Stake More</ButtonLight>
               </Link>
               {pairPercentage > 0 && (
-                <Link external href={getMiningPoolLink(firstPairAddress)}>
+                <Link external href={getUniswapAppLink(firstPairAddress)}>
                   <ButtonLight style={{ padding: '4px 6px', borderRadius: '4px' }}>Withdraw</ButtonLight>
                 </Link>
               )}
@@ -206,8 +205,8 @@ function MiningPositionList({ miningPositions }) {
 
       .sort((p0, p1) => {
         if (sortedColumn === SORT_FIELD.VALUE) {
-          const bal0 = (p0.balance / 1e18 / p0.pairData.totalSupply) * p0.pairData.reserveUSD
-          const bal1 = (p0.balance / 1e18 / p0.pairData.totalSupply) * p1.pairData.reserveUSD
+          const bal0 = (p0.balance / p0.pairData.totalSupply) * p0.pairData.reserveUSD
+          const bal1 = (p0.balance / p0.pairData.totalSupply) * p1.pairData.reserveUSD
           return bal0 > bal1 ? (sortDirection ? -1 : 1) : sortDirection ? 1 : -1
         }
         return 1
@@ -216,7 +215,7 @@ function MiningPositionList({ miningPositions }) {
       .map((miningPosition, index) => {
         return (
           <div key={index}>
-            <ListItem key={index} index={(page - 1) * 10 + index + 1} miningPosition={miningPosition} />
+            <ListItem key={index} index={(page - 1) * ITEMS_PER_PAGE + index + 1} miningPosition={miningPosition} />
             <Divider />
           </div>
         )
