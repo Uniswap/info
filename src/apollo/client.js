@@ -28,10 +28,10 @@ export const v1Client = new ApolloClient({
 
 export const stakingClient = new ApolloClient({
   link: new HttpLink({
-    uri: 'https://api.thegraph.com/subgraphs/name/way2rach/talisman'
+    uri: 'https://api.thegraph.com/subgraphs/name/way2rach/talisman',
   }),
   cache: new InMemoryCache(),
-  shouldBatch: true
+  shouldBatch: true,
 })
 
 export const blockClient = new ApolloClient({

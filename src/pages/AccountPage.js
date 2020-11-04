@@ -307,7 +307,7 @@ function AccountPage({ account }) {
           </TYPE.main>
           <Panel
             style={{
-              marginTop: '1.5rem'
+              marginTop: '1.5rem',
             }}
           >
             {miningPositions && <MiningPositionList miningPositions={miningPositions} />}

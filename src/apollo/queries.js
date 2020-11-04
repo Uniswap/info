@@ -669,7 +669,7 @@ export const PAIR_DATA = (pairAddress, block) => {
   return gql(queryString)
 }
 
-export const MINING_POSITIONS = account => {
+export const MINING_POSITIONS = (account) => {
   const queryString = `
     query users {
       user(id: "${account}") {
