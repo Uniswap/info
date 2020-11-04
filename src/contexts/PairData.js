@@ -26,6 +26,7 @@ import {
 } from '../utils'
 import { timeframeOptions } from '../constants'
 import { useLatestBlocks } from './Application'
+import { updateNameData } from '../utils/data'
 
 const UPDATE = 'UPDATE'
 const UPDATE_PAIR_TXNS = 'UPDATE_PAIR_TXNS'
@@ -289,14 +290,9 @@ function parseData(data, oneDayData, twoDayData, oneWeekData, ethPrice, oneDayBl
   if (!oneWeekData && data) {
     data.oneWeekVolumeUSD = parseFloat(data.volumeUSD)
   }
-  if (data?.token0?.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
-    data.token0.name = 'Ether (Wrapped)'
-    data.token0.symbol = 'ETH'
-  }
-  if (data?.token1?.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
-    data.token1.name = 'Ether (Wrapped)'
-    data.token1.symbol = 'ETH'
-  }
+
+  // format incorrect names
+  updateNameData(data)
 
   return data
 }

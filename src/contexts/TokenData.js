@@ -26,6 +26,7 @@ import {
 } from '../utils'
 import { timeframeOptions } from '../constants'
 import { useLatestBlocks } from './Application'
+import { updateNameData } from '../utils/data'
 
 const UPDATE = 'UPDATE'
 const UPDATE_TOKEN_TXNS = 'UPDATE_TOKEN_TXNS'
@@ -287,10 +288,10 @@ const getTopTokens = async (ethPrice, ethPriceOld) => {
             data.oneDayTxns = data.txCount
           }
 
-          if (data.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
-            data.name = 'Ether (Wrapped)'
-            data.symbol = 'ETH'
-          }
+          // update name data for
+          updateNameData({
+            token0: data,
+          })
 
           // HOTFIX for Aave
           if (data.id === '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9') {
@@ -415,11 +416,10 @@ const getTokenData = async (address, ethPrice, ethPriceOld) => {
       data.oneDayTxns = data.txCount
     }
 
-    // fix for WETH
-    if (data.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
-      data.name = 'ETH (Wrapped)'
-      data.symbol = 'ETH'
-    }
+    // update name data for
+    updateNameData({
+      token0: data,
+    })
 
     // HOTFIX for Aave
     if (data.id === '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9') {
