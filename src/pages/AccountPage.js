@@ -127,7 +127,7 @@ function AccountPage({ account }) {
 
   const dynamicPositions = activePosition ? [activePosition] : positions
 
-  const aggregateFees = dynamicPositions?.reduce(function(total, position) {
+  const aggregateFees = dynamicPositions?.reduce(function (total, position) {
     return total + position.fees.sum
   }, 0)
 
@@ -146,7 +146,7 @@ function AccountPage({ account }) {
   useEffect(() => {
     window.scrollTo({
       behavior: 'smooth',
-      top: 0
+      top: 0,
     })
   }, [])
 
@@ -297,7 +297,7 @@ function AccountPage({ account }) {
           </TYPE.main>{' '}
           <Panel
             style={{
-              marginTop: '1.5rem'
+              marginTop: '1.5rem',
             }}
           >
             <PositionList positions={positions} />
@@ -317,7 +317,7 @@ function AccountPage({ account }) {
           </TYPE.main>{' '}
           <Panel
             style={{
-              marginTop: '1.5rem'
+              marginTop: '1.5rem',
             }}
           >
             <TxnList transactions={transactions} />
@@ -327,7 +327,7 @@ function AccountPage({ account }) {
           </TYPE.main>{' '}
           <Panel
             style={{
-              marginTop: '1.5rem'
+              marginTop: '1.5rem',
             }}
           >
             <AutoRow gap="20px">

@@ -17,7 +17,7 @@ import SideNav from './components/SideNav'
 import AccountLookup from './pages/AccountLookup'
 import { OVERVIEW_TOKEN_BLACKLIST, PAIR_BLACKLIST } from './constants'
 import LocalLoader from './components/LocalLoader'
-import { useLatestBlock } from './contexts/Application'
+import { useLatestBlocks } from './contexts/Application'
 
 const AppWrapper = styled.div`
   position: relative;
@@ -46,7 +46,7 @@ const Right = styled.div`
   z-index: 99;
   width: ${({ open }) => (open ? '220px' : '64px')};
   height: ${({ open }) => (open ? 'fit-content' : '64px')};
-  overflow: scroll;
+  overflow: auto;
   background-color: ${({ theme }) => theme.bg1};
   @media screen and (max-width: 1400px) {
     display: none;
@@ -58,6 +58,21 @@ const Center = styled.div`
   z-index: 9999;
   transition: width 0.25s ease;
   background-color: ${({ theme }) => theme.onlyLight};
+`
+
+const WarningWrapper = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: center;
+`
+
+const WarningBanner = styled.div`
+  background-color: #ff6871;
+  padding: 1.5rem;
+  color: white;
+  width: 100%;
+  text-align: center;
+  font-weight: 500;
 `
 
 /**
@@ -77,16 +92,28 @@ const LayoutWrapper = ({ children, savedOpen, setSavedOpen }) => {
   )
 }
 
+const BLOCK_DIFFERENCE_THRESHOLD = 30
+
 function App() {
   const [savedOpen, setSavedOpen] = useState(false)
 
   const globalData = useGlobalData()
   const globalChartData = useGlobalChartData()
-  const latestBlock = useLatestBlock()
+  const [latestBlock, headBlock] = useLatestBlocks()
+
+  // show warning
+  const showWarning = headBlock && latestBlock ? headBlock - latestBlock > BLOCK_DIFFERENCE_THRESHOLD : false
 
   return (
     <ApolloProvider client={client}>
       <AppWrapper>
+        {showWarning && (
+          <WarningWrapper>
+            <WarningBanner>
+              {`Warning: The data on this site has only synced to Ethereum block ${latestBlock} (out of ${headBlock}). Please check back soon.`}
+            </WarningBanner>
+          </WarningWrapper>
+        )}
         {latestBlock &&
         globalData &&
         Object.keys(globalData).length > 0 &&

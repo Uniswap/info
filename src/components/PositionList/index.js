@@ -29,7 +29,7 @@ const PageButtons = styled.div`
 
 const Arrow = styled.div`
   color: ${({ theme }) => theme.primary1};
-  opacity: ${props => (props.faded ? 0.3 : 1)};
+  opacity: ${(props) => (props.faded ? 0.3 : 1)};
   padding: 0 20px;
   user-select: none;
   :hover {
@@ -104,7 +104,7 @@ const DataText = styled(Flex)`
 
 const SORT_FIELD = {
   VALUE: 'VALUE',
-  UNISWAP_RETURN: 'UNISWAP_RETURN'
+  UNISWAP_RETURN: 'UNISWAP_RETURN',
 }
 
 function PositionList({ positions }) {
@@ -297,7 +297,7 @@ function PositionList({ positions }) {
         <Flex alignItems="center" justifyContent="flexEnd">
           <ClickableText
             area="uniswap"
-            onClick={e => {
+            onClick={(e) => {
               setSortedColumn(SORT_FIELD.VALUE)
               setSortDirection(sortedColumn !== SORT_FIELD.VALUE ? true : !sortDirection)
             }}

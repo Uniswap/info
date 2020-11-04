@@ -5,7 +5,7 @@ import { getShareValueOverTime } from '.'
 
 export const priceOverrides = [
   '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', // USDC
-  '0x6b175474e89094c44da98b954eedeac495271d0f' // DAI
+  '0x6b175474e89094c44da98b954eedeac495271d0f', // DAI
 ]
 
 interface ReturnMetrics {
@@ -58,8 +58,8 @@ async function getPrincipalForUserPerPair(user: string, pairAddress: string) {
     query: USER_MINTS_BUNRS_PER_PAIR,
     variables: {
       user,
-      pair: pairAddress
-    }
+      pair: pairAddress,
+    },
   })
   for (const index in results.data.mints) {
     const mint = results.data.mints[index]
@@ -152,7 +152,7 @@ export function getMetricsForPositionWindow(positionT0: Position, positionT1: Po
     netReturn: netValueT1 - netValueT0,
     uniswapReturn: uniswap_return,
     impLoss: imp_loss_usd,
-    fees: difference_fees_usd
+    fees: difference_fees_usd,
   }
 }
 
@@ -170,7 +170,7 @@ export async function getHistoricalPairReturns(startDateTimestamp, currentPairDa
   }
   let dayIndex: number = Math.round(startDateTimestamp / 86400) // get unique day bucket unix
   const currentDayIndex: number = Math.round(dayjs.utc().unix() / 86400)
-  let sortedPositions = pairSnapshots.sort((a, b) => {
+  const sortedPositions = pairSnapshots.sort((a, b) => {
     return parseInt(a.timestamp) > parseInt(b.timestamp) ? 1 : -1
   })
   if (sortedPositions[0].timestamp > startDateTimestamp) {
@@ -188,7 +188,7 @@ export async function getHistoricalPairReturns(startDateTimestamp, currentPairDa
 
   const shareValues = await getShareValueOverTime(currentPairData.id, dayTimestamps)
   const shareValuesFormatted = {}
-  shareValues?.map(share => {
+  shareValues?.map((share) => {
     shareValuesFormatted[share.timestamp] = share
   })
 
@@ -204,7 +204,7 @@ export async function getHistoricalPairReturns(startDateTimestamp, currentPairDa
     const timestampCeiling = dayTimestamp + 86400
 
     // for each change in position value that day, create a window and update
-    const dailyChanges = pairSnapshots.filter(snapshot => {
+    const dailyChanges = pairSnapshots.filter((snapshot) => {
       return snapshot.timestamp < timestampCeiling && snapshot.timestamp > dayTimestamp
     })
     for (let i = 0; i < dailyChanges.length; i++) {
@@ -225,7 +225,7 @@ export async function getHistoricalPairReturns(startDateTimestamp, currentPairDa
         reserve1: currentPairData.reserve1,
         reserveUSD: currentPairData.reserveUSD,
         token0PriceUSD: currentPairData.token0.derivedETH * currentETHPrice,
-        token1PriceUSD: currentPairData.token1.derivedETH * currentETHPrice
+        token1PriceUSD: currentPairData.token1.derivedETH * currentETHPrice,
       }
     }
 
@@ -241,7 +241,7 @@ export async function getHistoricalPairReturns(startDateTimestamp, currentPairDa
       formattedHistory.push({
         date: dayTimestamp,
         usdValue: currentLiquidityValue,
-        fees: localFees
+        fees: localFees,
       })
     }
   }
@@ -263,7 +263,7 @@ export async function getLPReturnsOnPair(user: string, pair, ethPrice: number, s
   let uniswapReturn = 0
   let fees = 0
 
-  snapshots = snapshots.filter(entry => {
+  snapshots = snapshots.filter((entry) => {
     return entry.pair.id === pair.id
   })
 
@@ -276,15 +276,15 @@ export async function getLPReturnsOnPair(user: string, pair, ethPrice: number, s
     reserve1: pair.reserve1,
     reserveUSD: pair.reserveUSD,
     token0PriceUSD: pair.token0.derivedETH * ethPrice,
-    token1PriceUSD: pair.token1.derivedETH * ethPrice
+    token1PriceUSD: pair.token1.derivedETH * ethPrice,
   }
 
   for (const index in snapshots) {
     // get positions at both bounds of the window
-    let positionT0 = snapshots[index]
-    let positionT1 = parseInt(index) === snapshots.length - 1 ? currentPosition : snapshots[parseInt(index) + 1]
+    const positionT0 = snapshots[index]
+    const positionT1 = parseInt(index) === snapshots.length - 1 ? currentPosition : snapshots[parseInt(index) + 1]
 
-    let results = getMetricsForPositionWindow(positionT0, positionT1)
+    const results = getMetricsForPositionWindow(positionT0, positionT1)
     hodlReturn = hodlReturn + results.hodleReturn
     netReturn = netReturn + results.netReturn
     uniswapReturn = uniswapReturn + results.uniswapReturn
@@ -294,13 +294,13 @@ export async function getLPReturnsOnPair(user: string, pair, ethPrice: number, s
   return {
     principal,
     net: {
-      return: netReturn
+      return: netReturn,
     },
     uniswap: {
-      return: uniswapReturn
+      return: uniswapReturn,
     },
     fees: {
-      sum: fees
-    }
+      sum: fees,
+    },
   }
 }

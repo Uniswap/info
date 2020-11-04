@@ -5,7 +5,7 @@ import styled from 'styled-components'
 import Select from 'react-select'
 
 const selectStyles = {
-  control: styles => ({
+  control: (styles) => ({
     ...styles,
     padding: '1rem',
     border: 'none',
@@ -14,23 +14,23 @@ const selectStyles = {
     boxShadow: 'none',
     borderRadius: 0,
     ':hover': {
-      borderColor: '#e1e1e1'
-    }
+      borderColor: '#e1e1e1',
+    },
   }),
-  valueContainer: styles => ({
+  valueContainer: (styles) => ({
     ...styles,
-    padding: 0
+    padding: 0,
   }),
-  menu: () => null
+  menu: () => null,
 }
 
 export default class Popout extends Component {
   state = { isOpen: false, value: undefined }
   toggleOpen = () => {
-    this.setState(state => ({ isOpen: !state.isOpen }))
+    this.setState((state) => ({ isOpen: !state.isOpen }))
   }
 
-  onSelectChange = value => {
+  onSelectChange = (value) => {
     this.toggleOpen()
     this.setState({ value })
   }
@@ -50,7 +50,7 @@ export default class Popout extends Component {
             style={{
               whiteSpace: 'nowrap',
               overflow: 'hidden',
-              textOverflow: 'ellipsis'
+              textOverflow: 'ellipsis',
             }}
           >
             {value ? value.label : 'Select...'}
@@ -105,9 +105,9 @@ const Wrapper = styled.div`
   transition: 0.25s ease-in-out;
 `
 
-const Menu = props => <Wrapper {...props} />
+const Menu = (props) => <Wrapper {...props} />
 
-const Blanket = props => (
+const Blanket = (props) => (
   <div
     style={{
       bottom: 0,
@@ -116,7 +116,7 @@ const Blanket = props => (
       right: 0,
       backgroundColor: 'rgba(0,0,0,0.6)',
       position: 'fixed',
-      zIndex: 1
+      zIndex: 1,
     }}
     {...props}
   />

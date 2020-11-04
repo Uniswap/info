@@ -118,7 +118,7 @@ function PairPage({ pairAddress, history }) {
     volumeChangeUSD,
     oneDayVolumeUntracked,
     volumeChangeUntracked,
-    liquidityChangeUSD
+    liquidityChangeUSD,
   } = usePairData(pairAddress)
 
   useEffect(() => {
@@ -191,7 +191,7 @@ function PairPage({ pairAddress, history }) {
   useEffect(() => {
     window.scrollTo({
       behavior: 'smooth',
-      top: 0
+      top: 0,
     })
   }, [])
 
@@ -223,7 +223,14 @@ function PairPage({ pairAddress, history }) {
         >
           <DashboardWrapper>
             <AutoColumn gap="40px" style={{ marginBottom: '1.5rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', width: '100%' }}>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  flexWrap: 'wrap',
+                  width: '100%',
+                }}
+              >
                 <RowFixed style={{ flexWrap: 'wrap', minWidth: '100px' }}>
                   <RowFixed>
                     {token0 && token1 && (
@@ -248,7 +255,9 @@ function PairPage({ pairAddress, history }) {
                 <RowFixed
                   ml={below900 ? '0' : '2.5rem'}
                   mt={below1080 && '1rem'}
-                  style={{ flexDirection: below1080 ? 'row-reverse' : 'initial' }}
+                  style={{
+                    flexDirection: below1080 ? 'row-reverse' : 'initial',
+                  }}
                 >
                   {!!!savedPairs[pairAddress] && !below1080 ? (
                     <Hover onClick={() => addPair(pairAddress, token0.id, token1.id, token0.symbol, token1.symbol)}>
@@ -281,7 +290,7 @@ function PairPage({ pairAddress, history }) {
                 width: 'fit-content',
                 marginTop: below900 ? '1rem' : '0',
                 marginBottom: below900 ? '0' : '2rem',
-                flexWrap: 'wrap'
+                flexWrap: 'wrap',
               }}
             >
               <FixedPanel onClick={() => history.push(`/token/${token0?.id}`)}>
@@ -385,7 +394,12 @@ function PairPage({ pairAddress, history }) {
                     </Hover>
                   </AutoColumn>
                 </Panel>
-                <Panel style={{ gridColumn: below1080 ? '1' : '2/4', gridRow: below1080 ? '' : '1/5' }}>
+                <Panel
+                  style={{
+                    gridColumn: below1080 ? '1' : '2/4',
+                    gridRow: below1080 ? '' : '1/5',
+                  }}
+                >
                   <PairChart
                     address={pairAddress}
                     color={backgroundColor}
@@ -399,7 +413,7 @@ function PairPage({ pairAddress, history }) {
               </TYPE.main>{' '}
               <Panel
                 style={{
-                  marginTop: '1.5rem'
+                  marginTop: '1.5rem',
                 }}
               >
                 {transactions ? <TxnList transactions={transactions} /> : <Loader />}
@@ -410,7 +424,7 @@ function PairPage({ pairAddress, history }) {
               <Panel
                 rounded
                 style={{
-                  marginTop: '1.5rem'
+                  marginTop: '1.5rem',
                 }}
                 p={20}
               >
@@ -419,7 +433,8 @@ function PairPage({ pairAddress, history }) {
                     <TYPE.main>Pair Name</TYPE.main>
                     <TYPE.main style={{ marginTop: '.5rem' }}>
                       <RowFixed>
-                        <FormattedName text={token0?.symbol ?? ''} maxCharacters={8} />-
+                        <FormattedName text={token0?.symbol ?? ''} maxCharacters={8} />
+                        -
                         <FormattedName text={token1?.symbol ?? ''} maxCharacters={8} />
                       </RowFixed>
                     </TYPE.main>

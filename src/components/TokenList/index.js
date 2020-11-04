@@ -28,7 +28,7 @@ const PageButtons = styled.div`
 
 const Arrow = styled.div`
   color: ${({ theme }) => theme.primary1};
-  opacity: ${props => (props.faded ? 0.3 : 1)};
+  opacity: ${(props) => (props.faded ? 0.3 : 1)};
   padding: 0 20px;
   user-select: none;
   :hover {
@@ -117,7 +117,7 @@ const SORT_FIELD = {
   SYMBOL: 'symbol',
   NAME: 'name',
   PRICE: 'priceUSD',
-  CHANGE: 'priceChangeUSD'
+  CHANGE: 'priceChangeUSD',
 }
 
 // @TODO rework into virtualized list
@@ -143,10 +143,10 @@ function TopTokenList({ tokens, itemMax = 10 }) {
     return (
       tokens &&
       Object.keys(tokens)
-        .filter(key => {
+        .filter((key) => {
           return !OVERVIEW_TOKEN_BLACKLIST.includes(key)
         })
-        .map(key => tokens[key])
+        .map((key) => tokens[key])
     )
   }, [tokens])
 
@@ -218,7 +218,7 @@ function TopTokenList({ tokens, itemMax = 10 }) {
             color="text"
             area="name"
             fontWeight="500"
-            onClick={e => {
+            onClick={(e) => {
               setSortedColumn(SORT_FIELD.NAME)
               setSortDirection(sortedColumn !== SORT_FIELD.NAMe ? true : !sortDirection)
             }}
@@ -230,7 +230,7 @@ function TopTokenList({ tokens, itemMax = 10 }) {
           <Flex alignItems="center">
             <ClickableText
               area="symbol"
-              onClick={e => {
+              onClick={(e) => {
                 setSortedColumn(SORT_FIELD.SYMBOL)
                 setSortDirection(sortedColumn !== SORT_FIELD.SYMBOL ? true : !sortDirection)
               }}
@@ -243,7 +243,7 @@ function TopTokenList({ tokens, itemMax = 10 }) {
         <Flex alignItems="center">
           <ClickableText
             area="liq"
-            onClick={e => {
+            onClick={(e) => {
               setSortedColumn(SORT_FIELD.LIQ)
               setSortDirection(sortedColumn !== SORT_FIELD.LIQ ? true : !sortDirection)
             }}
@@ -254,7 +254,7 @@ function TopTokenList({ tokens, itemMax = 10 }) {
         <Flex alignItems="center">
           <ClickableText
             area="vol"
-            onClick={e => {
+            onClick={(e) => {
               setSortedColumn(SORT_FIELD.VOL)
               setSortDirection(sortedColumn !== SORT_FIELD.VOL ? true : !sortDirection)
             }}
@@ -267,7 +267,7 @@ function TopTokenList({ tokens, itemMax = 10 }) {
           <Flex alignItems="center">
             <ClickableText
               area="price"
-              onClick={e => {
+              onClick={(e) => {
                 setSortedColumn(SORT_FIELD.PRICE)
                 setSortDirection(sortedColumn !== SORT_FIELD.PRICE ? true : !sortDirection)
               }}
@@ -280,7 +280,7 @@ function TopTokenList({ tokens, itemMax = 10 }) {
           <Flex alignItems="center">
             <ClickableText
               area="change"
-              onClick={e => {
+              onClick={(e) => {
                 setSortedColumn(SORT_FIELD.CHANGE)
                 setSortDirection(sortedColumn !== SORT_FIELD.CHANGE ? true : !sortDirection)
               }}

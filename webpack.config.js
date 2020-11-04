@@ -3,8 +3,8 @@ module.exports = {
     loaders: [
       {
         test: /\.(png|jpg|gif)$/,
-        loader: 'url?limit=25000'
-      }
-    ]
-  }
+        loader: 'url?limit=25000',
+      },
+    ],
+  },
 }

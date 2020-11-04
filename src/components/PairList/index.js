@@ -27,7 +27,7 @@ const PageButtons = styled.div`
 
 const Arrow = styled.div`
   color: ${({ theme }) => theme.primary1};
-  opacity: ${props => (props.faded ? 0.3 : 1)};
+  opacity: ${(props) => (props.faded ? 0.3 : 1)};
   padding: 0 20px;
   user-select: none;
   :hover {
@@ -105,14 +105,14 @@ const SORT_FIELD = {
   VOL: 1,
   VOL_7DAYS: 3,
   FEES: 4,
-  APY: 5
+  APY: 5,
 }
 
 const FIELD_TO_VALUE = {
   [SORT_FIELD.LIQ]: 'trackedReserveUSD', // sort with tracked volume only
   [SORT_FIELD.VOL]: 'oneDayVolumeUSD',
   [SORT_FIELD.VOL_7DAYS]: 'oneWeekVolumeUSD',
-  [SORT_FIELD.FEES]: 'oneDayVolumeUSD'
+  [SORT_FIELD.FEES]: 'oneDayVolumeUSD',
 }
 
 function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
@@ -223,7 +223,7 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
         <Flex alignItems="center" justifyContent="flexEnd">
           <ClickableText
             area="liq"
-            onClick={e => {
+            onClick={(e) => {
               setSortedColumn(SORT_FIELD.LIQ)
               setSortDirection(sortedColumn !== SORT_FIELD.LIQ ? true : !sortDirection)
             }}
@@ -234,7 +234,7 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
         <Flex alignItems="center">
           <ClickableText
             area="vol"
-            onClick={e => {
+            onClick={(e) => {
               setSortedColumn(SORT_FIELD.VOL)
               setSortDirection(sortedColumn !== SORT_FIELD.VOL ? true : !sortDirection)
             }}
@@ -247,7 +247,7 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
           <Flex alignItems="center" justifyContent="flexEnd">
             <ClickableText
               area="volWeek"
-              onClick={e => {
+              onClick={(e) => {
                 setSortedColumn(SORT_FIELD.VOL_7DAYS)
                 setSortDirection(sortedColumn !== SORT_FIELD.VOL_7DAYS ? true : !sortDirection)
               }}
@@ -260,7 +260,7 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
           <Flex alignItems="center" justifyContent="flexEnd">
             <ClickableText
               area="fees"
-              onClick={e => {
+              onClick={(e) => {
                 setSortedColumn(SORT_FIELD.FEES)
                 setSortDirection(sortedColumn !== SORT_FIELD.FEES ? true : !sortDirection)
               }}
@@ -273,7 +273,7 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
           <Flex alignItems="center" justifyContent="flexEnd">
             <ClickableText
               area="apy"
-              onClick={e => {
+              onClick={(e) => {
                 setSortedColumn(SORT_FIELD.APY)
                 setSortDirection(sortedColumn !== SORT_FIELD.APY ? true : !sortDirection)
               }}
@@ -288,7 +288,7 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
       <List p={0}>{!pairList ? <LocalLoader /> : pairList}</List>
       <PageButtons>
         <div
-          onClick={e => {
+          onClick={(e) => {
             setPage(page === 1 ? page : page - 1)
           }}
         >
@@ -296,7 +296,7 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
         </div>
         <TYPE.body>{'Page ' + page + ' of ' + maxPage}</TYPE.body>
         <div
-          onClick={e => {
+          onClick={(e) => {
             setPage(page === maxPage ? page : page + 1)
           }}
         >

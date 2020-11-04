@@ -32,7 +32,7 @@ const Chart = ({ data, chartOption, currencyUnit, symbol }) => {
               interval="preserveEnd"
               tickMargin={14}
               minTickGap={80}
-              tickFormatter={tick => toNiceDate(tick)}
+              tickFormatter={(tick) => toNiceDate(tick)}
               dataKey="dayString"
             />
             <YAxis
@@ -40,7 +40,7 @@ const Chart = ({ data, chartOption, currencyUnit, symbol }) => {
               type="number"
               tickMargin={16}
               orientation="left"
-              tickFormatter={tick => toK(tick)}
+              tickFormatter={(tick) => toK(tick)}
               axisLine={false}
               tickLine={false}
               interval="preserveEnd"
@@ -52,7 +52,7 @@ const Chart = ({ data, chartOption, currencyUnit, symbol }) => {
               type="number"
               tickMargin={16}
               orientation="left"
-              tickFormatter={tick => toK(tick)}
+              tickFormatter={(tick) => toK(tick)}
               axisLine={false}
               tickLine={false}
               interval="preserveEnd"
@@ -83,13 +83,13 @@ const Chart = ({ data, chartOption, currencyUnit, symbol }) => {
             />
             <Tooltip
               cursor={true}
-              formatter={val => toK(val, true)}
-              labelFormatter={label => toNiceDateYear(label)}
+              formatter={(val) => toK(val, true)}
+              labelFormatter={(label) => toNiceDateYear(label)}
               labelStyle={{ paddingTop: 4 }}
               contentStyle={{
                 padding: '10px 14px',
                 borderRadius: 10,
-                borderColor: 'var(--c-zircon)'
+                borderColor: 'var(--c-zircon)',
               }}
               wrapperStyle={{ top: -70, left: -10 }}
             />
@@ -110,7 +110,7 @@ const Chart = ({ data, chartOption, currencyUnit, symbol }) => {
               interval="preserveEnd"
               tickMargin={14}
               minTickGap={80}
-              tickFormatter={tick => toNiceDate(tick)}
+              tickFormatter={(tick) => toNiceDate(tick)}
               dataKey="dayString"
             />
             <YAxis
@@ -118,7 +118,7 @@ const Chart = ({ data, chartOption, currencyUnit, symbol }) => {
               type="number"
               tickMargin={16}
               orientation="left"
-              tickFormatter={tick => toK(tick)}
+              tickFormatter={(tick) => toK(tick)}
               axisLine={false}
               tickLine={false}
               interval="preserveEnd"
@@ -130,7 +130,7 @@ const Chart = ({ data, chartOption, currencyUnit, symbol }) => {
               type="number"
               tickMargin={16}
               orientation="right"
-              tickFormatter={tick => toK(tick)}
+              tickFormatter={(tick) => toK(tick)}
               axisLine={false}
               tickLine={false}
               interval="preserveEnd"
@@ -139,13 +139,13 @@ const Chart = ({ data, chartOption, currencyUnit, symbol }) => {
             />
             <Tooltip
               cursor={true}
-              formatter={val => toK(val, true)}
-              labelFormatter={label => toNiceDateYear(label)}
+              formatter={(val) => toK(val, true)}
+              labelFormatter={(label) => toNiceDateYear(label)}
               labelStyle={{ paddingTop: 4 }}
               contentStyle={{
                 padding: '10px 14px',
                 borderRadius: 10,
-                borderColor: 'var(--c-zircon)'
+                borderColor: 'var(--c-zircon)',
               }}
               wrapperStyle={{ top: -70, left: -10 }}
             />
@@ -194,7 +194,7 @@ const Chart = ({ data, chartOption, currencyUnit, symbol }) => {
               interval="preserveEnd"
               minTickGap={80}
               tickMargin={14}
-              tickFormatter={tick => toNiceDate(tick)}
+              tickFormatter={(tick) => toNiceDate(tick)}
               dataKey="dayString"
             />
             <YAxis
@@ -202,7 +202,7 @@ const Chart = ({ data, chartOption, currencyUnit, symbol }) => {
               type="number"
               axisLine={false}
               tickMargin={16}
-              tickFormatter={tick => toK(tick)}
+              tickFormatter={(tick) => toK(tick)}
               tickLine={false}
               interval="preserveEnd"
               minTickGap={80}
@@ -210,13 +210,13 @@ const Chart = ({ data, chartOption, currencyUnit, symbol }) => {
             />
             <Tooltip
               cursor={true}
-              formatter={val => toK(val, true)}
-              labelFormatter={label => toNiceDateYear(label)}
+              formatter={(val) => toK(val, true)}
+              labelFormatter={(label) => toNiceDateYear(label)}
               labelStyle={{ paddingTop: 4 }}
               contentStyle={{
                 padding: '10px 14px',
                 borderRadius: 10,
-                borderColor: 'var(--c-zircon)'
+                borderColor: 'var(--c-zircon)',
               }}
               wrapperStyle={{ top: -70, left: -10 }}
             />

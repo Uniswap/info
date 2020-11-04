@@ -21,9 +21,9 @@ export async function getV1Data() {
       query: V1_DATA_QUERY,
       variables: {
         date: utcOneDayBack,
-        date2: utcTwoDaysBack
+        date2: utcTwoDaysBack,
       },
-      fetchPolicy: 'cache-first'
+      fetchPolicy: 'cache-first',
     })
 
     let data = result.data.current

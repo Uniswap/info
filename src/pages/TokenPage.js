@@ -102,7 +102,7 @@ function TokenPage({ address, history }) {
     priceChangeUSD,
     liquidityChangeUSD,
     oneDayTxns,
-    txnChange
+    txnChange,
   } = useTokenData(address)
 
   useEffect(() => {
@@ -163,7 +163,7 @@ function TokenPage({ address, history }) {
   useEffect(() => {
     window.scrollTo({
       behavior: 'smooth',
-      top: 0
+      top: 0,
     })
   }, [])
 
@@ -200,7 +200,13 @@ function TokenPage({ address, history }) {
 
         <WarningGrouping disabled={!dismissed && listedTokens && !listedTokens.includes(address)}>
           <DashboardWrapper style={{ marginTop: below1080 ? '0' : '1rem' }}>
-            <RowBetween style={{ flexWrap: 'wrap', marginBottom: '2rem', alignItems: 'flex-start' }}>
+            <RowBetween
+              style={{
+                flexWrap: 'wrap',
+                marginBottom: '2rem',
+                alignItems: 'flex-start',
+              }}
+            >
               <RowFixed style={{ flexWrap: 'wrap' }}>
                 <RowFixed style={{ alignItems: 'baseline' }}>
                   <TokenLogo address={address} size="32px" style={{ alignSelf: 'center' }} />
@@ -309,7 +315,12 @@ function TokenPage({ address, history }) {
                     </RowBetween>
                   </AutoColumn>
                 </Panel>
-                <Panel style={{ gridColumn: below1080 ? '1' : '2/4', gridRow: below1080 ? '' : '1/4' }}>
+                <Panel
+                  style={{
+                    gridColumn: below1080 ? '1' : '2/4',
+                    gridRow: below1080 ? '' : '1/4',
+                  }}
+                >
                   <TokenChart address={address} color={backgroundColor} base={priceUSD} />
                 </Panel>
               </PanelWrapper>
@@ -324,7 +335,7 @@ function TokenPage({ address, history }) {
               rounded
               style={{
                 marginTop: '1.5rem',
-                padding: '1.125rem 0 '
+                padding: '1.125rem 0 ',
               }}
             >
               {address && fetchedPairsList ? (
@@ -346,7 +357,7 @@ function TokenPage({ address, history }) {
               <Panel
                 rounded
                 style={{
-                  marginTop: '1.5rem'
+                  marginTop: '1.5rem',
                 }}
                 p={20}
               >

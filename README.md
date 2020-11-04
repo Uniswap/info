@@ -1,11 +1,10 @@
-# Uniswap History
+# Uniswap Info
 
-![Tests](https://github.com/Uniswap/uniswap-info/workflows/Tests/badge.svg)
+[![Lint](https://github.com/Uniswap/uniswap-info/workflows/Lint/badge.svg)](https://github.com/Uniswap/uniswap-info/actions?query=workflow%3ALint)
+[![Deploy](https://github.com/Uniswap/uniswap-info/workflows/Deploy/badge.svg)](https://github.com/Uniswap/uniswap-info/actions?query=workflow%3ADeploy)
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 
-Transaction and liquidity pool stats for [Uniswap](https://uniswap.org).
-
-Check it out live: [https://uniswap.info](https://uniswap.info).
+Analytics site for the [Uniswap Protocol](https://uniswap.org).
 
 ### To Start Development
 

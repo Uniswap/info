@@ -58,15 +58,9 @@ let addressStart = new RegExp('^0x')
 function customFilter(option, searchText) {
   const isAddress = addressStart.test(searchText)
   if (isAddress) {
-    return option.data.tokenAddress
-      .toString()
-      .toLowerCase()
-      .includes(searchText.toString().toLowerCase())
+    return option.data.tokenAddress.toString().toLowerCase().includes(searchText.toString().toLowerCase())
   }
-  return option.data.label
-    .toString()
-    .toLowerCase()
-    .includes(searchText.toString().toLowerCase())
+  return option.data.label.toString().toLowerCase().includes(searchText.toString().toLowerCase())
 }
 
 const Select = ({ options, onChange, setCapEth, capEth, tokenSelect = false, placeholder, ...rest }) => {
@@ -78,7 +72,7 @@ const Select = ({ options, onChange, setCapEth, capEth, tokenSelect = false, pla
       options={options}
       value={placeholder}
       filterOption={customFilter}
-      getOptionLabel={option => (
+      getOptionLabel={(option) => (
         <MenuLabel>
           <LogoBox>{option.logo}</LogoBox>
           <LabelBox>{option.label}</LabelBox>
@@ -109,7 +103,7 @@ const Select = ({ options, onChange, setCapEth, capEth, tokenSelect = false, pla
               {children}
             </CustomMenu>
           )
-        }
+        },
       }}
     />
   ) : (
@@ -126,7 +120,7 @@ const Select = ({ options, onChange, setCapEth, capEth, tokenSelect = false, pla
 
 Select.propTypes = {
   options: PropTypes.array.isRequired,
-  onChange: PropTypes.func
+  onChange: PropTypes.func,
 }
 
 export default Select
