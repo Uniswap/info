@@ -22,14 +22,14 @@ export default function AdvancedPairData(pairAddress) {
     apiKey: '0hWAaw2SsW1YyaNKcBXEV6LIkRk4HZ0o23dP6AV9',
     options: {
       colors: {
-        series: ['#ff007a']
+        series: ['#ff007a'],
       },
       protocol: 'uniswap',
       pairAddress: pairAddress,
       granularity: 'hourly',
       loader: false,
-      hideNavigator: true
-    }
+      hideNavigator: true,
+    },
   })
 
   return (
