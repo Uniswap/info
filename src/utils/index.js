@@ -65,6 +65,19 @@ export function getSwapLink(token0Address, token1Address = null) {
   }
 }
 
+export function getMiningPoolLink(token0Address) {
+  return `https://app.uniswap.org/#/uni/ETH/${token0Address}`
+}
+
+export function getUniswapAppLink(linkVariable) {
+  let baseUniswapUrl = 'https://app.uniswap.org/#/uni'
+  if (!linkVariable) {
+    return baseUniswapUrl
+  }
+
+  return `${baseUniswapUrl}/ETH/${linkVariable}`
+}
+
 export function localNumber(val) {
   return Numeral(val).format('0,0')
 }
