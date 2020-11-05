@@ -15,6 +15,7 @@ import { Divider, EmptyCard } from '..'
 import DropdownSelect from '../DropdownSelect'
 import FormattedName from '../FormattedName'
 import { TYPE } from '../../Theme'
+import { updateNameData } from '../../utils/data'
 
 dayjs.extend(utc)
 
@@ -192,8 +193,8 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
           newTxn.token0Amount = mint.amount0
           newTxn.token1Amount = mint.amount1
           newTxn.account = mint.to
-          newTxn.token0Symbol = mint.pair.token0.symbol
-          newTxn.token1Symbol = mint.pair.token1.symbol
+          newTxn.token0Symbol = updateNameData(mint.pair).token0.symbol
+          newTxn.token1Symbol = updateNameData(mint.pair).token1.symbol
           newTxn.amountUSD = mint.amountUSD
           return newTxns.push(newTxn)
         })
@@ -207,8 +208,8 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
           newTxn.token0Amount = burn.amount0
           newTxn.token1Amount = burn.amount1
           newTxn.account = burn.sender
-          newTxn.token0Symbol = burn.pair.token0.symbol
-          newTxn.token1Symbol = burn.pair.token1.symbol
+          newTxn.token0Symbol = updateNameData(burn.pair).token0.symbol
+          newTxn.token1Symbol = updateNameData(burn.pair).token1.symbol
           newTxn.amountUSD = burn.amountUSD
           return newTxns.push(newTxn)
         })
@@ -221,13 +222,13 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
           let newTxn = {}
 
           if (netToken0 < 0) {
-            newTxn.token0Symbol = swap.pair.token0.symbol
-            newTxn.token1Symbol = swap.pair.token1.symbol
+            newTxn.token0Symbol = updateNameData(swap.pair).token0.symbol
+            newTxn.token1Symbol = updateNameData(swap.pair).token1.symbol
             newTxn.token0Amount = Math.abs(netToken0)
             newTxn.token1Amount = Math.abs(netToken1)
           } else if (netToken1 < 0) {
-            newTxn.token0Symbol = swap.pair.token1.symbol
-            newTxn.token1Symbol = swap.pair.token0.symbol
+            newTxn.token0Symbol = updateNameData(swap.pair).token1.symbol
+            newTxn.token1Symbol = updateNameData(swap.pair).token0.symbol
             newTxn.token0Amount = Math.abs(netToken1)
             newTxn.token1Amount = Math.abs(netToken0)
           }
@@ -279,14 +280,6 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
   const below780 = useMedia('(max-width: 780px)')
 
   const ListItem = ({ item }) => {
-    if (item.token0Symbol === 'WETH') {
-      item.token0Symbol = 'ETH'
-    }
-
-    if (item.token1Symbol === 'WETH') {
-      item.token1Symbol = 'ETH'
-    }
-
     return (
       <DashGrid style={{ height: '48px' }}>
         <DataText area="txn" fontWeight="500">
