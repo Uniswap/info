@@ -29,7 +29,7 @@ const PageButtons = styled.div`
 
 const Arrow = styled.div`
   color: #2f80ed;
-  opacity: ${props => (props.faded ? 0.3 : 1)};
+  opacity: ${(props) => (props.faded ? 0.3 : 1)};
   padding: 0 20px;
   user-select: none;
   :hover {
@@ -134,14 +134,14 @@ const SORT_FIELD = {
   VALUE: 'amountUSD',
   AMOUNT0: 'token0Amount',
   AMOUNT1: 'token1Amount',
-  TIMESTAMP: 'timestamp'
+  TIMESTAMP: 'timestamp',
 }
 
 const TXN_TYPE = {
   ALL: 'All',
   SWAP: 'Swaps',
   ADD: 'Adds',
-  REMOVE: 'Removes'
+  REMOVE: 'Removes',
 }
 
 const ITEMS_PER_PAGE = 10
@@ -185,7 +185,7 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
     if (transactions && transactions.mints && transactions.burns && transactions.swaps) {
       let newTxns = []
       if (transactions.mints.length > 0) {
-        transactions.mints.map(mint => {
+        transactions.mints.map((mint) => {
           let newTxn = {}
           newTxn.hash = mint.transaction.id
           newTxn.timestamp = mint.transaction.timestamp
@@ -200,7 +200,7 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
         })
       }
       if (transactions.burns.length > 0) {
-        transactions.burns.map(burn => {
+        transactions.burns.map((burn) => {
           let newTxn = {}
           newTxn.hash = burn.transaction.id
           newTxn.timestamp = burn.transaction.timestamp
@@ -215,7 +215,7 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
         })
       }
       if (transactions.swaps.length > 0) {
-        transactions.swaps.map(swap => {
+        transactions.swaps.map((swap) => {
           const netToken0 = swap.amount0In - swap.amount0Out
           const netToken1 = swap.amount1In - swap.amount1Out
 
@@ -243,7 +243,7 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
         })
       }
 
-      const filtered = newTxns.filter(item => {
+      const filtered = newTxns.filter((item) => {
         if (txFilter !== TXN_TYPE.ALL) {
           return item.type === txFilter
         }
@@ -362,7 +362,7 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
           <ClickableText
             color="textDim"
             area="value"
-            onClick={e => {
+            onClick={(e) => {
               setSortedColumn(SORT_FIELD.VALUE)
               setSortDirection(sortedColumn !== SORT_FIELD.VALUE ? true : !sortDirection)
             }}
@@ -439,7 +439,7 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
       </List>
       <PageButtons>
         <div
-          onClick={e => {
+          onClick={(e) => {
             setPage(page === 1 ? page : page - 1)
           }}
         >
@@ -447,7 +447,7 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
         </div>
         <TYPE.body>{'Page ' + page + ' of ' + maxPage}</TYPE.body>
         <div
-          onClick={e => {
+          onClick={(e) => {
             setPage(page === maxPage ? page : page + 1)
           }}
         >
