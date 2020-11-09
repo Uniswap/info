@@ -29,7 +29,7 @@ export default function AdvancedPairData({ pairAddress, onPairNotSupported }) {
         apiKey: '0hWAaw2SsW1YyaNKcBXEV6LIkRk4HZ0o23dP6AV9',
         options: {
           colors: {
-            series: ['#ff007a']
+            series: ['#ff007a'],
           },
           protocol: 'uniswap',
           pairAddress,
@@ -37,9 +37,9 @@ export default function AdvancedPairData({ pairAddress, onPairNotSupported }) {
           loader: true,
           hideNavigator: true,
           events: {
-            onPairNotSupported // hide if not supported
-          }
-        }
+            onPairNotSupported, // hide if not supported
+          },
+        },
       })
     }
   }, [pairAddress, onPairNotSupported])

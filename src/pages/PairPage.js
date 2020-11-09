@@ -119,7 +119,7 @@ function PairPage({ pairAddress, history }) {
     volumeChangeUSD,
     oneDayVolumeUntracked,
     volumeChangeUntracked,
-    liquidityChangeUSD
+    liquidityChangeUSD,
   } = usePairData(pairAddress)
 
   useEffect(() => {
@@ -225,7 +225,7 @@ function PairPage({ pairAddress, history }) {
                   display: 'flex',
                   justifyContent: 'space-between',
                   flexWrap: 'wrap',
-                  width: '100%'
+                  width: '100%',
                 }}
               >
                 <RowFixed style={{ flexWrap: 'wrap', minWidth: '100px' }}>
@@ -253,7 +253,7 @@ function PairPage({ pairAddress, history }) {
                   ml={below900 ? '0' : '2.5rem'}
                   mt={below1080 && '1rem'}
                   style={{
-                    flexDirection: below1080 ? 'row-reverse' : 'initial'
+                    flexDirection: below1080 ? 'row-reverse' : 'initial',
                   }}
                 >
                   {!!!savedPairs[pairAddress] && !below1080 ? (
@@ -287,7 +287,7 @@ function PairPage({ pairAddress, history }) {
                 width: 'fit-content',
                 marginTop: below900 ? '1rem' : '0',
                 marginBottom: below900 ? '0' : '2rem',
-                flexWrap: 'wrap'
+                flexWrap: 'wrap',
               }}
             >
               <FixedPanel onClick={() => history.push(`/token/${token0?.id}`)}>
@@ -393,7 +393,7 @@ function PairPage({ pairAddress, history }) {
               <Panel
                 style={{
                   gridColumn: below1080 ? '1' : '2/4',
-                  gridRow: below1080 ? '' : '1/5'
+                  gridRow: below1080 ? '' : '1/5',
                 }}
               >
                 <PairChart
@@ -409,7 +409,7 @@ function PairPage({ pairAddress, history }) {
             </TYPE.main>{' '}
             <Panel
               style={{
-                marginTop: '1.5rem'
+                marginTop: '1.5rem',
               }}
             >
               {transactions ? <TxnList transactions={transactions} /> : <Loader />}
@@ -420,7 +420,7 @@ function PairPage({ pairAddress, history }) {
             <Panel
               rounded
               style={{
-                marginTop: '1.5rem'
+                marginTop: '1.5rem',
               }}
               p={20}
             >
@@ -487,7 +487,7 @@ function PairPage({ pairAddress, history }) {
                 <Panel
                   rounded
                   style={{
-                    marginTop: '1.5rem'
+                    marginTop: '1.5rem',
                   }}
                   p={20}
                 >
