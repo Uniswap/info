@@ -1,0 +1,50 @@
+/* FONT */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+.widget-container .itb-widget * {
+  font-family: 'Inter', sans-serif;
+}
+.widget-container .itb-widget {
+  min-width: unset;
+}
+
+/* CARDS */
+.widget-container .charts-container .itb-widget .defi-card {
+  box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 10px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+.widget-container .itb-widget .defi-card .tab-option {
+  font-weight: 500;
+  width: fit-content;
+  white-space: nowrap;
+  padding: 6px;
+  border-radius: 6px;
+  border: 1px solid rgb(206, 208, 217);
+  color: rgb(86, 90, 105);
+  box-shadow: none;
+}
+.widget-container .itb-widget .defi-card .tab-option.active {
+  background-color: rgb(237, 238, 242);
+  border: 1px solid #5a5d67;
+  color: rgb(31, 31, 31);
+  box-shadow: none;
+}
+
+/* NIGHT MODE */
+.night-mode .widget-container .charts-container .itb-widget .defi-card {
+  border: 1px solid rgb(64, 68, 79);
+  box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 10px;
+  background: transparent;
+}
+.night-mode .widget-container .itb-widget .defi-card .card-title {
+  color: white;
+}
+.night-mode .widget-container .itb-widget .defi-card .tab-option {
+  border: 1px solid rgb(86, 90, 105);
+  color: rgb(250, 250, 250);
+}
+.night-mode .widget-container .itb-widget .defi-card .tab-option.active {
+  background-color: rgb(64, 68, 79);
+  box-shadow: none;
+}

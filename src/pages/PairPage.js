@@ -30,6 +30,7 @@ import { usePathDismissed, useSavedPairs } from '../contexts/LocalStorage'
 import { Bookmark, PlusCircle } from 'react-feather'
 import FormattedName from '../components/FormattedName'
 import { useListedTokens } from '../contexts/Application'
+import AdvancedPairData from '../components/advancedData/PairData'
 
 const DashboardWrapper = styled.div`
   width: 100%;
@@ -104,21 +105,6 @@ const HoverSpan = styled.span`
 const WarningGrouping = styled.div`
   opacity: ${({ disabled }) => disabled && '0.4'};
   pointer-events: ${({ disabled }) => disabled && 'none'};
-`
-
-const AdvancedDataGroup = styled.div`
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  margin-top: 20px;
-  font-family: 'Inter var', sans-serif;
-`
-
-const AdvancedDataBox = styled.div`
-  width: calc(50% - 10px);
-  margin-bottom: 20px;
-  box-sizing: border-box;
-  box-shadow: none;
 `
 
 function PairPage({ pairAddress, history }) {
@@ -203,32 +189,12 @@ function PairPage({ pairAddress, history }) {
 
   const [dismissed, markAsDismissed] = usePathDismissed(history.location.pathname)
 
-  // on page load
-  useEffect(() => {
-    window.scrollTo({
-      behavior: 'smooth',
-      top: 0
-    })
-
-    window.itb_widget.init({
-      apiKey: '0hWAaw2SsW1YyaNKcBXEV6LIkRk4HZ0o23dP6AV9',
-      options: {
-        colors: {
-          series: ['#ff007a']
-        },
-        protocol: 'uniswap',
-        pairAddress: pairAddress,
-        granularity: 'hourly',
-        loader: false,
-        darkMode: true,
-        hideNavigator: true
-      }
-    })
-  }, [pairAddress])
-
   const [savedPairs, addPair] = useSavedPairs()
 
   const listedTokens = useListedTokens()
+
+  // callback if widget doesn't support selected pair
+  const [showAdvanced, setShowAdvanced] = useState(true)
 
   return (
     <PageWrapper>
@@ -513,31 +479,24 @@ function PairPage({ pairAddress, history }) {
                 </ButtonLight>
               </TokenDetailsLayout>
             </Panel>
-            <RowBetween style={{ marginTop: '3rem' }}>
-              <TYPE.main fontSize={'1.125rem'}>More Insights</TYPE.main>{' '}
-            </RowBetween>
-            <Panel
-              rounded
-              style={{
-                marginTop: '1.5rem'
-              }}
-              p={20}
-            >
-              <AdvancedDataGroup>
-                <AdvancedDataBox data-target="itb-widget" data-type="protocol-fees-per-liquidity" />
-                <AdvancedDataBox data-target="itb-widget" data-type="protocol-transactions-breakdown" />
-                <AdvancedDataBox
-                  data-target="itb-widget"
-                  data-type="protocol-liquidity-variation"
-                  data-options='{ "pairTokenIndex": 0 }'
-                />
-                <AdvancedDataBox
-                  data-target="itb-widget"
-                  data-type="protocol-liquidity-variation"
-                  data-options='{ "pairTokenIndex": 1 }'
-                />
-              </AdvancedDataGroup>
-            </Panel>
+            {showAdvanced && (
+              <>
+                <RowBetween style={{ marginTop: '3rem' }}>
+                  <TYPE.main fontSize={'1.125rem'}>More Insights</TYPE.main>{' '}
+                </RowBetween>
+                <Panel
+                  rounded
+                  style={{
+                    marginTop: '1.5rem'
+                  }}
+                  p={20}
+                >
+                  {pairAddress && (
+                    <AdvancedPairData pairAddress={pairAddress} onPairNotSupported={() => setShowAdvanced(false)} />
+                  )}
+                </Panel>
+              </>
+            )}
           </DashboardWrapper>
         </WarningGrouping>
       </ContentWrapperLarge>

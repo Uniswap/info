@@ -1,5 +1,7 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import styled from 'styled-components'
+import './override.css'
+import { useDarkModeManager } from '../../contexts/LocalStorage'
 
 const AdvancedDataGroup = styled.div`
   display: flex;
@@ -16,24 +18,35 @@ const AdvancedDataBox = styled.div`
   box-shadow: none;
 `
 
-export default function AdvancedPairData(pairAddress) {
+export default function AdvancedPairData({ pairAddress, onPairNotSupported }) {
   // load widget
-  window.itb_widget.init({
-    apiKey: '0hWAaw2SsW1YyaNKcBXEV6LIkRk4HZ0o23dP6AV9',
-    options: {
-      colors: {
-        series: ['#ff007a']
-      },
-      protocol: 'uniswap',
-      pairAddress: pairAddress,
-      granularity: 'hourly',
-      loader: false,
-      hideNavigator: true
+  useEffect(() => {
+    if (window.itbWidgetInit) {
+      window.itbWidgetInit({
+        apiKey: '0hWAaw2SsW1YyaNKcBXEV6LIkRk4HZ0o23dP6AV9',
+        options: {
+          colors: {
+            series: ['#ff007a']
+          },
+          protocol: 'uniswap',
+          pairAddress,
+          granularity: 'hourly',
+          loader: true,
+          hideNavigator: true,
+          events: {
+            onPairNotSupported: () => {
+              onPairNotSupported()
+            }
+          }
+        }
+      })
     }
-  })
+  }, [pairAddress])
+
+  const [isDark] = useDarkModeManager()
 
   return (
-    <AdvancedDataGroup>
+    <AdvancedDataGroup className={isDark ? 'night-mode' : ''}>
       <AdvancedDataBox data-target="itb-widget" data-type="protocol-fees-per-liquidity" />
       <AdvancedDataBox data-target="itb-widget" data-type="protocol-transactions-breakdown" />
       <AdvancedDataBox
