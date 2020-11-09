@@ -31,7 +31,6 @@
   box-shadow: none;
 }
 
-/* NIGHT MODE */
 .night-mode .widget-container .charts-container .itb-widget .defi-card {
   border: 1px solid rgb(64, 68, 79);
   box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 10px;
@@ -47,4 +46,10 @@
 .night-mode .widget-container .itb-widget .defi-card .tab-option.active {
   background-color: rgb(64, 68, 79);
   box-shadow: none;
+}
+
+.night-mode .itb-widget .defi-card {
+  border: 1px solid #333333 !important;
+  box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.05) !important;
+  border-radius: 8px !important;
 }

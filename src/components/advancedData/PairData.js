@@ -2,6 +2,9 @@ import React, { useEffect } from 'react'
 import styled from 'styled-components'
 import './override.css'
 import { useDarkModeManager } from '../../contexts/LocalStorage'
+import { ButtonLight } from '../ButtonStyled'
+import Link from '../Link'
+import { RowBetween } from '../Row'
 
 const AdvancedDataGroup = styled.div`
   display: flex;
@@ -21,8 +24,8 @@ const AdvancedDataBox = styled.div`
 export default function AdvancedPairData({ pairAddress, onPairNotSupported }) {
   // load widget
   useEffect(() => {
-    if (window.itbWidgetInit) {
-      window.itbWidgetInit({
+    if (window.itb_widget?.init) {
+      window.itb_widget.init({
         apiKey: '0hWAaw2SsW1YyaNKcBXEV6LIkRk4HZ0o23dP6AV9',
         options: {
           colors: {
@@ -34,14 +37,12 @@ export default function AdvancedPairData({ pairAddress, onPairNotSupported }) {
           loader: true,
           hideNavigator: true,
           events: {
-            onPairNotSupported: () => {
-              onPairNotSupported()
-            }
+            onPairNotSupported // hide if not supported
           }
         }
       })
     }
-  }, [pairAddress])
+  }, [pairAddress, onPairNotSupported])
 
   const [isDark] = useDarkModeManager()
 
@@ -59,6 +60,17 @@ export default function AdvancedPairData({ pairAddress, onPairNotSupported }) {
         data-type="protocol-liquidity-variation"
         data-options='{ "pairTokenIndex": 1 }'
       />
+      <RowBetween>
+        <div />
+        <ButtonLight>
+          <Link
+            external
+            href={`https://app.intotheblock.com/insights/defi/protocols/uniswap?address=${pairAddress}&pid=uniswap&utm_source=uniswap_widget`}
+          >
+            See more ↗
+          </Link>
+        </ButtonLight>
+      </RowBetween>
     </AdvancedDataGroup>
   )
 }
