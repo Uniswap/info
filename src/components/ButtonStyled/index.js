@@ -7,8 +7,8 @@ import { RowBetween } from '../Row'
 import { StyledIcon } from '..'
 
 const Base = styled(RebassButton)`
-  padding: 8px 12px;
-  font-size: 0.825rem;
+  padding: .875rem 1.25rem;
+  font-size: .825rem;
   font-weight: 600;
   border-radius: 12px;
   cursor: pointer;
@@ -60,8 +60,9 @@ const ContentWrapper = styled.div`
 `
 
 export const ButtonLight = styled(Base)`
-  background-color: ${({ color, theme }) => (color ? transparentize(0.9, color) : transparentize(0.9, theme.primary1))};
+  background-color: ${({ color, theme }) => (color ? transparentize(0.99, color) : transparentize(0.99, theme.primary1))};
   color: ${({ color, theme }) => (color ? darken(0.1, color) : theme.primary1)};
+  border: 2px solid ${({ color, theme }) => (color ? color : theme.primary1)};
 
   min-width: fit-content;
   border-radius: 12px;
@@ -138,14 +139,16 @@ export function ButtonCustom({ children, bgColor, color, ...rest }) {
 }
 
 export const OptionButton = styled.div`
-  font-weight: 500;
+  font-weight: 600;
+  font-size: .75rem;
   width: fit-content;
   white-space: nowrap;
-  padding: 6px;
-  border-radius: 6px;
-  border: 1px solid ${({ theme }) => theme.bg4};
-  background-color: ${({ active, theme }) => active && theme.bg3};
-  color: ${({ theme }) => theme.text1};
+  padding: .5rem 1rem;
+  margin: 5px;
+  border-radius: .625rem;
+  border: 2px solid ${({ active, theme }) => active ? theme.activeText : transparentize(0.7, theme.text6)};
+  background-color: ${({ active, theme }) => active && transparentize(0.9, theme.bg3)};
+  color: ${({ active, theme }) => active ? theme.activeText : transparentize(0.7, theme.text6)};
 
   :hover {
     cursor: ${({ disabled }) => !disabled && 'pointer'};

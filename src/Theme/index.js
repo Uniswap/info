@@ -30,6 +30,7 @@ const theme = (darkMode, color) => ({
   text3: darkMode ? '#6C7284' : '#888D9B',
   text4: darkMode ? '#565A69' : '#C3C5CB',
   text5: darkMode ? '#2C2F36' : '#EDEEF2',
+  text6: darkMode ? '#45484D' : '#45484D',
   activeText: '#6681A7',
 
   // special case text types

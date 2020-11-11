@@ -199,7 +199,7 @@ const PairChart = ({ address, color, base0, base1 }) => {
               minTickGap={80}
               tickFormatter={(tick) => toNiceDate(tick)}
               dataKey="date"
-              tick={{ fill: textColor }}
+              tick={{ fill: '#9D9FA2' }}
               type={'number'}
               domain={['dataMin', 'dataMax']}
             />
@@ -213,7 +213,7 @@ const PairChart = ({ address, color, base0, base1 }) => {
               minTickGap={80}
               yAxisId={0}
               tickMargin={16}
-              tick={{ fill: textColor }}
+              tick={{ fill: '#9D9FA2' }}
             />
             <Tooltip
               cursor={true}
@@ -225,17 +225,19 @@ const PairChart = ({ address, color, base0, base1 }) => {
                 borderRadius: 10,
                 borderColor: color,
                 color: 'black',
+                fontWeight: 500,
+                fontSize: 14
               }}
               wrapperStyle={{ top: -70, left: -10 }}
             />
             <Area
-              strokeWidth={2}
+              strokeWidth={1}
               dot={false}
               type="monotone"
               name={' (USD)'}
               dataKey={'reserveUSD'}
               yAxisId={0}
-              stroke={darken(0.12, color)}
+              stroke={color}
               fill="url(#colorUv)"
             />
           </AreaChart>

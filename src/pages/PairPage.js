@@ -274,10 +274,10 @@ function PairPage({ pairAddress, history }) {
                   )}
 
                   <Link external href={getPoolLink(token0?.id, token1?.id)}>
-                    <ButtonLight color={backgroundColor}>+ Add Liquidity</ButtonLight>
+                    <ButtonLight>Add Liquidity</ButtonLight>
                   </Link>
                   <Link external href={getSwapLink(token0?.id, token1?.id)}>
-                    <ButtonDark ml={!below1080 && '.5rem'} mr={below1080 && '.5rem'} color={backgroundColor}>
+                    <ButtonDark ml={!below1080 && '.5rem'} mr={below1080 && '.5rem'}>
                       Trade
                     </ButtonDark>
                   </Link>
@@ -402,7 +402,7 @@ function PairPage({ pairAddress, history }) {
                 >
                   <PairChart
                     address={pairAddress}
-                    color={backgroundColor}
+                    color={'#2E69BB'}
                     base0={reserve1 / reserve0}
                     base1={reserve0 / reserve1}
                   />
@@ -476,8 +476,8 @@ function PairPage({ pairAddress, history }) {
                       <CopyHelper toCopy={token1?.id} />
                     </AutoRow>
                   </Column>
-                  <ButtonLight color={backgroundColor}>
-                    <Link color={backgroundColor} external href={'https://etherscan.io/address/' + pairAddress}>
+                  <ButtonLight>
+                    <Link external href={'https://etherscan.io/address/' + pairAddress}>
                       View on Etherscan ↗
                     </Link>
                   </ButtonLight>
