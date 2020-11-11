@@ -22,8 +22,7 @@ const Wrapper = styled.div`
   top: 0px;
   z-index: 9999;
   box-sizing: border-box;
-  /* background-color: #1b1c22; */
-  background: linear-gradient(193.68deg, #1b1c22 0.68%, #000000 100.48%);
+  border-right: 1px solid ${({ theme }) => theme.mercuryGray};
   color: ${({ theme }) => theme.bg2};
 
   @media screen and (max-width: 800px) {
@@ -40,7 +39,7 @@ const Option = styled.div`
   font-weight: 500;
   font-size: 14px;
   opacity: ${({ activeText }) => (activeText ? 1 : 0.6)};
-  color: ${({ theme }) => theme.white};
+  color: ${({ theme }) => theme.text1};
   display: flex;
   :hover {
     opacity: 1;
@@ -71,7 +70,7 @@ const HeaderText = styled.div`
     opacity: 1;
   }
   a {
-    color: ${({ theme }) => theme.white};
+    color: ${({ theme }) => theme.text1};
   }
 `
 
@@ -164,27 +163,32 @@ function SideNav({ history }) {
           </AutoColumn>
           <AutoColumn gap="0.5rem" style={{ marginLeft: '.75rem', marginBottom: '4rem' }}>
             <HeaderText>
-              <Link href="https://uniswap.org" target="_blank">
-                Uniswap.org
+              <Link href="https://ws.exchange" target="_blank">
+                WS.exchange
               </Link>
             </HeaderText>
-            <HeaderText>
+            {/* <HeaderText>
               <Link href="https://v1.uniswap.info" target="_blank">
                 V1 Analytics
               </Link>
-            </HeaderText>
+            </HeaderText> */}
             <HeaderText>
-              <Link href="https://uniswap.org/docs/v2" target="_blank">
+              <Link href="https://docs.ws.exchange" target="_blank">
                 Docs
               </Link>
             </HeaderText>
             <HeaderText>
-              <Link href="https://discord.com/invite/XErMcTq" target="_blank">
+              <Link href="https://t.me/whiteswap" target="_blank">
+                Telegram
+              </Link>
+            </HeaderText>
+            <HeaderText>
+              <Link href="https://discord.com/invite/WDpFBmVJsx" target="_blank">
                 Discord
               </Link>
             </HeaderText>
             <HeaderText>
-              <Link href="https://twitter.com/UniswapProtocol" target="_blank">
+              <Link href="https://twitter.com/WhiteSwapFi" target="_blank">
                 Twitter
               </Link>
             </HeaderText>

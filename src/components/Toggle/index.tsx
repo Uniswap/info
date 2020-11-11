@@ -5,6 +5,11 @@ import { Sun, Moon } from 'react-feather'
 const IconWrapper = styled.div<{ isActive?: boolean }>`
   opacity: ${({ isActive }) => (isActive ? 0.8 : 0.4)};
 
+  > svg {
+    fill: ${({ theme }) => theme.text1};
+    stroke: ${({ theme }) => theme.text1};
+  }
+
   :hover {
     opacity: 1;
   }
@@ -23,6 +28,11 @@ const StyledToggle = styled.div`
   }
 `
 
+const Span = styled.span`
+  padding: 0 .5rem;
+  color: ${({ theme }) => theme.text1};
+`
+
 export interface ToggleProps {
   isActive: boolean
   toggle: () => void
@@ -36,7 +46,7 @@ export default function Toggle({ isActive, toggle }: ToggleProps) {
           <Sun size={20} />
         </IconWrapper>
       </span>
-      <span style={{ padding: '0 .5rem' }}>{' / '}</span>
+      <Span>{' / '}</Span>
       <span>
         <IconWrapper isActive={isActive}>
           <Moon size={20} />
