@@ -17,7 +17,6 @@ const Wrapper = styled.div`
   height: ${({ isMobile }) => (isMobile ? 'initial' : '100vh')};
   background-color: ${({ theme }) => transparentize(0.4, theme.bg1)};
   color: ${({ theme }) => theme.text1};
-  padding: 0.5rem 0.5rem 0.5rem 0.75rem;
   position: sticky;
   top: 0px;
   z-index: 9999;
@@ -37,13 +36,48 @@ const Wrapper = styled.div`
 
 const Option = styled.div`
   font-weight: 500;
-  font-size: 14px;
+  font-size: 1rem;
   opacity: ${({ activeText }) => (activeText ? 1 : 0.6)};
-  color: ${({ theme }) => theme.text1};
+  color: ${({ activeText, theme }) => (activeText ? theme.activeText : theme.text1)};
   display: flex;
+  padding: .5rem 1.5rem;
+  position: relative;
+  align-items: center;
+  width: 100%;
+
   :hover {
     opacity: 1;
   }
+
+  ${({ activeText, theme }) => activeText && `
+    background: rgba(102, 129, 167, 0.1);
+    font-weight: 700;
+
+    > div {
+      background: ${theme.activeText};
+
+      > svg {
+        stroke: ${theme.lightText1};
+      }
+    }
+
+    :before {
+      content: '';
+      position: absolute;
+      width: .25rem;
+      height: 100%;
+      top: 0;
+      left: 0;
+      background: ${theme.activeText};
+    }
+  `}
+`
+
+const StyledNavButton = styled.div`
+  display: flex;
+  border-radius: 100%;
+  padding: 8px;
+  margin-right: 1rem;
 `
 
 const DesktopWrapper = styled.div`
@@ -111,13 +145,15 @@ function SideNav({ history }) {
     <Wrapper isMobile={below1080}>
       {!below1080 ? (
         <DesktopWrapper>
-          <AutoColumn gap="1rem" style={{ marginLeft: '.75rem', marginTop: '1.5rem' }}>
+          <AutoColumn gap="1rem">
             <Title />
             {!below1080 && (
-              <AutoColumn gap="1.25rem" style={{ marginTop: '1rem' }}>
+              <AutoColumn style={{ marginTop: '5.25rem' }}>
                 <BasicLink to="/home">
                   <Option activeText={history.location.pathname === '/home' ?? undefined}>
-                    <TrendingUp size={20} style={{ marginRight: '.75rem' }} />
+                    <StyledNavButton>
+                      <TrendingUp size={20} />
+                    </StyledNavButton>
                     Overview
                   </Option>
                 </BasicLink>
@@ -129,7 +165,9 @@ function SideNav({ history }) {
                       undefined
                     }
                   >
-                    <Disc size={20} style={{ marginRight: '.75rem' }} />
+                    <StyledNavButton>
+                      <Disc size={20} />
+                    </StyledNavButton>
                     Tokens
                   </Option>
                 </BasicLink>
@@ -141,7 +179,9 @@ function SideNav({ history }) {
                       undefined
                     }
                   >
-                    <PieChart size={20} style={{ marginRight: '.75rem' }} />
+                    <StyledNavButton>
+                      <PieChart size={20} />
+                    </StyledNavButton>
                     Pairs
                   </Option>
                 </BasicLink>
@@ -154,14 +194,16 @@ function SideNav({ history }) {
                       undefined
                     }
                   >
-                    <List size={20} style={{ marginRight: '.75rem' }} />
+                    <StyledNavButton>
+                      <List size={20} />
+                    </StyledNavButton>
                     Accounts
                   </Option>
                 </BasicLink>
               </AutoColumn>
             )}
           </AutoColumn>
-          <AutoColumn gap="0.5rem" style={{ marginLeft: '.75rem', marginBottom: '4rem' }}>
+          <AutoColumn gap=".5rem" style={{ marginLeft: '1.5rem', marginBottom: '2.5rem' }}>
             <HeaderText>
               <Link href="https://ws.exchange" target="_blank">
                 WS.exchange
@@ -174,7 +216,7 @@ function SideNav({ history }) {
             </HeaderText> */}
             <HeaderText>
               <Link href="https://docs.ws.exchange" target="_blank">
-                Docs
+                Doc
               </Link>
             </HeaderText>
             <HeaderText>

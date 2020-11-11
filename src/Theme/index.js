@@ -25,11 +25,12 @@ const theme = (darkMode, color) => ({
   shadowColor: darkMode ? '#000' : '#2F80ED',
   mercuryGray: darkMode ? '#333333' : '#E1E1E1',
 
-  text1: darkMode ? '#FAFAFA' : '#1F1F1F',
+  text1: darkMode ? '#FAFAFA' : '#202327',
   text2: darkMode ? '#C3C5CB' : '#565A69',
   text3: darkMode ? '#6C7284' : '#888D9B',
   text4: darkMode ? '#565A69' : '#C3C5CB',
   text5: darkMode ? '#2C2F36' : '#EDEEF2',
+  activeText: '#6681A7',
 
   // special case text types
   white: '#FFFFFF',
@@ -72,6 +73,7 @@ const theme = (darkMode, color) => ({
   yellow2: '#F3841E',
   link: '#2172E5',
   blue: '2f80ed',
+  lightText1: '#FAFAFA',
 
   background: darkMode ? 'black' : `radial-gradient(50% 50% at 50% 50%, #C9A02F30 0%, #fff 0%)`,
 })
@@ -170,6 +172,10 @@ export const GlobalStyle = createGlobalStyle`
     height: 100%;
     font-size: 14px;    
     background-color: ${({ theme }) => theme.bg6};
+  }
+
+  * {
+    box-sizing: border-box;
   }
 
   a {
