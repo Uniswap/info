@@ -186,11 +186,11 @@ export const Search = ({ small = false }) => {
       try {
         if (value?.length > 0) {
           let tokens = await client.query({
+            query: TOKEN_SEARCH,
             variables: {
               value: value ? value.toUpperCase() : '',
               id: value,
             },
-            query: TOKEN_SEARCH,
           })
 
           let pairs = await client.query({
@@ -200,8 +200,13 @@ export const Search = ({ small = false }) => {
               id: value,
             },
           })
-          setSearchedPairs(pairs.data.as0.concat(pairs.data.as1).concat(pairs.data.asAddress))
-          let foundTokens = tokens.data.asSymbol.concat(tokens.data.asAddress).concat(tokens.data.asName)
+
+          setSearchedPairs(
+            updateNameData(pairs.data.as0)
+              .concat(updateNameData(pairs.data.as1))
+              .concat(updateNameData(pairs.data.asAddress))
+          )
+          const foundTokens = tokens.data.asSymbol.concat(tokens.data.asAddress).concat(tokens.data.asName)
           setSearchedTokens(foundTokens)
         }
       } catch (e) {
@@ -215,10 +220,11 @@ export const Search = ({ small = false }) => {
     return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') // $& means the whole matched string
   }
 
-  // add the searched tokens to the list if now found yet
+  // add the searched tokens to the list if not found yet
   allTokens = allTokens.concat(
     searchedTokens.filter((searchedToken) => {
       let included = false
+      updateNameData()
       allTokens.map((token) => {
         if (token.id === searchedToken.id) {
           included = true
@@ -495,6 +501,8 @@ export const Search = ({ small = false }) => {
             </MenuItem>
           )}
           {filteredTokenList.slice(0, tokensShown).map((token) => {
+            // update displayed names
+            updateNameData({ token0: token })
             return (
               <BasicLink to={'/token/' + token.id} key={token.id} onClick={onDismiss}>
                 <MenuItem>
