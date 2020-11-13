@@ -14,7 +14,6 @@ import Loader from '../components/LocalLoader'
 import { BasicLink } from '../components/Link'
 import Search from '../components/Search'
 import { formattedNum, formattedPercent, getPoolLink, getSwapLink } from '../utils'
-import { useColor } from '../hooks'
 import { usePairData, usePairTransactions } from '../contexts/PairData'
 import { TYPE } from '../Theme'
 import CopyHelper from '../components/Copy'
@@ -400,7 +399,7 @@ function PairPage({ pairAddress, history }) {
                 >
                   <PairChart
                     address={pairAddress}
-                    color={'#2E69BB'}
+                    color={'#6681A7'}
                     base0={reserve1 / reserve0}
                     base1={reserve0 / reserve1}
                   />

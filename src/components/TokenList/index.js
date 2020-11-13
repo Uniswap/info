@@ -25,7 +25,6 @@ const PageButtons = styled.div`
   display: flex;
   justify-content: center;
   margin-top: 2em;
-  margin-bottom: 2em;
 `
 
 const Arrow = styled.div`
