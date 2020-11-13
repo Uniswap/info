@@ -16,8 +16,7 @@ import Search from '../components/Search'
 import { formattedNum, formattedPercent, getPoolLink, getSwapLink } from '../utils'
 import { useColor } from '../hooks'
 import { usePairData, usePairTransactions } from '../contexts/PairData'
-import { TYPE, ThemedBackground } from '../Theme'
-import { transparentize } from 'polished'
+import { TYPE } from '../Theme'
 import CopyHelper from '../components/Copy'
 import { useMedia } from 'react-use'
 import DoubleTokenLogo from '../components/DoubleLogo'
@@ -33,12 +32,15 @@ import { useListedTokens } from '../contexts/Application'
 
 const DashboardWrapper = styled.div`
   width: 100%;
+  background-color: ${({ theme }) => theme.bg8};
+  padding: 2rem;
+  border-radius: 1rem;
 `
 
 const PanelWrapper = styled.div`
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: max-content;
-  gap: 6px;
+  gap: 14px;
   display: inline-grid;
   width: 100%;
   align-items: start;
@@ -85,13 +87,11 @@ const TokenDetailsLayout = styled.div`
 
 const FixedPanel = styled(Panel)`
   width: fit-content;
-  padding: 8px 12px;
-  border-radius: 10px;
-
-  :hover {
-    cursor: pointer;
-    background-color: ${({ theme }) => theme.bg2};
-  }
+  padding: 0;
+  border: 0;
+  background: unset;
+  cursor: pointer;
+  box-shadow: unset;
 `
 
 const HoverSpan = styled.span`
@@ -201,7 +201,6 @@ function PairPage({ pairAddress, history }) {
 
   return (
     <PageWrapper>
-      <ThemedBackground backgroundColor={transparentize(0.6, backgroundColor)} />
       <span />
       <Warning
         type={'pair'}
@@ -236,11 +235,11 @@ function PairPage({ pairAddress, history }) {
                     {token0 && token1 && (
                       <DoubleTokenLogo a0={token0?.id || ''} a1={token1?.id || ''} size={32} margin={true} />
                     )}{' '}
-                    <TYPE.main fontSize={below1080 ? '1.5rem' : '2rem'} style={{ margin: '0 1rem' }}>
+                    <TYPE.main fontSize={below1080 ? '1.5rem' : '2.5rem'} style={{ margin: '0 1rem' }}>
                       {token0 && token1 ? (
                         <>
                           <HoverSpan onClick={() => history.push(`/token/${token0?.id}`)}>{token0.symbol}</HoverSpan>
-                          <span>-</span>
+                            <span>/</span>
                           <HoverSpan onClick={() => history.push(`/token/${token1?.id}`)}>
                             {token1.symbol}
                           </HoverSpan>{' '}
@@ -295,71 +294,71 @@ function PairPage({ pairAddress, history }) {
             >
               <FixedPanel onClick={() => history.push(`/token/${token0?.id}`)}>
                 <RowFixed>
-                  <TokenLogo address={token0?.id} size={'16px'} />
-                  <TYPE.main fontSize={'16px'} lineHeight={1} fontWeight={500} ml={'4px'}>
+                  <TokenLogo address={token0?.id} size={'1rem'} />
+                  <TYPE.light fontSize='.875rem' lineHeight='1rem' fontWeight={700} ml='.25rem' mr='3.75rem'>
                     {token0 && token1
                       ? `1 ${formattedSymbol0} = ${token0Rate} ${formattedSymbol1} ${
                           parseFloat(token0?.derivedETH) ? '(' + token0USD + ')' : ''
                         }`
                       : '-'}
-                  </TYPE.main>
+                  </TYPE.light>
                 </RowFixed>
               </FixedPanel>
               <FixedPanel onClick={() => history.push(`/token/${token1?.id}`)}>
                 <RowFixed>
                   <TokenLogo address={token1?.id} size={'16px'} />
-                  <TYPE.main fontSize={'16px'} lineHeight={1} fontWeight={500} ml={'4px'}>
+                  <TYPE.light fontSize={'.875rem'} lineHeight={'1rem'} fontWeight={700} ml={'.25rem'}>
                     {token0 && token1
                       ? `1 ${formattedSymbol1} = ${token1Rate} ${formattedSymbol0}  ${
                           parseFloat(token1?.derivedETH) ? '(' + token1USD + ')' : ''
                         }`
                       : '-'}
-                  </TYPE.main>
+                  </TYPE.light>
                 </RowFixed>
               </FixedPanel>
             </AutoRow>
             <>
-              {!below1080 && <TYPE.main fontSize={'1.125rem'}>Pair Stats</TYPE.main>}
-              <PanelWrapper style={{ marginTop: '1.5rem' }}>
+              {!below1080 && <TYPE.main fontSize={'1.375rem'}>Pair Stats</TYPE.main>}
+              <PanelWrapper style={{ marginTop: '.875rem' }}>
                 <Panel style={{ height: '100%' }}>
                   <AutoColumn gap="20px">
                     <RowBetween>
-                      <TYPE.main>Total Liquidity {!usingTracked ? '(Untracked)' : ''}</TYPE.main>
+                      <TYPE.light fontSize={14} fontWeight={500}>Total Liquidity {!usingTracked ? '(Untracked)' : ''}</TYPE.light>
                       <div />
                     </RowBetween>
                     <RowBetween align="flex-end">
                       <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={500}>
                         {liquidity}
                       </TYPE.main>
-                      <TYPE.main>{liquidityChange}</TYPE.main>
+                      <TYPE.main fontSize={12} fontWeight={500}>{liquidityChange}</TYPE.main>
                     </RowBetween>
                   </AutoColumn>
                 </Panel>
                 <Panel style={{ height: '100%' }}>
                   <AutoColumn gap="20px">
                     <RowBetween>
-                      <TYPE.main>Volume (24hrs) {usingUtVolume && '(Untracked)'}</TYPE.main>
+                      <TYPE.light fontSize={14} fontWeight={500}>Volume (24hrs) {usingUtVolume && '(Untracked)'}</TYPE.light>
                       <div />
                     </RowBetween>
                     <RowBetween align="flex-end">
                       <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={500}>
                         {volume}
                       </TYPE.main>
-                      <TYPE.main>{volumeChange}</TYPE.main>
+                      <TYPE.main fontSize={12} fontWeight={500}>{volumeChange}</TYPE.main>
                     </RowBetween>
                   </AutoColumn>
                 </Panel>
                 <Panel style={{ height: '100%' }}>
                   <AutoColumn gap="20px">
                     <RowBetween>
-                      <TYPE.main>Fees (24hrs)</TYPE.main>
+                      <TYPE.light fontSize={14} fontWeight={500}>Fees (24hrs)</TYPE.light>
                       <div />
                     </RowBetween>
                     <RowBetween align="flex-end">
                       <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={500}>
                         {fees}
                       </TYPE.main>
-                      <TYPE.main>{volumeChange}</TYPE.main>
+                      <TYPE.main fontSize={12} fontWeight={500}>{volumeChange}</TYPE.main>
                     </RowBetween>
                   </AutoColumn>
                 </Panel>
@@ -367,7 +366,7 @@ function PairPage({ pairAddress, history }) {
                 <Panel style={{ height: '100%' }}>
                   <AutoColumn gap="20px">
                     <RowBetween>
-                      <TYPE.main>Pooled Tokens</TYPE.main>
+                      <TYPE.light fontSize={14} fontWeight={500}>Pooled Tokens</TYPE.light>
                       <div />
                     </RowBetween>
                     <Hover onClick={() => history.push(`/token/${token0?.id}`)} fade={true}>
@@ -408,82 +407,80 @@ function PairPage({ pairAddress, history }) {
                   />
                 </Panel>
               </PanelWrapper>
-              <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
-                Transactions
-              </TYPE.main>{' '}
-              <Panel
-                style={{
-                  marginTop: '1.5rem',
-                }}
-              >
-                {transactions ? <TxnList transactions={transactions} /> : <Loader />}
-              </Panel>
-              <RowBetween style={{ marginTop: '3rem' }}>
-                <TYPE.main fontSize={'1.125rem'}>Pair Information</TYPE.main>{' '}
-              </RowBetween>
-              <Panel
-                rounded
-                style={{
-                  marginTop: '1.5rem',
-                }}
-                p={20}
-              >
-                <TokenDetailsLayout>
-                  <Column>
-                    <TYPE.main>Pair Name</TYPE.main>
-                    <TYPE.main style={{ marginTop: '.5rem' }}>
-                      <RowFixed>
-                        <FormattedName text={token0?.symbol ?? ''} maxCharacters={8} />
-                        -
-                        <FormattedName text={token1?.symbol ?? ''} maxCharacters={8} />
-                      </RowFixed>
-                    </TYPE.main>
-                  </Column>
-                  <Column>
-                    <TYPE.main>Pair Address</TYPE.main>
-                    <AutoRow align="flex-end">
-                      <TYPE.main style={{ marginTop: '.5rem' }}>
-                        {pairAddress.slice(0, 6) + '...' + pairAddress.slice(38, 42)}
-                      </TYPE.main>
-                      <CopyHelper toCopy={pairAddress} />
-                    </AutoRow>
-                  </Column>
-                  <Column>
-                    <TYPE.main>
-                      <RowFixed>
-                        <FormattedName text={token0?.symbol ?? ''} maxCharacters={8} />{' '}
-                        <span style={{ marginLeft: '4px' }}>Address</span>
-                      </RowFixed>
-                    </TYPE.main>
-                    <AutoRow align="flex-end">
-                      <TYPE.main style={{ marginTop: '.5rem' }}>
-                        {token0 && token0.id.slice(0, 6) + '...' + token0.id.slice(38, 42)}
-                      </TYPE.main>
-                      <CopyHelper toCopy={token0?.id} />
-                    </AutoRow>
-                  </Column>
-                  <Column>
-                    <TYPE.main>
-                      <RowFixed>
-                        <FormattedName text={token1?.symbol ?? ''} maxCharacters={8} />{' '}
-                        <span style={{ marginLeft: '4px' }}>Address</span>
-                      </RowFixed>
-                    </TYPE.main>
-                    <AutoRow align="flex-end">
-                      <TYPE.main style={{ marginTop: '.5rem' }} fontSize={16}>
-                        {token1 && token1.id.slice(0, 6) + '...' + token1.id.slice(38, 42)}
-                      </TYPE.main>
-                      <CopyHelper toCopy={token1?.id} />
-                    </AutoRow>
-                  </Column>
-                  <ButtonLight>
-                    <Link external href={'https://etherscan.io/address/' + pairAddress}>
-                      View on Etherscan ↗
-                    </Link>
-                  </ButtonLight>
-                </TokenDetailsLayout>
-              </Panel>
             </>
+          </DashboardWrapper>
+          <DashboardWrapper style={{ marginTop: '1rem' }}>
+            <TYPE.main fontSize={22} fontWeight={500}>
+              Transactions
+            </TYPE.main>{' '}
+            {transactions ? <TxnList transactions={transactions} /> : <Loader />}
+          </DashboardWrapper>
+          <DashboardWrapper style={{ marginTop: '1rem' }}>
+            <RowBetween>
+              <TYPE.main fontSize={22} fontWeight={500}>Pair Information</TYPE.main>{' '}
+            </RowBetween>
+            <Panel
+              rounded
+              style={{
+                marginTop: '1.5rem',
+              }}
+              p={20}
+            >
+              <TokenDetailsLayout>
+                <Column>
+                  <TYPE.main>Pair Name</TYPE.main>
+                  <TYPE.main style={{ marginTop: '.5rem' }}>
+                    <RowFixed>
+                      <FormattedName text={token0?.symbol ?? ''} maxCharacters={8} />
+                      -
+                      <FormattedName text={token1?.symbol ?? ''} maxCharacters={8} />
+                    </RowFixed>
+                  </TYPE.main>
+                </Column>
+                <Column>
+                  <TYPE.main>Pair Address</TYPE.main>
+                  <AutoRow align="flex-end">
+                    <TYPE.main style={{ marginTop: '.5rem' }}>
+                      {pairAddress.slice(0, 6) + '...' + pairAddress.slice(38, 42)}
+                    </TYPE.main>
+                    <CopyHelper toCopy={pairAddress} />
+                  </AutoRow>
+                </Column>
+                <Column>
+                  <TYPE.main>
+                    <RowFixed>
+                      <FormattedName text={token0?.symbol ?? ''} maxCharacters={8} />{' '}
+                      <span style={{ marginLeft: '4px' }}>Address</span>
+                    </RowFixed>
+                  </TYPE.main>
+                  <AutoRow align="flex-end">
+                    <TYPE.main style={{ marginTop: '.5rem' }}>
+                      {token0 && token0.id.slice(0, 6) + '...' + token0.id.slice(38, 42)}
+                    </TYPE.main>
+                    <CopyHelper toCopy={token0?.id} />
+                  </AutoRow>
+                </Column>
+                <Column>
+                  <TYPE.main>
+                    <RowFixed>
+                      <FormattedName text={token1?.symbol ?? ''} maxCharacters={8} />{' '}
+                      <span style={{ marginLeft: '4px' }}>Address</span>
+                    </RowFixed>
+                  </TYPE.main>
+                  <AutoRow align="flex-end">
+                    <TYPE.main style={{ marginTop: '.5rem' }} fontSize={16}>
+                      {token1 && token1.id.slice(0, 6) + '...' + token1.id.slice(38, 42)}
+                    </TYPE.main>
+                    <CopyHelper toCopy={token1?.id} />
+                  </AutoRow>
+                </Column>
+                <ButtonLight>
+                  <Link external href={'https://etherscan.io/address/' + pairAddress}>
+                    View on Etherscan ↗
+                  </Link>
+                </ButtonLight>
+              </TokenDetailsLayout>
+            </Panel>
           </DashboardWrapper>
         </WarningGrouping>
       </ContentWrapperLarge>

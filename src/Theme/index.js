@@ -30,7 +30,7 @@ const theme = (darkMode, color) => ({
   text3: darkMode ? '#6C7284' : '#888D9B',
   text4: darkMode ? '#565A69' : '#C3C5CB',
   text5: darkMode ? '#2C2F36' : '#EDEEF2',
-  text6: darkMode ? '#45484D' : '#45484D',
+  text6: darkMode ? 'rgb(165, 172, 183)' : '#45484D',
   activeText: '#6681A7',
 
   // special case text types
@@ -43,6 +43,8 @@ const theme = (darkMode, color) => ({
   bg4: darkMode ? '#565A69' : '#CED0D9',
   bg5: darkMode ? '#565A69' : '#888D9B',
   bg6: darkMode ? '#000' : '#FFFFFF',
+  bg7: darkMode ? '#1f1f25' : '#F2F3F5',
+  bg8: darkMode ? '#303238' : '#FFFFFF',
 
   //specialty colors
   modalBG: darkMode ? 'rgba(0,0,0,0.425)' : 'rgba(0,0,0,0.3)',
@@ -51,7 +53,7 @@ const theme = (darkMode, color) => ({
   divider: darkMode ? 'rgba(43, 43, 43, 0.435)' : 'rgba(43, 43, 43, 0.035)',
 
   //primary colors
-  primary1: darkMode ? '#2172E5' : '#C9A02F',
+  primary1: darkMode ? '#C9A02F' : '#C9A02F',
   primary2: darkMode ? '#3680E7' : '#e0b856',
   primary3: darkMode ? '#4D8FEA' : '#e2c277',
   primary4: darkMode ? '#376bad70' : '#eed385',
@@ -68,12 +70,12 @@ const theme = (darkMode, color) => ({
   shadow1: darkMode ? '#000' : '#2F80ED',
 
   // other
-  red1: '#FF6871',
-  green1: '#27AE60',
+  red1: '#C73846',
+  green1: '#54B45D',
   yellow1: '#FFE270',
   yellow2: '#F3841E',
   link: '#2172E5',
-  blue: '2f80ed',
+  blue: '#2f80ed',
   lightText1: '#FAFAFA',
 
   background: darkMode ? 'black' : `radial-gradient(50% 50% at 50% 50%, #C9A02F30 0%, #fff 0%)`,
@@ -137,25 +139,6 @@ export const Link = styled.a.attrs({
   :active {
     text-decoration: none;
   }
-`
-
-export const ThemedBackground = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  pointer-events: none;
-  max-width: 100vw !important;
-  height: 200vh;
-  mix-blend-mode: color;
-  background: ${({ theme }) =>
-    `linear-gradient(${transparentize(0.7, theme.primary1)} 0%, ${transparentize(1, theme.bg1)} 100%)`};
-  position: absolute;
-  top: 0px;
-  left: 0px;
-  z-index: 9999;
-
-  transform: translateY(-110vh);
 `
 
 export const GlobalStyle = createGlobalStyle`
