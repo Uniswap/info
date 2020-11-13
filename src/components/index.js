@@ -9,6 +9,10 @@ import { urls } from '../utils'
 const Divider = styled(Box)`
   height: 1px;
   background-color: ${({ theme }) => theme.divider};
+
+  &:last-child {
+    display: none;
+  }
 `
 
 export const IconWrapper = styled.div`

@@ -98,9 +98,9 @@ const ClickableText = styled(Text)`
   text-align: end;
   font-size: 14px;
   font-weight: 500;
+  cursor: pointer;
 
   &:hover {
-    cursor: pointer;
     opacity: 0.6;
   }
 

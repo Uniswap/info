@@ -51,7 +51,7 @@ const DashGrid = styled.div`
   > * {
     justify-content: flex-end;
 
-    :first-child {
+    &:first-child {
       justify-content: flex-start;
       text-align: left;
       width: 20px;
@@ -79,13 +79,22 @@ const DashGrid = styled.div`
 const ListWrapper = styled.div``
 
 const ClickableText = styled(Text)`
-  color: ${({ theme }) => theme.text1};
-  &:hover {
-    cursor: pointer;
-    opacity: 0.6;
-  }
-  text-align: end;
+  color: ${({ theme }) => transparentize(0.3, theme.text6)};
   user-select: none;
+  text-align: end;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+
+  ${({ active = true, theme }) => active && `
+    &:hover {
+      opacity: 0.6;
+    }
+  `}
+
+  @media screen and (max-width: 640px) {
+    font-size: 14px;
+  }
 `
 
 const DataText = styled(Flex)`
@@ -229,7 +238,7 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
       <Panel
         style={{
           marginTop: '1.5rem', 
-          padding: '1rem 0 0 0'
+          padding: 0
         }}
       >
         <DashGrid
@@ -238,7 +247,7 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
           style={{ height: 'fit-content', padding: '1rem 2rem' }}
         >
           <Flex alignItems="center" justifyContent="flexStart">
-            <TYPE.main area="name">Name</TYPE.main>
+            <ClickableText active={false}>Name</ClickableText>
           </Flex>
           <Flex alignItems="center" justifyContent="flexEnd">
             <ClickableText
