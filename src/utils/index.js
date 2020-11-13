@@ -66,11 +66,11 @@ export function getSwapLink(token0Address, token1Address = null) {
 }
 
 export function getMiningPoolLink(token0Address) {
-  return `https://app.uniswap.org/#/uni/ETH/${token0Address}`
+  return `https://ws.exchange/stake/ETH/${token0Address}`
 }
 
 export function getUniswapAppLink(linkVariable) {
-  let baseUniswapUrl = 'https://app.uniswap.org/#/uni'
+  let baseUniswapUrl = 'https://ws.exchange/stake'
   if (!linkVariable) {
     return baseUniswapUrl
   }
