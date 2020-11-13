@@ -175,8 +175,7 @@ export const GlobalStyle = createGlobalStyle`
       text-decoration: none
     }
   }
-
-  
+ 
 .three-line-legend {
 	width: 100%;
 	height: 70px;

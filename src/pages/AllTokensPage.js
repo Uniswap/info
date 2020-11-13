@@ -9,6 +9,7 @@ import { PageWrapper, FullWrapper } from '../components'
 import { RowBetween } from '../components/Row'
 import Search from '../components/Search'
 import { useMedia } from 'react-use'
+import { DashboardWrapper } from '../Theme'
 
 function AllTokensPage() {
   const allTokens = useAllTokenData()
@@ -22,13 +23,13 @@ function AllTokensPage() {
   return (
     <PageWrapper>
       <FullWrapper>
-        <RowBetween>
-          <TYPE.largeHeader>Top Tokens</TYPE.largeHeader>
-          {!below600 && <Search small={true} />}
-        </RowBetween>
-        <Panel style={{ marginTop: '6px', padding: below600 && '1rem 0 0 0 ' }}>
+        <DashboardWrapper>
+          <RowBetween>
+            <TYPE.largeHeader>Top Tokens</TYPE.largeHeader>
+            {!below600 && <Search small={true} />}
+          </RowBetween>
           <TopTokenList tokens={allTokens} itemMax={50} />
-        </Panel>
+        </DashboardWrapper>
       </FullWrapper>
     </PageWrapper>
   )

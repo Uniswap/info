@@ -46,7 +46,8 @@ const DashGrid = styled.div`
   grid-gap: 1em;
   grid-template-columns: 100px 1fr 1fr;
   grid-template-areas: 'name liq vol';
-  padding: 0 1.125rem;
+  padding: 1rem 2rem;
+  border-top: 1px solid ${({ theme }) => theme.bg7};
 
   > * {
     justify-content: flex-end;
@@ -176,7 +177,7 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
       const apy = formattedPercent((pairData.oneDayVolumeUSD * 0.003 * 365 * 100) / pairData.reserveUSD)
 
       return (
-        <DashGrid style={{ height: '48px', padding: '1rem 2rem' }} disbaleLinks={disbaleLinks} focus={true}>
+        <DashGrid style={{ padding: '.875rem 2rem' }} disbaleLinks={disbaleLinks} focus={true}>
           <DataText area="name" fontWeight="500">
             {!below600 && <div style={{ marginRight: '20px', width: '10px' }}>{index}</div>}
             <DoubleTokenLogo
@@ -244,7 +245,7 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
         <DashGrid
           center={true}
           disbaleLinks={disbaleLinks}
-          style={{ height: 'fit-content', padding: '1rem 2rem' }}
+          style={{ height: 'fit-content', padding: '1rem 2rem', borderTop: 'none' }}
         >
           <Flex alignItems="center" justifyContent="flexStart">
             <ClickableText active={false}>Name</ClickableText>
