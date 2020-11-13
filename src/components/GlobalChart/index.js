@@ -1,14 +1,14 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react'
-import { ResponsiveContainer } from 'recharts'
 import { timeframeOptions } from '../../constants'
 import { useGlobalChartData, useGlobalData } from '../../contexts/GlobalData'
 import { useMedia } from 'react-use'
 import DropdownSelect from '../DropdownSelect'
 import TradingViewChart, { CHART_TYPES } from '../TradingviewChart'
-import { RowFixed } from '../Row'
-import { OptionButton } from '../ButtonStyled'
+// import { RowFixed } from '../Row'
+// import { OptionButton } from '../ButtonStyled'
 import { getTimeframe } from '../../utils'
-import { TYPE } from '../../Theme'
+// import { TYPE } from '../../Theme'
+import Panel from '../Panel'
 
 const CHART_VIEW = {
   VOLUME: 'Volume',
@@ -83,7 +83,7 @@ const GlobalChart = ({ display }) => {
       )}
 
       {chartDataFiltered && chartView === CHART_VIEW.LIQUIDITY && (
-        <ResponsiveContainer aspect={60 / 28} ref={ref}>
+        <Panel>
           <TradingViewChart
             data={dailyData}
             base={totalLiquidityUSD}
@@ -93,10 +93,10 @@ const GlobalChart = ({ display }) => {
             width={width}
             type={CHART_TYPES.AREA}
           />
-        </ResponsiveContainer>
+        </Panel>
       )}
       {chartDataFiltered && chartView === CHART_VIEW.VOLUME && (
-        <ResponsiveContainer aspect={60 / 28}>
+        <Panel>
           <TradingViewChart
             data={chartDataFiltered}
             base={volumeWindow === VOLUME_WINDOW.WEEKLY ? oneWeekVolume : oneDayVolumeUSD}
@@ -107,9 +107,9 @@ const GlobalChart = ({ display }) => {
             type={CHART_TYPES.BAR}
             useWeekly={volumeWindow === VOLUME_WINDOW.WEEKLY}
           />
-        </ResponsiveContainer>
+        </Panel>
       )}
-      {display === 'volume' && (
+      {/* {display === 'volume' && (
         <RowFixed
           style={{
             bottom: '70px',
@@ -132,7 +132,7 @@ const GlobalChart = ({ display }) => {
             <TYPE.body>W</TYPE.body>
           </OptionButton>
         </RowFixed>
-      )}
+      )} */}
     </>
   ) : (
     ''

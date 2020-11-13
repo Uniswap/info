@@ -14,10 +14,6 @@ const Header = styled.div`
   top: 0;
 `
 
-const Medium = styled.span`
-  font-weight: 500;
-`
-
 export default function GlobalStats() {
   const below1295 = useMedia('(max-width: 1295px)')
   const below1180 = useMedia('(max-width: 1180px)')
@@ -37,7 +33,9 @@ export default function GlobalStats() {
       <RowBetween style={{ padding: below816 ? '0.5rem' : '.5rem' }}>
         <RowFixed>
           {!below400 && (
-            <TYPE.main
+            <TYPE.light
+              fontSize={14}
+              fontWeight={700}
               mr={'1rem'}
               onMouseEnter={() => {
                 setShowPriceCard(true)
@@ -47,25 +45,37 @@ export default function GlobalStats() {
               }}
               style={{ position: 'relative' }}
             >
-              ETH Price: <Medium>{formattedEthPrice}</Medium>
+              ETH Price: {formattedEthPrice}
               {showPriceCard && <UniPrice />}
-            </TYPE.main>
+            </TYPE.light>
           )}
 
           {!below1180 && (
-            <TYPE.main mr={'1rem'}>
-              Transactions (24H): <Medium>{localNumber(oneDayTxns)}</Medium>
-            </TYPE.main>
+            <TYPE.light 
+              fontSize={14}
+              fontWeight={700}
+              mr={'1rem'}
+            >
+              Transactions (24H): {localNumber(oneDayTxns)}
+            </TYPE.light>
           )}
           {!below1024 && (
-            <TYPE.main mr={'1rem'}>
-              Pairs: <Medium>{localNumber(pairCount)}</Medium>
-            </TYPE.main>
+            <TYPE.light 
+              fontSize={14}
+              fontWeight={700}
+              mr={'1rem'}
+            >
+              Pairs: {localNumber(pairCount)}
+            </TYPE.light>
           )}
           {!below1295 && (
-            <TYPE.main mr={'1rem'}>
-              Fees (24H): <Medium>{oneDayFees}</Medium>&nbsp;
-            </TYPE.main>
+            <TYPE.light 
+              fontSize={14}
+              fontWeight={700}
+              mr={'1rem'}
+            >
+              Fees (24H): {oneDayFees}&nbsp;
+            </TYPE.light>
           )}
         </RowFixed>
       </RowBetween>

@@ -1,5 +1,4 @@
 import React from 'react'
-import { transparentize } from 'polished'
 import { ThemeProvider as StyledComponentsThemeProvider, createGlobalStyle } from 'styled-components'
 import { useDarkModeManager } from '../contexts/LocalStorage'
 import styled from 'styled-components'
