@@ -81,7 +81,7 @@ const TradingViewChart = ({
   // if no chart created yet, create one with options and add to DOM manually
   useEffect(() => {
     if (!chartCreated && formattedData) {
-      var chart = createChart(ref.current, {
+      let chart = createChart(ref.current, {
         width: width,
         height: HEIGHT,
         layout: {

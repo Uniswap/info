@@ -1,9 +1,8 @@
 import React, { useEffect } from 'react'
 import 'feather-icons'
 import { withRouter } from 'react-router-dom'
-import { TYPE } from '../Theme'
+import { DashboardWrapper, TYPE } from '../Theme'
 import { PageWrapper, FullWrapper } from '../components'
-import Panel from '../components/Panel'
 import LPList from '../components/LPList'
 import styled from 'styled-components'
 import AccountSearch from '../components/AccountSearch'
@@ -14,6 +13,8 @@ import { useMedia } from 'react-use'
 import Search from '../components/Search'
 
 const AccountWrapper = styled.div`
+  margin-top: 2rem;
+
   @media screen and (max-width: 600px) {
     width: 100%;
   }
@@ -32,17 +33,22 @@ function AccountLookup() {
   return (
     <PageWrapper>
       <FullWrapper>
-        <RowBetween>
-          <TYPE.largeHeader>Wallet analytics</TYPE.largeHeader>
-          {!below600 && <Search small={true} />}
-        </RowBetween>
-        <AccountWrapper>
-          <AccountSearch />
-        </AccountWrapper>
-        <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '2rem' }}>
-          Top Liquidity Positions
-        </TYPE.main>
-        <Panel>{topLps && topLps.length > 0 ? <LPList lps={topLps} maxItems={200} /> : <LocalLoader />}</Panel>
+        <DashboardWrapper>
+          <RowBetween>
+            <TYPE.largeHeader>Wallet analytics</TYPE.largeHeader>
+            {!below600 && <Search small={true} />}
+          </RowBetween>
+          <AccountWrapper>
+            <AccountSearch />
+          </AccountWrapper>
+        </DashboardWrapper>
+
+        <DashboardWrapper style={{ marginTop: '1rem' }}>
+          <TYPE.main fontSize={22} fontWeight={500}>
+            Top Liquidity Positions
+          </TYPE.main>
+          {topLps && topLps.length > 0 ? <LPList lps={topLps} maxItems={200} /> : <LocalLoader />}
+        </DashboardWrapper>      
       </FullWrapper>
     </PageWrapper>
   )

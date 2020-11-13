@@ -33,7 +33,7 @@ const Input = styled.input`
   background: none;
   border: none;
   outline: none;
-  padding: 12px 16px;
+  padding: .875rem 1rem;
   border-radius: 12px;
   color: ${({ theme }) => theme.text1};
   background-color: ${({ theme }) => theme.bg1};

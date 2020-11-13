@@ -3,7 +3,7 @@ import { useMedia } from 'react-use'
 import dayjs from 'dayjs'
 import LocalLoader from '../LocalLoader'
 import utc from 'dayjs/plugin/utc'
-import { Box, Flex } from 'rebass'
+import { Box, Flex, Text } from 'rebass'
 import styled from 'styled-components'
 
 import { CustomLink } from '../Link'
@@ -13,6 +13,8 @@ import { formattedNum } from '../../utils'
 import { TYPE } from '../../Theme'
 import DoubleTokenLogo from '../DoubleLogo'
 import { RowFixed } from '../Row'
+import Panel from '../Panel'
+import { transparentize } from 'polished'
 
 dayjs.extend(utc)
 
@@ -37,12 +39,25 @@ const List = styled(Box)`
   -webkit-overflow-scrolling: touch;
 `
 
+const CustomText = styled(Text)`
+  color: ${({ theme }) => transparentize(0.3, theme.text6)};
+  user-select: none;
+  text-align: end;
+  font-size: 14px;
+  font-weight: 500;
+
+  @media screen and (max-width: 640px) {
+    font-size: 14px;
+  }
+`
+
 const DashGrid = styled.div`
   display: grid;
   grid-gap: 1em;
   grid-template-columns: 10px 1.5fr 1fr 1fr;
   grid-template-areas: 'number name pair value';
-  padding: 0 4px;
+  padding: 1rem 2rem;
+  border-top: 1px solid ${({ theme }) => theme.bg7};
 
   > * {
     justify-content: flex-end;
@@ -64,13 +79,14 @@ const ListWrapper = styled.div``
 const DataText = styled(Flex)`
   align-items: center;
   text-align: center;
-  color: ${({ theme }) => theme.text1};
+  color: ${({ theme }) => transparentize(0.5, theme.text6)};
+
   & > * {
     font-size: 14px;
   }
 
   @media screen and (max-width: 600px) {
-    font-size: 13px;
+    font-size: 12px;
   }
 `
 
@@ -144,29 +160,40 @@ function LPList({ lps, disbaleLinks, maxItems = 10 }) {
 
   return (
     <ListWrapper>
-      <DashGrid center={true} disbaleLinks={disbaleLinks} style={{ height: 'fit-content', padding: ' 0 0 1rem 0' }}>
-        {!below600 && (
+      <Panel
+        style={{
+          marginTop: '1.5rem', 
+          padding: 0
+        }}
+      >
+        <DashGrid 
+          center={true} 
+          disbaleLinks={disbaleLinks} 
+          style={{ height: 'fit-content', padding: '1rem 2rem', borderTop: 'none' }}
+        >
+          {!below600 && (
+            <Flex alignItems="center" justifyContent="flex-start">
+              <CustomText area="number">#</CustomText>
+            </Flex>
+          )}
           <Flex alignItems="center" justifyContent="flex-start">
-            <TYPE.main area="number">#</TYPE.main>
+            <CustomText area="name">Account</CustomText>
           </Flex>
-        )}
-        <Flex alignItems="center" justifyContent="flex-start">
-          <TYPE.main area="name">Account</TYPE.main>
-        </Flex>
-        {/* {!below1080 && (
+          {/* {!below1080 && (
+            <Flex alignItems="center" justifyContent="flexEnd">
+              <TYPE.main area="type">Type</TYPE.main>
+            </Flex>
+          )} */}
           <Flex alignItems="center" justifyContent="flexEnd">
-            <TYPE.main area="type">Type</TYPE.main>
+            <CustomText area="pair">Pair</CustomText>
           </Flex>
-        )} */}
-        <Flex alignItems="center" justifyContent="flexEnd">
-          <TYPE.main area="pair">Pair</TYPE.main>
-        </Flex>
-        <Flex alignItems="center" justifyContent="flexEnd">
-          <TYPE.main area="value">Value</TYPE.main>
-        </Flex>
-      </DashGrid>
-      <Divider />
-      <List p={0}>{!lpList ? <LocalLoader /> : lpList}</List>
+          <Flex alignItems="center" justifyContent="flexEnd">
+            <CustomText area="value">Value</CustomText>
+          </Flex>
+        </DashGrid>
+        <Divider />
+        <List p={0}>{!lpList ? <LocalLoader /> : lpList}</List>
+      </Panel>
       <PageButtons>
         <div onClick={() => setPage(page === 1 ? page : page - 1)}>
           <Arrow faded={page === 1 ? true : false}>←</Arrow>
