@@ -31,7 +31,6 @@ const theme = (darkMode, color) => ({
   text4: darkMode ? '#565A69' : '#C3C5CB',
   text5: darkMode ? '#2C2F36' : '#EDEEF2',
   text6: darkMode ? 'rgb(165, 172, 183)' : '#45484D',
-  activeText: '#6681A7',
 
   // special case text types
   white: '#FFFFFF',
@@ -44,7 +43,7 @@ const theme = (darkMode, color) => ({
   bg5: darkMode ? '#565A69' : '#888D9B',
   bg6: darkMode ? '#000' : '#FFFFFF',
   bg7: darkMode ? '#1f1f25' : '#F2F3F5',
-  bg8: darkMode ? '#303238' : '#FFFFFF',
+  bg8: darkMode ? '#1C1C22' : '#FFFFFF',
 
   //specialty colors
   modalBG: darkMode ? 'rgba(0,0,0,0.425)' : 'rgba(0,0,0,0.3)',
@@ -75,7 +74,7 @@ const theme = (darkMode, color) => ({
   yellow1: '#FFE270',
   yellow2: '#F3841E',
   link: '#2172E5',
-  blue: '#2f80ed',
+  blue: '#6681A7',
   lightText1: '#FAFAFA',
 
   background: darkMode ? 'black' : `radial-gradient(50% 50% at 50% 50%, #C9A02F30 0%, #fff 0%)`,
@@ -103,7 +102,7 @@ export const TYPE = {
   },
 
   largeHeader(props) {
-    return <TextWrapper fontWeight={500} color={'text1'} fontSize={24} {...props} />
+    return <TextWrapper fontWeight={500} color={'text1'} fontSize={28} {...props} />
   },
 
   light(props) {
@@ -114,6 +113,13 @@ export const TYPE = {
     return <TextWrapper fontWeight={props.faded ? 400 : 600} color={props.faded ? 'text1' : 'text1'} {...props} />
   },
 }
+
+export const DashboardWrapper = styled.div`
+  width: 100%;
+  background-color: ${({ theme }) => theme.bg8};
+  padding: 2rem;
+  border-radius: 1rem;
+`
 
 export const Hover = styled.div`
   :hover {

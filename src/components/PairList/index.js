@@ -14,6 +14,8 @@ import DoubleTokenLogo from '../DoubleLogo'
 import FormattedName from '../FormattedName'
 import QuestionHelper from '../QuestionHelper'
 import { TYPE } from '../../Theme'
+import { transparentize } from 'polished'
+import Panel from '../Panel'
 
 dayjs.extend(utc)
 
@@ -89,7 +91,7 @@ const ClickableText = styled(Text)`
 const DataText = styled(Flex)`
   align-items: center;
   text-align: center;
-  color: ${({ theme }) => theme.text1};
+  color: ${({ theme }) => transparentize(0.5, theme.text6)};
 
   & > * {
     font-size: 14px;
@@ -97,6 +99,18 @@ const DataText = styled(Flex)`
 
   @media screen and (max-width: 600px) {
     font-size: 12px;
+  }
+`
+
+const Link = styled(CustomLink)`
+  font-size: 14px;
+  line-height: 16px;
+  font-weight: 700;
+  margin-left: 20px;
+  white-space: nowrap;
+
+  > div {
+    color: ${({ theme }) => theme.blue} !important;
   }
 `
 
@@ -153,7 +167,7 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
       const apy = formattedPercent((pairData.oneDayVolumeUSD * 0.003 * 365 * 100) / pairData.reserveUSD)
 
       return (
-        <DashGrid style={{ height: '48px' }} disbaleLinks={disbaleLinks} focus={true}>
+        <DashGrid style={{ height: '48px', padding: '1rem 2rem' }} disbaleLinks={disbaleLinks} focus={true}>
           <DataText area="name" fontWeight="500">
             {!below600 && <div style={{ marginRight: '20px', width: '10px' }}>{index}</div>}
             <DoubleTokenLogo
@@ -162,14 +176,14 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
               a1={pairData.token1.id}
               margin={!below740}
             />
-            <CustomLink style={{ marginLeft: '20px', whiteSpace: 'nowrap' }} to={'/pair/' + pairAddress} color={color}>
+            <Link to={'/pair/' + pairAddress}>
               <FormattedName
                 text={pairData.token0.symbol + '-' + pairData.token1.symbol}
                 maxCharacters={below600 ? 8 : 16}
                 adjustSize={true}
                 link={true}
               />
-            </CustomLink>
+            </Link>
           </DataText>
           <DataText area="liq">{liquidity}</DataText>
           <DataText area="vol">{volume}</DataText>
@@ -212,80 +226,87 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
 
   return (
     <ListWrapper>
-      <DashGrid
-        center={true}
-        disbaleLinks={disbaleLinks}
-        style={{ height: 'fit-content', padding: '0 1.125rem 1rem 1.125rem' }}
+      <Panel
+        style={{
+          marginTop: '1.5rem', 
+          padding: '1rem 0 0 0'
+        }}
       >
-        <Flex alignItems="center" justifyContent="flexStart">
-          <TYPE.main area="name">Name</TYPE.main>
-        </Flex>
-        <Flex alignItems="center" justifyContent="flexEnd">
-          <ClickableText
-            area="liq"
-            onClick={(e) => {
-              setSortedColumn(SORT_FIELD.LIQ)
-              setSortDirection(sortedColumn !== SORT_FIELD.LIQ ? true : !sortDirection)
-            }}
-          >
-            Liquidity {sortedColumn === SORT_FIELD.LIQ ? (!sortDirection ? '↑' : '↓') : ''}
-          </ClickableText>
-        </Flex>
-        <Flex alignItems="center">
-          <ClickableText
-            area="vol"
-            onClick={(e) => {
-              setSortedColumn(SORT_FIELD.VOL)
-              setSortDirection(sortedColumn !== SORT_FIELD.VOL ? true : !sortDirection)
-            }}
-          >
-            Volume (24hrs)
-            {sortedColumn === SORT_FIELD.VOL ? (!sortDirection ? '↑' : '↓') : ''}
-          </ClickableText>
-        </Flex>
-        {!below1080 && (
+        <DashGrid
+          center={true}
+          disbaleLinks={disbaleLinks}
+          style={{ height: 'fit-content', padding: '1rem 2rem' }}
+        >
+          <Flex alignItems="center" justifyContent="flexStart">
+            <TYPE.main area="name">Name</TYPE.main>
+          </Flex>
           <Flex alignItems="center" justifyContent="flexEnd">
             <ClickableText
-              area="volWeek"
+              area="liq"
               onClick={(e) => {
-                setSortedColumn(SORT_FIELD.VOL_7DAYS)
-                setSortDirection(sortedColumn !== SORT_FIELD.VOL_7DAYS ? true : !sortDirection)
+                setSortedColumn(SORT_FIELD.LIQ)
+                setSortDirection(sortedColumn !== SORT_FIELD.LIQ ? true : !sortDirection)
               }}
             >
-              Volume (7d) {sortedColumn === SORT_FIELD.VOL_7DAYS ? (!sortDirection ? '↑' : '↓') : ''}
+              Liquidity {sortedColumn === SORT_FIELD.LIQ ? (!sortDirection ? '↑' : '↓') : ''}
             </ClickableText>
           </Flex>
-        )}
-        {!below1080 && (
-          <Flex alignItems="center" justifyContent="flexEnd">
+          <Flex alignItems="center">
             <ClickableText
-              area="fees"
+              area="vol"
               onClick={(e) => {
-                setSortedColumn(SORT_FIELD.FEES)
-                setSortDirection(sortedColumn !== SORT_FIELD.FEES ? true : !sortDirection)
+                setSortedColumn(SORT_FIELD.VOL)
+                setSortDirection(sortedColumn !== SORT_FIELD.VOL ? true : !sortDirection)
               }}
             >
-              Fees (24hr) {sortedColumn === SORT_FIELD.FEES ? (!sortDirection ? '↑' : '↓') : ''}
+              Volume (24hrs)
+              {sortedColumn === SORT_FIELD.VOL ? (!sortDirection ? '↑' : '↓') : ''}
             </ClickableText>
           </Flex>
-        )}
-        {!below1080 && (
-          <Flex alignItems="center" justifyContent="flexEnd">
-            <ClickableText
-              area="apy"
-              onClick={(e) => {
-                setSortedColumn(SORT_FIELD.APY)
-                setSortDirection(sortedColumn !== SORT_FIELD.APY ? true : !sortDirection)
-              }}
-            >
-              1y Fees / Liquidity {sortedColumn === SORT_FIELD.APY ? (!sortDirection ? '↑' : '↓') : ''}
-            </ClickableText>
-            <QuestionHelper text={'Based on 24hr volume annualized'} />
-          </Flex>
-        )}
-      </DashGrid>
-      <Divider />
-      <List p={0}>{!pairList ? <LocalLoader /> : pairList}</List>
+          {!below1080 && (
+            <Flex alignItems="center" justifyContent="flexEnd">
+              <ClickableText
+                area="volWeek"
+                onClick={(e) => {
+                  setSortedColumn(SORT_FIELD.VOL_7DAYS)
+                  setSortDirection(sortedColumn !== SORT_FIELD.VOL_7DAYS ? true : !sortDirection)
+                }}
+              >
+                Volume (7d) {sortedColumn === SORT_FIELD.VOL_7DAYS ? (!sortDirection ? '↑' : '↓') : ''}
+              </ClickableText>
+            </Flex>
+          )}
+          {!below1080 && (
+            <Flex alignItems="center" justifyContent="flexEnd">
+              <ClickableText
+                area="fees"
+                onClick={(e) => {
+                  setSortedColumn(SORT_FIELD.FEES)
+                  setSortDirection(sortedColumn !== SORT_FIELD.FEES ? true : !sortDirection)
+                }}
+              >
+                Fees (24hr) {sortedColumn === SORT_FIELD.FEES ? (!sortDirection ? '↑' : '↓') : ''}
+              </ClickableText>
+            </Flex>
+          )}
+          {!below1080 && (
+            <Flex alignItems="center" justifyContent="flexEnd">
+              <ClickableText
+                area="apy"
+                onClick={(e) => {
+                  setSortedColumn(SORT_FIELD.APY)
+                  setSortDirection(sortedColumn !== SORT_FIELD.APY ? true : !sortDirection)
+                }}
+              >
+                1y Fees / Liquidity {sortedColumn === SORT_FIELD.APY ? (!sortDirection ? '↑' : '↓') : ''}
+              </ClickableText>
+              <QuestionHelper text={'Based on 24hr volume annualized'} />
+            </Flex>
+          )}
+        </DashGrid>
+        <Divider />
+        <List p={0}>{!pairList ? <LocalLoader /> : pairList}</List>
+      </Panel>
       <PageButtons>
         <div
           onClick={(e) => {

@@ -29,7 +29,7 @@ const PageButtons = styled.div`
 `
 
 const Arrow = styled.div`
-  color: #2f80ed;
+  color: #6681A7;
   opacity: ${(props) => (props.faded ? 0.3 : 1)};
   padding: 0 20px;
   user-select: none;
@@ -88,7 +88,7 @@ const DashGrid = styled.div`
 `
 
 const CustomLink = styled(Link)`
-  color: ${({ theme }) => theme.activeText};
+  color: ${({ theme }) => theme.blue};
   font-weight: 600;
 `
 
@@ -300,7 +300,7 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
     return (
       <DashGrid style={{ height: '48px', padding: '1rem 2rem' }}>
         <DataText area="txn" fontWeight="500">
-          <CustomLink color={color} external href={urls.showTransaction(item.hash)} style={{ fontWeight: 700 }}>
+          <CustomLink external href={urls.showTransaction(item.hash)} style={{ fontWeight: 700 }}>
             {getTransactionType(item.type, item.token1Symbol, item.token0Symbol)}
           </CustomLink>
         </DataText>
@@ -321,7 +321,7 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
         )}
         {!below1080 && (
           <DataText area="account">
-            <CustomLink color={"#6681A7"} external href={'https://etherscan.io/address/' + item.account}>
+            <CustomLink external href={'https://etherscan.io/address/' + item.account}>
               {item.account && item.account.slice(0, 6) + '...' + item.account.slice(38, 42)}
             </CustomLink>
           </DataText>
