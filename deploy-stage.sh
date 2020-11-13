@@ -1,0 +1,1 @@
+rsync --progress -avz build/* wtest1:whiteswap-info/

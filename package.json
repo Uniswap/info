@@ -74,7 +74,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "deploy:stage": "yarn && yarn build && ./deploy-stage.sh",
+    "deploy:prod": "yarn && yarn build && ./deploy-prod.sh"
   },
   "browserslist": {
     "production": [
