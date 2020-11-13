@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import 'feather-icons'
 import { withRouter } from 'react-router-dom'
-import styled from 'styled-components'
+import styled from 'styled-components/macro'
 import { ButtonLight, ButtonFaded } from '../ButtonStyled'
 import { AutoRow, RowBetween } from '../Row'
 import { isAddress } from '../../utils'

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
-import styled from 'styled-components'
+import styled from 'styled-components/macro'
 import { Area, XAxis, YAxis, ResponsiveContainer, Tooltip, AreaChart, BarChart, Bar } from 'recharts'
 import { AutoRow, RowBetween, RowFixed } from '../Row'
 
@@ -255,14 +255,16 @@ const TokenChart = ({ address, color, base }) => {
               cursor={true}
               formatter={(val) => formattedNum(val, true)}
               labelFormatter={(label) => toNiceDateYear(label)}
-              labelStyle={{ paddingTop: 4 }}
+              labelStyle={{ 
+                paddingTop: 4
+              }}
               contentStyle={{
                 padding: '10px 14px',
                 borderRadius: 10,
                 borderColor: color,
-                color: 'black',
+                color: 'black'
               }}
-              wrapperStyle={{ top: -70, left: -10 }}
+              wrapperStyle={{ top: '-70px', left: '-10px' }}
             />
             <Area
               key={'other'}
@@ -321,9 +323,9 @@ const TokenChart = ({ address, color, base }) => {
                   padding: '10px 14px',
                   borderRadius: 10,
                   borderColor: color,
-                  color: 'black',
+                  color: 'black'
                 }}
-                wrapperStyle={{ top: -70, left: -10 }}
+                wrapperStyle={{ top: '-70px', left: '-10px' }}
               />
               <Area
                 key={'other'}

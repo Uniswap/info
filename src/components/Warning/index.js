@@ -1,6 +1,6 @@
 import React from 'react'
 import 'feather-icons'
-import styled from 'styled-components'
+import styled from 'styled-components/macro'
 import { Text } from 'rebass'
 import { AlertTriangle } from 'react-feather'
 import { RowBetween, RowFixed } from '../Row'

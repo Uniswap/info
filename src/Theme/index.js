@@ -1,7 +1,7 @@
 import React from 'react'
-import { ThemeProvider as StyledComponentsThemeProvider, createGlobalStyle } from 'styled-components'
+import { ThemeProvider as StyledComponentsThemeProvider, createGlobalStyle } from 'styled-components/macro'
 import { useDarkModeManager } from '../contexts/LocalStorage'
-import styled from 'styled-components'
+import styled from 'styled-components/macro'
 import { Text } from 'rebass'
 
 export default function ThemeProvider({ children }) {

@@ -1,5 +1,5 @@
 import React from 'react'
-import styled from 'styled-components'
+import styled from 'styled-components/macro'
 import { Sun, Moon } from 'react-feather'
 
 const IconWrapper = styled.div<{ isActive?: boolean }>`

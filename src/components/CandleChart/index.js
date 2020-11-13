@@ -3,7 +3,7 @@ import { createChart, CrosshairMode } from 'lightweight-charts'
 import dayjs from 'dayjs'
 import { formattedNum } from '../../utils'
 import { usePrevious } from 'react-use'
-import styled from 'styled-components'
+import styled from 'styled-components/macro'
 import { Play } from 'react-feather'
 import { useDarkModeManager } from '../../contexts/LocalStorage'
 

@@ -1,5 +1,5 @@
 import { Box as RebassBox } from 'rebass'
-import styled, { css } from 'styled-components'
+import styled, { css } from 'styled-components/macro'
 
 const panelPseudo = css`
   :after {

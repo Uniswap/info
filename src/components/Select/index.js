@@ -1,5 +1,5 @@
 import React from 'react'
-import styled from 'styled-components'
+import styled from 'styled-components/macro'
 import PropTypes from 'prop-types'
 import { default as ReactSelect } from 'react-select'
 import { isMobile } from 'react-device-detect'

@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react'
-import styled from 'styled-components'
+import styled from 'styled-components/macro'
 import { useUserTransactions, useUserPositions, useMiningPositions } from '../contexts/User'
 import TxnList from '../components/TxnList'
 import Panel from '../components/Panel'

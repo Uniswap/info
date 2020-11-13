@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import styled from 'styled-components'
+import styled from 'styled-components/macro'
 
 import Row, { RowBetween } from '../Row'
 import { AutoColumn } from '../Column'

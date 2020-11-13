@@ -1,5 +1,5 @@
 import React from 'react'
-import styled from 'styled-components'
+import styled from 'styled-components/macro'
 import TokenLogo from '../TokenLogo'
 
 export default function DoubleTokenLogo({ a0, a1, size = 24, margin = false }) {

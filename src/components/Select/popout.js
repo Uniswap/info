@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { Button } from 'rebass'
-import styled from 'styled-components'
+import styled from 'styled-components/macro'
 
 import Select from 'react-select'
 
