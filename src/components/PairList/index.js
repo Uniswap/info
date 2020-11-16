@@ -119,7 +119,7 @@ const Link = styled(CustomLink)`
   white-space: nowrap;
 
   > div {
-    color: ${({ theme }) => theme.blue} !important;
+    color: ${({ theme }) => theme.blueGrey} !important;
   }
 `
 

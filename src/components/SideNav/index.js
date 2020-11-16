@@ -38,7 +38,7 @@ const Option = styled.div`
   font-weight: 500;
   font-size: 1rem;
   opacity: ${({ activeText }) => (activeText ? 1 : 0.6)};
-  color: ${({ activeText, theme }) => (activeText ? theme.blue : theme.text1)};
+  color: ${({ activeText, theme }) => (activeText ? theme.blueGrey : theme.text1)};
   display: flex;
   padding: .5rem 1.5rem;
   position: relative;
@@ -54,7 +54,7 @@ const Option = styled.div`
     font-weight: 700;
 
     > div {
-      background: ${theme.blue};
+      background: ${theme.blueGrey};
 
       > svg {
         stroke: ${theme.lightText1};
@@ -68,7 +68,7 @@ const Option = styled.div`
       height: 100%;
       top: 0;
       left: 0;
-      background: ${theme.blue};
+      background: ${theme.blueGrey};
     }
   `}
 `

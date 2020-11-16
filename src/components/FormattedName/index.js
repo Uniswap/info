@@ -6,7 +6,7 @@ import { Tooltip } from '../QuestionHelper'
 const TextWrapper = styled.div`
   position: relative;
   margin-left: ${({ margin }) => margin && '4px'};
-  color: ${({ theme, link }) => (link ? theme.blue : transparentize(0.5, theme.text6))};
+  color: ${({ theme, link }) => (link ? theme.blueGrey : transparentize(0.5, theme.text6))};
   font-size: ${({ fontSize }) => fontSize ?? 'inherit'};
 
   :hover {

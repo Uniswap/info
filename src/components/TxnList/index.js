@@ -87,7 +87,7 @@ const DashGrid = styled.div`
 `
 
 const CustomLink = styled(Link)`
-  color: ${({ theme }) => theme.blue};
+  color: ${({ theme }) => theme.blueGrey};
   font-weight: 600;
 `
 
@@ -297,7 +297,7 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
     }
 
     return (
-      <DashGrid style={{ height: '48px', padding: '1rem 2rem' }}>
+      <DashGrid style={{ padding: '1rem 2rem' }}>
         <DataText area="txn" fontWeight="500">
           <CustomLink external href={urls.showTransaction(item.hash)} style={{ fontWeight: 700 }}>
             {getTransactionType(item.type, item.token1Symbol, item.token0Symbol)}

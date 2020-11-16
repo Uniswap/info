@@ -43,7 +43,7 @@ function AccountLookup() {
           </AccountWrapper>
         </DashboardWrapper>
 
-        <DashboardWrapper style={{ marginTop: '1rem' }}>
+        <DashboardWrapper>
           <TYPE.main fontSize={22} fontWeight={500}>
             Top Liquidity Positions
           </TYPE.main>

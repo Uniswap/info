@@ -98,7 +98,7 @@ const ClickableText = styled(Text)`
 `
 
 const CustomLink = styled(RouterLink)`
-  color: ${({ theme }) => theme.blue};
+  color: ${({ theme }) => theme.blueGrey};
   font-weight: 600;
   cursor: pointer
 `

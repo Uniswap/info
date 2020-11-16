@@ -322,9 +322,9 @@ const PairChart = ({ address, color, base0, base1 }) => {
               name={'Volume'}
               dataKey={'dailyVolumeUSD'}
               fill={color}
-              opacity={'0.4'}
               yAxisId={0}
               stroke={color}
+              fill={color}
             />
           </BarChart>
         </ResponsiveContainer>

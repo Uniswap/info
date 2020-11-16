@@ -268,25 +268,23 @@ function AccountPage({ account }) {
           </DashboardWrapper>
         )}
         {!hideLPContent && (
-          <DashboardWrapper style={{ marginTop: '1rem' }}>
-            {/* <Panel style={{ gridColumn: '1' }}> */}
-              {activePosition ? (
-                <PairReturnsChart account={account} position={activePosition} />
-              ) : (
-                <UserChart account={account} position={activePosition} />
-              )}
-            {/* </Panel> */}
+          <DashboardWrapper>
+            {activePosition ? (
+              <PairReturnsChart account={account} position={activePosition} />
+            ) : (
+              <UserChart account={account} position={activePosition} />
+            )}
           </DashboardWrapper>
         )}
 
-        <DashboardWrapper style={{ marginTop: '1rem' }}>
+        <DashboardWrapper>
           <TYPE.main fontSize={22} fontWeight={500}>
             Positions
           </TYPE.main>{' '}
           <PositionList positions={positions} />
         </DashboardWrapper>
 
-        <DashboardWrapper style={{ marginTop: '1rem' }}>
+        <DashboardWrapper>
           <TYPE.main fontSize={22} fontWeight={500}>
             Liquidity Mining Pools
           </TYPE.main>
@@ -312,14 +310,14 @@ function AccountPage({ account }) {
             )}
         </DashboardWrapper>
 
-        <DashboardWrapper style={{ marginTop: '1rem' }}>
+        <DashboardWrapper>
           <TYPE.main fontSize={22} fontWeight={500}>
             Transactions
           </TYPE.main>{' '}
           <TxnList transactions={transactions} />
         </DashboardWrapper>
 
-        <DashboardWrapper style={{ marginTop: '1rem' }}>
+        <DashboardWrapper>
           <TYPE.main fontSize={22} fontWeight={500}>
             Wallet Stats
           </TYPE.main>{' '}

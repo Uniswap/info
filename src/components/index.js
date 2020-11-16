@@ -122,7 +122,7 @@ export const ContentWrapper = styled.div`
   justify-content: start;
   align-items: start;
   grid-template-columns: 1fr;
-  grid-gap: 24px;
+  grid-gap: 1rem;
   max-width: 1440px;
   width: 100%;
   margin: 0 auto;
@@ -157,7 +157,7 @@ export const FullWrapper = styled.div`
   justify-content: start;
   align-items: start;
   grid-template-columns: 1fr;
-  grid-gap: 24px;
+  grid-gap: 1rem;
   max-width: 1440px;
   width: 100%;
   margin: 0 auto;

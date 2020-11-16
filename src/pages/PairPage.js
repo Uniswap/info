@@ -399,7 +399,7 @@ function PairPage({ pairAddress, history }) {
                 >
                   <PairChart
                     address={pairAddress}
-                    color={'#6681A7'}
+                    color={'#2E69BB'}
                     base0={reserve1 / reserve0}
                     base1={reserve0 / reserve1}
                   />

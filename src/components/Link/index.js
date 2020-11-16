@@ -30,15 +30,15 @@ export const CustomLink = styled(RouterLink)`
   text-decoration: none;
   font-size: 14px;
   font-weight: 700;
-  color: ${({ color, theme }) => (color ? color : theme.blue)};
+  color: ${({ color, theme }) => (color ? color : theme.blueGrey)};
   cursor: pointer;
 
   &:visited {
-    color: ${({ color, theme }) => (color ? lighten(0.1, color) : lighten(0.1, theme.blue))};
+    color: ${({ color, theme }) => (color ? lighten(0.1, color) : lighten(0.1, theme.blueGrey))};
   }
 
   &:hover {
-    color: ${({ color, theme }) => (color ? darken(0.1, color) : darken(0.1, theme.blue))};
+    color: ${({ color, theme }) => (color ? darken(0.1, color) : darken(0.1, theme.blueGrey))};
   }
 `
 

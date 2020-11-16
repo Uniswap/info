@@ -5,7 +5,6 @@ import { AutoRow, RowBetween, RowFixed } from '../Row'
 
 import { toK, toNiceDate, toNiceDateYear, formattedNum, getTimeframe } from '../../utils'
 import { OptionButton } from '../ButtonStyled'
-import { darken } from 'polished'
 import { useMedia, usePrevious } from 'react-use'
 import { timeframeOptions } from '../../constants'
 import { useTokenChartData, useTokenPriceData } from '../../contexts/TokenData'
@@ -275,7 +274,7 @@ const TokenChart = ({ address, color, base }) => {
               type="monotone"
               name={'Liquidity'}
               yAxisId={0}
-              stroke={darken(0.12, color)}
+              stroke={color}
               fill="url(#colorUv)"
             />
           </AreaChart>
@@ -336,7 +335,7 @@ const TokenChart = ({ address, color, base }) => {
                 type="monotone"
                 name={'Price'}
                 yAxisId={0}
-                stroke={darken(0.12, color)}
+                stroke={color}
                 fill="url(#colorUv)"
               />
             </AreaChart>
