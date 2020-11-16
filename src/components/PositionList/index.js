@@ -5,7 +5,7 @@ import LocalLoader from '../LocalLoader'
 import utc from 'dayjs/plugin/utc'
 import { Box, Flex, Text } from 'rebass'
 import styled from 'styled-components/macro'
-import Link, { CustomLink } from '../Link'
+import Link, { CustomLink as RouterLink } from '../Link'
 import { Divider } from '../../components'
 import DoubleTokenLogo from '../DoubleLogo'
 import { withRouter } from 'react-router-dom'
@@ -16,6 +16,8 @@ import { RowFixed } from '../Row'
 import { ButtonLight } from '../ButtonStyled'
 import { TYPE } from '../../Theme'
 import FormattedName from '../FormattedName'
+import { transparentize } from 'polished'
+import Panel from '../Panel'
 
 dayjs.extend(utc)
 
@@ -46,7 +48,8 @@ const DashGrid = styled.div`
   grid-template-columns: 5px 0.5fr 1fr 1fr;
   grid-template-areas: 'number name uniswap return';
   align-items: flex-start;
-  padding: 20px 0;
+  padding: 1rem 2rem;
+  border-top: 1px solid ${({ theme }) => theme.bg7};
 
   > * {
     justify-content: flex-end;
@@ -78,26 +81,54 @@ const DashGrid = styled.div`
 const ListWrapper = styled.div``
 
 const ClickableText = styled(Text)`
-  color: ${({ theme }) => theme.text1};
+  color: ${({ theme }) => transparentize(0.3, theme.text6)};
+  user-select: none;
+  text-align: end;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+
   &:hover {
-    cursor: pointer;
     opacity: 0.6;
   }
 
-  text-align: end;
-  user-select: none;
+  @media screen and (max-width: 640px) {
+    font-size: 14px;
+  }
+`
+
+const CustomLink = styled(RouterLink)`
+  color: ${({ theme }) => theme.blue};
+  font-weight: 600;
+  cursor: pointer
 `
 
 const DataText = styled(Flex)`
   align-items: center;
-  text-align: center;
-  color: ${({ theme }) => theme.text1};
+  text-align: right;
+  color: ${({ theme }) => transparentize(0.5, theme.text6)};
+
   & > * {
     font-size: 1em;
   }
 
-  @media screen and (max-width: 600px) {
-    font-size: 13px;
+  @media screen and (max-width: 40em) {
+    font-size: 0.85rem;
+  }
+`
+
+const ButtonsContainer = styled(RowFixed)`
+  @media screen and (max-width: 440px) {
+    flex-wrap: wrap;
+
+    > a {
+      margin-right: 0;
+      margin-top: .5rem;
+      
+      &:first-child {
+        margin-top: 0;
+      }
+    }
   }
 `
 
@@ -148,39 +179,37 @@ function PositionList({ positions }) {
             <DoubleTokenLogo size={16} a0={position.pair.token0.id} a1={position.pair.token1.id} margin={!below740} />
           </AutoColumn>
           <AutoColumn gap="8px" justify="flex-start" style={{ marginLeft: '20px' }}>
-            <CustomLink to={'/pair/' + position.pair.id}>
-              <TYPE.main style={{ whiteSpace: 'nowrap' }} to={'/pair/'}>
-                <FormattedName
-                  text={position.pair.token0.symbol + '-' + position.pair.token1.symbol}
-                  maxCharacters={below740 ? 10 : 18}
-                />
-              </TYPE.main>
+            <CustomLink 
+              to={'/pair/' + position.pair.id} 
+              style={{ whiteSpace: 'nowrap' }}
+            >
+              {position.pair.token0.symbol + '-' + position.pair.token1.symbol}
             </CustomLink>
 
-            <RowFixed gap="8px" justify="flex-start">
+            <ButtonsContainer gap="8px" justify="flex-start">
               <Link
                 external
                 href={getPoolLink(position.pair.token0.id, position.pair.token1.id)}
                 style={{ marginRight: '.5rem' }}
               >
-                <ButtonLight style={{ padding: '4px 6px', borderRadius: '4px' }}>Add</ButtonLight>
+                <ButtonLight style={{ padding: '.5rem 1rem', borderRadius: '.625rem' }}>Add</ButtonLight>
               </Link>
               {poolOwnership > 0 && (
                 <Link external href={getPoolLink(position.pair.token0.id, position.pair.token1.id, true)}>
-                  <ButtonLight style={{ padding: '4px 6px', borderRadius: '4px' }}>Remove</ButtonLight>
+                  <ButtonLight style={{ padding: '.5rem 1rem', borderRadius: '.625rem' }}>Remove</ButtonLight>
                 </Link>
               )}
-            </RowFixed>
+            </ButtonsContainer>
           </AutoColumn>
         </DataText>
         <DataText area="uniswap">
           <AutoColumn gap="12px" justify="flex-end">
-            <TYPE.main>{formattedNum(valueUSD, true, true)}</TYPE.main>
+            <DataText>{formattedNum(valueUSD, true, true)}</DataText>
             <AutoColumn gap="4px" justify="flex-end">
               <RowFixed>
-                <TYPE.small fontWeight={400}>
+                <DataText fontWeight={400} fontSize={11}>
                   {formattedNum(poolOwnership * parseFloat(position.pair.reserve0))}{' '}
-                </TYPE.small>
+                </DataText>
                 <FormattedName
                   text={position.pair.token0.symbol}
                   maxCharacters={below740 ? 10 : 18}
@@ -189,9 +218,9 @@ function PositionList({ positions }) {
                 />
               </RowFixed>
               <RowFixed>
-                <TYPE.small fontWeight={400}>
+                <DataText fontWeight={400} fontSize={11}>
                   {formattedNum(poolOwnership * parseFloat(position.pair.reserve1))}{' '}
-                </TYPE.small>
+                </DataText>
                 <FormattedName
                   text={position.pair.token1.symbol}
                   maxCharacters={below740 ? 10 : 18}
@@ -210,7 +239,7 @@ function PositionList({ positions }) {
               </TYPE.main>
               <AutoColumn gap="4px" justify="flex-end">
                 <RowFixed>
-                  <TYPE.small fontWeight={400}>
+                  <DataText fontWeight={400} fontSize={11}>
                     {parseFloat(position.pair.token0.derivedETH)
                       ? formattedNum(
                           position?.fees.sum / (parseFloat(position.pair.token0.derivedETH) * ethPrice) / 2,
@@ -218,7 +247,7 @@ function PositionList({ positions }) {
                           true
                         )
                       : 0}{' '}
-                  </TYPE.small>
+                  </DataText>
                   <FormattedName
                     text={position.pair.token0.symbol}
                     maxCharacters={below740 ? 10 : 18}
@@ -227,7 +256,7 @@ function PositionList({ positions }) {
                   />
                 </RowFixed>
                 <RowFixed>
-                  <TYPE.small fontWeight={400}>
+                  <DataText fontWeight={400} fontSize={11}>
                     {parseFloat(position.pair.token1.derivedETH)
                       ? formattedNum(
                           position?.fees.sum / (parseFloat(position.pair.token1.derivedETH) * ethPrice) / 2,
@@ -235,7 +264,7 @@ function PositionList({ positions }) {
                           true
                         )
                       : 0}{' '}
-                  </TYPE.small>
+                  </DataText>
                   <FormattedName
                     text={position.pair.token1.symbol}
                     maxCharacters={below740 ? 10 : 18}
@@ -284,43 +313,50 @@ function PositionList({ positions }) {
 
   return (
     <ListWrapper>
-      <DashGrid center={true} style={{ height: '32px', padding: 0 }}>
-        {!below740 && (
-          <Flex alignItems="flex-start" justifyContent="flexStart">
-            <TYPE.main area="number">#</TYPE.main>
+      <Panel
+        style={{
+          marginTop: '1.5rem', 
+          padding: 0
+        }}
+      >
+        <DashGrid center={true} style={{ height: 'fit-content', padding: '1rem 2rem', border: 'unset' }}>
+          {!below740 && (
+            <Flex alignItems="flex-start" justifyContent="flexStart">
+              <ClickableText area="number">#</ClickableText>
+            </Flex>
+          )}
+          <Flex alignItems="flex-start" justifyContent="flex-start">
+            <ClickableText area="number">Name</ClickableText>
           </Flex>
-        )}
-        <Flex alignItems="flex-start" justifyContent="flex-start">
-          <TYPE.main area="number">Name</TYPE.main>
-        </Flex>
-        <Flex alignItems="center" justifyContent="flexEnd">
-          <ClickableText
-            area="uniswap"
-            onClick={(e) => {
-              setSortedColumn(SORT_FIELD.VALUE)
-              setSortDirection(sortedColumn !== SORT_FIELD.VALUE ? true : !sortDirection)
-            }}
-          >
-            {below740 ? 'Value' : 'Liquidity'} {sortedColumn === SORT_FIELD.VALUE ? (!sortDirection ? '↑' : '↓') : ''}
-          </ClickableText>
-        </Flex>
-        {!below500 && (
           <Flex alignItems="center" justifyContent="flexEnd">
             <ClickableText
-              area="return"
-              onClick={() => {
-                setSortedColumn(SORT_FIELD.UNISWAP_RETURN)
-                setSortDirection(sortedColumn !== SORT_FIELD.UNISWAP_RETURN ? true : !sortDirection)
+              area="uniswap"
+              onClick={(e) => {
+                setSortedColumn(SORT_FIELD.VALUE)
+                setSortDirection(sortedColumn !== SORT_FIELD.VALUE ? true : !sortDirection)
               }}
             >
-              {below740 ? 'Fees' : 'Total Fees Earned'}{' '}
-              {sortedColumn === SORT_FIELD.UNISWAP_RETURN ? (!sortDirection ? '↑' : '↓') : ''}
+              {below740 ? 'Value' : 'Liquidity'} {sortedColumn === SORT_FIELD.VALUE ? (!sortDirection ? '↑' : '↓') : ''}
             </ClickableText>
           </Flex>
-        )}
-      </DashGrid>
-      <Divider />
-      <List p={0}>{!positionsSorted ? <LocalLoader /> : positionsSorted}</List>
+          {!below500 && (
+            <Flex alignItems="center" justifyContent="flexEnd">
+              <ClickableText
+                area="return"
+                onClick={() => {
+                  setSortedColumn(SORT_FIELD.UNISWAP_RETURN)
+                  setSortDirection(sortedColumn !== SORT_FIELD.UNISWAP_RETURN ? true : !sortDirection)
+                }}
+              >
+                {below740 ? 'Fees' : 'Total Fees Earned'}{' '}
+                {sortedColumn === SORT_FIELD.UNISWAP_RETURN ? (!sortDirection ? '↑' : '↓') : ''}
+              </ClickableText>
+            </Flex>
+          )}
+        </DashGrid>
+        <Divider />
+        <List p={0}>{!positionsSorted ? <LocalLoader /> : positionsSorted}</List>
+      </Panel>
       <PageButtons>
         <div onClick={() => setPage(page === 1 ? page : page - 1)}>
           <Arrow faded={page === 1 ? true : false}>←</Arrow>

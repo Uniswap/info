@@ -15,6 +15,8 @@ import { RowFixed } from '../Row'
 import { ButtonLight } from '../ButtonStyled'
 import { TYPE } from '../../Theme'
 import FormattedName from '../FormattedName'
+import Panel from '../Panel'
+import { transparentize } from 'polished'
 
 dayjs.extend(utc)
 
@@ -45,7 +47,8 @@ const DashGrid = styled.div`
   grid-template-columns: 5px 0.5fr 1fr;
   grid-template-areas: 'number name uniswap';
   align-items: flex-start;
-  padding: 20px 0;
+  padding: 1rem 2rem;
+  border-top: 1px solid ${({ theme }) => theme.bg7};
 
   > * {
     justify-content: flex-end;
@@ -77,26 +80,33 @@ const DashGrid = styled.div`
 const ListWrapper = styled.div``
 
 const ClickableText = styled(Text)`
-  color: ${({ theme }) => theme.text1};
+  color: ${({ theme }) => transparentize(0.3, theme.text6)};
+  user-select: none;
+  text-align: end;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+
   &:hover {
-    cursor: pointer;
     opacity: 0.6;
   }
 
-  text-align: end;
-  user-select: none;
+  @media screen and (max-width: 640px) {
+    font-size: 14px;
+  }
 `
 
 const DataText = styled(Flex)`
   align-items: center;
-  text-align: center;
-  color: ${({ theme }) => theme.text1};
+  text-align: right;
+  color: ${({ theme }) => transparentize(0.5, theme.text6)};
+
   & > * {
     font-size: 1em;
   }
 
-  @media screen and (max-width: 600px) {
-    font-size: 13px;
+  @media screen and (max-width: 40em) {
+    font-size: 0.85rem;
   }
 `
 
@@ -222,29 +232,36 @@ function MiningPositionList({ miningPositions }) {
 
   return (
     <ListWrapper>
-      <DashGrid center={true} style={{ height: '32px', padding: 0 }}>
-        {!below740 && (
-          <Flex alignItems="flex-start" justifyContent="flexStart">
-            <TYPE.main area="number">#</TYPE.main>
+      <Panel
+        style={{
+          marginTop: '1.5rem', 
+          padding: 0
+        }}
+      >
+        <DashGrid center={true} style={{ height: 'fit-content', padding: '1rem 2rem', border: 'unset' }}>
+          {!below740 && (
+            <Flex alignItems="flex-start" justifyContent="flexStart">
+              <ClickableText area="number">#</ClickableText>
+            </Flex>
+          )}
+          <Flex alignItems="flex-start" justifyContent="flex-start">
+            <ClickableText area="number">Name</ClickableText>{' '}
           </Flex>
-        )}
-        <Flex alignItems="flex-start" justifyContent="flex-start">
-          <TYPE.main area="number">Name</TYPE.main>{' '}
-        </Flex>
-        <Flex alignItems="center" justifyContent="flexEnd">
-          <ClickableText
-            area="uniswap"
-            onClick={(e) => {
-              setSortedColumn(SORT_FIELD.VALUE)
-              setSortDirection(sortedColumn !== SORT_FIELD.VALUE ? true : !sortDirection)
-            }}
-          >
-            {below740 ? 'Value' : 'Liquidity'} {sortedColumn === SORT_FIELD.VALUE ? (!sortDirection ? '↑' : '↓') : ''}
-          </ClickableText>
-        </Flex>
-      </DashGrid>
-      <Divider />
-      <List p={0}>{!miningPositionsSorted ? <LocalLoader /> : miningPositionsSorted}</List>
+          <Flex alignItems="center" justifyContent="flexEnd">
+            <ClickableText
+              area="uniswap"
+              onClick={(e) => {
+                setSortedColumn(SORT_FIELD.VALUE)
+                setSortDirection(sortedColumn !== SORT_FIELD.VALUE ? true : !sortDirection)
+              }}
+            >
+              {below740 ? 'Value' : 'Liquidity'} {sortedColumn === SORT_FIELD.VALUE ? (!sortDirection ? '↑' : '↓') : ''}
+            </ClickableText>
+          </Flex>
+        </DashGrid>
+        <Divider />
+        <List p={0}>{!miningPositionsSorted ? <LocalLoader /> : miningPositionsSorted}</List>
+      </Panel>
       <PageButtons>
         <div onClick={() => setPage(page === 1 ? page : page - 1)}>
           <Arrow faded={page === 1}>←</Arrow>

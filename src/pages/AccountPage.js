@@ -10,7 +10,7 @@ import UserChart from '../components/UserChart'
 import PairReturnsChart from '../components/PairReturnsChart'
 import PositionList from '../components/PositionList'
 import MiningPositionList from '../components/MiningPositionList'
-import { TYPE } from '../Theme'
+import { DashboardWrapper, TYPE } from '../Theme'
 import { ButtonDropdown, ButtonLight } from '../components/ButtonStyled'
 import { PageWrapper, ContentWrapper, StyledIcon } from '../components'
 import DoubleTokenLogo from '../components/DoubleLogo'
@@ -31,10 +31,6 @@ const AccountWrapper = styled.div`
 `
 
 const Header = styled.div``
-
-const DashboardWrapper = styled.div`
-  width: 100%;
-`
 
 const DropdownWrapper = styled.div`
   position: relative;
@@ -180,157 +176,160 @@ function AccountPage({ account }) {
             </AccountWrapper>
           </RowBetween>
         </Header>
-        <DashboardWrapper>
-          {showWarning && <Warning>Fees cannot currently be calculated for pairs that include AMPL.</Warning>}
-          {!hideLPContent && (
-            <DropdownWrapper>
-              <ButtonDropdown width="100%" onClick={() => setShowDropdown(!showDropdown)} open={showDropdown}>
-                {!activePosition && (
-                  <RowFixed>
-                    <StyledIcon>
-                      <Activity size={16} />
-                    </StyledIcon>
-                    <TYPE.body ml={'10px'}>All Positions</TYPE.body>
-                  </RowFixed>
-                )}
-                {activePosition && (
-                  <RowFixed>
-                    <DoubleTokenLogo a0={activePosition.pair.token0.id} a1={activePosition.pair.token1.id} size={16} />
-                    <TYPE.body ml={'16px'}>
-                      {activePosition.pair.token0.symbol}-{activePosition.pair.token1.symbol} Position
-                    </TYPE.body>
-                  </RowFixed>
-                )}
-              </ButtonDropdown>
-              {showDropdown && (
-                <Flyout>
-                  <AutoColumn gap="0px">
-                    {positions?.map((p, i) => {
-                      if (p.pair.token1.symbol === 'WETH') {
-                        p.pair.token1.symbol = 'ETH'
-                      }
-                      if (p.pair.token0.symbol === 'WETH') {
-                        p.pair.token0.symbol = 'ETH'
-                      }
-                      return (
-                        p.pair.id !== activePosition?.pair.id && (
-                          <MenuRow
-                            onClick={() => {
-                              setActivePosition(p)
-                              setShowDropdown(false)
-                            }}
-                            key={i}
-                          >
-                            <DoubleTokenLogo a0={p.pair.token0.id} a1={p.pair.token1.id} size={16} />
-                            <TYPE.body ml={'16px'}>
-                              {p.pair.token0.symbol}-{p.pair.token1.symbol} Position
-                            </TYPE.body>
-                          </MenuRow>
-                        )
-                      )
-                    })}
-                    {activePosition && (
-                      <MenuRow
-                        onClick={() => {
-                          setActivePosition()
-                          setShowDropdown(false)
-                        }}
-                      >
-                        <RowFixed>
-                          <StyledIcon>
-                            <Activity size={16} />
-                          </StyledIcon>
-                          <TYPE.body ml={'10px'}>All Positions</TYPE.body>
-                        </RowFixed>
-                      </MenuRow>
-                    )}
-                  </AutoColumn>
-                </Flyout>
+        {showWarning && <Warning>Fees cannot currently be calculated for pairs that include AMPL.</Warning>}
+        {!hideLPContent && (
+          <DropdownWrapper>
+            <ButtonDropdown width="100%" onClick={() => setShowDropdown(!showDropdown)} open={showDropdown}>
+              {!activePosition && (
+                <RowFixed>
+                  <StyledIcon>
+                    <Activity size={16} />
+                  </StyledIcon>
+                  <TYPE.body ml={'10px'}>All Positions</TYPE.body>
+                </RowFixed>
               )}
-            </DropdownWrapper>
-          )}
-          {!hideLPContent && (
-            <Panel style={{ height: '100%', marginBottom: '1rem' }}>
-              <AutoRow gap="20px">
-                <AutoColumn gap="10px">
-                  <RowBetween>
-                    <TYPE.body>Liquidity (Including Fees)</TYPE.body>
-                    <div />
-                  </RowBetween>
-                  <RowFixed align="flex-end">
-                    <TYPE.header fontSize={'24px'} lineHeight={1}>
-                      {positionValue
-                        ? formattedNum(positionValue, true)
-                        : positionValue === 0
-                        ? formattedNum(0, true)
-                        : '-'}
-                    </TYPE.header>
-                  </RowFixed>
+              {activePosition && (
+                <RowFixed>
+                  <DoubleTokenLogo a0={activePosition.pair.token0.id} a1={activePosition.pair.token1.id} size={16} />
+                  <TYPE.body ml={'16px'}>
+                    {activePosition.pair.token0.symbol}-{activePosition.pair.token1.symbol} Position
+                  </TYPE.body>
+                </RowFixed>
+              )}
+            </ButtonDropdown>
+            {showDropdown && (
+              <Flyout>
+                <AutoColumn gap="0px">
+                  {positions?.map((p, i) => {
+                    if (p.pair.token1.symbol === 'WETH') {
+                      p.pair.token1.symbol = 'ETH'
+                    }
+                    if (p.pair.token0.symbol === 'WETH') {
+                      p.pair.token0.symbol = 'ETH'
+                    }
+                    return (
+                      p.pair.id !== activePosition?.pair.id && (
+                        <MenuRow
+                          onClick={() => {
+                            setActivePosition(p)
+                            setShowDropdown(false)
+                          }}
+                          key={i}
+                        >
+                          <DoubleTokenLogo a0={p.pair.token0.id} a1={p.pair.token1.id} size={16} />
+                          <TYPE.body ml={'16px'}>
+                            {p.pair.token0.symbol}-{p.pair.token1.symbol} Position
+                          </TYPE.body>
+                        </MenuRow>
+                      )
+                    )
+                  })}
+                  {activePosition && (
+                    <MenuRow
+                      onClick={() => {
+                        setActivePosition()
+                        setShowDropdown(false)
+                      }}
+                    >
+                      <RowFixed>
+                        <StyledIcon>
+                          <Activity size={16} />
+                        </StyledIcon>
+                        <TYPE.body ml={'10px'}>All Positions</TYPE.body>
+                      </RowFixed>
+                    </MenuRow>
+                  )}
                 </AutoColumn>
-                <AutoColumn gap="10px">
-                  <RowBetween>
-                    <TYPE.body>Fees Earned (Cumulative)</TYPE.body>
-                    <div />
-                  </RowBetween>
-                  <RowFixed align="flex-end">
-                    <TYPE.header fontSize={'24px'} lineHeight={1} color={aggregateFees && 'green'}>
-                      {aggregateFees ? formattedNum(aggregateFees, true, true) : '-'}
-                    </TYPE.header>
-                  </RowFixed>
-                </AutoColumn>
-              </AutoRow>
-            </Panel>
-          )}
-          {!hideLPContent && (
-            <PanelWrapper>
-              <Panel style={{ gridColumn: '1' }}>
-                {activePosition ? (
-                  <PairReturnsChart account={account} position={activePosition} />
-                ) : (
-                  <UserChart account={account} position={activePosition} />
-                )}
-              </Panel>
-            </PanelWrapper>
-          )}
-          <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
+              </Flyout>
+            )}
+          </DropdownWrapper>
+        )}
+        {!hideLPContent && (
+          <DashboardWrapper>
+            <AutoRow gap="1.5rem">
+              <AutoColumn gap="10px">
+                <RowBetween>
+                  <TYPE.light fontWeight={500}>Liquidity (Including Fees)</TYPE.light>
+                  <div />
+                </RowBetween>
+                <RowFixed align="flex-end">
+                  <TYPE.header fontSize={'24px'} lineHeight={1}>
+                    {positionValue
+                      ? formattedNum(positionValue, true)
+                      : positionValue === 0
+                      ? formattedNum(0, true)
+                      : '-'}
+                  </TYPE.header>
+                </RowFixed>
+              </AutoColumn>
+              <AutoColumn gap="10px">
+                <RowBetween>
+                  <TYPE.light fontWeight={500}>Fees Earned (Cumulative)</TYPE.light>
+                  <div />
+                </RowBetween>
+                <RowFixed align="flex-end">
+                  <TYPE.header fontSize={'24px'} lineHeight={1} color={aggregateFees && 'green'}>
+                    {aggregateFees ? formattedNum(aggregateFees, true, true) : '-'}
+                  </TYPE.header>
+                </RowFixed>
+              </AutoColumn>
+            </AutoRow>
+          </DashboardWrapper>
+        )}
+        {!hideLPContent && (
+          <DashboardWrapper style={{ marginTop: '1rem' }}>
+            {/* <Panel style={{ gridColumn: '1' }}> */}
+              {activePosition ? (
+                <PairReturnsChart account={account} position={activePosition} />
+              ) : (
+                <UserChart account={account} position={activePosition} />
+              )}
+            {/* </Panel> */}
+          </DashboardWrapper>
+        )}
+
+        <DashboardWrapper style={{ marginTop: '1rem' }}>
+          <TYPE.main fontSize={22} fontWeight={500}>
             Positions
           </TYPE.main>{' '}
-          <Panel
-            style={{
-              marginTop: '1.5rem',
-            }}
-          >
-            <PositionList positions={positions} />
-          </Panel>
-          <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
+          <PositionList positions={positions} />
+        </DashboardWrapper>
+
+        <DashboardWrapper style={{ marginTop: '1rem' }}>
+          <TYPE.main fontSize={22} fontWeight={500}>
             Liquidity Mining Pools
           </TYPE.main>
-          <Panel
-            style={{
-              marginTop: '1.5rem',
-            }}
-          >
             {miningPositions && <MiningPositionList miningPositions={miningPositions} />}
             {!miningPositions && (
-              <AutoColumn gap="8px" justify="flex-start">
-                <TYPE.main>No Staked Liquidity.</TYPE.main>
-                <AutoRow gap="8px" justify="flex-start">
-                  <ButtonLight style={{ padding: '4px 6px', borderRadius: '4px' }}>Learn More</ButtonLight>{' '}
-                </AutoRow>{' '}
-              </AutoColumn>
+              <Panel
+                style={{
+                  marginTop: '1.5rem',
+                }}
+              >
+                <AutoColumn gap="8px" justify="flex-start">
+                  <TYPE.main>No Staked Liquidity.</TYPE.main>
+                  <AutoRow gap="8px" justify="flex-start">
+                    <ButtonLight 
+                      style={{ padding: '.5rem 1rem', borderRadius: '.625rem' }}
+                      onClick={() => window.open('https://ws.exchange/', '_blank')}
+                    >
+                      Learn More
+                    </ButtonLight>{' '}
+                  </AutoRow>{' '}
+                </AutoColumn>
+              </Panel> 
             )}
-          </Panel>
-          <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
+        </DashboardWrapper>
+
+        <DashboardWrapper style={{ marginTop: '1rem' }}>
+          <TYPE.main fontSize={22} fontWeight={500}>
             Transactions
           </TYPE.main>{' '}
-          <Panel
-            style={{
-              marginTop: '1.5rem',
-            }}
-          >
-            <TxnList transactions={transactions} />
-          </Panel>
-          <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
+          <TxnList transactions={transactions} />
+        </DashboardWrapper>
+
+        <DashboardWrapper style={{ marginTop: '1rem' }}>
+          <TYPE.main fontSize={22} fontWeight={500}>
             Wallet Stats
           </TYPE.main>{' '}
           <Panel
