@@ -42,8 +42,8 @@ const ContentWrapper = styled.div`
 const Right = styled.div`
   position: fixed;
   right: 0;
-  bottom: 0rem;
-  z-index: 99;
+  bottom: 0;
+  z-index: 9999;
   width: ${({ open }) => (open ? '220px' : '64px')};
   height: ${({ open }) => (open ? 'fit-content' : '64px')};
   overflow: auto;

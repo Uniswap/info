@@ -64,15 +64,6 @@ const MenuRow = styled(Row)`
   }
 `
 
-const PanelWrapper = styled.div`
-  grid-template-columns: 1fr;
-  grid-template-rows: max-content;
-  gap: 6px;
-  display: inline-grid;
-  width: 100%;
-  align-items: start;
-`
-
 const Warning = styled.div`
   background-color: ${({ theme }) => theme.bg2};
   color: ${({ theme }) => theme.text1};
