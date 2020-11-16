@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "info.uniswap.org site",
+  "Description": "info.ws.exchange site",
   "Outputs": {
     "DeploymentAccessKeyId": {
       "Description": "Access key ID for deploying to the S3 bucket",
@@ -75,12 +75,12 @@
       "Type": "AWS::CertificateManager::Certificate",
       "Description": "The certificate used to secure the CloudFront distribution",
       "Properties": {
-        "DomainName": "info.uniswap.org",
+        "DomainName": "info.ws.exchange",
         "ValidationMethod": "DNS",
         "Tags": [
           {
             "Key": "Name",
-            "Value": "info.uniswap.org"
+            "Value": "info.ws.exchange"
           },
           {
             "Key": "Stack",
@@ -219,9 +219,9 @@
               "ResponsePagePath": "/"
             }
           ],
-          "Comment": "info.uniswap.org",
+          "Comment": "info.ws.exchange",
           "Enabled": true,
-          "Aliases": ["info.uniswap.org"],
+          "Aliases": ["info.ws.exchange"],
           "DefaultRootObject": "index.html",
           "HttpVersion": "http2",
           "Origins": [

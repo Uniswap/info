@@ -2,11 +2,11 @@ import React from 'react'
 
 const Attribution = () => (
   <p className="attribution">
-    <a href="https://github.com/Uniswap/uniswap-info" rel="noopener noreferrer" target="_blank">
+    <a href="https://github.com/WhiteSwap/whiteswap-info" rel="noopener noreferrer" target="_blank">
       Github
     </a>{' '}
     |{' '}
-    <a href="https://uniswap.io" rel="noopener noreferrer" target="_blank">
+    <a href="https://ws.exchange" rel="noopener noreferrer" target="_blank">
       WhiteSwap
     </a>{' '}
     |{' '}
