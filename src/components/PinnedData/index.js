@@ -15,14 +15,15 @@ import FormattedName from '../FormattedName'
 const RightColumn = styled.div`
   position: fixed;
   right: 0;
-  top: 0px;
+  top: 0;
   height: 100vh;
-  width: ${({ open }) => (open ? '160px' : '23px')};
+  width: ${({ open }) => (open ? '10rem' : '4rem')};
   padding: 1.25rem;
-  border-left: ${({ theme, open }) => '1px solid' + theme.bg3};
+  border-left: ${({ theme }) => '1px solid' + theme.bg3};
   background-color: ${({ theme }) => theme.bg1};
   z-index: 9999;
   overflow: auto;
+
   :hover {
     cursor: pointer;
   }
