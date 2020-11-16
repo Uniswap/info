@@ -17,7 +17,7 @@ const RightColumn = styled.div`
   right: 0;
   top: 0;
   height: 100vh;
-  width: ${({ open }) => (open ? '10rem' : '4rem')};
+  width: ${({ open }) => (open ? '12.5rem' : '4rem')};
   padding: 1.25rem;
   border-left: ${({ theme }) => '1px solid' + theme.bg3};
   background-color: ${({ theme }) => theme.bg1};
