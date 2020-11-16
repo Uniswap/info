@@ -504,7 +504,6 @@ const getIntervalTokenData = async (tokenAddress, startTime, interval = 3600, la
     }
 
     let result = await splitQuery(PRICES_BY_BLOCK, client, [tokenAddress], blocks, 50)
-    console.log(result);
     // format token ETH price results
     let values = []
     for (var row in result) {
@@ -523,7 +522,9 @@ const getIntervalTokenData = async (tokenAddress, startTime, interval = 3600, la
     for (var brow in result) {
       let timestamp = brow.split('b')[1]
       if (timestamp) {
-        values[index].priceUSD = result[brow].ethPrice * values[index].derivedETH
+        if(result[brow]) {
+          values[index].priceUSD = result[brow].ethPrice * values[index].derivedETH
+        }
         index += 1
       }
     }
@@ -608,9 +609,7 @@ const getTokenChartData = async (tokenAddress) => {
     data = data.sort((a, b) => (parseInt(a.date) > parseInt(b.date) ? 1 : -1))
   } catch (e) {
     console.error(e)
-    console.log(e)
   }
-  console.log(data)
 
   return data
 }
