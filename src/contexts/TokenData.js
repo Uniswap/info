@@ -586,7 +586,6 @@ const getTokenChartData = async (tokenAddress) => {
     let timestamp = data[0] && data[0].date ? data[0].date : startTime
     let latestLiquidityUSD = data[0] && data[0].totalLiquidityUSD
     let latestPriceUSD = data[0] && data[0].priceUSD
-    let latestPairDatas = data[0] && data[0].mostLiquidPairs
     let index = 1
     while (timestamp < utcEndTime.startOf('minute').unix() - oneDay) {
       const nextDay = timestamp + oneDay
@@ -598,12 +597,10 @@ const getTokenChartData = async (tokenAddress) => {
           dailyVolumeUSD: 0,
           priceUSD: latestPriceUSD,
           totalLiquidityUSD: latestLiquidityUSD,
-          mostLiquidPairs: latestPairDatas,
         })
       } else {
         latestLiquidityUSD = dayIndexArray[index].totalLiquidityUSD
         latestPriceUSD = dayIndexArray[index].priceUSD
-        latestPairDatas = dayIndexArray[index].mostLiquidPairs
         index = index + 1
       }
       timestamp = nextDay
