@@ -25,6 +25,10 @@ const PageButtons = styled.div`
   display: flex;
   justify-content: center;
   margin-top: 2em;
+
+  @media screen and (max-width: 440px) {
+    margin-top: .75rem;
+  }
 `
 
 const Arrow = styled.div`
@@ -75,6 +79,10 @@ const DashGrid = styled.div`
     grid-template-columns: 2.5fr 1fr;
     grid-template-areas: 'name uniswap';
   }
+
+  @media screen and (max-width: 440px) {
+    padding: .75rem;
+  }
 `
 
 const ListWrapper = styled.div``
@@ -117,6 +125,7 @@ const SORT_FIELD = {
 
 function MiningPositionList({ miningPositions }) {
   // const below500 = useMedia('(max-width: 500px)')
+  const below440 = useMedia('(max-width: 440px)')
   const below740 = useMedia('(max-width: 740px)')
 
   // pagination
@@ -234,11 +243,11 @@ function MiningPositionList({ miningPositions }) {
     <ListWrapper>
       <Panel
         style={{
-          marginTop: '1.5rem', 
+          marginTop: below440 ? '.75rem' : '1.5rem', 
           padding: 0
         }}
       >
-        <DashGrid center={true} style={{ height: 'fit-content', padding: '1rem 2rem', border: 'unset' }}>
+        <DashGrid center={true} style={{ height: 'fit-content', padding: below440 ? '.75rem' : '1rem 2rem', border: 'unset' }}>
           {!below740 && (
             <Flex alignItems="flex-start" justifyContent="flexStart">
               <ClickableText area="number">#</ClickableText>

@@ -14,6 +14,7 @@ import { Divider } from '..'
 import { Flex } from 'rebass'
 
 import { X } from 'react-feather'
+import { useMedia } from 'react-use'
 
 const Wrapper = styled.div`
   display: flex;
@@ -76,6 +77,7 @@ const DashGrid = styled.div`
 function AccountSearch({ history, small }) {
   const [accountValue, setAccountValue] = useState()
   const [savedAccounts, addAccount, removeAccount] = useSavedAccounts()
+  const below440 = useMedia('(max-width: 440px)')
 
   function handleAccountSearch() {
     if (isAddress(accountValue)) {
@@ -89,19 +91,23 @@ function AccountSearch({ history, small }) {
   return (
     <AutoColumn gap={'1rem'}>
       {!small && (
-        <>
-          <AutoRow>
-            <Wrapper>
-              <Input
-                placeholder="0x..."
-                onChange={(e) => {
-                  setAccountValue(e.target.value)
-                }}
-              />
-            </Wrapper>
-            <ButtonLight onClick={handleAccountSearch}>Load Account Details</ButtonLight>
-          </AutoRow>
-        </>
+        <AutoRow style={below440 ? { flexDirection: 'column' } : {}}>
+          <Wrapper>
+            <Input
+              style={below440 ? { marginRight: '0px' } : {}}
+              placeholder="0x..."
+              onChange={(e) => {
+                setAccountValue(e.target.value)
+              }}
+            />
+          </Wrapper>
+          <ButtonLight 
+            style={below440 ? { width: '100%', marginTop: '1rem' } : {}}
+            onClick={handleAccountSearch}
+          >
+            Load Account Details
+          </ButtonLight>
+        </AutoRow>
       )}
 
       <AutoColumn gap={'12px'}>

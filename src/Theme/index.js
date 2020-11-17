@@ -120,6 +120,10 @@ export const DashboardWrapper = styled.div`
   background-color: ${({ theme }) => theme.bg8};
   padding: 2rem;
   border-radius: 1rem;
+
+  @media screen and (max-width: 440px) {
+    padding: 1rem;
+  }
 `
 
 export const Hover = styled.div`
