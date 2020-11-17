@@ -137,8 +137,8 @@ const CandleStickChart = ({
       toolTip.className = 'three-line-legend'
       ref.current.appendChild(toolTip)
       toolTip.style.display = 'block'
-      toolTip.style.left = (margin ? 116 : 10) + 'px'
-      toolTip.style.top = 50 + 'px'
+      toolTip.style.left = (margin ? 174 : 10) + 'px'
+      toolTip.style.top = 64 + 'px'
       toolTip.style.backgroundColor = 'transparent'
 
       // get the title of the chart

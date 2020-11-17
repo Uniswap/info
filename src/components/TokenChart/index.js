@@ -269,7 +269,7 @@ const TokenChart = ({ address, color, base }) => {
               key={'other'}
               dataKey={'totalLiquidityUSD'}
               stackId="2"
-              strokeWidth={2}
+              strokeWidth={1}
               dot={false}
               type="monotone"
               name={'Liquidity'}
@@ -298,7 +298,7 @@ const TokenChart = ({ address, color, base }) => {
                 minTickGap={120}
                 tickFormatter={(tick) => toNiceDate(tick)}
                 dataKey="date"
-                tick={{ fill: textColor }}
+                tick={{ fill: 'textColor' }}
                 type={'number'}
                 domain={domain}
               />
@@ -366,7 +366,7 @@ const TokenChart = ({ address, color, base }) => {
             <YAxis
               type="number"
               axisLine={false}
-              tickMargin={16}
+              tickMargin={30}
               tickFormatter={(tick) => '$' + toK(tick)}
               tickLine={false}
               orientation="right"
@@ -393,7 +393,6 @@ const TokenChart = ({ address, color, base }) => {
               name={'Volume'}
               dataKey={'dailyVolumeUSD'}
               fill={color}
-              opacity={'0.4'}
               yAxisId={0}
               stroke={color}
             />
