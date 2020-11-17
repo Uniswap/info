@@ -140,6 +140,7 @@ const CandleStickChart = ({
       toolTip.style.left = (margin ? 174 : 10) + 'px'
       toolTip.style.top = 64 + 'px'
       toolTip.style.backgroundColor = 'transparent'
+      toolTip.style.width = '50%'
 
       // get the title of the chart
       function setLastBarText() {
