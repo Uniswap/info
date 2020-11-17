@@ -13,6 +13,7 @@ import Numeral from 'numeral'
 
 // format libraries
 const Decimal = toFormat(_Decimal)
+
 BigNumber.set({ EXPONENTIAL_AT: 50 })
 dayjs.extend(utc)
 
