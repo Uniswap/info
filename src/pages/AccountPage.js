@@ -75,6 +75,8 @@ const Warning = styled.div`
 `
 
 function AccountPage({ account }) {
+  const below440 = useMedia('max-width: 440px')
+
   // get data for this account
   const transactions = useUserTransactions(account)
   const positions = useUserPositions(account)
@@ -292,7 +294,7 @@ function AccountPage({ account }) {
             {!miningPositions && (
               <Panel
                 style={{
-                  marginTop: '1.5rem',
+                  marginTop: below440 ? '.75rem' : '1.5rem',
                 }}
               >
                 <AutoColumn gap="8px" justify="flex-start">
@@ -323,7 +325,7 @@ function AccountPage({ account }) {
           </TYPE.main>{' '}
           <Panel
             style={{
-              marginTop: '1.5rem',
+              marginTop: below440 ? '.75rem' : '1.5rem',
             }}
           >
             <AutoRow gap="20px">

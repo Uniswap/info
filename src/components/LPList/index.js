@@ -23,6 +23,10 @@ const PageButtons = styled.div`
   display: flex;
   justify-content: center;
   margin-top: 2em;
+
+  @media screen and (max-width: 440px) {
+    margin-top: .75rem;
+  }
 `
 
 const Arrow = styled.div`
@@ -46,8 +50,8 @@ const CustomText = styled(Text)`
   font-size: 14px;
   font-weight: 500;
 
-  @media screen and (max-width: 640px) {
-    font-size: 14px;
+  @media screen and (max-width: 440px) {
+    font-size: 10px;
   }
 `
 
@@ -72,6 +76,10 @@ const DashGrid = styled.div`
     grid-template-columns: 1fr 1fr 1fr;
     grid-template-areas: 'name pair value';
   }
+
+  @media screen and (max-width: 440px) {
+    padding: .75rem;
+  }
 `
 
 const ListWrapper = styled.div``
@@ -85,12 +93,13 @@ const DataText = styled(Flex)`
     font-size: 14px;
   }
 
-  @media screen and (max-width: 600px) {
-    font-size: 12px;
+  @media screen and (max-width: 440px) {
+    font-size: 10px;
   }
 `
 
 function LPList({ lps, disbaleLinks, maxItems = 10 }) {
+  const below440 = useMedia('(max-width: 440px)')
   const below600 = useMedia('(max-width: 600px)')
   const below800 = useMedia('(max-width: 800px)')
 
@@ -116,15 +125,15 @@ function LPList({ lps, disbaleLinks, maxItems = 10 }) {
 
   const ListItem = ({ lp, index }) => {
     return (
-      <DashGrid style={{ height: '48px' }} disbaleLinks={disbaleLinks} focus={true}>
+      <DashGrid disbaleLinks={disbaleLinks} focus={true}>
         {!below600 && (
           <DataText area="number" fontWeight="500">
             {index}
           </DataText>
         )}
         <DataText area="name" fontWeight="500" justifyContent="flex-start">
-          <CustomLink style={{ marginLeft: below600 ? 0 : '1rem', whiteSpace: 'nowrap' }} to={'/account/' + lp.user.id}>
-            {below800 ? lp.user.id.slice(0, 4) + '...' + lp.user.id.slice(38, 42) : lp.user.id}
+          <CustomLink style={{ whiteSpace: 'nowrap' }} to={'/account/' + lp.user.id}>
+            {below800 ? lp.user.id.slice(0, 4) + '...' + (below440 ? lp.user.id.slice(39, 42) : lp.user.id.slice(38, 42)) : lp.user.id}
           </CustomLink>
         </DataText>
 
@@ -136,7 +145,7 @@ function LPList({ lps, disbaleLinks, maxItems = 10 }) {
 
         <DataText>
           <CustomLink area="pair" to={'/pair/' + lp.pairAddress}>
-            <RowFixed>
+            <RowFixed style={{ textAlign: 'right' }}>
               {!below600 && <DoubleTokenLogo a0={lp.token0} a1={lp.token1} size={16} margin={true} />}
               {lp.pairName}
             </RowFixed>
@@ -162,14 +171,14 @@ function LPList({ lps, disbaleLinks, maxItems = 10 }) {
     <ListWrapper>
       <Panel
         style={{
-          marginTop: '1.5rem', 
+          marginTop: below440 ? '.75rem' : '1.5rem', 
           padding: 0
         }}
       >
         <DashGrid 
           center={true} 
           disbaleLinks={disbaleLinks} 
-          style={{ height: 'fit-content', padding: '1rem 2rem', borderTop: 'none' }}
+          style={{ height: 'fit-content', padding: below440 ? '.75rem' : '1rem 2rem', borderTop: 'none' }}
         >
           {!below600 && (
             <Flex alignItems="center" justifyContent="flex-start">

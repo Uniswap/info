@@ -25,6 +25,10 @@ const PageButtons = styled.div`
   display: flex;
   justify-content: center;
   margin-top: 2em;
+
+  @media screen and (max-width: 440px) {
+    margin-top: .75rem;
+  }
 `
 
 const Arrow = styled.div`
@@ -47,6 +51,7 @@ const DashGrid = styled.div`
   grid-template-columns: 100px 1fr 1fr;
   grid-template-areas: 'txn value time';
   border-top: 1px solid ${({ theme }) => theme.bg7};
+  padding: 1rem 2rem;
 
   > * {
     justify-content: flex-end;
@@ -84,11 +89,19 @@ const DashGrid = styled.div`
     grid-template-columns: 1.2fr 1fr 1fr 1fr 1fr 1fr;
     grid-template-areas: 'txn value amountToken amountOther account time';
   }
+
+  @media screen and (max-width: 440px) {
+    padding: .75rem;
+  }
 `
 
 const CustomLink = styled(Link)`
   color: ${({ theme }) => theme.blueGrey};
   font-weight: 600;
+
+  @media screen and (max-width: 440px) {
+    font-size: 10px;
+  }
 `
 
 const ClickableText = styled(Text)`
@@ -103,8 +116,8 @@ const ClickableText = styled(Text)`
     opacity: 0.6;
   }
 
-  @media screen and (max-width: 640px) {
-    font-size: 14px;
+  @media screen and (max-width: 440px) {
+    font-size: 10px;
   }
 `
 
@@ -119,6 +132,10 @@ const DataText = styled(Flex)`
 
   @media screen and (max-width: 40em) {
     font-size: 0.85rem;
+  }
+
+  @media screen and (max-width: 440px) {
+    font-size: 10px;
   }
 `
 
@@ -135,6 +152,10 @@ const SortText = styled.button`
 
   @media screen and (max-width: 600px) {
     font-size: 14px;
+  }
+
+  @media screen and (max-width: 440px) {
+    font-size: 10px;
   }
 `
 
@@ -286,6 +307,7 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
 
   const below1080 = useMedia('(max-width: 1080px)')
   const below780 = useMedia('(max-width: 780px)')
+  const below440 = useMedia('(max-width: 440px)')
 
   const ListItem = ({ item }) => {
     if (item.token0Symbol === 'WETH') {
@@ -297,7 +319,7 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
     }
 
     return (
-      <DashGrid style={{ padding: '1rem 2rem' }}>
+      <DashGrid>
         <DataText area="txn" fontWeight="500">
           <CustomLink external href={urls.showTransaction(item.hash)} style={{ fontWeight: 700 }}>
             {getTransactionType(item.type, item.token1Symbol, item.token0Symbol)}
@@ -334,11 +356,11 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
     <>
       <Panel
         style={{
-          marginTop: '1.5rem', 
+          marginTop: below440 ? '.75rem' : '1.5rem', 
           padding: 0
         }}
       >
-        <DashGrid center={true} style={{ height: 'fit-content', padding: '1rem 2rem', border: 'unset' }}>
+        <DashGrid center={true} style={{ height: 'fit-content', border: 'unset' }}>
           {below780 ? (
             <RowBetween area="txn">
               <DropdownSelect options={TXN_TYPE} active={txFilter} setActive={setTxFilter} color={color} />

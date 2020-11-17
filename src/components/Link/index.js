@@ -40,6 +40,10 @@ export const CustomLink = styled(RouterLink)`
   &:hover {
     color: ${({ color, theme }) => (color ? darken(0.1, color) : darken(0.1, theme.blueGrey))};
   }
+
+  @media screen and (max-width: 440px) {
+    font-size: 10px !important;
+  }
 `
 
 export const BasicLink = styled(RouterLink)`
