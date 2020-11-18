@@ -25,6 +25,10 @@ const PageButtons = styled.div`
   display: flex;
   justify-content: center;
   margin-top: 2em;
+
+  @media screen and (max-width: 440px) {
+    margin-top: .75rem;
+  }
 `
 
 const Arrow = styled.div`
@@ -57,6 +61,10 @@ const DashGrid = styled.div`
       text-align: left;
       width: 100px;
     }
+  }
+
+  @media screen and (max-width: 440px) {
+    padding: .75rem;
   }
 
   @media screen and (min-width: 680px) {
@@ -92,6 +100,8 @@ const ClickableText = styled(Text)`
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
+  display: flex;
+  justify-content: flex-end;
 
   ${({ active = true, theme }) => active && `
     &:hover {
@@ -100,7 +110,7 @@ const ClickableText = styled(Text)`
   `}
 
   @media screen and (max-width: 640px) {
-    font-size: 14px;
+    font-size: 10px;
   }
 `
 
@@ -115,6 +125,10 @@ const DataText = styled(Flex)`
 
   @media screen and (max-width: 600px) {
     font-size: 12px;
+  }
+
+  @media screen and (max-width: 440px) {
+    font-size: 10px !important;
   }
 `
 
@@ -140,6 +154,7 @@ function TopTokenList({ tokens, itemMax = 10 }) {
   const below1080 = useMedia('(max-width: 1080px)')
   const below680 = useMedia('(max-width: 680px)')
   const below600 = useMedia('(max-width: 600px)')
+  const below440 = useMedia('(max-width: 440px)')
 
   useEffect(() => {
     setMaxPage(1) // edit this to do modular
@@ -185,7 +200,7 @@ function TopTokenList({ tokens, itemMax = 10 }) {
 
   const ListItem = ({ item, index }) => {
     return (
-      <DashGrid style={{ padding: '.75rem 2rem' }} focus={true}>
+      <DashGrid style={{ padding: below440 ? '.75rem' : '.75rem 2rem' }} focus={true}>
         <DataText area="name" fontWeight="500">
           <Row>
             {!below680 && <div style={{ marginRight: '1rem', width: '10px' }}>{index}</div>}
@@ -196,6 +211,7 @@ function TopTokenList({ tokens, itemMax = 10 }) {
                 maxCharacters={below600 ? 8 : 16}
                 adjustSize={true}
                 link={true}
+                fontSize={below440 ? 10 : 14}
               />
             </CustomLink>
           </Row>
@@ -221,13 +237,13 @@ function TopTokenList({ tokens, itemMax = 10 }) {
     <ListWrapper>
       <Panel
         style={{
-          marginTop: '1.5rem', 
+          marginTop: below440 ? '.75rem' : '1.5rem', 
           padding: 0
         }}
       >
         <DashGrid 
           center={true} 
-          style={{ height: 'fit-content', padding: '1rem 2rem', borderTop: 'none' }}
+          style={{ height: 'fit-content', borderTop: 'none' }}
         >
           <Flex alignItems="center" justifyContent="flexStart">
             <ClickableText
