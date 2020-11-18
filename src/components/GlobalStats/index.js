@@ -30,7 +30,7 @@ export default function GlobalStats() {
 
   return (
     <Header>
-      <RowBetween style={{ padding: below816 ? '0.5rem' : '.5rem' }}>
+      {!below400 && <RowBetween style={{ padding: below816 ? '0.5rem' : '.5rem' }}>
         <RowFixed>
           {!below400 && (
             <TYPE.light
@@ -78,7 +78,7 @@ export default function GlobalStats() {
             </TYPE.light>
           )}
         </RowFixed>
-      </RowBetween>
+      </RowBetween>}
     </Header>
   )
 }

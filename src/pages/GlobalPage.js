@@ -51,6 +51,7 @@ function GlobalPage() {
   const { totalLiquidityUSD, oneDayVolumeUSD, volumeChangeUSD, liquidityChangeUSD } = useGlobalData()
 
   // breakpoints
+  const below440 = useMedia('(max-width: 440px)')
   const below800 = useMedia('(max-width: 800px)')
 
   // scrolling refs
@@ -67,7 +68,7 @@ function GlobalPage() {
       <ContentWrapper>
         <div>
           <DashboardWrapper>
-            <AutoColumn gap="24px" style={{ paddingBottom: below800 ? '0' : '24px' }}>
+            <AutoColumn gap={below440 ? '.75rem' : '1.5rem'} style={{ paddingBottom: below800 ? '0' : '24px' }}>
               <RowBetween>
                 <TYPE.largeHeader>{below800 ? 'Protocol Analytics' : 'WhiteSwap Protocol Analytics'}</TYPE.largeHeader>
                 {!below800 && <Search small={true} />}
@@ -75,38 +76,36 @@ function GlobalPage() {
               <GlobalStats />
             </AutoColumn>
             {below800 && ( // mobile card
-              <Box mb={20}>
-                <Panel>
-                  <Box>
-                    <AutoColumn gap="36px">
-                      <AutoColumn gap="20px">
-                        <RowBetween>
-                          <TYPE.main>Volume (24hrs)</TYPE.main>
-                          <div />
-                        </RowBetween>
-                        <RowBetween align="flex-end">
-                          <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
-                            {formattedNum(oneDayVolumeUSD, true)}
-                          </TYPE.main>
-                          <TYPE.main fontSize={12}>{formattedPercent(volumeChangeUSD)}</TYPE.main>
-                        </RowBetween>
-                      </AutoColumn>
-                      <AutoColumn gap="20px">
-                        <RowBetween>
-                          <TYPE.main>Total Liquidity</TYPE.main>
-                          <div />
-                        </RowBetween>
-                        <RowBetween align="flex-end">
-                          <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
-                            {formattedNum(totalLiquidityUSD, true)}
-                          </TYPE.main>
-                          <TYPE.main fontSize={12}>{formattedPercent(liquidityChangeUSD)}</TYPE.main>
-                        </RowBetween>
-                      </AutoColumn>
-                    </AutoColumn>
-                  </Box>
-                </Panel>
-              </Box>
+              <Panel
+                style={{
+                  marginBottom: '1.5rem'
+                }}
+              >
+                <AutoColumn gap={'2.25rem'}>
+                  <AutoColumn gap="1rem">
+                    <RowBetween>
+                      <TYPE.light>Volume (24hrs)</TYPE.light>
+                    </RowBetween>
+                    <RowBetween align="flex-end">
+                      <TYPE.main fontSize={below440 ? '1.25rem' : '1.5rem'} lineHeight={1} fontWeight={600}>
+                        {formattedNum(oneDayVolumeUSD, true)}
+                      </TYPE.main>
+                      <TYPE.main fontSize={12}>{formattedPercent(volumeChangeUSD)}</TYPE.main>
+                    </RowBetween>
+                  </AutoColumn>
+                  <AutoColumn gap="1rem">
+                    <RowBetween>
+                      <TYPE.light>Total Liquidity</TYPE.light>
+                    </RowBetween>
+                    <RowBetween align="flex-end">
+                      <TYPE.main fontSize={below440 ? '1.25rem' : '1.5rem'}  lineHeight={1} fontWeight={600}>
+                        {formattedNum(totalLiquidityUSD, true)}
+                      </TYPE.main>
+                      <TYPE.main fontSize={12}>{formattedPercent(liquidityChangeUSD)}</TYPE.main>
+                    </RowBetween>
+                  </AutoColumn>
+                </AutoColumn>
+              </Panel>
             )}
             {!below800 && (
               <GridRow>
@@ -116,9 +115,9 @@ function GlobalPage() {
             )}
             {below800 && (
               <AutoColumn style={{ marginTop: '6px' }} gap="24px">
-                <Panel style={{ height: '100%', minHeight: '300px' }}>
+                {/* <Panel style={{ height: '100%', minHeight: '300px' }}> */}
                   <GlobalChart display="liquidity" />
-                </Panel>
+                {/* </Panel> */}
               </AutoColumn>
             )}
           </DashboardWrapper>
