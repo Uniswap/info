@@ -144,9 +144,11 @@ function TokenPage({ address, history }) {
   const txnChangeFormatted = formattedPercent(txnChange)
 
   const below1080 = useMedia('(max-width: 1080px)')
+  const below1024 = useMedia('(max-width: 1024px)')
   const below800 = useMedia('(max-width: 800px)')
   const below600 = useMedia('(max-width: 600px)')
   const below500 = useMedia('(max-width: 500px)')
+  const below440 = useMedia('(max-width: 440px)')
 
   // format for long symbol
   const LENGTH = below1080 ? 10 : 16
@@ -194,7 +196,7 @@ function TokenPage({ address, history }) {
 
         <WarningGrouping disabled={!dismissed && listedTokens && !listedTokens.includes(address)}>
           <DashboardWrapper style={{ marginTop: below1080 ? '0' : '1rem' }}>
-            <RowBetween
+            <RowFixed
               style={{
                 flexWrap: 'wrap',
                 marginBottom: '2rem',
@@ -203,8 +205,8 @@ function TokenPage({ address, history }) {
             >
               <RowFixed style={{ flexWrap: 'wrap' }}>
                 <RowFixed style={{ alignItems: 'baseline' }}>
-                  <TokenLogo address={address} size="32px" style={{ alignSelf: 'center' }} />
-                  <TYPE.main fontSize={below1080 ? '1.5rem' : '2rem'} fontWeight={500} style={{ margin: '0 1rem' }}>
+                  <TokenLogo address={address} size={below440 ? '22px' : '32px'} style={{ alignSelf: 'center' }} />
+                    <TYPE.main fontSize={!below1080 ? '2.5rem' : below440 ? '1.25rem' : '1.5rem'} style={{ margin: '0 1rem' }}>
                     <RowFixed gap="6px">
                       <FormattedName text={name ? name + ' ' : ''} maxCharacters={16} style={{ marginRight: '6px' }} />{' '}
                       {formattedSymbol ? `(${formattedSymbol})` : ''}
@@ -236,16 +238,16 @@ function TokenPage({ address, history }) {
                     <></>
                   )}
                   <Link href={getPoolLink(address)} target="_blank">
-                    <ButtonLight color={backgroundColor}>+ Add Liquidity</ButtonLight>
+                    <ButtonLight color={backgroundColor}>Add Liquidity</ButtonLight>
                   </Link>
                   <Link href={getSwapLink(address)} target="_blank">
-                    <ButtonDark ml={'.5rem'} mr={below1080 && '.5rem'} color={backgroundColor}>
+                    <ButtonDark ml={'.5rem'} color={backgroundColor}>
                       Trade
                     </ButtonDark>
                   </Link>
                 </RowFixed>
               </span>
-            </RowBetween>
+            </RowFixed>
 
             <PanelWrapper style={{ marginTop: below1080 ? '0' : '1rem' }}>
               {below1080 && price && (
@@ -310,7 +312,7 @@ function TokenPage({ address, history }) {
               </Panel>
               <Panel
                 style={{
-                  gridColumn: below1080 ? '1' : '2/4',
+                  gridColumn: !below1080 ? '2/4' : below1024 ? '1/4' : '2/-1',
                   gridRow: below1080 ? '' : '1/4',
                 }}
               >
@@ -335,35 +337,35 @@ function TokenPage({ address, history }) {
             {transactions ? <TxnList color={backgroundColor} transactions={transactions} /> : <Loader />}
           </DashboardWrapper>
           <DashboardWrapper style={{ marginTop: '1.5rem' }}>
-            <TYPE.main fontSize={22} fontWeight={500}>Token Information</TYPE.main>{' '}
+            <TYPE.main fontSize={22} fontWeight={500}>Token Information</TYPE.main>
             <Panel
               rounded
               style={{
-                marginTop: '1.5rem',
+                marginTop: below440 ? '.75rem' : '1.5rem',
               }}
               p={20}
             >
               <TokenDetailsLayout>
                 <Column>
-                  <TYPE.main>Symbol</TYPE.main>
-                  <Text style={{ marginTop: '.5rem' }} fontSize={24} fontWeight="500">
-                    <FormattedName text={symbol} maxCharacters={12} />
-                  </Text>
-                </Column>
-                <Column>
-                  <TYPE.main>Name</TYPE.main>
-                  <TYPE.main style={{ marginTop: '.5rem' }} fontSize={24} fontWeight="500">
-                    <FormattedName text={name} maxCharacters={16} />
+                  <TYPE.light>Symbol</TYPE.light>
+                  <TYPE.main style={{ marginTop: '.5rem' }} fontWeight="500">
+                    {symbol}
                   </TYPE.main>
                 </Column>
                 <Column>
-                  <TYPE.main>Address</TYPE.main>
-                  <AutoRow align="flex-end">
-                    <TYPE.main style={{ marginTop: '.5rem' }} fontSize={24} fontWeight="500">
+                  <TYPE.light>Name</TYPE.light>
+                  <TYPE.main style={{ marginTop: '.5rem' }} fontWeight="500">
+                    {name}
+                  </TYPE.main>
+                </Column>
+                <Column>
+                  <TYPE.light>Address</TYPE.light>
+                  <RowBetween style={{ marginTop: '-5px' }}>
+                    <TYPE.main style={{ marginTop: '.5rem' }} fontWeight="500">
                       {address.slice(0, 8) + '...' + address.slice(36, 42)}
                     </TYPE.main>
-                    <CopyHelper toCopy={address} />
-                  </AutoRow>
+                    <CopyHelper toCopy={address}/>
+                  </RowBetween>
                 </Column>
                 <ButtonLight color={backgroundColor}>
                   <Link color={backgroundColor} external href={'https://etherscan.io/address/' + address}>

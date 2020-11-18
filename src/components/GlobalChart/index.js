@@ -25,7 +25,7 @@ const GlobalChart = ({ display }) => {
 
   // time window and window size for chart
   const timeWindow = timeframeOptions.ALL_TIME
-  const [volumeWindow, setVolumeWindow] = useState(VOLUME_WINDOW.DAYS)
+  const [volumeWindow] = useState(VOLUME_WINDOW.DAYS)
 
   // global historical data
   const [dailyData, weeklyData] = useGlobalChartData()

@@ -78,7 +78,6 @@ const PairChart = ({ address, color, base0, base1 }) => {
   const below1600 = useMedia('(max-width: 1600px)')
   const below1080 = useMedia('(max-width: 1080px)')
   const below700 = useMedia('(max-width: 700px)')
-  const below600 = useMedia('(max-width: 600px)')
 
   let utcStartTime = getTimeframe(timeWindow)
   chartData = chartData?.filter((entry) => entry.date >= utcStartTime)
