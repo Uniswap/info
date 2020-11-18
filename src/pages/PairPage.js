@@ -444,12 +444,12 @@ function PairPage({ pairAddress, history }) {
                 </Column>
                 <Column>
                   <TYPE.light>Pair Address</TYPE.light>
-                  <AutoRow align="flex-end">
+                  <RowBetween style={{ marginTop: '-5px' }}>
                     <TYPE.main style={{ marginTop: '.5rem' }}>
                       {pairAddress.slice(0, 6) + '...' + pairAddress.slice(38, 42)}
                     </TYPE.main>
                     <CopyHelper toCopy={pairAddress} />
-                  </AutoRow>
+                  </RowBetween>
                 </Column>
                 <Column>
                   <TYPE.light>
@@ -458,12 +458,12 @@ function PairPage({ pairAddress, history }) {
                       <span style={{ marginLeft: '4px' }}>Address</span>
                     </RowFixed>
                   </TYPE.light>
-                  <AutoRow align="flex-end">
+                  <RowBetween style={{ marginTop: '-5px' }}>
                     <TYPE.main style={{ marginTop: '.5rem' }}>
                       {token0 && token0.id.slice(0, 6) + '...' + token0.id.slice(38, 42)}
                     </TYPE.main>
                     <CopyHelper toCopy={token0?.id} />
-                  </AutoRow>
+                  </RowBetween>
                 </Column>
                 <Column>
                   <TYPE.light>
@@ -472,12 +472,12 @@ function PairPage({ pairAddress, history }) {
                       <span style={{ marginLeft: '4px' }}>Address</span>
                     </RowFixed>
                   </TYPE.light>
-                  <AutoRow align="flex-end">
-                    <TYPE.main style={{ marginTop: '.5rem' }} fontSize={16}>
+                  <RowBetween style={{ marginTop: '-5px' }}>
+                    <TYPE.main style={{ marginTop: '.5rem' }}>
                       {token1 && token1.id.slice(0, 6) + '...' + token1.id.slice(38, 42)}
                     </TYPE.main>
                     <CopyHelper toCopy={token1?.id} />
-                  </AutoRow>
+                    </RowBetween>
                 </Column>
                 <ButtonLight>
                   <Link external href={'https://etherscan.io/address/' + pairAddress}>
