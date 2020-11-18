@@ -75,7 +75,7 @@ const Warning = styled.div`
 `
 
 function AccountPage({ account }) {
-  const below440 = useMedia('max-width: 440px')
+  const below440 = useMedia('(max-width: 440px)')
 
   // get data for this account
   const transactions = useUserTransactions(account)
@@ -146,10 +146,10 @@ function AccountPage({ account }) {
       <ContentWrapper>
         <RowBetween>
           <TYPE.body>
-            <BasicLink to="/accounts">{'Accounts '}</BasicLink>→{' '}
+            <BasicLink to="/accounts">{'Accounts '}</BasicLink>→
             <Link lineHeight={'145.23%'} href={'https://etherscan.io/address/' + account} target="_blank">
-              {' '}
-              {account?.slice(0, 42)}{' '}
+              
+              {account?.slice(0, 42)}
             </Link>
           </TYPE.body>
           {!below600 && <Search small={true} />}
@@ -242,11 +242,11 @@ function AccountPage({ account }) {
             <AutoRow gap="1.5rem">
               <AutoColumn gap="10px">
                 <RowBetween>
-                  <TYPE.light fontWeight={500}>Liquidity (Including Fees)</TYPE.light>
+                  <TYPE.light fontSize={below440 ? 12 : 14} fontWeight={500}>Liquidity (Including Fees)</TYPE.light>
                   <div />
                 </RowBetween>
-                <RowFixed align="flex-end">
-                  <TYPE.header fontSize={'24px'} lineHeight={1}>
+                <RowFixed>
+                  <TYPE.header fontSize={below440 ? 18 : 24} lineHeight={1}>
                     {positionValue
                       ? formattedNum(positionValue, true)
                       : positionValue === 0
@@ -257,11 +257,11 @@ function AccountPage({ account }) {
               </AutoColumn>
               <AutoColumn gap="10px">
                 <RowBetween>
-                  <TYPE.light fontWeight={500}>Fees Earned (Cumulative)</TYPE.light>
+                  <TYPE.light fontSize={below440 ? 12 : 14} fontWeight={500}>Fees Earned (Cumulative)</TYPE.light>
                   <div />
                 </RowBetween>
                 <RowFixed align="flex-end">
-                  <TYPE.header fontSize={'24px'} lineHeight={1} color={aggregateFees && 'green'}>
+                  <TYPE.header  fontSize={below440 ? 18 : 24} lineHeight={1} color={aggregateFees && 'green'}>
                     {aggregateFees ? formattedNum(aggregateFees, true, true) : '-'}
                   </TYPE.header>
                 </RowFixed>
@@ -282,7 +282,7 @@ function AccountPage({ account }) {
         <DashboardWrapper>
           <TYPE.main fontSize={22} fontWeight={500}>
             Positions
-          </TYPE.main>{' '}
+          </TYPE.main>
           <PositionList positions={positions} />
         </DashboardWrapper>
 
@@ -305,8 +305,8 @@ function AccountPage({ account }) {
                       onClick={() => window.open('https://ws.exchange/', '_blank')}
                     >
                       Learn More
-                    </ButtonLight>{' '}
-                  </AutoRow>{' '}
+                    </ButtonLight>
+                  </AutoRow>
                 </AutoColumn>
               </Panel> 
             )}
@@ -315,35 +315,55 @@ function AccountPage({ account }) {
         <DashboardWrapper>
           <TYPE.main fontSize={22} fontWeight={500}>
             Transactions
-          </TYPE.main>{' '}
+          </TYPE.main>
           <TxnList transactions={transactions} />
         </DashboardWrapper>
 
         <DashboardWrapper>
           <TYPE.main fontSize={22} fontWeight={500}>
             Wallet Stats
-          </TYPE.main>{' '}
+          </TYPE.main>
           <Panel
             style={{
               marginTop: below440 ? '.75rem' : '1.5rem',
             }}
           >
-            <AutoRow gap="20px">
-              <AutoColumn gap="8px">
-                <TYPE.header fontSize={24}>{totalSwappedUSD ? formattedNum(totalSwappedUSD, true) : '-'}</TYPE.header>
-                <TYPE.main>Total Value Swapped</TYPE.main>
+            {below440 && 
+              <AutoColumn gap=".75rem">
+                <AutoColumn gap="8px">
+                  <TYPE.header fontSize={24}>{totalSwappedUSD ? formattedNum(totalSwappedUSD, true) : '-'}</TYPE.header>
+                  <TYPE.main>Total Value Swapped</TYPE.main>
+                </AutoColumn>
+                <AutoColumn gap="8px">
+                  <TYPE.header fontSize={24}>
+                    {totalSwappedUSD ? formattedNum(totalSwappedUSD * 0.003, true) : '-'}
+                  </TYPE.header>
+                  <TYPE.main>Total Fees Paid</TYPE.main>
+                </AutoColumn>
+                <AutoColumn gap="8px">
+                  <TYPE.header fontSize={24}>{transactionCount ? transactionCount : '-'}</TYPE.header>
+                  <TYPE.main>Total Transactions</TYPE.main>
+                </AutoColumn>
               </AutoColumn>
-              <AutoColumn gap="8px">
-                <TYPE.header fontSize={24}>
-                  {totalSwappedUSD ? formattedNum(totalSwappedUSD * 0.003, true) : '-'}
-                </TYPE.header>
-                <TYPE.main>Total Fees Paid</TYPE.main>
-              </AutoColumn>
-              <AutoColumn gap="8px">
-                <TYPE.header fontSize={24}>{transactionCount ? transactionCount : '-'}</TYPE.header>
-                <TYPE.main>Total Transactions</TYPE.main>
-              </AutoColumn>
-            </AutoRow>
+            }
+            {!below440 && 
+              <AutoRow gap="20px">
+                <AutoColumn gap="8px">
+                  <TYPE.header fontSize={24}>{totalSwappedUSD ? formattedNum(totalSwappedUSD, true) : '-'}</TYPE.header>
+                  <TYPE.main>Total Value Swapped</TYPE.main>
+                </AutoColumn>
+                <AutoColumn gap="8px">
+                  <TYPE.header fontSize={24}>
+                    {totalSwappedUSD ? formattedNum(totalSwappedUSD * 0.003, true) : '-'}
+                  </TYPE.header>
+                  <TYPE.main>Total Fees Paid</TYPE.main>
+                </AutoColumn>
+                <AutoColumn gap="8px">
+                  <TYPE.header fontSize={24}>{transactionCount ? transactionCount : '-'}</TYPE.header>
+                  <TYPE.main>Total Transactions</TYPE.main>
+                </AutoColumn>
+              </AutoRow>
+            }
           </Panel>
         </DashboardWrapper>
       </ContentWrapper>
