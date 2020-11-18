@@ -24,6 +24,10 @@ const PageButtons = styled.div`
   display: flex;
   justify-content: center;
   margin-top: 2em;
+
+  @media screen and (max-width: 440px) {
+    margin-top: .75rem;
+  }
 `
 
 const Arrow = styled.div`
@@ -57,11 +61,11 @@ const DashGrid = styled.div`
       width: 20px;
     }
   }
-
+  
   @media screen and (min-width: 740px) {
     padding: 0 1.125rem;
     grid-template-columns: 1.5fr 1fr 1fr};
-    grid-template-areas: ' name liq vol pool ';
+    grid-template-areas: ' name liq vol';
   }
 
   @media screen and (min-width: 1080px) {
@@ -85,6 +89,8 @@ const ClickableText = styled(Text)`
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
+  display: flex;
+  justify-content: flex-end;
 
   ${({ active = true, theme }) => active && `
     &:hover {
@@ -92,8 +98,8 @@ const ClickableText = styled(Text)`
     }
   `}
 
-  @media screen and (max-width: 640px) {
-    font-size: 14px;
+  @media screen and (max-width: 440px) {
+    font-size: 10px;
   }
 `
 
@@ -106,8 +112,12 @@ const DataText = styled(Flex)`
     font-size: 14px;
   }
 
-  @media screen and (max-width: 600px) {
+  @media screen and (max-width: 440px) {
     font-size: 12px;
+  }
+
+  @media screen and (max-width: 600px) {
+    font-size: 10px;
   }
 `
 
@@ -139,6 +149,7 @@ const FIELD_TO_VALUE = {
 }
 
 function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
+  const below440 = useMedia('(max-width: 440px)')
   const below600 = useMedia('(max-width: 600px)')
   const below740 = useMedia('(max-width: 740px)')
   const below1080 = useMedia('(max-width: 1080px)')
@@ -176,21 +187,25 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
       const apy = formattedPercent((pairData.oneDayVolumeUSD * 0.003 * 365 * 100) / pairData.reserveUSD)
 
       return (
-        <DashGrid style={{ padding: '.875rem 2rem' }} disbaleLinks={disbaleLinks} focus={true}>
+        <DashGrid style={{ padding: below440 ? '.75rem' : '.875rem 2rem' }} disbaleLinks={disbaleLinks} focus={true}>
           <DataText area="name" fontWeight="500">
             {!below600 && <div style={{ marginRight: '20px', width: '10px' }}>{index}</div>}
-            <DoubleTokenLogo
+            {!below440 && <DoubleTokenLogo
               size={below600 ? 16 : 20}
               a0={pairData.token0.id}
               a1={pairData.token1.id}
               margin={!below740}
-            />
-            <Link to={'/pair/' + pairAddress}>
+            />}
+            <Link 
+              to={'/pair/' + pairAddress}
+              style={{ marginLeft: below440 && 0 }}
+            >
               <FormattedName
                 text={pairData.token0.symbol + '-' + pairData.token1.symbol}
                 maxCharacters={below600 ? 8 : 16}
                 adjustSize={true}
                 link={true}
+                fontSize={ below440 ? 10 : 14 }
               />
             </Link>
           </DataText>
@@ -237,14 +252,14 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
     <ListWrapper>
       <Panel
         style={{
-          marginTop: '1.5rem', 
+          marginTop: below440 ? '.75rem' : '1.5rem', 
           padding: 0
         }}
       >
         <DashGrid
           center={true}
           disbaleLinks={disbaleLinks}
-          style={{ height: 'fit-content', padding: '1rem 2rem', borderTop: 'none' }}
+          style={{ height: 'fit-content', padding: below440 ? '.75rem' : '1rem 2rem', borderTop: 'none' }}
         >
           <Flex alignItems="center" justifyContent="flexStart">
             <ClickableText active={false}>Name</ClickableText>
