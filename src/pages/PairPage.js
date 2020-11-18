@@ -15,7 +15,7 @@ import { BasicLink } from '../components/Link'
 import Search from '../components/Search'
 import { formattedNum, formattedPercent, getPoolLink, getSwapLink } from '../utils'
 import { usePairData, usePairTransactions } from '../contexts/PairData'
-import { TYPE } from '../Theme'
+import { DashboardWrapper, TYPE } from '../Theme'
 import CopyHelper from '../components/Copy'
 import { useMedia } from 'react-use'
 import DoubleTokenLogo from '../components/DoubleLogo'
@@ -24,17 +24,9 @@ import { Hover } from '../components'
 import { useEthPrice } from '../contexts/GlobalData'
 import Warning from '../components/Warning'
 import { usePathDismissed, useSavedPairs } from '../contexts/LocalStorage'
-
 import { Bookmark, PlusCircle } from 'react-feather'
 import FormattedName from '../components/FormattedName'
 import { useListedTokens } from '../contexts/Application'
-
-const DashboardWrapper = styled.div`
-  width: 100%;
-  background-color: ${({ theme }) => theme.bg8};
-  padding: 2rem;
-  border-radius: 1rem;
-`
 
 const PanelWrapper = styled.div`
   grid-template-columns: repeat(3, 1fr);
@@ -43,6 +35,7 @@ const PanelWrapper = styled.div`
   display: inline-grid;
   width: 100%;
   align-items: start;
+
   @media screen and (max-width: 1024px) {
     grid-template-columns: 1fr;
     align-items: stretch;
@@ -72,9 +65,10 @@ const TokenDetailsLayout = styled.div`
   @media screen and (max-width: 1024px) {
     grid-template-columns: 1fr;
     align-items: stretch;
+
     > * {
       grid-column: 1 / 4;
-      margin-bottom: 1rem;
+      margin-bottom: 1.5rem;
     }
 
     &:last-child {
@@ -181,8 +175,10 @@ function PairPage({ pairAddress, history }) {
   const formattedSymbol1 = token1?.symbol.length > 6 ? token1?.symbol.slice(0, 5) + '...' : token1?.symbol
 
   const below1080 = useMedia('(max-width: 1080px)')
+  const below1024 = useMedia('(max-width: 1024px)')
   const below900 = useMedia('(max-width: 900px)')
   const below600 = useMedia('(max-width: 600px)')
+  const below440 = useMedia('(max-width: 440px)')
 
   const [dismissed, markAsDismissed] = usePathDismissed(history.location.pathname)
 
@@ -231,9 +227,9 @@ function PairPage({ pairAddress, history }) {
                 <RowFixed style={{ flexWrap: 'wrap', minWidth: '100px' }}>
                   <RowFixed>
                     {token0 && token1 && (
-                      <DoubleTokenLogo a0={token0?.id || ''} a1={token1?.id || ''} size={32} margin={true} />
+                      <DoubleTokenLogo a0={token0?.id || ''} a1={token1?.id || ''} size={below440 ? 22 : 32} margin={true} />
                     )}{' '}
-                    <TYPE.main fontSize={below1080 ? '1.5rem' : '2.5rem'} style={{ margin: '0 1rem' }}>
+                    <TYPE.main fontSize={!below1080 ? '2.5rem' : below440 ? '1.25rem' : '1.5rem'} style={{ margin: '0 1rem' }}>
                       {token0 && token1 ? (
                         <>
                           <HoverSpan onClick={() => history.push(`/token/${token0?.id}`)}>{token0.symbol}</HoverSpan>
@@ -243,9 +239,7 @@ function PairPage({ pairAddress, history }) {
                           </HoverSpan>{' '}
                           Pair
                         </>
-                      ) : (
-                        ''
-                      )}
+                      ) : null}
                     </TYPE.main>
                   </RowFixed>
                 </RowFixed>
@@ -393,8 +387,9 @@ function PairPage({ pairAddress, history }) {
                 </Panel>
                 <Panel
                   style={{
-                    gridColumn: below1080 ? '1' : '2/4',
+                    gridColumn: !below1080 ? '2/4' : below1024 ? '1/4' : '2/-1',
                     gridRow: below1080 ? '' : '1/5',
+                    width: '100%'
                   }}
                 >
                   <PairChart
@@ -420,23 +415,35 @@ function PairPage({ pairAddress, history }) {
             <Panel
               rounded
               style={{
-                marginTop: '1.5rem',
+                marginTop: below440 ? '.75rem' : '1.5rem',
               }}
               p={20}
             >
               <TokenDetailsLayout>
                 <Column>
-                  <TYPE.main>Pair Name</TYPE.main>
+                  <TYPE.light>Pair Name</TYPE.light>
                   <TYPE.main style={{ marginTop: '.5rem' }}>
                     <RowFixed>
-                      <FormattedName text={token0?.symbol ?? ''} maxCharacters={8} />
+                      <FormattedName 
+                        text={token0?.symbol ?? ''} 
+                        maxCharacters={8}
+                        style={{
+                          color: '#202327'
+                        }}
+                      />
                       -
-                      <FormattedName text={token1?.symbol ?? ''} maxCharacters={8} />
+                      <FormattedName 
+                        text={token1?.symbol ?? ''} 
+                        maxCharacters={8} 
+                        style={{
+                          color: '#202327'
+                        }}
+                      />
                     </RowFixed>
                   </TYPE.main>
                 </Column>
                 <Column>
-                  <TYPE.main>Pair Address</TYPE.main>
+                  <TYPE.light>Pair Address</TYPE.light>
                   <AutoRow align="flex-end">
                     <TYPE.main style={{ marginTop: '.5rem' }}>
                       {pairAddress.slice(0, 6) + '...' + pairAddress.slice(38, 42)}
@@ -445,12 +452,12 @@ function PairPage({ pairAddress, history }) {
                   </AutoRow>
                 </Column>
                 <Column>
-                  <TYPE.main>
+                  <TYPE.light>
                     <RowFixed>
                       <FormattedName text={token0?.symbol ?? ''} maxCharacters={8} />{' '}
                       <span style={{ marginLeft: '4px' }}>Address</span>
                     </RowFixed>
-                  </TYPE.main>
+                  </TYPE.light>
                   <AutoRow align="flex-end">
                     <TYPE.main style={{ marginTop: '.5rem' }}>
                       {token0 && token0.id.slice(0, 6) + '...' + token0.id.slice(38, 42)}
@@ -459,12 +466,12 @@ function PairPage({ pairAddress, history }) {
                   </AutoRow>
                 </Column>
                 <Column>
-                  <TYPE.main>
+                  <TYPE.light>
                     <RowFixed>
                       <FormattedName text={token1?.symbol ?? ''} maxCharacters={8} />{' '}
                       <span style={{ marginLeft: '4px' }}>Address</span>
                     </RowFixed>
-                  </TYPE.main>
+                  </TYPE.light>
                   <AutoRow align="flex-end">
                     <TYPE.main style={{ marginTop: '.5rem' }} fontSize={16}>
                       {token1 && token1.id.slice(0, 6) + '...' + token1.id.slice(38, 42)}

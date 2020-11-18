@@ -77,6 +77,7 @@ const PairChart = ({ address, color, base0, base1 }) => {
 
   const below1600 = useMedia('(max-width: 1600px)')
   const below1080 = useMedia('(max-width: 1080px)')
+  const below700 = useMedia('(max-width: 700px)')
   const below600 = useMedia('(max-width: 600px)')
 
   let utcStartTime = getTimeframe(timeWindow)
@@ -114,7 +115,7 @@ const PairChart = ({ address, color, base0, base1 }) => {
 
   return (
     <ChartWrapper>
-      {below600 ? (
+      {below700 ? (
         <RowBetween mb={40}>
           <DropdownSelect options={CHART_VIEW} active={chartFilter} setActive={setChartFilter} color={color} />
           <DropdownSelect options={timeframeOptions} active={timeWindow} setActive={setTimeWindow} color={color} />
