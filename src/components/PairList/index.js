@@ -262,7 +262,10 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
           style={{ height: 'fit-content', padding: below440 ? '.75rem' : '1rem 2rem', borderTop: 'none' }}
         >
           <Flex alignItems="center" justifyContent="flexStart">
-            <ClickableText active={false}>Name</ClickableText>
+            <ClickableText 
+              active={false}
+              style={{ justifyContent: 'flex-start' }}
+            >Name</ClickableText>
           </Flex>
           <Flex alignItems="center" justifyContent="flexEnd">
             <ClickableText
