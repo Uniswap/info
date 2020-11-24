@@ -99,6 +99,10 @@ const WarningGrouping = styled.div`
   pointer-events: ${({ disabled }) => disabled && 'none'};
 `
 
+const CustomFormattedName = styled(FormattedName)`
+  color: ${({ theme }) => theme.text1}
+`
+
 function PairPage({ pairAddress, history }) {
   const {
     token0,
@@ -424,20 +428,14 @@ function PairPage({ pairAddress, history }) {
                   <TYPE.light>Pair Name</TYPE.light>
                   <TYPE.main style={{ marginTop: '.5rem' }}>
                     <RowFixed>
-                      <FormattedName 
+                      <CustomFormattedName 
                         text={token0?.symbol ?? ''} 
                         maxCharacters={8}
-                        style={{
-                          color: '#202327'
-                        }}
                       />
                       -
-                      <FormattedName 
+                      <CustomFormattedName 
                         text={token1?.symbol ?? ''} 
                         maxCharacters={8} 
-                        style={{
-                          color: '#202327'
-                        }}
                       />
                     </RowFixed>
                   </TYPE.main>
