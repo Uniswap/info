@@ -116,20 +116,26 @@ export function useSavedAccounts() {
   const [state, { updateKey }] = useLocalStorageContext()
   const savedAccounts = state?.[SAVED_ACCOUNTS]
 
-  function addAccount(account) {
-    let newAccounts = state?.[SAVED_ACCOUNTS]
-    newAccounts.push(account)
-    updateKey(SAVED_ACCOUNTS, newAccounts)
-  }
+  const addAccount = useCallback(
+    (account) => {
+      let newAccounts = state?.[SAVED_ACCOUNTS]
+      newAccounts.push(account)
+      updateKey(SAVED_ACCOUNTS, newAccounts)
+    },
+    [state, updateKey]
+  )
 
-  function removeAccount(account) {
-    let newAccounts = state?.[SAVED_ACCOUNTS]
-    let index = newAccounts.indexOf(account)
-    if (index > -1) {
-      newAccounts.splice(index, 1)
-    }
-    updateKey(SAVED_ACCOUNTS, newAccounts)
-  }
+  const removeAccount = useCallback(
+    (account) => {
+      let newAccounts = state?.[SAVED_ACCOUNTS]
+      let index = newAccounts.indexOf(account)
+      if (index > -1) {
+        newAccounts.splice(index, 1)
+      }
+      updateKey(SAVED_ACCOUNTS, newAccounts)
+    },
+    [state, updateKey]
+  )
 
   return [savedAccounts, addAccount, removeAccount]
 }
