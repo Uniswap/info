@@ -118,23 +118,22 @@ export function useSavedAccounts() {
 
   const addAccount = useCallback(
     (account) => {
-      let newAccounts = state?.[SAVED_ACCOUNTS]
-      newAccounts.push(account)
-      updateKey(SAVED_ACCOUNTS, newAccounts)
+      updateKey(SAVED_ACCOUNTS, [...(savedAccounts ?? []), account])
     },
-    [state, updateKey]
+    [savedAccounts, updateKey]
   )
 
   const removeAccount = useCallback(
     (account) => {
-      let newAccounts = state?.[SAVED_ACCOUNTS]
-      let index = newAccounts.indexOf(account)
+      let index = savedAccounts?.indexOf(account) ?? -1
       if (index > -1) {
-        newAccounts.splice(index, 1)
+        updateKey(SAVED_ACCOUNTS, [
+          ...savedAccounts.slice(0, index),
+          ...savedAccounts.slice(index + 1, savedAccounts.length),
+        ])
       }
-      updateKey(SAVED_ACCOUNTS, newAccounts)
     },
-    [state, updateKey]
+    [savedAccounts, updateKey]
   )
 
   return [savedAccounts, addAccount, removeAccount]
