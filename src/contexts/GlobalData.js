@@ -1,15 +1,16 @@
 import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect, useState } from 'react'
-import { client, tokenClient } from '../apollo/client'
+import { client, xyzClient } from '../apollo/client'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { useTimeframe } from './Application'
 import {
   getPercentChange,
-  getBlockFromTimestamp,
+  // getBlockFromTimestamp,
   getBlocksFromTimestamps,
   get2DayPercentChange,
   getTimeframe,
 } from '../utils'
+import { getBlockFromTimestamp } from "../utils/mocks"
 import {
   GLOBAL_DATA,
   GLOBAL_TXNS,
@@ -233,36 +234,36 @@ async function getGlobalData(ethPrice, oldEthPrice) {
     ])
 
     // fetch the global data
-    let result = await client.query({
+    let result = await xyzClient.query({
       query: GLOBAL_DATA(),
       fetchPolicy: 'cache-first',
     })
-    data = result.data.uniswapFactories[0]
+    data = result.data.xyzswapFactories[0]
 
     // fetch the historical data
-    let oneDayResult = await client.query({
+    let oneDayResult = await xyzClient.query({
       query: GLOBAL_DATA(oneDayBlock?.number),
       fetchPolicy: 'cache-first',
     })
-    oneDayData = oneDayResult.data.uniswapFactories[0]
+    oneDayData = oneDayResult.data.xyzswapFactories[0]
 
-    let twoDayResult = await client.query({
+    let twoDayResult = await xyzClient.query({
       query: GLOBAL_DATA(twoDayBlock?.number),
       fetchPolicy: 'cache-first',
     })
-    twoDayData = twoDayResult.data.uniswapFactories[0]
+    twoDayData = twoDayResult.data.xyzswapFactories[0]
 
-    let oneWeekResult = await client.query({
+    let oneWeekResult = await xyzClient.query({
       query: GLOBAL_DATA(oneWeekBlock?.number),
       fetchPolicy: 'cache-first',
     })
-    const oneWeekData = oneWeekResult.data.uniswapFactories[0]
+    const oneWeekData = oneWeekResult.data.xyzswapFactories[0]
 
-    let twoWeekResult = await client.query({
+    let twoWeekResult = await xyzClient.query({
       query: GLOBAL_DATA(twoWeekBlock?.number),
       fetchPolicy: 'cache-first',
     })
-    const twoWeekData = twoWeekResult.data.uniswapFactories[0]
+    const twoWeekData = twoWeekResult.data.xyzswapFactories[0]
 
     if (data && oneDayData && twoDayData && twoWeekData) {
       let [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentChange(
@@ -506,7 +507,7 @@ async function getAllTokensOnUniswap() {
     let skipCount = 0
     let tokens = []
     while (!allFound) {
-      let result = await tokenClient.query({
+      let result = await xyzClient.query({
         query: ALL_TOKENS,
         variables: {
           skip: skipCount,

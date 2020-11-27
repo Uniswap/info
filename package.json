@@ -88,5 +88,9 @@
       "last 1 safari version"
     ]
   },
-  "license": "GPL-3.0-or-later"
+  "license": "GPL-3.0-or-later",
+  "dependencies": {
+    "eth-block-timestamp": "0.0.6",
+    "ethereum-block-by-date": "^1.2.5"
+  }
 }
