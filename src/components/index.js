@@ -102,8 +102,8 @@ export const SubNavEl = styled.li`
 export const PageWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  padding-top: 36px;
-  padding-bottom: 80px;
+  padding: 76px 0 72px;
+  background: #f2f2f2;
 
   @media screen and (max-width: 600px) {
     & > * {
@@ -119,9 +119,9 @@ export const ContentWrapper = styled.div`
   grid-template-columns: 1fr;
   grid-gap: 24px;
   max-width: 1440px;
+  padding: 0 20px;
   width: 100%;
   margin: 0 auto;
-  padding: 0 2rem;
   box-sizing: border-box;
   @media screen and (max-width: 1180px) {
     grid-template-columns: 1fr;

@@ -22,14 +22,12 @@ const PageButtons = styled.div`
   width: 100%;
   display: flex;
   justify-content: center;
-  margin-top: 2em;
-  margin-bottom: 2em;
+  margin-top: 30px;
 `
 
 const Arrow = styled.div`
-  color: ${({ theme }) => theme.primary1};
-  opacity: ${(props) => (props.faded ? 0.3 : 1)};
-  padding: 0 20px;
+  color: ${(props) => (props.faded ? '#B1B1B1' : '#2CB48A')};
+  padding: 0 15px;
   user-select: none;
   :hover {
     cursor: pointer;
@@ -45,7 +43,7 @@ const DashGrid = styled.div`
   grid-gap: 1em;
   grid-template-columns: 100px 1fr 1fr;
   grid-template-areas: 'name liq vol';
-  padding: 0 1.125rem;
+  padding: 0 30px;
 
   > * {
     justify-content: flex-end;
@@ -84,13 +82,18 @@ const DashGrid = styled.div`
 const ListWrapper = styled.div``
 
 const ClickableText = styled(Text)`
+  font-family: Gilroy-Regular;
+  font-size: 13px;
+  line-height: 15px;
+  letter-spacing: 0.15px;
   text-align: end;
+
   &:hover {
     cursor: pointer;
     opacity: 0.6;
   }
   user-select: none;
-  color: ${({ theme }) => theme.text1};
+  color: ${({ theme }) => theme.black};
 
   @media screen and (max-width: 640px) {
     font-size: 0.85rem;
@@ -98,13 +101,13 @@ const ClickableText = styled(Text)`
 `
 
 const DataText = styled(Flex)`
+  font-family: ${({ regular }) => (regular ? 'Gilroy-Regular' : 'Gilroy-Medium')};
+  font-weight: 500;
+  font-size: 15px;
+  line-height: 18px;
   align-items: center;
   text-align: center;
-  color: ${({ theme }) => theme.text1};
-
-  & > * {
-    font-size: 14px;
-  }
+  color: ${({ theme }) => theme.black};
 
   @media screen and (max-width: 600px) {
     font-size: 12px;
@@ -183,7 +186,10 @@ function TopTokenList({ tokens, itemMax = 10 }) {
           <Row>
             {!below680 && <div style={{ marginRight: '1rem', width: '10px' }}>{index}</div>}
             <TokenLogo address={item.id} />
-            <CustomLink style={{ marginLeft: '16px', whiteSpace: 'nowrap' }} to={'/token/' + item.id}>
+            <CustomLink
+              style={{ marginLeft: '16px', whiteSpace: 'nowrap' }}
+              to={'/token/' + item.id}
+            >
               <FormattedName
                 text={below680 ? item.symbol : item.name}
                 maxCharacters={below600 ? 8 : 16}
@@ -198,8 +204,12 @@ function TopTokenList({ tokens, itemMax = 10 }) {
             <FormattedName text={item.symbol} maxCharacters={5} />
           </DataText>
         )}
-        <DataText area="liq">{formattedNum(item.totalLiquidityUSD, true)}</DataText>
-        <DataText area="vol">{formattedNum(item.oneDayVolumeUSD, true)}</DataText>
+        <DataText area="liq" regular>
+          {formattedNum(item.totalLiquidityUSD, true)}
+        </DataText>
+        <DataText area="vol" regular>
+          {formattedNum(item.oneDayVolumeUSD, true)}
+        </DataText>
         {!below1080 && (
           <DataText area="price" color="text" fontWeight="500">
             {formattedNum(item.priceUSD, true)}
@@ -212,7 +222,7 @@ function TopTokenList({ tokens, itemMax = 10 }) {
 
   return (
     <ListWrapper>
-      <DashGrid center={true} style={{ height: 'fit-content', padding: '0 1.125rem 1rem 1.125rem' }}>
+      <DashGrid center={true} style={{ height: 'fit-content', padding: '0 30px 20px 30px' }}>
         <Flex alignItems="center" justifyContent="flexStart">
           <ClickableText
             color="text"
@@ -307,7 +317,7 @@ function TopTokenList({ tokens, itemMax = 10 }) {
         <div onClick={() => setPage(page === 1 ? page : page - 1)}>
           <Arrow faded={page === 1 ? true : false}>←</Arrow>
         </div>
-        <TYPE.body>{'Page ' + page + ' of ' + maxPage}</TYPE.body>
+        <TYPE.main style={{ fontFamily: 'Gilroy-medium' }}>{'Page ' + page + ' of ' + maxPage}</TYPE.main>
         <div onClick={() => setPage(page === maxPage ? page : page + 1)}>
           <Arrow faded={page === maxPage ? true : false}>→</Arrow>
         </div>

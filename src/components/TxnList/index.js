@@ -23,14 +23,12 @@ const PageButtons = styled.div`
   width: 100%;
   display: flex;
   justify-content: center;
-  margin-top: 2em;
-  margin-bottom: 0.5em;
+  margin-top: 30px;
 `
 
 const Arrow = styled.div`
-  color: #2f80ed;
-  opacity: ${(props) => (props.faded ? 0.3 : 1)};
-  padding: 0 20px;
+  color: ${(props) => (props.faded ? '#B1B1B1' : '#2CB48A')};
+  padding: 0 15px;
   user-select: none;
   :hover {
     cursor: pointer;
@@ -86,14 +84,18 @@ const DashGrid = styled.div`
 `
 
 const ClickableText = styled(Text)`
-  color: ${({ theme }) => theme.text1};
-  user-select: none;
+  font-family: Gilroy-Regular;
+  font-size: 13px;
+  line-height: 15px;
+  letter-spacing: 0.15px;
   text-align: end;
 
   &:hover {
     cursor: pointer;
     opacity: 0.6;
   }
+  user-select: none;
+  color: ${({ theme }) => theme.black};
 
   @media screen and (max-width: 640px) {
     font-size: 14px;
@@ -101,33 +103,31 @@ const ClickableText = styled(Text)`
 `
 
 const DataText = styled(Flex)`
+  font-family: ${({ medium }) => (medium ? 'Gilroy-Medium' : 'Gilroy-Regular')};
+  font-size: 15px;
+  line-height: 17px;
   align-items: center;
-  text-align: right;
-  color: ${({ theme }) => theme.text1};
+  text-align: center;
+  color: ${({ theme }) => theme.black};
 
-  & > * {
-    font-size: 1em;
-  }
-
-  @media screen and (max-width: 40em) {
-    font-size: 0.85rem;
+  @media screen and (max-width: 600px) {
+    font-size: 12px;
   }
 `
 
 const SortText = styled.button`
   cursor: pointer;
-  font-weight: ${({ active, theme }) => (active ? 500 : 400)};
-  margin-right: 0.75rem !important;
+  font-family: Gilroy-Medium;
+  opacity: ${({ active }) => (active ? 1 : 0.6)};
+  margin-right: 1rem !important;
   border: none;
   background-color: transparent;
-  font-size: 1rem;
+  font-size: 13px;
+  line-height: 15px;
+  letter-spacing: 0.15px;
   padding: 0px;
-  color: ${({ active, theme }) => (active ? theme.text1 : theme.text3)};
+  color: ${({ theme }) => theme.black};
   outline: none;
-
-  @media screen and (max-width: 600px) {
-    font-size: 14px;
-  }
 `
 
 const SORT_FIELD = {
@@ -281,9 +281,9 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
 
   const ListItem = ({ item }) => {
     return (
-      <DashGrid style={{ height: '48px' }}>
-        <DataText area="txn" fontWeight="500">
-          <Link color={color} external href={urls.showTransaction(item.hash)}>
+      <DashGrid style={{ height: '48px', padding: '0 30px' }}>
+        <DataText area="txn" fontWeight="500" medium>
+          <Link color="#1F936F" external href={urls.showTransaction(item.hash)}>
             {getTransactionType(item.type, item.token1Symbol, item.token0Symbol)}
           </Link>
         </DataText>
@@ -304,7 +304,7 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
         )}
         {!below1080 && (
           <DataText area="account">
-            <Link color={color} external href={'https://etherscan.io/address/' + item.account}>
+            <Link color="#1F936F" external href={'https://etherscan.io/address/' + item.account}>
               {item.account && item.account.slice(0, 6) + '...' + item.account.slice(38, 42)}
             </Link>
           </DataText>
@@ -316,7 +316,7 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
 
   return (
     <>
-      <DashGrid center={true} style={{ height: 'fit-content', padding: '0 0 1rem 0' }}>
+      <DashGrid center={true} style={{ height: 'fit-content', padding: '0 30px 20px 30px' }}>
         {below780 ? (
           <RowBetween area="txn">
             <DropdownSelect options={TXN_TYPE} active={txFilter} setActive={setTxFilter} color={color} />
@@ -445,7 +445,7 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
         >
           <Arrow faded={page === 1 ? true : false}>←</Arrow>
         </div>
-        <TYPE.body>{'Page ' + page + ' of ' + maxPage}</TYPE.body>
+        <TYPE.main style={{ fontFamily: 'Gilroy-medium' }}>{'Page ' + page + ' of ' + maxPage}</TYPE.main>
         <div
           onClick={(e) => {
             setPage(page === maxPage ? page : page + 1)

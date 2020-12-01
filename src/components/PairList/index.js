@@ -21,14 +21,12 @@ const PageButtons = styled.div`
   width: 100%;
   display: flex;
   justify-content: center;
-  margin-top: 2em;
-  margin-bottom: 0.5em;
+  margin-top: 30px;
 `
 
 const Arrow = styled.div`
-  color: ${({ theme }) => theme.primary1};
-  opacity: ${(props) => (props.faded ? 0.3 : 1)};
-  padding: 0 20px;
+  color: ${(props) => (props.faded ? '#B1B1B1' : '#2CB48A')};
+  padding: 0 15px;
   user-select: none;
   :hover {
     cursor: pointer;
@@ -44,7 +42,7 @@ const DashGrid = styled.div`
   grid-gap: 1em;
   grid-template-columns: 100px 1fr 1fr;
   grid-template-areas: 'name liq vol';
-  padding: 0 1.125rem;
+  padding: 0 30px;
 
   > * {
     justify-content: flex-end;
@@ -63,7 +61,7 @@ const DashGrid = styled.div`
   }
 
   @media screen and (min-width: 1080px) {
-    padding: 0 1.125rem;
+    padding: 0 30px;
     grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr 1fr;
     grid-template-areas: ' name liq vol volWeek fees apy';
   }
@@ -77,23 +75,27 @@ const DashGrid = styled.div`
 const ListWrapper = styled.div``
 
 const ClickableText = styled(Text)`
-  color: ${({ theme }) => theme.text1};
+  font-family: Gilroy-Regular;
+  font-size: 13px;
+  line-height: 15px;
+  letter-spacing: 0.15px;
+  text-align: end;
+
   &:hover {
     cursor: pointer;
     opacity: 0.6;
   }
-  text-align: end;
   user-select: none;
+  color: ${({ theme }) => theme.black};
 `
 
 const DataText = styled(Flex)`
+  font-family: ${({ medium }) => (medium ? 'Gilroy-Medium' : 'Gilroy-Regular')};
+  font-size: 15px;
+  line-height: 18px;
   align-items: center;
   text-align: center;
-  color: ${({ theme }) => theme.text1};
-
-  & > * {
-    font-size: 14px;
-  }
+  color: ${({ theme }) => theme.black};
 
   @media screen and (max-width: 600px) {
     font-size: 12px;
@@ -174,7 +176,11 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
           <DataText area="liq">{liquidity}</DataText>
           <DataText area="vol">{volume}</DataText>
           {!below1080 && <DataText area="volWeek">{formattedNum(pairData.oneWeekVolumeUSD, true)}</DataText>}
-          {!below1080 && <DataText area="fees">{formattedNum(pairData.oneDayVolumeUSD * 0.003, true)}</DataText>}
+          {!below1080 && (
+            <DataText area="fees" medium>
+              {formattedNum(pairData.oneDayVolumeUSD * 0.003, true)}
+            </DataText>
+          )}
           {!below1080 && <DataText area="apy">{apy}</DataText>}
         </DashGrid>
       )
@@ -215,7 +221,7 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
       <DashGrid
         center={true}
         disbaleLinks={disbaleLinks}
-        style={{ height: 'fit-content', padding: '0 1.125rem 1rem 1.125rem' }}
+        style={{ height: 'fit-content', padding: '0 30px 20px 30px' }}
       >
         <Flex alignItems="center" justifyContent="flexStart">
           <TYPE.main area="name">Name</TYPE.main>
@@ -294,7 +300,7 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
         >
           <Arrow faded={page === 1 ? true : false}>←</Arrow>
         </div>
-        <TYPE.body>{'Page ' + page + ' of ' + maxPage}</TYPE.body>
+        <TYPE.main style={{ fontFamily: 'Gilroy-medium' }}>{'Page ' + page + ' of ' + maxPage}</TYPE.main>
         <div
           onClick={(e) => {
             setPage(page === maxPage ? page : page + 1)

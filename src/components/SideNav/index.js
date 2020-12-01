@@ -1,49 +1,51 @@
-import React from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
 import { AutoColumn } from '../Column'
 import Title from '../Title'
 import { BasicLink } from '../Link'
 import { useMedia } from 'react-use'
-import { transparentize } from 'polished'
 import { TYPE } from '../../Theme'
 import { withRouter } from 'react-router-dom'
 import { TrendingUp, List, PieChart, Disc } from 'react-feather'
 import Link from '../Link'
 import { useSessionStart } from '../../contexts/Application'
-import { useDarkModeManager } from '../../contexts/LocalStorage'
-import Toggle from '../Toggle'
+import Burger from '../Burger'
 
 const Wrapper = styled.div`
   height: ${({ isMobile }) => (isMobile ? 'initial' : '100vh')};
-  background-color: ${({ theme }) => transparentize(0.4, theme.bg1)};
   color: ${({ theme }) => theme.text1};
-  padding: 0.5rem 0.5rem 0.5rem 0.75rem;
+  padding-top: 35px;
   position: sticky;
   top: 0px;
   z-index: 9999;
   box-sizing: border-box;
-  /* background-color: #1b1c22; */
-  background: linear-gradient(193.68deg, #1b1c22 0.68%, #000000 100.48%);
+  background: ${({ theme }) => theme.bg7};
   color: ${({ theme }) => theme.bg2};
 
-  @media screen and (max-width: 800px) {
-    grid-template-columns: 1fr;
-    position: relative;
+  @media screen and (max-width: 1079px) {
+    z-index: 10000;
   }
 
-  @media screen and (max-width: 600px) {
-    padding: 1rem;
+  @media screen and (max-width: 800px) {
+    padding: 20px;
+    grid-template-columns: 1fr;
+    position: relative;
   }
 `
 
 const Option = styled.div`
-  font-weight: 500;
-  font-size: 14px;
-  opacity: ${({ activeText }) => (activeText ? 1 : 0.6)};
+  font-family: Gilroy-SemiBold;
+  font-size: 16px;
+  letter-spacing: 0.15px;
   color: ${({ theme }) => theme.white};
   display: flex;
+  padding: 18px 0 18px 40px;
   :hover {
-    opacity: 1;
+    background: rgba(103, 191, 164, 0.4);
+  }
+
+  @media screen and (max-width: 1079px) {
+    padding: 15px 0;
   }
 `
 
@@ -58,18 +60,19 @@ const MobileWrapper = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background: ${({ theme }) => theme.bg7};
 `
 
 const HeaderText = styled.div`
   margin-right: 0.75rem;
-  font-size: 0.825rem;
-  font-weight: 500;
+  font-family: Gilroy-Medium;
   display: inline-box;
   display: -webkit-inline-box;
-  opacity: 0.8;
-  :hover {
-    opacity: 1;
+
+  @media screen and (max-width: 1079px) {
+    margin: 0;
   }
+
   a {
     color: ${({ theme }) => theme.white};
   }
@@ -78,25 +81,69 @@ const HeaderText = styled.div`
 const Polling = styled.div`
   position: fixed;
   display: flex;
+  align-items: center;
   left: 0;
   bottom: 0;
-  padding: 1rem;
+  padding: 0 0 40px 40px;
   color: white;
   opacity: 0.4;
   transition: opacity 0.25s ease;
   :hover {
     opacity: 1;
   }
+  @media screen and (max-width: 1079px) {
+    position: static;
+    margin: 60px 0 33px;
+    padding: 0;
+  }
 `
 const PollingDot = styled.div`
-  width: 8px;
-  height: 8px;
-  min-height: 8px;
-  min-width: 8px;
-  margin-right: 0.5rem;
-  margin-top: 3px;
+  width: 10px;
+  height: 10px;
+  min-height: 10px;
+  min-width: 10px;
+  margin-right: 10px;
   border-radius: 50%;
-  background-color: ${({ theme }) => theme.green1};
+  background: #56cdb0;
+`
+
+const MobileMenu = styled.div`
+  display: flex;
+  padding-top: 35px;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: ${({ theme }) => theme.bg7};
+
+  position: absolute;
+  top: 80px;
+  left: 0px;
+  transition: all 0.3s;
+  transition-property: height;
+  transition-duration: 2s;
+`
+
+const MenuWrapper = styled.div`
+  @media screen and (max-width: 1079px) {
+    padding: 0 40px 35px 0;
+  }
+
+  @media screen and (max-width: 800px) {
+    padding: 0;
+  }
+
+  .hide {
+    transform: translateY(-100%);
+    z-index: -1;
+    transition: all 0.4s;
+  }
+
+  .show {
+    transform: translateY(0%);
+    z-index: -1;
+    transition: all 0.3s;
+  }
 `
 
 function SideNav({ history }) {
@@ -106,19 +153,102 @@ function SideNav({ history }) {
 
   const seconds = useSessionStart()
 
-  const [isDark, toggleDarkMode] = useDarkModeManager()
+  const [show, setShow] = useState(false)
 
   return (
-    <Wrapper isMobile={below1080}>
-      {!below1080 ? (
-        <DesktopWrapper>
-          <AutoColumn gap="1rem" style={{ marginLeft: '.75rem', marginTop: '1.5rem' }}>
-            <Title />
-            {!below1080 && (
-              <AutoColumn gap="1.25rem" style={{ marginTop: '1rem' }}>
+    <>
+      <Wrapper isMobile={below1080}>
+        {!below1080 ? (
+          <DesktopWrapper>
+            <AutoColumn gap="100px">
+              <Title />
+              {!below1080 && (
+                <AutoColumn>
+                  <BasicLink to="/home">
+                    <Option activeText={history.location.pathname === '/home' ?? undefined}>
+                      <TrendingUp size={20} style={{ marginRight: '21px' }} />
+                      Overview
+                    </Option>
+                  </BasicLink>
+                  <BasicLink to="/tokens">
+                    <Option
+                      activeText={
+                        (history.location.pathname.split('/')[1] === 'tokens' ||
+                          history.location.pathname.split('/')[1] === 'token') ??
+                        undefined
+                      }
+                    >
+                      <Disc size={20} style={{ marginRight: '21px' }} />
+                      Tokens
+                    </Option>
+                  </BasicLink>
+                  <BasicLink to="/pairs">
+                    <Option
+                      activeText={
+                        (history.location.pathname.split('/')[1] === 'pairs' ||
+                          history.location.pathname.split('/')[1] === 'pair') ??
+                        undefined
+                      }
+                    >
+                      <PieChart size={20} style={{ marginRight: '21px' }} />
+                      Pairs
+                    </Option>
+                  </BasicLink>
+
+                  <BasicLink to="/accounts">
+                    <Option
+                      activeText={
+                        (history.location.pathname.split('/')[1] === 'accounts' ||
+                          history.location.pathname.split('/')[1] === 'account') ??
+                        undefined
+                      }
+                    >
+                      <List size={20} style={{ marginRight: '21px' }} />
+                      Accounts
+                    </Option>
+                  </BasicLink>
+                </AutoColumn>
+              )}
+            </AutoColumn>
+            <AutoColumn gap="20px" style={{ marginLeft: '40px', marginBottom: '110px' }}>
+              <HeaderText>
+                <Link href="#" target="_blank">
+                  Docs
+                </Link>
+              </HeaderText>
+              <HeaderText>
+                <Link href="#" target="_blank">
+                  Discord
+                </Link>
+              </HeaderText>
+              <HeaderText>
+                <Link href="#" target="_blank">
+                  Twitter
+                </Link>
+              </HeaderText>
+            </AutoColumn>
+            {!below1180 && (
+              <Polling>
+                <PollingDot />
+                <a href="/" style={{ color: 'white', opacity: 0.6 }}>
+                  <TYPE.small fontSize={12} color="white" fontFamily="Gilroy-Regular">
+                    Updated {!!seconds ? seconds + 's' : '-'} ago <br />
+                  </TYPE.small>
+                </a>
+              </Polling>
+            )}
+          </DesktopWrapper>
+        ) : (
+          <MenuWrapper>
+            <MobileWrapper>
+              <Title />
+              <Burger show={show} setShow={setShow} />
+            </MobileWrapper>
+            <MobileMenu className={show ? 'show' : 'hide'}>
+              <AutoColumn>
                 <BasicLink to="/home">
                   <Option activeText={history.location.pathname === '/home' ?? undefined}>
-                    <TrendingUp size={20} style={{ marginRight: '.75rem' }} />
+                    <TrendingUp size={20} style={{ marginRight: '21px' }} />
                     Overview
                   </Option>
                 </BasicLink>
@@ -130,7 +260,7 @@ function SideNav({ history }) {
                       undefined
                     }
                   >
-                    <Disc size={20} style={{ marginRight: '.75rem' }} />
+                    <Disc size={20} style={{ marginRight: '21px' }} />
                     Tokens
                   </Option>
                 </BasicLink>
@@ -142,7 +272,7 @@ function SideNav({ history }) {
                       undefined
                     }
                   >
-                    <PieChart size={20} style={{ marginRight: '.75rem' }} />
+                    <PieChart size={20} style={{ marginRight: '21px' }} />
                     Pairs
                   </Option>
                 </BasicLink>
@@ -155,58 +285,41 @@ function SideNav({ history }) {
                       undefined
                     }
                   >
-                    <List size={20} style={{ marginRight: '.75rem' }} />
+                    <List size={20} style={{ marginRight: '21px' }} />
                     Accounts
                   </Option>
                 </BasicLink>
               </AutoColumn>
-            )}
-          </AutoColumn>
-          <AutoColumn gap="0.5rem" style={{ marginLeft: '.75rem', marginBottom: '4rem' }}>
-            <HeaderText>
-              <Link href="https://uniswap.org" target="_blank">
-                Uniswap.org
-              </Link>
-            </HeaderText>
-            <HeaderText>
-              <Link href="https://v1.uniswap.info" target="_blank">
-                V1 Analytics
-              </Link>
-            </HeaderText>
-            <HeaderText>
-              <Link href="https://uniswap.org/docs/v2" target="_blank">
-                Docs
-              </Link>
-            </HeaderText>
-            <HeaderText>
-              <Link href="https://discord.com/invite/XErMcTq" target="_blank">
-                Discord
-              </Link>
-            </HeaderText>
-            <HeaderText>
-              <Link href="https://twitter.com/UniswapProtocol" target="_blank">
-                Twitter
-              </Link>
-            </HeaderText>
-            <Toggle isActive={isDark} toggle={toggleDarkMode} />
-          </AutoColumn>
-          {!below1180 && (
-            <Polling style={{ marginLeft: '.5rem' }}>
-              <PollingDot />
-              <a href="/" style={{ color: 'white' }}>
-                <TYPE.small color={'white'}>
-                  Updated {!!seconds ? seconds + 's' : '-'} ago <br />
-                </TYPE.small>
-              </a>
-            </Polling>
-          )}
-        </DesktopWrapper>
-      ) : (
-        <MobileWrapper>
-          <Title />
-        </MobileWrapper>
-      )}
-    </Wrapper>
+              <AutoColumn gap="12px" style={{ marginTop: '90px' }}>
+                <HeaderText>
+                  <Link href="#" target="_blank">
+                    Docs
+                  </Link>
+                </HeaderText>
+                <HeaderText>
+                  <Link href="#" target="_blank">
+                    Discord
+                  </Link>
+                </HeaderText>
+                <HeaderText>
+                  <Link href="#" target="_blank">
+                    Twitter
+                  </Link>
+                </HeaderText>
+              </AutoColumn>
+              <Polling>
+                <PollingDot />
+                <a href="/" style={{ color: 'white', opacity: 0.6 }}>
+                  <TYPE.small fontSize={12} color="white" fontFamily="Gilroy-Regular">
+                    Updated {!!seconds ? seconds + 's' : '-'} ago <br />
+                  </TYPE.small>
+                </a>
+              </Polling>
+            </MobileMenu>
+          </MenuWrapper>
+        )}
+      </Wrapper>
+    </>
   )
 }
 

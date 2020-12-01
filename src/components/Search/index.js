@@ -36,20 +36,17 @@ const Wrapper = styled.div`
   flex-direction: row;
   align-items: center;
   justify-content: flex-end;
-  padding: 12px 16px;
-  border-radius: 12px;
+  padding: 14px 20px;
+  border-radius: 10px;
   background: ${({ theme, small, open }) =>
     small ? (open ? transparentize(0.4, theme.bg1) : 'none') : transparentize(0.4, theme.bg6)};
-  border-bottom-right-radius: ${({ open }) => (open ? '0px' : '12px')};
-  border-bottom-left-radius: ${({ open }) => (open ? '0px' : '12px')};
+  border-bottom-right-radius: ${({ open }) => (open ? '0px' : '10px')};
+  border-bottom-left-radius: ${({ open }) => (open ? '0px' : '10px')};
   z-index: 9999;
   width: 100%;
   min-width: 300px;
   box-sizing: border-box;
-  box-shadow: ${({ open, small }) =>
-    !open && !small
-      ? '0px 24px 32px rgba(0, 0, 0, 0.04), 0px 16px 24px rgba(0, 0, 0, 0.04), 0px 4px 8px rgba(0, 0, 0, 0.04), 0px 0px 1px rgba(0, 0, 0, 0.04) '
-      : 'none'};
+  box-shadow: ${({ open, small }) => (!open && !small ? '0px 4px 30px rgba(0, 0, 0, 0.04)' : 'none')};
   @media screen and (max-width: 500px) {
     background: ${({ theme }) => transparentize(0.4, theme.bg1)};
     box-shadow: ${({ open }) =>
@@ -67,12 +64,12 @@ const Input = styled.input`
   border: none;
   outline: none;
   width: 100%;
+  font-family: Gilroy-Regular;
   color: ${({ theme }) => theme.text1};
-  font-size: ${({ large }) => (large ? '20px' : '14px')};
 
   ::placeholder {
-    color: ${({ theme }) => theme.text3};
-    font-size: 16px;
+    color: #9b9eb7;
+    font-size: 14px;
   }
 
   @media screen and (max-width: 640px) {
@@ -123,8 +120,13 @@ const Menu = styled.div`
 `
 
 const MenuItem = styled(Row)`
-  padding: 1rem;
-  font-size: 0.85rem;
+  padding: 20px 0 0 20px;
+  font-family: Gilroy-Medium;
+  font-weight: 500;
+  font-size: 15px;
+  line-height: 18px;
+  color: #000000;
+
   & > * {
     margin-right: 6px;
   }
@@ -135,16 +137,26 @@ const MenuItem = styled(Row)`
 `
 
 const Heading = styled(Row)`
-  padding: 1rem;
+  padding-top: 20px;
+  padding-left: 20px;
   display: ${({ hide = false }) => hide && 'none'};
 `
 
 const Gray = styled.span`
-  color: #888d9b;
+  font-family: Gilroy-Medium;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 19px;
+  letter-spacing: 0.15px;
+  color: #000000;
 `
 
 const Blue = styled.span`
-  color: #2172e5;
+  font-family: Gilroy-Medium;
+  font-weight: 500;
+  font-size: 13px;
+  line-height: 15px;
+  color: #1f936f;
   :hover {
     cursor: pointer;
   }
@@ -437,10 +449,10 @@ export const Search = ({ small = false }) => {
               : below410
               ? 'Search...'
               : below470
-              ? 'Search Uniswap...'
+              ? 'Search TBCC...'
               : below700
               ? 'Search pairs and tokens...'
-              : 'Search Uniswap pairs and tokens...'
+              : 'Search TBCC pairs and tokens...'
           }
           value={value}
           onChange={(e) => {

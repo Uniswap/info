@@ -63,7 +63,7 @@ const TradingViewChart = ({
   const topScale = type === CHART_TYPES.AREA ? 0.32 : 0.2
 
   const [darkMode] = useDarkModeManager()
-  const textColor = darkMode ? 'white' : 'black'
+  const textColor = 'black'
   const previousTheme = usePrevious(darkMode)
 
   // reset the chart if them switches
@@ -129,7 +129,7 @@ const TradingViewChart = ({
       var series =
         type === CHART_TYPES.BAR
           ? chart.addHistogramSeries({
-              color: '#ff007a',
+              color: '#ECAB43',
               priceFormat: {
                 type: 'volume',
               },
@@ -137,13 +137,13 @@ const TradingViewChart = ({
                 top: 0.32,
                 bottom: 0,
               },
-              lineColor: '#ff007a',
+              lineColor: '#ECAB43',
               lineWidth: 3,
             })
           : chart.addAreaSeries({
-              topColor: '#ff007a',
-              bottomColor: 'rgba(255, 0, 122, 0)',
-              lineColor: '#ff007a',
+              topColor: '#ECAB43',
+              bottomColor: 'rgba(236, 171, 67, 0)',
+              lineColor: '#ECAB43',
               lineWidth: 3,
             })
 
@@ -161,7 +161,7 @@ const TradingViewChart = ({
       // format numbers
       let percentChange = baseChange?.toFixed(2)
       let formattedPercentChange = (percentChange > 0 ? '+' : '') + percentChange + '%'
-      let color = percentChange >= 0 ? 'green' : 'red'
+      let color = percentChange >= 0 ? '#2CB48A' : '#E12222'
 
       // get the title of the chart
       function setLastBarText() {
@@ -200,7 +200,7 @@ const TradingViewChart = ({
           var price = param.seriesPrices.get(series)
 
           toolTip.innerHTML =
-            `<div style="font-size: 16px; margin: 4px 0px; color: ${textColor};">${title}</div>` +
+            `<div style="font-size: 16px; margin: 4px 0px; font-family: Gilroy-Medium; color: ${textColor};">${title}</div>` +
             `<div style="font-size: 22px; margin: 4px 0px; color: ${textColor}">` +
             formattedNum(price, true) +
             '</div>' +

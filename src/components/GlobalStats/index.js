@@ -16,6 +16,8 @@ const Header = styled.div`
 
 const Medium = styled.span`
   font-weight: 500;
+  font-size: 14px;
+  font-family: Gilroy-Medium;
 `
 
 export default function GlobalStats() {
@@ -34,7 +36,7 @@ export default function GlobalStats() {
 
   return (
     <Header>
-      <RowBetween style={{ padding: below816 ? '0.5rem' : '.5rem' }}>
+      <RowBetween>
         <RowFixed>
           {!below400 && (
             <TYPE.main

@@ -25,7 +25,6 @@ import { CustomLink } from '../components/Link'
 import { PageWrapper, ContentWrapper } from '../components'
 
 const ListOptions = styled(AutoRow)`
-  height: 40px;
   width: 100%;
   font-size: 1.25rem;
   font-weight: 600;
@@ -39,7 +38,7 @@ const GridRow = styled.div`
   display: grid;
   width: 100%;
   grid-template-columns: 1fr 1fr;
-  column-gap: 6px;
+  column-gap: 40px;
   align-items: start;
   justify-content: space-between;
 `
@@ -65,11 +64,12 @@ function GlobalPage() {
 
   return (
     <PageWrapper>
-      <ThemedBackground backgroundColor={transparentize(0.8, '#ff007a')} />
       <ContentWrapper>
         <div>
-          <AutoColumn gap="24px" style={{ paddingBottom: below800 ? '0' : '24px' }}>
-            <TYPE.largeHeader>{below800 ? 'Protocol Analytics' : 'Uniswap Protocol Analytics'}</TYPE.largeHeader>
+          <AutoColumn gap="24px" style={{ paddingBottom: below800 ? '40' : '50px' }}>
+            <TYPE.largeHeader style={{ marginBottom: '6px', fontFamily: 'Gilroy-Medium' }}>
+              {below800 ? 'Protocol Analytics' : 'TBCC Protocol Analytics'}
+            </TYPE.largeHeader>
             <Search />
             <GlobalStats />
           </AutoColumn>
@@ -109,10 +109,10 @@ function GlobalPage() {
           )}
           {!below800 && (
             <GridRow>
-              <Panel style={{ height: '100%', minHeight: '300px' }}>
+              <Panel style={{ height: '100%', minHeight: '323px', padding: 30 }}>
                 <GlobalChart display="liquidity" />
               </Panel>
-              <Panel style={{ height: '100%' }}>
+              <Panel style={{ height: '100%', padding: 30 }}>
                 <GlobalChart display="volume" />
               </Panel>
             </GridRow>
@@ -124,31 +124,39 @@ function GlobalPage() {
               </Panel>
             </AutoColumn>
           )}
-          <ListOptions gap="10px" style={{ marginTop: '2rem', marginBottom: '.5rem' }}>
+          <ListOptions gap="10px" style={{ margin: '40px 0 18px' }}>
             <RowBetween>
-              <TYPE.main fontSize={'1.125rem'}>Top Tokens</TYPE.main>
-              <CustomLink to={'/tokens'}>See All</CustomLink>
+              <TYPE.main style={{ fontFamily: 'Gilroy-Medium' }} fontSize="18px">
+                Top Tokens
+              </TYPE.main>
+              <CustomLink to={'/tokens'} style={{ color: '#454545' }}>
+                See all
+              </CustomLink>
             </RowBetween>
           </ListOptions>
-          <Panel style={{ marginTop: '6px', padding: '1.125rem 0 ' }}>
+          <Panel style={{ padding: '20px 0 30px' }}>
             <TopTokenList tokens={allTokens} />
           </Panel>
-          <ListOptions gap="10px" style={{ marginTop: '2rem', marginBottom: '.5rem' }}>
+          <ListOptions gap="10px" style={{ margin: '40px 0 18px' }}>
             <RowBetween>
-              <TYPE.main fontSize={'1rem'}>Top Pairs</TYPE.main>
-              <CustomLink to={'/pairs'}>See All</CustomLink>
+              <TYPE.main style={{ fontFamily: 'Gilroy-Medium' }} fontSize="18px">
+                Top Pairs
+              </TYPE.main>
+              <CustomLink to={'/pairs'} style={{ color: '#454545' }}>
+                See all
+              </CustomLink>
             </RowBetween>
           </ListOptions>
-          <Panel style={{ marginTop: '6px', padding: '1.125rem 0 ' }}>
+          <Panel style={{ padding: '20px 0 30px' }}>
             <PairList pairs={allPairs} />
           </Panel>
 
           <span>
-            <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '2rem' }}>
+            <TYPE.main fontSize="18px" style={{ margin: '40px 0 18px', fontFamily: 'Gilroy-Medium' }}>
               Transactions
             </TYPE.main>
           </span>
-          <Panel style={{ margin: '1rem 0' }}>
+          <Panel>
             <TxnList transactions={transactions} />
           </Panel>
         </div>

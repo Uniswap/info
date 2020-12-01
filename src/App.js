@@ -11,7 +11,7 @@ import { isAddress } from './utils'
 import AccountPage from './pages/AccountPage'
 import AllTokensPage from './pages/AllTokensPage'
 import AllPairsPage from './pages/AllPairsPage'
-import PinnedData from './components/PinnedData'
+// import PinnedData from './components/PinnedData'
 
 import SideNav from './components/SideNav'
 import AccountLookup from './pages/AccountLookup'
@@ -25,10 +25,10 @@ const AppWrapper = styled.div`
 `
 const ContentWrapper = styled.div`
   display: grid;
-  grid-template-columns: ${({ open }) => (open ? '220px 1fr 200px' : '220px 1fr 64px')};
+  grid-template-columns: ${({ open }) => (open ? '240px 1fr ' : '240px 1fr')};
 
   @media screen and (max-width: 1400px) {
-    grid-template-columns: 220px 1fr;
+    grid-template-columns: 240px 1fr;
   }
 
   @media screen and (max-width: 1080px) {
@@ -39,19 +39,19 @@ const ContentWrapper = styled.div`
   }
 `
 
-const Right = styled.div`
-  position: fixed;
-  right: 0;
-  bottom: 0rem;
-  z-index: 99;
-  width: ${({ open }) => (open ? '220px' : '64px')};
-  height: ${({ open }) => (open ? 'fit-content' : '64px')};
-  overflow: auto;
-  background-color: ${({ theme }) => theme.bg1};
-  @media screen and (max-width: 1400px) {
-    display: none;
-  }
-`
+// const Right = styled.div`
+//   position: fixed;
+//   right: 0;
+//   bottom: 0rem;
+//   z-index: 99;
+//   width: ${({ open }) => (open ? '220px' : '64px')};
+//   height: ${({ open }) => (open ? 'fit-content' : '64px')};
+//   overflow: auto;
+//   background-color: ${({ theme }) => theme.bg1};
+//   @media screen and (max-width: 1400px) {
+//     display: none;
+//   }
+// `
 
 const Center = styled.div`
   height: 100%;
@@ -84,9 +84,9 @@ const LayoutWrapper = ({ children, savedOpen, setSavedOpen }) => {
       <ContentWrapper open={savedOpen}>
         <SideNav />
         <Center id="center">{children}</Center>
-        <Right open={savedOpen}>
-          <PinnedData open={savedOpen} setSavedOpen={setSavedOpen} />
-        </Right>
+        {/*<Right open={savedOpen}>*/}
+        {/*  <PinnedData open={savedOpen} setSavedOpen={setSavedOpen} />*/}
+        {/*</Right>*/}
       </ContentWrapper>
     </>
   )

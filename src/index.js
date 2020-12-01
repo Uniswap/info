@@ -10,6 +10,7 @@ import PairDataContextProvider, { Updater as PairDataContextUpdater } from './co
 import ApplicationContextProvider from './contexts/Application'
 import UserContextProvider from './contexts/User'
 import App from './App'
+import './Theme/fonts.css'
 
 // initialize GA
 const GOOGLE_ANALYTICS_ID = process.env.REACT_APP_GOOGLE_ANALYTICS_ID
@@ -56,10 +57,8 @@ ReactDOM.render(
   <ContextProviders>
     <Updaters />
     <ThemeProvider>
-      <>
-        <GlobalStyle />
-        <App />
-      </>
+      <GlobalStyle />
+      <App />
     </ThemeProvider>
   </ContextProviders>,
   document.getElementById('root')
