@@ -75,6 +75,7 @@ const Warning = styled.div`
 `
 
 function AccountPage({ account }) {
+  const below600 = useMedia('(max-width: 600px)')
   const below440 = useMedia('(max-width: 440px)')
 
   // get data for this account
@@ -138,8 +139,6 @@ function AccountPage({ account }) {
       top: 0,
     })
   }, [])
-
-  const below600 = useMedia('(max-width: 600px)')
 
   return (
     <PageWrapper>
