@@ -20,8 +20,7 @@ const PageButtons = styled.div`
   width: 100%;
   display: flex;
   justify-content: center;
-  margin-top: 2em;
-  margin-bottom: 0.5em;
+  margin-top: 32px;
 `
 
 const Arrow = styled.div`
@@ -63,15 +62,15 @@ const DashGrid = styled.div`
 const ListWrapper = styled.div``
 
 const DataText = styled(Flex)`
+  font-family: ${({ medium }) => (medium ? 'Gilroy-Medium' : 'Gilroy-Regular')};
+  font-size: 15px;
+  line-height: 17px;
   align-items: center;
   text-align: center;
-  color: ${({ theme }) => theme.text1};
-  & > * {
-    font-size: 14px;
-  }
+  color: ${({ theme }) => theme.black};
 
   @media screen and (max-width: 600px) {
-    font-size: 13px;
+    font-size: 12px;
   }
 `
 
@@ -101,7 +100,7 @@ function LPList({ lps, disbaleLinks, maxItems = 10 }) {
 
   const ListItem = ({ lp, index }) => {
     return (
-      <DashGrid style={{ height: '48px' }} disbaleLinks={disbaleLinks} focus={true}>
+      <DashGrid style={{ height: '48px', padding: '0 30px' }} disbaleLinks={disbaleLinks} focus={true}>
         {!below600 && (
           <DataText area="number" fontWeight="500">
             {index}
@@ -145,7 +144,11 @@ function LPList({ lps, disbaleLinks, maxItems = 10 }) {
 
   return (
     <ListWrapper>
-      <DashGrid center={true} disbaleLinks={disbaleLinks} style={{ height: 'fit-content', padding: ' 0 0 1rem 0' }}>
+      <DashGrid
+        center={true}
+        disbaleLinks={disbaleLinks}
+        style={{ height: 'fit-content', padding: ' 0 30px 20px 30px' }}
+      >
         {!below600 && (
           <Flex alignItems="center" justifyContent="flex-start">
             <TYPE.main area="number">#</TYPE.main>
@@ -172,7 +175,7 @@ function LPList({ lps, disbaleLinks, maxItems = 10 }) {
         <div onClick={() => setPage(page === 1 ? page : page - 1)}>
           <Arrow faded={page === 1 ? true : false}>←</Arrow>
         </div>
-        <TYPE.body>{'Page ' + page + ' of ' + maxPage}</TYPE.body>
+        <TYPE.main style={{ fontFamily: 'Gilroy-medium' }}>{'Page ' + page + ' of ' + maxPage}</TYPE.main>
         <div onClick={() => setPage(page === maxPage ? page : page + 1)}>
           <Arrow faded={page === maxPage ? true : false}>→</Arrow>
         </div>

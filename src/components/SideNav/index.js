@@ -40,7 +40,13 @@ const Option = styled.div`
   color: ${({ theme }) => theme.white};
   display: flex;
   padding: 18px 0 18px 40px;
+  background: ${({ activeText }) => (activeText ? 'rgba(103, 191, 164, 0.4)' : 'transparent')};
+
   :hover {
+    background: rgba(103, 191, 164, 0.4);
+  }
+
+  :active {
     background: rgba(103, 191, 164, 0.4);
   }
 

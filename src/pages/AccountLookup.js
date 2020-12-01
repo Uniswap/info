@@ -33,13 +33,13 @@ function AccountLookup() {
     <PageWrapper>
       <FullWrapper>
         <RowBetween>
-          <TYPE.largeHeader>Wallet analytics</TYPE.largeHeader>
+          <TYPE.largeHeader style={{ fontFamily: 'Gilroy-Medium' }}>Wallet analytics</TYPE.largeHeader>
           {!below600 && <Search small={true} />}
         </RowBetween>
         <AccountWrapper>
           <AccountSearch />
         </AccountWrapper>
-        <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '2rem' }}>
+        <TYPE.main fontSize="18px" style={{ fontFamily: 'Gilroy-Medium', marginTop: '28px', marginBottom: '6px' }}>
           Top Liquidity Positions
         </TYPE.main>
         <Panel>{topLps && topLps.length > 0 ? <LPList lps={topLps} maxItems={200} /> : <LocalLoader />}</Panel>

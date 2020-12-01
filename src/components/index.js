@@ -117,7 +117,7 @@ export const ContentWrapper = styled.div`
   justify-content: start;
   align-items: start;
   grid-template-columns: 1fr;
-  grid-gap: 24px;
+  grid-gap: 30px;
   max-width: 1440px;
   padding: 0 20px;
   width: 100%;
@@ -152,11 +152,11 @@ export const FullWrapper = styled.div`
   justify-content: start;
   align-items: start;
   grid-template-columns: 1fr;
-  grid-gap: 24px;
+  grid-gap: 12px;
   max-width: 1440px;
   width: 100%;
   margin: 0 auto;
-  padding: 0 2rem;
+  padding: 0 20px;
   box-sizing: border-box;
 
   @media screen and (max-width: 1180px) {

@@ -60,11 +60,15 @@ const ContentWrapper = styled.div`
 `
 
 export const ButtonLight = styled(Base)`
-  background-color: ${({ color, theme }) => (color ? transparentize(0.9, color) : transparentize(0.9, theme.primary1))};
-  color: ${({ color, theme }) => (color ? darken(0.1, color) : theme.primary1)};
+  background: linear-gradient(180deg, #ecab43 0%, #f19f63 100%);
+  color: ${({ theme }) => theme.white};
+  padding: 12px 18px;
+  font-family: Gilroy-Bold;
+  font-size: 16px;
+  line-height: 16px;
 
   min-width: fit-content;
-  border-radius: 12px;
+  border-radius: 10px;
   white-space: nowrap;
 
   a {

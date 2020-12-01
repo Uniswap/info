@@ -181,7 +181,11 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
               {formattedNum(pairData.oneDayVolumeUSD * 0.003, true)}
             </DataText>
           )}
-          {!below1080 && <DataText area="apy">{apy}</DataText>}
+          {!below1080 && (
+            <DataText area="apy" style={{ color: '#2CB48A' }}>
+              {apy}
+            </DataText>
+          )}
         </DashGrid>
       )
     } else {
