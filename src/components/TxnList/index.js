@@ -24,6 +24,10 @@ const PageButtons = styled.div`
   display: flex;
   justify-content: center;
   margin-top: 30px;
+
+  @media screen and (max-width: 800px) {
+    margin: 16px 0;
+  }
 `
 
 const Arrow = styled.div`
@@ -44,6 +48,11 @@ const DashGrid = styled.div`
   grid-gap: 1em;
   grid-template-columns: 100px 1fr 1fr;
   grid-template-areas: 'txn value time';
+  padding: 0 30px;
+
+  @media screen and (max-width: 800px) {
+    padding: 0 10px 0 20px;
+  }
 
   > * {
     justify-content: flex-end;
@@ -173,6 +182,8 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
   const [filteredItems, setFilteredItems] = useState()
   const [txFilter, setTxFilter] = useState(TXN_TYPE.ALL)
 
+  const below800 = useMedia('(max-width: 800px)')
+
   const [currency] = useCurrentCurrency()
 
   useEffect(() => {
@@ -281,7 +292,7 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
 
   const ListItem = ({ item }) => {
     return (
-      <DashGrid style={{ height: '48px', padding: '0 30px' }}>
+      <DashGrid style={{ height: '48px' }}>
         <DataText area="txn" fontWeight="500" medium>
           <Link color="#1F936F" external href={urls.showTransaction(item.hash)}>
             {getTransactionType(item.type, item.token1Symbol, item.token0Symbol)}
@@ -316,7 +327,10 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
 
   return (
     <>
-      <DashGrid center={true} style={{ height: 'fit-content', padding: '0 30px 20px 30px' }}>
+      <DashGrid
+        center={true}
+        style={{ height: 'fit-content', padding: below800 ? '0 10px 20px 20px' : '0 30px 20px 30px' }}
+      >
         {below780 ? (
           <RowBetween area="txn">
             <DropdownSelect options={TXN_TYPE} active={txFilter} setActive={setTxFilter} color={color} />

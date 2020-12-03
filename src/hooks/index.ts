@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef } from 'react'
+import { useState, RefObject, useCallback, useEffect, useRef } from 'react'
 import { shade } from 'polished'
 import Vibrant from 'node-vibrant'
 import { hex } from 'wcag-contrast'
@@ -71,6 +71,31 @@ export const useOutsideClick = (ref, ref2, callback) => {
       document.removeEventListener('click', handleClick)
     }
   })
+}
+
+export function useOnClickOutside<T extends HTMLElement>(
+  node: RefObject<T | undefined>,
+  handler: undefined | (() => void)
+) {
+  const handlerRef = useRef<undefined | (() => void)>(handler)
+  useEffect(() => {
+    handlerRef.current = handler
+  }, [handler])
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (node.current?.contains(e.target as Node) ?? false) {
+        return
+      }
+      if (handlerRef.current) handlerRef.current()
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [node])
 }
 
 export default function useInterval(callback: () => void, delay: null | number) {

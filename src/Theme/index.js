@@ -79,27 +79,27 @@ const TextWrapper = styled(Text)`
 
 export const TYPE = {
   main(props) {
-    return <TextWrapper fon fontWeight={500} fontSize={14} color={'text1'} {...props} />
+    return <TextWrapper fontFamily="Gilroy-Medium" fontWeight={500} fontSize={14} color={'text1'} {...props} />
   },
 
   body(props) {
-    return <TextWrapper fontWeight={400} fontSize={14} color={'text1'} {...props} />
+    return <TextWrapper fontFamily="Gilroy-Regular" fontWeight={400} fontSize={14} color={'text1'} {...props} />
   },
 
   small(props) {
-    return <TextWrapper fontWeight={500} fontSize={11} color={'text1'} {...props} />
+    return <TextWrapper fontFamily="Gilroy-Medium" fontWeight={500} fontSize={11} color={'text1'} {...props} />
   },
 
   header(props) {
-    return <TextWrapper fontWeight={600} color={'text1'} {...props} />
+    return <TextWrapper fontFamily="Gilroy-SemiBold" fontWeight={600} color={'text1'} {...props} />
   },
 
   largeHeader(props) {
-    return <TextWrapper fontWeight={500} color={'text1'} fontSize={24} {...props} />
+    return <TextWrapper fontFamily="Gilroy-Medium" fontWeight={500} color={'text1'} fontSize={24} {...props} />
   },
 
   light(props) {
-    return <TextWrapper fontWeight={400} color={'text3'} fontSize={14} {...props} />
+    return <TextWrapper fontFamily="Gilroy-Regular" fontWeight={400} color={'text3'} fontSize={14} {...props} />
   },
 
   pink(props) {

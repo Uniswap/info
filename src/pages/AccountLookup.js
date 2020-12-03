@@ -30,16 +30,19 @@ function AccountLookup() {
   const below600 = useMedia('(max-width: 600px)')
 
   return (
-    <PageWrapper>
+    <PageWrapper style={{ paddingBottom: below600 && 46 }}>
       <FullWrapper>
         <RowBetween>
-          <TYPE.largeHeader style={{ fontFamily: 'Gilroy-Medium' }}>Wallet analytics</TYPE.largeHeader>
+          <TYPE.largeHeader>Wallet analytics</TYPE.largeHeader>
           {!below600 && <Search small={true} />}
         </RowBetween>
         <AccountWrapper>
           <AccountSearch />
         </AccountWrapper>
-        <TYPE.main fontSize="18px" style={{ fontFamily: 'Gilroy-Medium', marginTop: '28px', marginBottom: '6px' }}>
+        <TYPE.main
+          fontSize="18px"
+          style={{ fontFamily: 'Gilroy-Medium', marginTop: below600 ? 22 : 28, marginBottom: below600 ? 10 : 6 }}
+        >
           Top Liquidity Positions
         </TYPE.main>
         <Panel>{topLps && topLps.length > 0 ? <LPList lps={topLps} maxItems={200} /> : <LocalLoader />}</Panel>

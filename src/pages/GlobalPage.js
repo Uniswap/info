@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react'
 import { withRouter } from 'react-router-dom'
-import { Box } from 'rebass'
 import styled from 'styled-components'
 
 import { AutoRow, RowBetween } from '../components/Row'
@@ -12,14 +11,12 @@ import GlobalChart from '../components/GlobalChart'
 import Search from '../components/Search'
 import GlobalStats from '../components/GlobalStats'
 
-import { useGlobalData, useGlobalTransactions } from '../contexts/GlobalData'
+import { useGlobalTransactions } from '../contexts/GlobalData'
 import { useAllPairData } from '../contexts/PairData'
 import { useMedia } from 'react-use'
 import Panel from '../components/Panel'
 import { useAllTokenData } from '../contexts/TokenData'
-import { formattedNum, formattedPercent } from '../utils'
-import { TYPE, ThemedBackground } from '../Theme'
-import { transparentize } from 'polished'
+import { TYPE } from '../Theme'
 import { CustomLink } from '../components/Link'
 
 import { PageWrapper, ContentWrapper } from '../components'
@@ -48,7 +45,6 @@ function GlobalPage() {
   const allPairs = useAllPairData()
   const allTokens = useAllTokenData()
   const transactions = useGlobalTransactions()
-  const { totalLiquidityUSD, oneDayVolumeUSD, volumeChangeUSD, liquidityChangeUSD } = useGlobalData()
 
   // breakpoints
   const below800 = useMedia('(max-width: 800px)')
@@ -66,47 +62,13 @@ function GlobalPage() {
     <PageWrapper>
       <ContentWrapper>
         <div>
-          <AutoColumn gap="24px" style={{ paddingBottom: below800 ? '40' : '50px' }}>
+          <AutoColumn gap="24px" style={{ paddingBottom: below800 ? '40px' : '50px' }}>
             <TYPE.largeHeader style={{ marginBottom: '6px', fontFamily: 'Gilroy-Medium' }}>
               {below800 ? 'Protocol Analytics' : 'TBCC Protocol Analytics'}
             </TYPE.largeHeader>
             <Search />
             <GlobalStats />
           </AutoColumn>
-          {below800 && ( // mobile card
-            <Box mb={20}>
-              <Panel>
-                <Box>
-                  <AutoColumn gap="36px">
-                    <AutoColumn gap="20px">
-                      <RowBetween>
-                        <TYPE.main>Volume (24hrs)</TYPE.main>
-                        <div />
-                      </RowBetween>
-                      <RowBetween align="flex-end">
-                        <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
-                          {formattedNum(oneDayVolumeUSD, true)}
-                        </TYPE.main>
-                        <TYPE.main fontSize={12}>{formattedPercent(volumeChangeUSD)}</TYPE.main>
-                      </RowBetween>
-                    </AutoColumn>
-                    <AutoColumn gap="20px">
-                      <RowBetween>
-                        <TYPE.main>Total Liquidity</TYPE.main>
-                        <div />
-                      </RowBetween>
-                      <RowBetween align="flex-end">
-                        <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
-                          {formattedNum(totalLiquidityUSD, true)}
-                        </TYPE.main>
-                        <TYPE.main fontSize={12}>{formattedPercent(liquidityChangeUSD)}</TYPE.main>
-                      </RowBetween>
-                    </AutoColumn>
-                  </AutoColumn>
-                </Box>
-              </Panel>
-            </Box>
-          )}
           {!below800 && (
             <GridRow>
               <Panel style={{ height: '100%', minHeight: '323px', padding: 30 }}>
@@ -118,13 +80,20 @@ function GlobalPage() {
             </GridRow>
           )}
           {below800 && (
-            <AutoColumn style={{ marginTop: '6px' }} gap="24px">
-              <Panel style={{ height: '100%', minHeight: '300px' }}>
-                <GlobalChart display="liquidity" />
-              </Panel>
+            <AutoColumn gap="20px">
+              <AutoColumn gap="24px">
+                <Panel style={{ height: '100%', minHeight: '300px', padding: 20 }}>
+                  <GlobalChart display="liquidity" />
+                </Panel>
+              </AutoColumn>
+              <AutoColumn gap="24px">
+                <Panel style={{ height: '100%', minHeight: '300px', padding: 20 }}>
+                  <GlobalChart display="volume" />
+                </Panel>
+              </AutoColumn>
             </AutoColumn>
           )}
-          <ListOptions gap="10px" style={{ margin: '40px 0 18px' }}>
+          <ListOptions gap="10px" style={{ margin: below800 ? '34px 0 18px' : '40px 0 18px' }}>
             <RowBetween>
               <TYPE.main style={{ fontFamily: 'Gilroy-Medium' }} fontSize="18px">
                 Top Tokens
@@ -134,10 +103,10 @@ function GlobalPage() {
               </CustomLink>
             </RowBetween>
           </ListOptions>
-          <Panel style={{ padding: '20px 0 30px' }}>
+          <Panel style={{ padding: below800 ? '20px 0 0 0' : '20px 0 30px' }}>
             <TopTokenList tokens={allTokens} />
           </Panel>
-          <ListOptions gap="10px" style={{ margin: '40px 0 18px' }}>
+          <ListOptions gap="10px" style={{ margin: below800 ? '34px 0 18px' : '40px 0 18px' }}>
             <RowBetween>
               <TYPE.main style={{ fontFamily: 'Gilroy-Medium' }} fontSize="18px">
                 Top Pairs
@@ -147,16 +116,19 @@ function GlobalPage() {
               </CustomLink>
             </RowBetween>
           </ListOptions>
-          <Panel style={{ padding: '20px 0 30px' }}>
+          <Panel style={{ padding: below800 ? '20px 0 0 0' : '20px 0 30px' }}>
             <PairList pairs={allPairs} />
           </Panel>
 
           <span>
-            <TYPE.main fontSize="18px" style={{ margin: '40px 0 18px', fontFamily: 'Gilroy-Medium' }}>
+            <TYPE.main
+              fontSize="18px"
+              style={{ margin: below800 ? '34px 0 18px' : '40px 0 18px', fontFamily: 'Gilroy-Medium' }}
+            >
               Transactions
             </TYPE.main>
           </span>
-          <Panel>
+          <Panel style={{ padding: below800 ? '20px 0 0 0' : '20px 0 30px' }}>
             <TxnList transactions={transactions} />
           </Panel>
         </div>

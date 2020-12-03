@@ -23,8 +23,11 @@ const PageButtons = styled.div`
   width: 100%;
   display: flex;
   justify-content: center;
-  margin-top: 2em;
-  margin-bottom: 0.5em;
+  margin-top: 30px;
+
+  @media screen and (max-width: 800px) {
+    margin: 16px 0;
+  }
 `
 
 const Arrow = styled.div`
@@ -60,6 +63,10 @@ const DashGrid = styled.div`
     }
   }
 
+  @media screen and (max-width: 800px) {
+    padding: 0 10px 0 20px;
+  }
+
   @media screen and (min-width: 1200px) {
     grid-template-columns: 35px 2.5fr 1fr 1fr;
     grid-template-areas: 'number name uniswap return';
@@ -79,7 +86,12 @@ const DashGrid = styled.div`
 const ListWrapper = styled.div``
 
 const ClickableText = styled(Text)`
-  color: ${({ theme }) => theme.text1};
+  color: ${({ theme }) => theme.black};
+
+  font-family: Gilroy-Regular;
+  font-size: 13px;
+  line-height: 15px;
+  letter-spacing: 0.15px;
   &:hover {
     cursor: pointer;
     opacity: 0.6;
@@ -90,15 +102,16 @@ const ClickableText = styled(Text)`
 `
 
 const DataText = styled(Flex)`
+  font-family: ${({ regular }) => (regular ? 'Gilroy-Regular' : 'Gilroy-Medium')};
+  font-weight: 500;
+  font-size: 15px;
+  line-height: 18px;
   align-items: center;
   text-align: center;
-  color: ${({ theme }) => theme.text1};
-  & > * {
-    font-size: 1em;
-  }
+  color: ${({ theme }) => theme.black};
 
   @media screen and (max-width: 600px) {
-    font-size: 13px;
+    font-size: 12px;
   }
 `
 
@@ -110,6 +123,7 @@ const SORT_FIELD = {
 function PositionList({ positions }) {
   const below500 = useMedia('(max-width: 500px)')
   const below740 = useMedia('(max-width: 740px)')
+  const below800 = useMedia('(max-width: 800px)')
 
   // pagination
   const [page, setPage] = useState(1)
@@ -285,7 +299,7 @@ function PositionList({ positions }) {
 
   return (
     <ListWrapper>
-      <DashGrid center={true} style={{ height: '32px', padding: 0 }}>
+      <DashGrid center={true} style={{ padding: below800 ? '0 10px 20px 20px' : '0 30px 20px 30px' }}>
         {!below740 && (
           <Flex alignItems="flex-start" justifyContent="flexStart">
             <TYPE.main area="number">#</TYPE.main>
@@ -326,7 +340,7 @@ function PositionList({ positions }) {
         <div onClick={() => setPage(page === 1 ? page : page - 1)}>
           <Arrow faded={page === 1 ? true : false}>←</Arrow>
         </div>
-        <TYPE.body>{'Page ' + page + ' of ' + maxPage}</TYPE.body>
+        <TYPE.main style={{ fontFamily: 'Gilroy-medium' }}>{'Page ' + page + ' of ' + maxPage}</TYPE.main>
         <div onClick={() => setPage(page === maxPage ? page : page + 1)}>
           <Arrow faded={page === maxPage ? true : false}>→</Arrow>
         </div>

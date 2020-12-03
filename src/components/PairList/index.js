@@ -22,6 +22,10 @@ const PageButtons = styled.div`
   display: flex;
   justify-content: center;
   margin-top: 30px;
+
+  @media screen and (max-width: 800px) {
+    margin: 16px 0;
+  }
 `
 
 const Arrow = styled.div`
@@ -54,8 +58,12 @@ const DashGrid = styled.div`
     }
   }
 
+  @media screen and (max-width: 800px) {
+    padding: 0 10px 0 20px;
+    grid-gap: 0;
+  }
+
   @media screen and (min-width: 740px) {
-    padding: 0 1.125rem;
     grid-template-columns: 1.5fr 1fr 1fr};
     grid-template-areas: ' name liq vol pool ';
   }
@@ -120,6 +128,7 @@ const FIELD_TO_VALUE = {
 function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
   const below600 = useMedia('(max-width: 600px)')
   const below740 = useMedia('(max-width: 740px)')
+  const below800 = useMedia('(max-width: 800px)')
   const below1080 = useMedia('(max-width: 1080px)')
 
   // pagination
@@ -225,7 +234,7 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
       <DashGrid
         center={true}
         disbaleLinks={disbaleLinks}
-        style={{ height: 'fit-content', padding: '0 30px 20px 30px' }}
+        style={{ height: 'fit-content', padding: below800 ? '0 10px 20px 20px' : '0 30px 20px 30px' }}
       >
         <Flex alignItems="center" justifyContent="flexStart">
           <TYPE.main area="name">Name</TYPE.main>

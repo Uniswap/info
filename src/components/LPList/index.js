@@ -20,7 +20,11 @@ const PageButtons = styled.div`
   width: 100%;
   display: flex;
   justify-content: center;
-  margin-top: 32px;
+  margin-top: 30px;
+
+  @media screen and (max-width: 800px) {
+    margin: 16px 0;
+  }
 `
 
 const Arrow = styled.div`
@@ -42,10 +46,13 @@ const DashGrid = styled.div`
   grid-gap: 1em;
   grid-template-columns: 10px 1.5fr 1fr 1fr;
   grid-template-areas: 'number name pair value';
-  padding: 0 4px;
 
   > * {
     justify-content: flex-end;
+  }
+
+  @media screen and (max-width: 800px) {
+    padding: 0 10px 20px 20px;
   }
 
   @media screen and (max-width: 1080px) {
@@ -100,7 +107,11 @@ function LPList({ lps, disbaleLinks, maxItems = 10 }) {
 
   const ListItem = ({ lp, index }) => {
     return (
-      <DashGrid style={{ height: '48px', padding: '0 30px' }} disbaleLinks={disbaleLinks} focus={true}>
+      <DashGrid
+        style={{ height: '48px', padding: below800 ? '0 10px 0 20px' : '0 30px' }}
+        disbaleLinks={disbaleLinks}
+        focus={true}
+      >
         {!below600 && (
           <DataText area="number" fontWeight="500">
             {index}
@@ -111,12 +122,6 @@ function LPList({ lps, disbaleLinks, maxItems = 10 }) {
             {below800 ? lp.user.id.slice(0, 4) + '...' + lp.user.id.slice(38, 42) : lp.user.id}
           </CustomLink>
         </DataText>
-
-        {/* {!below1080 && (
-          <DataText area="type" justifyContent="flex-end">
-            {lp.type}
-          </DataText>
-        )} */}
 
         <DataText>
           <CustomLink area="pair" to={'/pair/' + lp.pairAddress}>
@@ -147,7 +152,7 @@ function LPList({ lps, disbaleLinks, maxItems = 10 }) {
       <DashGrid
         center={true}
         disbaleLinks={disbaleLinks}
-        style={{ height: 'fit-content', padding: ' 0 30px 20px 30px' }}
+        style={{ height: 'fit-content', padding: below800 ? '0 10px 20px 20px' : '0 30px 20px 30px' }}
       >
         {!below600 && (
           <Flex alignItems="center" justifyContent="flex-start">
@@ -157,11 +162,6 @@ function LPList({ lps, disbaleLinks, maxItems = 10 }) {
         <Flex alignItems="center" justifyContent="flex-start">
           <TYPE.main area="name">Account</TYPE.main>
         </Flex>
-        {/* {!below1080 && (
-          <Flex alignItems="center" justifyContent="flexEnd">
-            <TYPE.main area="type">Type</TYPE.main>
-          </Flex>
-        )} */}
         <Flex alignItems="center" justifyContent="flexEnd">
           <TYPE.main area="pair">Pair</TYPE.main>
         </Flex>

@@ -34,7 +34,7 @@ const ContentWrapper = styled.div`
   @media screen and (max-width: 1080px) {
     grid-template-columns: 1fr;
     max-width: 100vw;
-    overflow: hidden;
+    //overflow: hidden;
     grid-gap: 0;
   }
 `

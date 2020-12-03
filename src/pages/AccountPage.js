@@ -14,21 +14,12 @@ import { TYPE } from '../Theme'
 import { ButtonDropdown, ButtonLight } from '../components/ButtonStyled'
 import { PageWrapper, ContentWrapper, StyledIcon } from '../components'
 import DoubleTokenLogo from '../components/DoubleLogo'
-import { Bookmark, Activity } from 'react-feather'
+import { Activity } from 'react-feather'
 import Link from '../components/Link'
 import { FEE_WARNING_TOKENS } from '../constants'
 import { BasicLink } from '../components/Link'
 import { useMedia } from 'react-use'
 import Search from '../components/Search'
-
-const AccountWrapper = styled.div`
-  background-color: rgba(255, 255, 255, 0.2);
-  padding: 6px 16px;
-  border-radius: 100px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`
 
 const Header = styled.div``
 
@@ -38,7 +29,6 @@ const DashboardWrapper = styled.div`
 
 const DropdownWrapper = styled.div`
   position: relative;
-  margin-bottom: 1rem;
   border: 1px solid #edeef2;
   border-radius: 12px;
 `
@@ -85,6 +75,22 @@ const Warning = styled.div`
   border-radius: 10px;
   margin-bottom: 1rem;
   width: calc(100% - 2rem);
+`
+
+const FlexWrap = styled.div`
+  display: flex;
+
+  > div {
+    margin-right: 40px;
+  }
+
+  @media screen and (max-width: 600px) {
+    flex-wrap: wrap;
+
+    > div {
+      margin-bottom: 24px;
+    }
+  }
 `
 
 function AccountPage({ account }) {
@@ -153,16 +159,24 @@ function AccountPage({ account }) {
   const below600 = useMedia('(max-width: 600px)')
 
   return (
-    <PageWrapper>
+    <PageWrapper style={{ paddingBottom: 56 }}>
       <ContentWrapper>
         <RowBetween>
-          <TYPE.body>
-            <BasicLink to="/accounts">{'Accounts '}</BasicLink>→{' '}
-            <Link lineHeight={'145.23%'} href={'https://etherscan.io/address/' + account} target="_blank">
-              {' '}
-              {account?.slice(0, 42)}{' '}
+          <TYPE.main fontSize={15}>
+            <BasicLink to="/accounts" style={{ marginRight: 4 }}>
+              Accounts
+            </BasicLink>
+            →
+            <Link
+              color="#000000"
+              lineHeight={'145.23%'}
+              href={'https://etherscan.io/address/' + account}
+              target="_blank"
+              style={{ marginLeft: 4 }}
+            >
+              {account?.slice(0, 42)}
             </Link>
-          </TYPE.body>
+          </TYPE.main>
           {!below600 && <Search small={true} />}
         </RowBetween>
         <Header>
@@ -170,14 +184,9 @@ function AccountPage({ account }) {
             <span>
               <TYPE.header fontSize={24}>{account?.slice(0, 6) + '...' + account?.slice(38, 42)}</TYPE.header>
               <Link lineHeight={'145.23%'} href={'https://etherscan.io/address/' + account} target="_blank">
-                <TYPE.main fontSize={14}>View on Etherscan</TYPE.main>
+                <TYPE.main fontSize={15}>View on Etherscan</TYPE.main>
               </Link>
             </span>
-            <AccountWrapper>
-              <StyledIcon>
-                <Bookmark style={{ opacity: 0.4 }} />
-              </StyledIcon>
-            </AccountWrapper>
           </RowBetween>
         </Header>
         <DashboardWrapper>
@@ -188,15 +197,15 @@ function AccountPage({ account }) {
                 {!activePosition && (
                   <RowFixed>
                     <StyledIcon>
-                      <Activity size={16} />
+                      <Activity size={14} />
                     </StyledIcon>
                     <TYPE.body ml={'10px'}>All Positions</TYPE.body>
                   </RowFixed>
                 )}
                 {activePosition && (
                   <RowFixed>
-                    <DoubleTokenLogo a0={activePosition.pair.token0.id} a1={activePosition.pair.token1.id} size={16} />
-                    <TYPE.body ml={'16px'}>
+                    <DoubleTokenLogo a0={activePosition.pair.token0.id} a1={activePosition.pair.token1.id} size={20} />
+                    <TYPE.body ml={'10px'}>
                       {activePosition.pair.token0.symbol}-{activePosition.pair.token1.symbol} Position
                     </TYPE.body>
                   </RowFixed>
@@ -250,11 +259,11 @@ function AccountPage({ account }) {
             </DropdownWrapper>
           )}
           {!hideLPContent && (
-            <Panel style={{ height: '100%', marginBottom: '1rem' }}>
-              <AutoRow gap="20px">
-                <AutoColumn gap="10px">
+            <Panel style={{ height: '100%', padding: below600 ? '30px 30px 0 30px' : 30 }}>
+              <FlexWrap>
+                <AutoColumn gap="14px">
                   <RowBetween>
-                    <TYPE.body>Liquidity (Including Fees)</TYPE.body>
+                    <TYPE.main fontSize={15}>Liquidity (Including Fees)</TYPE.main>
                     <div />
                   </RowBetween>
                   <RowFixed align="flex-end">
@@ -267,23 +276,23 @@ function AccountPage({ account }) {
                     </TYPE.header>
                   </RowFixed>
                 </AutoColumn>
-                <AutoColumn gap="10px">
+                <AutoColumn gap="14px">
                   <RowBetween>
-                    <TYPE.body>Fees Earned (Cumulative)</TYPE.body>
+                    <TYPE.main fontSize={15}>Fees Earned (Cumulative)</TYPE.main>
                     <div />
                   </RowBetween>
                   <RowFixed align="flex-end">
-                    <TYPE.header fontSize={'24px'} lineHeight={1} color={aggregateFees && 'green'}>
+                    <TYPE.header fontSize={'24px'} lineHeight={1} color={aggregateFees && '#2CB48A'}>
                       {aggregateFees ? formattedNum(aggregateFees, true, true) : '-'}
                     </TYPE.header>
                   </RowFixed>
                 </AutoColumn>
-              </AutoRow>
+              </FlexWrap>
             </Panel>
           )}
           {!hideLPContent && (
             <PanelWrapper>
-              <Panel style={{ gridColumn: '1' }}>
+              <Panel style={{ gridColumn: '1', padding: 20 }}>
                 {activePosition ? (
                   <PairReturnsChart account={account} position={activePosition} />
                 ) : (
@@ -292,68 +301,70 @@ function AccountPage({ account }) {
               </Panel>
             </PanelWrapper>
           )}
-          <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
+          <TYPE.main fontSize={18} style={{ marginTop: below600 ? 34 : 40 }}>
             Positions
-          </TYPE.main>{' '}
+          </TYPE.main>
           <Panel
             style={{
-              marginTop: '1.5rem',
+              marginTop: 18,
             }}
           >
             <PositionList positions={positions} />
           </Panel>
-          <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
+          <TYPE.main fontSize={18} style={{ marginTop: below600 ? 34 : 40 }}>
             Liquidity Mining Pools
           </TYPE.main>
           <Panel
             style={{
-              marginTop: '1.5rem',
+              marginTop: 18,
+              padding: 30,
             }}
           >
             {miningPositions && <MiningPositionList miningPositions={miningPositions} />}
             {!miningPositions && (
-              <AutoColumn gap="8px" justify="flex-start">
+              <AutoColumn gap="14px" justify="flex-start">
                 <TYPE.main>No Staked Liquidity.</TYPE.main>
-                <AutoRow gap="8px" justify="flex-start">
+                <AutoRow gap="14px" justify="flex-start">
                   <ButtonLight style={{ padding: '4px 6px', borderRadius: '4px' }}>Learn More</ButtonLight>{' '}
-                </AutoRow>{' '}
+                </AutoRow>
               </AutoColumn>
             )}
           </Panel>
-          <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
+          <TYPE.main fontSize={18} style={{ marginTop: below600 ? 34 : 40 }}>
             Transactions
-          </TYPE.main>{' '}
+          </TYPE.main>
           <Panel
             style={{
-              marginTop: '1.5rem',
+              marginTop: 18,
             }}
           >
             <TxnList transactions={transactions} />
           </Panel>
-          <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
+          <TYPE.main fontSize={18} style={{ marginTop: below600 ? 34 : 40 }}>
             Wallet Stats
-          </TYPE.main>{' '}
+          </TYPE.main>
           <Panel
             style={{
-              marginTop: '1.5rem',
+              marginTop: 18,
+              padding: below600 ? 20 : 30,
             }}
           >
-            <AutoRow gap="20px">
-              <AutoColumn gap="8px">
+            <FlexWrap>
+              <AutoColumn gap="14px">
                 <TYPE.header fontSize={24}>{totalSwappedUSD ? formattedNum(totalSwappedUSD, true) : '-'}</TYPE.header>
-                <TYPE.main>Total Value Swapped</TYPE.main>
+                <TYPE.main fontSize={15}>Total Value Swapped</TYPE.main>
               </AutoColumn>
-              <AutoColumn gap="8px">
+              <AutoColumn gap="14px">
                 <TYPE.header fontSize={24}>
                   {totalSwappedUSD ? formattedNum(totalSwappedUSD * 0.003, true) : '-'}
                 </TYPE.header>
-                <TYPE.main>Total Fees Paid</TYPE.main>
+                <TYPE.main fontSize={15}>Total Fees Paid</TYPE.main>
               </AutoColumn>
-              <AutoColumn gap="8px">
+              <AutoColumn gap="14px">
                 <TYPE.header fontSize={24}>{transactionCount ? transactionCount : '-'}</TYPE.header>
-                <TYPE.main>Total Transactions</TYPE.main>
+                <TYPE.main fontSize={15}>Total Transactions</TYPE.main>
               </AutoColumn>
-            </AutoRow>
+            </FlexWrap>
           </Panel>
         </DashboardWrapper>
       </ContentWrapper>

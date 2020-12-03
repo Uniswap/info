@@ -14,11 +14,21 @@ import CandleStickChart from '../CandleChart'
 import LocalLoader from '../LocalLoader'
 import { AutoColumn } from '../Column'
 import { Activity } from 'react-feather'
-import { useDarkModeManager } from '../../contexts/LocalStorage'
 
 const ChartWrapper = styled.div`
   height: 100%;
-  min-height: 300px;
+  min-height: 340px;
+  padding: 20px;
+
+  .wrapping {
+    @media screen and (max-width: 500px) {
+      display: block;
+
+      .down {
+        margin-top: ${({ chartFilter }) => (chartFilter !== CHART_VIEW.PRICE ? '20px' : '-32px')};
+      }
+    }
+  }
 
   @media screen and (max-width: 600px) {
     min-height: 200px;
@@ -27,6 +37,22 @@ const ChartWrapper = styled.div`
 
 const PriceOption = styled(OptionButton)`
   border-radius: 2px;
+  margin-right: 10px;
+`
+
+const ButtonFilter = styled(OptionButton)`
+  width: fit-content;
+  height: fit-content;
+  padding: 7px 10px;
+  background: #ffffff;
+  border: 1px solid #9b9eb7;
+  border-radius: 4px;
+  font-family: Gilroy-Medium;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 16px;
+  color: #454242;
+  z-index: 200;
 `
 
 const CHART_VIEW = {
@@ -47,8 +73,7 @@ const TokenChart = ({ address, color, base }) => {
   const [chartFilter, setChartFilter] = useState(CHART_VIEW.PRICE)
   const [frequency, setFrequency] = useState(DATA_FREQUENCY.HOUR)
 
-  const [darkMode] = useDarkModeManager()
-  const textColor = darkMode ? 'white' : 'black'
+  const textColor = 'black'
 
   // reset view on new address
   const addressPrev = usePrevious(address)
@@ -129,96 +154,86 @@ const TokenChart = ({ address, color, base }) => {
   }, [isClient, width]) // Empty array ensures that effect is only run on mount and unmount
 
   return (
-    <ChartWrapper>
-      {below600 ? (
-        <RowBetween mb={40}>
-          <DropdownSelect options={CHART_VIEW} active={chartFilter} setActive={setChartFilter} color={color} />
-          <DropdownSelect options={timeframeOptions} active={timeWindow} setActive={setTimeWindow} color={color} />
-        </RowBetween>
-      ) : (
-        <RowBetween
-          mb={
-            chartFilter === CHART_VIEW.LIQUIDITY ||
-            chartFilter === CHART_VIEW.VOLUME ||
-            (chartFilter === CHART_VIEW.PRICE && frequency === DATA_FREQUENCY.LINE)
-              ? 40
-              : 0
-          }
-          align="flex-start"
-        >
-          <AutoColumn gap="8px">
-            <RowFixed>
-              <OptionButton
-                active={chartFilter === CHART_VIEW.LIQUIDITY}
-                onClick={() => setChartFilter(CHART_VIEW.LIQUIDITY)}
-                style={{ marginRight: '6px' }}
-              >
-                Liquidity
-              </OptionButton>
-              <OptionButton
-                active={chartFilter === CHART_VIEW.VOLUME}
-                onClick={() => setChartFilter(CHART_VIEW.VOLUME)}
-                style={{ marginRight: '6px' }}
-              >
-                Volume
-              </OptionButton>
-              <OptionButton
-                active={chartFilter === CHART_VIEW.PRICE}
+    <ChartWrapper chartFilter={chartFilter}>
+      <RowBetween
+        className="wrapping"
+        mb={
+          chartFilter === CHART_VIEW.LIQUIDITY ||
+          chartFilter === CHART_VIEW.VOLUME ||
+          (chartFilter === CHART_VIEW.PRICE && frequency === DATA_FREQUENCY.LINE)
+            ? 40
+            : 0
+        }
+        align="flex-start"
+      >
+        <AutoColumn gap="10px">
+          <RowFixed>
+            <ButtonFilter
+              active={chartFilter === CHART_VIEW.LIQUIDITY}
+              onClick={() => setChartFilter(CHART_VIEW.LIQUIDITY)}
+              style={{ marginRight: '10px' }}
+            >
+              Liquidity
+            </ButtonFilter>
+            <ButtonFilter
+              active={chartFilter === CHART_VIEW.VOLUME}
+              onClick={() => setChartFilter(CHART_VIEW.VOLUME)}
+              style={{ marginRight: '10px' }}
+            >
+              Volume
+            </ButtonFilter>
+            <ButtonFilter
+              active={chartFilter === CHART_VIEW.PRICE}
+              onClick={() => {
+                setChartFilter(CHART_VIEW.PRICE)
+              }}
+            >
+              Price
+            </ButtonFilter>
+          </RowFixed>
+          {chartFilter === CHART_VIEW.PRICE && (
+            <AutoRow gap="4px">
+              <PriceOption
+                active={frequency === DATA_FREQUENCY.DAY}
                 onClick={() => {
-                  setChartFilter(CHART_VIEW.PRICE)
+                  setTimeWindow(timeframeOptions.MONTH)
+                  setFrequency(DATA_FREQUENCY.DAY)
                 }}
               >
-                Price
-              </OptionButton>
-            </RowFixed>
-            {chartFilter === CHART_VIEW.PRICE && (
-              <AutoRow gap="4px">
-                <PriceOption
-                  active={frequency === DATA_FREQUENCY.DAY}
-                  onClick={() => {
-                    setTimeWindow(timeframeOptions.MONTH)
-                    setFrequency(DATA_FREQUENCY.DAY)
-                  }}
-                >
-                  D
-                </PriceOption>
-                <PriceOption
-                  active={frequency === DATA_FREQUENCY.HOUR}
-                  onClick={() => setFrequency(DATA_FREQUENCY.HOUR)}
-                >
-                  H
-                </PriceOption>
-                <PriceOption
-                  active={frequency === DATA_FREQUENCY.LINE}
-                  onClick={() => setFrequency(DATA_FREQUENCY.LINE)}
-                >
-                  <Activity size={14} />
-                </PriceOption>
-              </AutoRow>
-            )}
-          </AutoColumn>
-          <AutoRow justify="flex-end" gap="6px" align="flex-start">
-            <OptionButton
-              active={timeWindow === timeframeOptions.WEEK}
-              onClick={() => setTimeWindow(timeframeOptions.WEEK)}
-            >
-              1W
-            </OptionButton>
-            <OptionButton
-              active={timeWindow === timeframeOptions.MONTH}
-              onClick={() => setTimeWindow(timeframeOptions.MONTH)}
-            >
-              1M
-            </OptionButton>
-            <OptionButton
-              active={timeWindow === timeframeOptions.ALL_TIME}
-              onClick={() => setTimeWindow(timeframeOptions.ALL_TIME)}
-            >
-              All
-            </OptionButton>
-          </AutoRow>
-        </RowBetween>
-      )}
+                D
+              </PriceOption>
+              <PriceOption active={frequency === DATA_FREQUENCY.HOUR} onClick={() => setFrequency(DATA_FREQUENCY.HOUR)}>
+                H
+              </PriceOption>
+              <PriceOption active={frequency === DATA_FREQUENCY.LINE} onClick={() => setFrequency(DATA_FREQUENCY.LINE)}>
+                <Activity size={14} />
+              </PriceOption>
+            </AutoRow>
+          )}
+        </AutoColumn>
+        <AutoRow justify="flex-end" gap="6px" align="flex-start" className="down">
+          <ButtonFilter
+            active={timeWindow === timeframeOptions.WEEK}
+            onClick={() => setTimeWindow(timeframeOptions.WEEK)}
+            style={{ marginRight: '10px' }}
+          >
+            1W
+          </ButtonFilter>
+          <ButtonFilter
+            active={timeWindow === timeframeOptions.MONTH}
+            onClick={() => setTimeWindow(timeframeOptions.MONTH)}
+            style={{ marginRight: '10px' }}
+          >
+            1M
+          </ButtonFilter>
+          <ButtonFilter
+            active={timeWindow === timeframeOptions.ALL_TIME}
+            onClick={() => setTimeWindow(timeframeOptions.ALL_TIME)}
+          >
+            All
+          </ButtonFilter>
+        </AutoRow>
+      </RowBetween>
       {chartFilter === CHART_VIEW.LIQUIDITY && chartData && (
         <ResponsiveContainer aspect={aspect}>
           <AreaChart margin={{ top: 0, right: 10, bottom: 6, left: 0 }} barCategoryGap={1} data={chartData}>
@@ -273,7 +288,7 @@ const TokenChart = ({ address, color, base }) => {
               type="monotone"
               name={'Liquidity'}
               yAxisId={0}
-              stroke={darken(0.12, color)}
+              stroke={darken(0.12, 'red')}
               fill="url(#colorUv)"
             />
           </AreaChart>

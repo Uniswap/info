@@ -101,11 +101,15 @@ export function ButtonDropdown({ disabled = false, children, open, ...rest }) {
 }
 
 export const ButtonDark = styled(Base)`
-  background-color: ${({ color, theme }) => (color ? color : theme.primary1)};
+  background: #2cb48a;
   color: white;
   width: fit-content;
   border-radius: 12px;
   white-space: nowrap;
+  padding: 11px 20px;
+  font-family: Gilroy-Bold;
+  font-size: 16px;
+  line-height: 19px;
 
   :hover {
     background-color: ${({ color, theme }) => (color ? darken(0.1, color) : darken(0.1, theme.primary1))};
@@ -116,6 +120,7 @@ export const ButtonFaded = styled(Base)`
   background-color: ${({ theme }) => theme.bg2};
   color: (255, 255, 255, 0.5);
   white-space: nowrap;
+  padding: 10px 20px;
 
   :hover {
     opacity: 0.5;
@@ -142,14 +147,20 @@ export function ButtonCustom({ children, bgColor, color, ...rest }) {
 }
 
 export const OptionButton = styled.div`
+  font-family: Gilroy-Medium;
+  font-size: 16px;
+  line-height: 19px;
+  color: #454242;
   font-weight: 500;
-  width: fit-content;
   white-space: nowrap;
-  padding: 6px;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   border-radius: 6px;
   border: 1px solid ${({ theme }) => theme.bg4};
   background-color: ${({ active, theme }) => active && theme.bg3};
-  color: ${({ theme }) => theme.text1};
 
   :hover {
     cursor: ${({ disabled }) => !disabled && 'pointer'};

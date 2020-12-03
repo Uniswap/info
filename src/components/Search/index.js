@@ -71,12 +71,6 @@ const Input = styled.input`
     color: #9b9eb7;
     font-size: 14px;
   }
-
-  @media screen and (max-width: 640px) {
-    ::placeholder {
-      font-size: 1rem;
-    }
-  }
 `
 
 const SearchIconLarge = styled(SearchIcon)`

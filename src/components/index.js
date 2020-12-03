@@ -110,6 +110,10 @@ export const PageWrapper = styled.div`
       padding: 0 12px;
     }
   }
+
+  @media screen and (max-width: 800px) {
+    padding: 40px 0 35px;
+  }
 `
 
 export const ContentWrapper = styled.div`
@@ -125,7 +129,6 @@ export const ContentWrapper = styled.div`
   box-sizing: border-box;
   @media screen and (max-width: 1180px) {
     grid-template-columns: 1fr;
-    padding: 0 1rem;
   }
 `
 
@@ -134,8 +137,8 @@ export const ContentWrapperLarge = styled.div`
   justify-content: start;
   align-items: start;
   grid-template-columns: 1fr;
-  grid-gap: 24px;
-  padding: 0 2rem;
+  grid-gap: 30px;
+  padding: 0 20px;
   margin: 0 auto;
   box-sizing: border-box;
   max-width: 1440px;
@@ -161,7 +164,6 @@ export const FullWrapper = styled.div`
 
   @media screen and (max-width: 1180px) {
     grid-template-columns: 1fr;
-    padding: 0 1rem;
   }
 `
 

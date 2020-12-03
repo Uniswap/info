@@ -17,18 +17,35 @@ import { useDarkModeManager } from '../../contexts/LocalStorage'
 
 const ChartWrapper = styled.div`
   height: 100%;
-  max-height: 340px;
+  padding: 20px;
+  max-height: 380px;
 
   @media screen and (max-width: 600px) {
     min-height: 200px;
   }
 `
 
+const ButtonFilter = styled(OptionButton)`
+  width: fit-content;
+  height: fit-content;
+  padding: 7px 10px;
+  background: #ffffff;
+  border: 1px solid #9b9eb7;
+  border-radius: 4px;
+  font-family: Gilroy-Medium;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 16px;
+  color: #454242;
+  z-index: 200;
+  margin-right: ${({ mr }) => mr}px;
+`
+
 const OptionsRow = styled.div`
   display: flex;
   flex-direction: row;
   width: 100%;
-  margin-bottom: 40px;
+  margin-bottom: 30px;
 `
 
 const CHART_VIEW = {
@@ -43,8 +60,7 @@ const PairChart = ({ address, color, base0, base1 }) => {
 
   const [timeWindow, setTimeWindow] = useState(timeframeOptions.MONTH)
 
-  const [darkMode] = useDarkModeManager()
-  const textColor = darkMode ? 'white' : 'black'
+  const textColor = 'black'
 
   // update the width on a window resize
   const ref = useRef()
@@ -123,7 +139,8 @@ const PairChart = ({ address, color, base0, base1 }) => {
       ) : (
         <OptionsRow>
           <AutoRow gap="6px" style={{ flexWrap: 'nowrap' }}>
-            <OptionButton
+            <ButtonFilter
+              mr={10}
               active={chartFilter === CHART_VIEW.LIQUIDITY}
               onClick={() => {
                 setTimeWindow(timeframeOptions.ALL_TIME)
@@ -131,8 +148,9 @@ const PairChart = ({ address, color, base0, base1 }) => {
               }}
             >
               Liquidity
-            </OptionButton>
-            <OptionButton
+            </ButtonFilter>
+            <ButtonFilter
+              mr={10}
               active={chartFilter === CHART_VIEW.VOLUME}
               onClick={() => {
                 setTimeWindow(timeframeOptions.ALL_TIME)
@@ -140,8 +158,9 @@ const PairChart = ({ address, color, base0, base1 }) => {
               }}
             >
               Volume
-            </OptionButton>
-            <OptionButton
+            </ButtonFilter>
+            <ButtonFilter
+              mr={10}
               active={chartFilter === CHART_VIEW.RATE0}
               onClick={() => {
                 setTimeWindow(timeframeOptions.WEEK)
@@ -149,8 +168,8 @@ const PairChart = ({ address, color, base0, base1 }) => {
               }}
             >
               {pairData.token0 ? formattedSymbol1 + '/' + formattedSymbol0 : '-'}
-            </OptionButton>
-            <OptionButton
+            </ButtonFilter>
+            <ButtonFilter
               active={chartFilter === CHART_VIEW.RATE1}
               onClick={() => {
                 setTimeWindow(timeframeOptions.WEEK)
@@ -158,27 +177,29 @@ const PairChart = ({ address, color, base0, base1 }) => {
               }}
             >
               {pairData.token0 ? formattedSymbol0 + '/' + formattedSymbol1 : '-'}
-            </OptionButton>
+            </ButtonFilter>
           </AutoRow>
           <AutoRow justify="flex-end" gap="6px">
-            <OptionButton
+            <ButtonFilter
               active={timeWindow === timeframeOptions.WEEK}
               onClick={() => setTimeWindow(timeframeOptions.WEEK)}
+              mr={10}
             >
               1W
-            </OptionButton>
-            <OptionButton
+            </ButtonFilter>
+            <ButtonFilter
               active={timeWindow === timeframeOptions.MONTH}
               onClick={() => setTimeWindow(timeframeOptions.MONTH)}
+              mr={10}
             >
               1M
-            </OptionButton>
-            <OptionButton
+            </ButtonFilter>
+            <ButtonFilter
               active={timeWindow === timeframeOptions.ALL_TIME}
               onClick={() => setTimeWindow(timeframeOptions.ALL_TIME)}
             >
               All
-            </OptionButton>
+            </ButtonFilter>
           </AutoRow>
         </OptionsRow>
       )}

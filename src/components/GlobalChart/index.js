@@ -59,7 +59,6 @@ const GlobalChart = ({ display }) => {
         })
     )
   }, [dailyData, utcStartTime, volumeWindow, weeklyData])
-  const below800 = useMedia('(max-width: 800px)')
 
   // update the width on a window resize
   const ref = useRef()
@@ -78,10 +77,6 @@ const GlobalChart = ({ display }) => {
 
   return chartDataFiltered ? (
     <>
-      {below800 && (
-        <DropdownSelect options={CHART_VIEW} active={chartView} setActive={setChartView} color={'#ff007a'} />
-      )}
-
       {chartDataFiltered && chartView === CHART_VIEW.LIQUIDITY && (
         <ResponsiveContainer aspect={60 / 28} ref={ref}>
           <TradingViewChart

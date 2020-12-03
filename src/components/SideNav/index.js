@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import styled from 'styled-components'
 import { AutoColumn } from '../Column'
 import Title from '../Title'
@@ -10,6 +10,7 @@ import { TrendingUp, List, PieChart, Disc } from 'react-feather'
 import Link from '../Link'
 import { useSessionStart } from '../../contexts/Application'
 import Burger from '../Burger'
+import { useOnClickOutside, useOutsideClick } from '../../hooks'
 
 const Wrapper = styled.div`
   height: ${({ isMobile }) => (isMobile ? 'initial' : '100vh')};
@@ -60,6 +61,7 @@ const DesktopWrapper = styled.div`
   flex-direction: column;
   justify-content: space-between;
   height: 100vh;
+  background: ${({ theme }) => theme.bg7};
 `
 
 const MobileWrapper = styled.div`
@@ -67,6 +69,7 @@ const MobileWrapper = styled.div`
   justify-content: space-between;
   align-items: center;
   background: ${({ theme }) => theme.bg7};
+  margin-top: 1px;
 `
 
 const HeaderText = styled.div`
@@ -147,12 +150,12 @@ const MenuWrapper = styled.div`
 
   .show {
     transform: translateY(0%);
-    z-index: -1;
     transition: all 0.3s;
   }
 `
 
 function SideNav({ history }) {
+  const ref = useRef()
   const below1080 = useMedia('(max-width: 1080px)')
 
   const below1180 = useMedia('(max-width: 1180px)')
@@ -160,6 +163,8 @@ function SideNav({ history }) {
   const seconds = useSessionStart()
 
   const [show, setShow] = useState(false)
+
+  useOnClickOutside(ref, () => setShow(false))
 
   return (
     <>
@@ -245,7 +250,7 @@ function SideNav({ history }) {
             )}
           </DesktopWrapper>
         ) : (
-          <MenuWrapper>
+          <MenuWrapper ref={ref}>
             <MobileWrapper>
               <Title />
               <Burger show={show} setShow={setShow} />
@@ -253,13 +258,17 @@ function SideNav({ history }) {
             <MobileMenu className={show ? 'show' : 'hide'}>
               <AutoColumn>
                 <BasicLink to="/home">
-                  <Option activeText={history.location.pathname === '/home' ?? undefined}>
+                  <Option
+                    activeText={history.location.pathname === '/home' ?? undefined}
+                    onClick={() => setShow(false)}
+                  >
                     <TrendingUp size={20} style={{ marginRight: '21px' }} />
                     Overview
                   </Option>
                 </BasicLink>
                 <BasicLink to="/tokens">
                   <Option
+                    onClick={() => setShow(false)}
                     activeText={
                       (history.location.pathname.split('/')[1] === 'tokens' ||
                         history.location.pathname.split('/')[1] === 'token') ??
@@ -272,6 +281,7 @@ function SideNav({ history }) {
                 </BasicLink>
                 <BasicLink to="/pairs">
                   <Option
+                    onClick={() => setShow(false)}
                     activeText={
                       (history.location.pathname.split('/')[1] === 'pairs' ||
                         history.location.pathname.split('/')[1] === 'pair') ??
@@ -285,6 +295,7 @@ function SideNav({ history }) {
 
                 <BasicLink to="/accounts">
                   <Option
+                    onClick={() => setShow(false)}
                     activeText={
                       (history.location.pathname.split('/')[1] === 'accounts' ||
                         history.location.pathname.split('/')[1] === 'account') ??

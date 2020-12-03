@@ -22,8 +22,11 @@ const PageButtons = styled.div`
   width: 100%;
   display: flex;
   justify-content: center;
-  margin-top: 2em;
-  margin-bottom: 0.5em;
+  margin-top: 30px;
+
+  @media screen and (max-width: 800px) {
+    margin: 16px 0;
+  }
 `
 
 const Arrow = styled.div`

@@ -24,8 +24,7 @@ export default function GlobalStats() {
   const below1295 = useMedia('(max-width: 1295px)')
   const below1180 = useMedia('(max-width: 1180px)')
   const below1024 = useMedia('(max-width: 1024px)')
-  const below400 = useMedia('(max-width: 400px)')
-  const below816 = useMedia('(max-width: 816px)')
+  const below350 = useMedia('(max-width:350px)')
 
   const [showPriceCard, setShowPriceCard] = useState(false)
 
@@ -38,7 +37,7 @@ export default function GlobalStats() {
     <Header>
       <RowBetween>
         <RowFixed>
-          {!below400 && (
+          {!below350 && (
             <TYPE.main
               mr={'1rem'}
               onMouseEnter={() => {
