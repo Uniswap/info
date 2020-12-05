@@ -169,8 +169,8 @@ const HoverSpan = styled.span`
 `
 
 const WarningGrouping = styled.div`
-  opacity: ${({ disabled }) => disabled && '0.4'};
-  pointer-events: ${({ disabled }) => disabled && 'none'};
+  // opacity: ${({ disabled }) => disabled && '0.4'};
+  // pointer-events: ${({ disabled }) => disabled && 'none'};
 
   .name_wrapper {
     display: flex;

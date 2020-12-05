@@ -159,7 +159,7 @@ export const OptionButton = styled.div`
   justify-content: center;
   align-items: center;
   border-radius: 6px;
-  border: 1px solid ${({ theme }) => theme.bg4};
+  border: 1px solid ${({ active }) => (active ? '#ECAB43' : '#9B9EB7')};
   background-color: ${({ active, theme }) => active && theme.bg3};
 
   :hover {
