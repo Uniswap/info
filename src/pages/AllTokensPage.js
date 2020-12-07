@@ -17,7 +17,7 @@ function AllTokensPage() {
     window.scrollTo(0, 0)
   }, [])
 
-  const below600 = useMedia('(max-width: 800px)')
+  const below600 = useMedia('(max-width: 600px)')
 
   return (
     <PageWrapper style={{ paddingBottom: below600 && 46 }}>

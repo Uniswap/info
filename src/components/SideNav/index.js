@@ -76,10 +76,12 @@ const HeaderText = styled.div`
   margin-right: 0.75rem;
   font-family: Gilroy-Medium;
   display: inline-box;
-  display: -webkit-inline-box;
+  
 
   @media screen and (max-width: 1079px) {
     margin: 0;
+    display: flex;
+    justify-content: center;
   }
 
   a {
@@ -131,6 +133,14 @@ const MobileMenu = styled.div`
   transition: all 0.3s;
   transition-property: height;
   transition-duration: 2s;
+
+  .dummy {
+    width: 100%;
+
+    > a > div {
+      padding-left: 28%;
+    }
+  }
 `
 
 const MenuWrapper = styled.div`
@@ -223,18 +233,18 @@ function SideNav({ history }) {
             </AutoColumn>
             <AutoColumn gap="20px" style={{ marginLeft: '40px', marginBottom: '110px' }}>
               <HeaderText>
-                <Link href="#" target="_blank">
-                  Docs
+                <Link href="https://t.me/tbcc_eng" target="_blank">
+                  Telegram
                 </Link>
               </HeaderText>
               <HeaderText>
-                <Link href="#" target="_blank">
-                  Discord
+                <Link href="https://tbcc.exchange/#/swap" target="_blank">
+                  TBCC Swap
                 </Link>
               </HeaderText>
               <HeaderText>
-                <Link href="#" target="_blank">
-                  Twitter
+                <Link href="https://tbccwallet.com/" target="_blank">
+                  TBCC Wallet
                 </Link>
               </HeaderText>
             </AutoColumn>
@@ -256,7 +266,7 @@ function SideNav({ history }) {
               <Burger show={show} setShow={setShow} />
             </MobileWrapper>
             <MobileMenu className={show ? 'show' : 'hide'}>
-              <AutoColumn>
+              <div className="dummy">
                 <BasicLink to="/home">
                   <Option
                     activeText={history.location.pathname === '/home' ?? undefined}
@@ -306,21 +316,21 @@ function SideNav({ history }) {
                     Accounts
                   </Option>
                 </BasicLink>
-              </AutoColumn>
-              <AutoColumn gap="12px" style={{ marginTop: '90px' }}>
+              </div>
+              <AutoColumn gap="12px" style={{ marginTop: 90 }}>
                 <HeaderText>
-                  <Link href="#" target="_blank">
-                    Docs
+                  <Link href="https://t.me/tbcc_eng" target="_blank">
+                    Telegram
                   </Link>
                 </HeaderText>
                 <HeaderText>
-                  <Link href="#" target="_blank">
-                    Discord
+                  <Link href="https://tbcc.exchange/#/swap" target="_blank">
+                    TBCC Swap
                   </Link>
                 </HeaderText>
                 <HeaderText>
-                  <Link href="#" target="_blank">
-                    Twitter
+                  <Link href="https://tbccwallet.com/" target="_blank">
+                    TBCC Wallet
                   </Link>
                 </HeaderText>
               </AutoColumn>
