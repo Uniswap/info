@@ -9,8 +9,11 @@ import { RowBetween } from '../components/Row'
 import Search from '../components/Search'
 import { useMedia } from 'react-use'
 import { DashboardWrapper } from '../Theme'
+import { useTranslation } from 'react-i18next'
 
 function AllTokensPage() {
+  const { t } = useTranslation()
+  
   const allTokens = useAllTokenData()
 
   useEffect(() => {
@@ -24,7 +27,7 @@ function AllTokensPage() {
       <FullWrapper>
         <DashboardWrapper>
           <RowBetween>
-            <TYPE.largeHeader>Top Tokens</TYPE.largeHeader>
+            <TYPE.largeHeader>{t('topTokens')}</TYPE.largeHeader>
             {!below600 && <Search small={true} />}
           </RowBetween>
           <TopTokenList tokens={allTokens} itemMax={50} />

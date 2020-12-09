@@ -17,6 +17,7 @@ import { TYPE } from '../../Theme'
 import FormattedName from '../FormattedName'
 import Panel from '../Panel'
 import { transparentize } from 'polished'
+import { useTranslation } from 'react-i18next'
 
 dayjs.extend(utc)
 
@@ -124,6 +125,8 @@ const SORT_FIELD = {
 }
 
 function MiningPositionList({ miningPositions }) {
+  const { t } = useTranslation()
+
   // const below500 = useMedia('(max-width: 500px)')
   const below440 = useMedia('(max-width: 440px)')
   const below740 = useMedia('(max-width: 740px)')
@@ -254,7 +257,7 @@ function MiningPositionList({ miningPositions }) {
             </Flex>
           )}
           <Flex alignItems="flex-start" justifyContent="flex-start">
-            <ClickableText area="number">Name</ClickableText>{' '}
+            <ClickableText area="number">{t('name')}</ClickableText>{' '}
           </Flex>
           <Flex alignItems="center" justifyContent="flexEnd">
             <ClickableText
@@ -264,7 +267,7 @@ function MiningPositionList({ miningPositions }) {
                 setSortDirection(sortedColumn !== SORT_FIELD.VALUE ? true : !sortDirection)
               }}
             >
-              {below740 ? 'Value' : 'Liquidity'} {sortedColumn === SORT_FIELD.VALUE ? (!sortDirection ? '↑' : '↓') : ''}
+              {below740 ? t('value') : t('liquidity')} {sortedColumn === SORT_FIELD.VALUE ? (!sortDirection ? '↑' : '↓') : ''}
             </ClickableText>
           </Flex>
         </DashGrid>
@@ -275,7 +278,7 @@ function MiningPositionList({ miningPositions }) {
         <div onClick={() => setPage(page === 1 ? page : page - 1)}>
           <Arrow faded={page === 1}>←</Arrow>
         </div>
-        <TYPE.body>{'Page ' + page + ' of ' + maxPage}</TYPE.body>
+        <TYPE.body>{`${t('page')} ${page} ${t('of')} ${maxPage}`}</TYPE.body>
         <div onClick={() => setPage(page === maxPage ? page : page + 1)}>
           <Arrow faded={page === maxPage}>→</Arrow>
         </div>

@@ -15,6 +15,7 @@ import DoubleTokenLogo from '../DoubleLogo'
 import { RowFixed } from '../Row'
 import Panel from '../Panel'
 import { transparentize } from 'polished'
+import { useTranslation } from 'react-i18next'
 
 dayjs.extend(utc)
 
@@ -99,6 +100,7 @@ const DataText = styled(Flex)`
 `
 
 function LPList({ lps, disbaleLinks, maxItems = 10 }) {
+  const { t } = useTranslation()
   const below440 = useMedia('(max-width: 440px)')
   const below600 = useMedia('(max-width: 600px)')
   const below800 = useMedia('(max-width: 800px)')
@@ -186,7 +188,7 @@ function LPList({ lps, disbaleLinks, maxItems = 10 }) {
             </Flex>
           )}
           <Flex alignItems="center" justifyContent="flex-start">
-            <CustomText area="name">Account</CustomText>
+            <CustomText area="name">{t('account')}</CustomText>
           </Flex>
           {/* {!below1080 && (
             <Flex alignItems="center" justifyContent="flexEnd">
@@ -194,10 +196,10 @@ function LPList({ lps, disbaleLinks, maxItems = 10 }) {
             </Flex>
           )} */}
           <Flex alignItems="center" justifyContent="flexEnd">
-            <CustomText area="pair">Pair</CustomText>
+            <CustomText area="pair">{t('pair')}</CustomText>
           </Flex>
           <Flex alignItems="center" justifyContent="flexEnd">
-            <CustomText area="value">Value</CustomText>
+            <CustomText area="value">{t('value')}</CustomText>
           </Flex>
         </DashGrid>
         <Divider />
@@ -207,7 +209,7 @@ function LPList({ lps, disbaleLinks, maxItems = 10 }) {
         <div onClick={() => setPage(page === 1 ? page : page - 1)}>
           <Arrow faded={page === 1 ? true : false}>←</Arrow>
         </div>
-        <TYPE.body>{'Page ' + page + ' of ' + maxPage}</TYPE.body>
+        <TYPE.body>{`${t('page')} ${page} ${t('of')} ${maxPage}`}</TYPE.body>
         <div onClick={() => setPage(page === maxPage ? page : page + 1)}>
           <Arrow faded={page === maxPage ? true : false}>→</Arrow>
         </div>

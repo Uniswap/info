@@ -30,6 +30,7 @@ import { PlusCircle, Bookmark } from 'react-feather'
 import FormattedName from '../components/FormattedName'
 import { useListedTokens } from '../contexts/Application'
 import { DashboardWrapper } from '../Theme'
+import { useTranslation } from 'react-i18next'
 
 const PanelWrapper = styled.div`
   grid-template-columns: repeat(3, 1fr);
@@ -85,6 +86,8 @@ const WarningGrouping = styled.div`
 `
 
 function TokenPage({ address, history }) {
+  const { t } = useTranslation()
+  
   const {
     id,
     name,
@@ -177,7 +180,7 @@ function TokenPage({ address, history }) {
         <RowBetween style={{ flexWrap: 'wrap', alingItems: 'start' }}>
           <AutoRow align="flex-end" style={{ width: 'fit-content' }}>
             <TYPE.body>
-              <BasicLink to="/tokens">{'Tokens '}</BasicLink>→ {symbol}
+              <BasicLink to="/tokens">{`${t('tokens')} `}</BasicLink>→ {symbol}
               {'  '}
             </TYPE.body>
             <Link
@@ -238,11 +241,11 @@ function TokenPage({ address, history }) {
                     <></>
                   )}
                   <Link href={getPoolLink(address)} target="_blank">
-                    <ButtonLight color={backgroundColor}>Add Liquidity</ButtonLight>
+                    <ButtonLight color={backgroundColor}>{t('addLiquidity')}</ButtonLight>
                   </Link>
                   <Link href={getSwapLink(address)} target="_blank">
                     <ButtonDark ml={'.5rem'} color={backgroundColor}>
-                      Trade
+                      {t('trade')}
                     </ButtonDark>
                   </Link>
                 </RowFixed>
@@ -254,7 +257,7 @@ function TokenPage({ address, history }) {
                 <Panel>
                   <AutoColumn gap="20px">
                     <RowBetween>
-                      <TYPE.main>Price</TYPE.main>
+                      <TYPE.main>{t('price')}</TYPE.main>
                       <div />
                     </RowBetween>
                     <RowBetween align="flex-end">
@@ -270,7 +273,7 @@ function TokenPage({ address, history }) {
               <Panel>
                 <AutoColumn gap="20px">
                   <RowBetween>
-                    <TYPE.light fontSize={14} fontWeight={500}>Total Liquidity</TYPE.light>
+                    <TYPE.light fontSize={14} fontWeight={500}>{t('totalLiquidity')}</TYPE.light>
                     <div />
                   </RowBetween>
                   <RowBetween align="flex-end">
@@ -284,7 +287,7 @@ function TokenPage({ address, history }) {
               <Panel>
                 <AutoColumn gap="20px">
                   <RowBetween>
-                    <TYPE.light fontSize={14} fontWeight={500}>Volume (24hrs) {usingUtVolume && '(Untracked)'}</TYPE.light>
+                    <TYPE.light fontSize={14} fontWeight={500}>{t('volume24hrs')} {usingUtVolume && `(${t('untracked')})`}</TYPE.light>
                     <div />
                   </RowBetween>
                   <RowBetween align="flex-end">
@@ -299,7 +302,7 @@ function TokenPage({ address, history }) {
               <Panel>
                 <AutoColumn gap="20px">
                   <RowBetween>
-                    <TYPE.light fontSize={14} fontWeight={500}>Transactions (24hrs)</TYPE.light>
+                    <TYPE.light fontSize={14} fontWeight={500}>{t('transactions')} (24hrs)</TYPE.light>
                     <div />
                   </RowBetween>
                   <RowBetween align="flex-end">
@@ -323,7 +326,7 @@ function TokenPage({ address, history }) {
 
           <DashboardWrapper style={{ marginTop: '1.5rem' }}>
             <TYPE.main fontSize={22} fontWeight={500}>
-              Top Pairs
+              {t('topPairs')}
             </TYPE.main>
             {address && fetchedPairsList ? (
               <PairList color={backgroundColor} address={address} pairs={fetchedPairsList} />
@@ -333,7 +336,7 @@ function TokenPage({ address, history }) {
           </DashboardWrapper>
 
           <DashboardWrapper style={{ marginTop: '1.5rem' }}>
-            <TYPE.main fontSize={22} fontWeight={500}>Transactions</TYPE.main>
+            <TYPE.main fontSize={22} fontWeight={500}>{t('transactions')}</TYPE.main>
             {transactions ? <TxnList color={backgroundColor} transactions={transactions} /> : <Loader />}
           </DashboardWrapper>
           <DashboardWrapper style={{ marginTop: '1.5rem' }}>
@@ -347,19 +350,19 @@ function TokenPage({ address, history }) {
             >
               <TokenDetailsLayout>
                 <Column>
-                  <TYPE.light>Symbol</TYPE.light>
+                  <TYPE.light>{t('symbol')}</TYPE.light>
                   <TYPE.main style={{ marginTop: '.5rem' }} fontWeight="500">
                     {symbol}
                   </TYPE.main>
                 </Column>
                 <Column>
-                  <TYPE.light>Name</TYPE.light>
+                  <TYPE.light>{t('name')}</TYPE.light>
                   <TYPE.main style={{ marginTop: '.5rem' }} fontWeight="500">
                     {name}
                   </TYPE.main>
                 </Column>
                 <Column>
-                  <TYPE.light>Address</TYPE.light>
+                  <TYPE.light>{t('address')}</TYPE.light>
                   <RowBetween style={{ marginTop: '-5px' }}>
                     <TYPE.main style={{ marginTop: '.5rem' }} fontWeight="500">
                       {address.slice(0, 8) + '...' + address.slice(36, 42)}
@@ -369,7 +372,7 @@ function TokenPage({ address, history }) {
                 </Column>
                 <ButtonLight color={backgroundColor}>
                   <Link color={backgroundColor} external href={'https://etherscan.io/address/' + address}>
-                    View on Etherscan ↗
+                    {t('viewOnEtherscan')} ↗
                   </Link>
                 </ButtonLight>
               </TokenDetailsLayout>

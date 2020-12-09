@@ -14,6 +14,7 @@ import LocalLoader from '../LocalLoader'
 import { AutoColumn } from '../Column'
 import { Activity } from 'react-feather'
 import { useDarkModeManager } from '../../contexts/LocalStorage'
+import { useTranslation } from 'react-i18next'
 
 const ChartWrapper = styled.div`
   height: 100%;
@@ -42,6 +43,8 @@ const DATA_FREQUENCY = {
 }
 
 const TokenChart = ({ address, color, base }) => {
+  const { t } = useTranslation()
+  
   // settings for the window and candle width
   const [chartFilter, setChartFilter] = useState(CHART_VIEW.PRICE)
   const [frequency, setFrequency] = useState(DATA_FREQUENCY.HOUR)
@@ -152,14 +155,14 @@ const TokenChart = ({ address, color, base }) => {
                 onClick={() => setChartFilter(CHART_VIEW.LIQUIDITY)}
                 style={{ marginRight: '6px' }}
               >
-                Liquidity
+                {t('liquidity')}
               </OptionButton>
               <OptionButton
                 active={chartFilter === CHART_VIEW.VOLUME}
                 onClick={() => setChartFilter(CHART_VIEW.VOLUME)}
                 style={{ marginRight: '6px' }}
               >
-                Volume
+                {t('volume')}
               </OptionButton>
               <OptionButton
                 active={chartFilter === CHART_VIEW.PRICE}
@@ -167,7 +170,7 @@ const TokenChart = ({ address, color, base }) => {
                   setChartFilter(CHART_VIEW.PRICE)
                 }}
               >
-                Price
+                {t('price')}
               </OptionButton>
             </RowFixed>
             {chartFilter === CHART_VIEW.PRICE && (
@@ -213,7 +216,7 @@ const TokenChart = ({ address, color, base }) => {
               active={timeWindow === timeframeOptions.ALL_TIME}
               onClick={() => setTimeWindow(timeframeOptions.ALL_TIME)}
             >
-              All
+              {t('all')}
             </OptionButton>
           </AutoRow>
         </RowBetween>
@@ -272,7 +275,7 @@ const TokenChart = ({ address, color, base }) => {
               strokeWidth={1}
               dot={false}
               type="monotone"
-              name={'Liquidity'}
+              name={t('liquidity')}
               yAxisId={0}
               stroke={color}
               fill="url(#colorUv)"
@@ -333,7 +336,7 @@ const TokenChart = ({ address, color, base }) => {
                 strokeWidth={2}
                 dot={false}
                 type="monotone"
-                name={'Price'}
+                name={t('price')}
                 yAxisId={0}
                 stroke={color}
                 fill="url(#colorUv)"
@@ -390,7 +393,7 @@ const TokenChart = ({ address, color, base }) => {
             />
             <Bar
               type="monotone"
-              name={'Volume'}
+              name={t('volume')}
               dataKey={'dailyVolumeUSD'}
               fill={color}
               yAxisId={0}
