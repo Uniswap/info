@@ -11,6 +11,7 @@ import LocalLoader from '../components/LocalLoader'
 import { RowBetween } from '../components/Row'
 import { useMedia } from 'react-use'
 import Search from '../components/Search'
+import { useTranslation } from 'react-i18next'
 
 const AccountWrapper = styled.div`
   margin-top: 2rem;
@@ -21,6 +22,8 @@ const AccountWrapper = styled.div`
 `
 
 function AccountLookup() {
+  const { t } = useTranslation()
+
   // scroll to top
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -35,7 +38,7 @@ function AccountLookup() {
       <FullWrapper>
         <DashboardWrapper>
           <RowBetween>
-            <TYPE.largeHeader>Wallet analytics</TYPE.largeHeader>
+            <TYPE.largeHeader>{t('walletAnalytics')}</TYPE.largeHeader>
             {!below600 && <Search small={true} />}
           </RowBetween>
           <AccountWrapper>
@@ -45,7 +48,7 @@ function AccountLookup() {
 
         <DashboardWrapper>
           <TYPE.main fontSize={22} fontWeight={500}>
-            Top Liquidity Positions
+            {t('topLiquidityPositions')}
           </TYPE.main>
           {topLps && topLps.length > 0 ? <LPList lps={topLps} maxItems={200} /> : <LocalLoader />}
         </DashboardWrapper>      

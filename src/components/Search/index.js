@@ -19,6 +19,7 @@ import { PAIR_SEARCH, TOKEN_SEARCH } from '../../apollo/queries'
 import FormattedName from '../FormattedName'
 import { TYPE } from '../../Theme'
 import { updateNameData } from '../../utils/data'
+import { useTranslation } from 'react-i18next'
 
 const Container = styled.div`
   height: 48px;
@@ -144,6 +145,8 @@ const Blue = styled.span`
 `
 
 export const Search = ({ small = false }) => {
+  const { t } = useTranslation()
+
   let allTokens = useAllTokensInUniswap()
   const allTokenData = useAllTokenData()
 
@@ -422,12 +425,12 @@ export const Search = ({ small = false }) => {
             small
               ? ''
               : below410
-              ? 'Search...'
+              ? t('search')
               : below470
-              ? 'Search WhiteSwap...'
+              ? t('searchWhiteSwap')
               : below700
-              ? 'Search pairs and tokens...'
-              : 'Search WhiteSwap pairs and tokens...'
+              ? t('searchPairsAndTokens')
+              : t('searchWhiteSwapPairsAndTokens')
           }
           value={value}
           onChange={(e) => {
@@ -443,12 +446,12 @@ export const Search = ({ small = false }) => {
       </Wrapper>
       <Menu hide={!showMenu} ref={menuRef}>
         <Heading>
-          <Gray>Pairs</Gray>
+          <Gray>{t('pairs')}</Gray>
         </Heading>
         <div>
           {filteredPairList && Object.keys(filteredPairList).length === 0 && (
             <MenuItem>
-              <TYPE.body>No results</TYPE.body>
+              <TYPE.body>{t('noResults')}</TYPE.body>
             </MenuItem>
           )}
           {filteredPairList &&
@@ -460,7 +463,7 @@ export const Search = ({ small = false }) => {
                   <MenuItem>
                     <DoubleTokenLogo a0={pair?.token0?.id} a1={pair?.token1?.id} margin={true} />
                     <TYPE.body style={{ marginLeft: '10px' }}>
-                      {pair.token0.symbol + '-' + pair.token1.symbol} Pair
+                      {pair.token0.symbol + '-' + pair.token1.symbol} {t('pair')}
                     </TYPE.body>
                   </MenuItem>
                 </BasicLink>
@@ -474,17 +477,17 @@ export const Search = ({ small = false }) => {
                 setPairsShown(pairsShown + 5)
               }}
             >
-              See more...
+              {t('seeMore')}
             </Blue>
           </Heading>
         </div>
         <Heading>
-          <Gray>Tokens</Gray>
+          <Gray>{t('tokens')}</Gray>
         </Heading>
         <div>
           {Object.keys(filteredTokenList).length === 0 && (
             <MenuItem>
-              <TYPE.body>No results</TYPE.body>
+              <TYPE.body>{t('noResults')}</TYPE.body>
             </MenuItem>
           )}
           {filteredTokenList.slice(0, tokensShown).map((token) => {
@@ -509,7 +512,7 @@ export const Search = ({ small = false }) => {
                 setTokensShown(tokensShown + 5)
               }}
             >
-              See more...
+              {t('seeMore')}
             </Blue>
           </Heading>
         </div>

@@ -12,6 +12,7 @@ import Link from '../Link'
 import { useSessionStart } from '../../contexts/Application'
 import { useDarkModeManager } from '../../contexts/LocalStorage'
 import Toggle from '../Toggle'
+import { useTranslation } from 'react-i18next'
 
 const Wrapper = styled.div`
   height: ${({ isMobile }) => (isMobile ? 'initial' : '100vh')};
@@ -133,8 +134,9 @@ const PollingDot = styled.div`
 `
 
 function SideNav({ history }) {
-  const below1080 = useMedia('(max-width: 1080px)')
+  const { t } = useTranslation()
 
+  const below1080 = useMedia('(max-width: 1080px)')
   const below1180 = useMedia('(max-width: 1180px)')
 
   const seconds = useSessionStart()
@@ -154,7 +156,7 @@ function SideNav({ history }) {
                     <StyledNavButton>
                       <TrendingUp size={20} />
                     </StyledNavButton>
-                    Overview
+                    {t('sideNav.overview')}
                   </Option>
                 </BasicLink>
                 <BasicLink to="/tokens">
@@ -168,7 +170,7 @@ function SideNav({ history }) {
                     <StyledNavButton>
                       <Disc size={20} />
                     </StyledNavButton>
-                    Tokens
+                    {t('sideNav.tokens')}
                   </Option>
                 </BasicLink>
                 <BasicLink to="/pairs">
@@ -182,7 +184,7 @@ function SideNav({ history }) {
                     <StyledNavButton>
                       <PieChart size={20} />
                     </StyledNavButton>
-                    Pairs
+                    {t('sideNav.pairs')}
                   </Option>
                 </BasicLink>
 
@@ -197,7 +199,7 @@ function SideNav({ history }) {
                     <StyledNavButton>
                       <List size={20} />
                     </StyledNavButton>
-                    Accounts
+                    {t('sideNav.accounts')}
                   </Option>
                 </BasicLink>
               </AutoColumn>
@@ -216,7 +218,7 @@ function SideNav({ history }) {
             </HeaderText> */}
             <HeaderText>
               <Link href="https://docs.ws.exchange" target="_blank">
-                Doc
+                {t('sideNav.doc')}
               </Link>
             </HeaderText>
             <HeaderText>
@@ -241,7 +243,7 @@ function SideNav({ history }) {
               <PollingDot />
               <a href="/" style={{ color: 'activeColor' }}>
                 <TYPE.small>
-                  Updated {!!seconds ? seconds + 's' : '-'} ago <br />
+                  {`${t('updated')} ${!!seconds ? seconds + 's' : '-'} ${t('ago')}`}<br />
                 </TYPE.small>
               </a>
             </Polling>

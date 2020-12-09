@@ -12,6 +12,7 @@ import { useUserLiquidityChart } from '../../contexts/User'
 import LocalLoader from '../LocalLoader'
 import { useDarkModeManager } from '../../contexts/LocalStorage'
 import { TYPE } from '../../Theme'
+import { useTranslation } from 'react-i18next'
 
 const ChartWrapper = styled.div`
   height: 100%;
@@ -23,20 +24,21 @@ const ChartWrapper = styled.div`
 `
 
 const UserChart = ({ account }) => {
+  const { t } = useTranslation()
+
+  const below600 = useMedia('(max-width: 600px)')
+  const above1600 = useMedia('(min-width: 1600px)')
+  const [darkMode] = useDarkModeManager()
+  const textColor = darkMode ? 'white' : 'black'
+
   const chartData = useUserLiquidityChart(account)
 
   const [timeWindow, setTimeWindow] = useState(timeframeOptions.ALL_TIME)
   let utcStartTime = getTimeframe(timeWindow)
 
-  const below600 = useMedia('(max-width: 600px)')
-  const above1600 = useMedia('(min-width: 1600px)')
-
   const domain = [(dataMin) => (dataMin > utcStartTime ? dataMin : utcStartTime), 'dataMax']
 
   const aspect = above1600 ? 60 / 12 : below600 ? 60 / 42 : 60 / 16
-
-  const [darkMode] = useDarkModeManager()
-  const textColor = darkMode ? 'white' : 'black'
 
   return (
     <ChartWrapper>
@@ -48,7 +50,7 @@ const UserChart = ({ account }) => {
       ) : (
         <RowBetween mb={40}>
           <AutoRow gap="10px">
-            <TYPE.main>Liquidity Value</TYPE.main>
+            <TYPE.main>{t('liquidityValue')}</TYPE.main>
           </AutoRow>
           <AutoRow justify="flex-end" gap="4px">
             <OptionButton
@@ -67,7 +69,7 @@ const UserChart = ({ account }) => {
               active={timeWindow === timeframeOptions.ALL_TIME}
               onClick={() => setTimeWindow(timeframeOptions.ALL_TIME)}
             >
-              All
+              {t('all')}
             </OptionButton>
           </AutoRow>
         </RowBetween>
@@ -124,7 +126,7 @@ const UserChart = ({ account }) => {
               strokeWidth={1}
               dot={false}
               type="monotone"
-              name={'Liquidity'}
+              name={t('liquidity')}
               yAxisId={0}
               stroke={darken(0.12, '#2E69BB')}
               fill="url(#colorUv)"

@@ -15,6 +15,7 @@ import { Flex } from 'rebass'
 
 import { X } from 'react-feather'
 import { useMedia } from 'react-use'
+import { useTranslation } from 'react-i18next'
 
 const Wrapper = styled.div`
   display: flex;
@@ -75,6 +76,7 @@ const DashGrid = styled.div`
 `
 
 function AccountSearch({ history, small }) {
+  const { t } = useTranslation()
   const [accountValue, setAccountValue] = useState()
   const [savedAccounts, addAccount, removeAccount] = useSavedAccounts()
   const below440 = useMedia('(max-width: 440px)')
@@ -105,7 +107,7 @@ function AccountSearch({ history, small }) {
             style={below440 ? { width: '100%', marginTop: '1rem' } : {}}
             onClick={handleAccountSearch}
           >
-            Load Account Details
+            {t('loadAccountDetails')}
           </ButtonLight>
         </AutoRow>
       )}
@@ -114,7 +116,7 @@ function AccountSearch({ history, small }) {
         {!small && (
           <Panel>
             <DashGrid center={true} style={{ height: 'fit-content', padding: '0 0 1rem 0' }}>
-              <TYPE.main area="account">Saved Accounts</TYPE.main>
+              <TYPE.main area="account">{t('savedAccounts')}</TYPE.main>
             </DashGrid>
             <Divider />
             {savedAccounts?.length > 0 ? (
@@ -137,14 +139,14 @@ function AccountSearch({ history, small }) {
                 )
               })
             ) : (
-              <TYPE.light style={{ marginTop: '1rem' }}>No saved accounts</TYPE.light>
+              <TYPE.light style={{ marginTop: '1rem' }}>{t('noSavedAccounts')}</TYPE.light>
             )}
           </Panel>
         )}
 
         {small && (
           <>
-            <TYPE.main>{'Accounts'}</TYPE.main>
+            <TYPE.main>{t('accounts')}</TYPE.main>
             {savedAccounts?.length > 0 ? (
               savedAccounts.map((account) => {
                 return (
@@ -165,7 +167,7 @@ function AccountSearch({ history, small }) {
                 )
               })
             ) : (
-              <TYPE.light>No pinned wallets</TYPE.light>
+              <TYPE.light>{t('noPinnedWallets')}</TYPE.light>
             )}
           </>
         )}

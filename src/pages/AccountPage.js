@@ -20,6 +20,7 @@ import { FEE_WARNING_TOKENS } from '../constants'
 import { BasicLink } from '../components/Link'
 import { useMedia } from 'react-use'
 import Search from '../components/Search'
+import { useTranslation } from 'react-i18next'
 
 const AccountWrapper = styled.div`
   background-color: rgba(255, 255, 255, 0.2);
@@ -75,6 +76,8 @@ const Warning = styled.div`
 `
 
 function AccountPage({ account }) {
+  const { t } = useTranslation()
+
   const below600 = useMedia('(max-width: 600px)')
   const below440 = useMedia('(max-width: 440px)')
 
@@ -145,7 +148,7 @@ function AccountPage({ account }) {
       <ContentWrapper>
         <RowBetween>
           <TYPE.body>
-            <BasicLink to="/accounts">{'Accounts '}</BasicLink>→
+            <BasicLink to="/accounts">{`${t('accounts')} `}</BasicLink>→
             <Link lineHeight={'145.23%'} href={'https://etherscan.io/address/' + account} target="_blank">
               
               {account?.slice(0, 42)}
@@ -158,7 +161,7 @@ function AccountPage({ account }) {
             <span>
               <TYPE.header fontSize={24}>{account?.slice(0, 6) + '...' + account?.slice(38, 42)}</TYPE.header>
               <Link lineHeight={'145.23%'} href={'https://etherscan.io/address/' + account} target="_blank">
-                <TYPE.main fontSize={14}>View on Etherscan</TYPE.main>
+                <TYPE.main fontSize={14}>{t('viewOnEtherscan')}</TYPE.main>
               </Link>
             </span>
             <AccountWrapper>
@@ -168,7 +171,7 @@ function AccountPage({ account }) {
             </AccountWrapper>
           </RowBetween>
         </Header>
-        {showWarning && <Warning>Fees cannot currently be calculated for pairs that include AMPL.</Warning>}
+        {showWarning && <Warning>{t('feesCantBeCalc')}</Warning>}
         {!hideLPContent && (
           <DropdownWrapper>
             <ButtonDropdown width="100%" onClick={() => setShowDropdown(!showDropdown)} open={showDropdown}>
@@ -177,14 +180,14 @@ function AccountPage({ account }) {
                   <StyledIcon>
                     <Activity size={16} />
                   </StyledIcon>
-                  <TYPE.body ml={'10px'}>All Positions</TYPE.body>
+                  <TYPE.body ml={'10px'}>{t('allPositions')}</TYPE.body>
                 </RowFixed>
               )}
               {activePosition && (
                 <RowFixed>
                   <DoubleTokenLogo a0={activePosition.pair.token0.id} a1={activePosition.pair.token1.id} size={16} />
                   <TYPE.body ml={'16px'}>
-                    {activePosition.pair.token0.symbol}-{activePosition.pair.token1.symbol} Position
+                    {activePosition.pair.token0.symbol}-{activePosition.pair.token1.symbol} {t('position')}
                   </TYPE.body>
                 </RowFixed>
               )}
@@ -210,7 +213,7 @@ function AccountPage({ account }) {
                         >
                           <DoubleTokenLogo a0={p.pair.token0.id} a1={p.pair.token1.id} size={16} />
                           <TYPE.body ml={'16px'}>
-                            {p.pair.token0.symbol}-{p.pair.token1.symbol} Position
+                            {p.pair.token0.symbol}-{p.pair.token1.symbol} {t('position')}
                           </TYPE.body>
                         </MenuRow>
                       )
@@ -227,7 +230,7 @@ function AccountPage({ account }) {
                         <StyledIcon>
                           <Activity size={16} />
                         </StyledIcon>
-                        <TYPE.body ml={'10px'}>All Positions</TYPE.body>
+                        <TYPE.body ml={'10px'}>{t('allPositions')}</TYPE.body>
                       </RowFixed>
                     </MenuRow>
                   )}
@@ -241,7 +244,7 @@ function AccountPage({ account }) {
             <AutoRow gap="1.5rem">
               <AutoColumn gap="10px">
                 <RowBetween>
-                  <TYPE.light fontSize={below440 ? 12 : 14} fontWeight={500}>Liquidity (Including Fees)</TYPE.light>
+                  <TYPE.light fontSize={below440 ? 12 : 14} fontWeight={500}>{t('liquidityIncludingFees')}</TYPE.light>
                   <div />
                 </RowBetween>
                 <RowFixed>
@@ -256,7 +259,7 @@ function AccountPage({ account }) {
               </AutoColumn>
               <AutoColumn gap="10px">
                 <RowBetween>
-                  <TYPE.light fontSize={below440 ? 12 : 14} fontWeight={500}>Fees Earned (Cumulative)</TYPE.light>
+                  <TYPE.light fontSize={below440 ? 12 : 14} fontWeight={500}>{t('feesEarnedCumulative')}</TYPE.light>
                   <div />
                 </RowBetween>
                 <RowFixed align="flex-end">
@@ -280,7 +283,7 @@ function AccountPage({ account }) {
 
         <DashboardWrapper>
           <TYPE.main fontSize={22} fontWeight={500}>
-            Positions
+            {t('positions')}
           </TYPE.main>
           <PositionList positions={positions} />
         </DashboardWrapper>
@@ -313,14 +316,14 @@ function AccountPage({ account }) {
 
         <DashboardWrapper>
           <TYPE.main fontSize={22} fontWeight={500}>
-            Transactions
+            {t('transactions')}
           </TYPE.main>
           <TxnList transactions={transactions} />
         </DashboardWrapper>
 
         <DashboardWrapper>
           <TYPE.main fontSize={22} fontWeight={500}>
-            Wallet Stats
+            {t('walletStats')}
           </TYPE.main>
           <Panel
             style={{
@@ -331,7 +334,7 @@ function AccountPage({ account }) {
               <AutoColumn gap=".75rem">
                 <AutoColumn gap="8px">
                   <TYPE.header fontSize={24}>{totalSwappedUSD ? formattedNum(totalSwappedUSD, true) : '-'}</TYPE.header>
-                  <TYPE.main>Total Value Swapped</TYPE.main>
+                  <TYPE.main>{t('totalValueSwapped')}</TYPE.main>
                 </AutoColumn>
                 <AutoColumn gap="8px">
                   <TYPE.header fontSize={24}>
@@ -341,7 +344,7 @@ function AccountPage({ account }) {
                 </AutoColumn>
                 <AutoColumn gap="8px">
                   <TYPE.header fontSize={24}>{transactionCount ? transactionCount : '-'}</TYPE.header>
-                  <TYPE.main>Total Transactions</TYPE.main>
+                  <TYPE.main>{t('totalTransactions')}</TYPE.main>
                 </AutoColumn>
               </AutoColumn>
             }
@@ -349,17 +352,17 @@ function AccountPage({ account }) {
               <AutoRow gap="20px">
                 <AutoColumn gap="8px">
                   <TYPE.header fontSize={24}>{totalSwappedUSD ? formattedNum(totalSwappedUSD, true) : '-'}</TYPE.header>
-                  <TYPE.main>Total Value Swapped</TYPE.main>
+                  <TYPE.main>{t('totalValueSwapped')}</TYPE.main>
                 </AutoColumn>
                 <AutoColumn gap="8px">
                   <TYPE.header fontSize={24}>
                     {totalSwappedUSD ? formattedNum(totalSwappedUSD * 0.003, true) : '-'}
                   </TYPE.header>
-                  <TYPE.main>Total Fees Paid</TYPE.main>
+                  <TYPE.main>{t('totalFeesPaid')}</TYPE.main>
                 </AutoColumn>
                 <AutoColumn gap="8px">
                   <TYPE.header fontSize={24}>{transactionCount ? transactionCount : '-'}</TYPE.header>
-                  <TYPE.main>Total Transactions</TYPE.main>
+                  <TYPE.main>{t('totalTransactions')}</TYPE.main>
                 </AutoColumn>
               </AutoRow>
             }

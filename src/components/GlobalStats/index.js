@@ -7,6 +7,7 @@ import { formattedNum, localNumber } from '../../utils'
 
 import UniPrice from '../UniPrice'
 import { TYPE } from '../../Theme'
+import { useTranslation } from 'react-i18next'
 
 const Header = styled.div`
   width: 100%;
@@ -15,6 +16,8 @@ const Header = styled.div`
 `
 
 export default function GlobalStats() {
+  const { t } = useTranslation()
+  
   const below1295 = useMedia('(max-width: 1295px)')
   const below1180 = useMedia('(max-width: 1180px)')
   const below1024 = useMedia('(max-width: 1024px)')
@@ -45,7 +48,7 @@ export default function GlobalStats() {
               }}
               style={{ position: 'relative' }}
             >
-              ETH Price: {formattedEthPrice}
+              ETH {t('price')}: {formattedEthPrice}
               {showPriceCard && <UniPrice />}
             </TYPE.light>
           )}
@@ -56,7 +59,7 @@ export default function GlobalStats() {
               fontWeight={700}
               mr={'1rem'}
             >
-              Transactions (24H): {localNumber(oneDayTxns)}
+              {t('transactions')} (24H): {localNumber(oneDayTxns)}
             </TYPE.light>
           )}
           {!below1024 && (
@@ -65,7 +68,7 @@ export default function GlobalStats() {
               fontWeight={700}
               mr={'1rem'}
             >
-              Pairs: {localNumber(pairCount)}
+              {t('pairs')}: {localNumber(pairCount)}
             </TYPE.light>
           )}
           {!below1295 && (
@@ -74,7 +77,7 @@ export default function GlobalStats() {
               fontWeight={700}
               mr={'1rem'}
             >
-              Fees (24H): {oneDayFees}&nbsp;
+              {t('fees24hrs')}: {oneDayFees}&nbsp;
             </TYPE.light>
           )}
         </RowFixed>

@@ -3,6 +3,7 @@ import { Area, XAxis, YAxis, ResponsiveContainer, Bar, BarChart, CartesianGrid, 
 import styled from 'styled-components/macro'
 import { useMedia } from 'react-use'
 import { toK, toNiceDate, toNiceDateYear } from '../../utils'
+import { useTranslation } from 'react-i18next'
 
 const ChartWrapper = styled.div`
   padding-top: 1em;
@@ -13,6 +14,8 @@ const ChartWrapper = styled.div`
 `
 
 const Chart = ({ data, chartOption, currencyUnit, symbol }) => {
+  const { t } = useTranslation()
+  
   const [chartData, setChartData] = useState([])
   useEffect(() => {
     setChartData([])
@@ -63,7 +66,7 @@ const Chart = ({ data, chartOption, currencyUnit, symbol }) => {
               strokeWidth={2}
               dot={false}
               type="monotone"
-              name={currencyUnit === 'ETH' ? 'Price (ETH/' + symbol + ')' : 'Price (USD/' + symbol + ')'}
+              name={currencyUnit === 'ETH' ? `${t('price')} (ETH/` + symbol + ')' : `${t('price')} (USD/` + symbol + ')'}
               dataKey={currencyUnit === 'ETH' ? 'ethPerToken' : 'tokenPriceUSD'}
               yAxisId={2}
               fill="var(--c-token)"
@@ -74,7 +77,7 @@ const Chart = ({ data, chartOption, currencyUnit, symbol }) => {
               strokeWidth={2}
               dot={false}
               type="monotone"
-              name={currencyUnit === 'USD' ? 'Inverse (' + symbol + '/USD)' : 'Inverse (' + symbol + '/ETH)'}
+              name={currencyUnit === 'USD' ? `${t('inverse')} (` + symbol + '/USD)' : `${t('inverse')} (` + symbol + '/ETH)'}
               dataKey={currencyUnit === 'USD' ? 'tokensPerUSD' : 'tokensPerEth'}
               yAxisId={3}
               fill="var(--c-token)"
@@ -153,7 +156,7 @@ const Chart = ({ data, chartOption, currencyUnit, symbol }) => {
               strokeWidth={2}
               dot={false}
               type="monotone"
-              name={'Total Liquidity' + (currencyUnit === 'USD' ? ' (USD)' : ' (ETH)')}
+              name={t('totalLiquidity') + (currencyUnit === 'USD' ? ' (USD)' : ' (ETH)')}
               dataKey={currencyUnit === 'USD' ? 'usdLiquidity' : 'ethLiquidity'}
               yAxisId={0}
               fill="var(--c-token)"
@@ -162,7 +165,7 @@ const Chart = ({ data, chartOption, currencyUnit, symbol }) => {
             />
             <Area
               type="monotone"
-              name={'Eth Balance'}
+              name={`Eth ${t('balance')}`}
               dataKey={'ethBalance'}
               fill="var(--c-token)"
               opacity={'0'}
@@ -170,7 +173,7 @@ const Chart = ({ data, chartOption, currencyUnit, symbol }) => {
             />
             <Area
               type="monotone"
-              name={'Token Balance'}
+              name={`Token ${t('balance')}`}
               dataKey={'tokenBalance'}
               fill="var(--c-token)"
               yAxisId={1}
@@ -222,7 +225,7 @@ const Chart = ({ data, chartOption, currencyUnit, symbol }) => {
             />
             <Bar
               type="monotone"
-              name={'Volume' + (currencyUnit === 'USD' ? ' (USD)' : ' (ETH)')}
+              name={t('volume') + (currencyUnit === 'USD' ? ' (USD)' : ' (ETH)')}
               dataKey={currencyUnit === 'USD' ? 'usdVolume' : 'ethVolume'}
               fill="var(--c-token)"
               opacity={'0.4'}

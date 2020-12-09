@@ -9,8 +9,10 @@ import { RowBetween } from '../components/Row'
 import Search from '../components/Search'
 import { useMedia } from 'react-use'
 import { DashboardWrapper } from '../Theme'
+import { useTranslation } from 'react-i18next'
 
 function AllPairsPage() {
+  const { t } = useTranslation()
   const allPairs = useAllPairData()
 
   useEffect(() => {
@@ -24,7 +26,7 @@ function AllPairsPage() {
       <FullWrapper>
         <DashboardWrapper>
           <RowBetween>
-            <TYPE.largeHeader>Top Pairs</TYPE.largeHeader>
+            <TYPE.largeHeader>{t('topPairs')}</TYPE.largeHeader>
             {!below800 && <Search small={true} />}
           </RowBetween>
           <PairList pairs={allPairs} disbaleLinks={true} maxItems={50} />

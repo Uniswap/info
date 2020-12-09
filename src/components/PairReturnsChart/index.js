@@ -13,6 +13,7 @@ import { useTimeframe } from '../../contexts/Application'
 import LocalLoader from '../LocalLoader'
 import { useColor } from '../../hooks'
 import { useDarkModeManager } from '../../contexts/LocalStorage'
+import { useTranslation } from 'react-i18next'
 
 const ChartWrapper = styled.div`
   max-height: 420px;
@@ -35,24 +36,23 @@ const CHART_VIEW = {
 }
 
 const PairReturnsChart = ({ account, position }) => {
+  const { t } = useTranslation()
+
   let data = useUserPositionChart(position, account)
 
   const [timeWindow, setTimeWindow] = useTimeframe()
 
   const below600 = useMedia('(max-width: 600px)')
-
+  const aspect = below600 ? 60 / 42 : 60 / 16
   const color = useColor(position?.pair.token0.id)
+  const [darkMode] = useDarkModeManager()
+  const textColor = darkMode ? 'white' : 'black'
 
   const [chartView, setChartView] = useState(CHART_VIEW.VALUE)
 
   // based on window, get starttime
   let utcStartTime = getTimeframe(timeWindow)
   data = data?.filter((entry) => entry.date >= utcStartTime)
-
-  const aspect = below600 ? 60 / 42 : 60 / 16
-
-  const [darkMode] = useDarkModeManager()
-  const textColor = darkMode ? 'white' : 'black'
 
   return (
     <ChartWrapper>
@@ -65,10 +65,10 @@ const PairReturnsChart = ({ account, position }) => {
         <OptionsRow>
           <AutoRow gap="6px" style={{ flexWrap: 'nowrap' }}>
             <OptionButton active={chartView === CHART_VIEW.VALUE} onClick={() => setChartView(CHART_VIEW.VALUE)}>
-              Liquidity
+              {t('liquidity')}
             </OptionButton>
             <OptionButton active={chartView === CHART_VIEW.FEES} onClick={() => setChartView(CHART_VIEW.FEES)}>
-              Fees
+              {t('fees')}
             </OptionButton>
           </AutoRow>
           <AutoRow justify="flex-end" gap="6px">
@@ -144,7 +144,7 @@ const PairReturnsChart = ({ account, position }) => {
               dataKey={chartView === CHART_VIEW.VALUE ? 'usdValue' : 'fees'}
               stroke={color}
               yAxisId={0}
-              name={chartView === CHART_VIEW.VALUE ? 'Liquidity' : 'Fees Earned (Cumulative)'}
+              name={chartView === CHART_VIEW.VALUE ? t('liquidity') : t('feesEarnedCumulative')}
             />
           </LineChart>
         ) : (
