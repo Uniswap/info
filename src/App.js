@@ -114,8 +114,7 @@ function App() {
             </WarningBanner>
           </WarningWrapper>
         )}
-        {latestBlock &&
-        globalData &&
+        {globalData &&
         Object.keys(globalData).length > 0 &&
         globalChartData &&
         Object.keys(globalChartData).length > 0 ? (
