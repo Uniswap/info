@@ -325,11 +325,15 @@ export const formatNumber = (num) => {
 }
 
 // using a currency library here in case we want to add more in future
-var priceFormatter = new Intl.NumberFormat('en-US', {
-  style: 'currency',
-  currency: 'USD',
-  minimumFractionDigits: 2,
-})
+export const formatDollarAmount = (num, digits) => {
+  const formatter = new Intl.NumberFormat([], {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: digits,
+    maximumFractionDigits: digits,
+  })
+  return formatter.format(num)
+}
 
 export const toSignificant = (number, significantDigits) => {
   Decimal.set({ precision: significantDigits + 1, rounding: Decimal.ROUND_UP })
@@ -360,20 +364,19 @@ export const formattedNum = (number, usd = false, acceptNegatives = false) => {
 
   if (num > 1000) {
     return usd
-      ? '$' + Number(parseFloat(num).toFixed(0)).toLocaleString()
-      : '' + Number(parseFloat(num).toFixed(0)).toLocaleString()
+      ? formatDollarAmount(num, 0)
+      : Number(parseFloat(num).toFixed(0)).toLocaleString()
   }
 
   if (usd) {
     if (num < 0.1) {
-      return '$' + Number(parseFloat(num).toFixed(4))
+      return formatDollarAmount(num, 4)
     } else {
-      let usdString = priceFormatter.format(num)
-      return '$' + usdString.slice(1, usdString.length)
+      return formatDollarAmount(num, 2)
     }
   }
 
-  return Number(parseFloat(num).toFixed(5))
+  return Number(parseFloat(num).toFixed(5)).toLocaleString()
 }
 
 export function rawPercent(percentRaw) {
