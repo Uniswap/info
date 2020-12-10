@@ -363,9 +363,7 @@ export const formattedNum = (number, usd = false, acceptNegatives = false) => {
   }
 
   if (num > 1000) {
-    return usd
-      ? formatDollarAmount(num, 0)
-      : Number(parseFloat(num).toFixed(0)).toLocaleString()
+    return usd ? formatDollarAmount(num, 0) : Number(parseFloat(num).toFixed(0)).toLocaleString()
   }
 
   if (usd) {
