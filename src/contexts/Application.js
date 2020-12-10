@@ -174,19 +174,21 @@ export function useLatestBlocks() {
 
   useEffect(() => {
     async function fetch() {
-      try {
-        const res = await healthClient.query({
+      healthClient
+        .query({
           query: SUBGRAPH_HEALTH,
         })
-        const syncedBlock = res.data.indexingStatusForCurrentVersion.chains[0].latestBlock.number
-        const headBlock = res.data.indexingStatusForCurrentVersion.chains[0].chainHeadBlock.number
-        if (syncedBlock && headBlock) {
-          updateLatestBlock(syncedBlock)
-          updateHeadBlock(headBlock)
-        }
-      } catch (e) {
-        console.log(e)
-      }
+        .then((res) => {
+          const syncedBlock = res.data.indexingStatusForCurrentVersion.chains[0].latestBlock.number
+          const headBlock = res.data.indexingStatusForCurrentVersion.chains[0].chainHeadBlock.number
+          if (syncedBlock && headBlock) {
+            updateLatestBlock(syncedBlock)
+            updateHeadBlock(headBlock)
+          }
+        })
+        .catch((e) => {
+          console.log(e)
+        })
     }
     if (!latestBlock) {
       fetch()
