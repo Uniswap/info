@@ -20,10 +20,13 @@ import {
   getPercentChange,
   get2DayPercentChange,
   isAddress,
-  getBlocksFromTimestamps,
+  // getBlocksFromTimestamps,
   getTimestampsForChanges,
   splitQuery,
 } from '../utils'
+
+import { getBlockFromTimestamp, getBlocksFromTimestamps } from '../utils/mocks'
+
 import { timeframeOptions } from '../constants'
 import { useLatestBlocks } from './Application'
 
@@ -185,6 +188,8 @@ async function getBulkPairData(pairList, ethPrice) {
   const [t1, t2, tWeek] = getTimestampsForChanges()
   let [{ number: b1 }, { number: b2 }, { number: bWeek }] = await getBlocksFromTimestamps([t1, t2, tWeek])
 
+  console.log('_____________pair data ________________', b1, b2, bWeek)
+
   try {
     let current = await xyzClient.query({
       query: PAIRS_BULK,
@@ -248,6 +253,7 @@ async function getBulkPairData(pairList, ethPrice) {
           return data
         })
     )
+    console.log('!!!!!!!!!!!!!! pair data !!!!!!!!!!!', pairData)
     return pairData
   } catch (e) {
     console.log(e)

@@ -21,10 +21,12 @@ import {
   getPercentChange,
   // getBlockFromTimestamp,
   isAddress,
-  getBlocksFromTimestamps,
+  // getBlocksFromTimestamps,
   splitQuery,
 } from '../utils'
-import { getBlockFromTimestamp } from '../utils/mocks'
+
+import { getBlockFromTimestamp, getBlocksFromTimestamps } from '../utils/mocks'
+// import { getBlockFromTimestamp } from '../utils/mocks'
 import { timeframeOptions } from '../constants'
 import { useLatestBlocks } from './Application'
 import { from } from 'node-vibrant'
@@ -309,6 +311,8 @@ const getTopTokens = async (ethPrice, ethPriceOld) => {
           return data
         })
     )
+
+    console.log('___________!!!!!!!!!!!!!!!!  bulkResults____________  ', bulkResults)
 
     return bulkResults
 
