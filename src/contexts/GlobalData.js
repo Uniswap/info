@@ -6,11 +6,11 @@ import { useTimeframe } from './Application'
 import {
   getPercentChange,
   // getBlockFromTimestamp,
-  getBlocksFromTimestamps,
+  // getBlocksFromTimestamps,
   get2DayPercentChange,
   getTimeframe,
 } from '../utils'
-import { getBlockFromTimestamp } from "../utils/mocks"
+import { getBlockFromTimestamp, getBlocksFromTimestamps } from '../utils/mocks'
 import {
   GLOBAL_DATA,
   GLOBAL_TXNS,
@@ -216,7 +216,7 @@ async function getGlobalData(ethPrice, oldEthPrice) {
   let data = {}
   let oneDayData = {}
   let twoDayData = {}
-
+  console.log('=========== run to get global data =========')
   try {
     // get timestamps for the days
     const utcCurrentTime = dayjs()
@@ -233,12 +233,22 @@ async function getGlobalData(ethPrice, oldEthPrice) {
       utcTwoWeeksBack,
     ])
 
+    console.log(
+      '________________oneDayBlock, twoDayBlock, oneWeekBlock, twoWeekBlock',
+      oneDayBlock,
+      twoDayBlock,
+      oneWeekBlock,
+      twoWeekBlock
+    )
+
     // fetch the global data
     let result = await xyzClient.query({
       query: GLOBAL_DATA(),
       fetchPolicy: 'cache-first',
     })
     data = result.data.xyzswapFactories[0]
+
+    console.log('+++result global +++', data)
 
     // fetch the historical data
     let oneDayResult = await xyzClient.query({
@@ -264,6 +274,8 @@ async function getGlobalData(ethPrice, oldEthPrice) {
       fetchPolicy: 'cache-first',
     })
     const twoWeekData = twoWeekResult.data.xyzswapFactories[0]
+
+    console.log('++++data fetched ++', oneDayData, twoDayData, oneWeekResult, twoWeekResult)
 
     if (data && oneDayData && twoDayData && twoWeekData) {
       let [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentChange(
@@ -304,6 +316,8 @@ async function getGlobalData(ethPrice, oldEthPrice) {
     console.log(e)
   }
 
+  console.log('==========global = data =====', data)
+
   return data
 }
 
@@ -321,7 +335,7 @@ const getChartData = async (oldestDateToFetch) => {
 
   try {
     while (!allFound) {
-      let result = await client.query({
+      let result = await xyzClient.query({
         query: GLOBAL_CHART,
         variables: {
           startTime: oldestDateToFetch,
@@ -350,9 +364,9 @@ const getChartData = async (oldestDateToFetch) => {
       })
 
       // fill in empty days ( there will be no day datas if no trades made that day )
-      let timestamp = data[0].date ? data[0].date : oldestDateToFetch
-      let latestLiquidityUSD = data[0].totalLiquidityUSD
-      let latestDayDats = data[0].mostLiquidTokens
+      let timestamp = data[0] && data[0].date ? data[0].date : oldestDateToFetch
+      let latestLiquidityUSD = data[0] ? data[0].totalLiquidityUSD : 0
+      let latestDayDats = data[0] ? data[0].mostLiquidTokens : 0
       let index = 1
       while (timestamp < utcEndTime.unix() - oneDay) {
         const nextDay = timestamp + oneDay
@@ -401,7 +415,7 @@ const getGlobalTransactions = async () => {
   let transactions = {}
 
   try {
-    let result = await client.query({
+    let result = await xyzClient.query({
       query: GLOBAL_TXNS,
       fetchPolicy: 'cache-first',
     })
@@ -430,7 +444,6 @@ const getGlobalTransactions = async () => {
   } catch (e) {
     console.log(e)
   }
-
   return transactions
 }
 
@@ -447,16 +460,17 @@ const getEthPrice = async () => {
 
   try {
     let oneDayBlock = await getBlockFromTimestamp(utcOneDayBack)
-    let result = await client.query({
+    let result = await xyzClient.query({
       query: ETH_PRICE(),
       fetchPolicy: 'cache-first',
     })
-    let resultOneDay = await client.query({
+    let resultOneDay = await xyzClient.query({
       query: ETH_PRICE(oneDayBlock),
       fetchPolicy: 'cache-first',
     })
     const currentPrice = result?.data?.bundles[0]?.ethPrice
     const oneDayBackPrice = resultOneDay?.data?.bundles[0]?.ethPrice
+    console.log('*******eth price**********', currentPrice, oneDayBackPrice)
     priceChangeETH = getPercentChange(currentPrice, oneDayBackPrice)
     ethPrice = currentPrice
     ethPriceOneDay = oneDayBackPrice
@@ -479,7 +493,7 @@ async function getAllPairsOnUniswap() {
     let pairs = []
     let skipCount = 0
     while (!allFound) {
-      let result = await client.query({
+      let result = await xyzClient.query({
         query: ALL_PAIRS,
         variables: {
           skip: skipCount,
@@ -544,9 +558,10 @@ export function useGlobalData() {
       updateAllPairsInUniswap(allPairs)
 
       let allTokens = await getAllTokensOnUniswap()
-      console.log("_____________allTokens___________ ", allTokens)
       updateAllTokensInUniswap(allTokens)
     }
+
+    console.log('====================__________________', data, ethPrice, oldEthPrice)
     if (!data && ethPrice && oldEthPrice) {
       fetchData()
     }
@@ -662,7 +677,7 @@ export function useTopLps() {
         topPairs.map(async (pair) => {
           // for each one, fetch top LPs
           try {
-            const { data: results } = await client.query({
+            const { data: results } = await xyzClient.query({
               query: TOP_LPS_PER_PAIRS,
               variables: {
                 pair: pair.toString(),
@@ -672,7 +687,7 @@ export function useTopLps() {
             if (results) {
               return results.liquidityPositions
             }
-          } catch (e) { }
+          } catch (e) {}
         })
       )
 
