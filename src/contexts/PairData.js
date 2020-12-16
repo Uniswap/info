@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect, useState } from 'react'
 
-import { client } from '../apollo/client'
+import { client, xyzClient } from '../apollo/client'
 import {
   PAIR_DATA,
   PAIR_CHART,
@@ -186,7 +186,7 @@ async function getBulkPairData(pairList, ethPrice) {
   let [{ number: b1 }, { number: b2 }, { number: bWeek }] = await getBlocksFromTimestamps([t1, t2, tWeek])
 
   try {
-    let current = await client.query({
+    let current = await xyzClient.query({
       query: PAIRS_BULK,
       variables: {
         allPairs: pairList,
@@ -196,7 +196,7 @@ async function getBulkPairData(pairList, ethPrice) {
 
     let [oneDayResult, twoDayResult, oneWeekResult] = await Promise.all(
       [b1, b2, bWeek].map(async (block) => {
-        let result = client.query({
+        let result = xyzClient.query({
           query: PAIRS_HISTORICAL_BULK(block, pairList),
           fetchPolicy: 'cache-first',
         })
@@ -222,7 +222,7 @@ async function getBulkPairData(pairList, ethPrice) {
           let data = pair
           let oneDayHistory = oneDayData?.[pair.id]
           if (!oneDayHistory) {
-            let newData = await client.query({
+            let newData = await xyzClient.query({
               query: PAIR_DATA(pair.id, b1),
               fetchPolicy: 'cache-first',
             })
@@ -230,7 +230,7 @@ async function getBulkPairData(pairList, ethPrice) {
           }
           let twoDayHistory = twoDayData?.[pair.id]
           if (!twoDayHistory) {
-            let newData = await client.query({
+            let newData = await xyzClient.query({
               query: PAIR_DATA(pair.id, b2),
               fetchPolicy: 'cache-first',
             })
@@ -238,7 +238,7 @@ async function getBulkPairData(pairList, ethPrice) {
           }
           let oneWeekHistory = oneWeekData?.[pair.id]
           if (!oneWeekHistory) {
-            let newData = await client.query({
+            let newData = await xyzClient.query({
               query: PAIR_DATA(pair.id, bWeek),
               fetchPolicy: 'cache-first',
             })
@@ -305,7 +305,7 @@ const getPairTransactions = async (pairAddress) => {
   const transactions = {}
 
   try {
-    let result = await client.query({
+    let result = await xyzClient.query({
       query: FILTERED_TRANSACTIONS,
       variables: {
         allPairs: [pairAddress],
@@ -332,7 +332,7 @@ const getPairChartData = async (pairAddress) => {
     let allFound = false
     let skip = 0
     while (!allFound) {
-      let result = await client.query({
+      let result = await xyzClient.query({
         query: PAIR_CHART,
         variables: {
           pairAddress: pairAddress,
@@ -469,7 +469,7 @@ export function Updater() {
       // get top pairs by reserves
       let {
         data: { pairs },
-      } = await client.query({
+      } = await xyzClient.query({
         query: PAIRS_CURRENT,
         fetchPolicy: 'cache-first',
       })

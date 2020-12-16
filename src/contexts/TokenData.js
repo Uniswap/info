@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect } from 'react'
 
-import { client } from '../apollo/client'
+import { client, xyzClient } from '../apollo/client'
 import {
   TOKEN_DATA,
   FILTERED_TRANSACTIONS,
@@ -201,17 +201,17 @@ const getTopTokens = async (ethPrice, ethPriceOld) => {
   let twoDayBlock = await getBlockFromTimestamp(utcTwoDaysBack)
 
   try {
-    let current = await client.query({
+    let current = await xyzClient.query({
       query: TOKENS_CURRENT,
       fetchPolicy: 'cache-first',
     })
 
-    let oneDayResult = await client.query({
+    let oneDayResult = await xyzClient.query({
       query: TOKENS_DYNAMIC(oneDayBlock),
       fetchPolicy: 'cache-first',
     })
 
-    let twoDayResult = await client.query({
+    let twoDayResult = await xyzClient.query({
       query: TOKENS_DYNAMIC(twoDayBlock),
       fetchPolicy: 'cache-first',
     })
@@ -226,88 +226,88 @@ const getTopTokens = async (ethPrice, ethPriceOld) => {
 
     let bulkResults = await Promise.all(
       current &&
-      oneDayData &&
-      twoDayData &&
-      current?.data?.tokens.map(async (token) => {
-        let data = token
+        oneDayData &&
+        twoDayData &&
+        current?.data?.tokens.map(async (token) => {
+          let data = token
 
-        // let liquidityDataThisToken = liquidityData?.[token.id]
-        let oneDayHistory = oneDayData?.[token.id]
-        let twoDayHistory = twoDayData?.[token.id]
+          // let liquidityDataThisToken = liquidityData?.[token.id]
+          let oneDayHistory = oneDayData?.[token.id]
+          let twoDayHistory = twoDayData?.[token.id]
 
-        // catch the case where token wasnt in top list in previous days
-        if (!oneDayHistory) {
-          let oneDayResult = await client.query({
-            query: TOKEN_DATA(token.id, oneDayBlock),
-            fetchPolicy: 'cache-first',
-          })
-          oneDayHistory = oneDayResult.data.tokens[0]
-        }
-        if (!twoDayHistory) {
-          let twoDayResult = await client.query({
-            query: TOKEN_DATA(token.id, twoDayBlock),
-            fetchPolicy: 'cache-first',
-          })
-          twoDayHistory = twoDayResult.data.tokens[0]
-        }
+          // catch the case where token wasnt in top list in previous days
+          if (!oneDayHistory) {
+            let oneDayResult = await xyzClient.query({
+              query: TOKEN_DATA(token.id, oneDayBlock),
+              fetchPolicy: 'cache-first',
+            })
+            oneDayHistory = oneDayResult.data.tokens[0]
+          }
+          if (!twoDayHistory) {
+            let twoDayResult = await xyzClient.query({
+              query: TOKEN_DATA(token.id, twoDayBlock),
+              fetchPolicy: 'cache-first',
+            })
+            twoDayHistory = twoDayResult.data.tokens[0]
+          }
 
-        // calculate percentage changes and daily changes
-        const [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentChange(
-          data.tradeVolumeUSD,
-          oneDayHistory?.tradeVolumeUSD ?? 0,
-          twoDayHistory?.tradeVolumeUSD ?? 0
-        )
-        const [oneDayTxns, txnChange] = get2DayPercentChange(
-          data.txCount,
-          oneDayHistory?.txCount ?? 0,
-          twoDayHistory?.txCount ?? 0
-        )
+          // calculate percentage changes and daily changes
+          const [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentChange(
+            data.tradeVolumeUSD,
+            oneDayHistory?.tradeVolumeUSD ?? 0,
+            twoDayHistory?.tradeVolumeUSD ?? 0
+          )
+          const [oneDayTxns, txnChange] = get2DayPercentChange(
+            data.txCount,
+            oneDayHistory?.txCount ?? 0,
+            twoDayHistory?.txCount ?? 0
+          )
 
-        const currentLiquidityUSD = data?.totalLiquidity * ethPrice * data?.derivedETH
-        const oldLiquidityUSD = oneDayHistory?.totalLiquidity * ethPriceOld * oneDayHistory?.derivedETH
+          const currentLiquidityUSD = data?.totalLiquidity * ethPrice * data?.derivedETH
+          const oldLiquidityUSD = oneDayHistory?.totalLiquidity * ethPriceOld * oneDayHistory?.derivedETH
 
-        // percent changes
-        const priceChangeUSD = getPercentChange(
-          data?.derivedETH * ethPrice,
-          oneDayHistory?.derivedETH ? oneDayHistory?.derivedETH * ethPriceOld : 0
-        )
+          // percent changes
+          const priceChangeUSD = getPercentChange(
+            data?.derivedETH * ethPrice,
+            oneDayHistory?.derivedETH ? oneDayHistory?.derivedETH * ethPriceOld : 0
+          )
 
-        // set data
-        data.priceUSD = data?.derivedETH * ethPrice
-        data.totalLiquidityUSD = currentLiquidityUSD
-        data.oneDayVolumeUSD = parseFloat(oneDayVolumeUSD)
-        data.volumeChangeUSD = volumeChangeUSD
-        data.priceChangeUSD = priceChangeUSD
-        data.liquidityChangeUSD = getPercentChange(currentLiquidityUSD ?? 0, oldLiquidityUSD ?? 0)
-        data.oneDayTxns = oneDayTxns
-        data.txnChange = txnChange
+          // set data
+          data.priceUSD = data?.derivedETH * ethPrice
+          data.totalLiquidityUSD = currentLiquidityUSD
+          data.oneDayVolumeUSD = parseFloat(oneDayVolumeUSD)
+          data.volumeChangeUSD = volumeChangeUSD
+          data.priceChangeUSD = priceChangeUSD
+          data.liquidityChangeUSD = getPercentChange(currentLiquidityUSD ?? 0, oldLiquidityUSD ?? 0)
+          data.oneDayTxns = oneDayTxns
+          data.txnChange = txnChange
 
-        // new tokens
-        if (!oneDayHistory && data) {
-          data.oneDayVolumeUSD = data.tradeVolumeUSD
-          data.oneDayVolumeETH = data.tradeVolume * data.derivedETH
-          data.oneDayTxns = data.txCount
-        }
+          // new tokens
+          if (!oneDayHistory && data) {
+            data.oneDayVolumeUSD = data.tradeVolumeUSD
+            data.oneDayVolumeETH = data.tradeVolume * data.derivedETH
+            data.oneDayTxns = data.txCount
+          }
 
-        if (data.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
-          data.name = 'Ether (Wrapped)'
-          data.symbol = 'ETH'
-        }
+          if (data.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
+            data.name = 'Ether (Wrapped)'
+            data.symbol = 'ETH'
+          }
 
-        // HOTFIX for Aave
-        if (data.id === '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9') {
-          const aaveData = await client.query({
-            query: PAIR_DATA('0xdfc14d2af169b0d36c4eff567ada9b2e0cae044f'),
-            fetchPolicy: 'cache-first',
-          })
-          const result = aaveData.data.pairs[0]
-          data.totalLiquidityUSD = parseFloat(result.reserveUSD) / 2
-          data.liquidityChangeUSD = 0
-          data.priceChangeUSD = 0
-        }
+          // HOTFIX for Aave
+          if (data.id === '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9') {
+            const aaveData = await xyzClient.query({
+              query: PAIR_DATA('0xdfc14d2af169b0d36c4eff567ada9b2e0cae044f'),
+              fetchPolicy: 'cache-first',
+            })
+            const result = aaveData.data.pairs[0]
+            data.totalLiquidityUSD = parseFloat(result.reserveUSD) / 2
+            data.liquidityChangeUSD = 0
+            data.priceChangeUSD = 0
+          }
 
-        return data
-      })
+          return data
+        })
     )
 
     return bulkResults
@@ -332,21 +332,21 @@ const getTokenData = async (address, ethPrice, ethPriceOld) => {
 
   try {
     // fetch all current and historical data
-    let result = await client.query({
+    let result = await xyzClient.query({
       query: TOKEN_DATA(address),
       fetchPolicy: 'cache-first',
     })
     data = result?.data?.tokens?.[0]
 
     // get results from 24 hours in past
-    let oneDayResult = await client.query({
+    let oneDayResult = await xyzClient.query({
       query: TOKEN_DATA(address, oneDayBlock),
       fetchPolicy: 'cache-first',
     })
     oneDayData = oneDayResult.data.tokens[0]
 
     // get results from 48 hours in past
-    let twoDayResult = await client.query({
+    let twoDayResult = await xyzClient.query({
       query: TOKEN_DATA(address, twoDayBlock),
       fetchPolicy: 'cache-first',
     })
@@ -354,14 +354,14 @@ const getTokenData = async (address, ethPrice, ethPriceOld) => {
 
     // catch the case where token wasnt in top list in previous days
     if (!oneDayData) {
-      let oneDayResult = await client.query({
+      let oneDayResult = await xyzClient.query({
         query: TOKEN_DATA(address, oneDayBlock),
         fetchPolicy: 'cache-first',
       })
       oneDayData = oneDayResult.data.tokens[0]
     }
     if (!twoDayData) {
-      let twoDayResult = await client.query({
+      let twoDayResult = await xyzClient.query({
         query: TOKEN_DATA(address, twoDayBlock),
         fetchPolicy: 'cache-first',
       })
@@ -425,7 +425,7 @@ const getTokenData = async (address, ethPrice, ethPriceOld) => {
 
     // HOTFIX for Aave
     if (data.id === '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9') {
-      const aaveData = await client.query({
+      const aaveData = await xyzClient.query({
         query: PAIR_DATA('0xdfc14d2af169b0d36c4eff567ada9b2e0cae044f'),
         fetchPolicy: 'cache-first',
       })
@@ -443,7 +443,7 @@ const getTokenData = async (address, ethPrice, ethPriceOld) => {
 const getTokenTransactions = async (allPairsFormatted) => {
   const transactions = {}
   try {
-    let result = await client.query({
+    let result = await xyzClient.query({
       query: FILTERED_TRANSACTIONS,
       variables: {
         allPairs: allPairsFormatted,
@@ -462,7 +462,7 @@ const getTokenTransactions = async (allPairsFormatted) => {
 const getTokenPairs = async (tokenAddress) => {
   try {
     // fetch all current and historical data
-    let result = await client.query({
+    let result = await xyzClient.query({
       query: TOKEN_DATA(tokenAddress),
       fetchPolicy: 'cache-first',
     })
@@ -559,7 +559,7 @@ const getTokenChartData = async (tokenAddress) => {
     let allFound = false
     let skip = 0
     while (!allFound) {
-      let result = await client.query({
+      let result = await xyzClient.query({
         query: TOKEN_CHART,
         variables: {
           tokenAddr: tokenAddress,

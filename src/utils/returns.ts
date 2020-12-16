@@ -1,5 +1,5 @@
 import { USER_MINTS_BUNRS_PER_PAIR } from '../apollo/queries'
-import { client } from '../apollo/client'
+import { client, xyzClient } from '../apollo/client'
 import dayjs from 'dayjs'
 import { getShareValueOverTime } from '.'
 
@@ -54,7 +54,7 @@ async function getPrincipalForUserPerPair(user: string, pairAddress: string) {
   let amount0 = 0
   let amount1 = 0
   // get all minst and burns to get principal amounts
-  const results = await client.query({
+  const results = await xyzClient.query({
     query: USER_MINTS_BUNRS_PER_PAIR,
     variables: {
       user,
@@ -193,7 +193,6 @@ export async function getHistoricalPairReturns(startDateTimestamp, currentPairDa
       shareValuesFormatted[share.timestamp] = share
     })
   }
-
 
   // set the default position and data
   let positionT0 = pairSnapshots[0]

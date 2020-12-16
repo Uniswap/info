@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect, useState } from 'react'
 import { usePairData } from './PairData'
-import { client } from '../apollo/client'
+import { client, xyzClient } from '../apollo/client'
 import { USER_TRANSACTIONS, USER_POSITIONS, USER_HISTORY, PAIR_DAY_DATA_BULK } from '../apollo/queries'
 import { useTimeframe, useStartTimestamp } from './Application'
 import dayjs from 'dayjs'
@@ -147,7 +147,7 @@ export function useUserTransactions(account) {
   useEffect(() => {
     async function fetchData(account) {
       try {
-        let result = await client.query({
+        let result = await xyzClient.query({
           query: USER_TRANSACTIONS,
           variables: {
             user: account,
@@ -185,7 +185,7 @@ export function useUserSnapshots(account) {
         let allResults = []
         let found = false
         while (!found) {
-          let result = await client.query({
+          let result = await xyzClient.query({
             query: USER_HISTORY,
             variables: {
               skip: skip,
@@ -344,7 +344,7 @@ export function useUserLiquidityChart(account) {
       // get all day datas where date is in this list, and pair is in pair list
       let {
         data: { pairDayDatas },
-      } = await client.query({
+      } = await xyzClient.query({
         query: PAIR_DAY_DATA_BULK(pairs, startDateTimestamp),
       })
 
@@ -430,7 +430,7 @@ export function useUserPositions(account) {
   useEffect(() => {
     async function fetchData(account) {
       try {
-        let result = await client.query({
+        let result = await xyzClient.query({
           query: USER_POSITIONS,
           variables: {
             user: account,
