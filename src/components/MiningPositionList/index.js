@@ -28,7 +28,7 @@ const PageButtons = styled.div`
 
 const Arrow = styled.div`
   color: ${({ theme }) => theme.primary1};
-  opacity: ${(props) => (props.faded ? 0.3 : 1)};
+  opacity: ${props => (props.faded ? 0.3 : 1)};
   padding: 0 20px;
   user-select: none;
   :hover {
@@ -103,7 +103,7 @@ const DataText = styled(Flex)`
 
 const SORT_FIELD = {
   VALUE: 'VALUE',
-  UNISWAP_RETURN: 'UNISWAP_RETURN',
+  UNISWAP_RETURN: 'UNISWAP_RETURN'
 }
 
 function MiningPositionList({ miningPositions }) {
@@ -205,8 +205,8 @@ function MiningPositionList({ miningPositions }) {
 
       .sort((p0, p1) => {
         if (sortedColumn === SORT_FIELD.VALUE) {
-          const bal0 = (p0.balance / p0.pairData.totalSupply) * p0.pairData.reserveUSD
-          const bal1 = (p0.balance / p0.pairData.totalSupply) * p1.pairData.reserveUSD
+          const bal0 = (p0.balance / p0.pairData?.totalSupply) * p0.pairData?.reserveUSD
+          const bal1 = (p0.balance / p0.pairData?.totalSupply) * p1.pairData?.reserveUSD
           return bal0 > bal1 ? (sortDirection ? -1 : 1) : sortDirection ? 1 : -1
         }
         return 1
@@ -235,7 +235,7 @@ function MiningPositionList({ miningPositions }) {
         <Flex alignItems="center" justifyContent="flexEnd">
           <ClickableText
             area="uniswap"
-            onClick={(e) => {
+            onClick={e => {
               setSortedColumn(SORT_FIELD.VALUE)
               setSortDirection(sortedColumn !== SORT_FIELD.VALUE ? true : !sortDirection)
             }}
