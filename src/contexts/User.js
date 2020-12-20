@@ -415,12 +415,16 @@ export function useUserLiquidityChart(account) {
 
         // now cycle through pair day datas, for each one find usd value = ownership[address] * reserveUSD
         const dailyUSD = relavantDayDatas.reduce((totalUSD, dayData) => {
-          return (totalUSD =
-            totalUSD +
-            (ownershipPerPair[dayData.pairAddress]
-              ? (parseFloat(ownershipPerPair[dayData.pairAddress].lpTokenBalance) / parseFloat(dayData.totalSupply)) *
-                parseFloat(dayData.reserveUSD)
-              : 0))
+          if (dayData) {
+            return (totalUSD =
+              totalUSD +
+              (ownershipPerPair[dayData.pairAddress]
+                ? (parseFloat(ownershipPerPair[dayData.pairAddress].lpTokenBalance) / parseFloat(dayData.totalSupply)) *
+                  parseFloat(dayData.reserveUSD)
+                : 0))
+          } else {
+            return totalUSD
+          }
         }, 0)
 
         formattedHistory.push({

@@ -205,8 +205,8 @@ function MiningPositionList({ miningPositions }) {
 
       .sort((p0, p1) => {
         if (sortedColumn === SORT_FIELD.VALUE) {
-          const bal0 = (p0.balance / p0.pairData.totalSupply) * p0.pairData.reserveUSD
-          const bal1 = (p0.balance / p0.pairData.totalSupply) * p1.pairData.reserveUSD
+          const bal0 = (p0.balance / p0.pairData?.totalSupply) * p0.pairData?.reserveUSD
+          const bal1 = (p0.balance / p0.pairData?.totalSupply) * p1.pairData?.reserveUSD
           return bal0 > bal1 ? (sortDirection ? -1 : 1) : sortDirection ? 1 : -1
         }
         return 1
