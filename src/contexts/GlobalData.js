@@ -297,6 +297,10 @@ async function getGlobalData(ethPrice, oldEthPrice) {
       )
 
       // format the total liquidity in USD
+      console.log('-____currentLiquidityUSD____________', data.totalLiquidityETH, ethPrice)
+
+      console.log('-____oldLiquidityUSD____________', oneDayData.totalLiquidityETH, oldEthPrice)
+
       data.totalLiquidityUSD = data.totalLiquidityETH * ethPrice
       const liquidityChangeUSD = getPercentChange(
         data.totalLiquidityETH * ethPrice,
@@ -552,6 +556,7 @@ export function useGlobalData() {
   useEffect(() => {
     async function fetchData() {
       let globalData = await getGlobalData(ethPrice, oldEthPrice)
+      console.log('=============globalData=======__________________', globalData)
       globalData && update(globalData)
 
       let allPairs = await getAllPairsOnUniswap()
@@ -561,7 +566,6 @@ export function useGlobalData() {
       updateAllTokensInUniswap(allTokens)
     }
 
-    console.log('====================__________________', data, ethPrice, oldEthPrice)
     if (!data && ethPrice && oldEthPrice) {
       fetchData()
     }
