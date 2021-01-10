@@ -14,7 +14,7 @@ import { useAllPairsInUniswap, useAllTokensInUniswap } from '../../contexts/Glob
 import { OVERVIEW_TOKEN_BLACKLIST, PAIR_BLACKLIST } from '../../constants'
 
 import { transparentize } from 'polished'
-import { client, xyzClient } from '../../apollo/client'
+import { xyzClient } from '../../apollo/client'
 import { PAIR_SEARCH, TOKEN_SEARCH } from '../../apollo/queries'
 import FormattedName from '../FormattedName'
 import { TYPE } from '../../Theme'

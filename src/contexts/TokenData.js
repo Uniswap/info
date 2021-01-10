@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect } from 'react'
 
-import { client, xyzClient } from '../apollo/client'
+import { xyzClient } from '../apollo/client'
 import {
   TOKEN_DATA,
   FILTERED_TRANSACTIONS,
@@ -25,8 +25,8 @@ import {
   splitQuery,
 } from '../utils'
 
-import { getBlockFromTimestamp, getBlocksFromTimestamps } from '../utils/mocks'
-// import { getBlockFromTimestamp } from '../utils/mocks'
+// import { getBlockFromTimestamp, getBlocksFromTimestamps } from '../utils/mocks'
+import { getBlockFromTimestamp, getBlocksFromTimestamps } from '../utils'
 import { timeframeOptions } from '../constants'
 import { useLatestBlocks } from './Application'
 import { from } from 'node-vibrant'
@@ -509,7 +509,7 @@ const getIntervalTokenData = async (tokenAddress, startTime, interval = 3600, la
       })
     }
 
-    let result = await splitQuery(PRICES_BY_BLOCK, client, [tokenAddress], blocks, 50)
+    let result = await splitQuery(PRICES_BY_BLOCK, xyzClient, [tokenAddress], blocks, 50)
 
     // format token ETH price results
     let values = []

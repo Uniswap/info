@@ -1,5 +1,5 @@
 import { USER_MINTS_BUNRS_PER_PAIR } from '../apollo/queries'
-import { client, xyzClient } from '../apollo/client'
+import { xyzClient } from '../apollo/client'
 import dayjs from 'dayjs'
 import { getShareValueOverTime } from '.'
 

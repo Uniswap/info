@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect, useState } from 'react'
-import { client, xyzClient } from '../apollo/client'
+import { xyzClient } from '../apollo/client'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { useTimeframe } from './Application'
@@ -10,7 +10,8 @@ import {
   get2DayPercentChange,
   getTimeframe,
 } from '../utils'
-import { getBlockFromTimestamp, getBlocksFromTimestamps } from '../utils/mocks'
+import { getBlockFromTimestamp, getBlocksFromTimestamps } from '../utils'
+// import { getBlockFromTimestamp, getBlocksFromTimestamps } from '../utils/mocks'
 import {
   GLOBAL_DATA,
   GLOBAL_TXNS,
