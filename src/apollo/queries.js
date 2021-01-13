@@ -440,6 +440,7 @@ export const GLOBAL_DATA = (block) => {
        where: { id: "${FACTORY_ADDRESS}" }) {
         id
         totalVolumeUSD
+        totalFeeUSD
         totalVolumeETH
         untrackedVolumeUSD
         totalLiquidityUSD
@@ -691,7 +692,9 @@ export const PAIRS_HISTORICAL_BULK = (block, pairs) => {
       reserveUSD
       trackedReserveETH
       volumeUSD
+      feeUSD
       untrackedVolumeUSD
+      untrackedFeeUSD
     }
   }
   `

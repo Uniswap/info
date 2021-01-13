@@ -115,8 +115,10 @@ function PairPage({ pairAddress, history }) {
     reserveUSD,
     trackedReserveUSD,
     oneDayVolumeUSD,
+    oneDayFeeUSD,
     volumeChangeUSD,
     oneDayVolumeUntracked,
+    oneDayFeeUntracked,
     volumeChangeUntracked,
     liquidityChangeUSD,
   } = usePairData(pairAddress)
@@ -160,10 +162,10 @@ function PairPage({ pairAddress, history }) {
 
   // get fees	  // get fees
   const fees =
-    oneDayVolumeUSD || oneDayVolumeUSD === 0
+    oneDayFeeUSD || oneDayFeeUSD === 0
       ? usingUtVolume
-        ? formattedNum(oneDayVolumeUntracked * 0.003, true)
-        : formattedNum(oneDayVolumeUSD * 0.003, true)
+        ? formattedNum(oneDayFeeUntracked, true)
+        : formattedNum(oneDayFeeUSD, true)
       : '-'
 
   // token data for usd

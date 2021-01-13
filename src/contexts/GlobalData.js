@@ -286,6 +286,13 @@ async function getGlobalData(ethPrice, oldEthPrice) {
         twoDayData.totalVolumeUSD ? twoDayData.totalVolumeUSD : 0
       )
 
+      let [oneDayFeeUSD, feeChangeUSD] = get2DayPercentChange(
+        data.totalFeeUSD,
+        oneDayData.totalFeeUSD ? oneDayData.totalFeeUSD : 0,
+        twoDayData.totalFeeUSD ? twoDayData.totalFeeUSD : 0
+      )
+
+      console.log('++++oneDayFeeUSD++++++++++++++++++++++', oneDayFeeUSD)
       const [oneDayTxns, txnChange] = get2DayPercentChange(
         data.txCount,
         oneDayData.txCount ? oneDayData.txCount : 0,
@@ -300,6 +307,7 @@ async function getGlobalData(ethPrice, oldEthPrice) {
 
       data.oneDayVolumeUSD = oneDayVolumeUSD
       data.volumeChangeUSD = volumeChangeUSD
+      data.oneDayFeeUSD = oneDayFeeUSD
       data.liquidityChangeUSD = liquidityChangeUSD
       data.oneDayTxns = oneDayTxns
       data.txnChange = txnChange

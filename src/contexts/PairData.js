@@ -267,16 +267,29 @@ function parseData(data, oneDayData, twoDayData, oneWeekData, ethPrice, oneDayBl
     oneDayData?.volumeUSD ? oneDayData.volumeUSD : 0,
     twoDayData?.volumeUSD ? twoDayData.volumeUSD : 0
   )
+
+  const [oneDayFeeUSD, feeChangeUSD] = get2DayPercentChange(
+    data?.feeUSD,
+    oneDayData?.feeUSD ? oneDayData.feeUSD : 0,
+    twoDayData?.feeUSD ? twoDayData.feeUSD : 0
+  )
   const [oneDayVolumeUntracked, volumeChangeUntracked] = get2DayPercentChange(
     data?.untrackedVolumeUSD,
     oneDayData?.untrackedVolumeUSD ? parseFloat(oneDayData?.untrackedVolumeUSD) : 0,
     twoDayData?.untrackedVolumeUSD ? twoDayData?.untrackedVolumeUSD : 0
+  )
+  const [oneDayFeeUntracked, feeChangeUntracked] = get2DayPercentChange(
+    data?.untrackedFeeUSD,
+    oneDayData?.untrackedFeeUSD ? parseFloat(oneDayData?.untrackedFeeUSD) : 0,
+    twoDayData?.untrackedFeeUSD ? twoDayData?.untrackedFeeUSD : 0
   )
   const oneWeekVolumeUSD = parseFloat(oneWeekData ? data?.volumeUSD - oneWeekData?.volumeUSD : data.volumeUSD)
 
   // set volume properties
   data.oneDayVolumeUSD = parseFloat(oneDayVolumeUSD)
   data.oneWeekVolumeUSD = oneWeekVolumeUSD
+  data.oneDayFeeUSD = oneDayFeeUSD
+  data.oneDayFeeUntracked = oneDayFeeUntracked
   data.volumeChangeUSD = volumeChangeUSD
   data.oneDayVolumeUntracked = oneDayVolumeUntracked
   data.volumeChangeUntracked = volumeChangeUntracked
