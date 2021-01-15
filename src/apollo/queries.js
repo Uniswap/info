@@ -644,7 +644,9 @@ const PairFields = `
     trackedReserveETH
     reserveETH
     volumeUSD
+    feeUSD
     untrackedVolumeUSD
+    untrackedFeeUSD
     token0Price
     token1Price
     createdAtTimestamp

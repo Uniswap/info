@@ -188,8 +188,6 @@ async function getBulkPairData(pairList, ethPrice) {
   const [t1, t2, tWeek] = getTimestampsForChanges()
   let [{ number: b1 }, { number: b2 }, { number: bWeek }] = await getBlocksFromTimestamps([t1, t2, tWeek])
 
-  console.log('_____________pair data ________________', b1, b2, bWeek)
-
   try {
     let current = await xyzClient.query({
       query: PAIRS_BULK,
@@ -208,6 +206,8 @@ async function getBulkPairData(pairList, ethPrice) {
         return result
       })
     )
+
+    console.log('_____________pair data ________________', oneDayResult, twoDayResult, oneWeekResult)
 
     let oneDayData = oneDayResult?.data?.pairs.reduce((obj, cur, i) => {
       return { ...obj, [cur.id]: cur }
