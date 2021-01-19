@@ -19,7 +19,6 @@ const IconWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-
   :hover {
     cursor: pointer;
     opacity: 0.7;
