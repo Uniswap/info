@@ -55,7 +55,6 @@ function GlobalPage() {
   const below800 = useMedia('(max-width: 800px)')
 
   // scrolling refs
-
   useEffect(() => {
     document.querySelector('body').scrollTo({
       behavior: 'smooth',
