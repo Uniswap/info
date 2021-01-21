@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import 'feather-icons'
 import { withRouter } from 'react-router-dom'
 import { Text } from 'rebass'
@@ -27,9 +27,11 @@ import { useEffect } from 'react'
 import Warning from '../components/Warning'
 import { usePathDismissed, useSavedTokens } from '../contexts/LocalStorage'
 import { Hover, PageWrapper, ContentWrapper, StyledIcon } from '../components'
-import { PlusCircle, Bookmark } from 'react-feather'
+import { PlusCircle, Bookmark, AlertCircle } from 'react-feather'
 import FormattedName from '../components/FormattedName'
 import { useListedTokens } from '../contexts/Application'
+import HoverText from '../components/HoverText'
+import { UNTRACKED_COPY } from '../constants'
 
 const DashboardWrapper = styled.div`
   width: 100%;
@@ -83,6 +85,13 @@ const TokenDetailsLayout = styled.div`
   }
 `
 
+const WarningIcon = styled(AlertCircle)`
+  stroke: ${({ theme }) => theme.text1};
+  height: 16px;
+  width: 16px;
+  opacity: 0.6;
+`
+
 const WarningGrouping = styled.div`
   opacity: ${({ disabled }) => disabled && '0.4'};
   pointer-events: ${({ disabled }) => disabled && 'none'};
@@ -102,7 +111,7 @@ function TokenPage({ address, history }) {
     priceChangeUSD,
     liquidityChangeUSD,
     oneDayTxns,
-    txnChange,
+    txnChange
   } = useTokenData(address)
 
   useEffect(() => {
@@ -125,23 +134,13 @@ function TokenPage({ address, history }) {
   const priceChange = priceChangeUSD ? formattedPercent(priceChangeUSD) : ''
 
   // volume
-  const volume =
-    oneDayVolumeUSD || oneDayVolumeUSD === 0
-      ? formattedNum(oneDayVolumeUSD === 0 ? oneDayVolumeUT : oneDayVolumeUSD, true)
-      : oneDayVolumeUSD === 0
-      ? '$0'
-      : '-'
+  const volume = formattedNum(!!oneDayVolumeUSD ? oneDayVolumeUSD : oneDayVolumeUT, true)
 
-  // mark if using untracked volume
-  const [usingUtVolume, setUsingUtVolume] = useState(false)
-  useEffect(() => {
-    setUsingUtVolume(oneDayVolumeUSD === 0 ? true : false)
-  }, [oneDayVolumeUSD])
-
+  const usingUtVolume = oneDayVolumeUSD === 0 && !!oneDayVolumeUT
   const volumeChange = formattedPercent(!usingUtVolume ? volumeChangeUSD : volumeChangeUT)
 
   // liquidity
-  const liquidity = totalLiquidityUSD ? formattedNum(totalLiquidityUSD, true) : totalLiquidityUSD === 0 ? '$0' : '-'
+  const liquidity = formattedNum(totalLiquidityUSD, true)
   const liquidityChange = formattedPercent(liquidityChangeUSD)
 
   // transactions
@@ -163,14 +162,13 @@ function TokenPage({ address, history }) {
   useEffect(() => {
     window.scrollTo({
       behavior: 'smooth',
-      top: 0,
+      top: 0
     })
   }, [])
 
   return (
     <PageWrapper>
       <ThemedBackground backgroundColor={transparentize(0.6, backgroundColor)} />
-
       <Warning
         type={'token'}
         show={!dismissed && listedTokens && !listedTokens.includes(address)}
@@ -204,7 +202,7 @@ function TokenPage({ address, history }) {
               style={{
                 flexWrap: 'wrap',
                 marginBottom: '2rem',
-                alignItems: 'flex-start',
+                alignItems: 'flex-start'
               }}
             >
               <RowFixed style={{ flexWrap: 'wrap' }}>
@@ -254,6 +252,18 @@ function TokenPage({ address, history }) {
             </RowBetween>
 
             <>
+              {!below1080 && (
+                <RowFixed>
+                  <TYPE.main fontSize={'1.125rem'} mr="6px">
+                    Token Stats
+                  </TYPE.main>
+                  {usingUtVolume && (
+                    <HoverText text={UNTRACKED_COPY}>
+                      <WarningIcon />
+                    </HoverText>
+                  )}
+                </RowFixed>
+              )}
               <PanelWrapper style={{ marginTop: below1080 ? '0' : '1rem' }}>
                 {below1080 && price && (
                   <Panel>
@@ -289,7 +299,7 @@ function TokenPage({ address, history }) {
                 <Panel>
                   <AutoColumn gap="20px">
                     <RowBetween>
-                      <TYPE.main>Volume (24hrs) {usingUtVolume && '(Untracked)'}</TYPE.main>
+                      <TYPE.main>Volume (24hrs)</TYPE.main>
                       <div />
                     </RowBetween>
                     <RowBetween align="flex-end">
@@ -309,7 +319,7 @@ function TokenPage({ address, history }) {
                     </RowBetween>
                     <RowBetween align="flex-end">
                       <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={500}>
-                        {oneDayTxns ? localNumber(oneDayTxns) : oneDayTxns === 0 ? 0 : '-'}
+                        {oneDayTxns ? localNumber(oneDayTxns) : 0}
                       </TYPE.main>
                       <TYPE.main>{txnChangeFormatted}</TYPE.main>
                     </RowBetween>
@@ -318,7 +328,7 @@ function TokenPage({ address, history }) {
                 <Panel
                   style={{
                     gridColumn: below1080 ? '1' : '2/4',
-                    gridRow: below1080 ? '' : '1/4',
+                    gridRow: below1080 ? '' : '1/4'
                   }}
                 >
                   <TokenChart address={address} color={backgroundColor} base={priceUSD} />
@@ -335,7 +345,7 @@ function TokenPage({ address, history }) {
               rounded
               style={{
                 marginTop: '1.5rem',
-                padding: '1.125rem 0 ',
+                padding: '1.125rem 0 '
               }}
             >
               {address && fetchedPairsList ? (
@@ -357,7 +367,7 @@ function TokenPage({ address, history }) {
               <Panel
                 rounded
                 style={{
-                  marginTop: '1.5rem',
+                  marginTop: '1.5rem'
                 }}
                 p={20}
               >
