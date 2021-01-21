@@ -108,14 +108,22 @@ const SORT_FIELD = {
   APY: 5,
 }
 
-const FIELD_TO_VALUE = {
-  [SORT_FIELD.LIQ]: 'trackedReserveUSD', // sort with tracked volume only
-  [SORT_FIELD.VOL]: 'oneDayVolumeUSD',
-  [SORT_FIELD.VOL_7DAYS]: 'oneWeekVolumeUSD',
-  [SORT_FIELD.FEES]: 'oneDayVolumeUSD',
+const FIELD_TO_VALUE = (field, useTracked) => {
+  switch (field) {
+    case SORT_FIELD.LIQ:
+      return useTracked ? 'trackedReserveUSD' : 'reserveUSD'
+    case SORT_FIELD.VOL:
+      return useTracked ? 'oneDayVolumeUSD' : 'oneDayVolumeUntracked'
+    case SORT_FIELD.VOL_7DAYS:
+      return useTracked ? 'oneWeekVolumeUSD' : 'oneWeekVolumeUntracked'
+    case SORT_FIELD.FEES:
+      return useTracked ? 'oneDayVolumeUSD' : 'oneDayVolumeUntracked'
+    default:
+      return 'trackedReserveUSD'
+  }
 }
 
-function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
+function PairList({ pairs, color, disbaleLinks, maxItems = 10, useTracked = false }) {
   const below600 = useMedia('(max-width: 600px)')
   const below740 = useMedia('(max-width: 740px)')
   const below1080 = useMedia('(max-width: 1080px)')
@@ -148,9 +156,19 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
     const pairData = pairs[pairAddress]
 
     if (pairData && pairData.token0 && pairData.token1) {
-      const liquidity = formattedNum(pairData.reserveUSD, true)
-      const volume = formattedNum(pairData.oneDayVolumeUSD, true)
-      const apy = formattedPercent((pairData.oneDayVolumeUSD * 0.003 * 365 * 100) / pairData.reserveUSD)
+      const liquidity = formattedNum(useTracked ? pairData.trackedReserveUSD : pairData.reserveUSD, true)
+      const volume = formattedNum(useTracked ? pairData.oneDayVolumeUSD : pairData.oneDayVolumeUntracked, true)
+      const apy = formattedPercent(
+        ((useTracked ? pairData.oneDayVolumeUSD : pairData.oneDayVolumeUntracked) * 0.003 * 365 * 100) /
+          (useTracked ? pairData.trackedReserveUSD : pairData.reserveUSD)
+      )
+
+      const weekVolume = formattedNum(useTracked ? pairData.oneWeekVolumeUSD : pairData.oneWeekVolumeUntracked, true)
+
+      const fees = formattedNum(
+        useTracked ? pairData.oneDayVolumeUSD * 0.003 : pairData.oneDayVolumeUntracked * 0.003,
+        true
+      )
 
       return (
         <DashGrid style={{ height: '48px' }} disbaleLinks={disbaleLinks} focus={true}>
@@ -173,8 +191,8 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
           </DataText>
           <DataText area="liq">{liquidity}</DataText>
           <DataText area="vol">{volume}</DataText>
-          {!below1080 && <DataText area="volWeek">{formattedNum(pairData.oneWeekVolumeUSD, true)}</DataText>}
-          {!below1080 && <DataText area="fees">{formattedNum(pairData.oneDayVolumeUSD * 0.003, true)}</DataText>}
+          {!below1080 && <DataText area="volWeek">{weekVolume}</DataText>}
+          {!below1080 && <DataText area="fees">{fees}</DataText>}
           {!below1080 && <DataText area="apy">{apy}</DataText>}
         </DashGrid>
       )
@@ -194,7 +212,8 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
           const apy1 = parseFloat(pairB.oneDayVolumeUSD * 0.003 * 356 * 100) / parseFloat(pairB.reserveUSD)
           return apy0 > apy1 ? (sortDirection ? -1 : 1) * 1 : (sortDirection ? -1 : 1) * -1
         }
-        return parseFloat(pairA[FIELD_TO_VALUE[sortedColumn]]) > parseFloat(pairB[FIELD_TO_VALUE[sortedColumn]])
+        return parseFloat(pairA[FIELD_TO_VALUE(sortedColumn, useTracked)]) >
+          parseFloat(pairB[FIELD_TO_VALUE(sortedColumn, useTracked)])
           ? (sortDirection ? -1 : 1) * 1
           : (sortDirection ? -1 : 1) * -1
       })

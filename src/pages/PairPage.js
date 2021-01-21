@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { withRouter } from 'react-router-dom'
 import 'feather-icons'
 import styled from 'styled-components'
@@ -27,9 +27,11 @@ import { useEthPrice } from '../contexts/GlobalData'
 import Warning from '../components/Warning'
 import { usePathDismissed, useSavedPairs } from '../contexts/LocalStorage'
 
-import { Bookmark, PlusCircle } from 'react-feather'
+import { Bookmark, PlusCircle, AlertCircle } from 'react-feather'
 import FormattedName from '../components/FormattedName'
 import { useListedTokens } from '../contexts/Application'
+import HoverText from '../components/HoverText'
+import { UNTRACKED_COPY } from '../constants'
 
 const DashboardWrapper = styled.div`
   width: 100%;
@@ -101,6 +103,13 @@ const HoverSpan = styled.span`
   }
 `
 
+const WarningIcon = styled(AlertCircle)`
+  stroke: ${({ theme }) => theme.text1};
+  height: 16px;
+  width: 16px;
+  opacity: 0.6;
+`
+
 const WarningGrouping = styled.div`
   opacity: ${({ disabled }) => disabled && '0.4'};
   pointer-events: ${({ disabled }) => disabled && 'none'};
@@ -128,35 +137,16 @@ function PairPage({ pairAddress, history }) {
   const transactions = usePairTransactions(pairAddress)
   const backgroundColor = useColor(pairAddress)
 
-  // liquidity
-  const liquidity = trackedReserveUSD
-    ? formattedNum(trackedReserveUSD, true)
-    : reserveUSD
-    ? formattedNum(reserveUSD, true)
-    : '-'
+  const formattedLiquidity = reserveUSD ? formattedNum(reserveUSD, true) : formattedNum(trackedReserveUSD, true)
+  const usingUntrackedLiquidity = !trackedReserveUSD && !!reserveUSD
   const liquidityChange = formattedPercent(liquidityChangeUSD)
 
-  // mark if using untracked liquidity
-  const [usingTracked, setUsingTracked] = useState(true)
-  useEffect(() => {
-    setUsingTracked(!trackedReserveUSD ? false : true)
-  }, [trackedReserveUSD])
-
-  // volume	  // volume
-  const volume =
-    oneDayVolumeUSD || oneDayVolumeUSD === 0
-      ? formattedNum(oneDayVolumeUSD === 0 ? oneDayVolumeUntracked : oneDayVolumeUSD, true)
-      : oneDayVolumeUSD === 0
-      ? '$0'
-      : '-'
-
-  // mark if using untracked volume
-  const [usingUtVolume, setUsingUtVolume] = useState(false)
-  useEffect(() => {
-    setUsingUtVolume(oneDayVolumeUSD === 0 ? true : false)
-  }, [oneDayVolumeUSD])
-
+  // volume
+  const volume = !!oneDayVolumeUSD ? formattedNum(oneDayVolumeUSD, true) : formattedNum(oneDayVolumeUntracked, true)
+  const usingUtVolume = oneDayVolumeUSD === 0 && !!oneDayVolumeUntracked
   const volumeChange = formattedPercent(!usingUtVolume ? volumeChangeUSD : volumeChangeUntracked)
+
+  const showUSDWaning = usingUntrackedLiquidity | usingUtVolume
 
   // get fees	  // get fees
   const fees =
@@ -319,17 +309,28 @@ function PairPage({ pairAddress, history }) {
               </FixedPanel>
             </AutoRow>
             <>
-              {!below1080 && <TYPE.main fontSize={'1.125rem'}>Pair Stats</TYPE.main>}
+              {!below1080 && (
+                <RowFixed>
+                  <TYPE.main fontSize={'1.125rem'} mr="6px">
+                    Pair Stats
+                  </TYPE.main>
+                  {showUSDWaning ? (
+                    <HoverText text={UNTRACKED_COPY}>
+                      <WarningIcon />
+                    </HoverText>
+                  ) : null}
+                </RowFixed>
+              )}
               <PanelWrapper style={{ marginTop: '1.5rem' }}>
                 <Panel style={{ height: '100%' }}>
                   <AutoColumn gap="20px">
                     <RowBetween>
-                      <TYPE.main>Total Liquidity {!usingTracked ? '(Untracked)' : ''}</TYPE.main>
+                      <TYPE.main>Total Liquidity </TYPE.main>
                       <div />
                     </RowBetween>
                     <RowBetween align="flex-end">
                       <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={500}>
-                        {liquidity}
+                        {formattedLiquidity}
                       </TYPE.main>
                       <TYPE.main>{liquidityChange}</TYPE.main>
                     </RowBetween>
@@ -338,7 +339,7 @@ function PairPage({ pairAddress, history }) {
                 <Panel style={{ height: '100%' }}>
                   <AutoColumn gap="20px">
                     <RowBetween>
-                      <TYPE.main>Volume (24hrs) {usingUtVolume && '(Untracked)'}</TYPE.main>
+                      <TYPE.main>Volume (24hrs) </TYPE.main>
                       <div />
                     </RowBetween>
                     <RowBetween align="flex-end">
@@ -363,7 +364,6 @@ function PairPage({ pairAddress, history }) {
                     </RowBetween>
                   </AutoColumn>
                 </Panel>
-
                 <Panel style={{ height: '100%' }}>
                   <AutoColumn gap="20px">
                     <RowBetween>
