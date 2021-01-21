@@ -63,7 +63,7 @@ export default function TokenLogo({ address, header = false, size = '24px', ...r
           src={EthereumLogo}
           style={{
             boxShadow: '0px 6px 10px rgba(0, 0, 0, 0.075)',
-            borderRadius: '24px'
+            borderRadius: '24px',
           }}
           alt=""
         />
@@ -82,7 +82,7 @@ export default function TokenLogo({ address, header = false, size = '24px', ...r
         alt={''}
         src={path}
         size={size}
-        onError={event => {
+        onError={(event) => {
           BAD_IMAGES[address] = true
           setError(true)
           event.preventDefault()
