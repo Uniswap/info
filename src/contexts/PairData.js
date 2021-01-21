@@ -473,7 +473,7 @@ export function Updater() {
         data: { pairs }
       } = await client.query({
         query: PAIRS_CURRENT,
-        fetchPolicy: 'cache-first'
+        fetchPolicy: 'network-only'
       })
 
       // format as array of addresses
