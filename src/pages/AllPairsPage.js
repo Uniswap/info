@@ -9,18 +9,8 @@ import { PageWrapper, FullWrapper } from '../components'
 import { RowBetween, AutoRow } from '../components/Row'
 import Search from '../components/Search'
 import { useMedia } from 'react-use'
-import styled from 'styled-components'
 import QuestionHelper from '../components/QuestionHelper'
-
-const TextSwitch = styled(TYPE.main)`
-  cursor: pointer;
-
-  color: ${({ theme, active }) => (active ? theme.text1 : theme.text3)} 
-
-  :hover {
-    opacity: 0.6;
-  }
-`
+import CheckBox from '../components/Checkbox'
 
 function AllPairsPage() {
   const allPairs = useAllPairData()
@@ -41,13 +31,7 @@ function AllPairsPage() {
           {!below800 && <Search small={true} />}
         </RowBetween>
         <AutoRow gap="4px">
-          <TextSwitch active={useTracked} onClick={() => setUseTracked(true)}>
-            Tracked
-          </TextSwitch>
-          <TYPE.main>/</TYPE.main>{' '}
-          <TextSwitch active={!useTracked} onClick={() => setUseTracked(false)}>
-            Untracked
-          </TextSwitch>
+          <CheckBox checked={useTracked} setChecked={() => setUseTracked(!useTracked)} text={'Hide untracked pairs'} />
           <QuestionHelper text="Untracked USD values may be inaccurate due to low liquidity ETH or stablecoin pairs." />
         </AutoRow>
         <Panel style={{ padding: below800 && '1rem 0 0 0 ' }}>

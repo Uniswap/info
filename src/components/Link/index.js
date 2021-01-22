@@ -17,7 +17,7 @@ const WrappedLink = ({ external, children, ...rest }) => (
 )
 
 WrappedLink.propTypes = {
-  external: PropTypes.bool,
+  external: PropTypes.bool
 }
 
 const Link = styled(WrappedLink)`

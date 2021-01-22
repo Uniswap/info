@@ -141,7 +141,6 @@ function GlobalPage() {
           <Panel style={{ marginTop: '6px', padding: '1.125rem 0 ' }}>
             <PairList pairs={allPairs} useTracked={true} />
           </Panel>
-
           <span>
             <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '2rem' }}>
               Transactions
