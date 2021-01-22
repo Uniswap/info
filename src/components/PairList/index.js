@@ -46,6 +46,8 @@ const DashGrid = styled.div`
   grid-template-areas: 'name liq vol';
   padding: 0 1.125rem;
 
+  opacity: ${({ fade }) => (fade ? '0.6' : '1')};
+
   > * {
     justify-content: flex-end;
 
@@ -170,8 +172,10 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10, useTracked = fals
         true
       )
 
+      const noTracked = !pairData.trackedReserveUSD && !!pairData.reserveUSD
+
       return (
-        <DashGrid style={{ height: '48px' }} disbaleLinks={disbaleLinks} focus={true}>
+        <DashGrid style={{ height: '48px' }} disbaleLinks={disbaleLinks} focus={true} fade={noTracked}>
           <DataText area="name" fontWeight="500">
             {!below600 && <div style={{ marginRight: '20px', width: '10px' }}>{index}</div>}
             <DoubleTokenLogo
@@ -204,6 +208,7 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10, useTracked = fals
   const pairList =
     pairs &&
     Object.keys(pairs)
+      .filter((address) => (useTracked ? !!pairs[address]?.trackedReserveUSD : true))
       .sort((addressA, addressB) => {
         const pairA = pairs[addressA]
         const pairB = pairs[addressB]

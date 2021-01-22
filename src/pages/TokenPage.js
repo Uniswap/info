@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import 'feather-icons'
 import { withRouter } from 'react-router-dom'
 import { Text } from 'rebass'
@@ -32,6 +32,8 @@ import FormattedName from '../components/FormattedName'
 import { useListedTokens } from '../contexts/Application'
 import HoverText from '../components/HoverText'
 import { UNTRACKED_COPY } from '../constants'
+import QuestionHelper from '../components/QuestionHelper'
+import Checkbox from '../components/Checkbox'
 
 const DashboardWrapper = styled.div`
   width: 100%;
@@ -165,6 +167,8 @@ function TokenPage({ address, history }) {
       top: 0,
     })
   }, [])
+
+  const [useTracked, setUseTracked] = useState(true)
 
   return (
     <PageWrapper>
@@ -336,11 +340,17 @@ function TokenPage({ address, history }) {
               </PanelWrapper>
             </>
 
-            <span>
-              <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
-                Top Pairs
-              </TYPE.main>
-            </span>
+            <RowBetween style={{ marginTop: '3rem' }}>
+              <TYPE.main fontSize={'1.125rem'}>Top Pairs</TYPE.main>
+              <AutoRow gap="4px" style={{ width: 'fit-content' }}>
+                <Checkbox
+                  checked={useTracked}
+                  setChecked={() => setUseTracked(!useTracked)}
+                  text={'Hide untracked pairs'}
+                />
+                <QuestionHelper text="Untracked USD values may be inaccurate due to low liquidity ETH or stablecoin pairs." />
+              </AutoRow>
+            </RowBetween>
             <Panel
               rounded
               style={{
@@ -349,7 +359,7 @@ function TokenPage({ address, history }) {
               }}
             >
               {address && fetchedPairsList ? (
-                <PairList color={backgroundColor} address={address} pairs={fetchedPairsList} />
+                <PairList color={backgroundColor} address={address} pairs={fetchedPairsList} useTracked={useTracked} />
               ) : (
                 <Loader />
               )}
