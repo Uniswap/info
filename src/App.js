@@ -18,6 +18,7 @@ import AccountLookup from './pages/AccountLookup'
 import { OVERVIEW_TOKEN_BLACKLIST, PAIR_BLACKLIST } from './constants'
 import LocalLoader from './components/LocalLoader'
 import { useLatestBlocks } from './contexts/Application'
+import GoogleAnalyticsReporter from './components/analytics/GoogleAnalyticsReporter'
 
 const AppWrapper = styled.div`
   position: relative;
@@ -119,6 +120,7 @@ function App() {
         globalChartData &&
         Object.keys(globalChartData).length > 0 ? (
           <BrowserRouter>
+            <Route component={GoogleAnalyticsReporter} />
             <Switch>
               <Route
                 exacts
