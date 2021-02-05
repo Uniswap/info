@@ -135,8 +135,7 @@ function MiningPositionList({ miningPositions }) {
   }, [miningPositions])
 
   const ListItem = ({ miningPosition, index }) => {
-    if(!miningPosition.pairData)
-      return null;
+    if (!miningPosition.pairData) return null
     const pairPercentage = miningPosition.balance / miningPosition.pairData.totalSupply
     const valueUSD = miningPosition.pairData.reserveUSD
     const valueFirstPair = miningPosition.pairData.reserve0
