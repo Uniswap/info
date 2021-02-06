@@ -58,7 +58,7 @@ function GlobalPage() {
   useEffect(() => {
     document.querySelector('body').scrollTo({
       behavior: 'smooth',
-      top: 0,
+      top: 0
     })
   }, [])
 
@@ -84,9 +84,9 @@ function GlobalPage() {
                       </RowBetween>
                       <RowBetween align="flex-end">
                         <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
-                          {formattedNum(oneDayVolumeUSD, true)}
+                          {oneDayVolumeUSD ? formattedNum(oneDayVolumeUSD, true) : '-'}
                         </TYPE.main>
-                        <TYPE.main fontSize={12}>{formattedPercent(volumeChangeUSD)}</TYPE.main>
+                        <TYPE.main fontSize={12}>{volumeChangeUSD ? formattedPercent(volumeChangeUSD) : '-'}</TYPE.main>
                       </RowBetween>
                     </AutoColumn>
                     <AutoColumn gap="20px">
@@ -96,9 +96,11 @@ function GlobalPage() {
                       </RowBetween>
                       <RowBetween align="flex-end">
                         <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
-                          {formattedNum(totalLiquidityUSD, true)}
+                          {totalLiquidityUSD ? formattedNum(totalLiquidityUSD, true) : '-'}
                         </TYPE.main>
-                        <TYPE.main fontSize={12}>{formattedPercent(liquidityChangeUSD)}</TYPE.main>
+                        <TYPE.main fontSize={12}>
+                          {liquidityChangeUSD ? formattedPercent(liquidityChangeUSD) : '-'}
+                        </TYPE.main>
                       </RowBetween>
                     </AutoColumn>
                   </AutoColumn>

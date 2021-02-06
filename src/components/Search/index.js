@@ -189,16 +189,16 @@ export const Search = ({ small = false }) => {
             query: TOKEN_SEARCH,
             variables: {
               value: value ? value.toUpperCase() : '',
-              id: value,
-            },
+              id: value
+            }
           })
 
           let pairs = await client.query({
             query: PAIR_SEARCH,
             variables: {
-              tokens: tokens.data.asSymbol?.map((t) => t.id),
-              id: value,
-            },
+              tokens: tokens.data.asSymbol?.map(t => t.id),
+              id: value
+            }
           })
 
           setSearchedPairs(
@@ -222,10 +222,10 @@ export const Search = ({ small = false }) => {
 
   // add the searched tokens to the list if not found yet
   allTokens = allTokens.concat(
-    searchedTokens.filter((searchedToken) => {
+    searchedTokens.filter(searchedToken => {
       let included = false
       updateNameData()
-      allTokens.map((token) => {
+      allTokens.map(token => {
         if (token.id === searchedToken.id) {
           included = true
         }
@@ -238,7 +238,7 @@ export const Search = ({ small = false }) => {
   let uniqueTokens = []
   let found = {}
   allTokens &&
-    allTokens.map((token) => {
+    allTokens.map(token => {
       if (!found[token.id]) {
         found[token.id] = true
         uniqueTokens.push(token)
@@ -247,9 +247,9 @@ export const Search = ({ small = false }) => {
     })
 
   allPairs = allPairs.concat(
-    searchedPairs.filter((searchedPair) => {
+    searchedPairs.filter(searchedPair => {
       let included = false
-      allPairs.map((pair) => {
+      allPairs.map(pair => {
         if (pair.id === searchedPair.id) {
           included = true
         }
@@ -262,7 +262,7 @@ export const Search = ({ small = false }) => {
   let uniquePairs = []
   let pairsFound = {}
   allPairs &&
-    allPairs.map((pair) => {
+    allPairs.map(pair => {
       if (!pairsFound[pair.id]) {
         pairsFound[pair.id] = true
         uniquePairs.push(pair)
@@ -274,12 +274,6 @@ export const Search = ({ small = false }) => {
     return uniqueTokens
       ? uniqueTokens
           .sort((a, b) => {
-            if (OVERVIEW_TOKEN_BLACKLIST.includes(a.id)) {
-              return 1
-            }
-            if (OVERVIEW_TOKEN_BLACKLIST.includes(b.id)) {
-              return -1
-            }
             const tokenA = allTokenData[a.id]
             const tokenB = allTokenData[b.id]
             if (tokenA?.oneDayVolumeUSD && tokenB?.oneDayVolumeUSD) {
@@ -293,11 +287,11 @@ export const Search = ({ small = false }) => {
             }
             return 1
           })
-          .filter((token) => {
+          .filter(token => {
             if (OVERVIEW_TOKEN_BLACKLIST.includes(token.id)) {
               return false
             }
-            const regexMatches = Object.keys(token).map((tokenEntryKey) => {
+            const regexMatches = Object.keys(token).map(tokenEntryKey => {
               const isAddress = value.slice(0, 2) === '0x'
               if (tokenEntryKey === 'id' && isAddress) {
                 return token[tokenEntryKey].match(new RegExp(escapeRegExp(value), 'i'))
@@ -310,7 +304,7 @@ export const Search = ({ small = false }) => {
               }
               return false
             })
-            return regexMatches.some((m) => m)
+            return regexMatches.some(m => m)
           })
       : []
   }, [allTokenData, uniqueTokens, value])
@@ -332,7 +326,7 @@ export const Search = ({ small = false }) => {
             }
             return 0
           })
-          .filter((pair) => {
+          .filter(pair => {
             if (PAIR_BLACKLIST.includes(pair.id)) {
               return false
             }
@@ -352,7 +346,7 @@ export const Search = ({ small = false }) => {
                 (pair.token1.symbol.includes(pairA) || pair.token1.symbol.includes(pairB))
               )
             }
-            const regexMatches = Object.keys(pair).map((field) => {
+            const regexMatches = Object.keys(pair).map(field => {
               const isAddress = value.slice(0, 2) === '0x'
               if (field === 'id' && isAddress) {
                 return pair[field].match(new RegExp(escapeRegExp(value), 'i'))
@@ -371,7 +365,7 @@ export const Search = ({ small = false }) => {
               }
               return false
             })
-            return regexMatches.some((m) => m)
+            return regexMatches.some(m => m)
           })
       : []
   }, [allPairData, uniquePairs, value])
@@ -406,7 +400,7 @@ export const Search = ({ small = false }) => {
   const wrapperRef = useRef()
   const menuRef = useRef()
 
-  const handleClick = (e) => {
+  const handleClick = e => {
     if (
       !(menuRef.current && menuRef.current.contains(e.target)) &&
       !(wrapperRef.current && wrapperRef.current.contains(e.target))
@@ -443,7 +437,7 @@ export const Search = ({ small = false }) => {
               : 'Search Uniswap pairs and tokens...'
           }
           value={value}
-          onChange={(e) => {
+          onChange={e => {
             setValue(e.target.value)
           }}
           onFocus={() => {
@@ -465,7 +459,7 @@ export const Search = ({ small = false }) => {
             </MenuItem>
           )}
           {filteredPairList &&
-            filteredPairList.slice(0, pairsShown).map((pair) => {
+            filteredPairList.slice(0, pairsShown).map(pair => {
               //format incorrect names
               updateNameData(pair)
               return (
@@ -500,7 +494,7 @@ export const Search = ({ small = false }) => {
               <TYPE.body>No results</TYPE.body>
             </MenuItem>
           )}
-          {filteredTokenList.slice(0, tokensShown).map((token) => {
+          {filteredTokenList.slice(0, tokensShown).map(token => {
             // update displayed names
             updateNameData({ token0: token })
             return (
