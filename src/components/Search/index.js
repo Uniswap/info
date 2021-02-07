@@ -11,7 +11,7 @@ import { useAllPairData, usePairData } from '../../contexts/PairData'
 import DoubleTokenLogo from '../DoubleLogo'
 import { useMedia } from 'react-use'
 import { useAllPairsInUniswap, useAllTokensInUniswap } from '../../contexts/GlobalData'
-import { OVERVIEW_TOKEN_BLACKLIST, PAIR_BLACKLIST } from '../../constants'
+import { TOKEN_BLACKLIST, PAIR_BLACKLIST } from '../../constants'
 
 import { transparentize } from 'polished'
 import { client } from '../../apollo/client'
@@ -288,7 +288,7 @@ export const Search = ({ small = false }) => {
             return 1
           })
           .filter(token => {
-            if (OVERVIEW_TOKEN_BLACKLIST.includes(token.id)) {
+            if (TOKEN_BLACKLIST.includes(token.id)) {
               return false
             }
             const regexMatches = Object.keys(token).map(tokenEntryKey => {
