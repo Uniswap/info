@@ -14,6 +14,7 @@ import DoubleTokenLogo from '../DoubleLogo'
 import FormattedName from '../FormattedName'
 import QuestionHelper from '../QuestionHelper'
 import { TYPE } from '../../Theme'
+import { PAIR_BLACKLIST } from '../../constants'
 
 dayjs.extend(utc)
 
@@ -208,7 +209,9 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10, useTracked = fals
   const pairList =
     pairs &&
     Object.keys(pairs)
-      .filter((address) => (useTracked ? !!pairs[address]?.trackedReserveUSD : true))
+      .filter(
+        (address) => !PAIR_BLACKLIST.includes(address) && (useTracked ? !!pairs[address]?.trackedReserveUSD : true)
+      )
       .sort((addressA, addressB) => {
         const pairA = pairs[addressA]
         const pairB = pairs[addressB]

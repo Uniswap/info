@@ -31,9 +31,10 @@ import { PlusCircle, Bookmark, AlertCircle } from 'react-feather'
 import FormattedName from '../components/FormattedName'
 import { useListedTokens } from '../contexts/Application'
 import HoverText from '../components/HoverText'
-import { UNTRACKED_COPY } from '../constants'
+import { UNTRACKED_COPY, TOKEN_BLACKLIST, BLOCKED_WARNINGS } from '../constants'
 import QuestionHelper from '../components/QuestionHelper'
 import Checkbox from '../components/Checkbox'
+import { shortenAddress } from '../utils'
 
 const DashboardWrapper = styled.div`
   width: 100%;
@@ -170,6 +171,41 @@ function TokenPage({ address, history }) {
 
   const [useTracked, setUseTracked] = useState(true)
 
+  const BlockedWrapper = styled.div`
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  `
+
+  const BlockedMessageWrapper = styled.div`
+    border: 1px solid ${({ theme }) => theme.text3};
+    border-radius: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
+    max-width: 80%;
+  `
+
+  if (TOKEN_BLACKLIST.includes(address)) {
+    return (
+      <BlockedWrapper>
+        <BlockedMessageWrapper>
+          <AutoColumn gap="1rem" justify="center">
+            <TYPE.light style={{ textAlign: 'center' }}>
+              {BLOCKED_WARNINGS[address] ?? `This token is not supported.`}
+            </TYPE.light>
+            <Link external={true} href={'https://etherscan.io/address/' + address}>{`More about ${shortenAddress(
+              address
+            )}`}</Link>
+          </AutoColumn>
+        </BlockedMessageWrapper>
+      </BlockedWrapper>
+    )
+  }
+
   return (
     <PageWrapper>
       <ThemedBackground backgroundColor={transparentize(0.6, backgroundColor)} />
@@ -184,7 +220,6 @@ function TokenPage({ address, history }) {
           <AutoRow align="flex-end" style={{ width: 'fit-content' }}>
             <TYPE.body>
               <BasicLink to="/tokens">{'Tokens '}</BasicLink>→ {symbol}
-              {'  '}
             </TYPE.body>
             <Link
               style={{ width: 'fit-content' }}
@@ -199,7 +234,6 @@ function TokenPage({ address, history }) {
           </AutoRow>
           {!below600 && <Search small={true} />}
         </RowBetween>
-
         <WarningGrouping disabled={!dismissed && listedTokens && !listedTokens.includes(address)}>
           <DashboardWrapper style={{ marginTop: below1080 ? '0' : '1rem' }}>
             <RowBetween
