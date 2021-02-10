@@ -58,7 +58,7 @@ function GlobalPage() {
   useEffect(() => {
     document.querySelector('body').scrollTo({
       behavior: 'smooth',
-      top: 0
+      top: 0,
     })
   }, [])
 
