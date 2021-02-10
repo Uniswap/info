@@ -90,8 +90,7 @@ const ClickableText = styled(Text)`
     opacity: 0.6;
   }
   user-select: none;
-  color: ${({ theme }) => theme.text1};
-
+  color: ${({ theme }) => theme.text1} !important;
   @media screen and (max-width: 640px) {
     font-size: 0.85rem;
   }
@@ -100,7 +99,7 @@ const ClickableText = styled(Text)`
 const DataText = styled(Flex)`
   align-items: center;
   text-align: center;
-  color: ${({ theme }) => theme.text1};
+  color: ${({ theme }) => theme.text1} !important;
 
   & > * {
     font-size: 14px;

@@ -51,7 +51,7 @@ const PanelWrapper = styled.div`
     grid-template-columns: 1fr;
     align-items: stretch;
     > * {
-      grid-column: 1 / 4;
+      /* grid-column: 1 / 4; */
     }
 
     > * {
@@ -77,7 +77,7 @@ const TokenDetailsLayout = styled.div`
     grid-template-columns: 1fr;
     align-items: stretch;
     > * {
-      grid-column: 1 / 4;
+      /* grid-column: 1 / 4; */
       margin-bottom: 1rem;
     }
 
