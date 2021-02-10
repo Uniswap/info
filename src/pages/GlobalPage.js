@@ -58,17 +58,17 @@ function GlobalPage() {
   useEffect(() => {
     document.querySelector('body').scrollTo({
       behavior: 'smooth',
-      top: 0,
+      top: 0
     })
   }, [])
 
   return (
     <PageWrapper>
-      <ThemedBackground backgroundColor={transparentize(0.8, '#ff007a')} />
+      <ThemedBackground backgroundColor={transparentize(0.6, '#ff007a')} />
       <ContentWrapper>
         <div>
           <AutoColumn gap="24px" style={{ paddingBottom: below800 ? '0' : '24px' }}>
-            <TYPE.largeHeader>{below800 ? 'Protocol Analytics' : 'Uniswap Protocol Analytics'}</TYPE.largeHeader>
+            <TYPE.largeHeader>{below800 ? 'Uniswap Analytics' : 'Uniswap Analytics'}</TYPE.largeHeader>
             <Search />
             <GlobalStats />
           </AutoColumn>
