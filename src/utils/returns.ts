@@ -74,8 +74,8 @@ async function getPrincipalForUserPerPair(user: string, pairAddress: string) {
     } else {
       usd += parseFloat(mint.amountUSD)
     }
-    amount0 += amount0 + parseFloat(mint.amount0)
-    amount1 += amount1 + parseFloat(mint.amount1)
+    amount0 += parseFloat(mint.amount0)
+    amount1 += parseFloat(mint.amount1)
   }
 
   for (const index in results.data.burns) {
@@ -89,11 +89,11 @@ async function getPrincipalForUserPerPair(user: string, pairAddress: string) {
     } else if (priceOverrides.includes(burnToken1) && burn.timestamp < PRICE_DISCOVERY_START_TIMESTAMP) {
       usd += parseFloat(burn.amount1) * 2
     } else {
-      usd -= parseFloat(results.data.burns[index].amountUSD)
+      usd -= parseFloat(burn.amountUSD)
     }
 
-    amount0 -= parseFloat(results.data.burns[index].amount0)
-    amount1 -= parseFloat(results.data.burns[index].amount1)
+    amount0 -= parseFloat(burn.amount0)
+    amount1 -= parseFloat(burn.amount1)
   }
 
   return { usd, amount0, amount1 }
