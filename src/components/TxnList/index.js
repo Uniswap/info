@@ -68,7 +68,7 @@ const DashGrid = styled.div`
 
   @media screen and (min-width: 780px) {
     max-width: 1320px;
-    grid-template-columns: 1.2fr 1fr 1fr 1fr 1fr;
+    grid-template-columns: 1.2fr 1fr 1fr 2fr 1fr;
     grid-template-areas: 'txn value amountToken amountOther time';
 
     > * {
@@ -80,7 +80,7 @@ const DashGrid = styled.div`
 
   @media screen and (min-width: 1080px) {
     max-width: 1320px;
-    grid-template-columns: 1.2fr 1fr 1fr 1fr 1fr 1fr;
+    grid-template-columns: 1.2fr 1fr 2fr 2fr 1fr 1fr;
     grid-template-areas: 'txn value amountToken amountOther account time';
   }
 `
@@ -294,11 +294,11 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
           <>
             <DataText area="amountOther">
               {formattedNum(item.token1Amount) + ' '}{' '}
-              <FormattedName text={item.token1Symbol} maxCharacters={5} margin={true} />
+              <FormattedName text={item.token1Symbol} maxCharacters={20} margin={true} />
             </DataText>
             <DataText area="amountToken">
               {formattedNum(item.token0Amount) + ' '}{' '}
-              <FormattedName text={item.token0Symbol} maxCharacters={5} margin={true} />
+              <FormattedName text={item.token0Symbol} maxCharacters={20} margin={true} />
             </DataText>
           </>
         )}

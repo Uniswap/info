@@ -356,6 +356,8 @@ export const formattedNum = (number, usd = false, acceptNegatives = false) => {
   }
   let num = parseFloat(number)
 
+  console.log(num);
+
   if (num > 500000000) {
     return (usd ? '$' : '') + toK(num.toFixed(0), true)
   }
@@ -383,7 +385,7 @@ export const formattedNum = (number, usd = false, acceptNegatives = false) => {
     }
   }
 
-  return Number(parseFloat(num).toFixed(5)).toLocaleString()
+  return Number(parseFloat(num).toFixed(18))
 }
 
 export function rawPercent(percentRaw) {
