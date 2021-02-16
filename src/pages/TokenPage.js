@@ -114,7 +114,7 @@ function TokenPage({ address, history }) {
     priceChangeUSD,
     liquidityChangeUSD,
     oneDayTxns,
-    txnChange,
+    txnChange
   } = useTokenData(address)
 
   useEffect(() => {
@@ -165,7 +165,7 @@ function TokenPage({ address, history }) {
   useEffect(() => {
     window.scrollTo({
       behavior: 'smooth',
-      top: 0,
+      top: 0
     })
   }, [])
 
@@ -240,7 +240,7 @@ function TokenPage({ address, history }) {
               style={{
                 flexWrap: 'wrap',
                 marginBottom: '2rem',
-                alignItems: 'flex-start',
+                alignItems: 'flex-start'
               }}
             >
               <RowFixed style={{ flexWrap: 'wrap' }}>
@@ -366,7 +366,7 @@ function TokenPage({ address, history }) {
                 <Panel
                   style={{
                     gridColumn: below1080 ? '1' : '2/4',
-                    gridRow: below1080 ? '' : '1/4',
+                    gridRow: below1080 ? '' : '1/4'
                   }}
                 >
                   <TokenChart address={address} color={backgroundColor} base={priceUSD} />
@@ -380,16 +380,16 @@ function TokenPage({ address, history }) {
                 <Checkbox
                   checked={useTracked}
                   setChecked={() => setUseTracked(!useTracked)}
-                  text={'Hide untracked pairs'}
+                  text={'Sort by tracked data'}
                 />
-                <QuestionHelper text="Untracked USD values may be inaccurate due to low liquidity ETH or stablecoin pairs." />
+                <QuestionHelper text="Untracked USD values may be inaccurate due to low liquidity ETH or stablecoin pairs. Sorting will be done based  on tracked data only." />
               </AutoRow>
             </RowBetween>
             <Panel
               rounded
               style={{
                 marginTop: '1.5rem',
-                padding: '1.125rem 0 ',
+                padding: '1.125rem 0 '
               }}
             >
               {address && fetchedPairsList ? (
@@ -411,7 +411,7 @@ function TokenPage({ address, history }) {
               <Panel
                 rounded
                 style={{
-                  marginTop: '1.5rem',
+                  marginTop: '1.5rem'
                 }}
                 p={20}
               >
