@@ -380,7 +380,7 @@ function TokenPage({ address, history }) {
                 <Checkbox
                   checked={useTracked}
                   setChecked={() => setUseTracked(!useTracked)}
-                  text={'Hide non-stable pairs'}
+                  text={'Hide unstable pairs'}
                 />
                 <QuestionHelper text="USD amounts may be inaccurate in pairs without ETH or stablecoins." />
               </AutoRow>

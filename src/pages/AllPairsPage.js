@@ -31,7 +31,7 @@ function AllPairsPage() {
           {!below800 && <Search small={true} />}
         </RowBetween>
         <AutoRow gap="4px">
-          <CheckBox checked={useTracked} setChecked={() => setUseTracked(!useTracked)} text={'Hide non-stable pairs'} />
+          <CheckBox checked={useTracked} setChecked={() => setUseTracked(!useTracked)} text={'Hide unstable pairs'} />
           <QuestionHelper text="USD amounts may be inaccurate in pairs without ETH or stablecoins." />
         </AutoRow>
         <Panel style={{ padding: below800 && '1rem 0 0 0 ' }}>
