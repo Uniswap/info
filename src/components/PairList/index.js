@@ -133,7 +133,7 @@ const formatDataText = (value, trackedValue, supressWarning = false) => {
     <AutoColumn gap="2px" style={{ opacity: showUntracked ? '0.7' : '1' }}>
       <div style={{ textAlign: 'right' }}>{value}</div>
       <TYPE.light fontSize={'9px'} style={{ textAlign: 'right' }}>
-        {showUntracked ? 'unstable' : ' '}
+        {showUntracked ? 'unstable' : '  '}
       </TYPE.light>
     </AutoColumn>
   )
