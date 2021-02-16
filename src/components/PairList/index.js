@@ -239,7 +239,7 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10, useTracked = fals
   const pairList =
     pairs &&
     Object.keys(pairs)
-      .filter(address => !PAIR_BLACKLIST.includes(address))
+      .filter(address => !PAIR_BLACKLIST.includes(address) && (useTracked ? !!pairs[address].trackedReserveUSD : true))
       .sort((addressA, addressB) => {
         const pairA = pairs[addressA]
         const pairB = pairs[addressB]

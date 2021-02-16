@@ -380,9 +380,9 @@ function TokenPage({ address, history }) {
                 <Checkbox
                   checked={useTracked}
                   setChecked={() => setUseTracked(!useTracked)}
-                  text={'Sort by tracked data'}
+                  text={'Hide low tracked liquidity'}
                 />
-                <QuestionHelper text="Untracked USD values may be inaccurate due to low liquidity ETH or stablecoin pairs. Sorting will be done based  on tracked data only." />
+                <QuestionHelper text="Tracked liquidity may be low without liquid ETH or stabelcoin pairs." />
               </AutoRow>
             </RowBetween>
             <Panel

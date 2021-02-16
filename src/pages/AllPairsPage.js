@@ -31,8 +31,12 @@ function AllPairsPage() {
           {!below800 && <Search small={true} />}
         </RowBetween>
         <AutoRow gap="4px">
-          <CheckBox checked={useTracked} setChecked={() => setUseTracked(!useTracked)} text={'Sort by tracked data'} />
-          <QuestionHelper text="Untracked USD values may be inaccurate due to low liquidity ETH or stablecoin pairs. Sorting will be done based  on tracked data only." />
+          <CheckBox
+            checked={useTracked}
+            setChecked={() => setUseTracked(!useTracked)}
+            text={'Hide low tracked liquidity'}
+          />
+          <QuestionHelper text="Tracked liquidity may be low without liquid ETH or stabelcoin pairs." />
         </AutoRow>
         <Panel style={{ padding: below800 && '1rem 0 0 0 ' }}>
           <PairList pairs={allPairs} disbaleLinks={true} maxItems={50} useTracked={useTracked} />
