@@ -44,7 +44,7 @@ export default function Title() {
   const below1080 = useMedia('(max-width: 1080px)')
 
   return (
-    <TitleWrapper onClick={() => history.push('/')}>
+    <TitleWrapper>
       <Flex alignItems="center" style={{ justifyContent: 'space-between' }}>
         <RowFixed>
           <UniIcon id="link" onClick={() => history.push('/')}>
