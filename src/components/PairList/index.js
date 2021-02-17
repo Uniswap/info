@@ -15,6 +15,7 @@ import FormattedName from '../FormattedName'
 import QuestionHelper from '../QuestionHelper'
 import { TYPE } from '../../Theme'
 import { PAIR_BLACKLIST } from '../../constants'
+import { AutoColumn } from '../Column'
 
 dayjs.extend(utc)
 
@@ -126,6 +127,18 @@ const FIELD_TO_VALUE = (field, useTracked) => {
   }
 }
 
+const formatDataText = (value, trackedValue, supressWarning = false) => {
+  const showUntracked = value !== '$0' && !trackedValue & !supressWarning
+  return (
+    <AutoColumn gap="2px" style={{ opacity: showUntracked ? '0.7' : '1' }}>
+      <div style={{ textAlign: 'right' }}>{value}</div>
+      <TYPE.light fontSize={'9px'} style={{ textAlign: 'right' }}>
+        {showUntracked ? 'unstable' : '  '}
+      </TYPE.light>
+    </AutoColumn>
+  )
+}
+
 function PairList({ pairs, color, disbaleLinks, maxItems = 10, useTracked = false }) {
   const below600 = useMedia('(max-width: 600px)')
   const below740 = useMedia('(max-width: 740px)')
@@ -159,24 +172,37 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10, useTracked = fals
     const pairData = pairs[pairAddress]
 
     if (pairData && pairData.token0 && pairData.token1) {
-      const liquidity = formattedNum(useTracked ? pairData.trackedReserveUSD : pairData.reserveUSD, true)
-      const volume = formattedNum(useTracked ? pairData.oneDayVolumeUSD : pairData.oneDayVolumeUntracked, true)
-      const apy = formattedPercent(
-        ((useTracked ? pairData.oneDayVolumeUSD : pairData.oneDayVolumeUntracked) * 0.003 * 365 * 100) /
-          (useTracked ? pairData.trackedReserveUSD : pairData.reserveUSD)
-      )
-
-      const weekVolume = formattedNum(useTracked ? pairData.oneWeekVolumeUSD : pairData.oneWeekVolumeUntracked, true)
-
-      const fees = formattedNum(
-        useTracked ? pairData.oneDayVolumeUSD * 0.003 : pairData.oneDayVolumeUntracked * 0.003,
+      const liquidity = formattedNum(
+        !!pairData.trackedReserveUSD ? pairData.trackedReserveUSD : pairData.reserveUSD,
         true
       )
 
-      const noTracked = !pairData.trackedReserveUSD && !!pairData.reserveUSD
+      const volume = formattedNum(
+        pairData.oneDayVolumeUSD ? pairData.oneDayVolumeUSD : pairData.oneDayVolumeUntracked,
+        true
+      )
+
+      const apy = formattedPercent(
+        ((pairData.oneDayVolumeUSD ? pairData.oneDayVolumeUSD : pairData.oneDayVolumeUntracked) * 0.003 * 365 * 100) /
+          (pairData.oneDayVolumeUSD ? pairData.trackedReserveUSD : pairData.reserveUSD)
+      )
+
+      const weekVolume = formattedNum(
+        pairData.oneWeekVolumeUSD ? pairData.oneWeekVolumeUSD : pairData.oneWeekVolumeUntracked,
+        true
+      )
+
+      const fees = formattedNum(
+        pairData.oneDayVolumeUSD ? pairData.oneDayVolumeUSD * 0.003 : pairData.oneDayVolumeUntracked * 0.003,
+        true
+      )
+
+      if (pairAddress === '0xf52f433b79d21023af94251958bed3b64a2b7930') {
+        console.log(apy.toString())
+      }
 
       return (
-        <DashGrid style={{ height: '48px' }} disbaleLinks={disbaleLinks} focus={true} fade={noTracked}>
+        <DashGrid style={{ height: '48px' }} disbaleLinks={disbaleLinks} focus={true}>
           <DataText area="name" fontWeight="500">
             {!below600 && <div style={{ marginRight: '20px', width: '10px' }}>{index}</div>}
             <DoubleTokenLogo
@@ -194,11 +220,15 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10, useTracked = fals
               />
             </CustomLink>
           </DataText>
-          <DataText area="liq">{liquidity}</DataText>
-          <DataText area="vol">{volume}</DataText>
-          {!below1080 && <DataText area="volWeek">{weekVolume}</DataText>}
-          {!below1080 && <DataText area="fees">{fees}</DataText>}
-          {!below1080 && <DataText area="apy">{apy}</DataText>}
+          <DataText area="liq">{formatDataText(liquidity, pairData.trackedReserveUSD)}</DataText>
+          <DataText area="vol">{formatDataText(volume, pairData.oneDayVolumeUSD)}</DataText>
+          {!below1080 && <DataText area="volWeek">{formatDataText(weekVolume, pairData.oneWeekVolumeUSD)}</DataText>}
+          {!below1080 && <DataText area="fees">{formatDataText(fees, pairData.oneDayVolumeUSD)}</DataText>}
+          {!below1080 && (
+            <DataText area="apy">
+              {formatDataText(apy, pairData.oneDayVolumeUSD, pairData.oneDayVolumeUSD === 0)}
+            </DataText>
+          )}
         </DashGrid>
       )
     } else {
@@ -210,7 +240,7 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10, useTracked = fals
     pairs &&
     Object.keys(pairs)
       .filter(
-        (address) => !PAIR_BLACKLIST.includes(address) && (useTracked ? !!pairs[address]?.trackedReserveUSD : true)
+        (address) => !PAIR_BLACKLIST.includes(address) && (useTracked ? !!pairs[address].trackedReserveUSD : true)
       )
       .sort((addressA, addressB) => {
         const pairA = pairs[addressA]

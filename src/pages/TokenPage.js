@@ -380,9 +380,9 @@ function TokenPage({ address, history }) {
                 <Checkbox
                   checked={useTracked}
                   setChecked={() => setUseTracked(!useTracked)}
-                  text={'Hide untracked pairs'}
+                  text={'Hide unstable pairs'}
                 />
-                <QuestionHelper text="Untracked USD values may be inaccurate due to low liquidity ETH or stablecoin pairs." />
+                <QuestionHelper text="USD amounts may be inaccurate in low liquiidty pairs or pairs without ETH or stablecoins." />
               </AutoRow>
             </RowBetween>
             <Panel
