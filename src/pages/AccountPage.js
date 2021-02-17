@@ -121,6 +121,7 @@ function AccountPage({ account }) {
     }
   }, [positions])
 
+  console.log(positions);
   // settings for list view and dropdowns
   const hideLPContent = positions && positions.length === 0
   const [showDropdown, setShowDropdown] = useState(false)

@@ -296,6 +296,9 @@ export async function getLPReturnsOnPair(user: string, pair, ethPrice: number, s
     net: {
       return: netReturn,
     },
+    hodl: {
+      return: hodlReturn,
+    },
     uniswap: {
       return: uniswapReturn,
     },
