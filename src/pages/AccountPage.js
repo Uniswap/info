@@ -140,7 +140,9 @@ function AccountPage({ account }) {
       const date = getDateStringFromUnixTimeStamp(Date.now()/1000);
       xirrCurrentPosition.push({date, amount})
     }
-    const xirrData = xirrDataMints.concat(xirrDataBurns, xirrCurrentPosition)
+    const xirrData = xirrDataMints.concat(xirrDataBurns, xirrCurrentPosition).sort(function (a,b) {
+      return new Date(a.date) - new Date(b.date)
+    })
     console.log("xirrdata", xirrData)
     if (xirrData.length > 1) {
       const irr = xirr(xirrData)
