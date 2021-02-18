@@ -481,3 +481,12 @@ export function isEquivalent(a, b) {
   }
   return true
 }
+
+export function getDateStringFromUnixTimeStamp(timestamp) {
+  const date = new Date(timestamp*1000)
+  // need to produce string format YYYY-MM-DD
+  // TODO: find an easier way to do this
+  const month = (date.getMonth() < 9 ? '0' : '') + (date.getMonth()+1)
+  const day = (date.getDate() < 10 ? '0' : '') + date.getDate()
+  return `${date.getFullYear()}-${month}-${day}`
+}

@@ -267,6 +267,7 @@ export async function getLPReturnsOnPair(user: string, pair, ethPrice: number, s
     return entry.pair.id === pair.id
   })
 
+
   // get data about the current position
   const currentPosition: Position = {
     pair,

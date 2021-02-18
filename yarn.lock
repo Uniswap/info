@@ -8137,6 +8137,11 @@
   "resolved" "https://registry.npmjs.org/node-int64/-/node-int64-0.4.0.tgz"
   "version" "0.4.0"
 
+"node-irr@^2.0.3":
+  "integrity" "sha512-hNPnizd9LLnvQ3zyCGM31+TjVLIdAvtiJCDcKqmiGCPTUGfi+Kyzfi37oXlyMSkV5cIb6ZHoaReLjBtG8I+t+Q=="
+  "resolved" "https://registry.npmjs.org/node-irr/-/node-irr-2.0.3.tgz"
+  "version" "2.0.3"
+
 "node-libs-browser@^2.2.1":
   "integrity" "sha512-h/zcD8H9kaDZ9ALUWwlBUDo6TKF8a7qBSCSEGfjTVIYeqsioSKaAX+BN7NgiMGp6iSIXZ3PxgCu8KS3b71YK5Q=="
   "resolved" "https://registry.npmjs.org/node-libs-browser/-/node-libs-browser-2.2.1.tgz"

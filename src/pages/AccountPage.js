@@ -1,9 +1,10 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react'
+import { xirr, convertRate } from 'node-irr'
 import styled from 'styled-components'
 import { useUserTransactions, useUserPositions, useMiningPositions } from '../contexts/User'
 import TxnList from '../components/TxnList'
 import Panel from '../components/Panel'
-import { formattedNum } from '../utils'
+import { formattedNum, getDateStringFromUnixTimeStamp, formattedPercent } from '../utils'
 import Row, { AutoRow, RowFixed, RowBetween } from '../components/Row'
 import { AutoColumn } from '../components/Column'
 import UserChart from '../components/UserChart'
@@ -106,6 +107,50 @@ function AccountPage({ account }) {
       : 0
   }, [transactions])
 
+  // calculate irr
+  const irr = useMemo(() => {
+    let currentPriceToken0inToken1 = 0;
+    if (positions) {
+      currentPriceToken0inToken1 = parseFloat(positions[0].pair?.reserve0)/parseFloat(positions[0].pair?.reserve1)
+    }
+
+    // add all mints
+    const xirrDataMints = transactions?.mints?.map(function (mint) {
+      const amount = -1*(parseFloat(mint.amount0)+currentPriceToken0inToken1*parseFloat(mint.amount1))
+      const date = getDateStringFromUnixTimeStamp(mint.transaction.timestamp);
+      // TODO: for each mint, add an entry for its gas fees as costs
+      return {date, amount}
+    }) || []
+
+    // add all burns
+    const xirrDataBurns = transactions?.burns?.map(function (burn) {
+      const amount = parseFloat(burn.amount0)+currentPriceToken0inToken1*parseFloat(burn.amount1);
+      const date = getDateStringFromUnixTimeStamp(burn.transaction.timestamp);
+      // TODO: for each burn, add its gas fees as costs
+      return {date, amount}
+    }) || []
+
+    const xirrCurrentPosition = []
+    // add current position
+    if (positions) {
+      const share = (parseFloat(positions[0].liquidityTokenBalance) / parseFloat(positions[0].pair?.totalSupply))
+      const token0Current = parseFloat(positions[0].pair?.reserve0)*share
+      const token1Current = parseFloat(positions[0].pair?.reserve1)*share
+      const amount =  token0Current + currentPriceToken0inToken1*token1Current
+      const date = getDateStringFromUnixTimeStamp(Date.now()/1000);
+      xirrCurrentPosition.push({date, amount})
+    }
+    const xirrData = xirrDataMints.concat(xirrDataBurns, xirrCurrentPosition)
+    console.log("xirrdata", xirrData)
+    if (xirrData.length > 1) {
+      const irr = xirr(xirrData)
+      return convertRate(irr.rate, 'year')
+    }
+  })
+
+
+
+  
   // if any position has token from fee warning list, show warning
   const [showWarning, setShowWarning] = useState(false)
   useEffect(() => {
@@ -121,7 +166,6 @@ function AccountPage({ account }) {
     }
   }, [positions])
 
-  console.log(positions);
   // settings for list view and dropdowns
   const hideLPContent = positions && positions.length === 0
   const [showDropdown, setShowDropdown] = useState(false)
@@ -133,6 +177,7 @@ function AccountPage({ account }) {
     return total + position.fees.sum
   }, 0)
 
+  
   const positionValue = useMemo(() => {
     return dynamicPositions
       ? dynamicPositions.reduce((total, position) => {
@@ -287,6 +332,17 @@ function AccountPage({ account }) {
                   <RowFixed align="flex-end">
                     <TYPE.header fontSize={'24px'} lineHeight={1} color={aggregateFees && 'green'}>
                       {aggregateFees ? formattedNum(aggregateFees, true, true) : '-'}
+                    </TYPE.header>
+                  </RowFixed>
+                </AutoColumn>
+                <AutoColumn gap="10px">
+                  <RowBetween>
+                    <TYPE.body>APY (all mints and burns)</TYPE.body>
+                    <div />
+                  </RowBetween>
+                  <RowFixed align="flex-end">
+                    <TYPE.header fontSize={'24px'} lineHeight={1} color={aggregateFees && 'green'}>
+                      {irr ? formattedPercent(irr*100) : '-'}
                     </TYPE.header>
                   </RowFixed>
                 </AutoColumn>
