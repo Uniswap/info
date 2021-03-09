@@ -157,15 +157,11 @@ function App() {
                   if (PAIR_BLACKLIST.includes(match.params.pairAddress.toLowerCase())) {
                     return <Redirect to="/home" />
                   }
-                  if (isAddress(match.params.pairAddress.toLowerCase())) {
-                    return (
-                      <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
-                        <PairPage pairAddress={match.params.pairAddress.toLowerCase()} />
-                      </LayoutWrapper>
-                    )
-                  } else {
-                    return <Redirect to="/home" />
-                  }
+                  return (
+                    <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
+                      <PairPage pairAddress={match.params.pairAddress.toLowerCase()} />
+                    </LayoutWrapper>
+                  )
                 }}
               />
               <Route
