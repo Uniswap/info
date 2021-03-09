@@ -247,7 +247,7 @@ async function getGlobalData(ethPrice, oldEthPrice) {
       query: GLOBAL_DATA(),
       fetchPolicy: 'cache-first',
     })
-    data = result.data.xyzswapFactories[0]
+    data = result.data.dmmFactories[0]
 
     // fetch the historical data
     let oneDayResult = await xyzClient.query({
@@ -257,25 +257,25 @@ async function getGlobalData(ethPrice, oldEthPrice) {
 
     console.log('+++++++++++++++ one day results  +++', oneDayResult)
 
-    oneDayData = oneDayResult.data.xyzswapFactories[0]
+    oneDayData = oneDayResult.data.dmmFactories[0]
 
     let twoDayResult = await xyzClient.query({
       query: GLOBAL_DATA(twoDayBlock?.number),
       fetchPolicy: 'cache-first',
     })
-    twoDayData = twoDayResult.data.xyzswapFactories[0]
+    twoDayData = twoDayResult.data.dmmFactories[0]
 
     let oneWeekResult = await xyzClient.query({
       query: GLOBAL_DATA(oneWeekBlock?.number),
       fetchPolicy: 'cache-first',
     })
-    const oneWeekData = oneWeekResult.data.xyzswapFactories[0]
+    const oneWeekData = oneWeekResult.data.dmmFactories[0]
 
     let twoWeekResult = await xyzClient.query({
       query: GLOBAL_DATA(twoWeekBlock?.number),
       fetchPolicy: 'cache-first',
     })
-    const twoWeekData = twoWeekResult.data.xyzswapFactories[0]
+    const twoWeekData = twoWeekResult.data.dmmFactories[0]
 
     console.log('++++data fetched ++', data, oneDayData, twoDayData, oneWeekData, twoWeekData)
 
