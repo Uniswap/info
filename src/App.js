@@ -6,6 +6,7 @@ import { Route, Switch, BrowserRouter, Redirect } from 'react-router-dom'
 import GlobalPage from './pages/GlobalPage'
 import TokenPage from './pages/TokenPage'
 import PairPage from './pages/PairPage'
+import PoolPage from './pages/PoolPage'
 import { useGlobalData, useGlobalChartData } from './contexts/GlobalData'
 import { isAddress } from './utils'
 import AccountPage from './pages/AccountPage'
@@ -164,6 +165,23 @@ function App() {
                   )
                 }}
               />
+
+              <Route
+                exacts
+                strict
+                path="/pool/:poolAddress"
+                render={({ match }) => {
+                  if (PAIR_BLACKLIST.includes(match.params.poolAddress.toLowerCase())) {
+                    return <Redirect to="/home" />
+                  }
+                  return (
+                    <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
+                      <PoolPage poolAddress={match.params.poolAddress.toLowerCase()} />
+                    </LayoutWrapper>
+                  )
+                }}
+              />
+
               <Route
                 exacts
                 strict

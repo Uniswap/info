@@ -7,6 +7,7 @@ import LocalStorageContextProvider, { Updater as LocalStorageContextUpdater } fr
 import TokenDataContextProvider, { Updater as TokenDataContextUpdater } from './contexts/TokenData'
 import GlobalDataContextProvider from './contexts/GlobalData'
 import PairDataContextProvider, { Updater as PairDataContextUpdater } from './contexts/PairData'
+import PoolDataContextProvider, { Updater as PoolDataContextUpdater } from './contexts/PoolData'
 import ApplicationContextProvider from './contexts/Application'
 import UserContextProvider from './contexts/User'
 import App from './App'
@@ -33,7 +34,9 @@ function ContextProviders({ children }) {
         <TokenDataContextProvider>
           <GlobalDataContextProvider>
             <PairDataContextProvider>
-              <UserContextProvider>{children}</UserContextProvider>
+              <PoolDataContextProvider>
+                <UserContextProvider>{children}</UserContextProvider>
+              </PoolDataContextProvider>
             </PairDataContextProvider>
           </GlobalDataContextProvider>
         </TokenDataContextProvider>
@@ -47,6 +50,7 @@ function Updaters() {
     <>
       <LocalStorageContextUpdater />
       <PairDataContextUpdater />
+      <PoolDataContextUpdater />
       <TokenDataContextUpdater />
     </>
   )

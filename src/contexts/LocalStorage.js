@@ -9,6 +9,7 @@ const DISMISSED_PATHS = 'DISMISSED_PATHS'
 const SAVED_ACCOUNTS = 'SAVED_ACCOUNTS'
 const SAVED_TOKENS = 'SAVED_TOKENS'
 const SAVED_PAIRS = 'SAVED_PAIRS'
+const SAVED_POOLS = 'SAVED_POOLS'
 
 const DARK_MODE = 'DARK_MODE'
 
@@ -157,6 +158,31 @@ export function useSavedPairs() {
   }
 
   return [savedPairs, addPair, removePair]
+}
+
+export function useSavedPools() {
+  const [state, { updateKey }] = useLocalStorageContext()
+  const savedPools = state?.[SAVED_POOLS]
+
+  function addPool(address, token0Address, token1Address, token0Symbol, token1Symbol) {
+    let newList = state?.[SAVED_POOLS]
+    newList[address] = {
+      address,
+      token0Address,
+      token1Address,
+      token0Symbol,
+      token1Symbol,
+    }
+    updateKey(SAVED_POOLS, newList)
+  }
+
+  function removePool(address) {
+    let newList = state?.[SAVED_POOLS]
+    newList[address] = null
+    updateKey(SAVED_POOLS, newList)
+  }
+
+  return [savedPools, addPool, removePool]
 }
 
 export function useSavedTokens() {
