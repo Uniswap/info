@@ -50,6 +50,7 @@ function init() {
     [SAVED_ACCOUNTS]: [],
     [SAVED_TOKENS]: {},
     [SAVED_PAIRS]: {},
+    [SAVED_POOLS]: {},
   }
 
   try {
