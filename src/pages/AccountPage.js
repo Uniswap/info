@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import { useUserTransactions, useUserPositions, useMiningPositions } from '../contexts/User'
 import TxnList from '../components/TxnList'
 import Panel from '../components/Panel'
-import { formattedNum } from '../utils'
+import { formattedNum, formattedPercent } from '../utils'
 import Row, { AutoRow, RowFixed, RowBetween } from '../components/Row'
 import { AutoColumn } from '../components/Column'
 import UserChart from '../components/UserChart'
@@ -21,6 +21,7 @@ import { BasicLink } from '../components/Link'
 import { useMedia } from 'react-use'
 import Search from '../components/Search'
 import { useSavedAccounts } from '../contexts/LocalStorage'
+import QuestionHelper from '../components/QuestionHelper'
 
 const AccountWrapper = styled.div`
   background-color: rgba(255, 255, 255, 0.2);
@@ -143,6 +144,8 @@ function AccountPage({ account }) {
         }, 0)
       : null
   }, [dynamicPositions])
+
+  const simpleReturn = (aggregateFees / (positionValue - aggregateFees)) * 100
 
   useEffect(() => {
     window.scrollTo({
@@ -284,9 +287,16 @@ function AccountPage({ account }) {
                     <div />
                   </RowBetween>
                   <RowFixed align="flex-end">
-                    <TYPE.header fontSize={'24px'} lineHeight={1} color={aggregateFees && 'green'}>
+                    <TYPE.header
+                      fontSize={'24px'}
+                      lineHeight={1}
+                      style={{ marginRight: '1rem' }}
+                      color={aggregateFees && 'green'}
+                    >
                       {aggregateFees ? formattedNum(aggregateFees, true, true) : '-'}
                     </TYPE.header>
+                    {simpleReturn ? formattedPercent(simpleReturn) : '-'}
+                    <QuestionHelper text="The simplest way to calculate your performance, this is your Fees Earned (Cumulative) divided by your Liquidity (Excluding Fees)." />
                   </RowFixed>
                 </AutoColumn>
               </AutoRow>
