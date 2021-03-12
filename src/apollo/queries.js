@@ -701,6 +701,8 @@ const PoolFields = `
     }
     reserve0
     reserve1
+    vReserve0
+    vReserve1
     reserveUSD
     totalSupply
     trackedReserveETH
@@ -711,6 +713,10 @@ const PoolFields = `
     untrackedFeeUSD
     token0Price
     token1Price
+    token0PriceMin
+    token0PriceMax
+    token1PriceMin
+    token1PriceMax
     createdAtTimestamp
   }
 `
@@ -764,7 +770,7 @@ export const PAIRS_BULK = gql`
 
 export const POOLS_BULK = gql`
   ${PoolFields}
-  query pairs($allPools: [Bytes]!) {
+  query pools($allPools: [Bytes]!) {
     pools(where: { id_in: $allPools }, orderBy: trackedReserveETH, orderDirection: desc) {
       ...PoolFields
     }

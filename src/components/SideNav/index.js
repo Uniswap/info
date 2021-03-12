@@ -164,7 +164,7 @@ function SideNav({ history }) {
           </AutoColumn>
           <AutoColumn gap="0.5rem" style={{ marginLeft: '.75rem', marginBottom: '4rem' }}>
             <HeaderText>
-              <Link href="https://dev-dmm.knstats.com/#/" target="_blank">
+              <Link href={process.env.REACT_APP_DMM_SWAP_URL} target="_blank">
                 Dmm Swap
               </Link>
             </HeaderText>

@@ -22,13 +22,14 @@ import CopyHelper from '../components/Copy'
 import Warning from '../components/Warning'
 import DoubleTokenLogo from '../components/DoubleLogo'
 import TokenLogo from '../components/TokenLogo'
+import AddBookmark from '../components/Icons/AddBookmark'
 import { TYPE, ThemedBackground } from '../Theme'
 import { useColor } from '../hooks'
 import { usePoolData, usePoolTransactions } from '../contexts/PoolData'
 import { useEthPrice } from '../contexts/GlobalData'
 import { usePathDismissed, useSavedPools } from '../contexts/LocalStorage'
 import { useListedTokens } from '../contexts/Application'
-import { formattedNum, formattedPercent, getPoolLink, getSwapLink, shortenAddress } from '../utils'
+import { formattedNum, formattedPercent, formattedTokenRatio, getPoolLink, getSwapLink, shortenAddress } from '../utils'
 
 const DashboardWrapper = styled.div`
   width: 100%;
@@ -111,6 +112,8 @@ function PoolPage({ poolAddress, history }) {
     token1,
     reserve0,
     reserve1,
+    vReserve0,
+    vReserve1,
     reserveUSD,
     trackedReserveUSD,
     oneDayVolumeUSD,
@@ -120,6 +123,10 @@ function PoolPage({ poolAddress, history }) {
     oneDayFeeUntracked,
     volumeChangeUntracked,
     liquidityChangeUSD,
+    token0PriceMin,
+    token0PriceMax,
+    token1PriceMin,
+    token1PriceMax,
   } = usePoolData(poolAddress)
 
   useEffect(() => {
@@ -182,6 +189,10 @@ function PoolPage({ poolAddress, history }) {
   // formatted symbols for overflow
   const formattedSymbol0 = token0?.symbol.length > 6 ? token0?.symbol.slice(0, 5) + '...' : token0?.symbol
   const formattedSymbol1 = token1?.symbol.length > 6 ? token1?.symbol.slice(0, 5) + '...' : token1?.symbol
+
+  // Ratio of symbols
+  const percentToken0 = ((vReserve0 / reserve0) * 100) / (vReserve0 / reserve0 + vReserve1 / reserve1)
+  const percentToken1 = 100 - percentToken0
 
   const below1080 = useMedia('(max-width: 1080px)')
   const below900 = useMedia('(max-width: 900px)')
@@ -265,8 +276,8 @@ function PoolPage({ poolAddress, history }) {
                 >
                   {!!!savedPools[poolAddress] && !below1080 ? (
                     <Hover onClick={() => addPool(poolAddress, token0.id, token1.id, token0.symbol, token1.symbol)}>
-                      <StyledIcon>
-                        <PlusCircle style={{ marginRight: '0.5rem' }} />
+                      <StyledIcon style={{ marginRight: '0.5rem' }}>
+                        <AddBookmark />
                       </StyledIcon>
                     </Hover>
                   ) : !below1080 ? (
@@ -277,8 +288,15 @@ function PoolPage({ poolAddress, history }) {
                     <></>
                   )}
 
-                  <Link external href={getPoolLink(token0?.id, token1?.id)}>
+                  <Link external href={getPoolLink(token0?.id, token1?.id, false, poolAddress)}>
                     <ButtonLight color={backgroundColor}>+ Add Liquidity</ButtonLight>
+                  </Link>
+                  <Link
+                    external
+                    href={getPoolLink(token0?.id, token1?.id, true, poolAddress)}
+                    style={{ marginLeft: '8px' }}
+                  >
+                    <ButtonLight color={backgroundColor}>- Remove Liquidity</ButtonLight>
                   </Link>
                   <Link external href={getSwapLink(token0?.id, token1?.id)}>
                     <ButtonDark ml={!below1080 && '.5rem'} mr={below1080 && '.5rem'} color={backgroundColor}>
@@ -409,13 +427,15 @@ function PoolPage({ poolAddress, history }) {
                       <TYPE.main fontSize={14} lineHeight={1} fontWeight={500}>
                         <RowFixed>
                           <FormattedName text={token0?.symbol ?? ''} maxCharacters={8} margin={true} />
+                          {percentToken0 ? formattedTokenRatio(percentToken0) : ''}
                         </RowFixed>
                       </TYPE.main>
-                      <div style={{ color: 'white' }}>•</div>
+                      <div style={{ color: 'white', margin: '0 8px' }}>•</div>
                       <TokenLogo address={token1?.id} />
                       <TYPE.main fontSize={14} lineHeight={1} fontWeight={500}>
                         <RowFixed>
                           <FormattedName text={token1?.symbol ?? ''} maxCharacters={8} margin={true} />
+                          {percentToken1 ? formattedTokenRatio(percentToken1) : ''}
                         </RowFixed>
                       </TYPE.main>
                     </RowFixed>
@@ -426,13 +446,15 @@ function PoolPage({ poolAddress, history }) {
                     <RowFixed>
                       <TYPE.main fontSize={12} display="inherit">
                         Price Range <FormattedName text={token0?.symbol ?? ''} maxCharacters={8} margin={true} />
-                        / <FormattedName text={token1?.symbol ?? ''} maxCharacters={8} margin={true} />
+                        /
+                        <FormattedName text={token1?.symbol ?? ''} maxCharacters={8} />
                       </TYPE.main>
                     </RowFixed>
 
                     <RowBetween align="flex-end">
                       <TYPE.main fontSize={14} lineHeight={1} fontWeight={500}>
-                        0.0654 - 0.87765
+                        {token0PriceMin === '0' ? '.' : parseFloat(token0PriceMin).toPrecision(6)} -{' '}
+                        {token0PriceMax === '0' ? '.' : parseFloat(token0PriceMax).toPrecision(6)}
                       </TYPE.main>
                     </RowBetween>
                   </AutoColumn>
@@ -441,13 +463,15 @@ function PoolPage({ poolAddress, history }) {
                     <RowFixed>
                       <TYPE.main fontSize={12} display="inherit">
                         Price Range <FormattedName text={token1?.symbol ?? ''} maxCharacters={8} margin={true} />
-                        / <FormattedName text={token0?.symbol ?? ''} maxCharacters={8} margin={true} />
+                        /
+                        <FormattedName text={token0?.symbol ?? ''} maxCharacters={8} />
                       </TYPE.main>
                     </RowFixed>
 
                     <RowBetween align="flex-end">
                       <TYPE.main fontSize={14} lineHeight={1} fontWeight={500}>
-                        0.0654 - 0.87765
+                        {token1PriceMin === '0' ? '.' : parseFloat(token1PriceMin).toPrecision(6)} -{' '}
+                        {token1PriceMax === '0' ? '.' : parseFloat(token1PriceMax).toPrecision(6)}
                       </TYPE.main>
                     </RowBetween>
                   </AutoColumn>
