@@ -4,6 +4,7 @@ import { xyzClient } from '../apollo/client'
 import {
   PAIR_DATA,
   PAIR_CHART,
+  PAIR_POOLS_DATA,
   FILTERED_TRANSACTIONS,
   PAIRS_CURRENT,
   PAIRS_BULK,
@@ -31,6 +32,7 @@ import { timeframeOptions } from '../constants'
 import { useLatestBlocks } from './Application'
 
 const UPDATE = 'UPDATE'
+const UPDATE_PAIR_POOLS = 'UPDATE_PAIR_POOLS'
 const UPDATE_PAIR_TXNS = 'UPDATE_PAIR_TXNS'
 const UPDATE_CHART_DATA = 'UPDATE_CHART_DATA'
 const UPDATE_TOP_PAIRS = 'UPDATE_TOP_PAIRS'
@@ -78,6 +80,17 @@ function reducer(state, { type, payload }) {
       }
     }
 
+    case UPDATE_PAIR_POOLS: {
+      const { address, pools } = payload
+      return {
+        ...state,
+        [address]: {
+          ...(safeAccess(state, [address]) || {}),
+          pools,
+        },
+      }
+    }
+
     case UPDATE_PAIR_TXNS: {
       const { address, transactions } = payload
       return {
@@ -88,6 +101,7 @@ function reducer(state, { type, payload }) {
         },
       }
     }
+
     case UPDATE_CHART_DATA: {
       const { address, chartData } = payload
       return {
@@ -142,6 +156,13 @@ export default function Provider({ children }) {
     })
   }, [])
 
+  const updatePairPools = useCallback((address, pools) => {
+    dispatch({
+      type: UPDATE_PAIR_POOLS,
+      payload: { address, pools },
+    })
+  }, [])
+
   const updatePairTxns = useCallback((address, transactions) => {
     dispatch({
       type: UPDATE_PAIR_TXNS,
@@ -170,6 +191,7 @@ export default function Provider({ children }) {
           state,
           {
             update,
+            updatePairPools,
             updatePairTxns,
             updateChartData,
             updateTopPairs,
@@ -318,6 +340,22 @@ function parseData(data, oneDayData, twoDayData, oneWeekData, ethPrice, oneDayBl
   }
 
   return data
+}
+
+const getPairPools = async (pairAddress) => {
+  let pools = {}
+
+  try {
+    let result = await xyzClient.query({
+      query: PAIR_POOLS_DATA(pairAddress),
+      fetchPolicy: 'no-cache',
+    })
+    pools = result.data.pools
+  } catch (e) {
+    console.log(e)
+  }
+
+  return pools
 }
 
 const getPairTransactions = async (pairAddress) => {
@@ -607,6 +645,26 @@ export function usePairData(pairAddress) {
   }, [pairAddress, pairData, update, ethPrice])
 
   return pairData || {}
+}
+
+/**
+ * Get all pools for a pair
+ */
+export function usePairPools(pairAddress) {
+  const [state, { updatePairPools }] = usePairDataContext()
+  const pairPools = state?.[pairAddress]?.pools
+
+  useEffect(() => {
+    async function checkForTxns() {
+      if (!pairPools) {
+        let pools = await getPairPools(pairAddress)
+        updatePairPools(pairAddress, pools)
+      }
+    }
+    checkForTxns()
+  }, [pairPools, pairAddress, updatePairPools])
+
+  return pairPools
 }
 
 /**

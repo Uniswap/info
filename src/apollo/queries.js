@@ -699,6 +699,7 @@ const PoolFields = `
       totalLiquidity
       derivedETH
     }
+    amp
     reserve0
     reserve1
     vReserve0
@@ -748,11 +749,22 @@ export const PAIR_DATA = (pairAddress, block) => {
   return gql(queryString)
 }
 
-export const POOL_DATA = (pairAddress, block) => {
+export const POOL_DATA = (poolAddress, block) => {
   const queryString = `
     ${PoolFields}
     query pools {
-      pools(${block ? `block: {number: ${block}}` : ``} where: { id: "${pairAddress}"} ) {
+      pools(${block ? `block: {number: ${block}}` : ``} where: { id: "${poolAddress}"} ) {
+        ...PoolFields
+      }
+    }`
+  return gql(queryString)
+}
+
+export const PAIR_POOLS_DATA = (pairAddress, block) => {
+  const queryString = `
+    ${PoolFields}
+    query pools {
+      pools(${block ? `block: {number: ${block}}` : ``} where: { pair: "${pairAddress}"} ) {
         ...PoolFields
       }
     }`

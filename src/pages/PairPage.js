@@ -8,14 +8,14 @@ import { AutoRow, RowBetween, RowFixed } from '../components/Row'
 import Column, { AutoColumn } from '../components/Column'
 import { ButtonLight, ButtonDark } from '../components/ButtonStyled'
 import PairChart from '../components/PairChart'
+import PoolList from '../components/PoolList'
 import Link from '../components/Link'
-import TxnList from '../components/TxnList'
 import Loader from '../components/LocalLoader'
 import { BasicLink } from '../components/Link'
 import Search from '../components/Search'
 import { formattedNum, formattedPercent, getPoolLink, getSwapLink } from '../utils'
 import { useColor } from '../hooks'
-import { usePairData, usePairTransactions } from '../contexts/PairData'
+import { usePairData, usePairPools } from '../contexts/PairData'
 import { TYPE, ThemedBackground } from '../Theme'
 import { transparentize } from 'polished'
 import CopyHelper from '../components/Copy'
@@ -127,7 +127,8 @@ function PairPage({ pairAddress, history }) {
     document.querySelector('body').scrollTo(0, 0)
   }, [])
 
-  const transactions = usePairTransactions(pairAddress)
+  const pools = usePairPools(pairAddress)
+
   const backgroundColor = useColor(pairAddress)
 
   // liquidity
@@ -411,17 +412,18 @@ function PairPage({ pairAddress, history }) {
                 </Panel>
               </PanelWrapper>
               <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
-                Transactions
-              </TYPE.main>{' '}
+                Top Pools
+              </TYPE.main>
               <Panel
                 style={{
                   marginTop: '1.5rem',
+                  padding: 0,
                 }}
               >
-                {transactions ? <TxnList transactions={transactions} /> : <Loader />}
+                {pools ? <PoolList pools={pools} /> : <Loader />}
               </Panel>
               <RowBetween style={{ marginTop: '3rem' }}>
-                <TYPE.main fontSize={'1.125rem'}>Pair Information</TYPE.main>{' '}
+                <TYPE.main fontSize={'1.125rem'}>Pair Information</TYPE.main>
               </RowBetween>
               <Panel
                 rounded
