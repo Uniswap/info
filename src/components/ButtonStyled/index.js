@@ -151,3 +151,25 @@ export const OptionButton = styled.div`
     cursor: ${({ disabled }) => !disabled && 'pointer'};
   }
 `
+
+export const ButtonEmpty = styled(Base)`
+  background-color: transparent;
+  color: ${({ theme }) => theme.primary1};
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  &:focus {
+    text-decoration: underline;
+  }
+  &:hover {
+    text-decoration: underline;
+  }
+  &:active {
+    text-decoration: underline;
+  }
+  &:disabled {
+    opacity: 50%;
+    cursor: not-allowed;
+  }
+`

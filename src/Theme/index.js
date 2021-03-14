@@ -29,6 +29,8 @@ const theme = (darkMode, color) => ({
   text3: darkMode ? '#6C7284' : '#888D9B',
   text4: darkMode ? '#565A69' : '#C3C5CB',
   text5: darkMode ? '#2C2F36' : '#EDEEF2',
+  text6: darkMode ? '#6d8591' : '#565A69',
+  text7: darkMode ? '#c9d2d7' : '#565A69',
 
   // special case text types
   white: '#FFFFFF',
@@ -63,6 +65,10 @@ const theme = (darkMode, color) => ({
   secondary3: darkMode ? '#17000b26' : '#FDEAF1',
 
   shadow1: darkMode ? '#000' : '#2F80ED',
+
+  // table colors
+  oddRow: darkMode ? '#283339' : '#f4f4f4',
+  evenRow: darkMode ? '#303e46' : '#ffffff',
 
   // other
   red1: '#FF6871',
