@@ -399,7 +399,7 @@ export const PAIR_CHART = gql`
 
 export const POOL_CHART = gql`
   query poolDayDatas($poolAddress: Bytes!, $skip: Int!) {
-    pairDayDatas(first: 1000, skip: $skip, orderBy: date, orderDirection: asc, where: { poolAddress: $poolAddress }) {
+    poolDayDatas(first: 1000, skip: $skip, orderBy: date, orderDirection: asc, where: { poolAddress: $poolAddress }) {
       id
       date
       dailyVolumeToken0
@@ -448,8 +448,8 @@ export const PAIR_DAY_DATA_BULK = (pairs, startTimestamp) => {
 }
 
 export const GLOBAL_CHART = gql`
-  query uniswapDayDatas($startTime: Int!, $skip: Int!) {
-    uniswapDayDatas(first: 1000, skip: $skip, where: { date_gt: $startTime }, orderBy: date, orderDirection: asc) {
+  query dmmDayDatas($startTime: Int!, $skip: Int!) {
+    dmmDayDatas(first: 1000, skip: $skip, where: { date_gt: $startTime }, orderBy: date, orderDirection: asc) {
       id
       date
       totalVolumeUSD
@@ -833,17 +833,17 @@ export const TOKEN_CHART = gql`
       dailyVolumeETH
       dailyVolumeToken
       dailyVolumeUSD
-      mostLiquidPairs {
-        id
-        token0 {
-          id
-          derivedETH
-        }
-        token1 {
-          id
-          derivedETH
-        }
-      }
+      # mostLiquidPairs {
+      #   id
+      #   token0 {
+      #     id
+      #     derivedETH
+      #   }
+      #   token1 {
+      #     id
+      #     derivedETH
+      #   }
+      # }
     }
   }
 `

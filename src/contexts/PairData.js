@@ -342,6 +342,7 @@ const getPairTransactions = async (pairAddress) => {
 }
 
 const getPairChartData = async (pairAddress) => {
+  console.log('!!!!!!!!!!!! get chart data for pair ---------------', pairAddress)
   let data = []
   const utcEndTime = dayjs.utc()
   let utcStartTime = utcEndTime.subtract(1, 'year').startOf('minute')
@@ -351,6 +352,7 @@ const getPairChartData = async (pairAddress) => {
     let allFound = false
     let skip = 0
     while (!allFound) {
+      console.log('________ ready fetch data -____')
       let result = await xyzClient.query({
         query: PAIR_CHART,
         variables: {
@@ -359,12 +361,15 @@ const getPairChartData = async (pairAddress) => {
         },
         fetchPolicy: 'cache-first',
       })
+      console.log('_______ pair data fetched _____', data)
       skip += 1000
       data = data.concat(result.data.pairDayDatas)
       if (result.data.pairDayDatas.length < 1000) {
         allFound = true
       }
     }
+
+    console.log('11111111111111 data    -----', data)
 
     let dayIndexSet = new Set()
     let dayIndexArray = []
@@ -376,7 +381,7 @@ const getPairChartData = async (pairAddress) => {
       dayData.dailyVolumeUSD = parseFloat(dayData.dailyVolumeUSD)
       dayData.reserveUSD = parseFloat(dayData.reserveUSD)
     })
-
+    console.log('2222222222222 dailyVolumeUSD    -----', data)
     if (data[0]) {
       // fill in empty days
       let timestamp = data[0].date ? data[0].date : startTime
@@ -399,6 +404,8 @@ const getPairChartData = async (pairAddress) => {
         timestamp = nextDay
       }
     }
+
+    console.log('333333333 latestLiquidityUSD     -----', data)
 
     data = data.sort((a, b) => (parseInt(a.date) > parseInt(b.date) ? 1 : -1))
   } catch (e) {
