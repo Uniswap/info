@@ -4,7 +4,7 @@ import { Flex, Text } from 'rebass'
 import { ChevronUp, ChevronDown } from 'react-feather'
 
 import { ButtonEmpty } from '../ButtonStyled'
-import Link from '../Link'
+import Link, { CustomLink } from '../Link'
 import FavoriteStar from '../Icons/FavoriteStar'
 import AddCircle from '../Icons/AddCircle'
 import InfoHelper from '../InfoHelper'
@@ -100,7 +100,9 @@ const ListItem = ({ pool, oddRow }) => {
           <FavoriteStar />
         </div>
       )}
-      <DataText grid-area="pool">{shortenPoolAddress}</DataText>
+      <CustomLink to={`/pool/${pool.id}`} style={{ cursor: 'pointer' }}>
+        <DataText grid-area="pool">{shortenPoolAddress}</DataText>
+      </CustomLink>
       <DataText grid-area="ratio">
         <div>{`• ${percentToken0.toPrecision(2) ?? '.'}% ${pool.token0.symbol}`}</div>
         <div>{`• ${percentToken1.toPrecision(2) ?? '.'}% ${pool.token1.symbol}`}</div>
@@ -333,7 +335,7 @@ const PoolList = ({ pools, maxItems = 10 }) => {
       ) : (
         poolsList.map((pool, index) => {
           if (pool) {
-            return <ListItem key={pool.address} pool={pool} oddRow={(index + 1) % 2 !== 0} />
+            return <ListItem key={pool.id} pool={pool} oddRow={(index + 1) % 2 !== 0} />
           }
 
           return null
