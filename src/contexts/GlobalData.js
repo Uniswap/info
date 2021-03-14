@@ -354,8 +354,8 @@ const getChartData = async (oldestDateToFetch) => {
         fetchPolicy: 'cache-first',
       })
       skip += 1000
-      data = data.concat(result.data.uniswapDayDatas)
-      if (result.data.uniswapDayDatas.length < 1000) {
+      data = data.concat(result.data.dmmDayDatas)
+      if (result.data.dmmDayDatas.length < 1000) {
         allFound = true
       }
     }

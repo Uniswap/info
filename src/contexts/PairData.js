@@ -414,7 +414,6 @@ const getPairChartData = async (pairAddress) => {
       dayData.dailyVolumeUSD = parseFloat(dayData.dailyVolumeUSD)
       dayData.reserveUSD = parseFloat(dayData.reserveUSD)
     })
-
     if (data[0]) {
       // fill in empty days
       let timestamp = data[0].date ? data[0].date : startTime
