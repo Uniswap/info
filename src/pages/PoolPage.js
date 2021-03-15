@@ -11,7 +11,7 @@ import Panel from '../components/Panel'
 import { AutoRow, RowBetween, RowFixed } from '../components/Row'
 import Column, { AutoColumn } from '../components/Column'
 import { ButtonLight, ButtonDark } from '../components/ButtonStyled'
-import PairChart from '../components/PairChart'
+import PoolChart from '../components/PoolChart'
 import Link from '../components/Link'
 import TxnList from '../components/TxnList'
 import Loader from '../components/LocalLoader'
@@ -496,7 +496,7 @@ function PoolPage({ poolAddress, history }) {
                     gridRow: below1080 ? '' : '1/7',
                   }}
                 >
-                  <PairChart
+                  <PoolChart
                     address={poolAddress}
                     color={backgroundColor}
                     base0={reserve1 / reserve0}
