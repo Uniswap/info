@@ -360,7 +360,7 @@ export const USER_TRANSACTIONS = gql`
       amount1
       amountUSD
     }
-    swaps(orderBy: timestamp, orderDirection: desc, where: { to: $user }) {
+    swaps(orderBy: timestamp, orderDirection: desc, where: { origin: $user }) {
       id
       transaction {
         id
