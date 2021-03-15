@@ -1,24 +1,26 @@
-import React, { useState, useMemo, useEffect } from 'react'
+import React, { useState, useMemo, useEffect, useCallback } from 'react'
 import styled from 'styled-components'
-import { useUserTransactions, useUserPositions } from '../contexts/User'
+import { useMedia } from 'react-use'
+import { Bookmark, Activity } from 'react-feather'
+
+import { FEE_WARNING_TOKENS } from '../constants'
+import { PageWrapper, ContentWrapper, StyledIcon } from '../components'
 import TxnList from '../components/TxnList'
 import Panel from '../components/Panel'
-import { formattedNum } from '../utils'
 import Row, { AutoRow, RowFixed, RowBetween } from '../components/Row'
 import { AutoColumn } from '../components/Column'
 import UserChart from '../components/UserChart'
 import PairReturnsChart from '../components/PairReturnsChart'
 import PositionList from '../components/PositionList'
-import { TYPE } from '../Theme'
 import { ButtonDropdown } from '../components/ButtonStyled'
-import { PageWrapper, ContentWrapper, StyledIcon } from '../components'
 import DoubleTokenLogo from '../components/DoubleLogo'
-import { Bookmark, Activity } from 'react-feather'
 import Link from '../components/Link'
-import { FEE_WARNING_TOKENS } from '../constants'
 import { BasicLink } from '../components/Link'
-import { useMedia } from 'react-use'
 import Search from '../components/Search'
+import { TYPE } from '../Theme'
+import { useUserTransactions, useUserPositions } from '../contexts/User'
+import { useSavedAccounts } from '../contexts/LocalStorage'
+import { formattedNum } from '../utils'
 
 const AccountWrapper = styled.div`
   background-color: rgba(255, 255, 255, 0.2);
@@ -150,6 +152,13 @@ function AccountPage({ account }) {
 
   const below600 = useMedia('(max-width: 600px)')
 
+  // adding/removing account from saved accounts
+  const [savedAccounts, addAccount, removeAccount] = useSavedAccounts()
+  const isBookmarked = savedAccounts.includes(account)
+  const handleBookmarkClick = useCallback(() => {
+    ;(isBookmarked ? removeAccount : addAccount)(account)
+  }, [account, isBookmarked, addAccount, removeAccount])
+
   return (
     <PageWrapper>
       <ContentWrapper>
@@ -173,7 +182,10 @@ function AccountPage({ account }) {
             </span>
             <AccountWrapper>
               <StyledIcon>
-                <Bookmark style={{ opacity: 0.4 }} />
+                <Bookmark
+                  onClick={handleBookmarkClick}
+                  style={{ opacity: isBookmarked ? 0.8 : 0.4, cursor: 'pointer' }}
+                />
               </StyledIcon>
             </AccountWrapper>
           </RowBetween>

@@ -121,7 +121,12 @@ function AccountSearch({ history, small }) {
                       onClick={() => history.push('/account/' + account)}
                     >
                       <AccountLink>{account?.slice(0, 42)}</AccountLink>
-                      <Hover onClick={() => removeAccount(account)}>
+                      <Hover
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          removeAccount(account)
+                        }}
+                      >
                         <StyledIcon>
                           <X size={16} />
                         </StyledIcon>
