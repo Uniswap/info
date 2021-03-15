@@ -137,11 +137,7 @@ function PoolPage({ poolAddress, history }) {
   const backgroundColor = useColor(poolAddress)
 
   // liquidity
-  const liquidity = trackedReserveUSD
-    ? formattedNum(trackedReserveUSD, true)
-    : reserveUSD
-    ? formattedNum(reserveUSD, true)
-    : '-'
+  const liquidity = reserveUSD ? formattedNum(reserveUSD, true) : '-'
   const liquidityChange = formattedPercent(liquidityChangeUSD)
 
   // mark if using untracked liquidity
