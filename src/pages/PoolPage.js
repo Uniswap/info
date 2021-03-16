@@ -187,7 +187,7 @@ function PoolPage({ poolAddress, history }) {
   const formattedSymbol1 = token1?.symbol.length > 6 ? token1?.symbol.slice(0, 5) + '...' : token1?.symbol
 
   // Ratio of symbols
-  const percentToken0 = ((vReserve0 / reserve0) * 100) / (vReserve0 / reserve0 + vReserve1 / reserve1)
+  const percentToken0 = ((reserve0 / vReserve0) * 100) / (reserve0 / vReserve0 + reserve1 / vReserve1)
   const percentToken1 = 100 - percentToken0
 
   const below1080 = useMedia('(max-width: 1080px)')
