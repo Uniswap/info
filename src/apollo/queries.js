@@ -547,6 +547,7 @@ export const GLOBAL_TXNS = gql`
         amount1Out
         amountUSD
         to
+        origin
       }
     }
   }
@@ -980,6 +981,7 @@ export const FILTERED_TRANSACTIONS = gql`
       amount1Out
       amountUSD
       to
+      origin
     }
   }
 `
@@ -1050,6 +1052,7 @@ export const FILTERED_TRANSACTIONS_POOL = gql`
       amount1Out
       amountUSD
       to
+      origin
     }
   }
 `
