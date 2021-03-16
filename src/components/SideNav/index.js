@@ -117,7 +117,7 @@ function SideNav({ history }) {
                 <BasicLink to="/home">
                   <Option activeText={history.location.pathname === '/home' ?? undefined}>
                     <TrendingUp size={20} style={{ marginRight: '.75rem' }} />
-                    Overview
+                    Summary
                   </Option>
                 </BasicLink>
                 <BasicLink to="/tokens">
@@ -154,7 +154,7 @@ function SideNav({ history }) {
                     }
                   >
                     <List size={20} style={{ marginRight: '.75rem' }} />
-                    Accounts
+                    Wallet Data
                   </Option>
                 </BasicLink>
               </AutoColumn>
