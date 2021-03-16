@@ -380,6 +380,7 @@ export const USER_TRANSACTIONS = gql`
       amount1Out
       amountUSD
       to
+      origin
     }
   }
 `
