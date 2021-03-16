@@ -44,11 +44,11 @@ const Right = styled.div`
   position: fixed;
   right: 0;
   bottom: 0rem;
-  z-index: 99;
+  z-index: 10000;
   width: ${({ open }) => (open ? '220px' : '64px')};
   height: ${({ open }) => (open ? 'fit-content' : '64px')};
   overflow: auto;
-  background-color: ${({ theme }) => theme.bg1};
+  background-color: ${({ theme }) => theme.onlyLight};
   @media screen and (max-width: 1400px) {
     display: none;
   }
