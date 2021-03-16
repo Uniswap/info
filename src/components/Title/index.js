@@ -33,7 +33,7 @@ export default function Title() {
       <Flex alignItems="center">
         <RowFixed>
           <UniIcon id="link" onClick={() => history.push('/')}>
-            <img width={'50px'} src={Logo} alt="logo" />
+            <img width={'100px'} src={Logo} alt="logo" />
           </UniIcon>
           {/* <img width={'84px'} style={{ marginLeft: '8px', marginTop: '0px' }} src={Wordmark} alt="logo" /> */}
         </RowFixed>
