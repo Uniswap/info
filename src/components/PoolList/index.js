@@ -86,7 +86,7 @@ const ListItem = ({ pool, oddRow }) => {
   const isRecommended = amp === 1
 
   const percentToken0 =
-    ((pool.vReserve0 / pool.reserve0) * 100) / (pool.vReserve0 / pool.reserve0 + pool.vReserve1 / pool.reserve1)
+    ((pool.reserve0 / pool.vReserve0) * 100) / (pool.reserve0 / pool.vReserve0 + pool.reserve1 / pool.vReserve1)
   const percentToken1 = 100 - percentToken0
   // Shorten address with 0x + 3 characters at start and end
   const shortenPoolAddress = shortenAddress(pool.id, 3)
