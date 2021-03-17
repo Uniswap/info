@@ -30,6 +30,7 @@ import { getBlockFromTimestamp, getBlocksFromTimestamps } from '../utils'
 
 import { timeframeOptions } from '../constants'
 import { useLatestBlocks } from './Application'
+import { getBulkPoolData } from './PoolData'
 
 const UPDATE = 'UPDATE'
 const UPDATE_PAIR_POOLS = 'UPDATE_PAIR_POOLS'
@@ -651,16 +652,25 @@ export function usePairData(pairAddress) {
  */
 export function usePairPools(pairAddress) {
   const [state, { updatePairPools }] = usePairDataContext()
+  const [ethPrice] = useEthPrice()
   const pairPools = state?.[pairAddress]?.pools
 
   useEffect(() => {
-    async function checkForTxns() {
+    async function checkForPairPools() {
       if (!pairPools) {
         let pools = await getPairPools(pairAddress)
-        updatePairPools(pairAddress, pools)
+
+        // format as array of addresses
+        const formattedPools = pools.map((pool) => {
+          return pool.id
+        })
+
+        // get data for every pool in list
+        let pairPoolsData = await getBulkPoolData(formattedPools, ethPrice)
+        pairPoolsData && updatePairPools(pairAddress, pairPoolsData)
       }
     }
-    checkForTxns()
+    ethPrice && checkForPairPools()
   }, [pairPools, pairAddress, updatePairPools])
 
   return pairPools

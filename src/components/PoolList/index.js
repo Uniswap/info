@@ -3,6 +3,7 @@ import styled from 'styled-components'
 import { Flex, Text } from 'rebass'
 import { ChevronUp, ChevronDown } from 'react-feather'
 
+import { AutoColumn } from '../Column'
 import { ButtonEmpty } from '../ButtonStyled'
 import Link, { CustomLink } from '../Link'
 import FavoriteStar from '../Icons/FavoriteStar'
@@ -11,6 +12,7 @@ import InfoHelper from '../InfoHelper'
 import Loader from '../LocalLoader'
 import { shortenAddress, formattedNum } from '../../utils'
 import { getHealthFactor } from '../../utils/dmm'
+import { TYPE } from '../../Theme'
 
 const TableHeader = styled.div`
   display: grid;
@@ -78,6 +80,18 @@ const getOneYearFL = (liquidity, feeOneDay) => {
   return parseFloat(liquidity) === 0 ? 0 : (parseFloat(feeOneDay) * 365 * 100) / parseFloat(liquidity)
 }
 
+const formatDataText = (value, trackedValue, supressWarning = false) => {
+  const showUntracked = value !== '$0' && !trackedValue & !supressWarning
+  return (
+    <AutoColumn gap="2px" style={{ opacity: showUntracked ? '0.7' : '1' }}>
+      <div style={{ textAlign: 'left' }}>{value}</div>
+      <TYPE.light fontSize={'9px'} style={{ textAlign: 'right' }}>
+        {showUntracked ? 'unstable' : '  '}
+      </TYPE.light>
+    </AutoColumn>
+  )
+}
+
 const ListItem = ({ pool, oddRow }) => {
   const amp = pool.amp / 10000
 
@@ -91,7 +105,11 @@ const ListItem = ({ pool, oddRow }) => {
   // Shorten address with 0x + 3 characters at start and end
   const shortenPoolAddress = shortenAddress(pool.id, 3)
 
-  const oneYearFL = getOneYearFL(pool.reserveUSD, pool.feeUSD).toFixed(2)
+  const volume = pool.oneDayVolumeUSD ? pool.oneDayVolumeUSD : pool.oneDayVolumeUntracked
+
+  const fee = pool.oneDayFeeUSD ? pool.oneDayFeeUSD : pool.oneDayFeeUntracked
+
+  const oneYearFL = getOneYearFL(pool.reserveUSD, fee).toFixed(2)
 
   return (
     <TableRow oddRow={oddRow}>
@@ -108,8 +126,8 @@ const ListItem = ({ pool, oddRow }) => {
         <div>{`• ${percentToken1.toPrecision(2) ?? '.'}% ${pool.token1.symbol}`}</div>
       </DataText>
       <DataText grid-area="liq">{formattedNum(pool.reserveUSD, true)}</DataText>
-      <DataText grid-area="vol">{formattedNum(pool.volumeUSD, true)}</DataText>
-      <DataText>{formattedNum(pool.feeUSD, true)}</DataText>
+      <DataText grid-area="vol">{formatDataText(formattedNum(volume, true), pool.oneDayVolumeUSD)}</DataText>
+      <DataText>{formatDataText(formattedNum(fee, true), pool.oneDayFeeUSD)}</DataText>
       <DataText>{formattedNum(amp.toPrecision(5))}</DataText>
       <DataText>{`${oneYearFL}%`}</DataText>
       <DataText style={{ alignItems: 'flex-start' }}>
@@ -270,7 +288,7 @@ const PoolList = ({ pools, maxItems = 10 }) => {
               setSortDirection(sortedColumn !== SORT_FIELD.VOL ? true : !sortDirection)
             }}
           >
-            Volume
+            Volume (24h)
             {sortedColumn === SORT_FIELD.VOL ? (
               !sortDirection ? (
                 <ChevronUp size="14" style={{ marginLeft: '2px' }} />
