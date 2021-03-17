@@ -184,7 +184,7 @@ export default function Provider({ children }) {
   )
 }
 
-async function getBulkPoolData(poolList, ethPrice) {
+export async function getBulkPoolData(poolList, ethPrice) {
   const [t1, t2, tWeek] = getTimestampsForChanges()
   let [{ number: b1 }, { number: b2 }, { number: bWeek }] = await getBlocksFromTimestamps([t1, t2, tWeek])
 
