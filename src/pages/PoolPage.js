@@ -94,6 +94,21 @@ const FixedPanel = styled(Panel)`
   }
 `
 
+const PriceRangePanel = styled(Panel)`
+  height: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+
+  @media screen and (max-width: 1024px) {
+    grid-template-columns: 1fr;
+
+    > * {
+      margin-bottom: 1rem;
+    }
+  }
+`
+
 const HoverSpan = styled.span`
   :hover {
     cursor: pointer;
@@ -437,18 +452,28 @@ function PoolPage({ poolAddress, history }) {
                     </RowFixed>
                   </AutoColumn>
                 </Panel>
-                <Panel style={{ height: '100%', flexDirection: 'row', justifyContent: 'space-between' }}>
+                <PriceRangePanel>
                   <AutoColumn gap="20px">
                     <RowFixed>
-                      <TYPE.main fontSize={12} display="inherit">
-                        Price Range <FormattedName text={token0?.symbol ?? ''} maxCharacters={8} margin={true} />
+                      <TYPE.main fontSize={12}>
+                        Price Range{' '}
+                        <FormattedName
+                          text={token0?.symbol ?? ''}
+                          maxCharacters={8}
+                          margin={true}
+                          style={{ display: 'inline-block' }}
+                        />
                         /
-                        <FormattedName text={token1?.symbol ?? ''} maxCharacters={8} />
+                        <FormattedName
+                          text={token1?.symbol ?? ''}
+                          maxCharacters={8}
+                          style={{ display: 'inline-block' }}
+                        />
                       </TYPE.main>
                     </RowFixed>
 
                     <RowBetween align="flex-end">
-                      <TYPE.main fontSize={14} lineHeight={1} fontWeight={500}>
+                      <TYPE.main fontSize={14} lineHeight={1} fontWeight={500} style={{ display: 'inline-block' }}>
                         {token0PriceMin === '0'
                           ? '0.00'
                           : token0PriceMin === '-1'
@@ -466,15 +491,25 @@ function PoolPage({ poolAddress, history }) {
 
                   <AutoColumn gap="20px">
                     <RowFixed>
-                      <TYPE.main fontSize={12} display="inherit">
-                        Price Range <FormattedName text={token1?.symbol ?? ''} maxCharacters={8} margin={true} />
+                      <TYPE.main fontSize={12}>
+                        Price Range{' '}
+                        <FormattedName
+                          text={token1?.symbol ?? ''}
+                          maxCharacters={8}
+                          margin={true}
+                          style={{ display: 'inline-block' }}
+                        />
                         /
-                        <FormattedName text={token0?.symbol ?? ''} maxCharacters={8} />
+                        <FormattedName
+                          text={token0?.symbol ?? ''}
+                          maxCharacters={8}
+                          style={{ display: 'inline-block' }}
+                        />
                       </TYPE.main>
                     </RowFixed>
 
                     <RowBetween align="flex-end">
-                      <TYPE.main fontSize={14} lineHeight={1} fontWeight={500}>
+                      <TYPE.main fontSize={14} lineHeight={1} fontWeight={500} style={{ display: 'inline-block' }}>
                         {token1PriceMin === '0'
                           ? '0.00'
                           : token1PriceMin === '-1'
@@ -489,7 +524,7 @@ function PoolPage({ poolAddress, history }) {
                       </TYPE.main>
                     </RowBetween>
                   </AutoColumn>
-                </Panel>
+                </PriceRangePanel>
                 <Panel
                   style={{
                     gridColumn: below1080 ? '1' : '2/4',
