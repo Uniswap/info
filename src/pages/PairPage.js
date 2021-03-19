@@ -60,25 +60,15 @@ const PanelWrapper = styled.div`
 const TokenDetailsLayout = styled.div`
   display: inline-grid;
   width: 100%;
-  grid-template-columns: auto auto auto auto 1fr;
+  grid-template-columns: auto auto auto auto;
   column-gap: 60px;
-  align-items: start;
 
-  &:last-child {
-    align-items: center;
-    justify-items: end;
-  }
   @media screen and (max-width: 1024px) {
     grid-template-columns: 1fr;
     align-items: stretch;
     > * {
       grid-column: 1 / 4;
       margin-bottom: 1rem;
-    }
-
-    &:last-child {
-      align-items: start;
-      justify-items: start;
     }
   }
 `
@@ -447,7 +437,7 @@ function PairPage({ pairAddress, history }) {
                     <TYPE.main>Pair Address</TYPE.main>
                     <AutoRow align="flex-end">
                       <TYPE.main style={{ marginTop: '.5rem' }}>
-                        {pairAddress.slice(0, 6) + '...' + pairAddress.slice(38, 42)}
+                        {pairAddress.slice(0, 6) + '...' + pairAddress.slice(81, 85)}
                       </TYPE.main>
                       <CopyHelper toCopy={pairAddress} />
                     </AutoRow>
@@ -480,11 +470,6 @@ function PairPage({ pairAddress, history }) {
                       <CopyHelper toCopy={token1?.id} />
                     </AutoRow>
                   </Column>
-                  <ButtonLight color={backgroundColor}>
-                    <Link color={backgroundColor} external href={'https://ropsten.etherscan.io/address/' + pairAddress}>
-                      View on Etherscan ↗
-                    </Link>
-                  </ButtonLight>
                 </TokenDetailsLayout>
               </Panel>
             </>
