@@ -86,18 +86,7 @@ export default function Warning({ type, show, setShow, address }) {
             </RowBetween>
           </div>
         ) : (
-          <RowBetween style={{ marginTop: '10px' }}>
-            <Hover>
-              <Link
-                fontWeight={500}
-                lineHeight={'145.23%'}
-                color={'#2172E5'}
-                href={'https://ropsten.etherscan.io/address/' + address}
-                target="_blank"
-              >
-                View {type === 'token' ? 'token' : 'pair'} contract on Etherscan
-              </Link>
-            </Hover>
+          <RowBetween style={{ marginTop: '10px', justifyContent: 'flex-end' }}>
             <ButtonDark color={'#f82d3a'} style={{ minWidth: '140px' }} onClick={() => setShow(false)}>
               I understand
             </ButtonDark>
