@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
+
+import { ROPSTEN_TOKEN_LOGOS_MAPPING } from '../../constants'
 import { isAddress } from '../../utils/index.js'
 import PlaceHolder from '../../assets/placeholder.png'
 import EthereumLogo from '../../assets/eth.png'
@@ -68,6 +70,10 @@ export default function TokenLogo({ address, header = false, size = '24px', ...r
         />
       </StyledEthereumLogo>
     )
+  }
+
+  if (ROPSTEN_TOKEN_LOGOS_MAPPING[address?.toLowerCase()]) {
+    address = ROPSTEN_TOKEN_LOGOS_MAPPING[address?.toLowerCase()]
   }
 
   const path = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${isAddress(
