@@ -26,7 +26,7 @@ import { useDataForList } from '../contexts/PairData'
 import { useEffect } from 'react'
 import Warning from '../components/Warning'
 import { usePathDismissed, useSavedTokens } from '../contexts/LocalStorage'
-import { Hover, PageWrapper, ContentWrapper, StyledIcon } from '../components'
+import { Hover, PageWrapper, ContentWrapper, StyledIcon, BlockedWrapper, BlockedMessageWrapper } from '../components'
 import { PlusCircle, Bookmark, AlertCircle } from 'react-feather'
 import FormattedName from '../components/FormattedName'
 import { useListedTokens } from '../contexts/Application'
@@ -170,24 +170,6 @@ function TokenPage({ address, history }) {
   }, [])
 
   const [useTracked, setUseTracked] = useState(true)
-
-  const BlockedWrapper = styled.div`
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  `
-
-  const BlockedMessageWrapper = styled.div`
-    border: 1px solid ${({ theme }) => theme.text3};
-    border-radius: 12px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 1rem;
-    max-width: 80%;
-  `
 
   if (TOKEN_BLACKLIST.includes(address)) {
     return (
