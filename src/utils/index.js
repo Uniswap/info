@@ -188,27 +188,27 @@ export async function getBlocksFromTimestamps(timestamps, skipCount = 500) {
   return blocks
 }
 
-export async function getLiquidityTokenBalanceOvertime(account, timestamps) {
-  // get blocks based on timestamps
-  const blocks = await getBlocksFromTimestamps(timestamps)
+// export async function getLiquidityTokenBalanceOvertime(account, timestamps) {
+//   // get blocks based on timestamps
+//   const blocks = await getBlocksFromTimestamps(timestamps)
 
-  // get historical share values with time travel queries
-  let result = await client.query({
-    query: SHARE_VALUE(account, blocks),
-    fetchPolicy: 'cache-first',
-  })
+//   // get historical share values with time travel queries
+//   let result = await client.query({
+//     query: SHARE_VALUE(account, blocks),
+//     fetchPolicy: 'cache-first',
+//   })
 
-  let values = []
-  for (var row in result?.data) {
-    let timestamp = row.split('t')[1]
-    if (timestamp) {
-      values.push({
-        timestamp,
-        balance: 0,
-      })
-    }
-  }
-}
+//   let values = []
+//   for (var row in result?.data) {
+//     let timestamp = row.split('t')[1]
+//     if (timestamp) {
+//       values.push({
+//         timestamp,
+//         balance: 0,
+//       })
+//     }
+//   }
+// }
 
 /**
  * @notice Example query using time travel queries

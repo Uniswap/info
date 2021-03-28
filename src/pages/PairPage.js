@@ -3,7 +3,13 @@ import { withRouter } from 'react-router-dom'
 import 'feather-icons'
 import styled from 'styled-components'
 import Panel from '../components/Panel'
-import { PageWrapper, ContentWrapperLarge, StyledIcon } from '../components/index'
+import {
+  PageWrapper,
+  ContentWrapperLarge,
+  StyledIcon,
+  BlockedWrapper,
+  BlockedMessageWrapper,
+} from '../components/index'
 import { AutoRow, RowBetween, RowFixed } from '../components/Row'
 import Column, { AutoColumn } from '../components/Column'
 import { ButtonLight, ButtonDark } from '../components/ButtonStyled'
@@ -13,7 +19,7 @@ import TxnList from '../components/TxnList'
 import Loader from '../components/LocalLoader'
 import { BasicLink } from '../components/Link'
 import Search from '../components/Search'
-import { formattedNum, formattedPercent, getPoolLink, getSwapLink } from '../utils'
+import { formattedNum, formattedPercent, getPoolLink, getSwapLink, shortenAddress } from '../utils'
 import { useColor } from '../hooks'
 import { usePairData, usePairTransactions } from '../contexts/PairData'
 import { TYPE, ThemedBackground } from '../Theme'
@@ -31,7 +37,7 @@ import { Bookmark, PlusCircle, AlertCircle } from 'react-feather'
 import FormattedName from '../components/FormattedName'
 import { useListedTokens } from '../contexts/Application'
 import HoverText from '../components/HoverText'
-import { UNTRACKED_COPY } from '../constants'
+import { UNTRACKED_COPY, PAIR_BLACKLIST, BLOCKED_WARNINGS } from '../constants'
 
 const DashboardWrapper = styled.div`
   width: 100%;
@@ -188,6 +194,23 @@ function PairPage({ pairAddress, history }) {
   const [savedPairs, addPair] = useSavedPairs()
 
   const listedTokens = useListedTokens()
+
+  if (PAIR_BLACKLIST.includes(pairAddress)) {
+    return (
+      <BlockedWrapper>
+        <BlockedMessageWrapper>
+          <AutoColumn gap="1rem" justify="center">
+            <TYPE.light style={{ textAlign: 'center' }}>
+              {BLOCKED_WARNINGS[pairAddress] ?? `This pair is not supported.`}
+            </TYPE.light>
+            <Link external={true} href={'https://etherscan.io/address/' + pairAddress}>{`More about ${shortenAddress(
+              pairAddress
+            )}`}</Link>
+          </AutoColumn>
+        </BlockedMessageWrapper>
+      </BlockedWrapper>
+    )
+  }
 
   return (
     <PageWrapper>
