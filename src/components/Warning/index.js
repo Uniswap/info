@@ -55,6 +55,8 @@ export default function Warning({ type, show, setShow, address }) {
     </Text>
   )
 
+  const contractTypeLabel = type === 'token' ? 'token' : 'pool'
+
   return (
     <WarningWrapper show={show}>
       <AutoColumn gap="4px">
@@ -67,17 +69,21 @@ export default function Warning({ type, show, setShow, address }) {
         {textContent}
         {below800 ? (
           <div>
-            <Hover style={{ marginTop: '10px' }}>
-              <Link
-                fontWeight={500}
-                lineHeight={'145.23%'}
-                color={'#2172E5'}
-                href={'https://ropsten.etherscan.io/address/' + address}
-                target="_blank"
-              >
-                View {type === 'token' ? 'token' : 'pair'} contract on Etherscan
-              </Link>
-            </Hover>
+            {type === 'pair' ? (
+              <div />
+            ) : (
+              <Hover style={{ marginTop: '10px' }}>
+                <Link
+                  fontWeight={500}
+                  lineHeight={'145.23%'}
+                  color={'#2172E5'}
+                  href={'https://ropsten.etherscan.io/address/' + address}
+                  target="_blank"
+                >
+                  View {contractTypeLabel} contract on Etherscan
+                </Link>
+              </Hover>
+            )}
             <RowBetween style={{ marginTop: '20px' }}>
               <div />
               <ButtonDark color={'#f82d3a'} style={{ minWidth: '140px' }} onClick={() => setShow(false)}>
@@ -86,7 +92,22 @@ export default function Warning({ type, show, setShow, address }) {
             </RowBetween>
           </div>
         ) : (
-          <RowBetween style={{ marginTop: '10px', justifyContent: 'flex-end' }}>
+          <RowBetween style={{ marginTop: '10px' }}>
+            {type === 'pair' ? (
+              <div />
+            ) : (
+              <Hover>
+                <Link
+                  fontWeight={500}
+                  lineHeight={'145.23%'}
+                  color={'#2172E5'}
+                  href={'https://ropsten.etherscan.io/address/' + address}
+                  target="_blank"
+                >
+                  View {contractTypeLabel} contract on Etherscan
+                </Link>
+              </Hover>
+            )}
             <ButtonDark color={'#f82d3a'} style={{ minWidth: '140px' }} onClick={() => setShow(false)}>
               I understand
             </ButtonDark>
