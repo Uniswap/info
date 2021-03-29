@@ -305,6 +305,10 @@ const getTopTokens = async (ethPrice, ethPriceOld) => {
             data.priceChangeUSD = 0
           }
 
+          // used for custom adjustments
+          data.oneDayData = oneDayHistory
+          data.twoDayData = twoDayHistory
+
           return data
         })
     )
@@ -408,6 +412,10 @@ const getTokenData = async (address, ethPrice, ethPriceOld) => {
     data.liquidityChangeUSD = liquidityChangeUSD
     data.oneDayTxns = oneDayTxns
     data.txnChange = txnChange
+
+    // used for custom adjustments
+    data.oneDayData = oneDayData[address]
+    data.twoDayData = twoDayData[address]
 
     // new tokens
     if (!oneDayData && data) {
