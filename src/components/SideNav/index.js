@@ -7,11 +7,12 @@ import { useMedia } from 'react-use'
 import { transparentize } from 'polished'
 import { TYPE } from '../../Theme'
 import { withRouter } from 'react-router-dom'
-import { TrendingUp, List, PieChart, Disc } from 'react-feather'
+import { TrendingUp, List, PieChart, Disc, Repeat, Monitor } from 'react-feather'
 import Link from '../Link'
 import { useSessionStart } from '../../contexts/Application'
 import { useDarkModeManager } from '../../contexts/LocalStorage'
 import Toggle from '../Toggle'
+import SocialLinks from '../SocialLinks'
 
 const Wrapper = styled.div`
   height: ${({ isMobile }) => (isMobile ? 'initial' : '100vh')};
@@ -157,34 +158,47 @@ function SideNav({ history }) {
                     Wallet Data
                   </Option>
                 </BasicLink>
+
+                <Link href={process.env.REACT_APP_DMM_SWAP_URL} external>
+                  <Option>
+                    <Repeat size={20} style={{ marginRight: '.75rem' }} />
+                    Trade
+                  </Option>
+                </Link>
+
+                <Link href={`${process.env.REACT_APP_DMM_SWAP_URL}pools/ETH`} external>
+                  <Option>
+                    <Monitor size={20} style={{ marginRight: '.75rem' }} />
+                    Liquidity
+                  </Option>
+                </Link>
               </AutoColumn>
             )}
           </AutoColumn>
           <AutoColumn gap="0.5rem" style={{ marginLeft: '.75rem', marginBottom: '4rem' }}>
             <HeaderText>
-              <Link href={process.env.REACT_APP_DMM_SWAP_URL} target="_blank">
-                Dmm Swap
-              </Link>
-            </HeaderText>
-            {/* <HeaderText>
-              <Link href="https://v1.uniswap.info" target="_blank">
-                V1 Analytics
-              </Link>
-            </HeaderText> */}
-            <HeaderText>
-              <Link href="https://uniswap.org/docs/v2" target="_blank">
-                Docs
+              <Link href="https://github.com/dynamic-amm/dmm-info" external>
+                Github
               </Link>
             </HeaderText>
             <HeaderText>
-              <Link href="https://discord.com/invite/XErMcTq" target="_blank">
-                Discord
+              <Link href="https://kyber.org/vote" external>
+                KyberDAO
               </Link>
             </HeaderText>
             <HeaderText>
-              <Link href="https://twitter.com/UniswapProtocol" target="_blank">
-                Twitter
+              <Link href="https://github.com/dynamic-amm/lightpaper" external>
+                DMM Litepaper
               </Link>
+            </HeaderText>
+            <HeaderText>
+              <Link href="https://kyber.network/" external>
+                Kyber Network
+              </Link>
+            </HeaderText>
+            <SocialLinks />
+            <HeaderText>
+              <Link>(c) dmm.exchange </Link>
             </HeaderText>
             <Toggle isActive={isDark} toggle={toggleDarkMode} />
           </AutoColumn>
