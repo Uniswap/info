@@ -69,7 +69,7 @@ function GlobalPage() {
       <ContentWrapper>
         <div>
           <AutoColumn gap="24px" style={{ paddingBottom: below800 ? '0' : '24px' }}>
-            <TYPE.largeHeader>{below800 ? 'Protocol Analytics' : 'Dmm Analytics'}</TYPE.largeHeader>
+            {below800 ? null : <TYPE.largeHeader>Dynamic Market Maker Protocol Analytics</TYPE.largeHeader>}
             <Search />
             <GlobalStats />
           </AutoColumn>
