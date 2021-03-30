@@ -18,8 +18,8 @@ if (typeof GOOGLE_ANALYTICS_ID === 'string') {
   ReactGA.initialize(GOOGLE_ANALYTICS_ID, {
     gaOptions: {
       storage: 'none',
-      storeGac: false
-    }
+      storeGac: false,
+    },
   })
   ReactGA.set({
     anonymizeIp: true,
