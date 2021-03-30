@@ -474,17 +474,17 @@ function PoolPage({ poolAddress, history }) {
 
                     <RowBetween align="flex-end">
                       <TYPE.main fontSize={14} lineHeight={1} fontWeight={500} style={{ display: 'inline-block' }}>
-                        {token0PriceMin === '0'
+                        {token1PriceMin === '0'
                           ? '0.00'
-                          : token0PriceMin === '-1'
+                          : token1PriceMin === '-1'
                           ? '♾️'
-                          : parseFloat(token0PriceMin).toPrecision(6)}{' '}
+                          : parseFloat(token1PriceMin).toPrecision(6)}{' '}
                         -{' '}
-                        {token0PriceMax === '0'
+                        {token1PriceMax === '0'
                           ? '0.00'
-                          : token0PriceMax === '-1'
+                          : token1PriceMax === '-1'
                           ? '♾️'
-                          : parseFloat(token0PriceMax).toPrecision(6)}
+                          : parseFloat(token1PriceMax).toPrecision(6)}
                       </TYPE.main>
                     </RowBetween>
                   </AutoColumn>
@@ -510,17 +510,17 @@ function PoolPage({ poolAddress, history }) {
 
                     <RowBetween align="flex-end">
                       <TYPE.main fontSize={14} lineHeight={1} fontWeight={500} style={{ display: 'inline-block' }}>
-                        {token1PriceMin === '0'
+                        {token0PriceMin === '0'
                           ? '0.00'
-                          : token1PriceMin === '-1'
+                          : token0PriceMin === '-1'
                           ? '♾️'
-                          : parseFloat(token1PriceMin).toPrecision(6)}{' '}
+                          : parseFloat(token0PriceMin).toPrecision(6)}{' '}
                         -{' '}
-                        {token1PriceMax === '0'
+                        {token0PriceMax === '0'
                           ? '0.00'
-                          : token1PriceMax === '-1'
+                          : token0PriceMax === '-1'
                           ? '♾️'
-                          : parseFloat(token1PriceMax).toPrecision(6)}
+                          : parseFloat(token0PriceMax).toPrecision(6)}
                       </TYPE.main>
                     </RowBetween>
                   </AutoColumn>
