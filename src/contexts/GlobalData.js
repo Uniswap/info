@@ -592,18 +592,18 @@ export function useGlobalChartData() {
     }
   }, [activeWindow, oldestDateFetch])
 
-  // fix for scammy tokens
-  const delatVol = useTokenChartData('0x9ea3b5b4ec044b70375236a281986106457b20ef')
+  // fix for rebassing tokens
+  const offsetVol = useTokenChartData('0x9ea3b5b4ec044b70375236a281986106457b20ef')
 
-  const formattedDelataVol = useMemo(() => {
+  const formattedOffsetVol = useMemo(() => {
     return (
-      delatVol &&
-      delatVol.reduce(function (acc, day) {
+      offsetVol &&
+      offsetVol.reduce(function (acc, day) {
         acc[day.date] = day
         return acc
       }, {})
     )
-  }, [delatVol])
+  }, [offsetVol])
 
   /**
    * Fetch data if none fetched or older data is needed
@@ -611,13 +611,13 @@ export function useGlobalChartData() {
   useEffect(() => {
     async function fetchData() {
       // historical stuff for chart
-      let [newChartData, newWeeklyData] = await getChartData(oldestDateFetch, formattedDelataVol)
+      let [newChartData, newWeeklyData] = await getChartData(oldestDateFetch, formattedOffsetVol)
       updateChart(newChartData, newWeeklyData)
     }
-    if (oldestDateFetch && !(chartDataDaily && chartDataWeekly) && formattedDelataVol) {
+    if (oldestDateFetch && !(chartDataDaily && chartDataWeekly) && formattedOffsetVol) {
       fetchData()
     }
-  }, [chartDataDaily, chartDataWeekly, formattedDelataVol, oldestDateFetch, updateChart])
+  }, [chartDataDaily, chartDataWeekly, formattedOffsetVol, oldestDateFetch, updateChart])
 
   return [chartDataDaily, chartDataWeekly]
 }
