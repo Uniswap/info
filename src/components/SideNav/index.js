@@ -187,7 +187,7 @@ function SideNav({ history }) {
               </Link>
             </HeaderText>
             <HeaderText>
-              <Link href="https://github.com/dynamic-amm/lightpaper" external>
+              <Link href="https://files.kyber.network/DMM-Feb21.pdf" external>
                 DMM Litepaper
               </Link>
             </HeaderText>
