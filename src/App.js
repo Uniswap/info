@@ -18,6 +18,7 @@ import AccountLookup from './pages/AccountLookup'
 import LocalLoader from './components/LocalLoader'
 import { useLatestBlocks } from './contexts/Application'
 import GoogleAnalyticsReporter from './components/analytics/GoogleAnalyticsReporter'
+import { PAIR_BLACKLIST, TOKEN_BLACKLIST } from './constants'
 
 const AppWrapper = styled.div`
   position: relative;
@@ -126,7 +127,10 @@ function App() {
                 strict
                 path="/token/:tokenAddress"
                 render={({ match }) => {
-                  if (isAddress(match.params.tokenAddress.toLowerCase())) {
+                  if (
+                    isAddress(match.params.tokenAddress.toLowerCase()) &&
+                    !Object.keys(TOKEN_BLACKLIST).includes(match.params.tokenAddress.toLowerCase())
+                  ) {
                     return (
                       <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
                         <TokenPage address={match.params.tokenAddress.toLowerCase()} />
@@ -142,7 +146,10 @@ function App() {
                 strict
                 path="/pair/:pairAddress"
                 render={({ match }) => {
-                  if (isAddress(match.params.pairAddress.toLowerCase())) {
+                  if (
+                    isAddress(match.params.pairAddress.toLowerCase()) &&
+                    !Object.keys(PAIR_BLACKLIST).includes(match.params.pairAddress.toLowerCase())
+                  ) {
                     return (
                       <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
                         <PairPage pairAddress={match.params.pairAddress.toLowerCase()} />
