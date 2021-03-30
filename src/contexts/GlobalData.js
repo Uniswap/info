@@ -636,7 +636,7 @@ export function useGlobalChartData() {
       let [newChartData, newWeeklyData] = await getChartData(oldestDateFetch, formattedOffsetVol, formattedOffsetVol2)
       updateChart(newChartData, newWeeklyData)
     }
-    if (oldestDateFetch && !(chartDataDaily && chartDataWeekly) && formattedOffsetVol) {
+    if (oldestDateFetch && !(chartDataDaily && chartDataWeekly) && formattedOffsetVol && formattedOffsetVol2) {
       fetchData()
     }
   }, [chartDataDaily, chartDataWeekly, formattedOffsetVol, oldestDateFetch, updateChart, formattedOffsetVol2])
