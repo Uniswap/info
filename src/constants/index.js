@@ -30,6 +30,7 @@ export const TOKEN_BLACKLIST = [
   '0x05934eba98486693aaec2d00b0e9ce918e37dc3f',
   '0x3d7e683fc9c86b4d653c9e47ca12517440fad14e',
   '0xfae9c647ad7d89e738aba720acf09af93dc535f7',
+  '0x7296368fe9bcb25d3ecc19af13655b907818cc09',
 ]
 
 // pair blacklist

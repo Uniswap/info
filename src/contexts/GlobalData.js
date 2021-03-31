@@ -31,6 +31,14 @@ const UPDATE_ALL_PAIRS_IN_UNISWAP = 'UPDAUPDATE_ALL_PAIRS_IN_UNISWAPTE_TOP_PAIRS
 const UPDATE_ALL_TOKENS_IN_UNISWAP = 'UPDATE_ALL_TOKENS_IN_UNISWAP'
 const UPDATE_TOP_LPS = 'UPDATE_TOP_LPS'
 
+const offsetVolumes = [
+  '0x9ea3b5b4ec044b70375236a281986106457b20ef',
+  '0x05934eba98486693aaec2d00b0e9ce918e37dc3f',
+  '0x3d7e683fc9c86b4d653c9e47ca12517440fad14e',
+  '0xfae9c647ad7d89e738aba720acf09af93dc535f7',
+  '0x7296368fe9bcb25d3ecc19af13655b907818cc09',
+]
+
 // format dayjs with the libraries that we need
 dayjs.extend(utc)
 dayjs.extend(weekOfYear)
@@ -555,12 +563,7 @@ export function useGlobalData() {
 
   const data = state?.globalData
 
-  const combinedVolume = useTokenDataCombined([
-    '0x9ea3b5b4ec044b70375236a281986106457b20ef',
-    '0x05934eba98486693aaec2d00b0e9ce918e37dc3f',
-    '0x3d7e683fc9c86b4d653c9e47ca12517440fad14e',
-    '0xfae9c647ad7d89e738aba720acf09af93dc535f7',
-  ])
+  const combinedVolume = useTokenDataCombined(offsetVolumes)
 
   useEffect(() => {
     async function fetchData() {
@@ -606,12 +609,7 @@ export function useGlobalChartData() {
 
   // fix for rebass tokens
 
-  const combinedData = useTokenChartDataCombined([
-    '0x05934eba98486693aaec2d00b0e9ce918e37dc3f',
-    '0x9ea3b5b4ec044b70375236a281986106457b20ef',
-    '0x3d7e683fc9c86b4d653c9e47ca12517440fad14e',
-    '0xfae9c647ad7d89e738aba720acf09af93dc535f7',
-  ])
+  const combinedData = useTokenChartDataCombined(offsetVolumes)
 
   /**
    * Fetch data if none fetched or older data is needed
