@@ -230,7 +230,7 @@ function TopTokenList({ tokens, itemMax = 10, useTracked = false }) {
           <Flex alignItems="center">
             <ClickableText
               area="symbol"
-              onClick={(e) => {
+              onClick={() => {
                 setSortedColumn(SORT_FIELD.SYMBOL)
                 setSortDirection(sortedColumn !== SORT_FIELD.SYMBOL ? true : !sortDirection)
               }}
@@ -254,7 +254,7 @@ function TopTokenList({ tokens, itemMax = 10, useTracked = false }) {
         <Flex alignItems="center">
           <ClickableText
             area="vol"
-            onClick={(e) => {
+            onClick={() => {
               setSortedColumn(useTracked ? SORT_FIELD.VOL_UT : SORT_FIELD.VOL)
               setSortDirection(
                 sortedColumn !== (useTracked ? SORT_FIELD.VOL_UT : SORT_FIELD.VOL) ? true : !sortDirection
