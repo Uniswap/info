@@ -21,7 +21,7 @@ import {
 } from '../apollo/queries'
 import weekOfYear from 'dayjs/plugin/weekOfYear'
 import { useAllPairData } from './PairData'
-import { useTokenChartData, useTokenData } from './TokenData'
+import { useTokenChartDataCombined, useTokenDataCombined } from './TokenData'
 const UPDATE = 'UPDATE'
 const UPDATE_TXNS = 'UPDATE_TXNS'
 const UPDATE_CHART = 'UPDATE_CHART'
@@ -212,7 +212,7 @@ export default function Provider({ children }) {
  * @param {*} oldEthPrice
  */
 
-async function getGlobalData(ethPrice, oldEthPrice, offsetData, offsetData2) {
+async function getGlobalData(ethPrice, oldEthPrice, offsetVolume) {
   // data for each day , historic data used for % changes
   let data = {}
   let oneDayData = {}
@@ -293,7 +293,7 @@ async function getGlobalData(ethPrice, oldEthPrice, offsetData, offsetData2) {
       )
 
       // add relevant fields with the calculated amounts
-      data.oneDayVolumeUSD = oneDayVolumeUSD - offsetData.oneDayVolumeUSD - offsetData2.oneDayVolumeUSD
+      data.oneDayVolumeUSD = oneDayVolumeUSD - offsetVolume
       data.oneWeekVolume = oneWeekVolume
       data.weeklyVolumeChange = weeklyVolumeChange
       data.volumeChangeUSD = volumeChangeUSD
@@ -315,7 +315,7 @@ async function getGlobalData(ethPrice, oldEthPrice, offsetData, offsetData2) {
  */
 
 let checked = false
-const getChartData = async (oldestDateToFetch, formattedOffsetData, formattedOffsetData2) => {
+const getChartData = async (oldestDateToFetch, offsetData) => {
   let data = []
   let weeklyData = []
   const utcEndTime = dayjs.utc()
@@ -381,14 +381,19 @@ const getChartData = async (oldestDateToFetch, formattedOffsetData, formattedOff
     data = data.sort((a, b) => (parseInt(a.date) > parseInt(b.date) ? 1 : -1))
     let startIndexWeekly = -1
     let currentWeek = -1
+
     data.forEach((entry, i) => {
+      const date = data[i].date
+
       // hardcoded fix for offset volume
-      if (formattedOffsetData[data[i].date] && !checked) {
-        data[i].dailyVolumeUSD = data[i].dailyVolumeUSD - formattedOffsetData[data[i].date].dailyVolumeUSD
-      }
-      if (formattedOffsetData2[data[i].date] && !checked) {
-        data[i].dailyVolumeUSD = data[i].dailyVolumeUSD - formattedOffsetData2[data[i].date].dailyVolumeUSD
-      }
+      offsetData &&
+        offsetData.map((dayData) => {
+          if (dayData[date]) {
+            data[i].dailyVolumeUSD = data[i].dailyVolumeUSD - dayData.dailyVolumeUSD
+          }
+          return true
+        })
+
       const week = dayjs.utc(dayjs.unix(data[i].date)).week()
       if (week !== currentWeek) {
         currentWeek = week
@@ -550,12 +555,17 @@ export function useGlobalData() {
 
   const data = state?.globalData
 
-  const offsetData = useTokenData('0x05934eba98486693aaec2d00b0e9ce918e37dc3f')
-  const otherOffsetData = useTokenData('0x9ea3b5b4ec044b70375236a281986106457b20ef')
+  const combinedVolume = useTokenDataCombined([
+    '0x9ea3b5b4ec044b70375236a281986106457b20ef',
+    '0x05934eba98486693aaec2d00b0e9ce918e37dc3f',
+    '0x3d7e683fc9c86b4d653c9e47ca12517440fad14e',
+    '0xfae9c647ad7d89e738aba720acf09af93dc535f7',
+  ])
 
   useEffect(() => {
     async function fetchData() {
-      let globalData = await getGlobalData(ethPrice, oldEthPrice, offsetData, otherOffsetData)
+      let globalData = await getGlobalData(ethPrice, oldEthPrice, combinedVolume)
+
       globalData && update(globalData)
 
       let allPairs = await getAllPairsOnUniswap()
@@ -564,19 +574,10 @@ export function useGlobalData() {
       let allTokens = await getAllTokensOnUniswap()
       updateAllTokensInUniswap(allTokens)
     }
-    if (!data && ethPrice && oldEthPrice && offsetData && offsetData.oneDayVolumeUSD) {
+    if (!data && ethPrice && oldEthPrice && combinedVolume) {
       fetchData()
     }
-  }, [
-    ethPrice,
-    oldEthPrice,
-    update,
-    data,
-    updateAllPairsInUniswap,
-    updateAllTokensInUniswap,
-    offsetData,
-    otherOffsetData,
-  ])
+  }, [ethPrice, oldEthPrice, update, data, updateAllPairsInUniswap, updateAllTokensInUniswap, combinedVolume])
 
   return data || {}
 }
@@ -604,28 +605,13 @@ export function useGlobalChartData() {
   }, [activeWindow, oldestDateFetch])
 
   // fix for rebass tokens
-  const offsetVol = useTokenChartData('0x05934eba98486693aaec2d00b0e9ce918e37dc3f')
-  const offsetVol2 = useTokenChartData('0x9ea3b5b4ec044b70375236a281986106457b20ef')
 
-  const formattedOffsetVol = useMemo(() => {
-    return (
-      offsetVol &&
-      offsetVol.reduce(function (acc, day) {
-        acc[day.date] = day
-        return acc
-      }, {})
-    )
-  }, [offsetVol])
-
-  const formattedOffsetVol2 = useMemo(() => {
-    return (
-      offsetVol2 &&
-      offsetVol2.reduce(function (acc, day) {
-        acc[day.date] = day
-        return acc
-      }, {})
-    )
-  }, [offsetVol2])
+  const combinedData = useTokenChartDataCombined([
+    '0x05934eba98486693aaec2d00b0e9ce918e37dc3f',
+    '0x9ea3b5b4ec044b70375236a281986106457b20ef',
+    '0x3d7e683fc9c86b4d653c9e47ca12517440fad14e',
+    '0xfae9c647ad7d89e738aba720acf09af93dc535f7',
+  ])
 
   /**
    * Fetch data if none fetched or older data is needed
@@ -633,13 +619,13 @@ export function useGlobalChartData() {
   useEffect(() => {
     async function fetchData() {
       // historical stuff for chart
-      let [newChartData, newWeeklyData] = await getChartData(oldestDateFetch, formattedOffsetVol, formattedOffsetVol2)
+      let [newChartData, newWeeklyData] = await getChartData(oldestDateFetch, combinedData)
       updateChart(newChartData, newWeeklyData)
     }
-    if (oldestDateFetch && !(chartDataDaily && chartDataWeekly) && formattedOffsetVol && formattedOffsetVol2) {
+    if (oldestDateFetch && !(chartDataDaily && chartDataWeekly) && combinedData) {
       fetchData()
     }
-  }, [chartDataDaily, chartDataWeekly, formattedOffsetVol, oldestDateFetch, updateChart, formattedOffsetVol2])
+  }, [chartDataDaily, chartDataWeekly, combinedData, oldestDateFetch, updateChart])
 
   return [chartDataDaily, chartDataWeekly]
 }

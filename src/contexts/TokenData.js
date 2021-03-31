@@ -34,6 +34,7 @@ const UPDATE_CHART_DATA = 'UPDATE_CHART_DATA'
 const UPDATE_PRICE_DATA = 'UPDATE_PRICE_DATA'
 const UPDATE_TOP_TOKENS = ' UPDATE_TOP_TOKENS'
 const UPDATE_ALL_PAIRS = 'UPDATE_ALL_PAIRS'
+const UPDATE_COMBINED = 'UPDATE_COMBINED'
 
 const TOKEN_PAIRS_KEY = 'TOKEN_PAIRS_KEY'
 
@@ -67,6 +68,14 @@ function reducer(state, { type, payload }) {
       return {
         ...state,
         ...added,
+      }
+    }
+
+    case UPDATE_COMBINED: {
+      const { combinedVol } = payload
+      return {
+        ...state,
+        combinedVol,
       }
     }
 
@@ -142,6 +151,15 @@ export default function Provider({ children }) {
     })
   }, [])
 
+  const updateCombinedVolume = useCallback((combinedVol) => {
+    dispatch({
+      type: UPDATE_COMBINED,
+      payload: {
+        combinedVol,
+      },
+    })
+  }, [])
+
   const updateTokenTxns = useCallback((address, transactions) => {
     dispatch({
       type: UPDATE_TOKEN_TXNS,
@@ -182,9 +200,19 @@ export default function Provider({ children }) {
             updateTopTokens,
             updateAllPairs,
             updatePriceData,
+            updateCombinedVolume,
           },
         ],
-        [state, update, updateTokenTxns, updateChartData, updateTopTokens, updateAllPairs, updatePriceData]
+        [
+          state,
+          update,
+          updateTokenTxns,
+          updateCombinedVolume,
+          updateChartData,
+          updateTopTokens,
+          updateAllPairs,
+          updatePriceData,
+        ]
       )}
     >
       {children}
@@ -414,8 +442,8 @@ const getTokenData = async (address, ethPrice, ethPriceOld) => {
     data.txnChange = txnChange
 
     // used for custom adjustments
-    data.oneDayData = oneDayData[address]
-    data.twoDayData = twoDayData[address]
+    data.oneDayData = oneDayData?.[address]
+    data.twoDayData = twoDayData?.[address]
 
     // new tokens
     if (!oneDayData && data) {
@@ -694,6 +722,98 @@ export function useTokenPairs(tokenAddress) {
   return tokenPairs || []
 }
 
+export function useTokenDataCombined(tokenAddresses) {
+  const [state, { updateCombinedVolume }] = useTokenDataContext()
+  const [ethPrice, ethPriceOld] = useEthPrice()
+
+  const volume = state?.combinedVol
+
+  useEffect(() => {
+    async function fetchDatas() {
+      Promise.all(
+        tokenAddresses.map(async (address) => {
+          return await getTokenData(address, ethPrice, ethPriceOld)
+        })
+      )
+        .then((res) => {
+          if (res) {
+            const newVolume = res
+              ? res?.reduce(function (acc, entry) {
+                  acc = acc + parseFloat(entry.oneDayVolumeUSD)
+                  return acc
+                }, 0)
+              : 0
+            updateCombinedVolume(newVolume)
+          }
+        })
+        .catch(() => {
+          console.log('error fetching combined data')
+        })
+    }
+    if (!volume && ethPrice && ethPriceOld) {
+      fetchDatas()
+    }
+  }, [tokenAddresses, ethPrice, ethPriceOld, volume, updateCombinedVolume])
+
+  return volume
+}
+
+export function useTokenChartDataCombined(tokenAddresses) {
+  const [state, { updateChartData }] = useTokenDataContext()
+
+  const datas = useMemo(() => {
+    return (
+      tokenAddresses &&
+      tokenAddresses.reduce(function (acc, address) {
+        acc[address] = state?.[address]?.chartData
+        return acc
+      }, {})
+    )
+  }, [state, tokenAddresses])
+
+  const isMissingData = useMemo(() => Object.values(datas).filter((val) => !val).length > 0, [datas])
+
+  const formattedByDate = useMemo(() => {
+    return (
+      datas &&
+      !isMissingData &&
+      Object.keys(datas).map(function (address) {
+        const dayDatas = datas[address]
+        return dayDatas?.reduce(function (acc, dayData) {
+          acc[dayData.date] = dayData
+          return acc
+        }, {})
+      }, {})
+    )
+  }, [datas, isMissingData])
+
+  useEffect(() => {
+    async function fetchDatas() {
+      Promise.all(
+        tokenAddresses.map(async (address) => {
+          return await getTokenChartData(address)
+        })
+      )
+        .then((res) => {
+          res &&
+            res.map((result, i) => {
+              const tokenAddress = tokenAddresses[i]
+              updateChartData(tokenAddress, result)
+              return true
+            })
+        })
+        .catch(() => {
+          console.log('error fetching combined data')
+        })
+    }
+    if (isMissingData) {
+      fetchDatas()
+    }
+  }, [isMissingData, tokenAddresses, updateChartData])
+
+  return formattedByDate
+}
+
 export function useTokenChartData(tokenAddress) {
   const [state, { updateChartData }] = useTokenDataContext()
   const chartData = state?.[tokenAddress]?.chartData
@@ -741,5 +861,16 @@ export function useTokenPriceData(tokenAddress, timeWindow, interval = 3600) {
 
 export function useAllTokenData() {
   const [state] = useTokenDataContext()
-  return state
+
+  // filter out for only addresses
+  return Object.keys(state)
+    .filter((key) => key !== 'combinedVol')
+    .reduce(
+      (res, key) => {
+        res[key] = state[key]
+        return res
+      },
+
+      {}
+    )
 }
