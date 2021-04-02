@@ -277,7 +277,7 @@ function AccountPage({ account }) {
                     </TYPE.header>
                   </RowFixed>
                 </AutoColumn>
-                <AutoColumn gap="10px">
+                {/* <AutoColumn gap="10px">
                   <RowBetween>
                     <TYPE.body>Fees Earned (Cumulative)</TYPE.body>
                     <div />
@@ -287,7 +287,7 @@ function AccountPage({ account }) {
                       {aggregateFees ? formattedNum(aggregateFees, true, true) : '-'}
                     </TYPE.header>
                   </RowFixed>
-                </AutoColumn>
+                </AutoColumn> */}
               </AutoRow>
             </Panel>
           )}
