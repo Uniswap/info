@@ -24,6 +24,7 @@ deploy:
     bucket: dev-dmm-info.knstats.com
     skip_cleanup: true
     local-dir: build
+    cache_control: "no-cache"
     on:
       all_branches: true
       condition: $TRAVIS_BRANCH =~ ^develop$
@@ -33,6 +34,7 @@ deploy:
     bucket: staging-dmm-info.knstats.com
     skip_cleanup: true
     local-dir: build
+    cache_control: "no-cache"
     on:
       all_branches: true
       condition: $TRAVIS_BRANCH =~ ^staging$
