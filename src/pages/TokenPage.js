@@ -188,7 +188,7 @@ function TokenPage({ address, history }) {
               style={{ width: 'fit-content' }}
               color={backgroundColor}
               external
-              href={'https://ropsten.etherscan.io/address/' + address}
+              href={`${process.env.REACT_APP_ETHERSCAN_URL}/address/${address}`}
             >
               <Text style={{ marginLeft: '.15rem' }} fontSize={'14px'} fontWeight={400}>
                 ({address.slice(0, 8) + '...' + address.slice(36, 42)})
@@ -384,7 +384,11 @@ function TokenPage({ address, history }) {
                     </AutoRow>
                   </Column>
                   <ButtonLight color={backgroundColor}>
-                    <Link color={backgroundColor} external href={'https://ropsten.etherscan.io/address/' + address}>
+                    <Link
+                      color={backgroundColor}
+                      external
+                      href={`${process.env.REACT_APP_ETHERSCAN_URL}/address/${address}`}
+                    >
                       View on Etherscan ↗
                     </Link>
                   </ButtonLight>

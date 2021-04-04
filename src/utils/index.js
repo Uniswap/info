@@ -301,10 +301,10 @@ export const setThemeColor = (theme) => document.documentElement.style.setProper
 export const Big = (number) => new BigNumber(number)
 
 export const urls = {
-  showTransaction: (tx) => `https://ropsten.etherscan.io/tx/${tx}/`,
-  showAddress: (address) => `https://www.etherscan.io/address/${address}/`,
-  showToken: (address) => `https://www.etherscan.io/token/${address}/`,
-  showBlock: (block) => `https://ropsten.etherscan.io/block/${block}/`,
+  showTransaction: (tx) => `${process.env.REACT_APP_ETHERSCAN_URL}/tx/${tx}/`,
+  showAddress: (address) => `${process.env.REACT_APP_ETHERSCAN_URL}/address/${address}/`,
+  showToken: (address) => `${process.env.REACT_APP_ETHERSCAN_URL}/token/${address}/`,
+  showBlock: (block) => `${process.env.REACT_APP_ETHERSCAN_URL}/block/${block}/`,
 }
 
 export const formatTime = (unix) => {

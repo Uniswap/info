@@ -608,7 +608,11 @@ function PoolPage({ poolAddress, history }) {
                     </AutoRow>
                   </Column>
                   <ButtonLight color={backgroundColor}>
-                    <Link color={backgroundColor} external href={'https://ropsten.etherscan.io/address/' + poolAddress}>
+                    <Link
+                      color={backgroundColor}
+                      external
+                      href={`${process.env.REACT_APP_ETHERSCAN_URL}/address/${poolAddress}`}
+                    >
                       View on Etherscan ↗
                     </Link>
                   </ButtonLight>
