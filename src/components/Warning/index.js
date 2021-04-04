@@ -77,7 +77,7 @@ export default function Warning({ type, show, setShow, address }) {
                   fontWeight={500}
                   lineHeight={'145.23%'}
                   color={'#2172E5'}
-                  href={'https://ropsten.etherscan.io/address/' + address}
+                  href={`${process.env.REACT_APP_ETHERSCAN_URL}/address/${address}`}
                   target="_blank"
                 >
                   View {contractTypeLabel} contract on Etherscan
@@ -101,7 +101,7 @@ export default function Warning({ type, show, setShow, address }) {
                   fontWeight={500}
                   lineHeight={'145.23%'}
                   color={'#2172E5'}
-                  href={'https://ropsten.etherscan.io/address/' + address}
+                  href={`${process.env.REACT_APP_ETHERSCAN_URL}/address/${address}`}
                   target="_blank"
                 >
                   View {contractTypeLabel} contract on Etherscan
