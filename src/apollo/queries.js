@@ -483,7 +483,7 @@ export const GLOBAL_DATA = (block) => {
   const queryString = ` query dmmFactories {
     dmmFactories(
        ${block ? `block: { number: ${block}}` : ``} 
-       where: { id: "${FACTORY_ADDRESS}" }) {
+       where: { id: "${FACTORY_ADDRESS.toLowerCase()}" }) {
         id
         totalVolumeUSD
         totalFeeUSD
