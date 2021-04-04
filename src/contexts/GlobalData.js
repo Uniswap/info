@@ -482,8 +482,8 @@ const getEthPrice = async () => {
     const oneDayBackPrice = resultOneDay?.data?.bundles[0]?.ethPrice
     console.log('*******eth price**********', currentPrice, oneDayBackPrice)
     priceChangeETH = getPercentChange(currentPrice, oneDayBackPrice)
-    ethPrice = currentPrice
-    ethPriceOneDay = oneDayBackPrice
+    ethPrice = currentPrice || 0
+    ethPriceOneDay = oneDayBackPrice || 0
   } catch (e) {
     console.log(e)
   }
