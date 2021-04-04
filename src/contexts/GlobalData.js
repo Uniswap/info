@@ -483,7 +483,7 @@ const getEthPrice = async () => {
     console.log('*******eth price**********', currentPrice, oneDayBackPrice)
     priceChangeETH = getPercentChange(currentPrice, oneDayBackPrice)
     ethPrice = currentPrice || 0
-    ethPriceOneDay = oneDayBackPrice || 0
+    ethPriceOneDay = oneDayBackPrice || currentPrice
   } catch (e) {
     console.log(e)
   }
