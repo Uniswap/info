@@ -430,7 +430,7 @@ export const Search = ({ small = false }) => {
               : below410
               ? 'Search...'
               : below470
-              ? 'Search Uniswap...'
+              ? 'Search Dmm ...'
               : below700
               ? 'Search pairs and tokens...'
               : 'Search Dmm pairs and tokens...'
