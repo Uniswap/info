@@ -19,10 +19,10 @@ import {
   ETH_PRICE,
   ALL_PAIRS,
   ALL_TOKENS,
-  TOP_LPS_PER_PAIRS,
+  TOP_LPS_PER_POOLS,
 } from '../apollo/queries'
 import weekOfYear from 'dayjs/plugin/weekOfYear'
-import { useAllPairData } from './PairData'
+import { useAllPoolData } from './PoolData'
 const UPDATE = 'UPDATE'
 const UPDATE_TXNS = 'UPDATE_TXNS'
 const UPDATE_CHART = 'UPDATE_CHART'
@@ -673,24 +673,24 @@ export function useTopLps() {
   const [state, { updateTopLps }] = useGlobalDataContext()
   let topLps = state?.topLps
 
-  const allPairs = useAllPairData()
+  const allPools = useAllPoolData()
 
   useEffect(() => {
     async function fetchData() {
       // get top 20 by reserves
-      let topPairs = Object.keys(allPairs)
-        ?.sort((a, b) => parseFloat(allPairs[a].reserveUSD > allPairs[b].reserveUSD ? -1 : 1))
+      let topPools = Object.keys(allPools)
+        ?.sort((a, b) => parseFloat(allPools[a].reserveUSD > allPools[b].reserveUSD ? -1 : 1))
         ?.slice(0, 99)
-        .map((pair) => pair)
+        .map((pool) => pool)
 
       let topLpLists = await Promise.all(
-        topPairs.map(async (pair) => {
+        topPools.map(async (pool) => {
           // for each one, fetch top LPs
           try {
             const { data: results } = await xyzClient.query({
-              query: TOP_LPS_PER_PAIRS,
+              query: TOP_LPS_PER_POOLS,
               variables: {
-                pair: pair.toString(),
+                pool: pool.toString(),
               },
               fetchPolicy: 'cache-first',
             })
@@ -707,16 +707,17 @@ export function useTopLps() {
         .filter((i) => !!i) // check for ones not fetched correctly
         .map((list) => {
           return list.map((entry) => {
-            const pairData = allPairs[entry.pair.id]
+            const poolData = allPools[entry.pool.id]
             return topLps.push({
               user: entry.user,
-              pairName: pairData.token0.symbol + '-' + pairData.token1.symbol,
+              pairName: poolData.token0.symbol + '-' + poolData.token1.symbol,
               pairAddress: entry.pair.id,
-              token0: pairData.token0.id,
-              token1: pairData.token1.id,
+              poolAddress: entry.pool.id,
+              token0: poolData.token0.id,
+              token1: poolData.token1.id,
               usd:
-                (parseFloat(entry.liquidityTokenBalance) / parseFloat(pairData.totalSupply)) *
-                parseFloat(pairData.reserveUSD),
+                (parseFloat(entry.liquidityTokenBalance) / parseFloat(poolData.totalSupply)) *
+                parseFloat(poolData.reserveUSD),
             })
           })
         })
@@ -726,7 +727,7 @@ export function useTopLps() {
       updateTopLps(shorter)
     }
 
-    if (!topLps && allPairs && Object.keys(allPairs).length > 0) {
+    if (!topLps && allPools && Object.keys(allPools).length > 0) {
       fetchData()
     }
   })
