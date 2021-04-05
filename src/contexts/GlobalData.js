@@ -279,30 +279,30 @@ async function getGlobalData(ethPrice, oldEthPrice) {
 
     console.log('++++data fetched ++', data, oneDayData, twoDayData, oneWeekData, twoWeekData)
 
-    if (data && oneDayData && twoDayData) {
+    if (data) {
       let [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentChange(
-        data.totalVolumeUSD,
-        oneDayData.totalVolumeUSD ? oneDayData.totalVolumeUSD : 0,
-        twoDayData.totalVolumeUSD ? twoDayData.totalVolumeUSD : 0
+        data ? data.totalVolumeUSD : 0,
+        oneDayData && oneDayData.totalVolumeUSD ? oneDayData.totalVolumeUSD : 0,
+        twoDayData && twoDayData.totalVolumeUSD ? twoDayData.totalVolumeUSD : 0
       )
 
       let [oneDayFeeUSD, feeChangeUSD] = get2DayPercentChange(
-        data.totalFeeUSD,
-        oneDayData.totalFeeUSD ? oneDayData.totalFeeUSD : 0,
-        twoDayData.totalFeeUSD ? twoDayData.totalFeeUSD : 0
+        data ? data.totalFeeUSD : 0,
+        oneDayData && oneDayData.totalFeeUSD ? oneDayData.totalFeeUSD : 0,
+        twoDayData && twoDayData.totalFeeUSD ? twoDayData.totalFeeUSD : 0
       )
 
       console.log('++++oneDayFeeUSD++++++++++++++++++++++', oneDayFeeUSD)
       const [oneDayTxns, txnChange] = get2DayPercentChange(
-        data.txCount,
-        oneDayData.txCount ? oneDayData.txCount : 0,
-        twoDayData.txCount ? twoDayData.txCount : 0
+        data ? data.txCount : 0,
+        oneDayData && oneDayData.txCount ? oneDayData.txCount : 0,
+        twoDayData && twoDayData.txCount ? twoDayData.txCount : 0
       )
 
       data.totalLiquidityUSD = data.totalLiquidityETH * ethPrice
       const liquidityChangeUSD = getPercentChange(
-        data.totalLiquidityETH * ethPrice,
-        oneDayData.totalLiquidityETH * oldEthPrice
+        data && ethPrice ? data.totalLiquidityETH * ethPrice : 0,
+        oneDayData && oldEthPrice ? oneDayData.totalLiquidityETH * oldEthPrice : 0
       )
 
       data.oneDayVolumeUSD = oneDayVolumeUSD
@@ -315,9 +315,9 @@ async function getGlobalData(ethPrice, oldEthPrice) {
 
     if (data && oneWeekData && twoWeekData) {
       const [oneWeekVolume, weeklyVolumeChange] = get2DayPercentChange(
-        data.totalVolumeUSD,
-        oneWeekData.totalVolumeUSD,
-        twoWeekData.totalVolumeUSD
+        data ? data.totalVolumeUSD : 0,
+        oneWeekData ? oneWeekData.totalVolumeUSD : 0,
+        twoWeekData ? twoWeekData.totalVolumeUSD : 0
       )
       data.oneWeekVolume = oneWeekVolume
       data.weeklyVolumeChange = weeklyVolumeChange
