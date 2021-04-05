@@ -128,6 +128,23 @@ export const TOP_LPS_PER_PAIRS = gql`
   }
 `
 
+export const TOP_LPS_PER_POOLS = gql`
+  query lps($pool: Bytes!) {
+    liquidityPositions(where: { pool: $pool }, orderBy: liquidityTokenBalance, orderDirection: desc, first: 10) {
+      user {
+        id
+      }
+      pair {
+        id
+      }
+      pool {
+        id
+      }
+      liquidityTokenBalance
+    }
+  }
+`
+
 export const HOURLY_PAIR_RATES = (pairAddress, blocks) => {
   let queryString = 'query blocks {'
   queryString += blocks.map(
