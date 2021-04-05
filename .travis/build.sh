@@ -5,13 +5,13 @@ set -euo pipefail
 printf 'Building swap from commit %s\n' "$TRAVIS_COMMIT"
 if [[ "$TRAVIS_BRANCH" == "develop" ]]; then
   echo "Start running build"
-  yarn build
+  yarn build-ropsten
   echo "Finished running build-ropsten"
 elif [[ "$TRAVIS_BRANCH" == "staging" ]]; then
   echo "Start running build-staging"
   yarn build-staging
   echo "Finished running build-staging"
-elif [[ "$TRAVIS_BRANCH" == "master" ]]; then
+elif [[ "$TRAVIS_BRANCH" == "main" ]]; then
   echo "Start running build"
   yarn build-production
   echo "Finished running build"
