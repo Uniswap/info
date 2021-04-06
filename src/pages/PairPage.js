@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { withRouter } from 'react-router-dom'
 import 'feather-icons'
+import { Link as LinkScroll } from 'react-scroll'
 import styled from 'styled-components'
 import Panel from '../components/Panel'
 import { PageWrapper, ContentWrapperLarge, StyledIcon } from '../components/index'
@@ -266,9 +267,10 @@ function PairPage({ pairAddress, history }) {
                     <></>
                   )}
 
-                  <Link external href={getPoolLink(token0?.id, token1?.id)}>
-                    <ButtonLight color={backgroundColor}>+ Add Liquidity</ButtonLight>
-                  </Link>
+                  <LinkScroll to="topPools" spy={true} smooth={true}>
+                    <ButtonLight color={backgroundColor}>Choose pool to add liquidity</ButtonLight>
+                  </LinkScroll>
+
                   <Link external href={getSwapLink(token0?.id, token1?.id)}>
                     <ButtonDark ml={!below1080 && '.5rem'} mr={below1080 && '.5rem'} color={backgroundColor}>
                       Trade
@@ -401,7 +403,7 @@ function PairPage({ pairAddress, history }) {
                   />
                 </Panel>
               </PanelWrapper>
-              <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
+              <TYPE.main id="topPools" fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
                 Top Pools
               </TYPE.main>
               <Panel

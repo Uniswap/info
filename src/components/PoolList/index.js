@@ -17,7 +17,7 @@ import { TYPE } from '../../Theme'
 const TableHeader = styled.div`
   display: grid;
   grid-gap: 1em;
-  grid-template-columns: repeat(6, 1fr) repeat(2, 0.5fr);
+  grid-template-columns: repeat(8, 1fr);
   grid-template-areas: 'pool ratio liq vol';
   padding: 15px 36px 13px 26px;
   font-size: 12px;
@@ -33,7 +33,7 @@ const TableHeader = styled.div`
 const TableRow = styled.div`
   display: grid;
   grid-gap: 1em;
-  grid-template-columns: repeat(6, 1fr) repeat(2, 0.5fr);
+  grid-template-columns: repeat(8, 1fr);
   grid-template-areas: 'pool ratio liq vol';
   padding: 15px 36px 13px 26px;
   font-size: 12px;
@@ -95,10 +95,6 @@ const formatDataText = (value, trackedValue, supressWarning = false) => {
 const ListItem = ({ pool, oddRow }) => {
   const amp = pool.amp / 10000
 
-  // Recommended pools are pools that have AMP = 1 or is registered by kyber DAO in a whitelist contract
-  // TODO: Add recommended pool which is registered by kyber DAO  in a whitelist contract
-  const isRecommended = amp === 1
-
   const percentToken0 =
     ((pool.reserve0 / pool.vReserve0) * 100) / (pool.reserve0 / pool.vReserve0 + pool.reserve1 / pool.vReserve1)
   const percentToken1 = 100 - percentToken0
@@ -113,11 +109,6 @@ const ListItem = ({ pool, oddRow }) => {
 
   return (
     <TableRow oddRow={oddRow}>
-      {isRecommended && (
-        <div style={{ position: 'absolute' }}>
-          <FavoriteStar />
-        </div>
-      )}
       <CustomLink to={`/pool/${pool.id}`} style={{ cursor: 'pointer' }}>
         <DataText grid-area="pool">{shortenPoolAddress}</DataText>
       </CustomLink>
@@ -346,7 +337,9 @@ const PoolList = ({ pools, maxItems = 10 }) => {
           </ClickableText>
         </Flex>
 
-        <Flex alignItems="center" justifyContent="flexEnd" />
+        <Flex alignItems="center" justifyContent="flexEnd">
+          <ClickableText>Add Liquidity</ClickableText>
+        </Flex>
       </TableHeader>
       {!poolsList ? (
         <Loader />
