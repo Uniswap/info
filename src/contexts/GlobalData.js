@@ -217,7 +217,7 @@ async function getGlobalData(ethPrice, oldEthPrice) {
   let data = {}
   let oneDayData = {}
   let twoDayData = {}
-  console.log('=========== run to get global data =========')
+
   try {
     // get timestamps for the days
     const utcCurrentTime = dayjs()
@@ -234,14 +234,6 @@ async function getGlobalData(ethPrice, oldEthPrice) {
       utcTwoWeeksBack,
     ])
 
-    console.log(
-      '________________oneDayBlock, twoDayBlock, oneWeekBlock, twoWeekBlock',
-      oneDayBlock,
-      twoDayBlock,
-      oneWeekBlock,
-      twoWeekBlock
-    )
-
     // fetch the global data
     let result = await xyzClient.query({
       query: GLOBAL_DATA(),
@@ -254,8 +246,6 @@ async function getGlobalData(ethPrice, oldEthPrice) {
       query: GLOBAL_DATA(oneDayBlock?.number),
       fetchPolicy: 'cache-first',
     })
-
-    console.log('+++++++++++++++ one day results  +++', oneDayResult)
 
     oneDayData = oneDayResult.data.dmmFactories[0]
 
@@ -277,8 +267,6 @@ async function getGlobalData(ethPrice, oldEthPrice) {
     })
     const twoWeekData = twoWeekResult.data.dmmFactories[0]
 
-    console.log('++++data fetched ++', data, oneDayData, twoDayData, oneWeekData, twoWeekData)
-
     if (data) {
       let [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentChange(
         data ? data.totalVolumeUSD : 0,
@@ -292,7 +280,6 @@ async function getGlobalData(ethPrice, oldEthPrice) {
         twoDayData && twoDayData.totalFeeUSD ? twoDayData.totalFeeUSD : 0
       )
 
-      console.log('++++oneDayFeeUSD++++++++++++++++++++++', oneDayFeeUSD)
       const [oneDayTxns, txnChange] = get2DayPercentChange(
         data ? data.txCount : 0,
         oneDayData && oneDayData.txCount ? oneDayData.txCount : 0,
@@ -325,8 +312,6 @@ async function getGlobalData(ethPrice, oldEthPrice) {
   } catch (e) {
     console.log(e)
   }
-
-  console.log('==========global = data =====', data)
 
   return data
 }
@@ -480,7 +465,6 @@ const getEthPrice = async () => {
     })
     const currentPrice = result?.data?.bundles[0]?.ethPrice
     const oneDayBackPrice = resultOneDay?.data?.bundles[0]?.ethPrice
-    console.log('*******eth price**********', currentPrice, oneDayBackPrice)
     priceChangeETH = getPercentChange(currentPrice, oneDayBackPrice)
     ethPrice = currentPrice || 0
     ethPriceOneDay = oneDayBackPrice || currentPrice
@@ -562,7 +546,6 @@ export function useGlobalData() {
   useEffect(() => {
     async function fetchData() {
       let globalData = await getGlobalData(ethPrice, oldEthPrice)
-      console.log('=============globalData=======__________________', globalData)
       globalData && update(globalData)
 
       let allPairs = await getAllPairsOnUniswap()

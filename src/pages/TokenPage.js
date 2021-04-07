@@ -10,7 +10,7 @@ import PairList from '../components/PairList'
 import Loader from '../components/LocalLoader'
 import { AutoRow, RowBetween, RowFixed } from '../components/Row'
 import Column, { AutoColumn } from '../components/Column'
-import { ButtonLight, ButtonDark } from '../components/ButtonStyled'
+import { ButtonLight, ButtonDark, ButtonOutlined } from '../components/ButtonStyled'
 import TxnList from '../components/TxnList'
 import TokenChart from '../components/TokenChart'
 import { BasicLink } from '../components/Link'
@@ -19,7 +19,6 @@ import { formattedNum, formattedPercent, getPoolLink, getSwapLink, localNumber }
 import { useTokenData, useTokenTransactions, useTokenPairs } from '../contexts/TokenData'
 import { TYPE, ThemedBackground } from '../Theme'
 import { transparentize } from 'polished'
-import { useColor } from '../hooks'
 import CopyHelper from '../components/Copy'
 import { useMedia } from 'react-use'
 import { useDataForList } from '../contexts/PairData'
@@ -110,7 +109,7 @@ function TokenPage({ address, history }) {
   }, [])
 
   // detect color from token
-  const backgroundColor = useColor(id, symbol)
+  const backgroundColor = '#08a1e7'
 
   const allPairs = useTokenPairs(address)
 
@@ -186,7 +185,6 @@ function TokenPage({ address, history }) {
             </TYPE.body>
             <Link
               style={{ width: 'fit-content' }}
-              color={backgroundColor}
               external
               href={`${process.env.REACT_APP_ETHERSCAN_URL}/address/${address}`}
             >
@@ -242,10 +240,17 @@ function TokenPage({ address, history }) {
                     <></>
                   )}
                   <Link href={getPoolLink(address)} target="_blank">
-                    <ButtonLight color={backgroundColor}>+ Add Liquidity</ButtonLight>
+                    <ButtonOutlined color="#08a1e7" borderColor="#08a1e7" style={{ padding: '11px 22px' }}>
+                      + Add Liquidity
+                    </ButtonOutlined>
                   </Link>
                   <Link href={getSwapLink(address)} target="_blank">
-                    <ButtonDark ml={'.5rem'} mr={below1080 && '.5rem'} color={backgroundColor}>
+                    <ButtonDark
+                      ml={'.5rem'}
+                      mr={below1080 && '.5rem'}
+                      color={backgroundColor}
+                      style={{ padding: '11px 22px' }}
+                    >
                       Trade
                     </ButtonDark>
                   </Link>

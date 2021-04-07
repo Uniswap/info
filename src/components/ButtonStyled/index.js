@@ -77,6 +77,28 @@ export const ButtonLight = styled(Base)`
   }
 `
 
+export const ButtonOutlined = styled(Base)`
+  border: 1px solid ${({ theme, borderColor }) => borderColor || theme.primary1};
+  background-color: transparent;
+  color: ${({ theme, color }) => color || theme.primary1};
+  border-radius: 5.5px;
+  font-size: 12px;
+
+  &:focus {
+    box-shadow: 0 0 0 1px ${({ theme }) => theme.bg4};
+  }
+  &:hover {
+    box-shadow: 0 0 0 1px ${({ theme }) => theme.bg4};
+  }
+  &:active {
+    box-shadow: 0 0 0 1px ${({ theme }) => theme.bg4};
+  }
+  &:disabled {
+    opacity: 50%;
+    cursor: auto;
+  }
+`
+
 export function ButtonDropdown({ disabled = false, children, open, ...rest }) {
   return (
     <ButtonFaded {...rest} disabled={disabled} ope={open}>
@@ -100,7 +122,8 @@ export const ButtonDark = styled(Base)`
   background-color: ${({ color, theme }) => (color ? color : theme.primary1)};
   color: white;
   width: fit-content;
-  border-radius: 12px;
+  font-size: 12px;
+  border-radius: 5.5px;
   white-space: nowrap;
 
   :hover {

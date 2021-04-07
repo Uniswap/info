@@ -11037,10 +11037,10 @@ react-scroll-parallax@^2.2.0:
   dependencies:
     prop-types "^15.5.10"
 
-react-scroll@^1.8.0:
-  version "1.8.0"
-  resolved "https://registry.yarnpkg.com/react-scroll/-/react-scroll-1.8.0.tgz#0280cbe575e4e1a2f103c7cc6143dd38133573bd"
-  integrity sha512-oZfBXPhcxYPR8elI9tC3ORT6+iqiPPJWslsdR9intbNI5PVSa4XoAfC0I/cB3zk5lxQ/NSexCnT+8RqJL8mSZQ==
+react-scroll@^1.8.2:
+  version "1.8.2"
+  resolved "https://registry.yarnpkg.com/react-scroll/-/react-scroll-1.8.2.tgz#68e35b74ae296c88e7863393c9fd49f05afa29f5"
+  integrity sha512-f2ZEG5fsPbPTySI9ekcFpETCcNlqbmwbQj9hhzYK8tkgv+PA8APatSt66o/q0KSkDZxyT98ONTtXp9x0lyowEw==
   dependencies:
     lodash.throttle "^4.1.1"
     prop-types "^15.7.2"

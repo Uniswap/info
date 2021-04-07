@@ -230,8 +230,6 @@ async function getBulkPairData(pairList, ethPrice) {
       })
     )
 
-    console.log('_____________pair data ________________', oneDayResult, twoDayResult, oneWeekResult)
-
     let oneDayData = oneDayResult?.data?.pairs.reduce((obj, cur, i) => {
       return { ...obj, [cur.id]: cur }
     }, {})
@@ -276,7 +274,7 @@ async function getBulkPairData(pairList, ethPrice) {
           return data
         })
     )
-    console.log('!!!!!!!!!!!!!! pair data !!!!!!!!!!!', pairData)
+
     return pairData
   } catch (e) {
     console.log(e)
