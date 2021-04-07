@@ -171,7 +171,6 @@ export async function getBlocksFromTimestamps(timestamps, skipCount = 500) {
   }
 
   let fetchedData = await splitQuery(GET_BLOCKS, blockClient, [], timestamps, skipCount)
-  console.log('-___- fetched data ---', fetchedData)
   let blocks = []
   if (fetchedData) {
     for (var t in fetchedData) {
@@ -453,13 +452,7 @@ export const get2DayPercentChange = (valueNow, value24HoursAgo, value48HoursAgo)
   let previousChange = parseFloat(value24HoursAgo) - parseFloat(value48HoursAgo)
 
   const adjustedPercentChange = (parseFloat(currentChange - previousChange) / parseFloat(previousChange)) * 100
-  console.log(
-    '==============get2DayPercentChange=====================',
-    valueNow,
-    value24HoursAgo,
-    value48HoursAgo,
-    adjustedPercentChange
-  )
+
   if (isNaN(adjustedPercentChange) || !isFinite(adjustedPercentChange)) {
     return [currentChange, 0]
   }

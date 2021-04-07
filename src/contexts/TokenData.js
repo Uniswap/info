@@ -312,8 +312,6 @@ const getTopTokens = async (ethPrice, ethPriceOld) => {
         })
     )
 
-    console.log('___________!!!!!!!!!!!!!!!!  bulkResults____________  ', bulkResults)
-
     return bulkResults
 
     // calculate percentage changes and daily changes

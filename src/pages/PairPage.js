@@ -1,20 +1,20 @@
 import React, { useEffect, useState } from 'react'
 import { withRouter } from 'react-router-dom'
 import 'feather-icons'
+import { Link as LinkScroll } from 'react-scroll'
 import styled from 'styled-components'
 import Panel from '../components/Panel'
 import { PageWrapper, ContentWrapperLarge, StyledIcon } from '../components/index'
 import { AutoRow, RowBetween, RowFixed } from '../components/Row'
 import Column, { AutoColumn } from '../components/Column'
-import { ButtonLight, ButtonDark } from '../components/ButtonStyled'
+import { ButtonOutlined, ButtonDark } from '../components/ButtonStyled'
 import PairChart from '../components/PairChart'
 import PoolList from '../components/PoolList'
 import Link from '../components/Link'
 import Loader from '../components/LocalLoader'
 import { BasicLink } from '../components/Link'
 import Search from '../components/Search'
-import { formattedNum, formattedPercent, getPoolLink, getSwapLink } from '../utils'
-import { useColor } from '../hooks'
+import { formattedNum, formattedPercent, getSwapLink } from '../utils'
 import { usePairData, usePairPools } from '../contexts/PairData'
 import { TYPE, ThemedBackground } from '../Theme'
 import { transparentize } from 'polished'
@@ -119,7 +119,7 @@ function PairPage({ pairAddress, history }) {
 
   const pools = usePairPools(pairAddress)
 
-  const backgroundColor = useColor(pairAddress)
+  const backgroundColor = '#08a1e7'
 
   // liquidity
   const liquidity = trackedReserveUSD
@@ -266,11 +266,19 @@ function PairPage({ pairAddress, history }) {
                     <></>
                   )}
 
-                  <Link external href={getPoolLink(token0?.id, token1?.id)}>
-                    <ButtonLight color={backgroundColor}>+ Add Liquidity</ButtonLight>
-                  </Link>
+                  <LinkScroll to="topPools" spy={true} smooth={true}>
+                    <ButtonOutlined color="#08a1e7" borderColor="#08a1e7" style={{ padding: '11px 22px' }}>
+                      Choose pool to add liquidity
+                    </ButtonOutlined>
+                  </LinkScroll>
+
                   <Link external href={getSwapLink(token0?.id, token1?.id)}>
-                    <ButtonDark ml={!below1080 && '.5rem'} mr={below1080 && '.5rem'} color={backgroundColor}>
+                    <ButtonDark
+                      ml={!below1080 && '.5rem'}
+                      mr={below1080 && '.5rem'}
+                      color={backgroundColor}
+                      style={{ padding: '11px 22px' }}
+                    >
                       Trade
                     </ButtonDark>
                   </Link>
@@ -401,7 +409,7 @@ function PairPage({ pairAddress, history }) {
                   />
                 </Panel>
               </PanelWrapper>
-              <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
+              <TYPE.main id="topPools" fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
                 Top Pools
               </TYPE.main>
               <Panel

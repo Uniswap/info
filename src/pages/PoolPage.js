@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { withRouter } from 'react-router-dom'
 import 'feather-icons'
-import { Bookmark, PlusCircle } from 'react-feather'
+import { Bookmark } from 'react-feather'
 import { transparentize } from 'polished'
 import styled from 'styled-components'
 import { useMedia } from 'react-use'
@@ -10,7 +10,7 @@ import { PageWrapper, ContentWrapperLarge, StyledIcon, Hover } from '../componen
 import Panel from '../components/Panel'
 import { AutoRow, RowBetween, RowFixed } from '../components/Row'
 import Column, { AutoColumn } from '../components/Column'
-import { ButtonLight, ButtonDark } from '../components/ButtonStyled'
+import { ButtonDark, ButtonOutlined } from '../components/ButtonStyled'
 import PoolChart from '../components/PoolChart'
 import Link from '../components/Link'
 import TxnList from '../components/TxnList'
@@ -24,7 +24,6 @@ import DoubleTokenLogo from '../components/DoubleLogo'
 import TokenLogo from '../components/TokenLogo'
 import AddBookmark from '../components/Icons/AddBookmark'
 import { TYPE, ThemedBackground } from '../Theme'
-import { useColor } from '../hooks'
 import { usePoolData, usePoolTransactions } from '../contexts/PoolData'
 import { useEthPrice } from '../contexts/GlobalData'
 import { usePathDismissed, useSavedPools } from '../contexts/LocalStorage'
@@ -149,7 +148,7 @@ function PoolPage({ poolAddress, history }) {
   }, [])
 
   const transactions = usePoolTransactions(poolAddress)
-  const backgroundColor = useColor(poolAddress)
+  const backgroundColor = '#08a1e7'
 
   // liquidity
   const liquidity = reserveUSD ? formattedNum(reserveUSD, true) : '-'
@@ -300,17 +299,17 @@ function PoolPage({ poolAddress, history }) {
                   )}
 
                   <Link external href={getPoolLink(token0?.id, token1?.id, false, poolAddress)}>
-                    <ButtonLight color={backgroundColor}>+ Add Liquidity</ButtonLight>
-                  </Link>
-                  <Link
-                    external
-                    href={getPoolLink(token0?.id, token1?.id, true, poolAddress)}
-                    style={{ marginLeft: '8px' }}
-                  >
-                    <ButtonLight color={backgroundColor}>- Remove Liquidity</ButtonLight>
+                    <ButtonOutlined color="#08a1e7" borderColor="#08a1e7" style={{ padding: '11px 22px' }}>
+                      + Add Liquidity
+                    </ButtonOutlined>
                   </Link>
                   <Link external href={getSwapLink(token0?.id, token1?.id)}>
-                    <ButtonDark ml={!below1080 && '.5rem'} mr={below1080 && '.5rem'} color={backgroundColor}>
+                    <ButtonDark
+                      ml={!below1080 && '.5rem'}
+                      mr={below1080 && '.5rem'}
+                      color={backgroundColor}
+                      style={{ padding: '11px 22px' }}
+                    >
                       Trade
                     </ButtonDark>
                   </Link>
@@ -607,7 +606,7 @@ function PoolPage({ poolAddress, history }) {
                       <CopyHelper toCopy={token1?.id} />
                     </AutoRow>
                   </Column>
-                  <ButtonLight color={backgroundColor}>
+                  <ButtonOutlined color="#08a1e7" borderColor="#08a1e7" style={{ padding: '11px 22px' }}>
                     <Link
                       color={backgroundColor}
                       external
@@ -615,7 +614,7 @@ function PoolPage({ poolAddress, history }) {
                     >
                       View on Etherscan ↗
                     </Link>
-                  </ButtonLight>
+                  </ButtonOutlined>
                 </TokenDetailsLayout>
               </Panel>
             </>

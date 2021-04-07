@@ -135,8 +135,6 @@ function PositionList({ positions }) {
     }
   }, [positions])
 
-  const [ethPrice] = useEthPrice()
-
   const ListItem = ({ position, index }) => {
     const poolOwnership = position.liquidityTokenBalance / position.pool.totalSupply
     const valueUSD = poolOwnership * position.pool.reserveUSD
