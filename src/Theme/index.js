@@ -42,6 +42,7 @@ const theme = (darkMode, color) => ({
   bg4: darkMode ? '#565A69' : '#CED0D9',
   bg5: darkMode ? '#565A69' : '#888D9B',
   bg6: darkMode ? '#000' : '#FFFFFF',
+  bg7: darkMode ? '#303e46' : '#FFFFFF',
   sidebar: '#303e46',
 
   //specialty colors
@@ -66,6 +67,9 @@ const theme = (darkMode, color) => ({
   secondary3: darkMode ? '#17000b26' : '#FDEAF1',
 
   shadow1: darkMode ? '#000' : '#2F80ED',
+
+  // border colors
+  border: darkMode ? '#4c5f69' : '#859aa5',
 
   // table colors
   oddRow: darkMode ? '#283339' : '#f4f4f4',
