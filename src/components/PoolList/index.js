@@ -2,17 +2,13 @@ import React, { useState, useEffect, useMemo } from 'react'
 import styled from 'styled-components'
 import { Flex, Text } from 'rebass'
 import { ChevronUp, ChevronDown } from 'react-feather'
+import { useMedia } from 'react-use'
 
-import { AutoColumn } from '../Column'
 import { ButtonEmpty } from '../ButtonStyled'
-import Link, { CustomLink } from '../Link'
-import FavoriteStar from '../Icons/FavoriteStar'
-import AddCircle from '../Icons/AddCircle'
 import InfoHelper from '../InfoHelper'
 import Loader from '../LocalLoader'
-import { shortenAddress, formattedNum } from '../../utils'
 import { getHealthFactor } from '../../utils/dmm'
-import { TYPE } from '../../Theme'
+import ListItem, { ItemCard } from './ListItem'
 
 const TableHeader = styled.div`
   display: grid;
@@ -28,25 +24,6 @@ const TableHeader = styled.div`
   background-color: ${({ theme }) => theme.evenRow};
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
-`
-
-const TableRow = styled.div`
-  display: grid;
-  grid-gap: 1em;
-  grid-template-columns: repeat(8, 1fr);
-  grid-template-areas: 'pool ratio liq vol';
-  padding: 15px 36px 13px 26px;
-  font-size: 12px;
-  align-items: flex-start;
-  height: fit-content;
-  position: relative;
-  opacity: ${({ fade }) => (fade ? '0.6' : '1')};
-  background-color: ${({ theme, oddRow }) => (oddRow ? theme.oddRow : theme.evenRow)};
-  border: 1px solid transparent;
-
-  &:hover {
-    border: 1px solid #4a636f;
-  }
 `
 
 const ClickableText = styled(Text)`
@@ -80,63 +57,6 @@ const getOneYearFL = (liquidity, feeOneDay) => {
   return parseFloat(liquidity) === 0 ? 0 : (parseFloat(feeOneDay) * 365 * 100) / parseFloat(liquidity)
 }
 
-const formatDataText = (value, trackedValue, supressWarning = false) => {
-  const showUntracked = value !== '$0' && !trackedValue & !supressWarning
-  return (
-    <AutoColumn gap="2px" style={{ opacity: showUntracked ? '0.7' : '1' }}>
-      <div style={{ textAlign: 'left' }}>{value}</div>
-      <TYPE.light fontSize={'9px'} style={{ textAlign: 'right' }}>
-        {showUntracked ? 'unstable' : '  '}
-      </TYPE.light>
-    </AutoColumn>
-  )
-}
-
-const ListItem = ({ pool, oddRow }) => {
-  const amp = pool.amp / 10000
-
-  const percentToken0 =
-    ((pool.reserve0 / pool.vReserve0) * 100) / (pool.reserve0 / pool.vReserve0 + pool.reserve1 / pool.vReserve1)
-  const percentToken1 = 100 - percentToken0
-  // Shorten address with 0x + 3 characters at start and end
-  const shortenPoolAddress = shortenAddress(pool.id, 3)
-
-  const volume = pool.oneDayVolumeUSD ? pool.oneDayVolumeUSD : pool.oneDayVolumeUntracked
-
-  const fee = pool.oneDayFeeUSD ? pool.oneDayFeeUSD : pool.oneDayFeeUntracked
-
-  const oneYearFL = getOneYearFL(pool.reserveUSD, fee).toFixed(2)
-
-  return (
-    <TableRow oddRow={oddRow}>
-      <CustomLink to={`/pool/${pool.id}`} style={{ cursor: 'pointer' }}>
-        <DataText grid-area="pool">{shortenPoolAddress}</DataText>
-      </CustomLink>
-      <DataText grid-area="ratio">
-        <div>{`• ${percentToken0.toPrecision(2) ?? '.'}% ${pool.token0.symbol}`}</div>
-        <div>{`• ${percentToken1.toPrecision(2) ?? '.'}% ${pool.token1.symbol}`}</div>
-      </DataText>
-      <DataText grid-area="liq">{formattedNum(pool.reserveUSD, true)}</DataText>
-      <DataText grid-area="vol">{formatDataText(formattedNum(volume, true), pool.oneDayVolumeUSD)}</DataText>
-      <DataText>{formatDataText(formattedNum(fee, true), pool.oneDayFeeUSD)}</DataText>
-      <DataText>{formattedNum(amp.toPrecision(5))}</DataText>
-      <DataText>{`${oneYearFL}%`}</DataText>
-      <DataText style={{ alignItems: 'flex-start' }}>
-        {
-          <Link
-            href={`${process.env.REACT_APP_DMM_SWAP_URL}add/${pool.token0.id}/${pool.token1.id}/${pool.id}`}
-            target="_blank"
-          >
-            <ButtonEmpty padding="0" width="fit-content" style={{ padding: 0 }}>
-              <AddCircle />
-            </ButtonEmpty>
-          </Link>
-        }
-      </DataText>
-    </TableRow>
-  )
-}
-
 const SORT_FIELD = {
   NONE: -1,
   LIQ: 0,
@@ -146,6 +66,8 @@ const SORT_FIELD = {
 }
 
 const PoolList = ({ pools, maxItems = 10 }) => {
+  const above1200 = useMedia('(min-width: 1200px)') // Extra large screen
+
   // pagination
   const [page, setPage] = useState(1)
   const [maxPage, setMaxPage] = useState(1)
@@ -215,36 +137,8 @@ const PoolList = ({ pools, maxItems = 10 }) => {
     return 0
   }
 
-  const poolsList =
-    pools &&
-    Object.keys(pools)
-      .sort((addressA, addressB) => {
-        const poolA = pools[addressA]
-        const poolB = pools[addressB]
-        return sortList(poolA, poolB)
-      })
-      .slice(0, page * ITEMS_PER_PAGE)
-      .map((poolAddress) => {
-        return poolAddress && pools[poolAddress]
-      })
-
-  useEffect(() => {
-    setMaxPage(1) // edit this to do modular
-    setPage(1)
-  }, [pools])
-
-  useEffect(() => {
-    if (pools) {
-      let extraPages = 1
-      if (Object.keys(pools).length % ITEMS_PER_PAGE === 0) {
-        extraPages = 0
-      }
-      setMaxPage(Math.floor(Object.keys(pools).length / ITEMS_PER_PAGE) + extraPages)
-    }
-  }, [ITEMS_PER_PAGE, pools])
-
-  return (
-    <div>
+  const renderHeader = () => {
+    return above1200 ? (
       <TableHeader>
         <Flex alignItems="center" justifyContent="flexStart">
           <ClickableText>Pool</ClickableText>
@@ -350,12 +244,50 @@ const PoolList = ({ pools, maxItems = 10 }) => {
           <ClickableText>Add Liquidity</ClickableText>
         </Flex>
       </TableHeader>
+    ) : null
+  }
+
+  const poolsList =
+    pools &&
+    Object.keys(pools)
+      .sort((addressA, addressB) => {
+        const poolA = pools[addressA]
+        const poolB = pools[addressB]
+        return sortList(poolA, poolB)
+      })
+      .slice(0, page * ITEMS_PER_PAGE)
+      .map((poolAddress) => {
+        return poolAddress && pools[poolAddress]
+      })
+
+  useEffect(() => {
+    setMaxPage(1) // edit this to do modular
+    setPage(1)
+  }, [pools])
+
+  useEffect(() => {
+    if (pools) {
+      let extraPages = 1
+      if (Object.keys(pools).length % ITEMS_PER_PAGE === 0) {
+        extraPages = 0
+      }
+      setMaxPage(Math.floor(Object.keys(pools).length / ITEMS_PER_PAGE) + extraPages)
+    }
+  }, [ITEMS_PER_PAGE, pools])
+
+  return (
+    <div>
+      {renderHeader()}
       {!poolsList ? (
         <Loader />
       ) : (
         poolsList.map((pool, index) => {
           if (pool) {
-            return <ListItem key={pool.id} pool={pool} oddRow={(index + 1) % 2 !== 0} />
+            return above1200 ? (
+              <ListItem key={pool.id} pool={pool} oddRow={(index + 1) % 2 !== 0} />
+            ) : (
+              <ItemCard key={pool.id} pool={pool} />
+            )
           }
 
           return null

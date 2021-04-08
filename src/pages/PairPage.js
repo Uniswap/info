@@ -416,6 +416,7 @@ function PairPage({ pairAddress, history }) {
                 style={{
                   marginTop: '1.5rem',
                   padding: 0,
+                  border: 'none',
                 }}
               >
                 {pools ? <PoolList pools={pools} /> : <Loader />}
