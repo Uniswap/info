@@ -207,8 +207,6 @@ export async function getBulkPoolData(poolList, ethPrice) {
       })
     )
 
-    console.log('_____________pool data ________________', oneDayResult, twoDayResult, oneWeekResult)
-
     let oneDayData = oneDayResult?.data?.pools.reduce((obj, cur, i) => {
       return { ...obj, [cur.id]: cur }
     }, {})
@@ -253,7 +251,7 @@ export async function getBulkPoolData(poolList, ethPrice) {
           return data
         })
     )
-    console.log('!!!!!!!!!!!!!! pool data !!!!!!!!!!!', poolData)
+
     return poolData
   } catch (e) {
     console.log(e)
