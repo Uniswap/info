@@ -116,6 +116,27 @@ function TokenPage({ address, history }) {
   // pairs to show in pair list
   const fetchedPairsList = useDataForList(allPairs)
 
+  let bestPair
+  let bestPairToken
+
+  if (fetchedPairsList) {
+    const fetchedPairsListAddresses = Object.keys(fetchedPairsList)
+
+    if (Array.isArray(fetchedPairsListAddresses) && fetchedPairsListAddresses.length > 0) {
+      bestPair =
+        fetchedPairsList[
+          fetchedPairsListAddresses.sort(function (a, b) {
+            // Sort by reserveUSD in descending order
+            return parseFloat(fetchedPairsList[b].reserveUSD) - parseFloat(fetchedPairsList[a].reserveUSD)
+          })[0]
+        ]
+    }
+  }
+
+  if (bestPair) {
+    bestPairToken = bestPair.token0.id.toLowerCase() === address.toLowerCase() ? bestPair.token1.id : bestPair.token0.id
+  }
+
   // all transactions with this token
   const transactions = useTokenTransactions(address)
 
@@ -244,7 +265,10 @@ function TokenPage({ address, history }) {
                       + Add Liquidity
                     </ButtonOutlined>
                   </Link>
-                  <Link href={getSwapLink(address)} target="_blank">
+                  <Link
+                    href={bestPairToken ? getSwapLink(address, bestPairToken) : getSwapLink(address)}
+                    target="_blank"
+                  >
                     <ButtonDark
                       ml={'.5rem'}
                       mr={below1080 && '.5rem'}
