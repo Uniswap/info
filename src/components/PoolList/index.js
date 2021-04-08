@@ -251,7 +251,11 @@ const PoolList = ({ pools, maxItems = 10 }) => {
         </Flex>
         <Flex alignItems="center" justifyContent="flexEnd">
           <ClickableText>Ratio</ClickableText>
-          <InfoHelper text={'Based on 24hr volume annualized'} />
+          <InfoHelper
+            text={
+              'Current token pair ratio of the pool. Ratio changes depending on pool trades. Add liquidity according to this ratio.'
+            }
+          />
         </Flex>
         <Flex alignItems="center" justifyContent="flexEnd">
           <ClickableText
@@ -314,7 +318,11 @@ const PoolList = ({ pools, maxItems = 10 }) => {
 
         <Flex alignItems="center" justifyContent="flexEnd">
           <ClickableText>AMP</ClickableText>
-          <InfoHelper text={'Based on 24hr volume annualized'} />
+          <InfoHelper
+            text={
+              'Amplification Factor. Higher AMP, higher capital efficiency within a price range. Higher AMP recommended for more stable pairs, lower AMP for more volatile pairs.'
+            }
+          />
         </Flex>
 
         <Flex alignItems="center" justifyContent="flexEnd">
@@ -335,6 +343,7 @@ const PoolList = ({ pools, maxItems = 10 }) => {
               ''
             )}
           </ClickableText>
+          <InfoHelper text={'1Yr Fees Collected/Liquidity based on 24H volume annualized'} />
         </Flex>
 
         <Flex alignItems="center" justifyContent="flexEnd">
