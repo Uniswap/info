@@ -42,6 +42,7 @@ const theme = (darkMode, color) => ({
   bg4: darkMode ? '#565A69' : '#CED0D9',
   bg5: darkMode ? '#565A69' : '#888D9B',
   bg6: darkMode ? '#000' : '#FFFFFF',
+  bg7: darkMode ? '#303e46' : '#FFFFFF',
   sidebar: '#303e46',
 
   //specialty colors
@@ -67,6 +68,9 @@ const theme = (darkMode, color) => ({
 
   shadow1: darkMode ? '#000' : '#2F80ED',
 
+  // border colors
+  border: darkMode ? '#4c5f69' : '#859aa5',
+
   // table colors
   oddRow: darkMode ? '#283339' : '#f4f4f4',
   evenRow: darkMode ? '#303e46' : '#ffffff',
@@ -78,6 +82,7 @@ const theme = (darkMode, color) => ({
   yellow2: '#F3841E',
   link: '#2172E5',
   blue: '2f80ed',
+  menu: '#f4f4f4',
 
   background: darkMode ? 'black' : `radial-gradient(50% 50% at 50% 50%, #08a1e730 0%, #fff 0%)`,
 })

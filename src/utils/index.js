@@ -8,7 +8,7 @@ import { GET_BLOCK, GET_BLOCKS, SHARE_VALUE } from '../apollo/queries'
 import { Text } from 'rebass'
 import _Decimal from 'decimal.js-light'
 import toFormat from 'toformat'
-import { timeframeOptions } from '../constants'
+import { timeframeOptions, WETH_ADDRESS } from '../constants'
 import Numeral from 'numeral'
 
 // format libraries
@@ -43,16 +43,14 @@ export function getPoolLink(token0Address, token1Address = null, remove = false,
       return (
         process.env.REACT_APP_DMM_SWAP_URL +
         (remove ? `remove` : `add`) +
-        `/${
-          token0Address === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' ? 'ETH' : token0Address
-        }/${'ETH'}/${poolAddress}`
+        `/${token0Address === WETH_ADDRESS ? 'ETH' : token0Address}/${'ETH'}/${poolAddress}`
       )
     } else {
       return (
         process.env.REACT_APP_DMM_SWAP_URL +
         (remove ? `remove` : `add`) +
-        `/${token0Address === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' ? 'ETH' : token0Address}/${
-          token1Address === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' ? 'ETH' : token1Address
+        `/${token0Address === WETH_ADDRESS ? 'ETH' : token0Address}/${
+          token1Address === WETH_ADDRESS ? 'ETH' : token1Address
         }/${poolAddress}`
       )
     }
@@ -62,14 +60,14 @@ export function getPoolLink(token0Address, token1Address = null, remove = false,
     return (
       process.env.REACT_APP_DMM_SWAP_URL +
       (remove ? `remove` : `add`) +
-      `/${token0Address === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' ? 'ETH' : token0Address}/${'ETH'}`
+      `/${token0Address === WETH_ADDRESS ? 'ETH' : token0Address}/${'ETH'}`
     )
   } else {
     return (
       process.env.REACT_APP_DMM_SWAP_URL +
       (remove ? `remove` : `add`) +
-      `/${token0Address === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' ? 'ETH' : token0Address}/${
-        token1Address === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' ? 'ETH' : token1Address
+      `/${token0Address === WETH_ADDRESS ? 'ETH' : token0Address}/${
+        token1Address === WETH_ADDRESS ? 'ETH' : token1Address
       }`
     )
   }
@@ -80,8 +78,8 @@ export function getSwapLink(token0Address, token1Address = null) {
     return `${process.env.REACT_APP_DMM_SWAP_URL}swap?inputCurrency=${token0Address}`
   } else {
     return `${process.env.REACT_APP_DMM_SWAP_URL}swap?inputCurrency=${
-      token0Address === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' ? 'ETH' : token0Address
-    }&outputCurrency=${token1Address === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' ? 'ETH' : token1Address}`
+      token0Address === WETH_ADDRESS ? 'ETH' : token0Address
+    }&outputCurrency=${token1Address === WETH_ADDRESS ? 'ETH' : token1Address}`
   }
 }
 

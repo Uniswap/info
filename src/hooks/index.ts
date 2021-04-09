@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef } from 'react'
+import { useState, useCallback, useEffect, useRef, RefObject } from 'react'
 import { shade } from 'polished'
 import Vibrant from 'node-vibrant'
 import { hex } from 'wcag-contrast'
@@ -55,22 +55,29 @@ export function useCopyClipboard(timeout = 500) {
   return [isCopied, staticCopy]
 }
 
-export const useOutsideClick = (ref, ref2, callback) => {
-  const handleClick = (e) => {
-    if (ref.current && ref.current && !ref2.current) {
-      callback(true)
-    } else if (ref.current && !ref.current.contains(e.target) && ref2.current && !ref2.current.contains(e.target)) {
-      callback(true)
-    } else {
-      callback(false)
-    }
-  }
+export function useOnClickOutside<T extends HTMLElement>(
+  node: RefObject<T | undefined>,
+  handler: undefined | (() => void)
+) {
+  const handlerRef = useRef<undefined | (() => void)>(handler)
   useEffect(() => {
-    document.addEventListener('click', handleClick)
-    return () => {
-      document.removeEventListener('click', handleClick)
+    handlerRef.current = handler
+  }, [handler])
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (node.current?.contains(e.target as Node) ?? false) {
+        return
+      }
+      if (handlerRef.current) handlerRef.current()
     }
-  })
+
+    document.addEventListener('mousedown', handleClickOutside)
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [node])
 }
 
 export default function useInterval(callback: () => void, delay: null | number) {
