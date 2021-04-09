@@ -45,3 +45,8 @@ export const ROPSTEN_TOKEN_LOGOS_MAPPING = {
   '0x5f4f41e067e8ccf0d1f9ee007223af4d72990cdc': '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9',
   '0xc778417e063141139fce010982780140aa0cd5ab': '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
 }
+
+export const WETH_ADDRESS =
+  String(process.env.REACT_APP_CHAIN_ID) === '1'
+    ? '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
+    : '0xc778417e063141139fce010982780140aa0cd5ab'

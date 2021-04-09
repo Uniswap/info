@@ -13,6 +13,7 @@ const UPDATE_SESSION_START = 'UPDATE_SESSION_START'
 const UPDATED_SUPPORTED_TOKENS = 'UPDATED_SUPPORTED_TOKENS'
 const UPDATE_LATEST_BLOCK = 'UPDATE_LATEST_BLOCK'
 const UPDATE_HEAD_BLOCK = 'UPDATE_HEAD_BLOCK'
+const UPDATE_OPEN_MODAL = 'UPDATE_OPEN_MODAL'
 
 const SUPPORTED_TOKENS = 'SUPPORTED_TOKENS'
 const TIME_KEY = 'TIME_KEY'
@@ -20,6 +21,7 @@ const CURRENCY = 'CURRENCY'
 const SESSION_START = 'SESSION_START'
 const LATEST_BLOCK = 'LATEST_BLOCK'
 const HEAD_BLOCK = 'HEAD_BLOCK'
+const OPEN_MODAL = 'OPEN_MODAL'
 
 const ApplicationContext = createContext()
 
@@ -75,6 +77,14 @@ function reducer(state, { type, payload }) {
       }
     }
 
+    case UPDATE_OPEN_MODAL: {
+      const { openModal } = payload
+      return {
+        ...state,
+        [OPEN_MODAL]: openModal,
+      }
+    }
+
     default: {
       throw Error(`Unexpected action type in DataContext reducer: '${type}'.`)
     }
@@ -84,6 +94,7 @@ function reducer(state, { type, payload }) {
 const INITIAL_STATE = {
   CURRENCY: 'USD',
   TIME_KEY: timeframeOptions.ALL_TIME,
+  OPEN_MODAL: null,
 }
 
 export default function Provider({ children }) {
@@ -144,6 +155,15 @@ export default function Provider({ children }) {
     })
   }, [])
 
+  const updateOpenModal = useCallback((openModal) => {
+    dispatch({
+      type: UPDATE_OPEN_MODAL,
+      payload: {
+        openModal,
+      },
+    })
+  }, [])
+
   return (
     <ApplicationContext.Provider
       value={useMemo(
@@ -156,9 +176,19 @@ export default function Provider({ children }) {
             updateSupportedTokens,
             updateLatestBlock,
             updateHeadBlock,
+            updateOpenModal,
           },
         ],
-        [state, update, updateTimeframe, updateSessionStart, updateSupportedTokens, updateLatestBlock, updateHeadBlock]
+        [
+          state,
+          update,
+          updateTimeframe,
+          updateSessionStart,
+          updateSupportedTokens,
+          updateLatestBlock,
+          updateHeadBlock,
+          updateOpenModal,
+        ]
       )}
     >
       {children}
@@ -281,4 +311,22 @@ export function useListedTokens() {
   }, [updateSupportedTokens, supportedTokens])
 
   return supportedTokens
+}
+
+export const ApplicationModal = {
+  MENU: 'MENU',
+}
+
+export function useOpenModal() {
+  const [state] = useApplicationContext()
+  const openModal = state?.[OPEN_MODAL]
+
+  return openModal
+}
+
+export function useToggleModal(modal) {
+  const [state, { updateOpenModal }] = useApplicationContext()
+  const open = useOpenModal(modal)
+
+  return useCallback(() => updateOpenModal(open ? null : modal), [modal, open])
 }

@@ -61,6 +61,10 @@ const Panel = styled(RebassBox)`
     `};
 
   ${(props) => !props.last && panelPseudo}
+
+  @media screen and (max-width: 960px) {
+    background-color: transparent;
+  }
 `
 
 export default Panel

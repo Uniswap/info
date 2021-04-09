@@ -47,7 +47,6 @@
     "react-device-detect": "^1.9.10",
     "react-dom": "^16.9.0",
     "react-feather": "^2.0.3",
-    "react-ga": "^3.1.2",
     "react-iframe": "^1.8.0",
     "react-parallax": "^2.2.4",
     "react-popper": "^2.2.3",
