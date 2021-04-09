@@ -21,7 +21,7 @@ import {
 } from '../apollo/queries'
 import weekOfYear from 'dayjs/plugin/weekOfYear'
 import { useAllPairData } from './PairData'
-import { useTokenChartDataCombined, useTokenDataCombined } from './TokenData'
+import { useTokenChartDataCombined } from './TokenData'
 const UPDATE = 'UPDATE'
 const UPDATE_TXNS = 'UPDATE_TXNS'
 const UPDATE_CHART = 'UPDATE_CHART'
@@ -220,7 +220,7 @@ export default function Provider({ children }) {
  * @param {*} oldEthPrice
  */
 
-async function getGlobalData(ethPrice, oldEthPrice, offsetVolume) {
+async function getGlobalData(ethPrice, oldEthPrice) {
   // data for each day , historic data used for % changes
   let data = {}
   let oneDayData = {}
@@ -301,7 +301,7 @@ async function getGlobalData(ethPrice, oldEthPrice, offsetVolume) {
       )
 
       // add relevant fields with the calculated amounts
-      data.oneDayVolumeUSD = oneDayVolumeUSD - offsetVolume
+      data.oneDayVolumeUSD = oneDayVolumeUSD
       data.oneWeekVolume = oneWeekVolume
       data.weeklyVolumeChange = weeklyVolumeChange
       data.volumeChangeUSD = volumeChangeUSD
@@ -323,6 +323,7 @@ async function getGlobalData(ethPrice, oldEthPrice, offsetVolume) {
  */
 
 let checked = false
+
 const getChartData = async (oldestDateToFetch, offsetData) => {
   let data = []
   let weeklyData = []
@@ -395,9 +396,10 @@ const getChartData = async (oldestDateToFetch, offsetData) => {
 
       // hardcoded fix for offset volume
       offsetData &&
+        !checked &&
         offsetData.map((dayData) => {
           if (dayData[date]) {
-            data[i].dailyVolumeUSD = data[i].dailyVolumeUSD - dayData.dailyVolumeUSD
+            data[i].dailyVolumeUSD = parseFloat(data[i].dailyVolumeUSD) - parseFloat(dayData[date].dailyVolumeUSD)
           }
           return true
         })
@@ -563,11 +565,11 @@ export function useGlobalData() {
 
   const data = state?.globalData
 
-  const combinedVolume = useTokenDataCombined(offsetVolumes)
+  // const combinedVolume = useTokenDataCombined(offsetVolumes)
 
   useEffect(() => {
     async function fetchData() {
-      let globalData = await getGlobalData(ethPrice, oldEthPrice, combinedVolume)
+      let globalData = await getGlobalData(ethPrice, oldEthPrice)
 
       globalData && update(globalData)
 
@@ -577,10 +579,10 @@ export function useGlobalData() {
       let allTokens = await getAllTokensOnUniswap()
       updateAllTokensInUniswap(allTokens)
     }
-    if (!data && ethPrice && oldEthPrice && combinedVolume) {
+    if (!data && ethPrice && oldEthPrice) {
       fetchData()
     }
-  }, [ethPrice, oldEthPrice, update, data, updateAllPairsInUniswap, updateAllTokensInUniswap, combinedVolume])
+  }, [ethPrice, oldEthPrice, update, data, updateAllPairsInUniswap, updateAllTokensInUniswap])
 
   return data || {}
 }

@@ -212,7 +212,7 @@ export function useCurrentCurrency() {
 
 export function useTimeframe() {
   const [state, { updateTimeframe }] = useApplicationContext()
-  const activeTimeframe = state?.[TIME_KEY]
+  const activeTimeframe = state?.[`TIME_KEY`]
   return [activeTimeframe, updateTimeframe]
 }
 
