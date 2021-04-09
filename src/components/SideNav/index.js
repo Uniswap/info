@@ -198,7 +198,7 @@ function SideNav({ history }) {
             </HeaderText>
             <SocialLinks />
             <HeaderText>
-              <Link>(c) dmm.exchange </Link>
+              <Link>(c) dmm.exchange</Link>
             </HeaderText>
             <Toggle isActive={isDark} toggle={toggleDarkMode} />
           </AutoColumn>

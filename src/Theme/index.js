@@ -82,6 +82,7 @@ const theme = (darkMode, color) => ({
   yellow2: '#F3841E',
   link: '#2172E5',
   blue: '2f80ed',
+  menu: '#f4f4f4',
 
   background: darkMode ? 'black' : `radial-gradient(50% 50% at 50% 50%, #08a1e730 0%, #fff 0%)`,
 })
