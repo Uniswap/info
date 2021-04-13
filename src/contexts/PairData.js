@@ -24,7 +24,7 @@ import {
   getTimestampsForChanges,
   splitQuery,
 } from '../utils'
-import { timeframeOptions } from '../constants'
+import { timeframeOptions, TRACKED_OVERRIDES } from '../constants'
 import { useLatestBlocks } from './Application'
 import { updateNameData } from '../utils/data'
 
@@ -256,6 +256,8 @@ async function getBulkPairData(pairList, ethPrice) {
 }
 
 function parseData(data, oneDayData, twoDayData, oneWeekData, ethPrice, oneDayBlock) {
+  const pairAddress = data.id
+
   // get volume changes
   const [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentChange(
     data?.volumeUSD,
@@ -295,6 +297,13 @@ function parseData(data, oneDayData, twoDayData, oneWeekData, ethPrice, oneDayBl
   }
   if (!oneWeekData && data) {
     data.oneWeekVolumeUSD = parseFloat(data.volumeUSD)
+  }
+
+  if (TRACKED_OVERRIDES.includes(pairAddress)) {
+    data.oneDayVolumeUSD = oneDayVolumeUntracked
+    data.oneWeekVolumeUSD = oneWeekVolumeUntracked
+    data.volumeChangeUSD = volumeChangeUntracked
+    data.trackedReserveUSD = data.reserveUSD
   }
 
   // format incorrect names
