@@ -5,6 +5,7 @@ import { useMedia } from 'react-use'
 import { Flex } from 'rebass'
 import { Menu as MenuIcon, List, Repeat, Monitor } from 'react-feather'
 
+import { KNC_ADDRESS } from '../../constants'
 import Link, { BasicLink } from '../Link'
 import { AutoColumn } from '../Column'
 import { RowFixed } from '../Row'
@@ -180,7 +181,7 @@ export default function Title() {
               </Option>
             </Link>
 
-            <Link href={`${process.env.REACT_APP_DMM_SWAP_URL}pools/ETH`} external>
+            <Link href={`${process.env.REACT_APP_DMM_SWAP_URL}pools/ETH/${KNC_ADDRESS}`} external>
               <Option style={{ marginLeft: 0 }}>
                 <Monitor size={20} style={{ marginRight: '.75rem' }} />
                 Liquidity
