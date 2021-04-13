@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { withRouter } from 'react-router-dom'
 import { Box } from 'rebass'
 import styled from 'styled-components'
@@ -23,6 +23,8 @@ import { transparentize } from 'polished'
 import { CustomLink } from '../components/Link'
 
 import { PageWrapper, ContentWrapper } from '../components'
+import CheckBox from '../components/Checkbox'
+import QuestionHelper from '../components/QuestionHelper'
 
 const ListOptions = styled(AutoRow)`
   height: 40px;
@@ -61,6 +63,9 @@ function GlobalPage() {
       top: 0,
     })
   }, [])
+
+  // for tracked data on pairs
+  const [useTracked, setUseTracked] = useState(true)
 
   return (
     <PageWrapper>
@@ -127,7 +132,9 @@ function GlobalPage() {
           )}
           <ListOptions gap="10px" style={{ marginTop: '2rem', marginBottom: '.5rem' }}>
             <RowBetween>
-              <TYPE.main fontSize={'1.125rem'}>Top Tokens</TYPE.main>
+              <TYPE.main fontSize={'1.125rem'} style={{ whiteSpace: 'nowrap' }}>
+                Top Tokens
+              </TYPE.main>
               <CustomLink to={'/tokens'}>See All</CustomLink>
             </RowBetween>
           </ListOptions>
@@ -136,12 +143,22 @@ function GlobalPage() {
           </Panel>
           <ListOptions gap="10px" style={{ marginTop: '2rem', marginBottom: '.5rem' }}>
             <RowBetween>
-              <TYPE.main fontSize={'1rem'}>Top Pairs</TYPE.main>
-              <CustomLink to={'/pairs'}>See All</CustomLink>
+              <TYPE.main fontSize={'1rem'} style={{ whiteSpace: 'nowrap' }}>
+                Top Pairs
+              </TYPE.main>
+              <AutoRow gap="4px" width="100%" justifyContent="flex-end">
+                <CheckBox
+                  checked={useTracked}
+                  setChecked={() => setUseTracked(!useTracked)}
+                  text={'Hide untracked pairs'}
+                />
+                <QuestionHelper text="USD amounts may be inaccurate in low liquiidty pairs or pairs without ETH or stablecoins." />
+                <CustomLink to={'/pairs'}>See All</CustomLink>
+              </AutoRow>
             </RowBetween>
           </ListOptions>
           <Panel style={{ marginTop: '6px', padding: '1.125rem 0 ' }}>
-            <PairList pairs={allPairs} useTracked={true} />
+            <PairList pairs={allPairs} useTracked={useTracked} />
           </Panel>
           <span>
             <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '2rem' }}>
