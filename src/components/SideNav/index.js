@@ -1,13 +1,14 @@
 import React from 'react'
 import styled from 'styled-components'
+import { withRouter } from 'react-router-dom'
+import { TrendingUp, List, PieChart, Disc, Repeat, Monitor } from 'react-feather'
+import { useMedia } from 'react-use'
+
+import { KNC_ADDRESS } from '../../constants'
 import { AutoColumn } from '../Column'
 import Title from '../Title'
 import { BasicLink } from '../Link'
-import { useMedia } from 'react-use'
-import { transparentize } from 'polished'
 import { TYPE } from '../../Theme'
-import { withRouter } from 'react-router-dom'
-import { TrendingUp, List, PieChart, Disc, Repeat, Monitor } from 'react-feather'
 import Link from '../Link'
 import { useSessionStart } from '../../contexts/Application'
 import { useDarkModeManager } from '../../contexts/LocalStorage'
@@ -166,7 +167,7 @@ function SideNav({ history }) {
                   </Option>
                 </Link>
 
-                <Link href={`${process.env.REACT_APP_DMM_SWAP_URL}pools/ETH`} external>
+                <Link href={`${process.env.REACT_APP_DMM_SWAP_URL}pools/ETH/${KNC_ADDRESS}`} external>
                   <Option>
                     <Monitor size={20} style={{ marginRight: '.75rem' }} />
                     Liquidity

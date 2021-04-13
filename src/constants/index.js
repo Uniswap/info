@@ -50,3 +50,8 @@ export const WETH_ADDRESS =
   String(process.env.REACT_APP_CHAIN_ID) === '1'
     ? '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
     : '0xc778417e063141139fce010982780140aa0cd5ab'
+
+export const KNC_ADDRESS =
+  String(process.env.REACT_APP_CHAIN_ID) === '1'
+    ? '0xdd974D5C2e2928deA5F71b9825b8b646686BD200'
+    : '0x7B2810576aa1cce68F2B118CeF1F36467c648F92'
