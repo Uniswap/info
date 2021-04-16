@@ -162,8 +162,8 @@ export const ItemCard = ({ pool, myLiquidity }) => {
         <GridItem>
           <DataTitle>Ratio</DataTitle>
           <DataText grid-area="ratio">
-            <div>{`• ${percentToken0}% ${pool.token0.symbol}`}</div>
-            <div>{`• ${percentToken1}% ${pool.token1.symbol}`}</div>
+            <div>{`• ${percentToken0.toFixed(2) ?? '.'}% ${pool.token0.symbol}`}</div>
+            <div>{`• ${percentToken1.toFixed(2) ?? '.'}% ${pool.token1.symbol}`}</div>
           </DataText>
         </GridItem>
 
@@ -215,8 +215,8 @@ const ListItem = ({ pool, oddRow }) => {
         <DataText grid-area="pool">{shortenPoolAddress}</DataText>
       </CustomLink>
       <DataText grid-area="ratio">
-        <div>{`• ${percentToken0.toPrecision(2) ?? '.'}% ${pool.token0.symbol}`}</div>
-        <div>{`• ${percentToken1.toPrecision(2) ?? '.'}% ${pool.token1.symbol}`}</div>
+        <div>{`• ${percentToken0.toFixed(2) ?? '.'}% ${pool.token0.symbol}`}</div>
+        <div>{`• ${percentToken1.toFixed(2) ?? '.'}% ${pool.token1.symbol}`}</div>
       </DataText>
       <DataText grid-area="liq">{formattedNum(pool.reserveUSD, true)}</DataText>
       <DataText grid-area="vol">{formatDataText(formattedNum(volume, true), pool.oneDayVolumeUSD)}</DataText>
