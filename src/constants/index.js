@@ -39,7 +39,7 @@ export const PAIR_BLACKLIST = [
   '0xb6a741f37d6e455ebcc9f17e2c16d0586c3f57a5',
   '0x97cb8cbe91227ba87fc21aaf52c4212d245da3f8',
   '0x1acba73121d5f63d8ea40bdc64edb594bd88ed09',
-  // rebass tokens
+  // rebass token pairs
   '0x7d7e813082ef6c143277c71786e5be626ec77b20',
   '0x23fe4ee3bd9bfd1152993a7954298bb4d426698f',
   '0xe5ffe183ae47f1a0e4194618d34c5b05b98953a8',
