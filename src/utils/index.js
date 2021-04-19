@@ -383,7 +383,7 @@ export const formattedNum = (number, usd = false, acceptNegatives = false) => {
     }
   }
 
-  return Number(parseFloat(num).toFixed(5)).toLocaleString()
+  return Number(parseFloat(num).toFixed(4)).toString()
 }
 
 export function rawPercent(percentRaw) {
