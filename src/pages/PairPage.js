@@ -171,7 +171,7 @@ function PairPage({ pairAddress, history }) {
     token1?.derivedETH && ethPrice ? formattedNum(parseFloat(token1.derivedETH) * parseFloat(ethPrice), true) : ''
 
   // rates
-  const token0Rate = reserve0 && reserve1 ? formattedNum(reserve1 / reserve0, false, false, true) : '-'
+  const token0Rate = reserve0 && reserve1 ? formattedNum(reserve1 / reserve0) : '-'
   const token1Rate = reserve0 && reserve1 ? formattedNum(reserve0 / reserve1) : '-'
 
   // formatted symbols for overflow
