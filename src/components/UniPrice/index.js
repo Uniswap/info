@@ -4,7 +4,7 @@ import Panel from '../Panel'
 import { AutoColumn } from '../Column'
 import { RowFixed } from '../Row'
 import { TYPE } from '../../Theme'
-import { usePairData } from '../../contexts/PairData'
+import { usePoolData } from '../../contexts/PoolData'
 import { formattedNum } from '../../utils'
 
 const PriceCard = styled(Panel)`
@@ -24,9 +24,16 @@ function formatPercent(rawPercent) {
 }
 
 export default function UniPrice() {
-  const daiPair = usePairData('0x3c67d84eb6c0e11325091256cbc3deacaaf3945e')
-  const usdcPair = usePairData('0x770a86279fe70a7d4dc5ce9772526ef9c5c0110a')
-  const usdtPair = usePairData('0x998265e9aad3e9bcef2ca13c84b9472cfb611557')
+  const ethDaiBaseAmpPoolAddress =
+    process.env.REACT_APP_ETH_DAI_BASE_AMP_POOL_ADDRESS || '0x20d6b227f4a5a2a13d520329f01bb1f8f9d2d628'
+  const ethUsdcBaseAmpPoolAddress =
+    process.env.REACT_APP_ETH_USDC_BASE_AMP_POOL_ADDRESS || '0xd478953d5572f829f457a5052580cbeaee36c1aa'
+  const ethUsdtBaseAMPPoolAddress =
+    process.env.REACT_APP_ETH_USDT_BASE_AMP_POOL_ADDRESS || '0xf8467ef9de03e83b5a778ac858ea5c2d1fc47188'
+
+  const daiPair = usePoolData(ethDaiBaseAmpPoolAddress)
+  const usdcPair = usePoolData(ethUsdcBaseAmpPoolAddress)
+  const usdtPair = usePoolData(ethUsdtBaseAMPPoolAddress)
 
   const totalLiquidity = useMemo(() => {
     return daiPair && usdcPair && usdtPair
@@ -36,7 +43,11 @@ export default function UniPrice() {
 
   const daiPerEth = daiPair ? parseFloat(daiPair.token0Price).toFixed(2) : '-'
   const usdcPerEth = usdcPair ? parseFloat(usdcPair.token0Price).toFixed(2) : '-'
-  const usdtPerEth = usdtPair ? parseFloat(usdtPair.token0Price).toFixed(2) : '-'
+  const usdtPerEth = usdtPair
+    ? String(process.env.REACT_APP_CHAIN_ID) === '1' // ETH and USDT order are reversed on Mainnet vs Ropsten
+      ? parseFloat(usdtPair.token1Price).toFixed(2)
+      : parseFloat(usdtPair.token0Price).toFixed(2)
+    : '-'
 
   return (
     <PriceCard>
