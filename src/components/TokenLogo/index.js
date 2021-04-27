@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
 
-import { ROPSTEN_TOKEN_LOGOS_MAPPING, WETH_ADDRESS } from '../../constants'
+import { ROPSTEN_TOKEN_LOGOS_MAPPING, WETH_ADDRESS, KNCL_ADDRESS } from '../../constants'
 import { isAddress } from '../../utils/index.js'
 import PlaceHolder from '../../assets/placeholder.png'
 import EthereumLogo from '../../assets/eth.png'
@@ -44,6 +44,24 @@ export default function TokenLogo({ address, header = false, size = '24px', ...r
     return (
       <Inline>
         <Image {...rest} alt={''} src={PlaceHolder} size={size} />
+      </Inline>
+    )
+  }
+
+  if (address?.toLowerCase() === KNCL_ADDRESS.toLowerCase()) {
+    return (
+      <Inline>
+        <Image
+          {...rest}
+          alt={''}
+          src="https://i.imgur.com/1cDH5dy.png"
+          size={size}
+          onError={(event) => {
+            BAD_IMAGES[address] = true
+            setError(true)
+            event.preventDefault()
+          }}
+        />
       </Inline>
     )
   }
