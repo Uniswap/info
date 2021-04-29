@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useReducer, useMemo, useCallback, useState, useEffect } from 'react'
-import { timeframeOptions, SUPPORTED_LIST_URLS__NO_ENS } from '../constants'
+import { timeframeOptions, SUPPORTED_LIST_URLS__NO_ENS, KNC_ADDRESS } from '../constants'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import getTokenList from '../utils/tokenLists'
@@ -303,6 +303,7 @@ export function useListedTokens() {
         return Promise.resolve([...tokensSoFar, ...newTokens.tokens])
       }, Promise.resolve([]))
       let formatted = allFetched?.map((t) => t.address.toLowerCase())
+      formatted.push(KNC_ADDRESS.toLowerCase())
       updateSupportedTokens(formatted)
     }
     if (!supportedTokens) {
