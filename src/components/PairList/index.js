@@ -148,7 +148,7 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
     const pairData = pairs[pairAddress]
 
     if (pairData && pairData.token0 && pairData.token1) {
-      const liquidity = pairData.trackedReserveUSD ? pairData.trackedReserveUSD : pairData.reserveUSD
+      const liquidity = pairData.reserveUSD ? pairData.reserveUSD : pairData.trackedReserveUSD
 
       const volume = pairData.oneDayVolumeUSD ? pairData.oneDayVolumeUSD : pairData.oneDayVolumeUntracked
 
