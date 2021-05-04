@@ -122,11 +122,7 @@ function PairPage({ pairAddress, history }) {
   const backgroundColor = '#08a1e7'
 
   // liquidity
-  const liquidity = trackedReserveUSD
-    ? formattedNum(trackedReserveUSD, true)
-    : reserveUSD
-    ? formattedNum(reserveUSD, true)
-    : '-'
+  const formattedLiquidity = reserveUSD ? formattedNum(reserveUSD, true) : formattedNum(trackedReserveUSD, true)
   const liquidityChange = formattedPercent(liquidityChangeUSD)
 
   // mark if using untracked liquidity
@@ -330,7 +326,7 @@ function PairPage({ pairAddress, history }) {
                     </RowBetween>
                     <RowBetween align="flex-end">
                       <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={500}>
-                        {liquidity}
+                        {formattedLiquidity}
                       </TYPE.main>
                       <TYPE.main>{liquidityChange}</TYPE.main>
                     </RowBetween>

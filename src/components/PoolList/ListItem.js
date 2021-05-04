@@ -17,7 +17,7 @@ const TableRow = styled.div`
   display: grid;
   grid-gap: 1em;
   grid-template-columns: repeat(8, 1fr);
-  grid-template-areas: 'pool ratio liq vol';
+  grid-template-areas: 'pool ratio liq vol fee amp fl add_liquidity';
   padding: 15px 36px 13px 26px;
   font-size: 12px;
   align-items: flex-start;
@@ -111,11 +111,13 @@ export const ItemCard = ({ pool, myLiquidity }) => {
   // Shorten address with 0x + 3 characters at start and end
   const shortenPoolAddress = shortenAddress(pool.id, 3)
 
+  const liquidity = pool.reserveUSD ? pool.reserveUSD : pool.trackedReserveUSD
+
+  const oneDayFee = pool.oneDayFeeUSD ? pool.oneDayFeeUSD : pool.oneDayFeeUntracked
+
   const volume = pool.oneDayVolumeUSD ? pool.oneDayVolumeUSD : pool.oneDayVolumeUntracked
 
-  const fee = pool.oneDayFeeUSD ? pool.oneDayFeeUSD : pool.oneDayFeeUntracked
-
-  const oneYearFL = getOneYearFL(pool.reserveUSD, fee).toFixed(2)
+  const oneYearFL = getOneYearFL(liquidity, oneDayFee).toFixed(2)
 
   return (
     <div>
@@ -153,7 +155,7 @@ export const ItemCard = ({ pool, myLiquidity }) => {
 
         <GridItem>
           <DataTitle>Liquidity</DataTitle>
-          <DataText grid-area="liq">{formattedNum(pool.reserveUSD, true)}</DataText>
+          <DataText grid-area="liq">{formatDataText(formattedNum(liquidity, true), pool.trackedReserveUSD)}</DataText>
         </GridItem>
         <GridItem>
           <DataTitle>Volume (24h)</DataTitle>
@@ -169,7 +171,7 @@ export const ItemCard = ({ pool, myLiquidity }) => {
 
         <GridItem noBorder>
           <DataTitle>Fee (24h)</DataTitle>
-          <DataText>{formatDataText(formattedNum(fee, true), pool.oneDayFeeUSD)}</DataText>
+          <DataText>{formatDataText(formattedNum(oneDayFee, true), pool.oneDayFeeUSD)}</DataText>
         </GridItem>
         <GridItem noBorder>
           <DataTitle>AMP</DataTitle>
@@ -196,11 +198,13 @@ const ListItem = ({ pool, oddRow }) => {
   // Shorten address with 0x + 3 characters at start and end
   const shortenPoolAddress = shortenAddress(pool.id, 3)
 
+  const liquidity = pool.reserveUSD ? pool.reserveUSD : pool.trackedReserveUSD
+
+  const oneDayFee = pool.oneDayFeeUSD ? pool.oneDayFeeUSD : pool.oneDayFeeUntracked
+
   const volume = pool.oneDayVolumeUSD ? pool.oneDayVolumeUSD : pool.oneDayVolumeUntracked
 
-  const fee = pool.oneDayFeeUSD ? pool.oneDayFeeUSD : pool.oneDayFeeUntracked
-
-  const oneYearFL = getOneYearFL(pool.reserveUSD, fee).toFixed(2)
+  const oneYearFL = getOneYearFL(liquidity, oneDayFee).toFixed(2)
 
   return (
     <TableRow oddRow={oddRow}>
@@ -218,12 +222,12 @@ const ListItem = ({ pool, oddRow }) => {
         <div>{`• ${percentToken0.toFixed(2) ?? '.'}% ${pool.token0.symbol}`}</div>
         <div>{`• ${percentToken1.toFixed(2) ?? '.'}% ${pool.token1.symbol}`}</div>
       </DataText>
-      <DataText grid-area="liq">{formattedNum(pool.reserveUSD, true)}</DataText>
+      <DataText grid-area="liq">{formatDataText(formattedNum(liquidity, true), pool.trackedReserveUSD)}</DataText>
       <DataText grid-area="vol">{formatDataText(formattedNum(volume, true), pool.oneDayVolumeUSD)}</DataText>
-      <DataText>{formatDataText(formattedNum(fee, true), pool.oneDayFeeUSD)}</DataText>
-      <DataText>{formattedNum(amp.toPrecision(5))}</DataText>
-      <DataText>{`${oneYearFL}%`}</DataText>
-      <DataText style={{ alignItems: 'flex-start' }}>
+      <DataText grid-area="fee">{formatDataText(formattedNum(oneDayFee, true), pool.oneDayFeeUSD)}</DataText>
+      <DataText grid-area="amp">{formattedNum(amp.toPrecision(5))}</DataText>
+      <DataText grid-area="fl">{`${oneYearFL}%`}</DataText>
+      <DataText grid-area="add_liquidity" style={{ alignItems: 'flex-start' }}>
         {
           <Link
             href={`${process.env.REACT_APP_DMM_SWAP_URL}add/${pool.token0.id}/${pool.token1.id}/${pool.id}`}

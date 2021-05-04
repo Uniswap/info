@@ -58,7 +58,7 @@ const DashGrid = styled.div`
 
   @media screen and (min-width: 740px) {
     padding: 0 1.125rem;
-    grid-template-columns: 1.5fr 1fr 1fr};
+    grid-template-columns: 1.5fr 1fr 1fr;
     grid-template-areas: ' name liq vol pool ';
   }
 
@@ -148,9 +148,15 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
     const pairData = pairs[pairAddress]
 
     if (pairData && pairData.token0 && pairData.token1) {
-      const liquidity = formattedNum(pairData.reserveUSD, true)
-      const volume = formattedNum(pairData.oneDayVolumeUSD, true)
-      const apy = formattedPercent((pairData.oneDayFeeUSD * 365 * 100) / pairData.reserveUSD)
+      const liquidity = pairData.reserveUSD ? pairData.reserveUSD : pairData.trackedReserveUSD
+
+      const volume = pairData.oneDayVolumeUSD ? pairData.oneDayVolumeUSD : pairData.oneDayVolumeUntracked
+
+      const oneDayFee = pairData.oneDayFeeUSD ? pairData.oneDayFeeUSD : pairData.oneDayFeeUntracked
+
+      const apy = formattedPercent((oneDayFee * 365 * 100) / liquidity)
+
+      const weekVolume = pairData.oneWeekVolumeUSD ? pairData.oneWeekVolumeUSD : pairData.oneWeekVolumeUntracked
 
       return (
         <DashGrid style={{ height: '48px' }} disbaleLinks={disbaleLinks} focus={true}>
@@ -171,10 +177,10 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
               />
             </CustomLink>
           </DataText>
-          <DataText area="liq">{liquidity}</DataText>
-          <DataText area="vol">{volume}</DataText>
-          {!below1080 && <DataText area="volWeek">{formattedNum(pairData.oneWeekVolumeUSD, true)}</DataText>}
-          {!below1080 && <DataText area="fees">{formattedNum(pairData.oneDayFeeUSD, true)}</DataText>}
+          <DataText area="liq">{formattedNum(liquidity, true)}</DataText>
+          <DataText area="vol">{formattedNum(volume, true)}</DataText>
+          {!below1080 && <DataText area="volWeek">{formattedNum(weekVolume, true)}</DataText>}
+          {!below1080 && <DataText area="fees">{formattedNum(oneDayFee, true)}</DataText>}
           {!below1080 && <DataText area="apy">{apy}</DataText>}
         </DashGrid>
       )
