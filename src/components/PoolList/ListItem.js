@@ -111,7 +111,7 @@ export const ItemCard = ({ pool, myLiquidity }) => {
   // Shorten address with 0x + 3 characters at start and end
   const shortenPoolAddress = shortenAddress(pool.id, 3)
 
-  const liquidity = pool.trackedReserveUSD ? pool.trackedReserveUSD : pool.reserveUSD
+  const liquidity = pool.reserveUSD ? pool.reserveUSD : pool.trackedReserveUSD
 
   const oneDayFee = pool.oneDayFeeUSD ? pool.oneDayFeeUSD : pool.oneDayFeeUntracked
 
