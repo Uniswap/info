@@ -184,7 +184,7 @@ function SideNav({ history }) {
               </Link>
             </HeaderText>
             <HeaderText>
-              <Link href="https://twitter.com/UniswapProtocol" target="_blank">
+              <Link href="https://twitter.com/Uniswap" target="_blank">
                 Twitter
               </Link>
             </HeaderText>
