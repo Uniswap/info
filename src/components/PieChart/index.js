@@ -10,8 +10,8 @@ const ChartWrapper = styled.div`
   width: 100%;
 `
 
-const PieChartComponent = ({ v1, v2 }) => {
-  const total = v1 + v2
+const PieChartComponent = ({ v1, v2, v3 }) => {
+  const total = v1 + v2 + v3
 
   const data = [
     {
@@ -21,6 +21,10 @@ const PieChartComponent = ({ v1, v2 }) => {
     {
       name: 'V1',
       value: (v1 * 100) / total
+    },
+    {
+      name: 'V3',
+      value: (v3 * 100) / total
     }
   ]
 
@@ -28,7 +32,7 @@ const PieChartComponent = ({ v1, v2 }) => {
     <ChartWrapper>
       <RowBetween>
         <Text fontSize={16} fontWeight={500}>
-          Liquidity Breakdown
+          TVL Breakdown
         </Text>
         <div />
       </RowBetween>

@@ -14,6 +14,7 @@ import { useMedia } from 'react-use'
 import { useV1Data } from '../contexts/V1Data'
 
 import PieChart from '../components/PieChart'
+import { useFetchProtocolData } from '../contexts/v3Data'
 
 const PageWrapper = styled.div`
   display: flex;
@@ -107,6 +108,8 @@ function GlobalPage() {
 
   const v1Data = useV1Data()
 
+  const { data: v3Data } = useFetchProtocolData()
+
   return (
     <PageWrapper>
       <AutoColumn gap="60px">
@@ -124,9 +127,12 @@ function GlobalPage() {
                   </RowBetween>
                   <RowBetween align="flex-end">
                     <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
-                      {totalLiquidityUSD &&
-                        v1Data?.liquidityUsd &&
-                        formattedNum(parseFloat(totalLiquidityUSD) + parseFloat(v1Data.liquidityUsd), true)}
+                      {totalLiquidityUSD && v1Data?.liquidityUsd && v3Data
+                        ? formattedNum(
+                            parseFloat(totalLiquidityUSD) + parseFloat(v1Data.liquidityUsd) + parseFloat(v3Data.tvlUSD),
+                            true
+                          )
+                        : '-'}
                     </TYPE.main>
                   </RowBetween>
                 </AutoColumn>
@@ -139,9 +145,14 @@ function GlobalPage() {
                   </RowBetween>
                   <RowBetween align="flex-end">
                     <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
-                      {oneDayVolumeUSD &&
-                        v1Data?.dailyVolumeUSD &&
-                        formattedNum(parseFloat(oneDayVolumeUSD) + parseFloat(v1Data.dailyVolumeUSD), true)}
+                      {oneDayVolumeUSD && v1Data?.dailyVolumeUSD && v3Data
+                        ? formattedNum(
+                            parseFloat(oneDayVolumeUSD) +
+                              parseFloat(v1Data.dailyVolumeUSD) +
+                              parseFloat(v3Data.volumeUSD),
+                            true
+                          )
+                        : '-'}
                     </TYPE.main>
                   </RowBetween>
                 </AutoColumn>
@@ -154,9 +165,9 @@ function GlobalPage() {
                   </RowBetween>
                   <RowBetween align="flex-end">
                     <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
-                      {oneDayTxns &&
-                        v1Data?.txCount &&
-                        formattedNum(parseFloat(oneDayTxns) + parseFloat(v1Data.txCount))}
+                      {oneDayTxns && v1Data?.txCount && v3Data
+                        ? formattedNum(parseFloat(oneDayTxns) + parseFloat(v1Data.txCount) + parseFloat(v3Data.txCount))
+                        : '-'}
                     </TYPE.main>
                   </RowBetween>
                 </AutoColumn>
@@ -164,7 +175,11 @@ function GlobalPage() {
             </AutoColumn>
             {!below1080 && (
               <Panel style={{ width: below1080 ? '100%' : '50%', marginTop: below1080 ? '40px' : 0 }}>
-                <PieChart v1={v1Data && parseFloat(v1Data.liquidityUsd)} v2={parseFloat(totalLiquidityUSD)} />
+                <PieChart
+                  v1={v1Data && parseFloat(v1Data.liquidityUsd)}
+                  v2={parseFloat(totalLiquidityUSD)}
+                  v3={v3Data?.tvlUSD ?? 0}
+                />
               </Panel>
             )}
           </OverviewGroup>
@@ -172,7 +187,57 @@ function GlobalPage() {
         <AutoColumn gap="20px">
           <RowBetween>
             <Text fontSize={24} fontWeight={600}>
-              V2 Stats
+              24H Volume / TVL
+            </Text>
+          </RowBetween>
+          <TopGroup>
+            <Panel style={{ marginBottom: below1080 ? '20px' : 0 }}>
+              <AutoColumn gap="20px">
+                <RowBetween>
+                  <TYPE.main>V3</TYPE.main>
+                  <div />
+                </RowBetween>
+                <RowBetween align="flex-end">
+                  <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
+                    {v3Data ? formattedPercent((v3Data.volumeUSD / v3Data.tvlUSD) * 100) : '-'}
+                  </TYPE.main>
+                </RowBetween>
+              </AutoColumn>
+            </Panel>
+            <Panel style={{ marginBottom: below1080 ? '20px' : 0 }}>
+              <AutoColumn gap="20px">
+                <RowBetween>
+                  <TYPE.main>V2</TYPE.main>
+                  <div />
+                </RowBetween>
+                <RowBetween align="flex-end">
+                  <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
+                    {totalLiquidityUSD && oneDayVolumeUSD
+                      ? formattedPercent((oneDayVolumeUSD / totalLiquidityUSD) * 100)
+                      : '-'}
+                  </TYPE.main>
+                </RowBetween>
+              </AutoColumn>
+            </Panel>
+            <Panel style={{ marginBottom: below1080 ? '20px' : 0 }}>
+              <AutoColumn gap="20px">
+                <RowBetween>
+                  <TYPE.main>V1</TYPE.main>
+                  <div />
+                </RowBetween>
+                <RowBetween align="flex-end">
+                  <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
+                    {v1Data ? formattedPercent((v1Data.dailyVolumeUSD / v1Data.liquidityUsd) * 100) : '-'}
+                  </TYPE.main>
+                </RowBetween>
+              </AutoColumn>
+            </Panel>
+          </TopGroup>
+        </AutoColumn>
+        <AutoColumn gap="20px">
+          <RowBetween>
+            <Text fontSize={24} fontWeight={600}>
+              V3
             </Text>
             <Link href="https://www.uniswap.info">
               <TYPE.pink fontSize={20} fontWeight={500}>
@@ -184,7 +249,63 @@ function GlobalPage() {
             <Panel style={{ marginBottom: below1080 ? '20px' : 0 }}>
               <AutoColumn gap="20px">
                 <RowBetween>
-                  <TYPE.main>Total Liquidity</TYPE.main>
+                  <TYPE.main>Total Value Locked</TYPE.main>
+                  <div />
+                </RowBetween>
+                <RowBetween align="flex-end">
+                  <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
+                    {v3Data?.tvlUSD ? formattedNum(v3Data.tvlUSD, true) : '-'}
+                  </TYPE.main>
+                  <TYPE.main> {v3Data?.tvlUSDChange ? formattedPercent(v3Data?.tvlUSDChange) : '-'}</TYPE.main>
+                </RowBetween>
+              </AutoColumn>
+            </Panel>
+            <Panel style={{ marginBottom: below1080 ? '20px' : 0 }}>
+              <AutoColumn gap="20px">
+                <RowBetween>
+                  <TYPE.main>Volume (24hrs)</TYPE.main>
+                  <div />
+                </RowBetween>
+                <RowBetween align="flex-end">
+                  <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
+                    {v3Data?.volumeUSD ? formattedNum(v3Data.volumeUSD, true) : '-'}
+                  </TYPE.main>
+                  <TYPE.main>{v3Data?.volumeUSDChange ? formattedPercent(v3Data?.volumeUSDChange) : '-'}</TYPE.main>
+                </RowBetween>
+              </AutoColumn>
+            </Panel>
+            <Panel style={{ marginBottom: below1080 ? '20px' : 0 }}>
+              <AutoColumn gap="20px">
+                <RowBetween>
+                  <TYPE.main>Transactions (24hrs)</TYPE.main>
+                  <div />
+                </RowBetween>
+                <RowBetween align="flex-end">
+                  <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
+                    {v3Data?.txCount ? formattedNum(v3Data.txCount) : '-'}
+                  </TYPE.main>
+                  <TYPE.main>{v3Data?.txCountChange ? formattedPercent(v3Data?.txCountChange) : '-'}</TYPE.main>
+                </RowBetween>
+              </AutoColumn>
+            </Panel>
+          </TopGroup>
+        </AutoColumn>
+        <AutoColumn gap="20px">
+          <RowBetween>
+            <Text fontSize={24} fontWeight={600}>
+              V2
+            </Text>
+            <Link href="https://www.uniswap.info">
+              <TYPE.pink fontSize={20} fontWeight={500}>
+                View More
+              </TYPE.pink>
+            </Link>
+          </RowBetween>
+          <TopGroup>
+            <Panel style={{ marginBottom: below1080 ? '20px' : 0 }}>
+              <AutoColumn gap="20px">
+                <RowBetween>
+                  <TYPE.main>Total Value Locked</TYPE.main>
                   <div />
                 </RowBetween>
                 <RowBetween align="flex-end">
@@ -217,7 +338,7 @@ function GlobalPage() {
                 </RowBetween>
                 <RowBetween align="flex-end">
                   <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={600}>
-                    {oneDayTxns}
+                    {formattedNum(oneDayTxns)}
                   </TYPE.main>
                   <TYPE.main>{txnChangeFormatted && txnChangeFormatted}</TYPE.main>
                 </RowBetween>
@@ -228,7 +349,7 @@ function GlobalPage() {
         <AutoColumn gap="20px">
           <RowBetween>
             <Text fontSize={24} fontWeight={600}>
-              V1 Stats
+              V1
             </Text>
             <Link href="https://www.v1.uniswap.info">
               <TYPE.pink fontSize={20} fontWeight={500}>
@@ -240,7 +361,7 @@ function GlobalPage() {
             <Panel style={{ marginBottom: below1080 ? '20px' : 0 }}>
               <AutoColumn gap="20px">
                 <RowBetween>
-                  <TYPE.main>Total Liquidity</TYPE.main>
+                  <TYPE.main>Total Value Locked</TYPE.main>
                   <div />
                 </RowBetween>
                 <RowBetween align="flex-end">

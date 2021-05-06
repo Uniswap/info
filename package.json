@@ -4,6 +4,7 @@
   "private": true,
   "homepage": "https://uniswap.info",
   "dependencies": {
+    "@apollo/client": "^3.3.16",
     "@reach/router": "^1.2.1",
     "apollo-cache-inmemory": "^1.6.3",
     "apollo-client": "^2.6.4",
