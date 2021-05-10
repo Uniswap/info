@@ -6,6 +6,8 @@
 
 Analytics site for the [Uniswap Protocol](https://uniswap.org).
 
+Includes support for Uniswap V1 and V2. For Uniswap V3 info see https://github.com/Uniswap/uniswap-v3-info
+
 ### To Start Development
 
 ###### Installing dependencies
