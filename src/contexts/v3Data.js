@@ -7,7 +7,7 @@ import { splitQuery } from '../helpers'
 import { blockClient } from '../apollo/client'
 import { v3Client } from '../apollo/client'
 
-export const GLOBAL_DATA = block => {
+export const GLOBAL_DATA = (block) => {
   const queryString = ` query uniswapFactories {
       factories(
        ${block ? `block: { number: ${block}}` : ``} 
@@ -20,11 +20,12 @@ export const GLOBAL_DATA = block => {
   return gql(queryString)
 }
 
-export const GET_BLOCKS = timestamps => {
+export const GET_BLOCKS = (timestamps) => {
   let queryString = 'query blocks {'
-  queryString += timestamps.map(timestamp => {
-    return `t${timestamp}:blocks(first: 1, orderBy: timestamp, orderDirection: desc, where: { timestamp_gt: ${timestamp}, timestamp_lt: ${timestamp +
-      600} }) {
+  queryString += timestamps.map((timestamp) => {
+    return `t${timestamp}:blocks(first: 1, orderBy: timestamp, orderDirection: desc, where: { timestamp_gt: ${timestamp}, timestamp_lt: ${
+      timestamp + 600
+    } }) {
           number
         }`
   })
@@ -34,18 +35,9 @@ export const GET_BLOCKS = timestamps => {
 
 export function useDeltaTimestamps() {
   const utcCurrentTime = dayjs()
-  const t1 = utcCurrentTime
-    .subtract(1, 'day')
-    .startOf('minute')
-    .unix()
-  const t2 = utcCurrentTime
-    .subtract(2, 'day')
-    .startOf('minute')
-    .unix()
-  const tWeek = utcCurrentTime
-    .subtract(1, 'week')
-    .startOf('minute')
-    .unix()
+  const t1 = utcCurrentTime.subtract(1, 'day').startOf('minute').unix()
+  const t2 = utcCurrentTime.subtract(2, 'day').startOf('minute').unix()
+  const tWeek = utcCurrentTime.subtract(1, 'week').startOf('minute').unix()
   return [t1, t2, tWeek]
 }
 
@@ -78,7 +70,7 @@ export function useBlocksFromTimestamps(timestamps) {
         if (blocks[t].length > 0) {
           formatted.push({
             timestamp: t.split('t')[1],
-            number: blocks[t][0]['number']
+            number: blocks[t][0]['number'],
           })
         }
       }
@@ -89,7 +81,7 @@ export function useBlocksFromTimestamps(timestamps) {
 
   return {
     blocks: blocksFormatted,
-    error
+    error,
   }
 }
 
@@ -102,13 +94,13 @@ export function useFetchProtocolData() {
 
   // fetch all data
   const { loading, error, data } = useQuery(GLOBAL_DATA(), {
-    client: v3Client
+    client: v3Client,
   })
   const { loading: loading24, error: error24, data: data24 } = useQuery(GLOBAL_DATA(block24?.number ?? undefined), {
-    client: v3Client
+    client: v3Client,
   })
   const { loading: loading48, error: error48, data: data48 } = useQuery(GLOBAL_DATA(block48?.number ?? undefined), {
-    client: v3Client
+    client: v3Client,
   })
 
   const anyError = Boolean(error || error24 || error48 || blockError)
@@ -131,7 +123,7 @@ export function useFetchProtocolData() {
 
     const volumeUSDChange =
       parsed && parsed24 && parsed48 && volumeUSD
-        ? (volumeUSD / (parseFloat(parsed24.totalVolumeUSD) - parseFloat(parsed24.totalVolumeUSD))) * 100
+        ? (volumeUSD / (parseFloat(parsed24.totalVolumeUSD) - parseFloat(parsed48.totalVolumeUSD))) * 100
         : 0
 
     // total value locked
@@ -149,13 +141,13 @@ export function useFetchProtocolData() {
       tvlUSD: parseFloat(parsed.totalValueLockedUSD),
       tvlUSDChange,
       txCount,
-      txCountChange
+      txCountChange,
     }
   }, [anyError, anyLoading, blocks, parsed, parsed24, parsed48])
 
   return {
     loading: anyLoading,
     error: anyError,
-    data: formattedData
+    data: formattedData,
   }
 }

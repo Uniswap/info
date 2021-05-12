@@ -21,7 +21,7 @@ export const v3Client = new ApolloClient({
   // to a different host
   link: new HttpLink({
     // pending uniswap with 'fixed' trade volumne
-    uri: 'https://api.thegraph.com/subgraphs/name/ianlapham/uniswap-v3-alt',
+    uri: 'https://api.thegraph.com/subgraphs/name/ianlapham/uniswap-v3-testing',
   }),
   cache: new InMemoryCache(),
 })
