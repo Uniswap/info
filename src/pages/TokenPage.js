@@ -5,7 +5,7 @@ import { Text } from 'rebass'
 import styled from 'styled-components'
 import Link from '../components/Link'
 import Panel from '../components/Panel'
-import TokenLogo from '../components/TokenLogo'
+import TokenLogo, { getUrlLogo } from '../components/TokenLogo'
 import PairList from '../components/PairList'
 import Loader from '../components/LocalLoader'
 import { AutoRow, RowBetween, RowFixed } from '../components/Row'
@@ -29,6 +29,7 @@ import { Hover, PageWrapper, ContentWrapper, StyledIcon } from '../components'
 import { PlusCircle, Bookmark } from 'react-feather'
 import FormattedName from '../components/FormattedName'
 import { useListedTokens } from '../contexts/Application'
+import MetaMaskIcon from '../assets/metamask.png'
 
 const DashboardWrapper = styled.div`
   width: 100%;
@@ -87,11 +88,18 @@ const WarningGrouping = styled.div`
   pointer-events: ${({ disabled }) => disabled && 'none'};
 `
 
+const MetamaskImg = styled.img`
+  width: 16px;
+  margin-left: 10px;
+  vertical-align: bottom;
+`
+
 function TokenPage({ address, history }) {
   const {
     id,
     name,
     symbol,
+    decimals,
     priceUSD,
     oneDayVolumeUSD,
     totalLiquidityUSD,
@@ -125,10 +133,10 @@ function TokenPage({ address, history }) {
     if (Array.isArray(fetchedPairsListAddresses) && fetchedPairsListAddresses.length > 0) {
       bestPair =
         fetchedPairsList[
-          fetchedPairsListAddresses.sort(function (a, b) {
-            // Sort by reserveUSD in descending order
-            return parseFloat(fetchedPairsList[b].reserveUSD) - parseFloat(fetchedPairsList[a].reserveUSD)
-          })[0]
+        fetchedPairsListAddresses.sort(function (a, b) {
+          // Sort by reserveUSD in descending order
+          return parseFloat(fetchedPairsList[b].reserveUSD) - parseFloat(fetchedPairsList[a].reserveUSD)
+        })[0]
         ]
     }
   }
@@ -149,8 +157,8 @@ function TokenPage({ address, history }) {
     oneDayVolumeUSD || oneDayVolumeUSD === 0
       ? formattedNum(oneDayVolumeUSD === 0 ? oneDayVolumeUT : oneDayVolumeUSD, true)
       : oneDayVolumeUSD === 0
-      ? '$0'
-      : '-'
+        ? '$0'
+        : '-'
 
   // mark if using untracked volume
   const [usingUtVolume, setUsingUtVolume] = useState(false)
@@ -186,6 +194,32 @@ function TokenPage({ address, history }) {
       top: 0,
     })
   }, [])
+
+  async function addToMetaMask() {
+    const tokenAddress = address;
+    const tokenSymbol = symbol;
+    const tokenDecimals = decimals;
+    const tokenImage = getUrlLogo(address);
+
+    try {
+      if (window.ethereum) {
+        await window.ethereum.request({
+          method: 'wallet_watchAsset',
+          params: {
+            type: 'ERC20',
+            options: {
+              address: tokenAddress,
+              symbol: tokenSymbol,
+              decimals: tokenDecimals,
+              image: tokenImage,
+            },
+          },
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   return (
     <PageWrapper>
@@ -281,7 +315,10 @@ function TokenPage({ address, history }) {
                 </RowFixed>
               </span>
             </RowBetween>
-
+            <ButtonOutlined onClick={addToMetaMask} mb={10} color="#08a1e7" borderColor="#08a1e7" style={{ padding: '5px 15px' }}>
+              + Add {formattedSymbol} to MetaMask
+              <MetamaskImg src={MetaMaskIcon} alt="metamask icon" />
+            </ButtonOutlined>
             <>
               <PanelWrapper style={{ marginTop: below1080 ? '0' : '1rem' }}>
                 {below1080 && price && (
