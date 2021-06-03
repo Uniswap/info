@@ -114,3 +114,18 @@ export default function TokenLogo({ address, header = false, size = '24px', ...r
     </Inline>
   )
 }
+
+export function getUrlLogo(address) {
+  if (BAD_IMAGES[address]) {
+    return PlaceHolder
+  }
+  if (address.toLowerCase() === KNCL_ADDRESS.toLowerCase()) {
+    return "https://i.imgur.com/1cDH5dy.png"
+  }
+  if (ROPSTEN_TOKEN_LOGOS_MAPPING[address?.toLowerCase()]) {
+    address = ROPSTEN_TOKEN_LOGOS_MAPPING[address?.toLowerCase()]
+  }
+  return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${isAddress(
+    address
+  )}/logo.png`
+}
