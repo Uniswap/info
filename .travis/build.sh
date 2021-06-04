@@ -6,6 +6,10 @@ printf 'Building swap from commit %s\n' "$TRAVIS_COMMIT"
 if [[ "$TRAVIS_BRANCH" == "develop" ]]; then
   echo "Start running build"
   yarn build-ropsten
+  mv build build-ropsten
+  echo "Finished running build-ropsten"
+  yarn build-mumbai
+  mv build build-mumbai
   echo "Finished running build-ropsten"
 elif [[ "$TRAVIS_BRANCH" == "staging" ]]; then
   echo "Start running build-staging"
