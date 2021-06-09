@@ -499,3 +499,25 @@ export function shortenAddress(address, chars = 4) {
   }
   return `${parsed.substring(0, chars + 2)}...${parsed.substring(42 - chars)}`
 }
+
+export function getNativeTokenSymbol() {
+  switch (process.env.REACT_APP_CHAIN_ID) {
+    case '137':
+      return 'MATIC'
+    case '80001':
+      return 'MATIC'
+    default:
+      return 'ETH'
+  }
+}
+
+export function getEtherscanLinkText() {
+  switch (process.env.REACT_APP_CHAIN_ID) {
+    case '137':
+      return 'View on Explorer'
+    case '80001':
+      return 'View on Explorer'
+    default:
+      return 'View on Etherscan'
+  }
+}
