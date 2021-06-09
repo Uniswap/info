@@ -20,7 +20,7 @@ import Search from '../components/Search'
 import { TYPE } from '../Theme'
 import { useUserTransactions, useUserPositions } from '../contexts/User'
 import { useSavedAccounts } from '../contexts/LocalStorage'
-import { formattedNum } from '../utils'
+import { formattedNum, getEtherscanLinkText } from '../utils'
 
 const AccountWrapper = styled.div`
   background-color: rgba(255, 255, 255, 0.2);
@@ -185,7 +185,7 @@ function AccountPage({ account }) {
                 href={`${process.env.REACT_APP_ETHERSCAN_URL}/address/${account}`}
                 target="_blank"
               >
-                <TYPE.main fontSize={14}>View on Etherscan</TYPE.main>
+                <TYPE.main fontSize={14}>{getEtherscanLinkText()}</TYPE.main>
               </Link>
             </span>
             <AccountWrapper>

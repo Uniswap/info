@@ -510,3 +510,14 @@ export function getNativeTokenSymbol() {
       return 'ETH'
   }
 }
+
+export function getEtherscanLinkText() {
+  switch (process.env.REACT_APP_CHAIN_ID) {
+    case '137':
+      return 'View on Explorer'
+    case '80001':
+      return 'View on Explorer'
+    default:
+      return 'View on Etherscan'
+  }
+}
