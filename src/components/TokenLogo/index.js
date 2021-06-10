@@ -67,7 +67,7 @@ export default function TokenLogo({ address, header = false, size = '24px', ...r
   }
 
   // MFG new logo
-  if (address.toLowerCase() === '0x6710c63432a2de02954fc0f851db07146a6c0312') {
+  if (address?.toLowerCase() === '0x6710c63432a2de02954fc0f851db07146a6c0312') {
     return (
       <Inline>
         <Image
