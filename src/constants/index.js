@@ -47,15 +47,9 @@ export const ROPSTEN_TOKEN_LOGOS_MAPPING = {
   '0xc778417e063141139fce010982780140aa0cd5ab': '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
 }
 
-export const WETH_ADDRESS =
-  String(process.env.REACT_APP_CHAIN_ID) === '1'
-    ? '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
-    : '0xc778417e063141139fce010982780140aa0cd5ab'
+export const WETH_ADDRESS = String(process.env.REACT_APP_WETH_ADDRESS) || '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
 
-export const KNC_ADDRESS =
-  String(process.env.REACT_APP_CHAIN_ID) === '1'
-    ? '0xdeFA4e8a7bcBA345F687a2f1456F5Edd9CE97202'
-    : '0x8B4DDF9F13f382aff76D262F6C8C50E6d7961b94'
+export const KNC_ADDRESS = String(process.env.REACT_APP_KNC_ADDRESS) || '0xdeFA4e8a7bcBA345F687a2f1456F5Edd9CE97202'
 
 export const KNCL_ADDRESS =
   String(process.env.REACT_APP_CHAIN_ID) === '1'
