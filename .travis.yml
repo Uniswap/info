@@ -86,7 +86,7 @@ deploy:
   - provider: gcs
     access_key_id: $GCS_ACCESS_KEY_ID
     secret_access_key: $GCS_SECRET_KEY_ID
-    bucket: matic-info.dmm.exchange
+    bucket: polygon-info.dmm.exchange
     skip_cleanup: true
     local-dir: build-matic
     on:
@@ -96,7 +96,7 @@ deploy:
   - provider: gcs
     access_key_id: $GCS_ACCESS_KEY_ID
     secret_access_key: $GCS_SECRET_KEY_ID
-    bucket: matic-info.dmm.exchange
+    bucket: polygon-info.dmm.exchange
     skip_cleanup: true
     local-dir: build-matic-index
     cache_control: "public, max-age=30"
