@@ -66,6 +66,25 @@ export default function TokenLogo({ address, header = false, size = '24px', ...r
     )
   }
 
+  // MFG new logo
+  if (address?.toLowerCase() === '0x6710c63432a2de02954fc0f851db07146a6c0312') {
+    return (
+      <Inline>
+        <Image
+          {...rest}
+          alt={''}
+          src="https://i.imgur.com/oReNLqf.png"
+          size={size}
+          onError={(event) => {
+            BAD_IMAGES[address] = true
+            setError(true)
+            event.preventDefault()
+          }}
+        />
+      </Inline>
+    )
+  }
+
   // hard coded fixes for trust wallet api issues
   if (address?.toLowerCase() === '0x5e74c9036fb86bd7ecdcb084a0673efc32ea31cb') {
     address = '0x42456d7084eacf4083f1140d3229471bba2949a8'
@@ -120,8 +139,14 @@ export function getUrlLogo(address) {
     return PlaceHolder
   }
   if (address.toLowerCase() === KNCL_ADDRESS.toLowerCase()) {
-    return "https://i.imgur.com/1cDH5dy.png"
+    return 'https://i.imgur.com/1cDH5dy.png'
   }
+
+  // MFG new logo
+  if (address.toLowerCase() === '0x6710c63432a2de02954fc0f851db07146a6c0312') {
+    return 'https://i.imgur.com/oReNLqf.png'
+  }
+
   if (ROPSTEN_TOKEN_LOGOS_MAPPING[address?.toLowerCase()]) {
     address = ROPSTEN_TOKEN_LOGOS_MAPPING[address?.toLowerCase()]
   }

@@ -28,7 +28,15 @@ import { usePoolData, usePoolTransactions } from '../contexts/PoolData'
 import { useEthPrice } from '../contexts/GlobalData'
 import { usePathDismissed, useSavedPools } from '../contexts/LocalStorage'
 import { useListedTokens } from '../contexts/Application'
-import { formattedNum, formattedPercent, formattedTokenRatio, getPoolLink, getSwapLink, shortenAddress } from '../utils'
+import {
+  formattedNum,
+  formattedPercent,
+  formattedTokenRatio,
+  getEtherscanLinkText,
+  getPoolLink,
+  getSwapLink,
+  shortenAddress,
+} from '../utils'
 
 const DashboardWrapper = styled.div`
   width: 100%;
@@ -612,7 +620,7 @@ function PoolPage({ poolAddress, history }) {
                       external
                       href={`${process.env.REACT_APP_ETHERSCAN_URL}/address/${poolAddress}`}
                     >
-                      View on Etherscan ↗
+                      {getEtherscanLinkText()} ↗
                     </Link>
                   </ButtonOutlined>
                 </TokenDetailsLayout>

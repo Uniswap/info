@@ -33,7 +33,7 @@ export const PAIR_BLACKLIST = ['0xb6a741f37d6e455ebcc9f17e2c16d0586c3f57a5']
 export const FEE_WARNING_TOKENS = ['0xd46ba6d942050d489dbd938a2c909a5d5039a161']
 
 export const ROPSTEN_TOKEN_LOGOS_MAPPING = {
-  '0xbe87e5634f9fc7cd3ed88ad58b1462f3c5a7eb5b': '0xdefa4e8a7bcba345f687a2f1456f5edd9ce97202',
+  '0x8b4ddf9f13f382aff76d262f6c8c50e6d7961b94': '0xdefa4e8a7bcba345f687a2f1456f5edd9ce97202',
   '0x7b2810576aa1cce68f2b118cef1f36467c648f92': '0xdd974d5c2e2928dea5f71b9825b8b646686bd200',
   '0x068b43f7f2f2c6a662c36e201144ae45f7a1c040': '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
   '0x65bd1f48f1dd07bb285a3715c588f75684128ace': '0xdac17f958d2ee523a2206206994597c13d831ec7',
@@ -47,15 +47,9 @@ export const ROPSTEN_TOKEN_LOGOS_MAPPING = {
   '0xc778417e063141139fce010982780140aa0cd5ab': '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
 }
 
-export const WETH_ADDRESS =
-  String(process.env.REACT_APP_CHAIN_ID) === '1'
-    ? '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
-    : '0xc778417e063141139fce010982780140aa0cd5ab'
+export const WETH_ADDRESS = String(process.env.REACT_APP_WETH_ADDRESS) || '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
 
-export const KNC_ADDRESS =
-  String(process.env.REACT_APP_CHAIN_ID) === '1'
-    ? '0xdeFA4e8a7bcBA345F687a2f1456F5Edd9CE97202'
-    : '0xbe87E5634f9FC7cD3ED88ad58b1462F3C5A7EB5b'
+export const KNC_ADDRESS = String(process.env.REACT_APP_KNC_ADDRESS) || '0xdeFA4e8a7bcBA345F687a2f1456F5Edd9CE97202'
 
 export const KNCL_ADDRESS =
   String(process.env.REACT_APP_CHAIN_ID) === '1'
