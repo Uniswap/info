@@ -32,6 +32,7 @@ import { getBlockFromTimestamp, getBlocksFromTimestamps } from '../utils'
 import { timeframeOptions } from '../constants'
 import { useLatestBlocks } from './Application'
 import { getBulkPoolData } from './PoolData'
+import { getNativeTokenSymbol, getNativeTokenWrappedName } from '../utils'
 
 const UPDATE = 'UPDATE'
 const UPDATE_PAIR_POOLS = 'UPDATE_PAIR_POOLS'
@@ -331,12 +332,12 @@ function parseData(data, oneDayData, twoDayData, oneWeekData, ethPrice, oneDayBl
     data.oneWeekVolumeUSD = parseFloat(data.volumeUSD)
   }
   if (data?.token0?.id === WETH_ADDRESS) {
-    data.token0.name = 'Ether (Wrapped)'
-    data.token0.symbol = 'ETH'
+    data.token0.name = getNativeTokenWrappedName()
+    data.token0.symbol = getNativeTokenSymbol()
   }
   if (data?.token1?.id === WETH_ADDRESS) {
-    data.token1.name = 'Ether (Wrapped)'
-    data.token1.symbol = 'ETH'
+    data.token1.name = getNativeTokenWrappedName()
+    data.token1.symbol = getNativeTokenSymbol()
   }
 
   return data
