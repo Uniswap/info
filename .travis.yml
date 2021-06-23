@@ -56,7 +56,7 @@ deploy:
     secret_access_key: $GCS_SECRET_KEY_ID
     bucket: staging-matic-dmm-info.knstats.com
     skip_cleanup: true
-    local-dir: build-staging
+    local-dir: build-matic-staging
     cache_control: "no-cache"
     on:
       all_branches: true
