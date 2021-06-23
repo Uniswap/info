@@ -6,6 +6,8 @@ import { isAddress } from '../../utils/index.js'
 import PlaceHolder from '../../assets/placeholder.png'
 import EthereumLogo from '../../assets/eth.png'
 import PolygonLogo from '../../assets/polygon.png'
+import { getMaticTokenLogoURL } from '../../utils/maticTokenMapping'
+import { getMumbaiTokenLogoURL } from '../../utils/mumbaiTokenMapping'
 
 const BAD_IMAGES = {}
 
@@ -93,6 +95,10 @@ export default function TokenLogo({ address, header = false, size = '24px', ...r
     )
   }
 
+  if (address?.toLowerCase() === WETH_ADDRESS) {
+    return getNativeTokenLogo({ size })
+  }
+
   if (address?.toLowerCase() === KNCL_ADDRESS.toLowerCase()) {
     return (
       <Inline>
@@ -130,26 +136,39 @@ export default function TokenLogo({ address, header = false, size = '24px', ...r
     )
   }
 
-  // hard coded fixes for trust wallet api issues
-  if (address?.toLowerCase() === '0x5e74c9036fb86bd7ecdcb084a0673efc32ea31cb') {
-    address = '0x42456d7084eacf4083f1140d3229471bba2949a8'
-  }
+  let path
 
-  if (address?.toLowerCase() === '0xc011a73ee8576fb46f5e1c5751ca3b9fe0af2a6f') {
-    address = '0xc011a72400e58ecd99ee497cf89e3775d4bd732f'
-  }
+  switch (String(process.env.REACT_APP_CHAIN_ID)) {
+    case '3':
+      if (ROPSTEN_TOKEN_LOGOS_MAPPING[address?.toLowerCase()]) {
+        address = ROPSTEN_TOKEN_LOGOS_MAPPING[address?.toLowerCase()]
+      }
 
-  if (address?.toLowerCase() === WETH_ADDRESS) {
-    return getNativeTokenLogo({ size })
-  }
+      path = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${isAddress(
+        address
+      )}/logo.png`
+      break
+    case '137':
+      path = getMaticTokenLogoURL(address)
+      break
+    case '80001':
+      path = getMumbaiTokenLogoURL(address)
+      break
+    default:
+      // hard coded fixes for trust wallet api issues
+      if (address?.toLowerCase() === '0x5e74c9036fb86bd7ecdcb084a0673efc32ea31cb') {
+        address = '0x42456d7084eacf4083f1140d3229471bba2949a8'
+      }
 
-  if (ROPSTEN_TOKEN_LOGOS_MAPPING[address?.toLowerCase()]) {
-    address = ROPSTEN_TOKEN_LOGOS_MAPPING[address?.toLowerCase()]
-  }
+      if (address?.toLowerCase() === '0xc011a73ee8576fb46f5e1c5751ca3b9fe0af2a6f') {
+        address = '0xc011a72400e58ecd99ee497cf89e3775d4bd732f'
+      }
 
-  const path = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${isAddress(
-    address
-  )}/logo.png`
+      path = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${isAddress(
+        address
+      )}/logo.png`
+      break
+  }
 
   return (
     <Inline>
