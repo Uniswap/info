@@ -5,6 +5,7 @@ import { ROPSTEN_TOKEN_LOGOS_MAPPING, WETH_ADDRESS, KNCL_ADDRESS } from '../../c
 import { isAddress } from '../../utils/index.js'
 import PlaceHolder from '../../assets/placeholder.png'
 import EthereumLogo from '../../assets/eth.png'
+import PolygonLogo from '../../assets/polygon.png'
 
 const BAD_IMAGES = {}
 
@@ -32,6 +33,50 @@ const StyledEthereumLogo = styled.div`
     height: ${({ size }) => size};
   }
 `
+
+export function getNativeTokenLogo({ size = '24px', ...rest }) {
+  switch (process.env.REACT_APP_CHAIN_ID) {
+    case '137':
+      return (
+        <StyledEthereumLogo size={size} {...rest}>
+          <img
+            src={PolygonLogo}
+            style={{
+              boxShadow: '0px 6px 10px rgba(0, 0, 0, 0.075)',
+              borderRadius: '24px',
+            }}
+            alt=""
+          />
+        </StyledEthereumLogo>
+      )
+    case '80001':
+      return (
+        <StyledEthereumLogo size={size} {...rest}>
+          <img
+            src={PolygonLogo}
+            style={{
+              boxShadow: '0px 6px 10px rgba(0, 0, 0, 0.075)',
+              borderRadius: '24px',
+            }}
+            alt=""
+          />
+        </StyledEthereumLogo>
+      )
+    default:
+      return (
+        <StyledEthereumLogo size={size} {...rest}>
+          <img
+            src={EthereumLogo}
+            style={{
+              boxShadow: '0px 6px 10px rgba(0, 0, 0, 0.075)',
+              borderRadius: '24px',
+            }}
+            alt=""
+          />
+        </StyledEthereumLogo>
+      )
+  }
+}
 
 export default function TokenLogo({ address, header = false, size = '24px', ...rest }) {
   const [error, setError] = useState(false)
@@ -95,18 +140,7 @@ export default function TokenLogo({ address, header = false, size = '24px', ...r
   }
 
   if (address?.toLowerCase() === WETH_ADDRESS) {
-    return (
-      <StyledEthereumLogo size={size} {...rest}>
-        <img
-          src={EthereumLogo}
-          style={{
-            boxShadow: '0px 6px 10px rgba(0, 0, 0, 0.075)',
-            borderRadius: '24px',
-          }}
-          alt=""
-        />
-      </StyledEthereumLogo>
-    )
+    return getNativeTokenLogo({ size })
   }
 
   if (ROPSTEN_TOKEN_LOGOS_MAPPING[address?.toLowerCase()]) {

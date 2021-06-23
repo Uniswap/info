@@ -511,6 +511,17 @@ export function getNativeTokenSymbol() {
   }
 }
 
+export function getNativeTokenWrappedName() {
+  switch (process.env.REACT_APP_CHAIN_ID) {
+    case '137':
+      return 'Matic (Wrapped)'
+    case '80001':
+      return 'Matic (Wrapped)'
+    default:
+      return 'Ether (Wrapped)'
+  }
+}
+
 export function getEtherscanLinkText() {
   switch (process.env.REACT_APP_CHAIN_ID) {
     case '137':
