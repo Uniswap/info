@@ -38,19 +38,21 @@ export function getTimeframe(timeWindow) {
 }
 
 export function getPoolLink(token0Address, token1Address = null, remove = false, poolAddress = null) {
+  const nativeTokenSymbol = getNativeTokenSymbol()
+
   if (poolAddress) {
     if (!token1Address) {
       return (
         process.env.REACT_APP_DMM_SWAP_URL +
         (remove ? `remove` : `add`) +
-        `/${token0Address === WETH_ADDRESS ? 'ETH' : token0Address}/${'ETH'}/${poolAddress}`
+        `/${token0Address === WETH_ADDRESS ? nativeTokenSymbol : token0Address}/${nativeTokenSymbol}/${poolAddress}`
       )
     } else {
       return (
         process.env.REACT_APP_DMM_SWAP_URL +
         (remove ? `remove` : `add`) +
-        `/${token0Address === WETH_ADDRESS ? 'ETH' : token0Address}/${
-          token1Address === WETH_ADDRESS ? 'ETH' : token1Address
+        `/${token0Address === WETH_ADDRESS ? nativeTokenSymbol : token0Address}/${
+          token1Address === WETH_ADDRESS ? nativeTokenSymbol : token1Address
         }/${poolAddress}`
       )
     }
@@ -60,26 +62,28 @@ export function getPoolLink(token0Address, token1Address = null, remove = false,
     return (
       process.env.REACT_APP_DMM_SWAP_URL +
       (remove ? `remove` : `add`) +
-      `/${token0Address === WETH_ADDRESS ? 'ETH' : token0Address}/${'ETH'}`
+      `/${token0Address === WETH_ADDRESS ? nativeTokenSymbol : token0Address}/${nativeTokenSymbol}`
     )
   } else {
     return (
       process.env.REACT_APP_DMM_SWAP_URL +
       (remove ? `remove` : `add`) +
-      `/${token0Address === WETH_ADDRESS ? 'ETH' : token0Address}/${
-        token1Address === WETH_ADDRESS ? 'ETH' : token1Address
+      `/${token0Address === WETH_ADDRESS ? nativeTokenSymbol : token0Address}/${
+        token1Address === WETH_ADDRESS ? nativeTokenSymbol : token1Address
       }`
     )
   }
 }
 
 export function getSwapLink(token0Address, token1Address = null) {
+  const nativeTokenSymbol = getNativeTokenSymbol()
+
   if (!token1Address) {
     return `${process.env.REACT_APP_DMM_SWAP_URL}swap?inputCurrency=${token0Address}`
   } else {
     return `${process.env.REACT_APP_DMM_SWAP_URL}swap?inputCurrency=${
-      token0Address === WETH_ADDRESS ? 'ETH' : token0Address
-    }&outputCurrency=${token1Address === WETH_ADDRESS ? 'ETH' : token1Address}`
+      token0Address === WETH_ADDRESS ? nativeTokenSymbol : token0Address
+    }&outputCurrency=${token1Address === WETH_ADDRESS ? nativeTokenSymbol : token1Address}`
   }
 }
 
@@ -498,4 +502,37 @@ export function shortenAddress(address, chars = 4) {
     throw Error(`Invalid 'address' parameter '${address}'.`)
   }
   return `${parsed.substring(0, chars + 2)}...${parsed.substring(42 - chars)}`
+}
+
+export function getNativeTokenSymbol() {
+  switch (process.env.REACT_APP_CHAIN_ID) {
+    case '137':
+      return 'MATIC'
+    case '80001':
+      return 'MATIC'
+    default:
+      return 'ETH'
+  }
+}
+
+export function getNativeTokenWrappedName() {
+  switch (process.env.REACT_APP_CHAIN_ID) {
+    case '137':
+      return 'Matic (Wrapped)'
+    case '80001':
+      return 'Matic (Wrapped)'
+    default:
+      return 'Ether (Wrapped)'
+  }
+}
+
+export function getEtherscanLinkText() {
+  switch (process.env.REACT_APP_CHAIN_ID) {
+    case '137':
+      return 'View on Explorer'
+    case '80001':
+      return 'View on Explorer'
+    default:
+      return 'View on Etherscan'
+  }
 }

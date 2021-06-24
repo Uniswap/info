@@ -18,6 +18,7 @@ import { xyzClient } from '../../apollo/client'
 import { PAIR_SEARCH, TOKEN_SEARCH } from '../../apollo/queries'
 import FormattedName from '../FormattedName'
 import { TYPE } from '../../Theme'
+import { getNativeTokenSymbol, getNativeTokenWrappedName } from '../../utils'
 
 const Container = styled.div`
   height: 48px;
@@ -460,12 +461,12 @@ export const Search = ({ small = false }) => {
           {filteredPairList &&
             filteredPairList.slice(0, pairsShown).map((pair) => {
               if (pair?.token0?.id === WETH_ADDRESS) {
-                pair.token0.name = 'ETH (Wrapped)'
-                pair.token0.symbol = 'ETH'
+                pair.token0.name = getNativeTokenWrappedName()
+                pair.token0.symbol = getNativeTokenSymbol()
               }
               if (pair?.token1.id === WETH_ADDRESS) {
-                pair.token1.name = 'ETH (Wrapped)'
-                pair.token1.symbol = 'ETH'
+                pair.token1.name = getNativeTokenWrappedName()
+                pair.token1.symbol = getNativeTokenSymbol()
               }
               return (
                 <BasicLink to={'/pair/' + pair.id} key={pair.id} onClick={onDismiss}>

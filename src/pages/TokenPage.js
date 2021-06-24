@@ -15,7 +15,7 @@ import TxnList from '../components/TxnList'
 import TokenChart from '../components/TokenChart'
 import { BasicLink } from '../components/Link'
 import Search from '../components/Search'
-import { formattedNum, formattedPercent, getPoolLink, getSwapLink, localNumber } from '../utils'
+import { formattedNum, formattedPercent, getEtherscanLinkText, getPoolLink, getSwapLink, localNumber } from '../utils'
 import { useTokenData, useTokenTransactions, useTokenPairs } from '../contexts/TokenData'
 import { TYPE, ThemedBackground } from '../Theme'
 import { transparentize } from 'polished'
@@ -133,10 +133,10 @@ function TokenPage({ address, history }) {
     if (Array.isArray(fetchedPairsListAddresses) && fetchedPairsListAddresses.length > 0) {
       bestPair =
         fetchedPairsList[
-        fetchedPairsListAddresses.sort(function (a, b) {
-          // Sort by reserveUSD in descending order
-          return parseFloat(fetchedPairsList[b].reserveUSD) - parseFloat(fetchedPairsList[a].reserveUSD)
-        })[0]
+          fetchedPairsListAddresses.sort(function (a, b) {
+            // Sort by reserveUSD in descending order
+            return parseFloat(fetchedPairsList[b].reserveUSD) - parseFloat(fetchedPairsList[a].reserveUSD)
+          })[0]
         ]
     }
   }
@@ -157,8 +157,8 @@ function TokenPage({ address, history }) {
     oneDayVolumeUSD || oneDayVolumeUSD === 0
       ? formattedNum(oneDayVolumeUSD === 0 ? oneDayVolumeUT : oneDayVolumeUSD, true)
       : oneDayVolumeUSD === 0
-        ? '$0'
-        : '-'
+      ? '$0'
+      : '-'
 
   // mark if using untracked volume
   const [usingUtVolume, setUsingUtVolume] = useState(false)
@@ -196,10 +196,10 @@ function TokenPage({ address, history }) {
   }, [])
 
   async function addToMetaMask() {
-    const tokenAddress = address;
-    const tokenSymbol = symbol;
-    const tokenDecimals = decimals;
-    const tokenImage = getUrlLogo(address);
+    const tokenAddress = address
+    const tokenSymbol = symbol
+    const tokenDecimals = decimals
+    const tokenImage = getUrlLogo(address)
 
     try {
       if (window.ethereum) {
@@ -214,10 +214,10 @@ function TokenPage({ address, history }) {
               image: tokenImage,
             },
           },
-        });
+        })
       }
     } catch (error) {
-      console.log(error);
+      console.log(error)
     }
   }
 
@@ -315,7 +315,13 @@ function TokenPage({ address, history }) {
                 </RowFixed>
               </span>
             </RowBetween>
-            <ButtonOutlined onClick={addToMetaMask} mb={10} color="#08a1e7" borderColor="#08a1e7" style={{ padding: '5px 15px' }}>
+            <ButtonOutlined
+              onClick={addToMetaMask}
+              mb={10}
+              color="#08a1e7"
+              borderColor="#08a1e7"
+              style={{ padding: '5px 15px' }}
+            >
               + Add {formattedSymbol} to MetaMask
               <MetamaskImg src={MetaMaskIcon} alt="metamask icon" />
             </ButtonOutlined>
@@ -455,7 +461,7 @@ function TokenPage({ address, history }) {
                       external
                       href={`${process.env.REACT_APP_ETHERSCAN_URL}/address/${address}`}
                     >
-                      View on Etherscan ↗
+                      {getEtherscanLinkText()} ↗
                     </Link>
                   </ButtonLight>
                 </TokenDetailsLayout>

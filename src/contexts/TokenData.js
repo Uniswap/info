@@ -29,7 +29,7 @@ import {
 import { getBlockFromTimestamp, getBlocksFromTimestamps } from '../utils'
 import { timeframeOptions, WETH_ADDRESS } from '../constants'
 import { useLatestBlocks } from './Application'
-import { from } from 'node-vibrant'
+import { getNativeTokenSymbol, getNativeTokenWrappedName } from '../utils'
 
 const UPDATE = 'UPDATE'
 const UPDATE_TOKEN_TXNS = 'UPDATE_TOKEN_TXNS'
@@ -292,8 +292,8 @@ const getTopTokens = async (ethPrice, ethPriceOld) => {
           }
 
           if (data.id === WETH_ADDRESS) {
-            data.name = 'Ether (Wrapped)'
-            data.symbol = 'ETH'
+            data.name = getNativeTokenWrappedName()
+            data.symbol = getNativeTokenSymbol()
           }
 
           // HOTFIX for Aave
@@ -421,8 +421,8 @@ const getTokenData = async (address, ethPrice, ethPriceOld) => {
 
     // fix for WETH
     if (data.id === WETH_ADDRESS) {
-      data.name = 'ETH (Wrapped)'
-      data.symbol = 'ETH'
+      data.name = getNativeTokenWrappedName()
+      data.symbol = getNativeTokenSymbol()
     }
 
     // HOTFIX for Aave
