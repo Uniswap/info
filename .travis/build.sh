@@ -30,8 +30,8 @@ elif [[ "$TRAVIS_BRANCH" == "main" ]]; then
   echo "Start running build"
   yarn build-matic
   mkdir build-matic-index
-  build/index.html build-matic-index
-  mv build build-production
+  cp build/index.html build-matic-index
+  mv build build-matic
   echo "Finished running build"
 else
     echo "Branch is not set for auto-build."
