@@ -4,7 +4,6 @@ import { withRouter } from 'react-router-dom'
 import { TrendingUp, List, PieChart, Disc, Repeat, Monitor } from 'react-feather'
 import { useMedia } from 'react-use'
 
-import { KNC_ADDRESS } from '../../constants'
 import { AutoColumn } from '../Column'
 import Title from '../Title'
 import { BasicLink } from '../Link'
@@ -14,6 +13,7 @@ import { useSessionStart } from '../../contexts/Application'
 import { useDarkModeManager } from '../../contexts/LocalStorage'
 import Toggle from '../Toggle'
 import SocialLinks from '../SocialLinks'
+import { getDefaultAddLiquidityUrl } from '../../utils'
 
 const Wrapper = styled.div`
   height: ${({ isMobile }) => (isMobile ? 'initial' : '100vh')};
@@ -167,7 +167,7 @@ function SideNav({ history }) {
                   </Option>
                 </Link>
 
-                <Link href={`${process.env.REACT_APP_DMM_SWAP_URL}pools/ETH/${KNC_ADDRESS}`} external>
+                <Link href={getDefaultAddLiquidityUrl()} external>
                   <Option>
                     <Monitor size={20} style={{ marginRight: '.75rem' }} />
                     Liquidity
