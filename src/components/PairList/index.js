@@ -109,7 +109,7 @@ const SORT_FIELD = {
 }
 
 const FIELD_TO_VALUE = {
-  [SORT_FIELD.LIQ]: 'trackedReserveUSD', // sort with tracked volume only
+  [SORT_FIELD.LIQ]: 'reserveUSD', // sort with tracked volume only
   [SORT_FIELD.VOL]: 'oneDayVolumeUSD',
   [SORT_FIELD.VOL_7DAYS]: 'oneWeekVolumeUSD',
   [SORT_FIELD.FEES]: 'oneDayVolumeUSD',
