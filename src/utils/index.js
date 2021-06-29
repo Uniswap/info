@@ -8,7 +8,7 @@ import { GET_BLOCK, GET_BLOCKS, SHARE_VALUE } from '../apollo/queries'
 import { Text } from 'rebass'
 import _Decimal from 'decimal.js-light'
 import toFormat from 'toformat'
-import { timeframeOptions, WETH_ADDRESS } from '../constants'
+import { timeframeOptions, WETH_ADDRESS, KNC_ADDRESS } from '../constants'
 import Numeral from 'numeral'
 
 // format libraries
@@ -534,5 +534,16 @@ export function getEtherscanLinkText() {
       return 'View on Explorer'
     default:
       return 'View on Etherscan'
+  }
+}
+
+export function getDefaultAddLiquidityUrl() {
+  switch (process.env.REACT_APP_CHAIN_ID) {
+    case '137':
+      return `${process.env.REACT_APP_DMM_SWAP_URL}pools/0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619/${KNC_ADDRESS}`
+    case '80001':
+      return `${process.env.REACT_APP_DMM_SWAP_URL}pools/0x19395624C030A11f58e820C3AeFb1f5960d9742a/${KNC_ADDRESS}`
+    default:
+      return `${process.env.REACT_APP_DMM_SWAP_URL}pools/ETH/${KNC_ADDRESS}`
   }
 }
