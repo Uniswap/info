@@ -178,7 +178,7 @@ export const ItemCard = ({ pool, myLiquidity }) => {
           <DataText>{formattedNum(amp.toPrecision(5))}</DataText>
         </GridItem>
         <GridItem noBorder>
-          <DataTitle>1y F/L</DataTitle>
+          <DataTitle>APY</DataTitle>
           <DataText>{`${oneYearFL}%`}</DataText>
         </GridItem>
       </StyledItemCard>
