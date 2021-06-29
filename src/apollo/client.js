@@ -4,7 +4,7 @@ import { HttpLink } from 'apollo-link-http'
 
 export const xyzClient = new ApolloClient({
   link: new HttpLink({
-    uri: process.env.REACT_APP_SUBGRAPH_URL || 'https://api.thegraph.com/subgraphs/name/edwardevans094/devdmm',
+    uri: process.env.REACT_APP_SUBGRAPH_URL || 'https://api.thegraph.com/subgraphs/name/dynamic-amm/dynamic-amm',
   }),
   cache: new InMemoryCache(),
   shouldBatch: true,
@@ -37,8 +37,7 @@ export const v1Client = new ApolloClient({
 export const blockClient = new ApolloClient({
   link: new HttpLink({
     uri:
-      process.env.REACT_APP_SUBGRAPH_BLOCK_URL ||
-      'https://api.thegraph.com/subgraphs/name/edwardevans094/ropsten-blocks',
+      process.env.REACT_APP_SUBGRAPH_BLOCK_URL || 'https://api.thegraph.com/subgraphs/name/blocklytics/ethereum-blocks',
   }),
   cache: new InMemoryCache(),
 })
