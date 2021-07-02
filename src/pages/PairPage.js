@@ -164,8 +164,24 @@ function PairPage({ pairAddress, history }) {
     token1?.derivedETH && ethPrice ? formattedNum(parseFloat(token1.derivedETH) * parseFloat(ethPrice), true) : ''
 
   // rates
-  const token0Rate = reserve0 && reserve1 ? formattedNum(reserve1 / reserve0) : '-'
-  const token1Rate = reserve0 && reserve1 ? formattedNum(reserve0 / reserve1) : '-'
+  const token0Rate =
+    token0 &&
+    token1 &&
+    token0.derivedETH &&
+    token1.derivedETH &&
+    parseFloat(token0.derivedETH) > 0 &&
+    parseFloat(token1.derivedETH) > 0
+      ? formattedNum(token0.derivedETH / token1.derivedETH)
+      : '-'
+  const token1Rate =
+    token0 &&
+    token1 &&
+    token0.derivedETH &&
+    token1.derivedETH &&
+    parseFloat(token0.derivedETH) > 0 &&
+    parseFloat(token1.derivedETH) > 0
+      ? formattedNum(token1.derivedETH / token0.derivedETH)
+      : '-'
 
   // formatted symbols for overflow
   const formattedSymbol0 = token0?.symbol.length > 6 ? token0?.symbol.slice(0, 5) + '...' : token0?.symbol
