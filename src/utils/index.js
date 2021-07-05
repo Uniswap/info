@@ -529,11 +529,11 @@ export function getNativeTokenWrappedName() {
 export function getEtherscanLinkText() {
   switch (process.env.REACT_APP_CHAIN_ID) {
     case '137':
-      return 'View on Explorer'
+      return 'Polygonscan'
     case '80001':
-      return 'View on Explorer'
+      return 'Explorer'
     default:
-      return 'View on Etherscan'
+      return 'Etherscan'
   }
 }
 
