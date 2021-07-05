@@ -11,7 +11,10 @@ export const timeframeOptions = {
 }
 
 // token list urls to fetch tokens from - use for warnings on tokens and pairs
-export const SUPPORTED_LIST_URLS__NO_ENS = ['https://gateway.ipfs.io/ipns/tokens.uniswap.org']
+export const SUPPORTED_LIST_URLS__NO_ENS =
+  String(process.env.REACT_APP_CHAIN_ID) === '137'
+    ? ['https://unpkg.com/quickswap-default-token-list@1.0.72/build/quickswap-default.tokenlist.json']
+    : ['https://gateway.ipfs.io/ipns/tokens.uniswap.org']
 
 // hide from overview list
 export const OVERVIEW_TOKEN_BLACKLIST = [

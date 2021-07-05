@@ -620,7 +620,7 @@ function PoolPage({ poolAddress, history }) {
                       external
                       href={`${process.env.REACT_APP_ETHERSCAN_URL}/address/${poolAddress}`}
                     >
-                      {getEtherscanLinkText()} ↗
+                      {`View on ${getEtherscanLinkText()}`} ↗
                     </Link>
                   </ButtonOutlined>
                 </TokenDetailsLayout>

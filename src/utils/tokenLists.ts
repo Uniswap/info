@@ -50,6 +50,13 @@ export default async function getTokenList(listUrl: string): Promise<TokenList> 
     }
 
     const json = await response.json()
+
+    // Bypass validator for Matic network
+    // Because the Uniswap token schema will fail on Quickswap tokens list
+    if (String(process.env.REACT_APP_CHAIN_ID) === '137') {
+      return json
+    }
+
     if (!tokenListValidator(json)) {
       const validationErrors: string =
         tokenListValidator.errors?.reduce<string>((memo, error) => {
@@ -58,6 +65,7 @@ export default async function getTokenList(listUrl: string): Promise<TokenList> 
         }, '') ?? 'unknown error'
       throw new Error(`Token list failed validation: ${validationErrors}`)
     }
+
     return json
   }
   throw new Error('Unrecognized list URL protocol.')

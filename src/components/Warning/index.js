@@ -9,6 +9,7 @@ import { AutoColumn } from '../Column'
 import { Hover } from '..'
 import Link from '../Link'
 import { useMedia } from 'react-use'
+import { getEtherscanLinkText } from '../../utils'
 
 const WarningWrapper = styled.div`
   border-radius: 20px;
@@ -80,7 +81,7 @@ export default function Warning({ type, show, setShow, address }) {
                   href={`${process.env.REACT_APP_ETHERSCAN_URL}/address/${address}`}
                   target="_blank"
                 >
-                  View {contractTypeLabel} contract on Etherscan
+                  View {contractTypeLabel} contract on {getEtherscanLinkText()}
                 </Link>
               </Hover>
             )}
@@ -104,7 +105,7 @@ export default function Warning({ type, show, setShow, address }) {
                   href={`${process.env.REACT_APP_ETHERSCAN_URL}/address/${address}`}
                   target="_blank"
                 >
-                  View {contractTypeLabel} contract on Etherscan
+                  View {contractTypeLabel} contract on {getEtherscanLinkText()}
                 </Link>
               </Hover>
             )}
