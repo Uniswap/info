@@ -185,7 +185,7 @@ function AccountPage({ account }) {
                 href={`${process.env.REACT_APP_ETHERSCAN_URL}/address/${account}`}
                 target="_blank"
               >
-                <TYPE.main fontSize={14}>{getEtherscanLinkText()}</TYPE.main>
+                <TYPE.main fontSize={14}>{`View on ${getEtherscanLinkText()}`}</TYPE.main>
               </Link>
             </span>
             <AccountWrapper>

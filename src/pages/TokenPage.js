@@ -461,7 +461,7 @@ function TokenPage({ address, history }) {
                       external
                       href={`${process.env.REACT_APP_ETHERSCAN_URL}/address/${address}`}
                     >
-                      {getEtherscanLinkText()} ↗
+                      {`View on ${getEtherscanLinkText()}`} ↗
                     </Link>
                   </ButtonLight>
                 </TokenDetailsLayout>
