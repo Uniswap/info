@@ -537,6 +537,17 @@ export function getEtherscanLinkText() {
   }
 }
 
+export function getNetworkName() {
+  switch (process.env.REACT_APP_CHAIN_ID) {
+    case '137':
+      return 'Polygon'
+    case '80001':
+      return 'Polygon'
+    default:
+      return 'Ethereum'
+  }
+}
+
 export function getDefaultAddLiquidityUrl() {
   switch (process.env.REACT_APP_CHAIN_ID) {
     case '137':
