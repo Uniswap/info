@@ -541,8 +541,8 @@ function PoolPage({ poolAddress, history }) {
                   <PoolChart
                     address={poolAddress}
                     color={backgroundColor}
-                    base0={reserve1 / reserve0}
-                    base1={reserve0 / reserve1}
+                    base0={vReserve1 / vReserve0}
+                    base1={vReserve0 / vReserve1}
                   />
                 </Panel>
               </PanelWrapper>
