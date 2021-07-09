@@ -1,7 +1,6 @@
-import React, { useState } from 'react'
+import React from 'react'
 import styled from 'styled-components'
-import { RowFixed, RowBetween } from '../Row'
-import { useMedia } from 'react-use'
+import { RowBetween } from '../Row'
 import { useGlobalData, useEthPrice } from '../../contexts/GlobalData'
 import { formattedNum, getNativeTokenSymbol, localNumber } from '../../utils'
 import { TYPE } from '../../Theme'
@@ -16,15 +15,18 @@ const Medium = styled.span`
   font-weight: 500;
 `
 
+const StyledGlobalStats = styled.div`
+  display: grid;
+  grid-template-columns: 1.5fr 2fr 1fr 2fr;
+  font-size: 12px;
+  font-weight: 500;
+
+  @media screen and (max-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+`
+
 export default function GlobalStats() {
-  const below1295 = useMedia('(max-width: 1295px)')
-  const below1180 = useMedia('(max-width: 1180px)')
-  const below1024 = useMedia('(max-width: 1024px)')
-  const below400 = useMedia('(max-width: 400px)')
-  const below816 = useMedia('(max-width: 816px)')
-
-  const [showPriceCard, setShowPriceCard] = useState(false)
-
   const { oneDayVolumeUSD, oneDayTxns, pairCount, oneDayFeeUSD } = useGlobalData()
   const [ethPrice] = useEthPrice()
   const formattedEthPrice = ethPrice ? formattedNum(ethPrice, true) : '-'
@@ -32,39 +34,24 @@ export default function GlobalStats() {
 
   return (
     <Header>
-      <RowBetween style={{ padding: below816 ? '0.5rem' : '.5rem' }}>
-        <RowFixed>
-          {!below400 && (
-            <TYPE.main
-              mr={'1rem'}
-              onMouseEnter={() => {
-                setShowPriceCard(true)
-              }}
-              onMouseLeave={() => {
-                setShowPriceCard(false)
-              }}
-              style={{ position: 'relative' }}
-            >
-              {getNativeTokenSymbol()} Price: <Medium>{formattedEthPrice}</Medium>
-            </TYPE.main>
-          )}
+      <RowBetween style={{ padding: '0.5rem' }}>
+        <StyledGlobalStats>
+          <TYPE.main mr={'1rem'} style={{ position: 'relative' }}>
+            {getNativeTokenSymbol()} Price: <Medium>{formattedEthPrice}</Medium>
+          </TYPE.main>
 
-          {!below1180 && (
-            <TYPE.main mr={'1rem'}>
-              Transactions (24H): <Medium>{localNumber(oneDayTxns)}</Medium>
-            </TYPE.main>
-          )}
-          {!below1024 && (
-            <TYPE.main mr={'1rem'}>
-              Pairs: <Medium>{localNumber(pairCount)}</Medium>
-            </TYPE.main>
-          )}
-          {!below1295 && (
-            <TYPE.main mr={'1rem'}>
-              Fees (24H): <Medium>{oneDayFees}</Medium>&nbsp;
-            </TYPE.main>
-          )}
-        </RowFixed>
+          <TYPE.main mr={'1rem'}>
+            Transactions (24h): <Medium>{localNumber(oneDayTxns)}</Medium>
+          </TYPE.main>
+
+          <TYPE.main mr={'1rem'}>
+            Pairs: <Medium>{localNumber(pairCount)}</Medium>
+          </TYPE.main>
+
+          <TYPE.main mr={'1rem'}>
+            Fees (24h): <Medium>{oneDayFees}</Medium>&nbsp;
+          </TYPE.main>
+        </StyledGlobalStats>
       </RowBetween>
     </Header>
   )
