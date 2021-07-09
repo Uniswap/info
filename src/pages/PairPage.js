@@ -416,8 +416,8 @@ function PairPage({ pairAddress, history }) {
                   <PairChart
                     address={pairAddress}
                     color={backgroundColor}
-                    base0={reserve1 / reserve0}
-                    base1={reserve0 / reserve1}
+                    base0={token0 && token1 && token0.derivedETH ? token1.derivedETH / token0.derivedETH : 0}
+                    base1={token0 && token1 && token1.derivedETH ? token0.derivedETH / token1.derivedETH : 0}
                   />
                 </Panel>
               </PanelWrapper>
