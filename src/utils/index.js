@@ -3,7 +3,7 @@ import { BigNumber } from 'bignumber.js'
 import dayjs from 'dayjs'
 import { ethers } from 'ethers'
 import utc from 'dayjs/plugin/utc'
-import { blockClient, xyzClient } from '../apollo/client'
+import { blockClient, client } from '../apollo/client'
 import { GET_BLOCK, GET_BLOCKS, SHARE_VALUE } from '../apollo/queries'
 import { Text } from 'rebass'
 import _Decimal from 'decimal.js-light'
@@ -192,7 +192,7 @@ export async function getLiquidityTokenBalanceOvertime(account, timestamps) {
   const blocks = await getBlocksFromTimestamps(timestamps)
 
   // get historical share values with time travel queries
-  let result = await xyzClient.query({
+  let result = await client.query({
     query: SHARE_VALUE(account, blocks),
     fetchPolicy: 'cache-first',
   })
@@ -226,7 +226,7 @@ export async function getShareValueOverTime(pairAddress, timestamps) {
   const blocks = await getBlocksFromTimestamps(timestamps)
 
   // get historical share values with time travel queries
-  let result = await xyzClient.query({
+  let result = await client.query({
     query: SHARE_VALUE(pairAddress, blocks),
     fetchPolicy: 'cache-first',
   })
