@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect } from 'react'
 
-import { xyzClient } from '../apollo/client'
+import { client } from '../apollo/client'
 import {
   TOKEN_DATA,
   FILTERED_TRANSACTIONS,
@@ -203,17 +203,17 @@ const getTopTokens = async (ethPrice, ethPriceOld) => {
   let twoDayBlock = await getBlockFromTimestamp(utcTwoDaysBack)
 
   try {
-    let current = await xyzClient.query({
+    let current = await client.query({
       query: TOKENS_CURRENT,
       fetchPolicy: 'cache-first',
     })
 
-    let oneDayResult = await xyzClient.query({
+    let oneDayResult = await client.query({
       query: TOKENS_DYNAMIC(oneDayBlock),
       fetchPolicy: 'cache-first',
     })
 
-    let twoDayResult = await xyzClient.query({
+    let twoDayResult = await client.query({
       query: TOKENS_DYNAMIC(twoDayBlock),
       fetchPolicy: 'cache-first',
     })
@@ -239,14 +239,14 @@ const getTopTokens = async (ethPrice, ethPriceOld) => {
 
           // catch the case where token wasnt in top list in previous days
           if (!oneDayHistory) {
-            let oneDayResult = await xyzClient.query({
+            let oneDayResult = await client.query({
               query: TOKEN_DATA(token.id, oneDayBlock),
               fetchPolicy: 'cache-first',
             })
             oneDayHistory = oneDayResult.data.tokens[0]
           }
           if (!twoDayHistory) {
-            let twoDayResult = await xyzClient.query({
+            let twoDayResult = await client.query({
               query: TOKEN_DATA(token.id, twoDayBlock),
               fetchPolicy: 'cache-first',
             })
@@ -298,7 +298,7 @@ const getTopTokens = async (ethPrice, ethPriceOld) => {
 
           // HOTFIX for Aave
           if (data.id === '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9') {
-            const aaveData = await xyzClient.query({
+            const aaveData = await client.query({
               query: PAIR_DATA('0xdfc14d2af169b0d36c4eff567ada9b2e0cae044f'),
               fetchPolicy: 'cache-first',
             })
@@ -334,21 +334,21 @@ const getTokenData = async (address, ethPrice, ethPriceOld) => {
 
   try {
     // fetch all current and historical data
-    let result = await xyzClient.query({
+    let result = await client.query({
       query: TOKEN_DATA(address),
       fetchPolicy: 'cache-first',
     })
     data = result?.data?.tokens?.[0]
 
     // get results from 24 hours in past
-    let oneDayResult = await xyzClient.query({
+    let oneDayResult = await client.query({
       query: TOKEN_DATA(address, oneDayBlock),
       fetchPolicy: 'cache-first',
     })
     oneDayData = oneDayResult.data.tokens[0]
 
     // get results from 48 hours in past
-    let twoDayResult = await xyzClient.query({
+    let twoDayResult = await client.query({
       query: TOKEN_DATA(address, twoDayBlock),
       fetchPolicy: 'cache-first',
     })
@@ -356,14 +356,14 @@ const getTokenData = async (address, ethPrice, ethPriceOld) => {
 
     // catch the case where token wasnt in top list in previous days
     if (!oneDayData) {
-      let oneDayResult = await xyzClient.query({
+      let oneDayResult = await client.query({
         query: TOKEN_DATA(address, oneDayBlock),
         fetchPolicy: 'cache-first',
       })
       oneDayData = oneDayResult.data.tokens[0]
     }
     if (!twoDayData) {
-      let twoDayResult = await xyzClient.query({
+      let twoDayResult = await client.query({
         query: TOKEN_DATA(address, twoDayBlock),
         fetchPolicy: 'cache-first',
       })
@@ -427,7 +427,7 @@ const getTokenData = async (address, ethPrice, ethPriceOld) => {
 
     // HOTFIX for Aave
     if (data.id === '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9') {
-      const aaveData = await xyzClient.query({
+      const aaveData = await client.query({
         query: PAIR_DATA('0xdfc14d2af169b0d36c4eff567ada9b2e0cae044f'),
         fetchPolicy: 'cache-first',
       })
@@ -445,7 +445,7 @@ const getTokenData = async (address, ethPrice, ethPriceOld) => {
 const getTokenTransactions = async (allPairsFormatted) => {
   const transactions = {}
   try {
-    let result = await xyzClient.query({
+    let result = await client.query({
       query: FILTERED_TRANSACTIONS,
       variables: {
         allPairs: allPairsFormatted,
@@ -464,7 +464,7 @@ const getTokenTransactions = async (allPairsFormatted) => {
 const getTokenPairs = async (tokenAddress) => {
   try {
     // fetch all current and historical data
-    let result = await xyzClient.query({
+    let result = await client.query({
       query: TOKEN_DATA(tokenAddress),
       fetchPolicy: 'cache-first',
     })
@@ -501,13 +501,14 @@ const getIntervalTokenData = async (tokenAddress, startTime, interval = 3600, la
       return []
     }
 
-    if (latestBlock) {
+    // TODO: Remove this code process.env.REACT_APP_CHAIN_ID === '1'
+    if (latestBlock && process.env.REACT_APP_CHAIN_ID === '1') {
       blocks = blocks.filter((b) => {
         return parseFloat(b.number) <= parseFloat(latestBlock)
       })
     }
 
-    let result = await splitQuery(PRICES_BY_BLOCK, xyzClient, [tokenAddress], blocks, 50)
+    let result = await splitQuery(PRICES_BY_BLOCK, client, [tokenAddress], blocks, 50)
 
     // format token ETH price results
     let values = []
@@ -561,7 +562,7 @@ const getTokenChartData = async (tokenAddress) => {
     let allFound = false
     let skip = 0
     while (!allFound) {
-      let result = await xyzClient.query({
+      let result = await client.query({
         query: TOKEN_CHART,
         variables: {
           tokenAddr: tokenAddress,
@@ -721,7 +722,9 @@ export function useTokenPriceData(tokenAddress, timeWindow, interval = 3600) {
     const currentTime = dayjs.utc()
     const windowSize = timeWindow === timeframeOptions.MONTH ? 'month' : 'week'
     const startTime =
-      timeWindow === timeframeOptions.ALL_TIME ? 1589760000 : currentTime.subtract(1, windowSize).startOf('hour').unix()
+      timeWindow === timeframeOptions.ALL_TIME
+        ? parseInt(process.env.REACT_APP_DEFAULT_START_TIME)
+        : currentTime.subtract(1, windowSize).startOf('hour').unix()
 
     async function fetch() {
       let data = await getIntervalTokenData(tokenAddress, startTime, interval, latestBlock)
