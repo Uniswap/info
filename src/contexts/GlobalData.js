@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect, useState } from 'react'
-import { xyzClient } from '../apollo/client'
+import { client } from '../apollo/client'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { useTimeframe } from './Application'
@@ -235,33 +235,33 @@ async function getGlobalData(ethPrice, oldEthPrice) {
     ])
 
     // fetch the global data
-    let result = await xyzClient.query({
+    let result = await client.query({
       query: GLOBAL_DATA(),
       fetchPolicy: 'cache-first',
     })
     data = result.data.dmmFactories[0]
 
     // fetch the historical data
-    let oneDayResult = await xyzClient.query({
+    let oneDayResult = await client.query({
       query: GLOBAL_DATA(oneDayBlock?.number),
       fetchPolicy: 'cache-first',
     })
 
     oneDayData = oneDayResult.data.dmmFactories[0]
 
-    let twoDayResult = await xyzClient.query({
+    let twoDayResult = await client.query({
       query: GLOBAL_DATA(twoDayBlock?.number),
       fetchPolicy: 'cache-first',
     })
     twoDayData = twoDayResult.data.dmmFactories[0]
 
-    let oneWeekResult = await xyzClient.query({
+    let oneWeekResult = await client.query({
       query: GLOBAL_DATA(oneWeekBlock?.number),
       fetchPolicy: 'cache-first',
     })
     const oneWeekData = oneWeekResult.data.dmmFactories[0]
 
-    let twoWeekResult = await xyzClient.query({
+    let twoWeekResult = await client.query({
       query: GLOBAL_DATA(twoWeekBlock?.number),
       fetchPolicy: 'cache-first',
     })
@@ -330,7 +330,7 @@ const getChartData = async (oldestDateToFetch) => {
 
   try {
     while (!allFound) {
-      let result = await xyzClient.query({
+      let result = await client.query({
         query: GLOBAL_CHART,
         variables: {
           startTime: oldestDateToFetch,
@@ -410,7 +410,7 @@ const getGlobalTransactions = async () => {
   let transactions = {}
 
   try {
-    let result = await xyzClient.query({
+    let result = await client.query({
       query: GLOBAL_TXNS,
       fetchPolicy: 'cache-first',
     })
@@ -455,11 +455,11 @@ const getEthPrice = async () => {
 
   try {
     let oneDayBlock = await getBlockFromTimestamp(utcOneDayBack)
-    let result = await xyzClient.query({
+    let result = await client.query({
       query: ETH_PRICE(),
       fetchPolicy: 'cache-first',
     })
-    let resultOneDay = await xyzClient.query({
+    let resultOneDay = await client.query({
       query: ETH_PRICE(oneDayBlock),
       fetchPolicy: 'cache-first',
     })
@@ -487,7 +487,7 @@ async function getAllPairsOnUniswap() {
     let pairs = []
     let skipCount = 0
     while (!allFound) {
-      let result = await xyzClient.query({
+      let result = await client.query({
         query: ALL_PAIRS,
         variables: {
           skip: skipCount,
@@ -515,7 +515,7 @@ async function getAllTokensOnUniswap() {
     let skipCount = 0
     let tokens = []
     while (!allFound) {
-      let result = await xyzClient.query({
+      let result = await client.query({
         query: ALL_TOKENS,
         variables: {
           skip: skipCount,
@@ -670,7 +670,7 @@ export function useTopLps() {
         topPools.map(async (pool) => {
           // for each one, fetch top LPs
           try {
-            const { data: results } = await xyzClient.query({
+            const { data: results } = await client.query({
               query: TOP_LPS_PER_POOLS,
               variables: {
                 pool: pool.toString(),

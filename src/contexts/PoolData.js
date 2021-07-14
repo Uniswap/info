@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect, useState } from 'react'
 
-import { xyzClient } from '../apollo/client'
+import { client } from '../apollo/client'
 import {
   POOL_DATA,
   POOL_CHART,
@@ -190,7 +190,7 @@ export async function getBulkPoolData(poolList, ethPrice) {
   let [{ number: b1 }, { number: b2 }, { number: bWeek }] = await getBlocksFromTimestamps([t1, t2, tWeek])
 
   try {
-    let current = await xyzClient.query({
+    let current = await client.query({
       query: POOLS_BULK,
       variables: {
         allPools: poolList,
@@ -200,7 +200,7 @@ export async function getBulkPoolData(poolList, ethPrice) {
 
     let [oneDayResult, twoDayResult, oneWeekResult] = await Promise.all(
       [b1, b2, bWeek].map(async (block) => {
-        let result = xyzClient.query({
+        let result = client.query({
           query: POOLS_HISTORICAL_BULK(block, poolList),
           fetchPolicy: 'cache-first',
         })
@@ -226,7 +226,7 @@ export async function getBulkPoolData(poolList, ethPrice) {
           let data = pool
           let oneDayHistory = oneDayData?.[pool.id]
           if (!oneDayHistory) {
-            let newData = await xyzClient.query({
+            let newData = await client.query({
               query: POOL_DATA(pool.id, b1),
               fetchPolicy: 'cache-first',
             })
@@ -234,7 +234,7 @@ export async function getBulkPoolData(poolList, ethPrice) {
           }
           let twoDayHistory = twoDayData?.[pool.id]
           if (!twoDayHistory) {
-            let newData = await xyzClient.query({
+            let newData = await client.query({
               query: POOL_DATA(pool.id, b2),
               fetchPolicy: 'cache-first',
             })
@@ -242,7 +242,7 @@ export async function getBulkPoolData(poolList, ethPrice) {
           }
           let oneWeekHistory = oneWeekData?.[pool.id]
           if (!oneWeekHistory) {
-            let newData = await xyzClient.query({
+            let newData = await client.query({
               query: POOL_DATA(pool.id, bWeek),
               fetchPolicy: 'cache-first',
             })
@@ -323,7 +323,7 @@ const getPoolTransactions = async (poolAddress) => {
   const transactions = {}
 
   try {
-    let result = await xyzClient.query({
+    let result = await client.query({
       query: FILTERED_TRANSACTIONS_POOL,
       variables: {
         allPools: [poolAddress],
@@ -350,7 +350,7 @@ const getPoolChartData = async (poolAddress) => {
     let allFound = false
     let skip = 0
     while (!allFound) {
-      let result = await xyzClient.query({
+      let result = await client.query({
         query: POOL_CHART,
         variables: {
           poolAddress: poolAddress,
@@ -440,7 +440,7 @@ const getHourlyRateData = async (poolAddress, startTime, latestBlock) => {
       })
     }
 
-    const result = await splitQuery(HOURLY_POOL_RATES, xyzClient, [poolAddress], blocks, 100)
+    const result = await splitQuery(HOURLY_POOL_RATES, client, [poolAddress], blocks, 100)
 
     // format token ETH price results
     let values = []
@@ -487,7 +487,7 @@ export function Updater() {
       // get top pools by reserves
       let {
         data: { pools },
-      } = await xyzClient.query({
+      } = await client.query({
         query: POOLS_CURRENT,
         fetchPolicy: 'cache-first',
       })
@@ -515,7 +515,9 @@ export function useHourlyRateData(poolAddress, timeWindow) {
     const currentTime = dayjs.utc()
     const windowSize = timeWindow === timeframeOptions.MONTH ? 'month' : 'week'
     const startTime =
-      timeWindow === timeframeOptions.ALL_TIME ? 1589760000 : currentTime.subtract(1, windowSize).startOf('hour').unix()
+      timeWindow === timeframeOptions.ALL_TIME
+        ? parseInt(process.env.REACT_APP_DEFAULT_START_TIME)
+        : currentTime.subtract(1, windowSize).startOf('hour').unix()
 
     async function fetch() {
       let data = await getHourlyRateData(poolAddress, startTime, latestBlock)
