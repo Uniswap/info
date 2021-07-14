@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect, useState } from 'react'
 
 import { WETH_ADDRESS } from '../constants'
-import { xyzClient } from '../apollo/client'
+import { client } from '../apollo/client'
 import {
   PAIR_DATA,
   PAIR_CHART,
@@ -214,7 +214,7 @@ async function getBulkPairData(pairList, ethPrice) {
   let [{ number: b1 }, { number: b2 }, { number: bWeek }] = await getBlocksFromTimestamps([t1, t2, tWeek])
 
   try {
-    let current = await xyzClient.query({
+    let current = await client.query({
       query: PAIRS_BULK,
       variables: {
         allPairs: pairList,
@@ -224,7 +224,7 @@ async function getBulkPairData(pairList, ethPrice) {
 
     let [oneDayResult, twoDayResult, oneWeekResult] = await Promise.all(
       [b1, b2, bWeek].map(async (block) => {
-        let result = xyzClient.query({
+        let result = client.query({
           query: PAIRS_HISTORICAL_BULK(block, pairList),
           fetchPolicy: 'cache-first',
         })
@@ -250,7 +250,7 @@ async function getBulkPairData(pairList, ethPrice) {
           let data = pair
           let oneDayHistory = oneDayData?.[pair.id]
           if (!oneDayHistory) {
-            let newData = await xyzClient.query({
+            let newData = await client.query({
               query: PAIR_DATA(pair.id, b1),
               fetchPolicy: 'cache-first',
             })
@@ -258,7 +258,7 @@ async function getBulkPairData(pairList, ethPrice) {
           }
           let twoDayHistory = twoDayData?.[pair.id]
           if (!twoDayHistory) {
-            let newData = await xyzClient.query({
+            let newData = await client.query({
               query: PAIR_DATA(pair.id, b2),
               fetchPolicy: 'cache-first',
             })
@@ -266,7 +266,7 @@ async function getBulkPairData(pairList, ethPrice) {
           }
           let oneWeekHistory = oneWeekData?.[pair.id]
           if (!oneWeekHistory) {
-            let newData = await xyzClient.query({
+            let newData = await client.query({
               query: PAIR_DATA(pair.id, bWeek),
               fetchPolicy: 'cache-first',
             })
@@ -352,7 +352,7 @@ const getPairPools = async (pairAddress) => {
   let pools = {}
 
   try {
-    let result = await xyzClient.query({
+    let result = await client.query({
       query: PAIR_POOLS_DATA(pairAddress),
       fetchPolicy: 'no-cache',
     })
@@ -368,7 +368,7 @@ const getPairTransactions = async (pairAddress) => {
   const transactions = {}
 
   try {
-    let result = await xyzClient.query({
+    let result = await client.query({
       query: FILTERED_TRANSACTIONS,
       variables: {
         allPairs: [pairAddress],
@@ -395,7 +395,7 @@ const getPairChartData = async (pairAddress) => {
     let allFound = false
     let skip = 0
     while (!allFound) {
-      let result = await xyzClient.query({
+      let result = await client.query({
         query: PAIR_CHART,
         variables: {
           pairAddress: pairAddress,
@@ -484,7 +484,7 @@ const getHourlyRateData = async (pairAddress, startTime, latestBlock) => {
       })
     }
 
-    const result = await splitQuery(HOURLY_PAIR_RATES, xyzClient, [pairAddress], blocks, 100)
+    const result = await splitQuery(HOURLY_PAIR_RATES, client, [pairAddress], blocks, 100)
 
     // format token ETH price results
     let values = []
@@ -531,7 +531,7 @@ export function Updater() {
       // get top pairs by reserves
       let {
         data: { pairs },
-      } = await xyzClient.query({
+      } = await client.query({
         query: PAIRS_CURRENT,
         fetchPolicy: 'cache-first',
       })
@@ -559,7 +559,9 @@ export function useHourlyRateData(pairAddress, timeWindow) {
     const currentTime = dayjs.utc()
     const windowSize = timeWindow === timeframeOptions.MONTH ? 'month' : 'week'
     const startTime =
-      timeWindow === timeframeOptions.ALL_TIME ? 1589760000 : currentTime.subtract(1, windowSize).startOf('hour').unix()
+      timeWindow === timeframeOptions.ALL_TIME
+        ? parseInt(process.env.REACT_APP_DEFAULT_START_TIME)
+        : currentTime.subtract(1, windowSize).startOf('hour').unix()
 
     async function fetch() {
       let data = await getHourlyRateData(pairAddress, startTime, latestBlock)

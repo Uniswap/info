@@ -14,7 +14,7 @@ import { useAllPairsInUniswap, useAllTokensInUniswap } from '../../contexts/Glob
 import { OVERVIEW_TOKEN_BLACKLIST, PAIR_BLACKLIST, WETH_ADDRESS } from '../../constants'
 
 import { transparentize } from 'polished'
-import { xyzClient } from '../../apollo/client'
+import { client } from '../../apollo/client'
 import { PAIR_SEARCH, TOKEN_SEARCH } from '../../apollo/queries'
 import FormattedName from '../FormattedName'
 import { TYPE } from '../../Theme'
@@ -185,7 +185,7 @@ export const Search = ({ small = false }) => {
     async function fetchData() {
       try {
         if (value?.length > 0) {
-          let tokens = await xyzClient.query({
+          let tokens = await client.query({
             variables: {
               value: value ? value.toUpperCase() : '',
               id: value,
@@ -193,7 +193,7 @@ export const Search = ({ small = false }) => {
             query: TOKEN_SEARCH,
           })
 
-          let pairs = await xyzClient.query({
+          let pairs = await client.query({
             query: PAIR_SEARCH,
             variables: {
               tokens: tokens.data.asSymbol?.map((t) => t.id),
