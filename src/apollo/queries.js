@@ -280,7 +280,7 @@ export const FIRST_SNAPSHOT = gql`
 
 export const USER_HISTORY = gql`
   query snapshots($user: Bytes!, $skip: Int!) {
-    liquidityPositionSnapshots(first: 1000, skip: $skip, where: { user: $user }) {
+    liquidityPositionSnapshots(orderBy: block, orderDirection: desc, first: 1000, skip: $skip, where: { user: $user }) {
       timestamp
       reserveUSD
       liquidityTokenBalance
@@ -461,8 +461,10 @@ export const PAIR_DAY_DATA = gql`
 
 export const PAIR_DAY_DATA_BULK = (pairs, startTimestamp) => {
   let pairsString = `[`
-  pairs.map((pair) => {
-    return (pairsString += `"${pair}"`)
+  pairs.forEach((pair) => {
+    if (!pairsString.includes(pair)) {
+      return (pairsString += `"${pair}"`)
+    }
   })
   pairsString += ']'
   const queryString = `
