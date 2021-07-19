@@ -461,8 +461,10 @@ export const PAIR_DAY_DATA = gql`
 
 export const PAIR_DAY_DATA_BULK = (pairs, startTimestamp) => {
   let pairsString = `[`
-  pairs.map((pair) => {
-    return (pairsString += `"${pair}"`)
+  pairs.forEach((pair) => {
+    if (!pairsString.includes(pair)) {
+      return (pairsString += `"${pair}"`)
+    }
   })
   pairsString += ']'
   const queryString = `
