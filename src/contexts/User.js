@@ -194,7 +194,9 @@ export function useUserSnapshots(account) {
             fetchPolicy: 'cache-first',
           })
           allResults = allResults.concat(result.data.liquidityPositionSnapshots)
-          if (result.data.liquidityPositionSnapshots.length < 1000) {
+          // Thegraph does not allow to set $skip larger than 5000
+          // https://thegraph.com/docs/developer/graphql-api#pagination
+          if (result.data.liquidityPositionSnapshots.length < 1000 || skip >= 5000) {
             found = true
           } else {
             skip += 1000
