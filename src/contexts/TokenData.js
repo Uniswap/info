@@ -501,8 +501,7 @@ const getIntervalTokenData = async (tokenAddress, startTime, interval = 3600, la
       return []
     }
 
-    // TODO: Remove this code process.env.REACT_APP_CHAIN_ID === '1'
-    if (latestBlock && process.env.REACT_APP_CHAIN_ID === '1') {
+    if (latestBlock) {
       blocks = blocks.filter((b) => {
         return parseFloat(b.number) <= parseFloat(latestBlock)
       })
