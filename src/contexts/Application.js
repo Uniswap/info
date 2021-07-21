@@ -206,7 +206,7 @@ export function useLatestBlocks() {
     async function fetch() {
       try {
         const res = await healthClient.query({
-          query: SUBGRAPH_HEALTH,
+          query: SUBGRAPH_HEALTH(process.env.REACT_APP_SUBGRAPH_NAME),
         })
         const syncedBlock = res.data.indexingStatusForCurrentVersion.chains[0].latestBlock.number
         const headBlock = res.data.indexingStatusForCurrentVersion.chains[0].chainHeadBlock.number

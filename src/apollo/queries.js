@@ -1,22 +1,24 @@
 import gql from 'graphql-tag'
 import { FACTORY_ADDRESS, BUNDLE_ID } from '../constants'
 
-export const SUBGRAPH_HEALTH = gql`
-  query health {
-    indexingStatusForCurrentVersion(subgraphName: "dynamic-amm/dynamic-amm") {
-      synced
-      health
-      chains {
-        chainHeadBlock {
-          number
-        }
-        latestBlock {
-          number
+export const SUBGRAPH_HEALTH = (subgraphName) => {
+  return gql(`
+    query health {
+      indexingStatusForCurrentVersion(subgraphName: "${subgraphName}") {
+        synced
+        health
+        chains {
+          chainHeadBlock {
+            number
+          }
+          latestBlock {
+            number
+          }
         }
       }
     }
-  }
-`
+  `)
+}
 
 export const V1_DATA_QUERY = gql`
   query uniswap($date: Int!, $date2: Int!) {
