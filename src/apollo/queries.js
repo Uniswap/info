@@ -752,6 +752,48 @@ const TokenFields = `
   }
 `
 
+// used for getting top tokens by total liquidity
+export const TOKEN_TOP_DAY_DATAS = gql`
+  query tokenDayDatas($date: Int) {
+    tokenDayDatas(first: 50, orderBy: dailyVolumeUSD, orderDirection: desc, where: { date_gt: $date }) {
+      id
+      date
+    }
+  }
+`
+
+export const TOKENS_BULK = gql`
+  ${TokenFields}
+  query tokens($tokenAddresses: [Bytes]!) {
+    pairs(where: { id_in: $tokenAddresses }) {
+      ...TokenFields
+    }
+  }
+`
+export const TOKENS_HISTORICAL_BULK = (tokens, block) => {
+  let tokenString = `[`
+  tokens.map((token) => {
+    return (tokenString += `"${token}",`)
+  })
+  tokenString += ']'
+  let queryString = `
+  query tokens {
+    tokens(first: 50, where: {id_in: ${tokenString}}, ${block ? 'block: {number: ' + block + '}' : ''}  ) {
+      id
+      name
+      symbol
+      derivedETH
+      tradeVolume
+      tradeVolumeUSD
+      untrackedVolumeUSD
+      totalLiquidity
+      txCount
+    }
+  }
+  `
+  return gql(queryString)
+}
+
 export const TOKENS_CURRENT = gql`
   ${TokenFields}
   query tokens {
