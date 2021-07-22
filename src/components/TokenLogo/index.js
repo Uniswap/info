@@ -96,7 +96,7 @@ export default function TokenLogo({ address, header = false, size = '24px', ...r
   }
 
   if (address?.toLowerCase() === WETH_ADDRESS) {
-    return getNativeTokenLogo({ size })
+    return getNativeTokenLogo({ size, ...rest })
   }
 
   if (address?.toLowerCase() === KNCL_ADDRESS.toLowerCase()) {
