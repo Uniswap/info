@@ -10,7 +10,7 @@ import { useDarkModeManager } from '../../contexts/LocalStorage'
 const IconWrapper = styled.div`
   position: absolute;
   right: 10px;
-  color: ${({ theme }) => theme.text1}
+  color: ${({ theme }) => theme.text1};
   border-radius: 3px;
   height: 16px;
   width: 16px;
@@ -81,8 +81,12 @@ const CandleStickChart = ({
     if (data !== dataPrev && chartCreated) {
       // remove the tooltip element
       let tooltip = document.getElementById('tooltip-id')
+      let currentChart = document.getElementsByClassName('tv-lightweight-charts')
       let node = document.getElementById('test-id')
       node.removeChild(tooltip)
+      if (currentChart.length > 0) {
+        node.removeChild(currentChart[0])
+      }
       chartCreated.resize(0, 0)
       setChartCreated()
     }
