@@ -12,11 +12,11 @@ import { useMedia } from 'react-use'
 import { getNetworkName, getEtherscanLinkText } from '../../utils'
 
 const WarningWrapper = styled.div`
-  border-radius: 20px;
-  border: 1px solid #f82d3a;
-  background: rgba(248, 45, 58, 0.05);
-  padding: 1rem;
-  color: #f82d3a;
+  border-radius: 8px;
+  border: 1px solid ${({ theme }) => theme.warningBorder};
+  background: ${({ theme }) => theme.warningBackground};
+  padding: 1.5rem 2.5rem;
+  color: ${({ theme }) => theme.warningTextColor};
   display: ${({ show }) => !show && 'none'};
   margin: 0 2rem 2rem 2rem;
   position: relative;
@@ -30,7 +30,7 @@ const WarningWrapper = styled.div`
 const StyledWarningIcon = styled(AlertTriangle)`
   min-height: 20px;
   min-width: 20px;
-  stroke: red;
+  stroke: #ffaf01;
 `
 
 export default function Warning({ type, show, setShow, address }) {
@@ -38,21 +38,21 @@ export default function Warning({ type, show, setShow, address }) {
 
   const textContent = below800 ? (
     <div>
-      <Text fontWeight={500} lineHeight={'145.23%'} mt={'10px'}>
+      <Text fontSize={14} fontWeight={500} lineHeight={'155.23%'} mt={'10px'} lineSpacing={'normal'}>
         Anyone can create and name any ERC20 token on {getNetworkName()}, including creating fake versions of existing
-        tokens and tokens that claim to represent projects that do not have a token.
+        tokens that claim to represent projects that do not have a token.
       </Text>
-      <Text fontWeight={500} lineHeight={'145.23%'} mt={'10px'}>
+      <Text fontSize={14} fontWeight={500} lineHeight={'155.23%'} mt={'10px'}>
         Similar to {getEtherscanLinkText()}, this site automatically tracks analytics for all ERC20 tokens independent
         of token integrity. Please do your own research before interacting with any ERC20 token.
       </Text>
     </div>
   ) : (
-    <Text fontWeight={500} lineHeight={'145.23%'} mt={'10px'}>
+    <Text fontSize={14} fontWeight={500} lineHeight={'155.23%'} mt={'10px'} lineSpacing={'normal'}>
       Anyone can create and name any ERC20 token on {getNetworkName()}, including creating fake versions of existing
-      tokens and tokens that claim to represent projects that do not have a token. Similar to {getEtherscanLinkText()},
-      this site automatically tracks analytics for all ERC20 tokens independent of token integrity. Please do your own
-      research before interacting with any ERC20 token.
+      tokens that claim to represent projects that do not have a token. Similar to {getEtherscanLinkText()}, this site
+      automatically tracks analytics for all ERC20 tokens independent of token integrity. Please do your own research
+      before interacting with any ERC20 token.
     </Text>
   )
 
@@ -63,8 +63,8 @@ export default function Warning({ type, show, setShow, address }) {
       <AutoColumn gap="4px">
         <RowFixed>
           <StyledWarningIcon />
-          <Text fontWeight={600} lineHeight={'145.23%'} ml={'10px'}>
-            Token Safety Alert
+          <Text fontWeight={500} fontSize={16} color={'#ffaf01'} lineHeight={'145.23%'} ml={'10px'}>
+            Token Safety Reminder
           </Text>
         </RowFixed>
         {textContent}
@@ -75,9 +75,8 @@ export default function Warning({ type, show, setShow, address }) {
             ) : (
               <Hover style={{ marginTop: '10px' }}>
                 <Link
-                  fontWeight={500}
                   lineHeight={'145.23%'}
-                  color={'#2172E5'}
+                  color={'#08a1e7'}
                   href={`${process.env.REACT_APP_ETHERSCAN_URL}/address/${address}`}
                   target="_blank"
                 >
@@ -87,7 +86,7 @@ export default function Warning({ type, show, setShow, address }) {
             )}
             <RowBetween style={{ marginTop: '20px' }}>
               <div />
-              <ButtonDark color={'#f82d3a'} style={{ minWidth: '140px' }} onClick={() => setShow(false)}>
+              <ButtonDark color={'#08a1e7'} style={{ minWidth: '140px' }} onClick={() => setShow(false)}>
                 I understand
               </ButtonDark>
             </RowBetween>
@@ -99,9 +98,8 @@ export default function Warning({ type, show, setShow, address }) {
             ) : (
               <Hover>
                 <Link
-                  fontWeight={500}
                   lineHeight={'145.23%'}
-                  color={'#2172E5'}
+                  color={'#08a1e7'}
                   href={`${process.env.REACT_APP_ETHERSCAN_URL}/address/${address}`}
                   target="_blank"
                 >
@@ -109,7 +107,7 @@ export default function Warning({ type, show, setShow, address }) {
                 </Link>
               </Hover>
             )}
-            <ButtonDark color={'#f82d3a'} style={{ minWidth: '140px' }} onClick={() => setShow(false)}>
+            <ButtonDark color={'#08a1e7'} style={{ minWidth: '140px' }} onClick={() => setShow(false)}>
               I understand
             </ButtonDark>
           </RowBetween>
