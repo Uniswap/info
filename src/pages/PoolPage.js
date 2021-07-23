@@ -249,11 +249,7 @@ function PoolPage({ poolAddress, history }) {
           </TYPE.body>
           {!below600 && <Search small={true} />}
         </RowBetween>
-        <WarningGrouping
-          disabled={
-            !dismissed && listedTokens && !(listedTokens.includes(token0?.id) && listedTokens.includes(token1?.id))
-          }
-        >
+        <WarningGrouping>
           <DashboardWrapper>
             <AutoColumn gap="40px" style={{ marginBottom: '1.5rem' }}>
               <div
