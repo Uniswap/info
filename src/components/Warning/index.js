@@ -22,8 +22,9 @@ const WarningWrapper = styled.div`
   position: relative;
 
   @media screen and (max-width: 800px) {
-    width: 80% !important;
-    margin-left: 5%;
+    width: 90% !important;
+    margin: 0 auto 2rem;
+    padding: 1.5rem 1rem;
   }
 `
 
