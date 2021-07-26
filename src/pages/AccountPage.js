@@ -136,8 +136,8 @@ function AccountPage({ account }) {
       ? dynamicPositions.reduce((total, position) => {
           return (
             total +
-            (parseFloat(position?.liquidityTokenBalance) / parseFloat(position?.pair?.totalSupply)) *
-              position?.pair?.reserveUSD
+            (parseFloat(position?.liquidityTokenBalance) / parseFloat(position?.pool?.totalSupply)) *
+              position?.pool?.reserveUSD
           )
         }, 0)
       : null
