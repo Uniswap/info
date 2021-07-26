@@ -160,7 +160,7 @@ const PairChart = ({ address, color, base0, base1 }) => {
               {pairData.token0 ? formattedSymbol0 + '/' + formattedSymbol1 : '-'}
             </OptionButton>
           </AutoRow>
-          <AutoRow justify="flex-end" gap="6px">
+          <AutoRow justify="flex-end" gap="6px" style={{ width: 'fit-content' }}>
             <OptionButton
               active={timeWindow === timeframeOptions.WEEK}
               onClick={() => setTimeWindow(timeframeOptions.WEEK)}
