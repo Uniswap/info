@@ -194,14 +194,14 @@ function TopTokenList({ tokens, itemMax = 10 }) {
           </Row>
         </DataText>
         {!below680 && (
-          <DataText area="symbol" color="text" fontWeight="500">
+          <DataText area="symbol" fontWeight="500">
             <FormattedName text={item.symbol} maxCharacters={5} />
           </DataText>
         )}
         <DataText area="liq">{formattedNum(item.totalLiquidityUSD, true)}</DataText>
         <DataText area="vol">{formattedNum(item.oneDayVolumeUSD, true)}</DataText>
         {!below1080 && (
-          <DataText area="price" color="text" fontWeight="500">
+          <DataText area="price" fontWeight="500">
             {formattedNum(item.priceUSD, true)}
           </DataText>
         )}
@@ -215,12 +215,11 @@ function TopTokenList({ tokens, itemMax = 10 }) {
       <DashGrid center={true} style={{ height: 'fit-content', padding: '0 1.125rem 1rem 1.125rem' }}>
         <Flex alignItems="center" justifyContent="flexStart">
           <ClickableText
-            color="text"
             area="name"
             fontWeight="500"
             onClick={(e) => {
               setSortedColumn(SORT_FIELD.NAME)
-              setSortDirection(sortedColumn !== SORT_FIELD.NAMe ? true : !sortDirection)
+              setSortDirection(sortedColumn !== SORT_FIELD.NAME ? true : !sortDirection)
             }}
           >
             {below680 ? 'Symbol' : 'Name'} {sortedColumn === SORT_FIELD.NAME ? (!sortDirection ? '↑' : '↓') : ''}

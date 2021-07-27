@@ -538,7 +538,7 @@ function PoolPage({ poolAddress, history }) {
                     address={poolAddress}
                     color={backgroundColor}
                     base0={vReserve0 && vReserve1 ? vReserve1 / vReserve0 : 0}
-                    base1={vReserve1 && vReserve1 ? vReserve0 / vReserve1 : 0}
+                    base1={vReserve0 && vReserve1 ? vReserve0 / vReserve1 : 0}
                   />
                 </Panel>
               </PanelWrapper>
