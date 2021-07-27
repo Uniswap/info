@@ -135,7 +135,7 @@ export const ItemCard = ({ pool, myLiquidity }) => {
           <DataText grid-area="pool">
             <PoolAddressContainer>
               {shortenPoolAddress}
-              <CopyHelper toCopy={pool.address} />
+              <CopyHelper toCopy={pool.id} />
             </PoolAddressContainer>
           </DataText>
         </GridItem>

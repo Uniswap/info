@@ -34,8 +34,8 @@ const OptionsRow = styled.div`
 const CHART_VIEW = {
   VOLUME: 'Volume',
   LIQUIDITY: 'Liquidity',
-  RATE0: 'Rate 0',
-  RATE1: 'Rate 1',
+  RATE0: 'RATE0',
+  RATE1: 'RATE1',
 }
 
 const PairChart = ({ address, color, base0, base1 }) => {
@@ -117,7 +117,17 @@ const PairChart = ({ address, color, base0, base1 }) => {
     <ChartWrapper>
       {below600 ? (
         <RowBetween mb={40}>
-          <DropdownSelect options={CHART_VIEW} active={chartFilter} setActive={setChartFilter} color={color} />
+          <DropdownSelect
+            options={CHART_VIEW}
+            active={chartFilter}
+            setActive={setChartFilter}
+            color={color}
+            optionTitles={{
+              ...CHART_VIEW,
+              RATE0: pairData.token0 ? formattedSymbol0 + '/' + formattedSymbol1 : '-',
+              RATE1: pairData.token0 ? formattedSymbol1 + '/' + formattedSymbol0 : '-',
+            }}
+          />
           <DropdownSelect options={timeframeOptions} active={timeWindow} setActive={setTimeWindow} color={color} />
         </RowBetween>
       ) : (
@@ -148,7 +158,7 @@ const PairChart = ({ address, color, base0, base1 }) => {
                 setChartFilter(CHART_VIEW.RATE0)
               }}
             >
-              {pairData.token0 ? formattedSymbol1 + '/' + formattedSymbol0 : '-'}
+              {pairData.token0 ? formattedSymbol0 + '/' + formattedSymbol1 : '-'}
             </OptionButton>
             <OptionButton
               active={chartFilter === CHART_VIEW.RATE1}
@@ -157,7 +167,7 @@ const PairChart = ({ address, color, base0, base1 }) => {
                 setChartFilter(CHART_VIEW.RATE1)
               }}
             >
-              {pairData.token0 ? formattedSymbol0 + '/' + formattedSymbol1 : '-'}
+              {pairData.token0 ? formattedSymbol1 + '/' + formattedSymbol0 : '-'}
             </OptionButton>
           </AutoRow>
           <AutoRow justify="flex-end" gap="6px" style={{ width: 'fit-content' }}>
