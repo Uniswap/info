@@ -29,7 +29,6 @@ import { Hover, PageWrapper, ContentWrapper, StyledIcon } from '../components'
 import { PlusCircle, Bookmark } from 'react-feather'
 import FormattedName from '../components/FormattedName'
 import { useListedTokens } from '../contexts/Application'
-import MetaMaskIcon from '../assets/metamask.png'
 
 const DashboardWrapper = styled.div`
   width: 100%;
@@ -86,12 +85,6 @@ const TokenDetailsLayout = styled.div`
 const WarningGrouping = styled.div`
   opacity: ${({ disabled }) => disabled && '0.4'};
   pointer-events: ${({ disabled }) => disabled && 'none'};
-`
-
-const MetamaskImg = styled.img`
-  width: 16px;
-  margin-left: 10px;
-  vertical-align: bottom;
 `
 
 function TokenPage({ address, history }) {
@@ -195,32 +188,6 @@ function TokenPage({ address, history }) {
     })
   }, [])
 
-  async function addToMetaMask() {
-    const tokenAddress = address
-    const tokenSymbol = symbol
-    const tokenDecimals = decimals
-    const tokenImage = getUrlLogo(address)
-
-    try {
-      if (window.ethereum) {
-        await window.ethereum.request({
-          method: 'wallet_watchAsset',
-          params: {
-            type: 'ERC20',
-            options: {
-              address: tokenAddress,
-              symbol: tokenSymbol,
-              decimals: tokenDecimals,
-              image: tokenImage,
-            },
-          },
-        })
-      }
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
   return (
     <PageWrapper>
       <ThemedBackground backgroundColor={transparentize(0.6, backgroundColor)} />
@@ -315,16 +282,6 @@ function TokenPage({ address, history }) {
                 </RowFixed>
               </span>
             </RowBetween>
-            <ButtonOutlined
-              onClick={addToMetaMask}
-              mb={10}
-              color="#08a1e7"
-              borderColor="#08a1e7"
-              style={{ padding: '5px 15px' }}
-            >
-              + Add {formattedSymbol} to MetaMask
-              <MetamaskImg src={MetaMaskIcon} alt="metamask icon" />
-            </ButtonOutlined>
             <>
               <PanelWrapper style={{ marginTop: below1080 ? '0' : '1rem' }}>
                 {below1080 && price && (
