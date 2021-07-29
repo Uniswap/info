@@ -55,3 +55,8 @@ export const KNCL_ADDRESS =
   String(process.env.REACT_APP_CHAIN_ID) === '1'
     ? '0xdd974D5C2e2928deA5F71b9825b8b646686BD200'
     : '0x7B2810576aa1cce68F2B118CeF1F36467c648F92'
+
+export const ANALYTICS_URLS = {
+  1: 'https://info.dmm.exchange',
+  137: 'https://polygon-info.dmm.exchange',
+}
