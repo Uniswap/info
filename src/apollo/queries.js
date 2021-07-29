@@ -834,7 +834,7 @@ export const TOKEN_DATA = (tokenAddress, block) => {
 }
 
 export const FILTERED_TRANSACTIONS = gql`
-  query($allPairs: [Bytes]!) {
+  query ($allPairs: [Bytes]!) {
     mints(first: 20, where: { pair_in: $allPairs }, orderBy: timestamp, orderDirection: desc) {
       transaction {
         id
