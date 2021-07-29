@@ -315,19 +315,28 @@ export function useListedTokens() {
 }
 
 export const ApplicationModal = {
+  NETWORK: 'NETWORK',
   MENU: 'MENU',
 }
 
-export function useOpenModal() {
+export function useModalOpen(modal) {
   const [state] = useApplicationContext()
   const openModal = state?.[OPEN_MODAL]
 
-  return openModal
+  return openModal === modal
 }
 
 export function useToggleModal(modal) {
   const [state, { updateOpenModal }] = useApplicationContext()
-  const open = useOpenModal(modal)
+  const open = useModalOpen(modal)
 
   return useCallback(() => updateOpenModal(open ? null : modal), [modal, open])
+}
+
+export function useToggleMenuModal() {
+  return useToggleModal(ApplicationModal.MENU)
+}
+
+export function useToggleNetworkModal() {
+  return useToggleModal(ApplicationModal.NETWORK)
 }
