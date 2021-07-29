@@ -8,9 +8,10 @@ import { Menu as MenuIcon, List, Repeat, Monitor } from 'react-feather'
 import { KNC_ADDRESS } from '../../constants'
 import Link, { BasicLink } from '../Link'
 import { AutoColumn } from '../Column'
-import { RowFixed } from '../Row'
+import { RowFixed, AutoRow } from '../Row'
+import SwitchNetworkButton from '../SwitcNetworkButton'
 import Logo from '../../assets/logo_white.svg'
-import { ApplicationModal, useOpenModal, useToggleModal } from '../../contexts/Application'
+import { ApplicationModal, useModalOpen, useToggleMenuModal } from '../../contexts/Application'
 import { useOnClickOutside } from '../../hooks'
 import SocialLinks from '../SocialLinks'
 
@@ -73,6 +74,7 @@ const StyledMenuButton = styled.button`
 `
 
 const MenuFlyout = styled.span`
+  width: fit-content;
   background-color: ${({ theme }) => theme.bg3};
   box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.01), 0px 4px 8px rgba(0, 0, 0, 0.04), 0px 16px 24px rgba(0, 0, 0, 0.04),
     0px 24px 32px rgba(0, 0, 0, 0.01);
@@ -110,9 +112,9 @@ export default function Title() {
   const history = useHistory()
   const below1080 = useMedia('(max-width: 1080px)')
   const node = useRef()
-  const open = useOpenModal(ApplicationModal.MENU)
-  const toggle = useToggleModal(ApplicationModal.MENU)
-  useOnClickOutside(node, open ? toggle : undefined)
+  const menuModalOpen = useModalOpen(ApplicationModal.MENU)
+  const toggleMenuModal = useToggleMenuModal()
+  useOnClickOutside(node, menuModalOpen ? toggleMenuModal : undefined)
 
   return (
     <TitleWrapper ref={node}>
@@ -150,16 +152,20 @@ export default function Title() {
               </Option>
             </BasicLink>
 
-            <StyledMenuButton onClick={toggle}>
+            <StyledMenuButton onClick={toggleMenuModal}>
               <StyledMenuIcon />
             </StyledMenuButton>
           </RowFixed>
         )}
       </Flex>
 
-      {open && (
+      {menuModalOpen && (
         <MenuFlyout>
           <AutoColumn gap="1.25rem">
+            <AutoRow style={{ width: '90%' }}>
+              <SwitchNetworkButton />
+            </AutoRow>
+
             <BasicLink to="/accounts">
               <Option
                 activeText={

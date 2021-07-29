@@ -4,12 +4,15 @@ import { withRouter } from 'react-router-dom'
 import { TrendingUp, List, PieChart, Disc, Repeat, Monitor } from 'react-feather'
 import { useMedia } from 'react-use'
 
+import { AutoRow } from '../Row'
 import { AutoColumn } from '../Column'
 import Title from '../Title'
 import { BasicLink } from '../Link'
 import { TYPE } from '../../Theme'
 import Link from '../Link'
-import { useSessionStart } from '../../contexts/Application'
+import NetworkModal from '../NetworkModal'
+import SwitchNetworkButton from '../SwitcNetworkButton'
+import { ApplicationModal, useModalOpen, useSessionStart } from '../../contexts/Application'
 import { useDarkModeManager } from '../../contexts/LocalStorage'
 import Toggle from '../Toggle'
 import SocialLinks from '../SocialLinks'
@@ -108,12 +111,17 @@ function SideNav({ history }) {
 
   const [isDark, toggleDarkMode] = useDarkModeManager()
 
+  const networkModalOpen = useModalOpen(ApplicationModal.NETWORK)
+
   return (
     <Wrapper isMobile={below1080}>
       {!below1080 ? (
         <DesktopWrapper>
           <AutoColumn gap="1rem" style={{ marginLeft: '.75rem', marginTop: '1.5rem' }}>
             <Title />
+            <AutoRow style={{ width: '90%' }}>
+              <SwitchNetworkButton />
+            </AutoRow>
             {!below1080 && (
               <AutoColumn gap="1.25rem" style={{ marginTop: '1rem' }}>
                 <BasicLink to="/home">
@@ -219,6 +227,8 @@ function SideNav({ history }) {
           <Title />
         </MobileWrapper>
       )}
+
+      {networkModalOpen && <NetworkModal />}
     </Wrapper>
   )
 }
