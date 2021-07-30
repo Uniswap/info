@@ -4,6 +4,7 @@
   "homepage": "https://info.uniswap.org",
   "devDependencies": {
     "@popperjs/core": "^2.4.2",
+    "@reach/dialog": "^0.15.3",
     "@reach/portal": "^0.10.3",
     "@reach/router": "^1.2.1",
     "@types/jest": "^26.0.0",
@@ -60,6 +61,7 @@
     "react-springy-parallax": "^1.3.0",
     "react-switch": "^5.0.1",
     "react-use": "^12.2.0",
+    "react-use-gesture": "^9.1.3",
     "rebass": "^4.0.7",
     "recharts": "^1.7.1",
     "recharts-fork": "^1.7.2",

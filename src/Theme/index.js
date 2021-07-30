@@ -1,8 +1,26 @@
 import React from 'react'
 import { ThemeProvider as StyledComponentsThemeProvider, createGlobalStyle } from 'styled-components'
 import { useDarkModeManager } from '../contexts/LocalStorage'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 import { Text } from 'rebass'
+
+const MEDIA_WIDTHS = {
+  upToExtraSmall: 576,
+  upToSmall: 768,
+  upToMedium: 992,
+  upToLarge: 1200,
+  upToXL: 1400,
+  upToXXL: 1800,
+}
+
+const mediaWidthTemplates = Object.keys(MEDIA_WIDTHS).reduce((accumulator, size) => {
+  accumulator[size] = (a, b, c) => css`
+    @media (max-width: ${MEDIA_WIDTHS[size]}px) {
+      ${css(a, b, c)}
+    }
+  `
+  return accumulator
+}, {})
 
 export default function ThemeProvider({ children }) {
   const [darkMode] = useDarkModeManager()
@@ -31,6 +49,8 @@ const theme = (darkMode, color) => ({
   text5: darkMode ? '#2C2F36' : '#EDEEF2',
   text6: darkMode ? '#6d8591' : '#565A69',
   text7: darkMode ? '#c9d2d7' : '#565A69',
+  text8: darkMode ? '#C3C5CB' : '#565A69',
+  text9: darkMode ? '#FFFFFF' : '#000000',
 
   // special case text types
   white: '#FFFFFF',
@@ -41,12 +61,14 @@ const theme = (darkMode, color) => ({
   bg3: darkMode ? '#40444F' : '#EDEEF2',
   bg4: darkMode ? '#565A69' : '#CED0D9',
   bg5: darkMode ? '#565A69' : '#888D9B',
-  bg6: darkMode ? '#000' : '#FFFFFF',
+  bg6: darkMode ? '#243036' : '#FFFFFF',
   bg7: darkMode ? '#303e46' : '#FFFFFF',
+  bg8: darkMode ? '#0078b0' : '#b3e5fc',
+  bg12: darkMode ? '#11171a' : '#f5f5f5',
   sidebar: '#303e46',
 
   //specialty colors
-  modalBG: darkMode ? 'rgba(0,0,0,0.85)' : 'rgba(0,0,0,0.6)',
+  modalBG: darkMode ? 'rgba(0,0,0,.425)' : 'rgba(0,0,0,0.3)',
   advancedBG: darkMode ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.4)',
   onlyLight: darkMode ? '#222c31' : 'transparent',
   divider: darkMode ? 'rgba(43, 43, 43, 0.435)' : 'rgba(43, 43, 43, 0.035)',
@@ -88,6 +110,9 @@ const theme = (darkMode, color) => ({
   warningTextColor: darkMode ? '#859aa5' : '#1d272b',
 
   background: darkMode ? 'black' : `radial-gradient(50% 50% at 50% 50%, #08a1e730 0%, #fff 0%)`,
+
+  // media queries
+  mediaWidth: mediaWidthTemplates,
 })
 
 const TextWrapper = styled(Text)`
