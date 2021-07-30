@@ -136,6 +136,25 @@ export default function TokenLogo({ address, header = false, size = '24px', ...r
     )
   }
 
+  // RICE logo
+  if (address?.toLowerCase() === '0xbcd515d6c5de70d3a31d999a7fa6a299657de294') {
+    return (
+      <Inline>
+        <Image
+          {...rest}
+          alt={''}
+          src="https://drive.google.com/uc?export=download&id=16PVXI1Da5P27cywWiyqrcV-Q17u1aXsi"
+          size={size}
+          onError={(event) => {
+            BAD_IMAGES[address] = true
+            setError(true)
+            event.preventDefault()
+          }}
+        />
+      </Inline>
+    )
+  }
+
   let path
 
   switch (String(process.env.REACT_APP_CHAIN_ID)) {
@@ -185,25 +204,4 @@ export default function TokenLogo({ address, header = false, size = '24px', ...r
       />
     </Inline>
   )
-}
-
-export function getUrlLogo(address) {
-  if (BAD_IMAGES[address]) {
-    return PlaceHolder
-  }
-  if (address.toLowerCase() === KNCL_ADDRESS.toLowerCase()) {
-    return 'https://i.imgur.com/1cDH5dy.png'
-  }
-
-  // MFG new logo
-  if (address.toLowerCase() === '0x6710c63432a2de02954fc0f851db07146a6c0312') {
-    return 'https://i.imgur.com/oReNLqf.png'
-  }
-
-  if (ROPSTEN_TOKEN_LOGOS_MAPPING[address?.toLowerCase()]) {
-    address = ROPSTEN_TOKEN_LOGOS_MAPPING[address?.toLowerCase()]
-  }
-  return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${isAddress(
-    address
-  )}/logo.png`
 }
