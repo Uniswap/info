@@ -1,23 +1,25 @@
 import React, { useState } from 'react'
+import { Route, Switch, BrowserRouter, Redirect } from 'react-router-dom'
 import styled from 'styled-components'
 import { ApolloProvider } from 'react-apollo'
+import { Text } from 'rebass'
+
 import { client } from './apollo/client'
-import { Route, Switch, BrowserRouter, Redirect } from 'react-router-dom'
 import GlobalPage from './pages/GlobalPage'
 import TokenPage from './pages/TokenPage'
 import PairPage from './pages/PairPage'
 import PoolPage from './pages/PoolPage'
 import { useGlobalData, useGlobalChartData } from './contexts/GlobalData'
-import { isAddress } from './utils'
+import { getNetworkName, isAddress } from './utils'
 import AccountPage from './pages/AccountPage'
 import AllTokensPage from './pages/AllTokensPage'
 import AllPairsPage from './pages/AllPairsPage'
 import PinnedData from './components/PinnedData'
-
 import SideNav from './components/SideNav'
 import AccountLookup from './pages/AccountLookup'
 import { OVERVIEW_TOKEN_BLACKLIST, PAIR_BLACKLIST } from './constants'
 import LocalLoader from './components/LocalLoader'
+import { ButtonDark } from './components/ButtonStyled'
 import { useLatestBlocks } from './contexts/Application'
 
 const AppWrapper = styled.div`
@@ -69,12 +71,23 @@ const WarningWrapper = styled.div`
 `
 
 const WarningBanner = styled.div`
-  background-color: #ff6871;
-  padding: 1.5rem;
-  color: white;
+  border: 1px solid ${({ theme }) => theme.warningBorder};
+  background: ${({ theme }) => theme.warningBackground};
+  padding: 1.5rem 2.5rem;
+  color: ${({ theme }) => theme.warningTextColor};
   width: 100%;
   text-align: center;
   font-weight: 500;
+
+  @media screen and (max-width: 800px) {
+    padding: 1.5rem 1rem;
+  }
+`
+
+const CloseButtonWrapper = styled.div`
+  margin-top: 1rem;
+  cursor: pointer;
+  color: ${({ theme }) => theme.warningTextColor};
 `
 
 /**
@@ -94,7 +107,7 @@ const LayoutWrapper = ({ children, savedOpen, setSavedOpen }) => {
   )
 }
 
-const BLOCK_DIFFERENCE_THRESHOLD = 30
+const BLOCK_DIFFERENCE_THRESHOLD = process.env.REACT_APP_CHAIN_ID === '137' ? 210 : 30
 
 function App() {
   const [savedOpen, setSavedOpen] = useState(false)
@@ -103,16 +116,29 @@ function App() {
   const globalChartData = useGlobalChartData()
   const [latestBlock, headBlock] = useLatestBlocks()
 
+  const [dismissed, markAsDismissed] = useState(false)
+
   // show warning
   const showWarning = headBlock && latestBlock ? headBlock - latestBlock > BLOCK_DIFFERENCE_THRESHOLD : false
 
   return (
     <ApolloProvider client={client}>
       <AppWrapper>
-        {showWarning && (
+        {!dismissed && showWarning && (
           <WarningWrapper>
             <WarningBanner>
-              {`Warning: The data on this site has only synced to Ethereum block ${latestBlock} (out of ${headBlock}). Please check back soon.`}
+              <div>
+                <Text fontWeight={500} fontSize={14} color={'#ffaf01'} style={{ display: 'inline' }} mr={'8px'}>
+                  Warning:
+                </Text>
+                {`The data on this site has only synced to ${getNetworkName()} block ${latestBlock} (out of ${headBlock}). Please check back soon.`}
+              </div>
+
+              <CloseButtonWrapper>
+                <ButtonDark color={'#08a1e7'} style={{ minWidth: '140px' }} onClick={() => markAsDismissed(true)}>
+                  Close
+                </ButtonDark>
+              </CloseButtonWrapper>
             </WarningBanner>
           </WarningWrapper>
         )}

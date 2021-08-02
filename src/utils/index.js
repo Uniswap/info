@@ -531,7 +531,7 @@ export function getEtherscanLinkText() {
     case '137':
       return 'Polygonscan'
     case '80001':
-      return 'Explorer'
+      return 'Polygonscan'
     default:
       return 'Etherscan'
   }
