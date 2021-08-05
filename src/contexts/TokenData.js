@@ -238,9 +238,8 @@ const getTopTokens = async (ethPrice, ethPriceOld) => {
     })
 
     const ids = tokenids?.data?.tokenDayDatas?.reduce((accum, entry) => {
-      const newMap = accum
-      newMap.push(entry.id.slice(0, 42))
-      return newMap
+      accum.push(entry.id.slice(0, 42))
+      return accum
     }, [])
 
     let current = await client.query({
