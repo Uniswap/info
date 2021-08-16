@@ -149,6 +149,9 @@ export async function splitQuery(query, localClient, vars, list, skipCount = 100
  * @param {Int} timestamp in seconds
  */
 export async function getBlockFromTimestamp(timestamp) {
+  if (parseInt(timestamp) < parseInt(process.env.REACT_APP_DEFAULT_START_TIME)) {
+    timestamp = parseInt(process.env.REACT_APP_DEFAULT_START_TIME)
+  }
   let result = await blockClient.query({
     query: GET_BLOCK,
     variables: {
@@ -172,7 +175,14 @@ export async function getBlocksFromTimestamps(timestamps, skipCount = 500) {
     return []
   }
 
+  timestamps = timestamps.map((t) =>
+    parseInt(t) < parseInt(process.env.REACT_APP_DEFAULT_START_TIME)
+      ? parseInt(process.env.REACT_APP_DEFAULT_START_TIME)
+      : t
+  )
+
   let fetchedData = await splitQuery(GET_BLOCKS, blockClient, [], timestamps, skipCount)
+
   let blocks = []
   if (fetchedData) {
     for (var t in fetchedData) {
@@ -183,6 +193,9 @@ export async function getBlocksFromTimestamps(timestamps, skipCount = 500) {
         })
       }
     }
+  }
+  while (blocks.length < timestamps.length) {
+    blocks.push(blocks[blocks.length - 1])
   }
   return blocks
 }
@@ -510,6 +523,10 @@ export function getNativeTokenSymbol() {
       return 'MATIC'
     case '80001':
       return 'MATIC'
+    case '56':
+      return 'BNB'
+    case '97':
+      return 'BNB'
     default:
       return 'ETH'
   }
@@ -521,6 +538,10 @@ export function getNativeTokenWrappedName() {
       return 'Matic (Wrapped)'
     case '80001':
       return 'Matic (Wrapped)'
+    case '56':
+      return 'BNB (Wrapped)'
+    case '97':
+      return 'BNB (Wrapped)'
     default:
       return 'Ether (Wrapped)'
   }
@@ -532,6 +553,10 @@ export function getEtherscanLinkText() {
       return 'Polygonscan'
     case '80001':
       return 'Polygonscan'
+    case '56':
+      return 'Bscscan'
+    case '97':
+      return 'Bscscan'
     default:
       return 'Etherscan'
   }
@@ -543,6 +568,10 @@ export function getNetworkName() {
       return 'Polygon'
     case '80001':
       return 'Polygon'
+    case '56':
+      return 'BSC'
+    case '97':
+      return 'BSC'
     default:
       return 'Ethereum'
   }
@@ -554,6 +583,10 @@ export function getDefaultAddLiquidityUrl() {
       return `${process.env.REACT_APP_DMM_SWAP_URL}pools/0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619/${KNC_ADDRESS}`
     case '80001':
       return `${process.env.REACT_APP_DMM_SWAP_URL}pools/0x19395624C030A11f58e820C3AeFb1f5960d9742a/${KNC_ADDRESS}`
+    case '56':
+      return `${process.env.REACT_APP_DMM_SWAP_URL}pools/BNB`
+    case '97':
+      return `${process.env.REACT_APP_DMM_SWAP_URL}pools/BNB`
     default:
       return `${process.env.REACT_APP_DMM_SWAP_URL}pools/ETH/${KNC_ADDRESS}`
   }
