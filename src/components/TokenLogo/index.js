@@ -6,8 +6,10 @@ import { isAddress } from '../../utils/index.js'
 import PlaceHolder from '../../assets/placeholder.png'
 import EthereumLogo from '../../assets/eth.png'
 import PolygonLogo from '../../assets/polygon.png'
+import BnbLogo from '../../assets/bnb.png'
 import { getMaticTokenLogoURL } from '../../utils/maticTokenMapping'
 import { getMumbaiTokenLogoURL } from '../../utils/mumbaiTokenMapping'
+import { getBscTestnetTokenLogoURL } from '../../utils/bscTestnetTokenMapping'
 
 const BAD_IMAGES = {}
 
@@ -56,6 +58,34 @@ export function getNativeTokenLogo({ size = '24px', ...rest }) {
         <StyledEthereumLogo size={size} {...rest}>
           <img
             src={PolygonLogo}
+            style={{
+              boxShadow: '0px 6px 10px rgba(0, 0, 0, 0.075)',
+              borderRadius: '24px',
+            }}
+            alt=""
+          />
+        </StyledEthereumLogo>
+      )
+
+    case '97':
+      return (
+        <StyledEthereumLogo size={size} {...rest}>
+          <img
+            src={BnbLogo}
+            style={{
+              boxShadow: '0px 6px 10px rgba(0, 0, 0, 0.075)',
+              borderRadius: '24px',
+            }}
+            alt=""
+          />
+        </StyledEthereumLogo>
+      )
+
+    case '56':
+      return (
+        <StyledEthereumLogo size={size} {...rest}>
+          <img
+            src={BnbLogo}
             style={{
               boxShadow: '0px 6px 10px rgba(0, 0, 0, 0.075)',
               borderRadius: '24px',
@@ -172,6 +202,14 @@ export default function TokenLogo({ address, header = false, size = '24px', ...r
       break
     case '80001':
       path = getMumbaiTokenLogoURL(address)
+      break
+    case '97':
+      path = getBscTestnetTokenLogoURL(address)
+      break
+    case '56':
+      path = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${isAddress(
+        address
+      )}/logo.png`
       break
     default:
       // hard coded fixes for trust wallet api issues
