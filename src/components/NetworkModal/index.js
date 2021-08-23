@@ -96,7 +96,7 @@ export default function NetworkModal() {
         <InstructionText>You are currently on {NETWORK_LABEL[chainId]} Analytics page. Switch network?</InstructionText>
 
         <NetworkList>
-          {[1, 137, 56].map((key, i) => {
+          {[1, 137].map((key, i) => {
             if (chainId === key) {
               return (
                 <SelectNetworkButton key={i} padding="0">
