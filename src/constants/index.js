@@ -14,6 +14,8 @@ export const timeframeOptions = {
 export const SUPPORTED_LIST_URLS__NO_ENS =
   String(process.env.REACT_APP_CHAIN_ID) === '137'
     ? ['https://unpkg.com/quickswap-default-token-list@1.0.72/build/quickswap-default.tokenlist.json']
+    : String(process.env.REACT_APP_CHAIN_ID) === '56'
+    ? ['https://tokens.pancakeswap.finance/pancakeswap-top-100.json']
     : ['https://gateway.ipfs.io/ipns/tokens.uniswap.org']
 
 // hide from overview list
