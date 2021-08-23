@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
 
-import { ROPSTEN_TOKEN_LOGOS_MAPPING, WETH_ADDRESS, KNCL_ADDRESS } from '../../constants'
+import { ROPSTEN_TOKEN_LOGOS_MAPPING, WETH_ADDRESS } from '../../constants'
+import ETHEREUM_TOKEN_LIST from '../../constants/tokenLists/ethereum.tokenlist'
+import POLYGON_TOKEN_LIST from '../../constants/tokenLists/polygon.tokenlist'
 import { isAddress } from '../../utils/index.js'
 import PlaceHolder from '../../assets/placeholder.png'
 import EthereumLogo from '../../assets/eth.png'
@@ -27,7 +29,7 @@ const Image = styled.img`
   box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.075);
 `
 
-const StyledEthereumLogo = styled.div`
+const StyledNativeTokenLogo = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -42,7 +44,7 @@ export function getNativeTokenLogo({ size = '24px', ...rest }) {
   switch (process.env.REACT_APP_CHAIN_ID) {
     case '137':
       return (
-        <StyledEthereumLogo size={size} {...rest}>
+        <StyledNativeTokenLogo size={size} {...rest}>
           <img
             src={PolygonLogo}
             style={{
@@ -51,11 +53,11 @@ export function getNativeTokenLogo({ size = '24px', ...rest }) {
             }}
             alt=""
           />
-        </StyledEthereumLogo>
+        </StyledNativeTokenLogo>
       )
     case '80001':
       return (
-        <StyledEthereumLogo size={size} {...rest}>
+        <StyledNativeTokenLogo size={size} {...rest}>
           <img
             src={PolygonLogo}
             style={{
@@ -64,12 +66,12 @@ export function getNativeTokenLogo({ size = '24px', ...rest }) {
             }}
             alt=""
           />
-        </StyledEthereumLogo>
+        </StyledNativeTokenLogo>
       )
 
     case '97':
       return (
-        <StyledEthereumLogo size={size} {...rest}>
+        <StyledNativeTokenLogo size={size} {...rest}>
           <img
             src={BnbLogo}
             style={{
@@ -78,12 +80,12 @@ export function getNativeTokenLogo({ size = '24px', ...rest }) {
             }}
             alt=""
           />
-        </StyledEthereumLogo>
+        </StyledNativeTokenLogo>
       )
 
     case '56':
       return (
-        <StyledEthereumLogo size={size} {...rest}>
+        <StyledNativeTokenLogo size={size} {...rest}>
           <img
             src={BnbLogo}
             style={{
@@ -92,11 +94,11 @@ export function getNativeTokenLogo({ size = '24px', ...rest }) {
             }}
             alt=""
           />
-        </StyledEthereumLogo>
+        </StyledNativeTokenLogo>
       )
     default:
       return (
-        <StyledEthereumLogo size={size} {...rest}>
+        <StyledNativeTokenLogo size={size} {...rest}>
           <img
             src={EthereumLogo}
             style={{
@@ -105,9 +107,27 @@ export function getNativeTokenLogo({ size = '24px', ...rest }) {
             }}
             alt=""
           />
-        </StyledEthereumLogo>
+        </StyledNativeTokenLogo>
       )
   }
+}
+
+export function getCustomLogo({ address, src, size, setError, ...rest }) {
+  return (
+    <Inline>
+      <Image
+        {...rest}
+        alt={''}
+        src={src}
+        size={size}
+        onError={(event) => {
+          BAD_IMAGES[address] = true
+          setError(true)
+          event.preventDefault()
+        }}
+      />
+    </Inline>
+  )
 }
 
 export default function TokenLogo({ address, header = false, size = '24px', ...rest }) {
@@ -129,62 +149,7 @@ export default function TokenLogo({ address, header = false, size = '24px', ...r
     return getNativeTokenLogo({ size, ...rest })
   }
 
-  if (address?.toLowerCase() === KNCL_ADDRESS.toLowerCase()) {
-    return (
-      <Inline>
-        <Image
-          {...rest}
-          alt={''}
-          src="https://i.imgur.com/1cDH5dy.png"
-          size={size}
-          onError={(event) => {
-            BAD_IMAGES[address] = true
-            setError(true)
-            event.preventDefault()
-          }}
-        />
-      </Inline>
-    )
-  }
-
-  // MFG new logo
-  if (address?.toLowerCase() === '0x6710c63432a2de02954fc0f851db07146a6c0312') {
-    return (
-      <Inline>
-        <Image
-          {...rest}
-          alt={''}
-          src="https://i.imgur.com/oReNLqf.png"
-          size={size}
-          onError={(event) => {
-            BAD_IMAGES[address] = true
-            setError(true)
-            event.preventDefault()
-          }}
-        />
-      </Inline>
-    )
-  }
-
-  // RICE logo
-  if (address?.toLowerCase() === '0xbcd515d6c5de70d3a31d999a7fa6a299657de294') {
-    return (
-      <Inline>
-        <Image
-          {...rest}
-          alt={''}
-          src="https://drive.google.com/uc?export=download&id=16PVXI1Da5P27cywWiyqrcV-Q17u1aXsi"
-          size={size}
-          onError={(event) => {
-            BAD_IMAGES[address] = true
-            setError(true)
-            event.preventDefault()
-          }}
-        />
-      </Inline>
-    )
-  }
-
+  const formattedAddress = isAddress(address)
   let path
 
   switch (String(process.env.REACT_APP_CHAIN_ID)) {
@@ -193,11 +158,13 @@ export default function TokenLogo({ address, header = false, size = '24px', ...r
         address = ROPSTEN_TOKEN_LOGOS_MAPPING[address?.toLowerCase()]
       }
 
-      path = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${isAddress(
-        address
-      )}/logo.png`
+      path = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${formattedAddress}/logo.png`
       break
     case '137':
+      if (formattedAddress && POLYGON_TOKEN_LIST[formattedAddress]) {
+        return getCustomLogo({ address, src: POLYGON_TOKEN_LIST[formattedAddress].logoURI, size, setError, ...rest })
+      }
+
       path = getMaticTokenLogoURL(address)
       break
     case '80001':
@@ -207,11 +174,13 @@ export default function TokenLogo({ address, header = false, size = '24px', ...r
       path = getBscTestnetTokenLogoURL(address)
       break
     case '56':
-      path = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${isAddress(
-        address
-      )}/logo.png`
+      path = `https://pancakeswap.finance/images/tokens/${formattedAddress}.png`
       break
     default:
+      if (formattedAddress && ETHEREUM_TOKEN_LIST[formattedAddress]) {
+        return getCustomLogo({ address, src: ETHEREUM_TOKEN_LIST[formattedAddress].logoURI, size, setError, ...rest })
+      }
+
       // hard coded fixes for trust wallet api issues
       if (address?.toLowerCase() === '0x5e74c9036fb86bd7ecdcb084a0673efc32ea31cb') {
         address = '0x42456d7084eacf4083f1140d3229471bba2949a8'
@@ -221,9 +190,7 @@ export default function TokenLogo({ address, header = false, size = '24px', ...r
         address = '0xc011a72400e58ecd99ee497cf89e3775d4bd732f'
       }
 
-      path = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${isAddress(
-        address
-      )}/logo.png`
+      path = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${formattedAddress}/logo.png`
       break
   }
 
