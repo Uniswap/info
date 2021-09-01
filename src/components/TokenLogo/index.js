@@ -13,6 +13,7 @@ import AvaxLogo from '../../assets/avax.png'
 import { getMaticTokenLogoURL } from '../../utils/maticTokenMapping'
 import { getMumbaiTokenLogoURL } from '../../utils/mumbaiTokenMapping'
 import { getBscTestnetTokenLogoURL } from '../../utils/bscTestnetTokenMapping'
+import { getBscTokenLogoURL } from '../../utils/bscTokenMapping'
 import { getAvaxTokenLogoURL } from '../../utils/avaxTokenMapping'
 
 const BAD_IMAGES = {}
@@ -203,7 +204,7 @@ export default function TokenLogo({ address, header = false, size = '24px', ...r
       path = getBscTestnetTokenLogoURL(address)
       break
     case '56':
-      path = `https://pancakeswap.finance/images/tokens/${formattedAddress}.png`
+      path = getBscTokenLogoURL(address)
       break
 
     case '43114':
