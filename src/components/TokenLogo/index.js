@@ -9,9 +9,11 @@ import PlaceHolder from '../../assets/placeholder.png'
 import EthereumLogo from '../../assets/eth.png'
 import PolygonLogo from '../../assets/polygon.png'
 import BnbLogo from '../../assets/bnb.png'
+import AvaxLogo from '../../assets/avax.png'
 import { getMaticTokenLogoURL } from '../../utils/maticTokenMapping'
 import { getMumbaiTokenLogoURL } from '../../utils/mumbaiTokenMapping'
 import { getBscTestnetTokenLogoURL } from '../../utils/bscTestnetTokenMapping'
+import { getAvaxTokenLogoURL } from '../../utils/avaxTokenMapping'
 
 const BAD_IMAGES = {}
 
@@ -88,6 +90,33 @@ export function getNativeTokenLogo({ size = '24px', ...rest }) {
         <StyledNativeTokenLogo size={size} {...rest}>
           <img
             src={BnbLogo}
+            style={{
+              boxShadow: '0px 6px 10px rgba(0, 0, 0, 0.075)',
+              borderRadius: '24px',
+            }}
+            alt=""
+          />
+        </StyledNativeTokenLogo>
+      )
+    case '43113':
+      return (
+        <StyledNativeTokenLogo size={size} {...rest}>
+          <img
+            src={AvaxLogo}
+            style={{
+              boxShadow: '0px 6px 10px rgba(0, 0, 0, 0.075)',
+              borderRadius: '24px',
+            }}
+            alt=""
+          />
+        </StyledNativeTokenLogo>
+      )
+
+    case '43114':
+      return (
+        <StyledNativeTokenLogo size={size} {...rest}>
+          <img
+            src={AvaxLogo}
             style={{
               boxShadow: '0px 6px 10px rgba(0, 0, 0, 0.075)',
               borderRadius: '24px',
@@ -176,6 +205,11 @@ export default function TokenLogo({ address, header = false, size = '24px', ...r
     case '56':
       path = `https://pancakeswap.finance/images/tokens/${formattedAddress}.png`
       break
+
+    case '43114':
+      path = getAvaxTokenLogoURL(address)
+      break
+
     default:
       if (formattedAddress && ETHEREUM_TOKEN_LIST[formattedAddress]) {
         return getCustomLogo({ address, src: ETHEREUM_TOKEN_LIST[formattedAddress].logoURI, size, setError, ...rest })
