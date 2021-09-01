@@ -114,3 +114,45 @@ deploy:
     on:
       all_branches: true
       condition: $TRAVIS_BRANCH =~ ^main$
+
+  - provider: gcs
+    access_key_id: $GCS_ACCESS_KEY_ID
+    secret_access_key: $GCS_SECRET_KEY_ID
+    bucket: bsc-info.dmm.exchange
+    skip_cleanup: true
+    local-dir: build-bsc
+    on:
+      all_branches: true
+      condition: $TRAVIS_BRANCH =~ ^main$
+
+  - provider: gcs
+    access_key_id: $GCS_ACCESS_KEY_ID
+    secret_access_key: $GCS_SECRET_KEY_ID
+    bucket: bsc-info.dmm.exchange
+    skip_cleanup: true
+    local-dir: build-bsc-index
+    cache_control: "public, max-age=30"
+    on:
+      all_branches: true
+      condition: $TRAVIS_BRANCH =~ ^main$
+
+  - provider: gcs
+    access_key_id: $GCS_ACCESS_KEY_ID
+    secret_access_key: $GCS_SECRET_KEY_ID
+    bucket: avax-info.dmm.exchange
+    skip_cleanup: true
+    local-dir: build-avax
+    on:
+      all_branches: true
+      condition: $TRAVIS_BRANCH =~ ^main$
+
+  - provider: gcs
+    access_key_id: $GCS_ACCESS_KEY_ID
+    secret_access_key: $GCS_SECRET_KEY_ID
+    bucket: avax-info.dmm.exchange
+    skip_cleanup: true
+    local-dir: build-avax-index
+    cache_control: "public, max-age=30"
+    on:
+      all_branches: true
+      condition: $TRAVIS_BRANCH =~ ^main$
