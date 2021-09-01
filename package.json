@@ -94,7 +94,7 @@
     "build-bsc-testnet": "env-cmd -f .env.bsc.testnet react-scripts build",
     "build-bsc-staging": "env-cmd -f .env.bsc.staging react-scripts build",
     "build-bsc": "env-cmd -f .env.bsc react-scripts build",
-    "build-avx": "env-cmd -f .env.avax react-scripts build",
+    "build-avax": "env-cmd -f .env.avax react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
