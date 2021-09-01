@@ -15,7 +15,9 @@ export const SUPPORTED_LIST_URLS__NO_ENS =
   String(process.env.REACT_APP_CHAIN_ID) === '137'
     ? ['https://unpkg.com/quickswap-default-token-list@1.0.72/build/quickswap-default.tokenlist.json']
     : String(process.env.REACT_APP_CHAIN_ID) === '56'
-    ? ['https://tokens.pancakeswap.finance/pancakeswap-top-100.json']
+    ? ['https://tokens.pancakeswap.finance/pancakeswap-extended.json']
+    : String(process.env.REACT_APP_CHAIN_ID) === '43114'
+    ? ['https://raw.githubusercontent.com/pangolindex/tokenlists/main/ab.tokenlist.json']
     : ['https://gateway.ipfs.io/ipns/tokens.uniswap.org']
 
 // hide from overview list
@@ -61,4 +63,6 @@ export const KNCL_ADDRESS =
 export const ANALYTICS_URLS = {
   1: 'https://info.dmm.exchange',
   137: 'https://polygon-info.dmm.exchange',
+  56: 'https://bsc-info.dmm.exchange',
+  43114: 'https://avax-info.dmm.exchange',
 }

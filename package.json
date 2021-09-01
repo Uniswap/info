@@ -82,6 +82,8 @@
     "start-matic": "env-cmd -f .env.matic react-scripts start",
     "start-bsc-testnet": "env-cmd -f .env.bsc.testnet react-scripts start",
     "start-bsc-staging": "env-cmd -f .env.bsc.staging react-scripts start",
+    "start-bsc": "env-cmd -f .env.bsc react-scripts start",
+    "start-avax": "env-cmd -f .env.avax react-scripts start",
     "build": "react-scripts build",
     "build-ropsten": "env-cmd -f .env.ropsten react-scripts build",
     "build-staging": "env-cmd -f .env.staging react-scripts build",
@@ -91,6 +93,8 @@
     "build-matic": "env-cmd -f .env.matic react-scripts build",
     "build-bsc-testnet": "env-cmd -f .env.bsc.testnet react-scripts build",
     "build-bsc-staging": "env-cmd -f .env.bsc.staging react-scripts build",
+    "build-bsc": "env-cmd -f .env.bsc react-scripts build",
+    "build-avax": "env-cmd -f .env.avax react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

@@ -527,6 +527,8 @@ export function getNativeTokenSymbol() {
       return 'BNB'
     case '97':
       return 'BNB'
+    case '43114':
+      return 'AVAX'
     default:
       return 'ETH'
   }
@@ -542,6 +544,8 @@ export function getNativeTokenWrappedName() {
       return 'BNB (Wrapped)'
     case '97':
       return 'BNB (Wrapped)'
+    case '43114':
+      return 'AVAX (Wrapped)'
     default:
       return 'Ether (Wrapped)'
   }
