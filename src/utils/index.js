@@ -561,6 +561,8 @@ export function getEtherscanLinkText() {
       return 'Bscscan'
     case '97':
       return 'Bscscan'
+    case '43114':
+      return 'C-Chain Explorer'
     default:
       return 'Etherscan'
   }
@@ -576,6 +578,8 @@ export function getNetworkName() {
       return 'BSC'
     case '97':
       return 'BSC'
+    case '43114':
+      return 'AVAX'
     default:
       return 'Ethereum'
   }
@@ -591,6 +595,8 @@ export function getDefaultAddLiquidityUrl() {
       return `${process.env.REACT_APP_DMM_SWAP_URL}pools/BNB`
     case '97':
       return `${process.env.REACT_APP_DMM_SWAP_URL}pools/BNB`
+    case '43114':
+      return `${process.env.REACT_APP_DMM_SWAP_URL}pools/AVAX`
     default:
       return `${process.env.REACT_APP_DMM_SWAP_URL}pools/ETH/${KNC_ADDRESS}`
   }
