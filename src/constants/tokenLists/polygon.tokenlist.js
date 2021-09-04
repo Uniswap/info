@@ -33,7 +33,7 @@ const POLYGON_TOKEN_LIST = {
     name: 'Rai Reflex Index',
     decimals: 18,
     logoURI: 'https://assets.coingecko.com/coins/images/14004/small/RAI-logo-coin.png?1613592334',
-  },
+  }
 }
 
 export default POLYGON_TOKEN_LIST
