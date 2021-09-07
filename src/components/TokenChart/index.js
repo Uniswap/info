@@ -37,7 +37,7 @@ const CHART_VIEW = {
 }
 
 const DATA_FREQUENCY = {
-  DAY: 'DAY',
+  FIVE_MINUTES: 'FIVE_MINUTES',
   HOUR: 'HOUR',
   LINE: 'LINE',
 }
@@ -45,7 +45,7 @@ const DATA_FREQUENCY = {
 const TokenChart = ({ address, color, base }) => {
   // settings for the window and candle width
   const [chartFilter, setChartFilter] = useState(CHART_VIEW.PRICE)
-  const [frequency, setFrequency] = useState(DATA_FREQUENCY.HOUR)
+  const [frequency, setFrequency] = useState(DATA_FREQUENCY.FIVE_MINUTES)
 
   const [darkMode] = useDarkModeManager()
   const textColor = darkMode ? 'white' : 'black'
@@ -60,47 +60,47 @@ const TokenChart = ({ address, color, base }) => {
 
   let chartData = useTokenChartData(address)
 
-  const [timeWindow, setTimeWindow] = useState(timeframeOptions.WEEK)
+  const [timeWindow, setTimeWindow] = useState(timeframeOptions.THERE_DAYS)
   const prevWindow = usePrevious(timeWindow)
 
   // hourly and daily price data based on the current time window
-  const hourlyWeek = useTokenPriceData(address, timeframeOptions.WEEK, 3600)
-  const hourlyMonth = useTokenPriceData(address, timeframeOptions.MONTH, 3600)
-  const hourlyAll = useTokenPriceData(address, timeframeOptions.ALL_TIME, 3600)
-  const dailyWeek = useTokenPriceData(address, timeframeOptions.WEEK, 86400)
-  const dailyMonth = useTokenPriceData(address, timeframeOptions.MONTH, 86400)
-  const dailyAll = useTokenPriceData(address, timeframeOptions.ALL_TIME, 86400)
+  const data5m3days = useTokenPriceData(address, timeframeOptions.THERE_DAYS, 300)
+  const data5mWeek = useTokenPriceData(address, timeframeOptions.WEEK, 300)
+  const data5mMonth = useTokenPriceData(address, timeframeOptions.MONTH, 300)
+  const dataHourly3days = useTokenPriceData(address, timeframeOptions.THERE_DAYS, 3600)
+  const dataHourlyWeek = useTokenPriceData(address, timeframeOptions.WEEK, 3600)
+  const dataHourlyMonth = useTokenPriceData(address, timeframeOptions.MONTH, 3600)
 
   const priceData =
     timeWindow === timeframeOptions.MONTH
       ? // monthly selected
-        frequency === DATA_FREQUENCY.DAY
-        ? dailyMonth
-        : hourlyMonth
+        frequency === DATA_FREQUENCY.FIVE_MINUTES
+        ? data5mMonth
+        : dataHourlyMonth
       : // weekly selected
       timeWindow === timeframeOptions.WEEK
-      ? frequency === DATA_FREQUENCY.DAY
-        ? dailyWeek
-        : hourlyWeek
-      : // all time selected
-      frequency === DATA_FREQUENCY.DAY
-      ? dailyAll
-      : hourlyAll
+      ? frequency === DATA_FREQUENCY.FIVE_MINUTES
+        ? data5mWeek
+        : dataHourlyWeek
+      : // 3 days selected
+      frequency === DATA_FREQUENCY.FIVE_MINUTES
+      ? data5m3days
+      : dataHourly3days
 
+  // switch to 5m data when switched to 3 days window
   // switch to hourly data when switched to week window
+  // switch to hourly data if switched to month window
   useEffect(() => {
+    if (timeWindow === timeframeOptions.THERE_DAYS && prevWindow && prevWindow !== timeframeOptions.THERE_DAYS) {
+      setFrequency(DATA_FREQUENCY.FIVE_MINUTES)
+    }
+
     if (timeWindow === timeframeOptions.WEEK && prevWindow && prevWindow !== timeframeOptions.WEEK) {
       setFrequency(DATA_FREQUENCY.HOUR)
     }
-  }, [prevWindow, timeWindow])
 
-  // switch to daily data if switche to month or all time view
-  useEffect(() => {
     if (timeWindow === timeframeOptions.MONTH && prevWindow && prevWindow !== timeframeOptions.MONTH) {
-      setFrequency(DATA_FREQUENCY.DAY)
-    }
-    if (timeWindow === timeframeOptions.ALL_TIME && prevWindow && prevWindow !== timeframeOptions.ALL_TIME) {
-      setFrequency(DATA_FREQUENCY.DAY)
+      setFrequency(DATA_FREQUENCY.HOUR)
     }
   }, [prevWindow, timeWindow])
 
@@ -174,13 +174,13 @@ const TokenChart = ({ address, color, base }) => {
             {chartFilter === CHART_VIEW.PRICE && (
               <AutoRow gap="4px">
                 <PriceOption
-                  active={frequency === DATA_FREQUENCY.DAY}
+                  active={frequency === DATA_FREQUENCY.FIVE_MINUTES}
                   onClick={() => {
-                    setTimeWindow(timeframeOptions.MONTH)
-                    setFrequency(DATA_FREQUENCY.DAY)
+                    setTimeWindow(timeframeOptions.THERE_DAYS)
+                    setFrequency(DATA_FREQUENCY.FIVE_MINUTES)
                   }}
                 >
-                  D
+                  5m
                 </PriceOption>
                 <PriceOption
                   active={frequency === DATA_FREQUENCY.HOUR}
@@ -197,7 +197,13 @@ const TokenChart = ({ address, color, base }) => {
               </AutoRow>
             )}
           </AutoColumn>
-          <AutoRow justify="flex-end" gap="6px" align="flex-start">
+          <AutoRow justify="flex-end" gap="6px" align="flex-start" style={{ width: 'fit-content' }}>
+            <OptionButton
+              active={timeWindow === timeframeOptions.THERE_DAYS}
+              onClick={() => setTimeWindow(timeframeOptions.THERE_DAYS)}
+            >
+              3D
+            </OptionButton>
             <OptionButton
               active={timeWindow === timeframeOptions.WEEK}
               onClick={() => setTimeWindow(timeframeOptions.WEEK)}
@@ -209,12 +215,6 @@ const TokenChart = ({ address, color, base }) => {
               onClick={() => setTimeWindow(timeframeOptions.MONTH)}
             >
               1M
-            </OptionButton>
-            <OptionButton
-              active={timeWindow === timeframeOptions.ALL_TIME}
-              onClick={() => setTimeWindow(timeframeOptions.ALL_TIME)}
-            >
-              All
             </OptionButton>
           </AutoRow>
         </RowBetween>
