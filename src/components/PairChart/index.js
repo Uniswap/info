@@ -136,7 +136,7 @@ const PairChart = ({ address, color, base0, base1 }) => {
             <OptionButton
               active={chartFilter === CHART_VIEW.LIQUIDITY}
               onClick={() => {
-                setTimeWindow(timeframeOptions.ALL_TIME)
+                setTimeWindow(timeframeOptions.MONTH)
                 setChartFilter(CHART_VIEW.LIQUIDITY)
               }}
             >
@@ -145,7 +145,7 @@ const PairChart = ({ address, color, base0, base1 }) => {
             <OptionButton
               active={chartFilter === CHART_VIEW.VOLUME}
               onClick={() => {
-                setTimeWindow(timeframeOptions.ALL_TIME)
+                setTimeWindow(timeframeOptions.MONTH)
                 setChartFilter(CHART_VIEW.VOLUME)
               }}
             >
@@ -154,7 +154,7 @@ const PairChart = ({ address, color, base0, base1 }) => {
             <OptionButton
               active={chartFilter === CHART_VIEW.RATE0}
               onClick={() => {
-                setTimeWindow(timeframeOptions.WEEK)
+                setTimeWindow(timeframeOptions.THERE_DAYS)
                 setChartFilter(CHART_VIEW.RATE0)
               }}
             >
@@ -163,7 +163,7 @@ const PairChart = ({ address, color, base0, base1 }) => {
             <OptionButton
               active={chartFilter === CHART_VIEW.RATE1}
               onClick={() => {
-                setTimeWindow(timeframeOptions.WEEK)
+                setTimeWindow(timeframeOptions.THERE_DAYS)
                 setChartFilter(CHART_VIEW.RATE1)
               }}
             >
@@ -171,6 +171,12 @@ const PairChart = ({ address, color, base0, base1 }) => {
             </OptionButton>
           </AutoRow>
           <AutoRow justify="flex-end" gap="6px" style={{ width: 'fit-content' }}>
+            <OptionButton
+              active={timeWindow === timeframeOptions.THERE_DAYS}
+              onClick={() => setTimeWindow(timeframeOptions.THERE_DAYS)}
+            >
+              3D
+            </OptionButton>
             <OptionButton
               active={timeWindow === timeframeOptions.WEEK}
               onClick={() => setTimeWindow(timeframeOptions.WEEK)}
@@ -182,12 +188,6 @@ const PairChart = ({ address, color, base0, base1 }) => {
               onClick={() => setTimeWindow(timeframeOptions.MONTH)}
             >
               1M
-            </OptionButton>
-            <OptionButton
-              active={timeWindow === timeframeOptions.ALL_TIME}
-              onClick={() => setTimeWindow(timeframeOptions.ALL_TIME)}
-            >
-              All
             </OptionButton>
           </AutoRow>
         </OptionsRow>
