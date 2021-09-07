@@ -458,9 +458,9 @@ const getHourlyRateData = async (pairAddress, startTime, latestBlock) => {
 
     // create an array of hour start times until we reach current hour
     const timestamps = []
-    while (time <= utcEndTime.unix() - 3600) {
+    while (time <= utcEndTime.unix() - 300) {
       timestamps.push(time)
-      time += 3600
+      time += 300
     }
 
     // backout if invalid timestamp format
@@ -557,11 +557,22 @@ export function useHourlyRateData(pairAddress, timeWindow) {
 
   useEffect(() => {
     const currentTime = dayjs.utc()
-    const windowSize = timeWindow === timeframeOptions.MONTH ? 'month' : 'week'
-    const startTime =
-      timeWindow === timeframeOptions.ALL_TIME
-        ? parseInt(process.env.REACT_APP_DEFAULT_START_TIME)
-        : currentTime.subtract(1, windowSize).startOf('hour').unix()
+    let startTime
+
+    switch (timeWindow) {
+      case timeframeOptions.THERE_DAYS:
+        startTime = currentTime.subtract(3, 'day').startOf('hour').unix()
+        break
+      case timeframeOptions.WEEK:
+        startTime = currentTime.subtract(1, 'week').startOf('hour').unix()
+        break
+      case timeframeOptions.MONTH:
+        startTime = currentTime.subtract(1, 'month').startOf('hour').unix()
+        break
+      default:
+        startTime = currentTime.subtract(3, 'day').startOf('hour').unix()
+        break
+    }
 
     async function fetch() {
       let data = await getHourlyRateData(pairAddress, startTime, latestBlock)

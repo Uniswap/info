@@ -719,11 +719,22 @@ export function useTokenPriceData(tokenAddress, timeWindow, interval = 3600) {
 
   useEffect(() => {
     const currentTime = dayjs.utc()
-    const windowSize = timeWindow === timeframeOptions.MONTH ? 'month' : 'week'
-    const startTime =
-      timeWindow === timeframeOptions.ALL_TIME
-        ? parseInt(process.env.REACT_APP_DEFAULT_START_TIME)
-        : currentTime.subtract(1, windowSize).startOf('hour').unix()
+    let startTime
+
+    switch (timeWindow) {
+      case timeframeOptions.THERE_DAYS:
+        startTime = currentTime.subtract(3, 'day').startOf('hour').unix()
+        break
+      case timeframeOptions.WEEK:
+        startTime = currentTime.subtract(1, 'week').startOf('hour').unix()
+        break
+      case timeframeOptions.MONTH:
+        startTime = currentTime.subtract(1, 'month').startOf('hour').unix()
+        break
+      default:
+        startTime = currentTime.subtract(3, 'day').startOf('hour').unix()
+        break
+    }
 
     async function fetch() {
       let data = await getIntervalTokenData(tokenAddress, startTime, interval, latestBlock)
