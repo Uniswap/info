@@ -4,6 +4,7 @@ import styled from 'styled-components'
 import { ROPSTEN_TOKEN_LOGOS_MAPPING, WETH_ADDRESS } from '../../constants'
 import ETHEREUM_TOKEN_LIST from '../../constants/tokenLists/ethereum.tokenlist'
 import POLYGON_TOKEN_LIST from '../../constants/tokenLists/polygon.tokenlist'
+import BSC_TOKEN_LIST from '../../constants/tokenLists/bsc.tokenlist'
 import { isAddress } from '../../utils/index.js'
 import PlaceHolder from '../../assets/placeholder.png'
 import EthereumLogo from '../../assets/eth.png'
@@ -204,6 +205,9 @@ export default function TokenLogo({ address, header = false, size = '24px', ...r
       path = getBscTestnetTokenLogoURL(address)
       break
     case '56':
+      if (formattedAddress && BSC_TOKEN_LIST[formattedAddress]) {
+        return getCustomLogo({ address, src: BSC_TOKEN_LIST[formattedAddress].logoURI, size, setError, ...rest })
+      }
       path = getBscTokenLogoURL(address)
       break
 
