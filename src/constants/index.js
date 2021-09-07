@@ -3,6 +3,7 @@ export const FACTORY_ADDRESS = process.env.REACT_APP_FACTORY_ADDRESS || '0x06395
 export const BUNDLE_ID = '1'
 
 export const timeframeOptions = {
+  THERE_DAYS: '3 days',
   WEEK: '1 week',
   MONTH: '1 month',
   // THREE_MONTHS: '3 months',
