@@ -14,6 +14,7 @@ import Logo from '../../assets/logo_white.svg'
 import { ApplicationModal, useModalOpen, useToggleMenuModal } from '../../contexts/Application'
 import { useOnClickOutside } from '../../hooks'
 import SocialLinks from '../SocialLinks'
+import { getDefaultAddLiquidityUrl, addNetworkIdQueryString } from '../../utils'
 
 const TitleWrapper = styled.div`
   text-decoration: none;
@@ -180,14 +181,14 @@ export default function Title() {
               </Option>
             </BasicLink>
 
-            <Link href={process.env.REACT_APP_DMM_SWAP_URL} external>
+            <Link href={addNetworkIdQueryString(process.env.REACT_APP_DMM_SWAP_URL)} external>
               <Option style={{ marginLeft: 0 }}>
                 <Repeat size={20} style={{ marginRight: '.75rem' }} />
                 Trade
               </Option>
             </Link>
 
-            <Link href={`${process.env.REACT_APP_DMM_SWAP_URL}pools/ETH/${KNC_ADDRESS}`} external>
+            <Link href={addNetworkIdQueryString(getDefaultAddLiquidityUrl())} external>
               <Option style={{ marginLeft: 0 }}>
                 <Monitor size={20} style={{ marginRight: '.75rem' }} />
                 Liquidity

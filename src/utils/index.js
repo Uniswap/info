@@ -37,7 +37,7 @@ export function getTimeframe(timeWindow) {
   return utcStartTime
 }
 
-function addNetworkIdQueryString(url) {
+export function addNetworkIdQueryString(url) {
   if (url.includes('?')) {
     return `${url}&networkId=${process.env.REACT_APP_CHAIN_ID}`
   }

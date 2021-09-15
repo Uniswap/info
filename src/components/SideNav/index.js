@@ -16,7 +16,7 @@ import { ApplicationModal, useModalOpen, useSessionStart } from '../../contexts/
 import { useDarkModeManager } from '../../contexts/LocalStorage'
 import Toggle from '../Toggle'
 import SocialLinks from '../SocialLinks'
-import { getDefaultAddLiquidityUrl } from '../../utils'
+import { getDefaultAddLiquidityUrl, addNetworkIdQueryString } from '../../utils'
 
 const Wrapper = styled.div`
   height: ${({ isMobile }) => (isMobile ? 'initial' : '100vh')};
@@ -168,14 +168,14 @@ function SideNav({ history }) {
                   </Option>
                 </BasicLink>
 
-                <Link href={process.env.REACT_APP_DMM_SWAP_URL} external>
+                <Link href={addNetworkIdQueryString(process.env.REACT_APP_DMM_SWAP_URL)} external>
                   <Option>
                     <Repeat size={20} style={{ marginRight: '.75rem' }} />
                     Trade
                   </Option>
                 </Link>
 
-                <Link href={getDefaultAddLiquidityUrl()} external>
+                <Link href={addNetworkIdQueryString(getDefaultAddLiquidityUrl())} external>
                   <Option>
                     <Monitor size={20} style={{ marginRight: '.75rem' }} />
                     Liquidity
