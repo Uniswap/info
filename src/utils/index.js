@@ -37,40 +37,48 @@ export function getTimeframe(timeWindow) {
   return utcStartTime
 }
 
+function addNetworkIdQueryString(url) {
+  if (url.includes('?')) {
+    return `${url}&networkId=${process.env.REACT_APP_CHAIN_ID}`
+  }
+
+  return `${url}?networkId=${process.env.REACT_APP_CHAIN_ID}`
+}
+
 export function getPoolLink(token0Address, token1Address = null, remove = false, poolAddress = null) {
   const nativeTokenSymbol = getNativeTokenSymbol()
 
   if (poolAddress) {
     if (!token1Address) {
-      return (
+      return addNetworkIdQueryString(
         process.env.REACT_APP_DMM_SWAP_URL +
-        (remove ? `remove` : `add`) +
-        `/${token0Address === WETH_ADDRESS ? nativeTokenSymbol : token0Address}/${nativeTokenSymbol}/${poolAddress}`
+          (remove ? `remove` : `add`) +
+          `/${token0Address === WETH_ADDRESS ? nativeTokenSymbol : token0Address}/${nativeTokenSymbol}/${poolAddress}`
       )
     } else {
-      return (
+      return addNetworkIdQueryString(
         process.env.REACT_APP_DMM_SWAP_URL +
-        (remove ? `remove` : `add`) +
-        `/${token0Address === WETH_ADDRESS ? nativeTokenSymbol : token0Address}/${
-          token1Address === WETH_ADDRESS ? nativeTokenSymbol : token1Address
-        }/${poolAddress}`
+          (remove ? `remove` : `add`) +
+          `/${token0Address === WETH_ADDRESS ? nativeTokenSymbol : token0Address}/${
+            token1Address === WETH_ADDRESS ? nativeTokenSymbol : token1Address
+          }/${poolAddress}`
       )
     }
   }
 
   if (!token1Address) {
-    return (
+    return addNetworkIdQueryString(
       process.env.REACT_APP_DMM_SWAP_URL +
-      (remove ? `remove` : `add`) +
-      `/${token0Address === WETH_ADDRESS ? nativeTokenSymbol : token0Address}/${nativeTokenSymbol}`
+        (remove ? `remove` : `add`) +
+        `/${token0Address === WETH_ADDRESS ? nativeTokenSymbol : token0Address}/${nativeTokenSymbol}`
     )
   } else {
-    return (
+    return addNetworkIdQueryString(
       process.env.REACT_APP_DMM_SWAP_URL +
-      (remove ? `remove` : `add`) +
-      `/${token0Address === WETH_ADDRESS ? nativeTokenSymbol : token0Address}/${
-        token1Address === WETH_ADDRESS ? nativeTokenSymbol : token1Address
-      }`
+        (remove ? `remove` : `add`) +
+        `/${token0Address === WETH_ADDRESS ? nativeTokenSymbol : token0Address}/${
+          token1Address === WETH_ADDRESS ? nativeTokenSymbol : token1Address
+        }`
     )
   }
 }
@@ -79,11 +87,13 @@ export function getSwapLink(token0Address, token1Address = null) {
   const nativeTokenSymbol = getNativeTokenSymbol()
 
   if (!token1Address) {
-    return `${process.env.REACT_APP_DMM_SWAP_URL}swap?inputCurrency=${token0Address}`
+    return addNetworkIdQueryString(`${process.env.REACT_APP_DMM_SWAP_URL}swap?inputCurrency=${token0Address}`)
   } else {
-    return `${process.env.REACT_APP_DMM_SWAP_URL}swap?inputCurrency=${
-      token0Address === WETH_ADDRESS ? nativeTokenSymbol : token0Address
-    }&outputCurrency=${token1Address === WETH_ADDRESS ? nativeTokenSymbol : token1Address}`
+    return addNetworkIdQueryString(
+      `${process.env.REACT_APP_DMM_SWAP_URL}swap?inputCurrency=${
+        token0Address === WETH_ADDRESS ? nativeTokenSymbol : token0Address
+      }&outputCurrency=${token1Address === WETH_ADDRESS ? nativeTokenSymbol : token1Address}`
+    )
   }
 }
 
