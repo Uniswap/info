@@ -975,6 +975,19 @@ const TokenFields = `
     txCount
   }
 `
+const TokenFieldsHydra = `
+  fragment TokenFields on Token {
+    id
+    name
+    symbol
+    derivedHYDRA
+    tradeVolume
+    tradeVolumeUSD
+    untrackedVolumeUSD
+    totalLiquidity
+    txCount
+  }
+`
 
 // used for getting top tokens by daily volume
 // export const TOKEN_TOP_DAY_DATAS = gql`
@@ -1090,6 +1103,24 @@ export const TOKEN_DATA = (tokenAddress, block) => {
   return gql(queryString)
 }
 
+export const TOKEN_DATA_HYDRA = (tokenAddress, block) => {
+  const queryString = `
+    ${TokenFieldsHydra}
+    query tokens {
+      tokens(${block ? `block : {number: ${block}}` : ``} where: {id:"${tokenAddress}"}) {
+        ...TokenFields
+      }
+      pairs0: pairs(where: {token0: "${tokenAddress}"}, first: 50, orderBy: "reserveUSD", orderDirection: "desc"){
+        id
+      }
+      pairs1: pairs(where: {token1: "${tokenAddress}"}, first: 50, orderBy: "reserveUSD", orderDirection: "desc"){
+        id
+      }
+    }
+  `
+  return gql(queryString)
+}
+
 export const FILTERED_TRANSACTIONS = gql`
   query ($allPairs: [Bytes]!) {
     mints(first: 20, where: { pair_in: $allPairs }, orderBy: timestamp, orderDirection: desc) {
@@ -1147,6 +1178,76 @@ export const FILTERED_TRANSACTIONS = gql`
         }
         token1 {
           id
+          symbol
+        }
+      }
+      amount0In
+      amount0Out
+      amount1In
+      amount1Out
+      amountUSD
+      to
+    }
+  }
+`
+
+export const FILTERED_TRANSACTIONS_HYDRA = gql`
+  query ($allPairs: [String!]!) {
+    mints(first: 20, where: { pair_in: $allPairs }, orderBy: "timestamp", orderDirection: "desc") {
+      transaction {
+        txHash
+        timestamp
+      }
+      pair {
+        token0 {
+          tokenAddress
+          symbol
+        }
+        token1 {
+          tokenAddress
+          symbol
+        }
+      }
+      to
+      liquidity
+      amount0
+      amount1
+      amountUSD
+    }
+    burns(first: 20, where: { pair_in: $allPairs }, orderBy: "timestamp", orderDirection: "desc") {
+      transaction {
+        txHash
+        timestamp
+      }
+      pair {
+        token0 {
+          tokenAddress
+          symbol
+        }
+        token1 {
+          tokenAddress
+          symbol
+        }
+      }
+      sender
+      liquidity
+      amount0
+      amount1
+      amountUSD
+    }
+    swaps(first: 30, where: { pair_in: $allPairs }, orderBy: "timestamp", orderDirection: "desc") {
+      transaction {
+        txHash
+        timestamp
+      }
+      id
+      pair {
+        token0 {
+          tokenAddress
+          symbol
+        }
+        token1 {
+          tokenAddress
           symbol
         }
       }

@@ -125,7 +125,7 @@ function TokenPage({ address, history }) {
   const backgroundColor = useColor(id, symbol)
 
   const allPairs = useTokenPairs(address)
-
+  // console.log('allPairs ->', allPairs);
   // pairs to show in pair list
   const fetchedPairsList = useDataForList(allPairs)
 

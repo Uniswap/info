@@ -11,6 +11,8 @@ import {
   TOKENS_HISTORICAL_BULK,
   TOKEN_TOP_DAY_DATAS_HYDRA,
   TOKENS_HISTORICAL_BULK_HYDRA,
+  TOKEN_DATA_HYDRA,
+  FILTERED_TRANSACTIONS_HYDRA,
 } from '../apollo/queries'
 
 import { useEthPrice } from './GlobalData'
@@ -403,8 +405,12 @@ const getTokenData = async (address, ethPrice, ethPriceOld) => {
 
   try {
     // fetch all current and historical data
-    let result = await client.query({
-      query: TOKEN_DATA(address),
+    // let result = await client.query({
+    //   query: TOKEN_DATA(address),
+    //   fetchPolicy: 'cache-first',
+    // })
+    let result = await clientHydra.query({
+      query: TOKEN_DATA_HYDRA(address),
       fetchPolicy: 'cache-first',
     })
     data = result?.data?.tokens?.[0]
@@ -517,8 +523,16 @@ const getTokenData = async (address, ethPrice, ethPriceOld) => {
 const getTokenTransactions = async (allPairsFormatted) => {
   const transactions = {}
   try {
-    let result = await client.query({
-      query: FILTERED_TRANSACTIONS,
+    // let result = await client.query({
+    //   query: FILTERED_TRANSACTIONS,
+    //   variables: {
+    //     allPairs: allPairsFormatted,
+    //   },
+    //   fetchPolicy: 'cache-first',
+    // })
+    // console.log('allPairsFormatted ->', allPairsFormatted);
+    let result = await clientHydra.query({
+      query: FILTERED_TRANSACTIONS_HYDRA,
       variables: {
         allPairs: allPairsFormatted,
       },
@@ -527,6 +541,21 @@ const getTokenTransactions = async (allPairsFormatted) => {
     transactions.mints = result.data.mints
     transactions.burns = result.data.burns
     transactions.swaps = result.data.swaps
+    transactions.mints.forEach((mint) => {
+      mint.pair.token0.id = mint.pair.token0.tokenAddress
+      mint.pair.token1.id = mint.pair.token1.tokenAddress
+      mint.transaction.id = mint.transaction.txHash
+    })
+    transactions.burns.forEach((burn) => {
+      burn.pair.token0.id = burn.pair.token0.tokenAddress
+      burn.pair.token1.id = burn.pair.token1.tokenAddress
+      burn.transaction.id = burn.transaction.txHash
+    })
+    transactions.swaps.forEach((swap) => {
+      swap.pair.token0.id = swap.pair.token0.tokenAddress
+      swap.pair.token1.id = swap.pair.token1.tokenAddress
+      swap.transaction.id = swap.transaction.txHash
+    })
   } catch (e) {
     console.log(e)
   }
@@ -536,10 +565,15 @@ const getTokenTransactions = async (allPairsFormatted) => {
 const getTokenPairs = async (tokenAddress) => {
   try {
     // fetch all current and historical data
-    let result = await client.query({
-      query: TOKEN_DATA(tokenAddress),
+    // let result = await client.query({
+    //   query: TOKEN_DATA(tokenAddress),
+    //   fetchPolicy: 'cache-first',
+    // })
+    let result = await clientHydra.query({
+      query: TOKEN_DATA_HYDRA(tokenAddress),
       fetchPolicy: 'cache-first',
     })
+    // console.log('result ->', result);
     return result.data?.['pairs0'].concat(result.data?.['pairs1'])
   } catch (e) {
     console.log(e)
@@ -887,7 +921,6 @@ export function useTokenPriceData(tokenAddress, timeWindow, interval = 3600) {
     const startTime =
       timeWindow === timeframeOptions.ALL_TIME ? 1617840000 : currentTime.subtract(1, windowSize).startOf('hour').unix()
       // 1589760000
-    console.log('starttime ->', startTime);
     async function fetch() {
       let data = await getIntervalTokenData(tokenAddress, startTime, interval, latestBlock)
       updatePriceData(tokenAddress, data, timeWindow, interval)
