@@ -10,6 +10,14 @@ export const client = new ApolloClient({
   shouldBatch: true,
 })
 
+export const clientHydra = new ApolloClient({
+  link: new HttpLink({
+    uri: 'http://localhost:3000/graphql',
+  }),
+  cache: new InMemoryCache(),
+  shouldBatch: true,
+})
+
 export const healthClient = new ApolloClient({
   link: new HttpLink({
     uri: 'https://api.thegraph.com/index-node/graphql',

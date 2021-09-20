@@ -314,13 +314,13 @@ export const Search = ({ small = false }) => {
           .sort((a, b) => {
             const pairA = allPairData[a.id]
             const pairB = allPairData[b.id]
-            if (pairA?.trackedReserveETH && pairB?.trackedReserveETH) {
-              return parseFloat(pairA.trackedReserveETH) > parseFloat(pairB.trackedReserveETH) ? -1 : 1
+            if (pairA?.trackedReserveHYDRA && pairB?.trackedReserveHYDRA) {
+              return parseFloat(pairA.trackedReserveHYDRA) > parseFloat(pairB.trackedReserveHYDRA) ? -1 : 1
             }
-            if (pairA?.trackedReserveETH && !pairB?.trackedReserveETH) {
+            if (pairA?.trackedReserveHYDRA && !pairB?.trackedReserveHYDRA) {
               return -1
             }
-            if (!pairA?.trackedReserveETH && pairB?.trackedReserveETH) {
+            if (!pairA?.trackedReserveHYDRA && pairB?.trackedReserveHYDRA) {
               return 1
             }
             return 0
@@ -430,10 +430,10 @@ export const Search = ({ small = false }) => {
               : below410
               ? 'Search...'
               : below470
-              ? 'Search Uniswap...'
+              ? 'Search Hydraswap...'
               : below700
               ? 'Search pairs and tokens...'
-              : 'Search Uniswap pairs and tokens...'
+              : 'Search Hydraswap pairs and tokens...'
           }
           value={value}
           onChange={(e) => {

@@ -47,9 +47,13 @@ const GridRow = styled.div`
 `
 
 function GlobalPage() {
+  // console.log('global page');
+
   // get data for lists and totals
   const allPairs = useAllPairData()
   const allTokens = useAllTokenData()
+  // console.log(allTokens);
+  // console.log('------ allPairs ->', allPairs);
   const transactions = useGlobalTransactions()
   const { totalLiquidityUSD, oneDayVolumeUSD, volumeChangeUSD, liquidityChangeUSD } = useGlobalData()
 
@@ -73,7 +77,7 @@ function GlobalPage() {
       <ContentWrapper>
         <div>
           <AutoColumn gap="24px" style={{ paddingBottom: below800 ? '0' : '24px' }}>
-            <TYPE.largeHeader>{below800 ? 'Uniswap Analytics' : 'Uniswap Analytics'}</TYPE.largeHeader>
+            <TYPE.largeHeader>{below800 ? 'Hydraswap Analytics' : 'Hydraswap Analytics'}</TYPE.largeHeader>
             <Search />
             <GlobalStats />
           </AutoColumn>

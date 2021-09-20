@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect, useState } from 'react'
 
-import { client } from '../apollo/client'
+import { client, clientHydra } from '../apollo/client'
 import {
   PAIR_DATA,
   PAIR_CHART,
@@ -9,6 +9,8 @@ import {
   PAIRS_BULK,
   PAIRS_HISTORICAL_BULK,
   HOURLY_PAIR_RATES,
+  PAIRS_CURRENT_HYDRA,
+  PAIRS_BULK_HYDRA,
 } from '../apollo/queries'
 
 import { useEthPrice } from './GlobalData'
@@ -185,16 +187,30 @@ export default function Provider({ children }) {
 async function getBulkPairData(pairList, ethPrice) {
   const [t1, t2, tWeek] = getTimestampsForChanges()
   let [{ number: b1 }, { number: b2 }, { number: bWeek }] = await getBlocksFromTimestamps([t1, t2, tWeek])
-
+  // console.log('pair list ->', pairList)
   try {
-    let current = await client.query({
-      query: PAIRS_BULK,
+    // let current = await client.query({
+    //   query: PAIRS_BULK,
+    //   variables: {
+    //     allPairs: pairList,
+    //   },
+    //   fetchPolicy: 'cache-first',
+    // })
+    let current = await clientHydra.query({
+      query: PAIRS_BULK_HYDRA,
       variables: {
         allPairs: pairList,
       },
       fetchPolicy: 'cache-first',
     })
-
+    // console.log('current pairs ->', current);
+    if (current) {
+      current.data.pairs.forEach(async (pair) => {
+        pair.id = pair.pairAddress
+        pair.token0.id = pair.token0.tokenAddress
+        pair.token1.id = pair.token1.tokenAddress
+      })
+    }
     let [oneDayResult, twoDayResult, oneWeekResult] = await Promise.all(
       [b1, b2, bWeek].map(async (block) => {
         let result = client.query({
@@ -249,6 +265,7 @@ async function getBulkPairData(pairList, ethPrice) {
           return data
         })
     )
+    // console.log('pair data ->', pairData);
     return pairData
   } catch (e) {
     console.log(e)
@@ -285,7 +302,7 @@ function parseData(data, oneDayData, twoDayData, oneWeekData, ethPrice, oneDayBl
   data.volumeChangeUntracked = volumeChangeUntracked
 
   // set liquidity properties
-  data.trackedReserveUSD = data.trackedReserveETH * ethPrice
+  data.trackedReserveUSD = data.trackedReserveHYDRA * ethPrice
   data.liquidityChangeUSD = getPercentChange(data.reserveUSD, oneDayData?.reserveUSD)
 
   // format if pair hasnt existed for a day or a week
@@ -478,18 +495,25 @@ export function Updater() {
   useEffect(() => {
     async function getData() {
       // get top pairs by reserves
+      // let {
+      //   data: { pairs },
+      // } = await client.query({
+      //   query: PAIRS_CURRENT,
+      //   fetchPolicy: 'cache-first',
+      // })
+
       let {
         data: { pairs },
-      } = await client.query({
-        query: PAIRS_CURRENT,
+      } = await clientHydra.query({
+        query: PAIRS_CURRENT_HYDRA,
         fetchPolicy: 'cache-first',
       })
-
+      // console.log('pairs pak ->', pairs);
       // format as array of addresses
       const formattedPairs = pairs.map((pair) => {
-        return pair.id
+        return pair.pairAddress
       })
-
+      // console.log('formatedPairs ->', formattedPairs);
       // get data for every pair in list
       let topPairs = await getBulkPairData(formattedPairs, ethPrice)
       topPairs && updateTopPairs(topPairs)
@@ -636,7 +660,7 @@ export function usePairChartData(pairAddress) {
 }
 
 /**
- * Get list of all pairs in Uniswap
+ * Get list of all pairs in Hydraswap
  */
 export function useAllPairData() {
   const [state] = usePairDataContext()

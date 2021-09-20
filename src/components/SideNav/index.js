@@ -162,7 +162,7 @@ function SideNav({ history }) {
               </AutoColumn>
             )}
           </AutoColumn>
-          <AutoColumn gap="0.5rem" style={{ marginLeft: '.75rem', marginBottom: '4rem' }}>
+          {/* <AutoColumn gap="0.5rem" style={{ marginLeft: '.75rem', marginBottom: '4rem' }}>
             <HeaderText>
               <Link href="https://uniswap.org" target="_blank">
                 Uniswap.org
@@ -189,7 +189,7 @@ function SideNav({ history }) {
               </Link>
             </HeaderText>
             <Toggle isActive={isDark} toggle={toggleDarkMode} />
-          </AutoColumn>
+          </AutoColumn> */}
           {!below1180 && (
             <Polling style={{ marginLeft: '.5rem' }}>
               <PollingDot />

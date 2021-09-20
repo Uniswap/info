@@ -3,8 +3,8 @@ import { BigNumber } from 'bignumber.js'
 import dayjs from 'dayjs'
 import { ethers } from 'ethers'
 import utc from 'dayjs/plugin/utc'
-import { client, blockClient } from '../apollo/client'
-import { GET_BLOCK, GET_BLOCKS, SHARE_VALUE } from '../apollo/queries'
+import { client, blockClient, clientHydra } from '../apollo/client'
+import { GET_BLOCK, GET_BLOCKS, GET_BLOCKS_HYDRA, GET_BLOCK_HYDRA, SHARE_VALUE } from '../apollo/queries'
 import { Text } from 'rebass'
 import _Decimal from 'decimal.js-light'
 import toFormat from 'toformat'
@@ -114,7 +114,7 @@ export function getTimestampsForChanges() {
   return [t1, t2, tWeek]
 }
 
-export async function splitQuery(query, localClient, vars, list, skipCount = 100) {
+export async function splitQuery(query, localClient, vars, list, skipCount = 100, isMine = false) {
   let fetchedData = {}
   let allFound = false
   let skip = 0
@@ -160,6 +160,28 @@ export async function getBlockFromTimestamp(timestamp) {
   return result?.data?.blocks?.[0]?.number
 }
 
+export async function getBlockFromTimestampHYDRA(timestamp) {
+  let result = await clientHydra.query({
+    query: GET_BLOCK_HYDRA,
+    variables: {
+      timestampFrom: timestamp,
+      timestampTo: timestamp + 600,
+    },
+    fetchPolicy: 'cache-first',
+  })
+  return result?.data?.blocks?.[0]?.number + ''
+}
+
+function transformDataHydra(data) {
+  const transformed = {}
+  for (let i = 0; i < data?.blocks?.length; i++) {
+    const block = data.blocks[i]
+    block.number = block.height + ''
+    transformed['t' + block.timestamp_from] = [block]
+  }
+  return transformed
+}
+
 /**
  * @notice Fetches block objects for an array of timestamps.
  * @dev blocks are returned in chronological order (ASC) regardless of input.
@@ -172,8 +194,9 @@ export async function getBlocksFromTimestamps(timestamps, skipCount = 500) {
     return []
   }
 
-  let fetchedData = await splitQuery(GET_BLOCKS, blockClient, [], timestamps, skipCount)
-
+  // let fetchedData = await splitQuery(GET_BLOCKS, blockClient, [], timestamps, skipCount)
+  let fetchedData = await splitQuery(GET_BLOCKS_HYDRA, clientHydra, [], timestamps, skipCount, true)
+  fetchedData = transformDataHydra(fetchedData)
   let blocks = []
   if (fetchedData) {
     for (var t in fetchedData) {
@@ -244,8 +267,8 @@ export async function getShareValueOverTime(pairAddress, timestamps) {
         reserve0: result.data[row].reserve0,
         reserve1: result.data[row].reserve1,
         reserveUSD: result.data[row].reserveUSD,
-        token0DerivedETH: result.data[row].token0.derivedETH,
-        token1DerivedETH: result.data[row].token1.derivedETH,
+        token0DerivedETH: result.data[row].token0.derivedHYDRA,
+        token1DerivedETH: result.data[row].token1.derivedHYDRA,
         roiUsd: values && values[0] ? sharePriceUsd / values[0]['sharePriceUsd'] : 1,
         ethPrice: 0,
         token0PriceUSD: 0,
@@ -303,10 +326,10 @@ export const setThemeColor = (theme) => document.documentElement.style.setProper
 export const Big = (number) => new BigNumber(number)
 
 export const urls = {
-  showTransaction: (tx) => `https://etherscan.io/tx/${tx}/`,
-  showAddress: (address) => `https://www.etherscan.io/address/${address}/`,
-  showToken: (address) => `https://www.etherscan.io/token/${address}/`,
-  showBlock: (block) => `https://etherscan.io/block/${block}/`,
+  showTransaction: (tx) => `https://explorer.hydrachain.org/tx/${tx}/`,
+  showAddress: (address) => `https://explorer.hydrachain.org/address/${address}/`,
+  showToken: (address) => `https://explorer.hydrachain.org/address/${address}/`,
+  showBlock: (block) => `https://explorer.hydrachain.org/block/${block}/`,
 }
 
 export const formatTime = (unix) => {

@@ -165,10 +165,10 @@ function PairPage({ pairAddress, history }) {
   // token data for usd
   const [ethPrice] = useEthPrice()
   const token0USD =
-    token0?.derivedETH && ethPrice ? formattedNum(parseFloat(token0.derivedETH) * parseFloat(ethPrice), true) : ''
+    token0?.derivedHYDRA && ethPrice ? formattedNum(parseFloat(token0.derivedHYDRA) * parseFloat(ethPrice), true) : ''
 
   const token1USD =
-    token1?.derivedETH && ethPrice ? formattedNum(parseFloat(token1.derivedETH) * parseFloat(ethPrice), true) : ''
+    token1?.derivedHYDRA && ethPrice ? formattedNum(parseFloat(token1.derivedHYDRA) * parseFloat(ethPrice), true) : ''
 
   // rates
   const token0Rate = reserve0 && reserve1 ? formattedNum(reserve1 / reserve0) : '-'
@@ -203,9 +203,10 @@ function PairPage({ pairAddress, history }) {
             <TYPE.light style={{ textAlign: 'center' }}>
               {BLOCKED_WARNINGS[pairAddress] ?? `This pair is not supported.`}
             </TYPE.light>
-            <Link external={true} href={'https://etherscan.io/address/' + pairAddress}>{`More about ${shortenAddress(
-              pairAddress
-            )}`}</Link>
+            <Link
+              external={true}
+              href={'https://explorer.hydrachain.org/address/' + pairAddress}
+            >{`More about ${shortenAddress(pairAddress)}`}</Link>
           </AutoColumn>
         </BlockedMessageWrapper>
       </BlockedWrapper>
@@ -312,7 +313,7 @@ function PairPage({ pairAddress, history }) {
                   <TYPE.main fontSize={'16px'} lineHeight={1} fontWeight={500} ml={'4px'}>
                     {token0 && token1
                       ? `1 ${formattedSymbol0} = ${token0Rate} ${formattedSymbol1} ${
-                          parseFloat(token0?.derivedETH) ? '(' + token0USD + ')' : ''
+                          parseFloat(token0?.derivedHYDRA) ? '(' + token0USD + ')' : ''
                         }`
                       : '-'}
                   </TYPE.main>
@@ -324,7 +325,7 @@ function PairPage({ pairAddress, history }) {
                   <TYPE.main fontSize={'16px'} lineHeight={1} fontWeight={500} ml={'4px'}>
                     {token0 && token1
                       ? `1 ${formattedSymbol1} = ${token1Rate} ${formattedSymbol0}  ${
-                          parseFloat(token1?.derivedETH) ? '(' + token1USD + ')' : ''
+                          parseFloat(token1?.derivedHYDRA) ? '(' + token1USD + ')' : ''
                         }`
                       : '-'}
                   </TYPE.main>
@@ -500,8 +501,8 @@ function PairPage({ pairAddress, history }) {
                     </AutoRow>
                   </Column>
                   <ButtonLight color={backgroundColor}>
-                    <Link color={backgroundColor} external href={'https://etherscan.io/address/' + pairAddress}>
-                      View on Etherscan ↗
+                    <Link color={backgroundColor} external href={'https://explorer.hydrachain.org/contract/' + pairAddress}>
+                      View on Hydra Explorer ↗
                     </Link>
                   </ButtonLight>
                 </TokenDetailsLayout>
