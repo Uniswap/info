@@ -37,6 +37,10 @@ const Arrow = styled.div`
 `
 
 const List = styled(Box)`
+  border-radius: 8px;
+  padding: 1.25rem;
+  border: 1px solid ${({ theme }) => theme.bg3};
+  box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.05); /* box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.01), 0px 4px 8px rgba(0, 0, 0, 0.01), 0px 16px 24px rgba(0, 0, 0, 0.01), 0px 24px 32px rgba(0, 0, 0, 0.01); */
   -webkit-overflow-scrolling: touch;
 `
 
@@ -45,7 +49,7 @@ const DashGrid = styled.div`
   grid-gap: 1em;
   grid-template-columns: 100px 1fr 1fr;
   grid-template-areas: 'name liq vol';
-  padding: 0 1.125rem;
+  padding: 1.25rem;
 
   > * {
     justify-content: flex-end;
@@ -90,7 +94,7 @@ const ClickableText = styled(Text)`
     opacity: 0.6;
   }
   user-select: none;
-  color: ${({ theme }) => theme.text1} !important;
+  color: ${({ theme }) => theme.text5} !important;
   @media screen and (max-width: 640px) {
     font-size: 0.85rem;
   }
@@ -178,10 +182,10 @@ function TopTokenList({ tokens, itemMax = 10, useTracked = false }) {
 
   const ListItem = ({ item, index }) => {
     return (
-      <DashGrid style={{ height: '48px' }} focus={true}>
+      <DashGrid style={{ height: '60px' }} focus={true}>
         <DataText area="name" fontWeight="500">
           <Row>
-            {!below680 && <div style={{ marginRight: '1rem', width: '10px' }}>{index}</div>}
+            {!below680 && <div style={{ marginRight: '1rem', width: '10px', color: '#13CFFF' }}>{index}</div>}
             <TokenLogo address={item.id} />
             <CustomLink style={{ marginLeft: '16px', whiteSpace: 'nowrap' }} to={'/token/' + item.id}>
               <FormattedName
@@ -212,7 +216,7 @@ function TopTokenList({ tokens, itemMax = 10, useTracked = false }) {
 
   return (
     <ListWrapper>
-      <DashGrid center={true} style={{ height: 'fit-content', padding: '0 1.125rem 1rem 1.125rem' }}>
+      <DashGrid center={true} style={{ height: 'fit-content', padding: '1.25rem' }}>
         <Flex alignItems="center" justifyContent="flexStart">
           <ClickableText
             color="text"

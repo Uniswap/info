@@ -38,19 +38,15 @@ const Wrapper = styled.div`
   justify-content: flex-end;
   padding: 12px 16px;
   border-radius: 12px;
-  background: ${({ theme, small, open }) => (small ? (open ? theme.bg6 : 'none') : transparentize(0.4, theme.bg6))};
+  background: ${({ theme, small, open }) => (small ? (open ? theme.bg5 : 'none') : transparentize(0.4, theme.bg5))};
   border-bottom-right-radius: ${({ open }) => (open ? '0px' : '12px')};
   border-bottom-left-radius: ${({ open }) => (open ? '0px' : '12px')};
   z-index: 9999;
   width: 100%;
   min-width: 300px;
   box-sizing: border-box;
-  box-shadow: ${({ open, small }) =>
-    !open && !small
-      ? '0px 24px 32px rgba(0, 0, 0, 0.04), 0px 16px 24px rgba(0, 0, 0, 0.04), 0px 4px 8px rgba(0, 0, 0, 0.04), 0px 0px 1px rgba(0, 0, 0, 0.04) '
-      : 'none'};
   @media screen and (max-width: 500px) {
-    background: ${({ theme }) => theme.bg6};
+    background: ${({ theme }) => theme.bg5};
     box-shadow: ${({ open }) =>
       !open
         ? '0px 24px 32px rgba(0, 0, 0, 0.04), 0px 16px 24px rgba(0, 0, 0, 0.04), 0px 4px 8px rgba(0, 0, 0, 0.04), 0px 0px 1px rgba(0, 0, 0, 0.04) '
@@ -113,7 +109,7 @@ const Menu = styled.div`
   overflow: auto;
   left: 0;
   padding-bottom: 20px;
-  background: ${({ theme }) => theme.bg6};
+  background: ${({ theme }) => theme.bg5};
   border-bottom-right-radius: 12px;
   border-bottom-left-radius: 12px;
   box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.04), 0px 4px 8px rgba(0, 0, 0, 0.04), 0px 16px 24px rgba(0, 0, 0, 0.04),
@@ -449,7 +445,7 @@ export const Search = ({ small = false }) => {
       </Wrapper>
       <Menu hide={!showMenu} ref={menuRef}>
         <Heading>
-          <Gray>Pairs</Gray>
+          <TYPE.white>Pairs</TYPE.white>
         </Heading>
         <div>
           {filteredPairList && Object.keys(filteredPairList).length === 0 && (
@@ -485,7 +481,7 @@ export const Search = ({ small = false }) => {
           </Heading>
         </div>
         <Heading>
-          <Gray>Tokens</Gray>
+          <TYPE.white>Tokens</TYPE.white>
         </Heading>
         <div>
           {Object.keys(filteredTokenList).length === 0 && (
