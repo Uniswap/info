@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
-import { isAddress } from '../../utils/index.js'
+import { ethers } from 'ethers'
+// import { isAddress } from '../../utils/index.js'
 import EthereumLogo from '../../assets/eth.png'
 
 const BAD_IMAGES = {}
@@ -77,11 +78,13 @@ export default function TokenLogo({ address, header = false, size = '24px', ...r
 
   const getPath = (address) => {
     try {
-      console.log('coin image', require(`../../assets/${isAddress(address)}.png`))
-      return require(`../../assets/${isAddress(address)}.png`)
-    } catch(e) {
+      const validateAddress = ethers.utils.getAddress(address.toLowerCase())
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      console.log("coin image", require(`../../assets/${validateAddress}.png`));
+      return require(`../../assets/${validateAddress}.png`)
+    } catch (e) {
       console.log('errorrrrr', e)
-      return ''
+      return "";
     }
   }
 
