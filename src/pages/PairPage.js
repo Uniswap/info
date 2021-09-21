@@ -218,12 +218,12 @@ function PairPage({ pairAddress, history }) {
     <PageWrapper>
       <ThemedBackground backgroundColor={transparentize(0.6, backgroundColor)} />
       <span />
-      <Warning
+      {/* <Warning
         type={'pair'}
         show={!dismissed && listedTokens && !(listedTokens.includes(token0?.id) && listedTokens.includes(token1?.id))}
         setShow={markAsDismissed}
         address={pairAddress}
-      />
+      /> */}
       <ContentWrapperLarge>
         <RowBetween>
           <TYPE.body>
