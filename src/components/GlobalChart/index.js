@@ -81,7 +81,7 @@ const GlobalChart = ({ display }) => {
           <TradingViewChart
             data={dailyData}
             base={totalLiquidityUSD}
-            baseChange={liquidityChangeUSD}
+            baseChange={liquidityChangeUSD || 0}
             title="Liquidity"
             field="totalLiquidityUSD"
             width={width}
@@ -94,7 +94,7 @@ const GlobalChart = ({ display }) => {
           <TradingViewChart
             data={chartDataFiltered}
             base={volumeWindow === VOLUME_WINDOW.WEEKLY ? oneWeekVolume : oneDayVolumeUSD}
-            baseChange={volumeWindow === VOLUME_WINDOW.WEEKLY ? weeklyVolumeChange : volumeChangeUSD}
+            baseChange={volumeWindow === VOLUME_WINDOW.WEEKLY ? (weeklyVolumeChange || 0) : (volumeChangeUSD || 0)}
             title={volumeWindow === VOLUME_WINDOW.WEEKLY ? 'Volume (7d)' : 'Volume'}
             field={volumeWindow === VOLUME_WINDOW.WEEKLY ? 'weeklyVolumeUSD' : 'dailyVolumeUSD'}
             width={width}

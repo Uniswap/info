@@ -3,7 +3,7 @@ import { FACTORY_ADDRESS, BUNDLE_ID } from '../constants'
 
 export const SUBGRAPH_HEALTH = gql`
   query health {
-    indexingStatusForCurrentVersion(subgraphName: "uniswap/uniswap-v2") {
+    indexingStatusForCurrentVersion(subgraphName: "pancakeswap/exchange") {
       synced
       health
       chains {
@@ -23,12 +23,10 @@ export const V1_DATA_QUERY = gql`
     current: uniswap(id: "1") {
       totalVolumeUSD
       totalLiquidityUSD
-      txCount
     }
     oneDay: uniswapHistoricalDatas(where: { timestamp_lt: $date }, first: 1, orderBy: timestamp, orderDirection: desc) {
       totalVolumeUSD
       totalLiquidityUSD
-      txCount
     }
     twoDay: uniswapHistoricalDatas(
       where: { timestamp_lt: $date2 }
@@ -38,7 +36,6 @@ export const V1_DATA_QUERY = gql`
     ) {
       totalVolumeUSD
       totalLiquidityUSD
-      txCount
     }
     exchanges(first: 200, orderBy: ethBalance, orderDirection: desc) {
       ethBalance
@@ -97,7 +94,7 @@ export const PRICES_BY_BLOCK = (tokenAddress, blocks) => {
   queryString += blocks.map(
     (block) => `
       t${block.timestamp}:token(id:"${tokenAddress}", block: { number: ${block.number} }) { 
-        derivedETH
+        derivedBNB
       }
     `
   )
@@ -105,7 +102,7 @@ export const PRICES_BY_BLOCK = (tokenAddress, blocks) => {
   queryString += blocks.map(
     (block) => `
       b${block.timestamp}: bundle(id:"1", block: { number: ${block.number} }) { 
-        ethPrice
+        bnbPrice
       }
     `
   )
@@ -153,10 +150,10 @@ export const SHARE_VALUE = (pairAddress, blocks) => {
         reserveUSD
         totalSupply 
         token0{
-          derivedETH
+          derivedBNB
         }
         token1{
-          derivedETH
+          derivedBNB
         }
       }
     `
@@ -165,7 +162,7 @@ export const SHARE_VALUE = (pairAddress, blocks) => {
   queryString += blocks.map(
     (block) => `
       b${block.timestamp}: bundle(id:"1", block: { number: ${block.number} }) { 
-        ethPrice
+        bnbPrice
       }
     `
   )
@@ -180,14 +177,14 @@ export const ETH_PRICE = (block) => {
     query bundles {
       bundles(where: { id: ${BUNDLE_ID} } block: {number: ${block}}) {
         id
-        ethPrice
+        bnbPrice
       }
     }
   `
     : ` query bundles {
       bundles(where: { id: ${BUNDLE_ID} }) {
         id
-        ethPrice
+        bnbPrice
       }
     }
   `
@@ -284,12 +281,12 @@ export const USER_POSITIONS = gql`
         token0 {
           id
           symbol
-          derivedETH
+          derivedBNB
         }
         token1 {
           id
           symbol
-          derivedETH
+          derivedBNB
         }
         totalSupply
       }
@@ -420,32 +417,31 @@ export const PAIR_DAY_DATA_BULK = (pairs, startTimestamp) => {
 }
 
 export const GLOBAL_CHART = gql`
-  query uniswapDayDatas($startTime: Int!, $skip: Int!) {
-    uniswapDayDatas(first: 1000, skip: $skip, where: { date_gt: $startTime }, orderBy: date, orderDirection: asc) {
+  query pancakeDayDatas($startTime: Int!, $skip: Int!) {
+    pancakeDayDatas(first: 1000, skip: $skip, where: { date_gt: $startTime }, orderBy: date, orderDirection: asc) {
       id
       date
       totalVolumeUSD
       dailyVolumeUSD
-      dailyVolumeETH
+      dailyVolumeBNB
       totalLiquidityUSD
-      totalLiquidityETH
+      totalLiquidityBNB
     }
   }
 `
 
 export const GLOBAL_DATA = (block) => {
-  const queryString = ` query uniswapFactories {
-      uniswapFactories(
+  const queryString = ` query pancakeFactories {
+    pancakeFactories(
        ${block ? `block: { number: ${block}}` : ``} 
        where: { id: "${FACTORY_ADDRESS}" }) {
         id
         totalVolumeUSD
-        totalVolumeETH
+        totalVolumeBNB
         untrackedVolumeUSD
         totalLiquidityUSD
-        totalLiquidityETH
-        txCount
-        pairCount
+        totalLiquidityBNB
+        totalPairs
       }
     }`
   return gql(queryString)
@@ -602,7 +598,7 @@ export const PAIR_SEARCH = gql`
 
 export const ALL_PAIRS = gql`
   query pairs($skip: Int!) {
-    pairs(first: 500, skip: $skip, orderBy: trackedReserveETH, orderDirection: desc) {
+    pairs(first: 500, skip: $skip, orderBy: trackedReserveBNB, orderDirection: desc) {
       id
       token0 {
         id
@@ -621,32 +617,30 @@ export const ALL_PAIRS = gql`
 const PairFields = `
   fragment PairFields on Pair {
     id
-    txCount
     token0 {
       id
       symbol
       name
       totalLiquidity
-      derivedETH
+      derivedBNB
     }
     token1 {
       id
       symbol
       name
       totalLiquidity
-      derivedETH
+      derivedBNB
     }
     reserve0
     reserve1
     reserveUSD
     totalSupply
-    trackedReserveETH
-    reserveETH
+    trackedReserveBNB
+    reserveBNB
     volumeUSD
     untrackedVolumeUSD
     token0Price
     token1Price
-    createdAtTimestamp
   }
 `
 
@@ -696,7 +690,7 @@ export const MINING_POSITIONS = (account) => {
 export const PAIRS_BULK = gql`
   ${PairFields}
   query pairs($allPairs: [Bytes]!) {
-    pairs(first: 500, where: { id_in: $allPairs }, orderBy: trackedReserveETH, orderDirection: desc) {
+    pairs(first: 500, where: { id_in: $allPairs }, orderBy: trackedReserveBNB, orderDirection: desc) {
       ...PairFields
     }
   }
@@ -710,10 +704,10 @@ export const PAIRS_HISTORICAL_BULK = (block, pairs) => {
   pairsString += ']'
   let queryString = `
   query pairs {
-    pairs(first: 200, where: {id_in: ${pairsString}}, block: {number: ${block}}, orderBy: trackedReserveETH, orderDirection: desc) {
+    pairs(first: 200, where: {id_in: ${pairsString}}, block: {number: ${block}}, orderBy: trackedReserveBNB, orderDirection: desc) {
       id
       reserveUSD
-      trackedReserveETH
+      trackedReserveBNB
       volumeUSD
       untrackedVolumeUSD
     }
@@ -730,8 +724,8 @@ export const TOKEN_CHART = gql`
       priceUSD
       totalLiquidityToken
       totalLiquidityUSD
-      totalLiquidityETH
-      dailyVolumeETH
+      totalLiquidityBNB
+      dailyVolumeBNB
       dailyVolumeToken
       dailyVolumeUSD
     }
@@ -743,12 +737,11 @@ const TokenFields = `
     id
     name
     symbol
-    derivedETH
+    derivedBNB
     tradeVolume
     tradeVolumeUSD
     untrackedVolumeUSD
     totalLiquidity
-    txCount
   }
 `
 
@@ -782,12 +775,11 @@ export const TOKENS_HISTORICAL_BULK = (tokens, block) => {
       id
       name
       symbol
-      derivedETH
+      derivedBNB
       tradeVolume
       tradeVolumeUSD
       untrackedVolumeUSD
       totalLiquidity
-      txCount
     }
   }
   `

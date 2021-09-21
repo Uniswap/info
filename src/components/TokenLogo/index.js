@@ -71,16 +71,24 @@ export default function TokenLogo({ address, header = false, size = '24px', ...r
     )
   }
 
-  const path = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${isAddress(
-    address
-  )}/logo.png`
+  // const path = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${isAddress(
+  //   address
+  // )}/logo.png`
+
+  const getPath = (address) => {
+    try {
+      return require(`../../assets/${isAddress(address)}.png`)
+    } catch {
+      return ''
+    }
+  }
 
   return (
     <Inline>
       <Image
         {...rest}
         alt={''}
-        src={path}
+        src={getPath(address)}
         size={size}
         onError={(event) => {
           BAD_IMAGES[address] = true

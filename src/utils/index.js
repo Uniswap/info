@@ -16,6 +16,8 @@ const Decimal = toFormat(_Decimal)
 BigNumber.set({ EXPONENTIAL_AT: 50 })
 dayjs.extend(utc)
 
+const SWAP_DOMAIN = process.env.REACT_APP_SWAP_DOMAIN
+
 export function getTimeframe(timeWindow) {
   const utcEndTime = dayjs.utc()
   // based on window, get starttime
@@ -40,13 +42,13 @@ export function getTimeframe(timeWindow) {
 export function getPoolLink(token0Address, token1Address = null, remove = false) {
   if (!token1Address) {
     return (
-      `https://app.uniswap.org/#/` +
+      `${SWAP_DOMAIN}/#/` +
       (remove ? `remove` : `add`) +
-      `/v2/${token0Address === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' ? 'ETH' : token0Address}/${'ETH'}`
+      `/v2/${token0Address === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' ? 'ETH' : token0Address}`
     )
   } else {
     return (
-      `https://app.uniswap.org/#/` +
+      `${SWAP_DOMAIN}/#/` +
       (remove ? `remove` : `add`) +
       `/v2/${token0Address === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' ? 'ETH' : token0Address}/${
         token1Address === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' ? 'ETH' : token1Address
@@ -57,20 +59,20 @@ export function getPoolLink(token0Address, token1Address = null, remove = false)
 
 export function getSwapLink(token0Address, token1Address = null) {
   if (!token1Address) {
-    return `https://app.uniswap.org/#/swap?inputCurrency=${token0Address}`
+    return `${SWAP_DOMAIN}/#/swap?inputCurrency=${token0Address}`
   } else {
-    return `https://app.uniswap.org/#/swap?inputCurrency=${
+    return `${SWAP_DOMAIN}/#/swap?inputCurrency=${
       token0Address === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' ? 'ETH' : token0Address
     }&outputCurrency=${token1Address === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' ? 'ETH' : token1Address}`
   }
 }
 
 export function getMiningPoolLink(token0Address) {
-  return `https://app.uniswap.org/#/uni/ETH/${token0Address}`
+  return `${SWAP_DOMAIN}/#/uni/ETH/${token0Address}`
 }
 
 export function getUniswapAppLink(linkVariable) {
-  let baseUniswapUrl = 'https://app.uniswap.org/#/uni'
+  let baseUniswapUrl = `${SWAP_DOMAIN}/#/uni`
   if (!linkVariable) {
     return baseUniswapUrl
   }
@@ -244,8 +246,8 @@ export async function getShareValueOverTime(pairAddress, timestamps) {
         reserve0: result.data[row].reserve0,
         reserve1: result.data[row].reserve1,
         reserveUSD: result.data[row].reserveUSD,
-        token0DerivedETH: result.data[row].token0.derivedETH,
-        token1DerivedETH: result.data[row].token1.derivedETH,
+        token0DerivedETH: result.data[row].token0.derivedBNB,
+        token1DerivedETH: result.data[row].token1.derivedBNB,
         roiUsd: values && values[0] ? sharePriceUsd / values[0]['sharePriceUsd'] : 1,
         ethPrice: 0,
         token0PriceUSD: 0,
@@ -302,11 +304,12 @@ export const setThemeColor = (theme) => document.documentElement.style.setProper
 
 export const Big = (number) => new BigNumber(number)
 
+const FACCHAIN_DOMAIN = process.env.REACT_APP_FACCHAIN_DOMAIN
 export const urls = {
-  showTransaction: (tx) => `https://etherscan.io/tx/${tx}/`,
-  showAddress: (address) => `https://www.etherscan.io/address/${address}/`,
-  showToken: (address) => `https://www.etherscan.io/token/${address}/`,
-  showBlock: (block) => `https://etherscan.io/block/${block}/`,
+  showTransaction: (tx) => `${FACCHAIN_DOMAIN}/tx/${tx}/`,
+  showAddress: (address) => `${FACCHAIN_DOMAIN}/address/${address}/`,
+  showToken: (address) => `${FACCHAIN_DOMAIN}/token/${address}/`,
+  showBlock: (block) => `${FACCHAIN_DOMAIN}/block/${block}/`,
 }
 
 export const formatTime = (unix) => {
