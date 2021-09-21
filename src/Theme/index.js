@@ -169,6 +169,7 @@ export const GlobalStyle = createGlobalStyle`
     height: 100%;
     font-size: 14px;    
     background-color: ${({ theme }) => theme.bg6};
+    font-family: 'Inter', sans-serif !important;
   }
 
   a {
