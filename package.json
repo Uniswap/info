@@ -88,5 +88,9 @@
       "last 1 safari version"
     ]
   },
-  "license": "GPL-3.0-or-later"
+  "license": "GPL-3.0-or-later",
+  "dependencies": {
+    "bootstrap": "^5.1.0",
+    "react-bootstrap": "^2.0.0-beta.6"
+  }
 }

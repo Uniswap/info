@@ -11,32 +11,33 @@ import { isAddress } from "./utils";
 import AccountPage from "./pages/AccountPage";
 import AllTokensPage from "./pages/AllTokensPage";
 import AllPairsPage from "./pages/AllPairsPage";
-import PinnedData from "./components/PinnedData";
+// import PinnedData from "./components/PinnedData";
 
-import SideNav from "./components/SideNav";
-import AccountLookup from "./pages/AccountLookup";
+// import SideNav from "./components/SideNav";
+// import AccountLookup from "./pages/AccountLookup";
 import LocalLoader from "./components/LocalLoader";
+import Header from "./components/Header";
+import Footer from "./components/Footer";
 import { useLatestBlocks } from "./contexts/Application";
 import GoogleAnalyticsReporter from "./components/analytics/GoogleAnalyticsReporter";
 import { PAIR_BLACKLIST, TOKEN_BLACKLIST } from "./constants";
+import BackgroundDesktop from './assets/background-desktop.png'
+import BackgroundMobile from './assets/background-mobile.png'
+
+import "bootstrap/dist/css/bootstrap.min.css";
 
 const AppWrapper = styled.div`
   position: relative;
   width: 100%;
 `;
 const ContentWrapper = styled.div`
-  display: grid;
-  grid-template-columns: ${({ open }) => (open ? "220px 1fr 0" : "220px 1fr 0")};
-
-  @media screen and (max-width: 1400px) {
-    grid-template-columns: 220px 1fr;
-  }
-
-  @media screen and (max-width: 1080px) {
-    grid-template-columns: 1fr;
-    max-width: 100vw;
-    overflow: hidden;
-    grid-gap: 0;
+  background-image: url(${BackgroundDesktop});
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  min-height: 100vh;
+  @media (max-width: 576px) {
+    background-image: url(${BackgroundMobile});
+    min-height: 100vh;
   }
 `;
 
@@ -58,7 +59,6 @@ const Center = styled.div`
   height: 100%;
   z-index: 9999;
   transition: width 0.25s ease;
-  background-color: ${({ theme }) => theme.onlyLight};
 `;
 
 const WarningWrapper = styled.div`
@@ -84,11 +84,13 @@ const LayoutWrapper = ({ children, savedOpen, setSavedOpen }) => {
   return (
     <>
       <ContentWrapper open={savedOpen}>
-        <SideNav />
+        {/* <SideNav /> */}
+        <Header />
         <Center id="center">{children}</Center>
         {/* <Right open={savedOpen}>
           <PinnedData open={savedOpen} setSavedOpen={setSavedOpen} />
         </Right> */}
+        <Footer />
       </ContentWrapper>
     </>
   );

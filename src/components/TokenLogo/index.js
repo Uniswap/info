@@ -79,11 +79,8 @@ export default function TokenLogo({ address, header = false, size = '24px', ...r
   const getPath = (address) => {
     try {
       const validateAddress = ethers.utils.getAddress(address.toLowerCase())
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      console.log("coin image", require(`../../assets/${validateAddress}.png`));
       return require(`../../assets/${validateAddress}.png`)
     } catch (e) {
-      console.log('errorrrrr', e)
       return "";
     }
   }

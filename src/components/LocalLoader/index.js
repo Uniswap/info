@@ -15,7 +15,7 @@ const Wrapper = styled.div`
   justify-content: center;
   height: 100%;
   width: 100%;
-
+  background-color: rgb(0, 0, 0);
   ${props =>
     props.fill && !props.height
       ? css`
