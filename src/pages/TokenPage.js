@@ -100,6 +100,8 @@ const WarningGrouping = styled.div`
   pointer-events: ${({ disabled }) => disabled && 'none'};
 `
 
+const FACCHAIN_DOMAIN = process.env.REACT_APP_FACCHAIN_DOMAIN
+
 function TokenPage({ address, history }) {
   const {
     id,
@@ -179,7 +181,7 @@ function TokenPage({ address, history }) {
             <TYPE.light style={{ textAlign: 'center' }}>
               {BLOCKED_WARNINGS[address] ?? `This token is not supported.`}
             </TYPE.light>
-            <Link external={true} href={'https://etherscan.io/address/' + address}>{`More about ${shortenAddress(
+            <Link external={true} href={`${FACCHAIN_DOMAIN}/address/${address}`}>{`More about ${shortenAddress(
               address
             )}`}</Link>
           </AutoColumn>
@@ -207,7 +209,7 @@ function TokenPage({ address, history }) {
               style={{ width: 'fit-content' }}
               color={backgroundColor}
               external
-              href={'https://etherscan.io/address/' + address}
+              href={`${FACCHAIN_DOMAIN}/address/${address}`}
             >
               <Text style={{ marginLeft: '.15rem' }} fontSize={'14px'} fontWeight={400}>
                 ({address.slice(0, 8) + '...' + address.slice(36, 42)})
@@ -364,7 +366,7 @@ function TokenPage({ address, history }) {
                   setChecked={() => setUseTracked(!useTracked)}
                   text={'Hide untracked pairs'}
                 />
-                <QuestionHelper text="USD amounts may be inaccurate in low liquiidty pairs or pairs without ETH or stablecoins." />
+                <QuestionHelper text="USD amounts may be inaccurate in low liquiidty pairs or pairs without FAC or stablecoins." />
               </AutoRow>
             </RowBetween>
             <Panel
@@ -420,8 +422,8 @@ function TokenPage({ address, history }) {
                     </AutoRow>
                   </Column>
                   <ButtonLight color={backgroundColor}>
-                    <Link color={backgroundColor} external href={'https://etherscan.io/address/' + address}>
-                      View on Etherscan ↗
+                    <Link color={backgroundColor} external href={`${FACCHAIN_DOMAIN}/address/${address}`}>
+                      View on Facscan ↗
                     </Link>
                   </ButtonLight>
                 </TokenDetailsLayout>

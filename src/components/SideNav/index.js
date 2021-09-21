@@ -147,7 +147,7 @@ function SideNav({ history }) {
                   </Option>
                 </BasicLink>
 
-                <BasicLink to="/accounts">
+                {/* <BasicLink to="/accounts">
                   <Option
                     activeText={
                       (history.location.pathname.split('/')[1] === 'accounts' ||
@@ -158,16 +158,11 @@ function SideNav({ history }) {
                     <List size={20} style={{ marginRight: '.75rem' }} />
                     Accounts
                   </Option>
-                </BasicLink>
+                </BasicLink> */}
               </AutoColumn>
             )}
           </AutoColumn>
-          <AutoColumn gap="0.5rem" style={{ marginLeft: '.75rem', marginBottom: '4rem' }}>
-            <HeaderText>
-              <Link href="https://uniswap.org" target="_blank">
-                Uniswap.org
-              </Link>
-            </HeaderText>
+          {/* <AutoColumn gap="0.5rem" style={{ marginLeft: '.75rem', marginBottom: '4rem' }}>
             <HeaderText>
               <Link href="https://v1.uniswap.info" target="_blank">
                 V1 Analytics
@@ -189,7 +184,7 @@ function SideNav({ history }) {
               </Link>
             </HeaderText>
             <Toggle isActive={isDark} toggle={toggleDarkMode} />
-          </AutoColumn>
+          </AutoColumn> */}
           {!below1180 && (
             <Polling style={{ marginLeft: '.5rem' }}>
               <PollingDot />

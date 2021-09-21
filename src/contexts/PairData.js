@@ -255,7 +255,7 @@ async function getBulkPairData(pairList, ethPrice) {
   }
 }
 
-function parseData(data, oneDayData, twoDayData, oneWeekData, ethPrice, oneDayBlock) {
+function parseData(data, oneDayData, twoDayData, oneWeekData, bnbPrice, oneDayBlock) {
   const pairAddress = data.id
 
   // get volume changes
@@ -285,7 +285,7 @@ function parseData(data, oneDayData, twoDayData, oneWeekData, ethPrice, oneDayBl
   data.volumeChangeUntracked = volumeChangeUntracked
 
   // set liquidity properties
-  data.trackedReserveUSD = data.trackedReserveETH * ethPrice
+  data.trackedReserveUSD = data.trackedReserveBNB * bnbPrice
   data.liquidityChangeUSD = getPercentChange(data.reserveUSD, oneDayData?.reserveUSD)
 
   // format if pair hasnt existed for a day or a week

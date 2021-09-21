@@ -1,6 +1,6 @@
 {
-  "short_name": "Uniswap Info",
-  "name": "View statistics for Uniswap exchanges.",
+  "short_name": "Factory Info",
+  "name": "View statistics for Factory exchanges.",
   "icons": [
     {
       "src": "favicon.ico",

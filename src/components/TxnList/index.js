@@ -161,6 +161,7 @@ function getTransactionType(event, symbol0, symbol1) {
   }
 }
 
+const FACCHAIN_DOMAIN = process.env.REACT_APP_FACCHAIN_DOMAIN
 // @TODO rework into virtualized list
 function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
   // page state
@@ -288,7 +289,7 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
           </Link>
         </DataText>
         <DataText area="value">
-          {currency === 'ETH' ? 'Ξ ' + formattedNum(item.valueETH) : formattedNum(item.amountUSD, true)}
+          {currency === 'BNB' ? 'Ξ ' + formattedNum(item.valueETH) : formattedNum(item.amountUSD, true)}
         </DataText>
         {!below780 && (
           <>
@@ -304,7 +305,7 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
         )}
         {!below1080 && (
           <DataText area="account">
-            <Link color={color} external href={'https://etherscan.io/address/' + item.account}>
+            <Link color={color} external href={`${FACCHAIN_DOMAIN}/address/${item.account}`}>
               {item.account && item.account.slice(0, 6) + '...' + item.account.slice(38, 42)}
             </Link>
           </DataText>
