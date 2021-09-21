@@ -77,8 +77,10 @@ export default function TokenLogo({ address, header = false, size = '24px', ...r
 
   const getPath = (address) => {
     try {
+      console.log('coin image', require(`../../assets/${isAddress(address)}.png`))
       return require(`../../assets/${isAddress(address)}.png`)
-    } catch {
+    } catch(e) {
+      console.log('errorrrrr', e)
       return ''
     }
   }
