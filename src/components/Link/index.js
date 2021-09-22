@@ -59,7 +59,7 @@ export const CustomLink = styled(RouterLink)`
 
 export const BasicLink = styled(RouterLink)`
   text-decoration: none;
-  color: #7583A1;
+  color: #7583a1;
   &:hover {
     cursor: pointer;
     text-decoration: none;
