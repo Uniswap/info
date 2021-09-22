@@ -12,7 +12,7 @@ export const client = new ApolloClient({
 
 export const clientHydra = new ApolloClient({
   link: new HttpLink({
-    uri: 'http://localhost:3000/graphql',
+    uri: 'process.env.REACT_APP_HYDRA_GRAPH_URL || http://localhost:3000/graphql',
   }),
   cache: new InMemoryCache(),
   shouldBatch: true,
