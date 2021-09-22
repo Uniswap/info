@@ -27,7 +27,6 @@ const mediaWidthTemplates = Object.keys(MEDIA_WIDTHS).reduce((accumulator, size)
   return accumulator
 }, {})
 
-
 const theme = (darkMode, color) => ({
   customColor: color,
   textColor: darkMode ? color : 'black',

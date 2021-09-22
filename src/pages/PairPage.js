@@ -38,6 +38,7 @@ import FormattedName from '../components/FormattedName'
 import { useListedTokens } from '../contexts/Application'
 import HoverText from '../components/HoverText'
 import { UNTRACKED_COPY, PAIR_BLACKLIST, BLOCKED_WARNINGS } from '../constants'
+import useTheme from '../hooks/useTheme'
 
 const DashboardWrapper = styled.div`
   width: 100%;
@@ -46,7 +47,7 @@ const DashboardWrapper = styled.div`
 const PanelWrapper = styled.div`
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: max-content;
-  gap: 6px;
+  gap: 30px;
   display: inline-grid;
   width: 100%;
   align-items: start;
@@ -137,13 +138,13 @@ function PairPage({ pairAddress, history }) {
     volumeChangeUntracked,
     liquidityChangeUSD,
   } = usePairData(pairAddress)
-
+  const theme = useTheme()
   useEffect(() => {
     document.querySelector('body').scrollTo(0, 0)
   }, [])
 
   const transactions = usePairTransactions(pairAddress)
-  const backgroundColor = useColor(pairAddress)
+  const backgroundColor = theme.link
 
   const formattedLiquidity = reserveUSD ? formattedNum(reserveUSD, true) : formattedNum(trackedReserveUSD, true)
   const usingUntrackedLiquidity = !trackedReserveUSD && !!reserveUSD
@@ -229,7 +230,7 @@ function PairPage({ pairAddress, history }) {
           <TYPE.body>
             <BasicLink to="/pools">{'Pairs '}</BasicLink>→ {token0?.symbol}-{token1?.symbol}
           </TYPE.body>
-          {!below600 && <Search small={true} />}
+          {/* {!below600 && <Search small={true} />} */}
         </RowBetween>
         <WarningGrouping
           disabled={
@@ -289,10 +290,10 @@ function PairPage({ pairAddress, history }) {
                   )}
 
                   <Link external href={getPoolLink(token0?.id, token1?.id)}>
-                    <ButtonLight color={backgroundColor}>+ Add Liquidity</ButtonLight>
+                    <ButtonLight style={{ padding: '10px 32px' }}>+ Add Liquidity</ButtonLight>
                   </Link>
                   <Link external href={getSwapLink(token0?.id, token1?.id)}>
-                    <ButtonDark ml={!below1080 && '.5rem'} mr={below1080 && '.5rem'} color={backgroundColor}>
+                    <ButtonDark ml={!below1080 && '.5rem'} mr={below1080 && '.5rem'} style={{ padding: '10px 32px' }}>
                       Trade
                     </ButtonDark>
                   </Link>
@@ -347,10 +348,10 @@ function PairPage({ pairAddress, history }) {
                 </RowFixed>
               )}
               <PanelWrapper style={{ marginTop: '1.5rem' }}>
-                <Panel style={{ height: '100%' }}>
+                <Panel style={{ height: '100%' }} withBackground="true">
                   <AutoColumn gap="20px">
                     <RowBetween>
-                      <TYPE.main>Total Liquidity </TYPE.main>
+                      <TYPE.main style={{ lineHeight: 'unset', color: '#7583A1' }}>Total Liquidity </TYPE.main>
                       <div />
                     </RowBetween>
                     <RowBetween align="flex-end">
@@ -361,10 +362,10 @@ function PairPage({ pairAddress, history }) {
                     </RowBetween>
                   </AutoColumn>
                 </Panel>
-                <Panel style={{ height: '100%' }}>
+                <Panel style={{ height: '100%' }} withBackground="true">
                   <AutoColumn gap="20px">
                     <RowBetween>
-                      <TYPE.main>Volume (24hrs) </TYPE.main>
+                      <TYPE.main style={{ lineHeight: 'unset', color: '#7583A1' }}>Volume (24hrs) </TYPE.main>
                       <div />
                     </RowBetween>
                     <RowBetween align="flex-end">
@@ -375,10 +376,10 @@ function PairPage({ pairAddress, history }) {
                     </RowBetween>
                   </AutoColumn>
                 </Panel>
-                <Panel style={{ height: '100%' }}>
+                <Panel style={{ height: '100%' }} withBackground="true">
                   <AutoColumn gap="20px">
                     <RowBetween>
-                      <TYPE.main>Fees (24hrs)</TYPE.main>
+                      <TYPE.main style={{ lineHeight: 'unset', color: '#7583A1' }}>Fees (24hrs)</TYPE.main>
                       <div />
                     </RowBetween>
                     <RowBetween align="flex-end">
@@ -389,15 +390,15 @@ function PairPage({ pairAddress, history }) {
                     </RowBetween>
                   </AutoColumn>
                 </Panel>
-                <Panel style={{ height: '100%' }}>
+                <Panel style={{ height: '100%' }} withBackground="true">
                   <AutoColumn gap="20px">
                     <RowBetween>
-                      <TYPE.main>Pooled Tokens</TYPE.main>
+                      <TYPE.main style={{ lineHeight: 'unset', color: '#7583A1' }}>Pooled Tokens</TYPE.main>
                       <div />
                     </RowBetween>
                     <Hover onClick={() => history.push(`/token/${token0?.id}`)} fade={true}>
                       <AutoRow gap="4px">
-                        <TokenLogo address={token0?.id} />
+                        <TokenLogo address={token0?.id} size={'16px'} />
                         <TYPE.main fontSize={20} lineHeight={1} fontWeight={500}>
                           <RowFixed>
                             {reserve0 ? formattedNum(reserve0) : ''}{' '}
@@ -408,7 +409,7 @@ function PairPage({ pairAddress, history }) {
                     </Hover>
                     <Hover onClick={() => history.push(`/token/${token1?.id}`)} fade={true}>
                       <AutoRow gap="4px">
-                        <TokenLogo address={token1?.id} />
+                        <TokenLogo address={token1?.id} size={'16px'} />
                         <TYPE.main fontSize={20} lineHeight={1} fontWeight={500}>
                           <RowFixed>
                             {reserve1 ? formattedNum(reserve1) : ''}{' '}
@@ -423,11 +424,14 @@ function PairPage({ pairAddress, history }) {
                   style={{
                     gridColumn: below1080 ? '1' : '2/4',
                     gridRow: below1080 ? '' : '1/5',
+                    background: '#252847',
+                    borderRadius: '8px',
+                    padding: '16px',
                   }}
                 >
                   <PairChart
                     address={pairAddress}
-                    color={backgroundColor}
+                    color={theme.primary1}
                     base0={reserve1 / reserve0}
                     base1={reserve0 / reserve1}
                   />
@@ -501,11 +505,9 @@ function PairPage({ pairAddress, history }) {
                       <CopyHelper toCopy={token1?.id} />
                     </AutoRow>
                   </Column>
-                  <ButtonLight color={backgroundColor}>
-                    <Link color={backgroundColor} external href={`${FACCHAIN_DOMAIN}/address/${pairAddress}`}>
-                      View on Facscan ↗
-                    </Link>
-                  </ButtonLight>
+                  <Link color={backgroundColor} external href={`${FACCHAIN_DOMAIN}/address/${pairAddress}`}>
+                    View on Facscan ↗
+                  </Link>
                 </TokenDetailsLayout>
               </Panel>
             </>

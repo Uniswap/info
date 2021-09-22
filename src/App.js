@@ -1,39 +1,39 @@
-import React, { useState } from "react";
-import styled from "styled-components";
+import React, { useState } from 'react'
+import styled from 'styled-components'
 import { darken } from 'polished'
 import { Box } from 'rebass/styled-components'
-import { ApolloProvider } from "react-apollo";
+import { ApolloProvider } from 'react-apollo'
 import { useMedia } from 'react-use'
-import { client } from "./apollo/client";
-import { Route, Switch, BrowserRouter, Redirect, NavLink, useRouteMatch } from "react-router-dom";
-import GlobalPage from "./pages/GlobalPage";
-import TokenPage from "./pages/TokenPage";
-import PairPage from "./pages/PairPage";
-import { useGlobalData, useGlobalChartData } from "./contexts/GlobalData";
-import { isAddress } from "./utils";
-import AccountPage from "./pages/AccountPage";
-import AllTokensPage from "./pages/AllTokensPage";
-import AllPairsPage from "./pages/AllPairsPage";
+import { client } from './apollo/client'
+import { Route, Switch, BrowserRouter, Redirect, NavLink, useRouteMatch } from 'react-router-dom'
+import GlobalPage from './pages/GlobalPage'
+import TokenPage from './pages/TokenPage'
+import PairPage from './pages/PairPage'
+import { useGlobalData, useGlobalChartData } from './contexts/GlobalData'
+import { isAddress } from './utils'
+import AccountPage from './pages/AccountPage'
+import AllTokensPage from './pages/AllTokensPage'
+import AllPairsPage from './pages/AllPairsPage'
 // import PinnedData from "./components/PinnedData";
 
 // import SideNav from "./components/SideNav";
 // import AccountLookup from "./pages/AccountLookup";
-import LocalLoader from "./components/LocalLoader";
-import Header from "./components/Header";
-import Footer from "./components/Footer";
-import Search from './components/Search';
-import { useLatestBlocks } from "./contexts/Application";
-import GoogleAnalyticsReporter from "./components/analytics/GoogleAnalyticsReporter";
-import { PAIR_BLACKLIST, TOKEN_BLACKLIST } from "./constants";
+import LocalLoader from './components/LocalLoader'
+import Header from './components/Header'
+import Footer from './components/Footer'
+import Search from './components/Search'
+import { useLatestBlocks } from './contexts/Application'
+import GoogleAnalyticsReporter from './components/analytics/GoogleAnalyticsReporter'
+import { PAIR_BLACKLIST, TOKEN_BLACKLIST } from './constants'
 import BackgroundDesktop from './assets/background-desktop.png'
 import BackgroundMobile from './assets/background-mobile.png'
 
-import "bootstrap/dist/css/bootstrap.min.css";
+import 'bootstrap/dist/css/bootstrap.min.css'
 
 const AppWrapper = styled.div`
   position: relative;
   width: 100%;
-`;
+`
 const ContentWrapper = styled.div`
   background-image: url(${BackgroundDesktop});
   background-repeat: no-repeat;
@@ -43,34 +43,34 @@ const ContentWrapper = styled.div`
     background-image: url(${BackgroundMobile});
     min-height: 100vh;
   }
-`;
+`
 
 const Right = styled.div`
   position: fixed;
   right: 0;
   bottom: 0rem;
   z-index: 99;
-  width: ${({ open }) => (open ? "220px" : "64px")};
-  height: ${({ open }) => (open ? "fit-content" : "64px")};
+  width: ${({ open }) => (open ? '220px' : '64px')};
+  height: ${({ open }) => (open ? 'fit-content' : '64px')};
   overflow: auto;
   background-color: ${({ theme }) => theme.bg1};
   @media screen and (max-width: 1400px) {
     display: none;
   }
-`;
+`
 
 const Center = styled.div`
   height: 100%;
   z-index: 9999;
   transition: width 0.25s ease;
   min-height: calc(100vh - 316px);
-`;
+`
 
 const WarningWrapper = styled.div`
   width: 100%;
   display: flex;
   justify-content: center;
-`;
+`
 
 const WarningBanner = styled.div`
   background-color: #ff6871;
@@ -79,7 +79,7 @@ const WarningBanner = styled.div`
   width: 100%;
   text-align: center;
   font-weight: 500;
-`;
+`
 
 const Row = styled(Box)`
   width: ${({ width }) => width ?? '100%'};
@@ -122,7 +122,7 @@ const StyledNavLink = styled(NavLink)`
   word-break: break-word;
   overflow: hidden;
   white-space: nowrap;
-  border-bottom: 4px solid #243F52;
+  border-bottom: 4px solid #243f52;
 
   &.active {
     font-weight: 600;
@@ -164,7 +164,7 @@ export const NavWrapper = styled.div`
 // eslint-disable-next-line react/prop-types
 const LayoutWrapper = ({ children, savedOpen, setSavedOpen }) => {
   const below800 = useMedia('(max-width: 768px)')
-  let match = useRouteMatch("/home")
+  let match = useRouteMatch('/home')
 
   return (
     <>
@@ -179,13 +179,7 @@ const LayoutWrapper = ({ children, savedOpen, setSavedOpen }) => {
             <StyledNavLink
               id={`pool-nav-link`}
               to={'/pools'}
-              isActive={(match, { pathname }) =>
-                Boolean(match) ||
-                pathname.startsWith('/add') ||
-                pathname.startsWith('/remove') ||
-                pathname.startsWith('/increase') ||
-                pathname.startsWith('/find')
-              }
+              isActive={(match, { pathname }) => Boolean(match) || pathname.startsWith('/pair')}
             >
               Pools
             </StyledNavLink>
@@ -209,19 +203,19 @@ const LayoutWrapper = ({ children, savedOpen, setSavedOpen }) => {
       </ContentWrapper>
     </>
   )
-};
+}
 
-const BLOCK_DIFFERENCE_THRESHOLD = 30;
+const BLOCK_DIFFERENCE_THRESHOLD = 30
 
 function App() {
-  const [savedOpen, setSavedOpen] = useState(false);
+  const [savedOpen, setSavedOpen] = useState(false)
 
-  const globalData = useGlobalData();
-  const globalChartData = useGlobalChartData();
-  const [latestBlock, headBlock] = useLatestBlocks();
+  const globalData = useGlobalData()
+  const globalChartData = useGlobalChartData()
+  const [latestBlock, headBlock] = useLatestBlocks()
 
   // show warning
-  const showWarning = headBlock && latestBlock ? headBlock - latestBlock > BLOCK_DIFFERENCE_THRESHOLD : false;
+  const showWarning = headBlock && latestBlock ? headBlock - latestBlock > BLOCK_DIFFERENCE_THRESHOLD : false
 
   return (
     <ApolloProvider client={client}>
@@ -253,9 +247,9 @@ function App() {
                       <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
                         <TokenPage address={match.params.tokenAddress.toLowerCase()} />
                       </LayoutWrapper>
-                    );
+                    )
                   } else {
-                    return <Redirect to="/home" />;
+                    return <Redirect to="/home" />
                   }
                 }}
               />
@@ -272,9 +266,9 @@ function App() {
                       <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
                         <PairPage pairAddress={match.params.pairAddress.toLowerCase()} />
                       </LayoutWrapper>
-                    );
+                    )
                   } else {
-                    return <Redirect to="/home" />;
+                    return <Redirect to="/home" />
                   }
                 }}
               />
@@ -288,9 +282,9 @@ function App() {
                       <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
                         <AccountPage account={match.params.accountAddress.toLowerCase()} />
                       </LayoutWrapper>
-                    );
+                    )
                   } else {
-                    return <Redirect to="/home" />;
+                    return <Redirect to="/home" />
                   }
                 }}
               />
@@ -327,7 +321,7 @@ function App() {
         )}
       </AppWrapper>
     </ApolloProvider>
-  );
+  )
 }
 
-export default App;
+export default App
