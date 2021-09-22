@@ -227,7 +227,7 @@ function PairPage({ pairAddress, history }) {
       <ContentWrapperLarge>
         <RowBetween>
           <TYPE.body>
-            <BasicLink to="/pairs">{'Pairs '}</BasicLink>→ {token0?.symbol}-{token1?.symbol}
+            <BasicLink to="/pools">{'Pairs '}</BasicLink>→ {token0?.symbol}-{token1?.symbol}
           </TYPE.body>
           {!below600 && <Search small={true} />}
         </RowBetween>
@@ -277,12 +277,12 @@ function PairPage({ pairAddress, history }) {
                   {!!!savedPairs[pairAddress] && !below1080 ? (
                     <Hover onClick={() => addPair(pairAddress, token0.id, token1.id, token0.symbol, token1.symbol)}>
                       <StyledIcon>
-                        <PlusCircle style={{ marginRight: '0.5rem' }} />
+                        <PlusCircle style={{ marginRight: '0.5rem', display: 'none' }} />
                       </StyledIcon>
                     </Hover>
                   ) : !below1080 ? (
                     <StyledIcon>
-                      <Bookmark style={{ marginRight: '0.5rem', opacity: 0.4 }} />
+                      <Bookmark style={{ marginRight: '0.5rem', opacity: 0.4, display: 'none' }} />
                     </StyledIcon>
                   ) : (
                     <></>

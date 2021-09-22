@@ -33,6 +33,23 @@ const Panel = styled(RebassBox)`
   ${(props) => props.background && `background-color: ${props.theme.advancedBG};`}
 
   ${(props) => (props.area ? `grid-area: ${props.area};` : null)}
+  
+  ${(props) =>
+    props.withBackground
+      ? `
+    background: #2F3253;
+    border-radius: 8px;
+    padding: 12px 20px;
+  `
+      : ''}
+
+  ${(props) =>
+    props.withBorder
+      ? `
+      border: 1px solid #414E6A;
+      border-radius: 16px;
+  `
+      : null}
 
   ${(props) =>
     props.grouped &&

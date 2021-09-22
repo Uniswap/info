@@ -60,7 +60,7 @@ const TradingViewChart = ({
   })
 
   // adjust the scale based on the type of chart
-  const topScale = type === CHART_TYPES.AREA ? 0.32 : 0.2
+  const topScale = type === CHART_TYPES.AREA ? 0.4 : 0.2
 
   const [darkMode] = useDarkModeManager()
   const textColor = darkMode ? 'white' : 'black'
@@ -85,7 +85,7 @@ const TradingViewChart = ({
         width: width,
         height: HEIGHT,
         layout: {
-          backgroundColor: 'transparent',
+          backgroundColor: '#1A2A3B',
           textColor: textColor,
         },
         rightPriceScale: {
@@ -166,10 +166,10 @@ const TradingViewChart = ({
       // get the title of the chart
       function setLastBarText() {
         toolTip.innerHTML =
-          `<div style="font-size: 16px; margin: 4px 0px; color: ${textColor};">${title} ${
+          `<div style="font-size: 14px; margin: 18px 0 0 20px; color: #7583A1;">${title} ${
             type === CHART_TYPES.BAR && !useWeekly ? '(24hr)' : ''
           }</div>` +
-          `<div style="font-size: 22px; margin: 4px 0px; color:${textColor}" >` +
+          `<div style="font-size: 22px; margin: 4px 0 0 20px; color:${textColor}" >` +
           formattedNum(base ?? 0, true) +
           `<span style="margin-left: 10px; font-size: 16px; color: ${color};">${formattedPercentChange}</span>` +
           '</div>'
@@ -200,11 +200,11 @@ const TradingViewChart = ({
           var price = param.seriesPrices.get(series)
 
           toolTip.innerHTML =
-            `<div style="font-size: 16px; margin: 4px 0px; color: ${textColor};">${title}</div>` +
-            `<div style="font-size: 22px; margin: 4px 0px; color: ${textColor}">` +
+            `<div style="font-size: 14px; margin: 18px 0 0 20px; color: #7583A1;">${title}</div>` +
+            `<div style="font-size: 22px; margin: 4px 0 0 20px; color: ${textColor}">` +
             formattedNum(price, true) +
             '</div>' +
-            '<div>' +
+            `<div style="font-size: 12px; margin: 4px 0 0 20px; color: ${textColor}">` +
             dateStr +
             '</div>'
         }

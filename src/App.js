@@ -1,8 +1,11 @@
 import React, { useState } from "react";
 import styled from "styled-components";
+import { darken } from 'polished'
+import { Box } from 'rebass/styled-components'
 import { ApolloProvider } from "react-apollo";
+import { useMedia } from 'react-use'
 import { client } from "./apollo/client";
-import { Route, Switch, BrowserRouter, Redirect } from "react-router-dom";
+import { Route, Switch, BrowserRouter, Redirect, NavLink, useRouteMatch } from "react-router-dom";
 import GlobalPage from "./pages/GlobalPage";
 import TokenPage from "./pages/TokenPage";
 import PairPage from "./pages/PairPage";
@@ -18,6 +21,7 @@ import AllPairsPage from "./pages/AllPairsPage";
 import LocalLoader from "./components/LocalLoader";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import Search from './components/Search';
 import { useLatestBlocks } from "./contexts/Application";
 import GoogleAnalyticsReporter from "./components/analytics/GoogleAnalyticsReporter";
 import { PAIR_BLACKLIST, TOKEN_BLACKLIST } from "./constants";
@@ -59,6 +63,7 @@ const Center = styled.div`
   height: 100%;
   z-index: 9999;
   transition: width 0.25s ease;
+  min-height: calc(100vh - 316px);
 `;
 
 const WarningWrapper = styled.div`
@@ -76,16 +81,126 @@ const WarningBanner = styled.div`
   font-weight: 500;
 `;
 
+const Row = styled(Box)`
+  width: ${({ width }) => width ?? '100%'};
+  display: flex;
+  padding: 0;
+  align-items: ${({ align }) => align ?? 'center'};
+  justify-content: ${({ justify }) => justify ?? 'flex-start'};
+  padding: ${({ padding }) => padding};
+  border: ${({ border }) => border};
+  border-radius: ${({ borderRadius }) => borderRadius};
+`
+const HeaderLinks = styled(Row)`
+  justify-self: center;
+  width: fit-content;
+  padding: 4px;
+  border-radius: 16px;
+  display: grid;
+  grid-auto-flow: column;
+  overflow: auto;
+  align-items: center;
+  ${({ theme }) => theme.mediaWidth.upToMedium`
+    justify-self: center;
+  `};
+  @media screen and (max-width: 576px) {
+    width: 100%;
+    display: flex;
+  }
+`
+
+const StyledNavLink = styled(NavLink)`
+  ${({ theme }) => theme.flexRowNoWrap}
+  align-items: left;
+  outline: none;
+  cursor: pointer;
+  text-decoration: none;
+  color: ${({ theme }) => theme.text3};
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 8px 20px 20px;
+  word-break: break-word;
+  overflow: hidden;
+  white-space: nowrap;
+  border-bottom: 4px solid #243F52;
+
+  &.active {
+    font-weight: 600;
+    justify-content: center;
+    color: ${({ theme }) => theme.white};
+    border-bottom: 4px solid ${({ theme }) => theme.green1};
+  }
+  :hover,
+  :focus {
+    color: ${({ theme }) => darken(0.1, theme.white)};
+  }
+
+  @media screen and (max-width: 576px) {
+    width: 33.33%;
+    text-align: center;
+  }
+`
+
+export const NavWrapper = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1440px;
+  width: 100%;
+  margin: 60px auto 4px;
+  padding: 0 2rem;
+  box-sizing: border-box;
+  @media screen and (max-width: 1180px) {
+    padding: 0 1rem;
+  }
+  @media screen and (max-width: 576px) {
+    margin: 40px auto 4px;
+  }
+`
+
 /**
  * Wrap the component with the header and sidebar pinned tab
  */
 // eslint-disable-next-line react/prop-types
 const LayoutWrapper = ({ children, savedOpen, setSavedOpen }) => {
+  const below800 = useMedia('(max-width: 768px)')
+  let match = useRouteMatch("/home")
+
   return (
     <>
       <ContentWrapper open={savedOpen}>
         {/* <SideNav /> */}
         <Header />
+        <NavWrapper>
+          <HeaderLinks>
+            <StyledNavLink id={`swap-nav-link`} to={'/home'}>
+              Overview
+            </StyledNavLink>
+            <StyledNavLink
+              id={`pool-nav-link`}
+              to={'/pools'}
+              isActive={(match, { pathname }) =>
+                Boolean(match) ||
+                pathname.startsWith('/add') ||
+                pathname.startsWith('/remove') ||
+                pathname.startsWith('/increase') ||
+                pathname.startsWith('/find')
+              }
+            >
+              Pools
+            </StyledNavLink>
+            <StyledNavLink
+              id={`charts-nav-link`}
+              to={'/tokens'}
+              isActive={(match, { pathname }) => {
+                return Boolean(match) || pathname.startsWith('/token')
+              }}
+            >
+              Tokens
+            </StyledNavLink>
+          </HeaderLinks>
+          {!below800 && !match && <Search small={true} />}
+        </NavWrapper>
         <Center id="center">{children}</Center>
         {/* <Right open={savedOpen}>
           <PinnedData open={savedOpen} setSavedOpen={setSavedOpen} />
@@ -93,7 +208,7 @@ const LayoutWrapper = ({ children, savedOpen, setSavedOpen }) => {
         <Footer />
       </ContentWrapper>
     </>
-  );
+  )
 };
 
 const BLOCK_DIFFERENCE_THRESHOLD = 30;
@@ -192,7 +307,7 @@ function App() {
                 </LayoutWrapper>
               </Route>
 
-              <Route path="/pairs">
+              <Route path="/pools">
                 <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
                   <AllPairsPage />
                 </LayoutWrapper>

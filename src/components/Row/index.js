@@ -28,6 +28,9 @@ export const AutoRow = styled(Row)`
   & > * {
     margin: ${({ gap }) => gap} !important;
   }
+  @media screen and (max-width: 576px) {
+    ${({ untrack }) => (untrack ? `width: ${'100%'} !important` : '')}
+  }
 `
 
 export const RowFixed = styled(Row)`

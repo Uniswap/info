@@ -190,9 +190,9 @@ export function useLatestBlocks() {
           console.log(e)
         })
     }
-    if (!latestBlock) {
-      fetch()
-    }
+    // if (!latestBlock) {
+    //   fetch()
+    // }
   }, [latestBlock, updateHeadBlock, updateLatestBlock])
 
   return [latestBlock, headBlock]
@@ -277,9 +277,9 @@ export function useListedTokens() {
       let formatted = allFetched?.map((t) => t.address.toLowerCase())
       updateSupportedTokens(formatted)
     }
-    if (!supportedTokens) {
-      fetchList()
-    }
+    // if (!supportedTokens) {
+    //   fetchList()
+    // }
   }, [updateSupportedTokens, supportedTokens])
 
   return supportedTokens

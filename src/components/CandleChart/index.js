@@ -143,7 +143,7 @@ const CandleStickChart = ({
       // get the title of the chart
       function setLastBarText() {
         toolTip.innerHTML = base
-          ? `<div style="font-size: 22px; margin: 4px 0px; color: ${textColor}">` + valueFormatter(base) + '</div>'
+          ? `<div style="font-size: 22px; margin: 4px 0px 4px 36px; color: ${textColor}; font-weight: bold">` + valueFormatter(base) + '</div>'
           : ''
       }
       setLastBarText()
@@ -163,9 +163,9 @@ const CandleStickChart = ({
           var price = param.seriesPrices.get(candleSeries).close
           const time = dayjs.unix(param.time).format('MM/DD h:mm A')
           toolTip.innerHTML =
-            `<div style="font-size: 22px; margin: 4px 0px; color: ${textColor}">` +
-            valueFormatter(price) +
-            `<span style="font-size: 12px; margin: 4px 6px; color: ${textColor}">` +
+            `<div style="font-size: 22px; margin: 4px 0px 4px 36px; color: ${textColor};">` +
+            `<span style="font-weight: bold; font-size: 20px">${valueFormatter(price)}</span>` +
+            `<span style="font-size: 14px; margin: 4px 6px; color: ${textColor}">` +
             time +
             ' UTC' +
             '</span>' +

@@ -59,13 +59,14 @@ const ContentWrapper = styled.div`
   justify-content: space-between;
 `
 
+// background-color: ${({ color, theme }) => (color ? transparentize(0.9, color) : transparentize(0.9, theme.primary1))};
 export const ButtonLight = styled(Base)`
-  background-color: ${({ color, theme }) => (color ? transparentize(0.9, color) : transparentize(0.9, theme.primary1))};
   color: ${({ color, theme }) => (color ? darken(0.1, color) : theme.primary1)};
-
+  background-color: transparent;
+  border: 1px solid ${({ theme }) => theme.primary1};
   min-width: fit-content;
-  border-radius: 12px;
   white-space: nowrap;
+  border-radius: 47px;
 
   a {
     color: ${({ color, theme }) => (color ? darken(0.1, color) : theme.primary1)};
@@ -102,7 +103,7 @@ export const ButtonDark = styled(Base)`
   width: fit-content;
   border-radius: 12px;
   white-space: nowrap;
-
+  border-radius: 47px;
   :hover {
     background-color: ${({ color, theme }) => (color ? darken(0.1, color) : darken(0.1, theme.primary1))};
   }
@@ -144,8 +145,18 @@ export const OptionButton = styled.div`
   padding: 6px;
   border-radius: 6px;
   border: 1px solid ${({ theme }) => theme.bg4};
-  background-color: ${({ active, theme }) => active && theme.bg3};
+  background-color: ${({ active, theme, customTokenChart }) =>
+    customTokenChart ? active && '#7583A1' : active && theme.bg3};
   color: ${({ theme }) => theme.text1};
+  ${(props) =>
+    props.customTokenChart
+      ? `
+    border: 1px solid #414E6A;
+    border-radius: 4px; 
+    font-weight: bold;
+    padding: 5px 12px;
+  `
+      : ''};
 
   :hover {
     cursor: ${({ disabled }) => !disabled && 'pointer'};
