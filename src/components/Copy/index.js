@@ -5,6 +5,8 @@ import { CheckCircle, Copy } from 'react-feather'
 import { StyledIcon } from '..'
 
 const CopyIcon = styled.div`
+  display: flex;
+  justify-content: center;
   color: #aeaeae;
   flex-shrink: 0;
   margin-right: 1rem;
