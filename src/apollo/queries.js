@@ -61,36 +61,69 @@ export const GET_BLOCK = gql`
   }
 `
 
-export const GET_BLOCKS = (timestamps) => {
-  let queryString = 'query blocks {'
-  queryString += timestamps.map((timestamp) => {
-    return `t${timestamp}:blocks(first: 1, orderBy: timestamp, orderDirection: desc, where: { timestamp_gt: ${timestamp}, timestamp_lt: ${
-      timestamp + 600
-    } }) {
+export const GET_BLOCK_HYDRA = gql`
+  query blocks($timestampFrom: Int!, $timestampTo: Int!) {
+    blocks(
+      first: 1
+      orderBy: "timestamp"
+      orderDirection: "asc"
+      timestamps: { timestamps_gt: [$timestampFrom], timestamps_lt: [$timestampTo] }
+    ) {
+      id
       number
-    }`
-  })
-  queryString += '}'
+      timestamp
+    }
+  }
+`
+
+// export const GET_BLOCKS = (timestamps) => {
+//   let queryString = 'query blocks {'
+//   queryString += timestamps.map((timestamp) => {
+//     return `t${timestamp}:blocks(first: 1, orderBy: timestamp, orderDirection: desc, where: { timestamp_gt: ${timestamp}, timestamp_lt: ${
+//       timestamp + 600
+//     } }) {
+//       number
+//     }`
+//   })
+//   queryString += '}'
+//   return gql(queryString)
+// }
+
+export const GET_BLOCKS_HYDRA = (timestamps) => {
+  let queryString = `query blocks { 
+    blocks(
+      timestamps: { 
+        timestamps_gt: [${timestamps}],
+        timestamps_lt: [${timestamps.map((timestamp) => timestamp + 600)}] 
+      },
+      first: 1,
+      orderBy: "timestamp",
+      orderDirection: "desc"
+    ) {
+      height,
+      timestamp_from
+    }
+  }`
   return gql(queryString)
 }
 
-export const POSITIONS_BY_BLOCK = (account, blocks) => {
-  let queryString = 'query blocks {'
-  queryString += blocks.map(
-    (block) => `
-      t${block.timestamp}:liquidityPositions(where: {user: "${account}"}, block: { number: ${block.number} }) { 
-        liquidityTokenBalance
-        pair  {
-          id
-          totalSupply
-          reserveUSD
-        }
-      }
-    `
-  )
-  queryString += '}'
-  return gql(queryString)
-}
+// export const POSITIONS_BY_BLOCK = (account, blocks) => {
+//   let queryString = 'query blocks {'
+//   queryString += blocks.map(
+//     (block) => `
+//       t${block.timestamp}:liquidityPositions(where: {user: "${account}"}, block: { number: ${block.number} }) { 
+//         liquidityTokenBalance
+//         pair  {
+//           id
+//           totalSupply
+//           reserveUSD
+//         }
+//       }
+//     `
+//   )
+//   queryString += '}'
+//   return gql(queryString)
+// }
 
 export const PRICES_BY_BLOCK = (tokenAddress, blocks) => {
   let queryString = 'query blocks {'
@@ -114,14 +147,27 @@ export const PRICES_BY_BLOCK = (tokenAddress, blocks) => {
   return gql(queryString)
 }
 
-export const TOP_LPS_PER_PAIRS = gql`
-  query lps($pair: Bytes!) {
-    liquidityPositions(where: { pair: $pair }, orderBy: liquidityTokenBalance, orderDirection: desc, first: 10) {
+// export const TOP_LPS_PER_PAIRS = gql`
+//   query lps($pair: Bytes!) {
+//     liquidityPositions(where: { pair: $pair }, orderBy: liquidityTokenBalance, orderDirection: desc, first: 10) {
+//       user {
+//         id
+//       }
+//       pair {
+//         id
+//       }
+//       liquidityTokenBalance
+//     }
+//   }
+// `
+export const TOP_LPS_PER_PAIRS_HYDRA = gql`
+  query lps($pair: String!) {
+    liquidityPositions(where: { pair: $pair }, orderBy: "liquidityTokenBalance", orderDirection: "desc", first: 10) {
       user {
         id
       }
       pair {
-        id
+        pairAddress
       }
       liquidityTokenBalance
     }
@@ -129,6 +175,7 @@ export const TOP_LPS_PER_PAIRS = gql`
 `
 
 export const HOURLY_PAIR_RATES = (pairAddress, blocks) => {
+
   let queryString = 'query blocks {'
   queryString += blocks.map(
     (block) => `
@@ -174,36 +221,58 @@ export const SHARE_VALUE = (pairAddress, blocks) => {
   return gql(queryString)
 }
 
-export const ETH_PRICE = (block) => {
+// export const ETH_PRICE = (block) => {
+//   // console.log('queries -> ETH_PRICE');
+//   const queryString = block
+//     ? `
+//     query bundles {
+//       bundles(where: { id: ${BUNDLE_ID} } block: {number: ${block}}) {
+//         id
+//         ethPrice
+//       }
+//     }
+//   `
+//     : ` query bundles {
+//       bundles(where: { id: ${BUNDLE_ID} }) {
+//         id
+//         ethPrice
+//       }
+//     }
+//   `
+//   return gql(queryString)
+// }
+
+export const HYDRA_PRICE = (block) => {
   const queryString = block
     ? `
     query bundles {
-      bundles(where: { id: ${BUNDLE_ID} } block: {number: ${block}}) {
+      bundles(where: { id: "${BUNDLE_ID}" } block: {number: ${block}}) {
         id
-        ethPrice
+        hydraPrice
       }
     }
   `
     : ` query bundles {
-      bundles(where: { id: ${BUNDLE_ID} }) {
+      bundles(where: { id: "${BUNDLE_ID}" }) {
         id
-        ethPrice
+        hydraPrice
       }
     }
   `
   return gql(queryString)
 }
 
-export const USER = (block, account) => {
-  const queryString = `
-    query users {
-      user(id: "${account}", block: {number: ${block}}) {
-        liquidityPositions
-      }
-    }
-`
-  return gql(queryString)
-}
+// export const USER = (block, account) => {
+//   // console.log('queries -> USER');
+//   const queryString = `
+//     query users {
+//       user(id: "${account}", block: {number: ${block}}) {
+//         liquidityPositions
+//       }
+//     }
+// `
+//   return gql(queryString)
+// }
 
 export const USER_MINTS_BUNRS_PER_PAIR = gql`
   query events($user: Bytes!, $pair: Bytes!) {
@@ -451,21 +520,110 @@ export const GLOBAL_DATA = (block) => {
   return gql(queryString)
 }
 
-export const GLOBAL_TXNS = gql`
+export const GLOBAL_DATA_HYDRA = (block) => {
+  const queryString = ` query Query {
+      hydraswapFactories(
+       ${block ? `block: { number: ${block}}` : ``} 
+       where: { id: "5a2a927bea6c5f4a48d4e0116049c1e36d52a528" }) {
+        id
+        totalVolumeUSD
+        totalVolumeHYDRA
+        untrackedVolumeUSD
+        totalLiquidityUSD
+        totalLiquidityHYDRA
+        txCount
+        pairCount
+      }
+    }`
+  return gql(queryString)
+}
+
+// export const GLOBAL_TXNS = gql`
+//   query transactions {
+//     transactions(first: 100, orderBy: timestamp, orderDirection: desc) {
+//       mints(orderBy: timestamp, orderDirection: desc) {
+//         transaction {
+//           id
+//           timestamp
+//         }
+//         pair {
+//           token0 {
+//             id
+//             symbol
+//           }
+//           token1 {
+//             id
+//             symbol
+//           }
+//         }
+//         to
+//         liquidity
+//         amount0
+//         amount1
+//         amountUSD
+//       }
+//       burns(orderBy: timestamp, orderDirection: desc) {
+//         transaction {
+//           id
+//           timestamp
+//         }
+//         pair {
+//           token0 {
+//             id
+//             symbol
+//           }
+//           token1 {
+//             id
+//             symbol
+//           }
+//         }
+//         sender
+//         liquidity
+//         amount0
+//         amount1
+//         amountUSD
+//       }
+//       swaps(orderBy: timestamp, orderDirection: desc) {
+//         transaction {
+//           id
+//           timestamp
+//         }
+//         pair {
+//           token0 {
+//             id
+//             symbol
+//           }
+//           token1 {
+//             id
+//             symbol
+//           }
+//         }
+//         amount0In
+//         amount0Out
+//         amount1In
+//         amount1Out
+//         amountUSD
+//         to
+//       }
+//     }
+//   }
+// `
+
+export const GLOBAL_TXNS_HYDRA = gql`
   query transactions {
-    transactions(first: 100, orderBy: timestamp, orderDirection: desc) {
-      mints(orderBy: timestamp, orderDirection: desc) {
+    transactions(first: 100, orderBy: "timestamp", orderDirection: "desc") {
+      mints {
         transaction {
-          id
+          txHash
           timestamp
         }
         pair {
           token0 {
-            id
+            tokenAddress
             symbol
           }
           token1 {
-            id
+            tokenAddress
             symbol
           }
         }
@@ -475,18 +633,18 @@ export const GLOBAL_TXNS = gql`
         amount1
         amountUSD
       }
-      burns(orderBy: timestamp, orderDirection: desc) {
+      burns {
         transaction {
-          id
+          txHash
           timestamp
         }
         pair {
           token0 {
-            id
+            tokenAddress
             symbol
           }
           token1 {
-            id
+            tokenAddress
             symbol
           }
         }
@@ -496,18 +654,18 @@ export const GLOBAL_TXNS = gql`
         amount1
         amountUSD
       }
-      swaps(orderBy: timestamp, orderDirection: desc) {
+      swaps {
         transaction {
-          id
+          txHash
           timestamp
         }
         pair {
           token0 {
-            id
+            tokenAddress
             symbol
           }
           token1 {
-            id
+            tokenAddress
             symbol
           }
         }
@@ -521,7 +679,7 @@ export const GLOBAL_TXNS = gql`
     }
   }
 `
-
+// napraveno e
 export const ALL_TOKENS = gql`
   query tokens($skip: Int!) {
     tokens(first: 500, skip: $skip) {
@@ -600,17 +758,35 @@ export const PAIR_SEARCH = gql`
   }
 `
 
-export const ALL_PAIRS = gql`
+// export const ALL_PAIRS = gql`
+//   query pairs($skip: Int!) {
+//     pairs(first: 500, skip: $skip, orderBy: trackedReserveETH, orderDirection: desc) {
+//       id
+//       token0 {
+//         id
+//         symbol
+//         name
+//       }
+//       token1 {
+//         id
+//         symbol
+//         name
+//       }
+//     }
+//   }
+// `
+
+export const ALL_PAIRS_HYDRA = gql`
   query pairs($skip: Int!) {
-    pairs(first: 500, skip: $skip, orderBy: trackedReserveETH, orderDirection: desc) {
-      id
+    pairs(first: 500, skip: $skip, orderBy: "trackedReserveHYDRA", orderDirection: "desc") {
+      pairAddress
       token0 {
-        id
+        tokenAddress
         symbol
         name
       }
       token1 {
-        id
+        tokenAddress
         symbol
         name
       }
@@ -650,10 +826,50 @@ const PairFields = `
   }
 `
 
-export const PAIRS_CURRENT = gql`
+const PairFieldsHYDRA = `
+  fragment PairFieldsHYDRA on Pair {
+    pairAddress
+    txCount
+    token0 {
+      tokenAddress
+      symbol
+      name
+      totalLiquidity
+      derivedHYDRA
+    }
+    token1 {
+      tokenAddress
+      symbol
+      name
+      totalLiquidity
+      derivedHYDRA
+    }
+    reserve0
+    reserve1
+    reserveUSD
+    totalSupply
+    trackedReserveHYDRA
+    reserveHYDRA
+    volumeUSD
+    untrackedVolumeUSD
+    token0Price
+    token1Price
+    createdAtTimestamp
+  }
+`
+
+// export const PAIRS_CURRENT = gql`
+//   query pairs {
+//     pairs(first: 200, orderBy: reserveUSD, orderDirection: desc) {
+//       id
+//     }
+//   }
+// `
+
+export const PAIRS_CURRENT_HYDRA = gql`
   query pairs {
-    pairs(first: 200, orderBy: reserveUSD, orderDirection: desc) {
-      id
+    pairs(first: 200, orderBy: "reserveUSD", orderDirection: "desc") {
+      pairAddress
     }
   }
 `
@@ -693,11 +909,19 @@ export const MINING_POSITIONS = (account) => {
   return gql(queryString)
 }
 
-export const PAIRS_BULK = gql`
-  ${PairFields}
-  query pairs($allPairs: [Bytes]!) {
-    pairs(first: 500, where: { id_in: $allPairs }, orderBy: trackedReserveETH, orderDirection: desc) {
-      ...PairFields
+// export const PAIRS_BULK = gql`
+//   ${PairFields}
+//   query pairs($allPairs: [Bytes]!) {
+//     pairs(first: 500, where: { id_in: $allPairs }, orderBy: trackedReserveETH, orderDirection: desc) {
+//       ...PairFields
+//     }
+//   }
+// `
+export const PAIRS_BULK_HYDRA = gql`
+  ${PairFieldsHYDRA}
+  query pairs($allPairs: [String!]!) {
+    pairs(first: 50, where: { id_in: $allPairs }, orderBy: "trackedReserveHYDRA", orderDirection: "desc") {
+      ...PairFieldsHYDRA
     }
   }
 `
@@ -751,25 +975,47 @@ const TokenFields = `
     txCount
   }
 `
+const TokenFieldsHydra = `
+  fragment TokenFields on Token {
+    id
+    name
+    symbol
+    derivedHYDRA
+    tradeVolume
+    tradeVolumeUSD
+    untrackedVolumeUSD
+    totalLiquidity
+    txCount
+  }
+`
 
 // used for getting top tokens by daily volume
-export const TOKEN_TOP_DAY_DATAS = gql`
-  query tokenDayDatas($date: Int) {
-    tokenDayDatas(first: 50, orderBy: totalLiquidityUSD, orderDirection: desc, where: { date_gt: $date }) {
+// export const TOKEN_TOP_DAY_DATAS = gql`
+//   query tokenDayDatas($date: Int) {
+//     tokenDayDatas(first: 50, orderBy: totalLiquidityUSD, orderDirection: desc, where: { date_gt: $date }) {
+//       id
+//       date
+//     }
+//   }
+// `
+
+export const TOKEN_TOP_DAY_DATAS_HYDRA = gql`
+  query tokenDayDatas($date: String!) {
+    tokenDayDatas(first: 50, orderBy: "totalLiquidityUSD", orderDirection: "desc", where: { date_gt: $date }) {
       id
       date
     }
   }
 `
 
-export const TOKENS_BULK = gql`
-  ${TokenFields}
-  query tokens($tokenAddresses: [Bytes]!) {
-    pairs(where: { id_in: $tokenAddresses }) {
-      ...TokenFields
-    }
-  }
-`
+// export const TOKENS_BULK = gql`
+//   ${TokenFields}
+//   query tokens($tokenAddresses: [Bytes]!) {
+//     pairs(where: { id_in: $tokenAddresses }) {
+//       ...TokenFields
+//     }
+//   }
+// `
 export const TOKENS_HISTORICAL_BULK = (tokens, block) => {
   let tokenString = `[`
   tokens.map((token) => {
@@ -794,26 +1040,50 @@ export const TOKENS_HISTORICAL_BULK = (tokens, block) => {
   return gql(queryString)
 }
 
-export const TOKENS_CURRENT = gql`
-  ${TokenFields}
+export const TOKENS_HISTORICAL_BULK_HYDRA = (tokens, block) => {
+  let tokenString = `[`
+  tokens.map((token) => {
+    return (tokenString += `"${token}",`)
+  })
+  tokenString += ']'
+  let queryString = `
   query tokens {
-    tokens(first: 200, orderBy: tradeVolumeUSD, orderDirection: desc) {
-      ...TokenFields
+    tokens(first: 50, where: {id_in: ${tokenString}}, ${block ? 'block: {number: ' + block + '}' : ''}  ) {
+      id
+      name
+      symbol
+      derivedHYDRA
+      tradeVolume
+      tradeVolumeUSD
+      untrackedVolumeUSD
+      totalLiquidity
+      txCount
     }
   }
-`
-
-export const TOKENS_DYNAMIC = (block) => {
-  const queryString = `
-    ${TokenFields}
-    query tokens {
-      tokens(block: {number: ${block}} first: 200, orderBy: tradeVolumeUSD, orderDirection: desc) {
-        ...TokenFields
-      }
-    }
   `
   return gql(queryString)
 }
+
+// export const TOKENS_CURRENT = gql`
+//   ${TokenFields}
+//   query tokens {
+//     tokens(first: 200, orderBy: tradeVolumeUSD, orderDirection: desc) {
+//       ...TokenFields
+//     }
+//   }
+// `
+
+// export const TOKENS_DYNAMIC = (block) => {
+//   const queryString = `
+//     ${TokenFields}
+//     query tokens {
+//       tokens(block: {number: ${block}} first: 200, orderBy: tradeVolumeUSD, orderDirection: desc) {
+//         ...TokenFields
+//       }
+//     }
+//   `
+//   return gql(queryString)
+// }
 
 export const TOKEN_DATA = (tokenAddress, block) => {
   const queryString = `
@@ -826,6 +1096,24 @@ export const TOKEN_DATA = (tokenAddress, block) => {
         id
       }
       pairs1: pairs(where: {token1: "${tokenAddress}"}, first: 50, orderBy: reserveUSD, orderDirection: desc){
+        id
+      }
+    }
+  `
+  return gql(queryString)
+}
+
+export const TOKEN_DATA_HYDRA = (tokenAddress, block) => {
+  const queryString = `
+    ${TokenFieldsHydra}
+    query tokens {
+      tokens(${block ? `block : {number: ${block}}` : ``} where: {id:"${tokenAddress}"}) {
+        ...TokenFields
+      }
+      pairs0: pairs(where: {token0: "${tokenAddress}"}, first: 50, orderBy: "reserveUSD", orderDirection: "desc"){
+        id
+      }
+      pairs1: pairs(where: {token1: "${tokenAddress}"}, first: 50, orderBy: "reserveUSD", orderDirection: "desc"){
         id
       }
     }
@@ -890,6 +1178,76 @@ export const FILTERED_TRANSACTIONS = gql`
         }
         token1 {
           id
+          symbol
+        }
+      }
+      amount0In
+      amount0Out
+      amount1In
+      amount1Out
+      amountUSD
+      to
+    }
+  }
+`
+
+export const FILTERED_TRANSACTIONS_HYDRA = gql`
+  query ($allPairs: [String!]!) {
+    mints(first: 20, where: { pair_in: $allPairs }, orderBy: "timestamp", orderDirection: "desc") {
+      transaction {
+        txHash
+        timestamp
+      }
+      pair {
+        token0 {
+          tokenAddress
+          symbol
+        }
+        token1 {
+          tokenAddress
+          symbol
+        }
+      }
+      to
+      liquidity
+      amount0
+      amount1
+      amountUSD
+    }
+    burns(first: 20, where: { pair_in: $allPairs }, orderBy: "timestamp", orderDirection: "desc") {
+      transaction {
+        txHash
+        timestamp
+      }
+      pair {
+        token0 {
+          tokenAddress
+          symbol
+        }
+        token1 {
+          tokenAddress
+          symbol
+        }
+      }
+      sender
+      liquidity
+      amount0
+      amount1
+      amountUSD
+    }
+    swaps(first: 30, where: { pair_in: $allPairs }, orderBy: "timestamp", orderDirection: "desc") {
+      transaction {
+        txHash
+        timestamp
+      }
+      id
+      pair {
+        token0 {
+          tokenAddress
+          symbol
+        }
+        token1 {
+          tokenAddress
           symbol
         }
       }

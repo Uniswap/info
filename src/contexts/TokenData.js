@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect } from 'react'
 
-import { client } from '../apollo/client'
+import { client, clientHydra } from '../apollo/client'
 import {
   TOKEN_DATA,
   FILTERED_TRANSACTIONS,
@@ -9,6 +9,10 @@ import {
   PRICES_BY_BLOCK,
   PAIR_DATA,
   TOKENS_HISTORICAL_BULK,
+  TOKEN_TOP_DAY_DATAS_HYDRA,
+  TOKENS_HISTORICAL_BULK_HYDRA,
+  TOKEN_DATA_HYDRA,
+  FILTERED_TRANSACTIONS_HYDRA,
 } from '../apollo/queries'
 
 import { useEthPrice } from './GlobalData'
@@ -23,6 +27,7 @@ import {
   isAddress,
   getBlocksFromTimestamps,
   splitQuery,
+  getBlockFromTimestampHYDRA,
 } from '../utils'
 import { timeframeOptions } from '../constants'
 import { useLatestBlocks } from './Application'
@@ -224,33 +229,55 @@ const getTopTokens = async (ethPrice, ethPriceOld) => {
   const utcCurrentTime = dayjs()
   const utcOneDayBack = utcCurrentTime.subtract(1, 'day').unix()
   const utcTwoDaysBack = utcCurrentTime.subtract(2, 'day').unix()
-  let oneDayBlock = await getBlockFromTimestamp(utcOneDayBack)
+  let oneDayBlockEth = await getBlockFromTimestamp(utcOneDayBack)
+  let oneDayBlock = await getBlockFromTimestampHYDRA(utcOneDayBack)
+  // console.log('oneDayBlockEth ->', oneDayBlockEth);
+  // console.log('oneDayBlock ->', oneDayBlock);
   let twoDayBlock = await getBlockFromTimestamp(utcTwoDaysBack)
 
   try {
     // need to get the top tokens by liquidity by need token day datas
     const currentDate = parseInt(Date.now() / 86400 / 1000) * 86400 - 86400
+    // let tokenidseth = await client.query({
+    //   query: TOKEN_TOP_DAY_DATAS,
+    //   fetchPolicy: 'network-only',
+    //   variables: { date: currentDate },
+    // })
+    // console.log('tokenidseth->', tokenidseth)
 
-    let tokenids = await client.query({
-      query: TOKEN_TOP_DAY_DATAS,
+    let tokenids = await clientHydra.query({
+      query: TOKEN_TOP_DAY_DATAS_HYDRA,
       fetchPolicy: 'network-only',
-      variables: { date: currentDate },
+      variables: { date: currentDate + '' },
     })
+    // console.log('tokenids->', tokenids)
+    // const idseth = tokenidseth?.data?.tokenDayDatas?.reduce((accum, entry) => {
+    //   accum.push(entry.id.slice(0, 42))
+    //   return accum
+    // }, [])
 
     const ids = tokenids?.data?.tokenDayDatas?.reduce((accum, entry) => {
       accum.push(entry.id.slice(0, 42))
       return accum
     }, [])
 
-    let current = await client.query({
-      query: TOKENS_HISTORICAL_BULK(ids),
+    // let currentEth = await client.query({
+    //   query: TOKENS_HISTORICAL_BULK(idseth),
+    //   fetchPolicy: 'cache-first',
+    // })
+    // console.log('currentEth =>', currentEth);
+
+    let current = await clientHydra.query({
+      query: TOKENS_HISTORICAL_BULK_HYDRA(ids),
       fetchPolicy: 'cache-first',
     })
+    // console.log('currents tokens ->', current);
 
     let oneDayResult = await client.query({
-      query: TOKENS_HISTORICAL_BULK(ids, oneDayBlock),
+      query: TOKENS_HISTORICAL_BULK(ids, oneDayBlockEth),
       fetchPolicy: 'cache-first',
     })
+    // console.log('oneDayResult ->', oneDayResult);
 
     let twoDayResult = await client.query({
       query: TOKENS_HISTORICAL_BULK(ids, twoDayBlock),
@@ -304,17 +331,17 @@ const getTopTokens = async (ethPrice, ethPriceOld) => {
             twoDayHistory?.txCount ?? 0
           )
 
-          const currentLiquidityUSD = data?.totalLiquidity * ethPrice * data?.derivedETH
-          const oldLiquidityUSD = oneDayHistory?.totalLiquidity * ethPriceOld * oneDayHistory?.derivedETH
+          const currentLiquidityUSD = data?.totalLiquidity * ethPrice * data?.derivedHYDRA
+          const oldLiquidityUSD = oneDayHistory?.totalLiquidity * ethPriceOld * oneDayHistory?.derivedHYDRA
 
           // percent changes
           const priceChangeUSD = getPercentChange(
-            data?.derivedETH * ethPrice,
-            oneDayHistory?.derivedETH ? oneDayHistory?.derivedETH * ethPriceOld : 0
+            data?.derivedHYDRA * ethPrice,
+            oneDayHistory?.derivedHYDRA ? oneDayHistory?.derivedHYDRA * ethPriceOld : 0
           )
 
           // set data
-          data.priceUSD = data?.derivedETH * ethPrice
+          data.priceUSD = data?.derivedHYDRA * ethPrice
           data.totalLiquidityUSD = currentLiquidityUSD
           data.oneDayVolumeUSD = parseFloat(oneDayVolumeUSD)
           data.volumeChangeUSD = volumeChangeUSD
@@ -326,7 +353,7 @@ const getTopTokens = async (ethPrice, ethPriceOld) => {
           // new tokens
           if (!oneDayHistory && data) {
             data.oneDayVolumeUSD = data.tradeVolumeUSD
-            data.oneDayVolumeETH = data.tradeVolume * data.derivedETH
+            data.oneDayVolumeETH = data.tradeVolume * data.derivedHYDRA
             data.oneDayTxns = data.txCount
           }
 
@@ -355,6 +382,7 @@ const getTopTokens = async (ethPrice, ethPriceOld) => {
         })
     )
 
+    // console.log('token bulkResults ->', bulkResults);
     return bulkResults
 
     // calculate percentage changes and daily changes
@@ -377,8 +405,12 @@ const getTokenData = async (address, ethPrice, ethPriceOld) => {
 
   try {
     // fetch all current and historical data
-    let result = await client.query({
-      query: TOKEN_DATA(address),
+    // let result = await client.query({
+    //   query: TOKEN_DATA(address),
+    //   fetchPolicy: 'cache-first',
+    // })
+    let result = await clientHydra.query({
+      query: TOKEN_DATA_HYDRA(address),
       fetchPolicy: 'cache-first',
     })
     data = result?.data?.tokens?.[0]
@@ -435,15 +467,15 @@ const getTokenData = async (address, ethPrice, ethPriceOld) => {
     )
 
     const priceChangeUSD = getPercentChange(
-      data?.derivedETH * ethPrice,
-      parseFloat(oneDayData?.derivedETH ?? 0) * ethPriceOld
+      data?.derivedHYDRA * ethPrice,
+      parseFloat(oneDayData?.derivedHYDRA ?? 0) * ethPriceOld
     )
 
-    const currentLiquidityUSD = data?.totalLiquidity * ethPrice * data?.derivedETH
-    const oldLiquidityUSD = oneDayData?.totalLiquidity * ethPriceOld * oneDayData?.derivedETH
+    const currentLiquidityUSD = data?.totalLiquidity * ethPrice * data?.derivedHYDRA
+    const oldLiquidityUSD = oneDayData?.totalLiquidity * ethPriceOld * oneDayData?.derivedHYDRA
 
     // set data
-    data.priceUSD = data?.derivedETH * ethPrice
+    data.priceUSD = data?.derivedHYDRA * ethPrice
     data.totalLiquidityUSD = currentLiquidityUSD
     data.oneDayVolumeUSD = oneDayVolumeUSD
     data.volumeChangeUSD = volumeChangeUSD
@@ -462,7 +494,7 @@ const getTokenData = async (address, ethPrice, ethPriceOld) => {
     // new tokens
     if (!oneDayData && data) {
       data.oneDayVolumeUSD = data.tradeVolumeUSD
-      data.oneDayVolumeETH = data.tradeVolume * data.derivedETH
+      data.oneDayVolumeETH = data.tradeVolume * data.derivedHYDRA
       data.oneDayTxns = data.txCount
     }
 
@@ -491,8 +523,16 @@ const getTokenData = async (address, ethPrice, ethPriceOld) => {
 const getTokenTransactions = async (allPairsFormatted) => {
   const transactions = {}
   try {
-    let result = await client.query({
-      query: FILTERED_TRANSACTIONS,
+    // let result = await client.query({
+    //   query: FILTERED_TRANSACTIONS,
+    //   variables: {
+    //     allPairs: allPairsFormatted,
+    //   },
+    //   fetchPolicy: 'cache-first',
+    // })
+    // console.log('allPairsFormatted ->', allPairsFormatted);
+    let result = await clientHydra.query({
+      query: FILTERED_TRANSACTIONS_HYDRA,
       variables: {
         allPairs: allPairsFormatted,
       },
@@ -501,6 +541,21 @@ const getTokenTransactions = async (allPairsFormatted) => {
     transactions.mints = result.data.mints
     transactions.burns = result.data.burns
     transactions.swaps = result.data.swaps
+    transactions.mints.forEach((mint) => {
+      mint.pair.token0.id = mint.pair.token0.tokenAddress
+      mint.pair.token1.id = mint.pair.token1.tokenAddress
+      mint.transaction.id = mint.transaction.txHash
+    })
+    transactions.burns.forEach((burn) => {
+      burn.pair.token0.id = burn.pair.token0.tokenAddress
+      burn.pair.token1.id = burn.pair.token1.tokenAddress
+      burn.transaction.id = burn.transaction.txHash
+    })
+    transactions.swaps.forEach((swap) => {
+      swap.pair.token0.id = swap.pair.token0.tokenAddress
+      swap.pair.token1.id = swap.pair.token1.tokenAddress
+      swap.transaction.id = swap.transaction.txHash
+    })
   } catch (e) {
     console.log(e)
   }
@@ -510,10 +565,15 @@ const getTokenTransactions = async (allPairsFormatted) => {
 const getTokenPairs = async (tokenAddress) => {
   try {
     // fetch all current and historical data
-    let result = await client.query({
-      query: TOKEN_DATA(tokenAddress),
+    // let result = await client.query({
+    //   query: TOKEN_DATA(tokenAddress),
+    //   fetchPolicy: 'cache-first',
+    // })
+    let result = await clientHydra.query({
+      query: TOKEN_DATA_HYDRA(tokenAddress),
       fetchPolicy: 'cache-first',
     })
+    // console.log('result ->', result);
     return result.data?.['pairs0'].concat(result.data?.['pairs1'])
   } catch (e) {
     console.log(e)
@@ -559,7 +619,7 @@ const getIntervalTokenData = async (tokenAddress, startTime, interval = 3600, la
     let values = []
     for (var row in result) {
       let timestamp = row.split('t')[1]
-      let derivedETH = parseFloat(result[row]?.derivedETH)
+      let derivedETH = parseFloat(result[row]?.derivedHYDRA)
       if (timestamp) {
         values.push({
           timestamp,
@@ -573,7 +633,7 @@ const getIntervalTokenData = async (tokenAddress, startTime, interval = 3600, la
     for (var brow in result) {
       let timestamp = brow.split('b')[1]
       if (timestamp) {
-        values[index].priceUSD = result[brow].ethPrice * values[index].derivedETH
+        values[index].priceUSD = result[brow].hydraPrice * values[index].derivedHYDRA
         index += 1
       }
     }
@@ -859,8 +919,8 @@ export function useTokenPriceData(tokenAddress, timeWindow, interval = 3600) {
     const currentTime = dayjs.utc()
     const windowSize = timeWindow === timeframeOptions.MONTH ? 'month' : 'week'
     const startTime =
-      timeWindow === timeframeOptions.ALL_TIME ? 1589760000 : currentTime.subtract(1, windowSize).startOf('hour').unix()
-
+      timeWindow === timeframeOptions.ALL_TIME ? 1617840000 : currentTime.subtract(1, windowSize).startOf('hour').unix()
+      // 1589760000
     async function fetch() {
       let data = await getIntervalTokenData(tokenAddress, startTime, interval, latestBlock)
       updatePriceData(tokenAddress, data, timeWindow, interval)
@@ -875,7 +935,6 @@ export function useTokenPriceData(tokenAddress, timeWindow, interval = 3600) {
 
 export function useAllTokenData() {
   const [state] = useTokenDataContext()
-
   // filter out for only addresses
   return Object.keys(state)
     .filter((key) => key !== 'combinedVol')
