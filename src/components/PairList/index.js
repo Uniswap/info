@@ -51,7 +51,7 @@ const DashGrid = styled.div`
   grid-template-columns: 100px 1fr 1fr;
   grid-template-areas: 'name liq vol';
   padding: 1.25rem;
-
+  border-bottom: 1px solid #1A2837;
   opacity: ${({ fade }) => (fade ? '0.6' : '1')};
 
   > * {
@@ -92,6 +92,9 @@ const ClickableText = styled(Text)`
   }
   text-align: end;
   user-select: none;
+  @media screen and (max-width: 576px) {
+    font-size: 14px;
+  }
 `
 
 const DataText = styled(Flex)`

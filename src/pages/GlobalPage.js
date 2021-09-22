@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { withRouter } from 'react-router-dom'
-import { Box } from 'rebass'
+// import { Box } from 'rebass'
 import styled from 'styled-components'
-
+import Row from 'react-bootstrap/Row'
+import Col from 'react-bootstrap/Col'
 import { AutoRow, RowBetween } from '../components/Row'
 import { AutoColumn } from '../components/Column'
 import PairList from '../components/PairList'
@@ -17,9 +18,9 @@ import { useAllPairData } from '../contexts/PairData'
 import { useMedia } from 'react-use'
 import Panel from '../components/Panel'
 import { useAllTokenData } from '../contexts/TokenData'
-import { formattedNum, formattedPercent } from '../utils'
+// import { formattedNum, formattedPercent } from '../utils'
 import { TYPE, ThemedBackground } from '../Theme'
-import { transparentize } from 'polished'
+// import { transparentize } from 'polished'
 import { CustomLink } from '../components/Link'
 
 import { PageWrapper, ContentWrapper } from '../components'
@@ -37,13 +38,10 @@ const ListOptions = styled(AutoRow)`
   }
 `
 
-const GridRow = styled.div`
-  display: grid;
-  width: 100%;
-  grid-template-columns: 1fr 1fr;
-  column-gap: 6px;
-  align-items: start;
-  justify-content: space-between;
+const CustomRow = styled(Row)`
+  @media screen and (max-width: 576px) {
+    gap: 24px;
+  }
 `
 
 function GlobalPage() {
@@ -51,7 +49,7 @@ function GlobalPage() {
   const allPairs = useAllPairData()
   const allTokens = useAllTokenData()
   const transactions = useGlobalTransactions()
-  const { totalLiquidityUSD, oneDayVolumeUSD, volumeChangeUSD, liquidityChangeUSD } = useGlobalData()
+  // const { totalLiquidityUSD, oneDayVolumeUSD, volumeChangeUSD, liquidityChangeUSD } = useGlobalData()
 
   // breakpoints
   const below800 = useMedia('(max-width: 800px)')
@@ -77,7 +75,7 @@ function GlobalPage() {
             <Search />
             <GlobalStats />
           </AutoColumn>
-          {below800 && ( // mobile card
+          {/* {below800 && ( // mobile card
             <Box mb={20}>
               <Panel>
                 <Box>
@@ -112,24 +110,26 @@ function GlobalPage() {
                 </Box>
               </Panel>
             </Box>
-          )}
-          {!below800 && (
-            <GridRow>
+          )} */}
+          <CustomRow>
+            <Col xs={12} md={6}>
               <Panel style={{ height: '100%', minHeight: '300px' }}>
                 <GlobalChart display="liquidity" />
               </Panel>
+            </Col>
+            <Col xs={12} md={6}>
               <Panel style={{ height: '100%' }}>
                 <GlobalChart display="volume" />
               </Panel>
-            </GridRow>
-          )}
-          {below800 && (
+            </Col>
+          </CustomRow>
+          {/* {below800 && (
             <AutoColumn style={{ marginTop: '6px' }} gap="24px">
               <Panel style={{ height: '100%', minHeight: '300px' }}>
                 <GlobalChart display="liquidity" />
               </Panel>
             </AutoColumn>
-          )}
+          )} */}
           <ListOptions gap="10px" style={{ marginTop: '2rem', marginBottom: '.5rem' }}>
             <RowBetween>
               <TYPE.main fontSize={'1.125rem'} style={{ whiteSpace: 'nowrap' }}>
@@ -142,18 +142,18 @@ function GlobalPage() {
             <TopTokenList tokens={allTokens} />
           </Panel>
           <ListOptions gap="10px" style={{ marginTop: '2rem', marginBottom: '.5rem' }}>
-            <RowBetween>
+            <RowBetween style={{ flexWrap: 'wrap' }}>
               <TYPE.main fontSize={'1rem'} style={{ whiteSpace: 'nowrap' }}>
-                Top Pairs
+                Top Pools
               </TYPE.main>
-              <AutoRow gap="4px" width="100%" justifyContent="flex-end">
+              <AutoRow untrack gap="4px" style={{ width: 'auto' }}>
                 <CheckBox
                   checked={useTracked}
                   setChecked={() => setUseTracked(!useTracked)}
                   text={'Hide untracked pairs'}
                 />
-                <QuestionHelper text="USD amounts may be inaccurate in low liquiidty pairs or pairs without FAC or stablecoins." />
-                <CustomLink to={'/pairs'}>See All</CustomLink>
+                <QuestionHelper text="USD amounts may be inaccurate in low liquiidty pools or pools without FAC or stablecoins." />
+                <CustomLink to={'/pools'}>See All</CustomLink>
               </AutoRow>
             </RowBetween>
           </ListOptions>

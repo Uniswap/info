@@ -2,8 +2,8 @@ import React, { useState, useMemo, useEffect, useRef } from 'react'
 import { ResponsiveContainer } from 'recharts'
 import { timeframeOptions } from '../../constants'
 import { useGlobalChartData, useGlobalData } from '../../contexts/GlobalData'
-import { useMedia } from 'react-use'
-import DropdownSelect from '../DropdownSelect'
+// import { useMedia } from 'react-use'
+// import DropdownSelect from '../DropdownSelect'
 import TradingViewChart, { CHART_TYPES } from '../TradingviewChart'
 import { RowFixed } from '../Row'
 import { OptionButton } from '../ButtonStyled'
@@ -53,7 +53,7 @@ const GlobalChart = ({ display }) => {
         })
     )
   }, [dailyData, utcStartTime, volumeWindow, weeklyData])
-  const below800 = useMedia('(max-width: 800px)')
+  // const below800 = useMedia('(max-width: 800px)')
 
   // update the width on a window resize
   const ref = useRef()
@@ -72,9 +72,9 @@ const GlobalChart = ({ display }) => {
 
   return chartDataFiltered ? (
     <>
-      {below800 && (
+      {/* {below800 && (
         <DropdownSelect options={CHART_VIEW} active={chartView} setActive={setChartView} color={'#ff007a'} />
-      )}
+      )} */}
 
       {chartDataFiltered && chartView === CHART_VIEW.LIQUIDITY && (
         <ResponsiveContainer aspect={60 / 28} ref={ref}>

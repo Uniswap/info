@@ -19,7 +19,10 @@ import { useDarkModeManager } from '../../contexts/LocalStorage'
 const ChartWrapper = styled.div`
   height: 100%;
   min-height: 300px;
-
+  .recharts-responsive-container {
+    margin-top: 30px;
+    height: auto !important;
+  }
   @media screen and (max-width: 600px) {
     min-height: 200px;
   }
@@ -149,20 +152,23 @@ const TokenChart = ({ address, color, base }) => {
           <AutoColumn gap="8px">
             <RowFixed>
               <OptionButton
+                customTokenChart="true"
                 active={chartFilter === CHART_VIEW.LIQUIDITY}
                 onClick={() => setChartFilter(CHART_VIEW.LIQUIDITY)}
-                style={{ marginRight: '6px' }}
+                style={{ marginRight: '12px' }}
               >
                 Liquidity
               </OptionButton>
               <OptionButton
+                customTokenChart="true"
                 active={chartFilter === CHART_VIEW.VOLUME}
                 onClick={() => setChartFilter(CHART_VIEW.VOLUME)}
-                style={{ marginRight: '6px' }}
+                style={{ marginRight: '12px' }}
               >
                 Volume
               </OptionButton>
               <OptionButton
+                customTokenChart="true"
                 active={chartFilter === CHART_VIEW.PRICE}
                 onClick={() => {
                   setChartFilter(CHART_VIEW.PRICE)
@@ -174,6 +180,7 @@ const TokenChart = ({ address, color, base }) => {
             {chartFilter === CHART_VIEW.PRICE && (
               <AutoRow gap="4px">
                 <PriceOption
+                  customTokenChart="true"
                   active={frequency === DATA_FREQUENCY.DAY}
                   onClick={() => {
                     setTimeWindow(timeframeOptions.MONTH)
@@ -183,12 +190,14 @@ const TokenChart = ({ address, color, base }) => {
                   D
                 </PriceOption>
                 <PriceOption
+                  customTokenChart="true"
                   active={frequency === DATA_FREQUENCY.HOUR}
                   onClick={() => setFrequency(DATA_FREQUENCY.HOUR)}
                 >
                   H
                 </PriceOption>
                 <PriceOption
+                  customTokenChart="true"
                   active={frequency === DATA_FREQUENCY.LINE}
                   onClick={() => setFrequency(DATA_FREQUENCY.LINE)}
                 >
@@ -199,18 +208,21 @@ const TokenChart = ({ address, color, base }) => {
           </AutoColumn>
           <AutoRow justify="flex-end" gap="6px" align="flex-start">
             <OptionButton
+              customTokenChart="true"
               active={timeWindow === timeframeOptions.WEEK}
               onClick={() => setTimeWindow(timeframeOptions.WEEK)}
             >
               1W
             </OptionButton>
             <OptionButton
+              customTokenChart="true"
               active={timeWindow === timeframeOptions.MONTH}
               onClick={() => setTimeWindow(timeframeOptions.MONTH)}
             >
               1M
             </OptionButton>
             <OptionButton
+              customTokenChart="true"
               active={timeWindow === timeframeOptions.ALL_TIME}
               onClick={() => setTimeWindow(timeframeOptions.ALL_TIME)}
             >
@@ -387,15 +399,7 @@ const TokenChart = ({ address, color, base }) => {
               }}
               wrapperStyle={{ top: -70, left: -10 }}
             />
-            <Bar
-              type="monotone"
-              name={'Volume'}
-              dataKey={'dailyVolumeUSD'}
-              fill={color}
-              opacity={'0.4'}
-              yAxisId={0}
-              stroke={color}
-            />
+            <Bar type="monotone" name={'Volume'} dataKey={'dailyVolumeUSD'} fill={color} yAxisId={0} stroke={color} />
           </BarChart>
         </ResponsiveContainer>
       )}

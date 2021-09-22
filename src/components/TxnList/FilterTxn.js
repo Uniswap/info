@@ -4,7 +4,7 @@ import { Label, Radio } from '@rebass/forms'
 
 const SortText = styled(Radio)`
   margin-right: 0.75rem;
-  color: ${({ theme }) => theme.primary1} !important;
+  color: ${({ theme, checked }) => checked ? theme.primary1 : '#fff'} !important;
 `
 
 const WrapperFilterTxn = styled.div`
@@ -15,6 +15,7 @@ const WrapperLabel = styled(Label)`
   color: ${({ theme }) => theme.white};
   width: auto !important;
   margin-right: 10px !important;
+  cursor: pointer;
 `
 
 const TXN_TYPE = {

@@ -3,12 +3,30 @@ import { ThemeProvider as StyledComponentsThemeProvider, createGlobalStyle } fro
 import { useDarkModeManager } from '../contexts/LocalStorage'
 import styled from 'styled-components'
 import { Text } from 'rebass'
+import { css } from 'styled-components/macro'
 
 export default function ThemeProvider({ children }) {
   const darkMode = false
 
   return <StyledComponentsThemeProvider theme={theme(darkMode)}>{children}</StyledComponentsThemeProvider>
 }
+
+export const MEDIA_WIDTHS = {
+  upToExtraSmall: 500,
+  upToSmall: 720,
+  upToMedium: 960,
+  upToLarge: 1280,
+}
+
+const mediaWidthTemplates = Object.keys(MEDIA_WIDTHS).reduce((accumulator, size) => {
+  accumulator[size] = (a, b, c) => css`
+    @media (max-width: ${MEDIA_WIDTHS[size]}px) {
+      ${css(a, b, c)}
+    }
+  `
+  return accumulator
+}, {})
+
 
 const theme = (darkMode, color) => ({
   customColor: color,
@@ -66,13 +84,14 @@ const theme = (darkMode, color) => ({
 
   // other
   red1: '#FF5353',
-  green1: '#ACFF35',
+  green1: '#96FF00',
   yellow1: '#FFE270',
   yellow2: '#F3841E',
   link: '#2172E5',
   blue: '#13CFFF',
 
   background: darkMode ? 'black' : `radial-gradient(50% 50% at 50% 50%, #ff007a30 0%, #fff 0%)`,
+  mediaWidth: mediaWidthTemplates,
 })
 
 const TextWrapper = styled(Text)`

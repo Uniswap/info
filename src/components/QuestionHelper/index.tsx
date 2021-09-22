@@ -13,12 +13,17 @@ const QuestionWrapper = styled.div`
   outline: none;
   cursor: default;
   border-radius: 36px;
-  background-color: ${({ theme }) => theme.bg2};
+  background-color: transparent;
   color: ${({ theme }) => theme.text2};
-
+  position: relative;
+  top: 2.5px;
   :hover,
   :focus {
     opacity: 0.7;
+  }
+  svg {
+    width: 20px;
+    height: 20px;
   }
 `
 

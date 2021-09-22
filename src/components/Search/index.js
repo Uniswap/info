@@ -30,6 +30,7 @@ const Container = styled.div`
   }
 `
 
+// ${({ theme }) => transparentize(0.4, theme.bg5)};
 const Wrapper = styled.div`
   display: flex;
   position: relative;
@@ -38,7 +39,7 @@ const Wrapper = styled.div`
   justify-content: flex-end;
   padding: 12px 16px;
   border-radius: 12px;
-  background: ${({ theme, small, open }) => (small ? (open ? theme.bg5 : 'none') : transparentize(0.4, theme.bg5))};
+  background: #111626;
   border-bottom-right-radius: ${({ open }) => (open ? '0px' : '12px')};
   border-bottom-left-radius: ${({ open }) => (open ? '0px' : '12px')};
   z-index: 9999;
@@ -63,7 +64,7 @@ const Input = styled.input`
   outline: none;
   width: 100%;
   color: ${({ theme }) => theme.text1};
-  font-size: ${({ large }) => (large ? '20px' : '14px')};
+  font-size: ${({ large }) => (large ? '18px' : '14px')};
 
   ::placeholder {
     color: ${({ theme }) => theme.text3};
@@ -422,14 +423,14 @@ export const Search = ({ small = false }) => {
           ref={wrapperRef}
           placeholder={
             small
-              ? ''
+              ? 'Search pools or tokens...'
               : below410
               ? 'Search...'
               : below470
               ? 'Search Uniswap...'
               : below700
-              ? 'Search pairs and tokens...'
-              : 'Search Uniswap pairs and tokens...'
+              ? 'Search pools or tokens...'
+              : 'Search pools or tokens...'
           }
           value={value}
           onChange={(e) => {
