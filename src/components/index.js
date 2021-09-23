@@ -8,7 +8,7 @@ import { urls } from '../utils'
 
 const Divider = styled(Box)`
   height: 1px;
-  background-color: ${({ theme }) => theme.divider};
+  background-color: #1A2837;
 `
 
 export const BlockedWrapper = styled.div`
