@@ -452,6 +452,7 @@ function PairPage({ pairAddress, history }) {
               </RowBetween>
               <Panel
                 rounded
+                withBorder
                 style={{
                   marginTop: '1.5rem',
                 }}
@@ -459,7 +460,7 @@ function PairPage({ pairAddress, history }) {
               >
                 <TokenDetailsLayout>
                   <Column>
-                    <TYPE.main>Pair Name</TYPE.main>
+                    <TYPE.main style={{fontSize: '12px', fontWeight: 'bold'}}>Pair Name</TYPE.main>
                     <TYPE.main style={{ marginTop: '.5rem' }}>
                       <RowFixed>
                         <FormattedName text={token0?.symbol ?? ''} maxCharacters={8} />
@@ -469,7 +470,7 @@ function PairPage({ pairAddress, history }) {
                     </TYPE.main>
                   </Column>
                   <Column>
-                    <TYPE.main>Pair Address</TYPE.main>
+                    <TYPE.main style={{fontSize: '12px', fontWeight: 'bold'}}>Pair Address</TYPE.main>
                     <AutoRow align="flex-end">
                       <TYPE.main style={{ marginTop: '.5rem' }}>
                         {pairAddress.slice(0, 6) + '...' + pairAddress.slice(38, 42)}
@@ -479,7 +480,7 @@ function PairPage({ pairAddress, history }) {
                   </Column>
                   <Column>
                     <TYPE.main>
-                      <RowFixed>
+                      <RowFixed style={{fontSize: '12px', fontWeight: 'bold'}}>
                         <FormattedName text={token0?.symbol ?? ''} maxCharacters={8} />{' '}
                         <span style={{ marginLeft: '4px' }}>Address</span>
                       </RowFixed>
@@ -493,7 +494,7 @@ function PairPage({ pairAddress, history }) {
                   </Column>
                   <Column>
                     <TYPE.main>
-                      <RowFixed>
+                      <RowFixed style={{fontSize: '12px', fontWeight: 'bold'}}>
                         <FormattedName text={token1?.symbol ?? ''} maxCharacters={8} />{' '}
                         <span style={{ marginLeft: '4px' }}>Address</span>
                       </RowFixed>
@@ -505,7 +506,7 @@ function PairPage({ pairAddress, history }) {
                       <CopyHelper toCopy={token1?.id} />
                     </AutoRow>
                   </Column>
-                  <Link color={backgroundColor} external href={`${FACCHAIN_DOMAIN}/address/${pairAddress}`}>
+                  <Link color={'#13CFFF'} external button href={`${FACCHAIN_DOMAIN}/address/${pairAddress}`}>
                     View on Facscan ↗
                   </Link>
                 </TokenDetailsLayout>

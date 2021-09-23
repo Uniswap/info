@@ -24,30 +24,6 @@ const ChartWrapper = styled.div`
   }
 `
 
-const NavChart = styled.div`
-  display: flex;
-  align-items: center;
-  width: 100%;
-  margin-bottom: 20px;
-  box-sizing: border-box;
-  @media screen and (max-width: 1180px) {
-    padding: 0 1rem;
-  }
-  @media screen and (max-width: 576px) {
-    margin: 40px auto 4px;
-  }
-`
-const OptionNav = styled.div`
-  width: 25%;
-  height: 40px;
-  text-align: center;
-  color: ${({ active, theme }) => (active ? theme.white : theme.text5)};
-  background-color: transparent;
-  border-bottom: 4px solid ${({ active, theme }) => (active ? theme.green1 : theme.bg3)};
-  &:hover {
-    cursor: pointer;
-  }
-`
 const OptionsRow = styled.div`
   display: flex;
   flex-direction: row;
@@ -68,7 +44,7 @@ const PairChart = ({ address, color, base0, base1 }) => {
   const [timeWindow, setTimeWindow] = useState(timeframeOptions.MONTH)
 
   const [darkMode] = useDarkModeManager()
-  const textColor = 'white'
+  const textColor = darkMode ? 'white' : 'black'
 
   // update the width on a window resize
   const ref = useRef()
@@ -145,9 +121,10 @@ const PairChart = ({ address, color, base0, base1 }) => {
           <DropdownSelect options={timeframeOptions} active={timeWindow} setActive={setTimeWindow} color={color} />
         </RowBetween>
       ) : (
-        <>
-          <NavChart>
-            <OptionNav
+        <OptionsRow>
+          <AutoRow gap="6px" style={{ flexWrap: 'nowrap' }}>
+            <OptionButton
+              customTokenChart
               active={chartFilter === CHART_VIEW.LIQUIDITY}
               onClick={() => {
                 setTimeWindow(timeframeOptions.ALL_TIME)
@@ -155,8 +132,9 @@ const PairChart = ({ address, color, base0, base1 }) => {
               }}
             >
               Liquidity
-            </OptionNav>
-            <OptionNav
+            </OptionButton>
+            <OptionButton
+              customTokenChart
               active={chartFilter === CHART_VIEW.VOLUME}
               onClick={() => {
                 setTimeWindow(timeframeOptions.ALL_TIME)
@@ -164,8 +142,9 @@ const PairChart = ({ address, color, base0, base1 }) => {
               }}
             >
               Volume
-            </OptionNav>
-            <OptionNav
+            </OptionButton>
+            <OptionButton
+              customTokenChart
               active={chartFilter === CHART_VIEW.RATE0}
               onClick={() => {
                 setTimeWindow(timeframeOptions.WEEK)
@@ -173,8 +152,9 @@ const PairChart = ({ address, color, base0, base1 }) => {
               }}
             >
               {pairData.token0 ? formattedSymbol1 + '/' + formattedSymbol0 : '-'}
-            </OptionNav>
-            <OptionNav
+            </OptionButton>
+            <OptionButton
+              customTokenChart
               active={chartFilter === CHART_VIEW.RATE1}
               onClick={() => {
                 setTimeWindow(timeframeOptions.WEEK)
@@ -182,40 +162,36 @@ const PairChart = ({ address, color, base0, base1 }) => {
               }}
             >
               {pairData.token0 ? formattedSymbol0 + '/' + formattedSymbol1 : '-'}
-            </OptionNav>
-          </NavChart>
-          <OptionsRow>
-            <AutoRow justify="flex-end" gap="6px">
-              <OptionButton
-                active={timeWindow === timeframeOptions.WEEK}
-                onClick={() => setTimeWindow(timeframeOptions.WEEK)}
-              >
-                1W
-              </OptionButton>
-              <OptionButton
-                active={timeWindow === timeframeOptions.MONTH}
-                onClick={() => setTimeWindow(timeframeOptions.MONTH)}
-              >
-                1M
-              </OptionButton>
-              <OptionButton
-                active={timeWindow === timeframeOptions.ALL_TIME}
-                onClick={() => setTimeWindow(timeframeOptions.ALL_TIME)}
-              >
-                All
-              </OptionButton>
-            </AutoRow>
-          </OptionsRow>
-        </>
+            </OptionButton>
+          </AutoRow>
+          <AutoRow justify="flex-end" gap="6px">
+            <OptionButton
+              customTokenChart
+              active={timeWindow === timeframeOptions.WEEK}
+              onClick={() => setTimeWindow(timeframeOptions.WEEK)}
+            >
+              1W
+            </OptionButton>
+            <OptionButton
+              customTokenChart
+              active={timeWindow === timeframeOptions.MONTH}
+              onClick={() => setTimeWindow(timeframeOptions.MONTH)}
+            >
+              1M
+            </OptionButton>
+            <OptionButton
+              customTokenChart
+              active={timeWindow === timeframeOptions.ALL_TIME}
+              onClick={() => setTimeWindow(timeframeOptions.ALL_TIME)}
+            >
+              All
+            </OptionButton>
+          </AutoRow>
+        </OptionsRow>
       )}
       {chartFilter === CHART_VIEW.LIQUIDITY && (
         <ResponsiveContainer aspect={aspect}>
-          <AreaChart
-            margin={{ top: 0, right: 10, bottom: 6, left: 0 }}
-            barCategoryGap={1}
-            data={chartData}
-            fillOpacity="1"
-          >
+          <AreaChart margin={{ top: 0, right: 10, bottom: 6, left: 0 }} barCategoryGap={1} data={chartData} fillOpacity="1">
             <defs>
               <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor={color} stopOpacity={0.35} />
@@ -228,9 +204,9 @@ const PairChart = ({ address, color, base0, base1 }) => {
               interval="preserveEnd"
               tickMargin={14}
               minTickGap={80}
-              opacity={1}
               tickFormatter={(tick) => toNiceDate(tick)}
               dataKey="date"
+              opacity={1}
               tick={{ fill: textColor }}
               type={'number'}
               domain={['dataMin', 'dataMax']}
@@ -244,8 +220,8 @@ const PairChart = ({ address, color, base0, base1 }) => {
               interval="preserveEnd"
               minTickGap={80}
               yAxisId={0}
-              tickMargin={16}
               opacity={1}
+              tickMargin={16}
               tick={{ fill: textColor }}
             />
             <Tooltip
@@ -354,8 +330,8 @@ const PairChart = ({ address, color, base0, base1 }) => {
               name={'Volume'}
               dataKey={'dailyVolumeUSD'}
               fill={color}
-              opacity={'1'}
               yAxisId={0}
+              opacity={1}
               stroke={color}
             />
           </BarChart>

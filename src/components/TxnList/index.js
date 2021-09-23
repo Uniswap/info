@@ -269,9 +269,9 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
   const below1080 = useMedia('(max-width: 1080px)')
   const below780 = useMedia('(max-width: 780px)')
 
-  const ListItem = ({ item }) => {
+  const ListItem = ({ item, withPadding }) => {
     return (
-      <DashGrid style={{ height: '60px' }}>
+      <DashGrid style={{ height: '60px', padding: withPadding ? '0 1.25rem' : '' }}>
         <DataText area="txn" fontWeight="500">
           <Link color={color} external href={urls.showTransaction(item.hash)} color={theme.primary1}>
             {getTransactionType(item.type, item.token1Symbol, item.token0Symbol)}
@@ -393,7 +393,7 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
         </>
       </DashGrid>
       <Divider />
-      <List pt={0} pb={0}>
+      <List pl={0} pr={0} pt={0} pb={0}>
         {!filteredList ? (
           <LocalLoader />
         ) : filteredList.length === 0 ? (
@@ -402,7 +402,7 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
           filteredList.map((item, index) => {
             return (
               <div key={index}>
-                <ListItem key={index} index={index + 1} item={item} />
+                <ListItem key={index} index={index + 1} item={item} withPadding />
                 <Divider />
               </div>
             )
