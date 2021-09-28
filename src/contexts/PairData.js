@@ -11,6 +11,9 @@ import {
   HOURLY_PAIR_RATES,
   PAIRS_CURRENT_HYDRA,
   PAIRS_BULK_HYDRA,
+  FILTERED_TRANSACTIONS_HYDRA,
+  PAIRS_HISTORICAL_BULK_HYDRA,
+  PAIR_DATA_HYDRA,
 } from '../apollo/queries'
 
 import { useEthPrice } from './GlobalData'
@@ -211,16 +214,25 @@ async function getBulkPairData(pairList, ethPrice) {
         pair.token1.id = pair.token1.tokenAddress
       })
     }
+    // let [oneDayResult, twoDayResult, oneWeekResult] = await Promise.all(
+    //   [b1, b2, bWeek].map(async (block) => {
+    //     let result = client.query({
+    //       query: PAIRS_HISTORICAL_BULK(block, pairList),
+    //       fetchPolicy: 'cache-first',
+    //     })
+    //     return result
+    //   })
+    // )
     let [oneDayResult, twoDayResult, oneWeekResult] = await Promise.all(
       [b1, b2, bWeek].map(async (block) => {
-        let result = client.query({
-          query: PAIRS_HISTORICAL_BULK(block, pairList),
+        let result = clientHydra.query({
+          query: PAIRS_HISTORICAL_BULK_HYDRA(block, pairList),
           fetchPolicy: 'cache-first',
         })
         return result
       })
     )
-
+    
     let oneDayData = oneDayResult?.data?.pairs.reduce((obj, cur, i) => {
       return { ...obj, [cur.id]: cur }
     }, {})
@@ -239,24 +251,36 @@ async function getBulkPairData(pairList, ethPrice) {
           let data = pair
           let oneDayHistory = oneDayData?.[pair.id]
           if (!oneDayHistory) {
-            let newData = await client.query({
-              query: PAIR_DATA(pair.id, b1),
+            // let newData = await client.query({
+            //   query: PAIR_DATA(pair.id, b1),
+            //   fetchPolicy: 'cache-first',
+            // })
+            let newData = await clientHydra.query({
+              query: PAIR_DATA_HYDRA(pair.id, b1),
               fetchPolicy: 'cache-first',
             })
             oneDayHistory = newData.data.pairs[0]
           }
           let twoDayHistory = twoDayData?.[pair.id]
           if (!twoDayHistory) {
-            let newData = await client.query({
-              query: PAIR_DATA(pair.id, b2),
+            // let newData = await client.query({
+            //   query: PAIR_DATA(pair.id, b2),
+            //   fetchPolicy: 'cache-first',
+            // })
+            let newData = await clientHydra.query({
+              query: PAIR_DATA_HYDRA(pair.id, b2),
               fetchPolicy: 'cache-first',
             })
             twoDayHistory = newData.data.pairs[0]
           }
           let oneWeekHistory = oneWeekData?.[pair.id]
           if (!oneWeekHistory) {
-            let newData = await client.query({
-              query: PAIR_DATA(pair.id, bWeek),
+            // let newData = await client.query({
+            //   query: PAIR_DATA(pair.id, bWeek),
+            //   fetchPolicy: 'cache-first',
+            // })
+            let newData = await clientHydra.query({
+              query: PAIR_DATA_HYDRA(pair.id, bWeek),
               fetchPolicy: 'cache-first',
             })
             oneWeekHistory = newData.data.pairs[0]
@@ -333,8 +357,15 @@ const getPairTransactions = async (pairAddress) => {
   const transactions = {}
 
   try {
-    let result = await client.query({
-      query: FILTERED_TRANSACTIONS,
+    // let result = await client.query({
+    //   query: FILTERED_TRANSACTIONS,
+    //   variables: {
+    //     allPairs: [pairAddress],
+    //   },
+    //   fetchPolicy: 'no-cache',
+    // })
+    let result = await clientHydra.query({
+      query: FILTERED_TRANSACTIONS_HYDRA,
       variables: {
         allPairs: [pairAddress],
       },
@@ -343,6 +374,21 @@ const getPairTransactions = async (pairAddress) => {
     transactions.mints = result.data.mints
     transactions.burns = result.data.burns
     transactions.swaps = result.data.swaps
+    transactions.mints.forEach((mint) => {
+      mint.pair.token0.id = mint.pair.token0.tokenAddress
+      mint.pair.token1.id = mint.pair.token1.tokenAddress
+      mint.transaction.id = mint.transaction.txHash
+    })
+    transactions.burns.forEach((burn) => {
+      burn.pair.token0.id = burn.pair.token0.tokenAddress
+      burn.pair.token1.id = burn.pair.token1.tokenAddress
+      burn.transaction.id = burn.transaction.txHash
+    })
+    transactions.swaps.forEach((swap) => {
+      swap.pair.token0.id = swap.pair.token0.tokenAddress
+      swap.pair.token1.id = swap.pair.token1.tokenAddress
+      swap.transaction.id = swap.transaction.txHash
+    })
   } catch (e) {
     console.log(e)
   }

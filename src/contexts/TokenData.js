@@ -229,16 +229,17 @@ const getTopTokens = async (ethPrice, ethPriceOld) => {
   const utcCurrentTime = dayjs()
   const utcOneDayBack = utcCurrentTime.subtract(1, 'day').unix()
   const utcTwoDaysBack = utcCurrentTime.subtract(2, 'day').unix()
-  let oneDayBlockEth = await getBlockFromTimestamp(utcOneDayBack)
+  // let oneDayBlock = await getBlockFromTimestamp(utcOneDayBack)
   let oneDayBlock = await getBlockFromTimestampHYDRA(utcOneDayBack)
   // console.log('oneDayBlockEth ->', oneDayBlockEth);
-  // console.log('oneDayBlock ->', oneDayBlock);
-  let twoDayBlock = await getBlockFromTimestamp(utcTwoDaysBack)
+  console.log('oneDayBlockHydra ->', oneDayBlock);
+  // let twoDayBlock = await getBlockFromTimestamp(utcTwoDaysBack)
+  let twoDayBlock = await getBlockFromTimestampHYDRA(utcTwoDaysBack)
 
   try {
     // need to get the top tokens by liquidity by need token day datas
     const currentDate = parseInt(Date.now() / 86400 / 1000) * 86400 - 86400
-    // let tokenidseth = await client.query({
+    // let tokenids = await client.query({
     //   query: TOKEN_TOP_DAY_DATAS,
     //   fetchPolicy: 'network-only',
     //   variables: { date: currentDate },
@@ -250,40 +251,46 @@ const getTopTokens = async (ethPrice, ethPriceOld) => {
       fetchPolicy: 'network-only',
       variables: { date: currentDate + '' },
     })
-    // console.log('tokenids->', tokenids)
-    // const idseth = tokenidseth?.data?.tokenDayDatas?.reduce((accum, entry) => {
+    // const ids = tokenids?.data?.tokenDayDatas?.reduce((accum, entry) => {
     //   accum.push(entry.id.slice(0, 42))
     //   return accum
     // }, [])
 
     const ids = tokenids?.data?.tokenDayDatas?.reduce((accum, entry) => {
-      accum.push(entry.id.slice(0, 42))
+      accum.push(entry.id.slice(0, 40))
       return accum
     }, [])
-
-    // let currentEth = await client.query({
-    //   query: TOKENS_HISTORICAL_BULK(idseth),
+    // let current = await client.query({
+    //   query: TOKENS_HISTORICAL_BULK(ids),
     //   fetchPolicy: 'cache-first',
     // })
-    // console.log('currentEth =>', currentEth);
+    // console.log('currentEth =>', current);
 
     let current = await clientHydra.query({
       query: TOKENS_HISTORICAL_BULK_HYDRA(ids),
       fetchPolicy: 'cache-first',
     })
-    // console.log('currents tokens ->', current);
+    // console.log('currentHydra ->', current);
 
-    let oneDayResult = await client.query({
-      query: TOKENS_HISTORICAL_BULK(ids, oneDayBlockEth),
+    // let oneDayResult = await client.query({
+    //   query: TOKENS_HISTORICAL_BULK(ids, oneDayBlock),
+    //   fetchPolicy: 'cache-first',
+    // })
+    let oneDayResult = await clientHydra.query({
+      query: TOKENS_HISTORICAL_BULK_HYDRA(ids, oneDayBlock),
       fetchPolicy: 'cache-first',
     })
     // console.log('oneDayResult ->', oneDayResult);
 
-    let twoDayResult = await client.query({
-      query: TOKENS_HISTORICAL_BULK(ids, twoDayBlock),
+    // let twoDayResult = await client.query({
+    //   query: TOKENS_HISTORICAL_BULK(ids, twoDayBlock),
+    //   fetchPolicy: 'cache-first',
+    // })
+    let twoDayResult = await clientHydra.query({
+      query: TOKENS_HISTORICAL_BULK_HYDRA(ids, twoDayBlock),
       fetchPolicy: 'cache-first',
     })
-
+    // console.log('twoDayResult ->', twoDayResult);
     let oneDayData = oneDayResult?.data?.tokens.reduce((obj, cur, i) => {
       return { ...obj, [cur.id]: cur }
     }, {})
@@ -305,15 +312,24 @@ const getTopTokens = async (ethPrice, ethPriceOld) => {
 
           // catch the case where token wasnt in top list in previous days
           if (!oneDayHistory) {
-            let oneDayResult = await client.query({
-              query: TOKEN_DATA(token.id, oneDayBlock),
+            // let oneDayResult = await client.query({
+            //   query: TOKEN_DATA(token.id, oneDayBlock),
+            //   fetchPolicy: 'cache-first',
+            // })
+            let oneDayResult = await clientHydra.query({
+              query: TOKEN_DATA_HYDRA(token.id, oneDayBlock),
               fetchPolicy: 'cache-first',
             })
             oneDayHistory = oneDayResult.data.tokens[0]
+            console.log('TOKEN_DATA(token.id, oneDayBlock) ->', oneDayResult);
           }
           if (!twoDayHistory) {
-            let twoDayResult = await client.query({
-              query: TOKEN_DATA(token.id, twoDayBlock),
+            // let twoDayResult = await client.query({
+            //   query: TOKEN_DATA(token.id, twoDayBlock),
+            //   fetchPolicy: 'cache-first',
+            // })
+            let twoDayResult = await clientHydra.query({
+              query: TOKEN_DATA_HYDRA(token.id, twoDayBlock),
               fetchPolicy: 'cache-first',
             })
             twoDayHistory = twoDayResult.data.tokens[0]
@@ -363,16 +379,16 @@ const getTopTokens = async (ethPrice, ethPriceOld) => {
           })
 
           // HOTFIX for Aave
-          if (data.id === '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9') {
-            const aaveData = await client.query({
-              query: PAIR_DATA('0xdfc14d2af169b0d36c4eff567ada9b2e0cae044f'),
-              fetchPolicy: 'cache-first',
-            })
-            const result = aaveData.data.pairs[0]
-            data.totalLiquidityUSD = parseFloat(result.reserveUSD) / 2
-            data.liquidityChangeUSD = 0
-            data.priceChangeUSD = 0
-          }
+          // if (data.id === '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9') {
+          //   const aaveData = await client.query({
+          //     query: PAIR_DATA('0xdfc14d2af169b0d36c4eff567ada9b2e0cae044f'),
+          //     fetchPolicy: 'cache-first',
+          //   })
+          //   const result = aaveData.data.pairs[0]
+          //   data.totalLiquidityUSD = parseFloat(result.reserveUSD) / 2
+          //   data.liquidityChangeUSD = 0
+          //   data.priceChangeUSD = 0
+          // }
 
           // used for custom adjustments
           data.oneDayData = oneDayHistory
@@ -395,8 +411,10 @@ const getTokenData = async (address, ethPrice, ethPriceOld) => {
   const utcCurrentTime = dayjs()
   const utcOneDayBack = utcCurrentTime.subtract(1, 'day').startOf('minute').unix()
   const utcTwoDaysBack = utcCurrentTime.subtract(2, 'day').startOf('minute').unix()
-  let oneDayBlock = await getBlockFromTimestamp(utcOneDayBack)
-  let twoDayBlock = await getBlockFromTimestamp(utcTwoDaysBack)
+  // let oneDayBlock = await getBlockFromTimestamp(utcOneDayBack)
+  // let twoDayBlock = await getBlockFromTimestamp(utcTwoDaysBack)
+  let oneDayBlock = await getBlockFromTimestampHYDRA(utcOneDayBack)
+  let twoDayBlock = await getBlockFromTimestampHYDRA(utcTwoDaysBack)
 
   // initialize data arrays
   let data = {}
@@ -414,32 +432,50 @@ const getTokenData = async (address, ethPrice, ethPriceOld) => {
       fetchPolicy: 'cache-first',
     })
     data = result?.data?.tokens?.[0]
-
+    console.log('result ->',result);
     // get results from 24 hours in past
-    let oneDayResult = await client.query({
-      query: TOKEN_DATA(address, oneDayBlock),
+    // let oneDayResult = await client.query({
+    //   query: TOKEN_DATA(address, oneDayBlock),
+    //   fetchPolicy: 'cache-first',
+    // })
+    let oneDayResult = await clientHydra.query({
+      query: TOKEN_DATA_HYDRA(address, oneDayBlock),
       fetchPolicy: 'cache-first',
     })
     oneDayData = oneDayResult.data.tokens[0]
+    console.log('oneDayData ->',oneDayData);
+
 
     // get results from 48 hours in past
-    let twoDayResult = await client.query({
-      query: TOKEN_DATA(address, twoDayBlock),
+    // let twoDayResult = await client.query({
+    //   query: TOKEN_DATA(address, twoDayBlock),
+    //   fetchPolicy: 'cache-first',
+    // })
+    let twoDayResult = await clientHydra.query({
+      query: TOKEN_DATA_HYDRA(address, twoDayBlock),
       fetchPolicy: 'cache-first',
     })
     twoDayData = twoDayResult.data.tokens[0]
 
     // catch the case where token wasnt in top list in previous days
     if (!oneDayData) {
-      let oneDayResult = await client.query({
-        query: TOKEN_DATA(address, oneDayBlock),
+      // let oneDayResult = await client.query({
+      //   query: TOKEN_DATA(address, oneDayBlock),
+      //   fetchPolicy: 'cache-first',
+      // })
+      let oneDayResult = await clientHydra.query({
+        query: TOKEN_DATA_HYDRA(address, oneDayBlock),
         fetchPolicy: 'cache-first',
       })
       oneDayData = oneDayResult.data.tokens[0]
     }
     if (!twoDayData) {
-      let twoDayResult = await client.query({
-        query: TOKEN_DATA(address, twoDayBlock),
+      // let twoDayResult = await client.query({
+      //   query: TOKEN_DATA(address, twoDayBlock),
+      //   fetchPolicy: 'cache-first',
+      // })
+      let twoDayResult = await clientHydra.query({
+        query: TOKEN_DATA_HYDRA(address, twoDayBlock),
         fetchPolicy: 'cache-first',
       })
       twoDayData = twoDayResult.data.tokens[0]
@@ -504,16 +540,16 @@ const getTokenData = async (address, ethPrice, ethPriceOld) => {
     })
 
     // HOTFIX for Aave
-    if (data.id === '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9') {
-      const aaveData = await client.query({
-        query: PAIR_DATA('0xdfc14d2af169b0d36c4eff567ada9b2e0cae044f'),
-        fetchPolicy: 'cache-first',
-      })
-      const result = aaveData.data.pairs[0]
-      data.totalLiquidityUSD = parseFloat(result.reserveUSD) / 2
-      data.liquidityChangeUSD = 0
-      data.priceChangeUSD = 0
-    }
+    // if (data.id === '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9') {
+    //   const aaveData = await client.query({
+    //     query: PAIR_DATA('0xdfc14d2af169b0d36c4eff567ada9b2e0cae044f'),
+    //     fetchPolicy: 'cache-first',
+    //   })
+    //   const result = aaveData.data.pairs[0]
+    //   data.totalLiquidityUSD = parseFloat(result.reserveUSD) / 2
+    //   data.liquidityChangeUSD = 0
+    //   data.priceChangeUSD = 0
+    // }
   } catch (e) {
     console.log(e)
   }
@@ -633,7 +669,7 @@ const getIntervalTokenData = async (tokenAddress, startTime, interval = 3600, la
     for (var brow in result) {
       let timestamp = brow.split('b')[1]
       if (timestamp) {
-        values[index].priceUSD = result[brow].hydraPrice * values[index].derivedHYDRA
+        values[index].priceUSD = result[brow]?.hydraPrice * values[index].derivedHYDRA
         index += 1
       }
     }

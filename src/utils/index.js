@@ -148,17 +148,17 @@ export async function splitQuery(query, localClient, vars, list, skipCount = 100
  * @dev Query speed is optimized by limiting to a 600-second period
  * @param {Int} timestamp in seconds
  */
-export async function getBlockFromTimestamp(timestamp) {
-  let result = await blockClient.query({
-    query: GET_BLOCK,
-    variables: {
-      timestampFrom: timestamp,
-      timestampTo: timestamp + 600,
-    },
-    fetchPolicy: 'cache-first',
-  })
-  return result?.data?.blocks?.[0]?.number
-}
+// export async function getBlockFromTimestamp(timestamp) {
+//   let result = await blockClient.query({
+//     query: GET_BLOCK,
+//     variables: {
+//       timestampFrom: timestamp,
+//       timestampTo: timestamp + 600,
+//     },
+//     fetchPolicy: 'cache-first',
+//   })
+//   return result?.data?.blocks?.[0]?.number
+// }
 
 export async function getBlockFromTimestampHYDRA(timestamp) {
   let result = await clientHydra.query({
