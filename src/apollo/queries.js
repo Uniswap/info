@@ -76,18 +76,18 @@ export const GET_BLOCK_HYDRA = gql`
   }
 `
 
-// export const GET_BLOCKS = (timestamps) => {
-//   let queryString = 'query blocks {'
-//   queryString += timestamps.map((timestamp) => {
-//     return `t${timestamp}:blocks(first: 1, orderBy: timestamp, orderDirection: desc, where: { timestamp_gt: ${timestamp}, timestamp_lt: ${
-//       timestamp + 600
-//     } }) {
-//       number
-//     }`
-//   })
-//   queryString += '}'
-//   return gql(queryString)
-// }
+export const GET_BLOCKS = (timestamps) => {
+  let queryString = 'query blocks {'
+  queryString += timestamps.map((timestamp) => {
+    return `t${timestamp}:blocks(first: 1, orderBy: timestamp, orderDirection: desc, where: { timestamp_gt: ${timestamp}, timestamp_lt: ${
+      timestamp + 600
+    } }) {
+      number
+    }`
+  })
+  queryString += '}'
+  return gql(queryString)
+}
 
 export const GET_BLOCKS_HYDRA = (timestamps) => {
   let queryString = `query blocks { 
@@ -139,6 +139,28 @@ export const PRICES_BY_BLOCK = (tokenAddress, blocks) => {
     (block) => `
       b${block.timestamp}: bundle(id:"1", block: { number: ${block.number} }) { 
         ethPrice
+      }
+    `
+  )
+
+  queryString += '}'
+  return gql(queryString)
+}
+
+export const PRICES_BY_BLOCK_HYDRA = (tokenAddress, blocks) => {
+  let queryString = 'query blocks {'
+  queryString += blocks.map(
+    (block) => `
+      t${block.timestamp}:token(id:"${tokenAddress}", block: { number: ${block.number} }) { 
+        derivedHYDRA
+      }
+    `
+  )
+  queryString += ','
+  queryString += blocks.map(
+    (block) => `
+      b${block.timestamp}: bundle(id:"1", block: { number: ${block.number} }) { 
+        hydraPrice
       }
     `
   )
@@ -488,37 +510,51 @@ export const PAIR_DAY_DATA_BULK = (pairs, startTimestamp) => {
   return gql(queryString)
 }
 
-export const GLOBAL_CHART = gql`
-  query uniswapDayDatas($startTime: Int!, $skip: Int!) {
-    uniswapDayDatas(first: 1000, skip: $skip, where: { date_gt: $startTime }, orderBy: date, orderDirection: asc) {
+// export const GLOBAL_CHART = gql`
+//   query uniswapDayDatas($startTime: Int!, $skip: Int!) {
+//     uniswapDayDatas(first: 1000, skip: $skip, where: { date_gt: $startTime }, orderBy: date, orderDirection: asc) {
+//       id
+//       date
+//       totalVolumeUSD
+//       dailyVolumeUSD
+//       dailyVolumeETH
+//       totalLiquidityUSD
+//       totalLiquidityETH
+//     }
+//   }
+// `
+
+export const GLOBAL_CHART_HYDRA = gql`
+  query hydraswapDayDatas($startTime: Int!, $skip: Int!) {
+    hydraswapDayDatas(first: 1000, skip: $skip, where: { date_gt: $startTime }, orderBy: "date", orderDirection: "asc") {
       id
       date
       totalVolumeUSD
       dailyVolumeUSD
-      dailyVolumeETH
+      dailyVolumeHYDRA
       totalLiquidityUSD
-      totalLiquidityETH
+      totalLiquidityHYDRA
     }
   }
 `
 
-export const GLOBAL_DATA = (block) => {
-  const queryString = ` query uniswapFactories {
-      uniswapFactories(
-       ${block ? `block: { number: ${block}}` : ``} 
-       where: { id: "${FACTORY_ADDRESS}" }) {
-        id
-        totalVolumeUSD
-        totalVolumeETH
-        untrackedVolumeUSD
-        totalLiquidityUSD
-        totalLiquidityETH
-        txCount
-        pairCount
-      }
-    }`
-  return gql(queryString)
-}
+// export const GLOBAL_DATA = (block) => {
+//   const queryString = ` query uniswapFactories {
+//       uniswapFactories(
+//        ${block ? `block: { number: ${block}}` : ``} 
+//        where: { id: "${FACTORY_ADDRESS}" }) {
+//         id
+//         totalVolumeUSD
+//         totalVolumeETH
+//         untrackedVolumeUSD
+//         totalLiquidityUSD
+//         totalLiquidityETH
+//         txCount
+//         pairCount
+//       }
+//     }`
+//   return gql(queryString)
+// }
 
 export const GLOBAL_DATA_HYDRA = (block) => {
   const queryString = ` query Query {
@@ -993,19 +1029,35 @@ export const TOKEN_CHART = gql`
   }
 `
 
-const TokenFields = `
-  fragment TokenFields on Token {
-    id
-    name
-    symbol
-    derivedETH
-    tradeVolume
-    tradeVolumeUSD
-    untrackedVolumeUSD
-    totalLiquidity
-    txCount
+export const TOKEN_CHART_HYDRA = gql`
+  query tokenDayDatas($tokenAddr: String!, $skip: Int!) {
+    tokenDayDatas(first: 1000, skip: $skip, orderBy: "date", orderDirection: "asc", where: { token: $tokenAddr }) {
+      id
+      date
+      priceUSD
+      totalLiquidityToken
+      totalLiquidityUSD
+      totalLiquidityHYDRA
+      dailyVolumeHYDRA
+      dailyVolumeToken
+      dailyVolumeUSD
+    }
   }
 `
+
+// const TokenFields = `
+//   fragment TokenFields on Token {
+//     id
+//     name
+//     symbol
+//     derivedETH
+//     tradeVolume
+//     tradeVolumeUSD
+//     untrackedVolumeUSD
+//     totalLiquidity
+//     txCount
+//   }
+// `
 const TokenFieldsHydra = `
   fragment TokenFields on Token {
     id

@@ -24,6 +24,7 @@ import {
   ALL_PAIRS_HYDRA,
   GLOBAL_TXNS_HYDRA,
   TOP_LPS_PER_PAIRS_HYDRA,
+  GLOBAL_CHART_HYDRA,
 } from '../apollo/queries'
 import weekOfYear from 'dayjs/plugin/weekOfYear'
 import { useAllPairData } from './PairData'
@@ -264,30 +265,45 @@ async function getGlobalData(ethPrice, oldEthPrice) {
 
 
     // fetch the historical data
-    let oneDayResult = await client.query({
-      query: GLOBAL_DATA(oneDayBlock?.number),
+    // let oneDayResult = await client.query({
+    //   query: GLOBAL_DATA(oneDayBlock?.number),
+    //   fetchPolicy: 'cache-first',
+    // })
+    console.log('oneDayBlock', oneDayBlock);
+    let oneDayResult = await clientHydra.query({
+      query: GLOBAL_DATA_HYDRA(oneDayBlock?.number),
       fetchPolicy: 'cache-first',
     })
-    // console.log('GLOBAL_DATA(oneDayBlock?.number) Eth ->', oneDayResult);
-    oneDayData = oneDayResult.data.uniswapFactories[0]
+    oneDayData = oneDayResult.data.hydraswapFactories[0]
+    // let twoDayResult = await client.query({
+    //   query: GLOBAL_DATA(twoDayBlock?.number),
+    //   fetchPolicy: 'cache-first',
+    // })
+    let twoDayResult = await clientHydra.query({
+      query: GLOBAL_DATA_HYDRA(twoDayBlock?.number),
+      fetchPolicy: 'cache-first',
+    })
+    twoDayData = twoDayResult.data.hydraswapFactories[0]
 
-    let twoDayResult = await client.query({
-      query: GLOBAL_DATA(twoDayBlock?.number),
+    // let oneWeekResult = await client.query({
+    //   query: GLOBAL_DATA(oneWeekBlock?.number),
+    //   fetchPolicy: 'cache-first',
+    // })
+    let oneWeekResult = await clientHydra.query({
+      query: GLOBAL_DATA_HYDRA(oneWeekBlock?.number),
       fetchPolicy: 'cache-first',
     })
-    twoDayData = twoDayResult.data.uniswapFactories[0]
+    const oneWeekData = oneWeekResult.data.hydraswapFactories[0]
 
-    let oneWeekResult = await client.query({
-      query: GLOBAL_DATA(oneWeekBlock?.number),
+    // let twoWeekResult = await client.query({
+    //   query: GLOBAL_DATA(twoWeekBlock?.number),
+    //   fetchPolicy: 'cache-first',
+    // })
+    let twoWeekResult = await clientHydra.query({
+      query: GLOBAL_DATA_HYDRA(twoWeekBlock?.number),
       fetchPolicy: 'cache-first',
     })
-    const oneWeekData = oneWeekResult.data.uniswapFactories[0]
-
-    let twoWeekResult = await client.query({
-      query: GLOBAL_DATA(twoWeekBlock?.number),
-      fetchPolicy: 'cache-first',
-    })
-    const twoWeekData = twoWeekResult.data.uniswapFactories[0]
+    const twoWeekData = twoWeekResult.data.hydraswapFactories[0]
 
     if (data && oneDayData && twoDayData && twoWeekData) {
       let [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentChange(
@@ -327,7 +343,7 @@ async function getGlobalData(ethPrice, oldEthPrice) {
   } catch (e) {
     console.log(e)
   }
-
+  
   return data
 }
 
@@ -348,8 +364,16 @@ const getChartData = async (oldestDateToFetch, offsetData) => {
 
   try {
     while (!allFound) {
-      let result = await client.query({
-        query: GLOBAL_CHART,
+      // let result = await client.query({
+      //   query: GLOBAL_CHART,
+      //   variables: {
+      //     startTime: oldestDateToFetch,
+      //     skip,
+      //   },
+      //   fetchPolicy: 'cache-first',
+      // })
+      let result = await clientHydra.query({
+        query: GLOBAL_CHART_HYDRA,
         variables: {
           startTime: oldestDateToFetch,
           skip,
@@ -357,8 +381,8 @@ const getChartData = async (oldestDateToFetch, offsetData) => {
         fetchPolicy: 'cache-first',
       })
       skip += 1000
-      data = data.concat(result.data.uniswapDayDatas)
-      if (result.data.uniswapDayDatas.length < 1000) {
+      data = data.concat(result.data.hydraswapDayDatas)
+      if (result.data.hydraswapDayDatas.length < 1000) {
         allFound = true
       }
     }
