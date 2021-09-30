@@ -1,7 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
 import { Flex } from 'rebass'
-import { MoreHorizontal } from 'react-feather'
 
 import { AutoColumn } from '../Column'
 import { ButtonEmpty } from '../ButtonStyled'
@@ -71,14 +70,6 @@ const DataText = styled(Flex)`
   flex-direction: column;
 `
 
-const ButtonWrapper = styled(Flex)`
-  justify-content: space-between;
-`
-
-const StyledMoreHorizontal = styled(MoreHorizontal)`
-  color: ${({ theme }) => theme.text9};
-`
-
 const PoolAddressContainer = styled(Flex)`
   align-items: center;
 `
@@ -99,7 +90,7 @@ const getOneYearFL = (liquidity, feeOneDay) => {
   return !feeOneDay || parseFloat(liquidity) === 0 ? 0 : (parseFloat(feeOneDay) * 365 * 100) / parseFloat(liquidity)
 }
 
-export const ItemCard = ({ pool, myLiquidity }) => {
+export const ItemCard = ({ pool }) => {
   const amp = pool.amp / 10000
 
   const percentToken0 =

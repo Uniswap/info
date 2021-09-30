@@ -327,10 +327,11 @@ export function useModalOpen(modal) {
 }
 
 export function useToggleModal(modal) {
-  const [state, { updateOpenModal }] = useApplicationContext()
+  const [, { updateOpenModal }] = useApplicationContext()
+
   const open = useModalOpen(modal)
 
-  return useCallback(() => updateOpenModal(open ? null : modal), [modal, open])
+  return useCallback(() => updateOpenModal(open ? null : modal), [modal, open, updateOpenModal])
 }
 
 export function useToggleMenuModal() {

@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import 'feather-icons'
 import { withRouter } from 'react-router-dom'
 import { Text } from 'rebass'
 import styled from 'styled-components'
@@ -89,10 +88,8 @@ const WarningGrouping = styled.div`
 
 function TokenPage({ address, history }) {
   const {
-    id,
     name,
     symbol,
-    decimals,
     priceUSD,
     oneDayVolumeUSD,
     totalLiquidityUSD,

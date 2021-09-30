@@ -25,7 +25,7 @@ const SocialLinks = () => {
         </StyledIcon>
       </Link>
 
-      <Link href="https://discord.gg/HdXWUb2pQM" external>
+      <Link href="https://discord.gg/fQjDvdkc" external>
         <StyledIcon>
           <DiscordIcon />
         </StyledIcon>

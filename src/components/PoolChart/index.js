@@ -66,7 +66,7 @@ const PoolChart = ({ address, color, base0, base1 }) => {
   // get data for pool, and rates
   const poolData = usePoolData(address)
   let chartData = usePoolChartData(address)
-  const hourlyData = useHourlyRateData(address, timeWindow)
+  const hourlyData = useHourlyRateData(address, timeWindow, timeWindow === timeframeOptions.THERE_DAYS ? 300 : 3600)
   const hourlyRate0 = hourlyData && hourlyData[0]
   const hourlyRate1 = hourlyData && hourlyData[1]
 

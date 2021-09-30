@@ -26,7 +26,7 @@ import {
   getTimestampsForChanges,
   splitQuery,
 } from '../utils'
-import { getBlockFromTimestamp, getBlocksFromTimestamps } from '../utils'
+import { getBlocksFromTimestamps } from '../utils'
 // import { getBlockFromTimestamp, getBlocksFromTimestamps } from '../utils/mocks'
 
 import { timeframeOptions } from '../constants'
@@ -201,7 +201,7 @@ export default function Provider({ children }) {
             updateHourlyData,
           },
         ],
-        [state, update, updatePairTxns, updateChartData, updateTopPairs, updateHourlyData]
+        [state, update, updatePairTxns, updateChartData, updateTopPairs, updateHourlyData, updatePairPools]
       )}
     >
       {children}
@@ -291,7 +291,7 @@ function parseData(data, oneDayData, twoDayData, oneWeekData, ethPrice, oneDayBl
     twoDayData?.volumeUSD ? twoDayData.volumeUSD : 0
   )
 
-  const [oneDayFeeUSD, feeChangeUSD] = get2DayPercentChange(
+  const [oneDayFeeUSD] = get2DayPercentChange(
     data?.feeUSD,
     oneDayData?.feeUSD ? oneDayData.feeUSD : 0,
     twoDayData?.feeUSD ? twoDayData.feeUSD : 0
@@ -301,7 +301,7 @@ function parseData(data, oneDayData, twoDayData, oneWeekData, ethPrice, oneDayBl
     oneDayData?.untrackedVolumeUSD ? parseFloat(oneDayData?.untrackedVolumeUSD) : 0,
     twoDayData?.untrackedVolumeUSD ? twoDayData?.untrackedVolumeUSD : 0
   )
-  const [oneDayFeeUntracked, feeChangeUntracked] = get2DayPercentChange(
+  const [oneDayFeeUntracked] = get2DayPercentChange(
     data?.untrackedFeeUSD,
     oneDayData?.untrackedFeeUSD ? parseFloat(oneDayData?.untrackedFeeUSD) : 0,
     twoDayData?.untrackedFeeUSD ? twoDayData?.untrackedFeeUSD : 0
@@ -451,16 +451,16 @@ const getPairChartData = async (pairAddress) => {
   return data
 }
 
-const getHourlyRateData = async (pairAddress, startTime, latestBlock) => {
+const getRateData = async (pairAddress, startTime, latestBlock, frequency = 300) => {
   try {
     const utcEndTime = dayjs.utc()
     let time = startTime
 
     // create an array of hour start times until we reach current hour
     const timestamps = []
-    while (time <= utcEndTime.unix() - 300) {
+    while (time <= utcEndTime.unix() - frequency) {
       timestamps.push(time)
-      time += 300
+      time += frequency
     }
 
     // backout if invalid timestamp format
@@ -550,7 +550,7 @@ export function Updater() {
   return null
 }
 
-export function useHourlyRateData(pairAddress, timeWindow) {
+export function usePairRateData(pairAddress, timeWindow, frequency) {
   const [state, { updateHourlyData }] = usePairDataContext()
   const chartData = state?.[pairAddress]?.hourlyData?.[timeWindow]
   const [latestBlock] = useLatestBlocks()
@@ -575,13 +575,13 @@ export function useHourlyRateData(pairAddress, timeWindow) {
     }
 
     async function fetch() {
-      let data = await getHourlyRateData(pairAddress, startTime, latestBlock)
+      let data = await getRateData(pairAddress, startTime, latestBlock, frequency)
       updateHourlyData(pairAddress, data, timeWindow)
     }
     if (!chartData) {
       fetch()
     }
-  }, [chartData, timeWindow, pairAddress, updateHourlyData, latestBlock])
+  }, [chartData, timeWindow, pairAddress, updateHourlyData, latestBlock, frequency])
 
   return chartData
 }
@@ -689,7 +689,7 @@ export function usePairPools(pairAddress) {
       }
     }
     ethPrice && checkForPairPools()
-  }, [pairPools, pairAddress, updatePairPools])
+  }, [pairPools, pairAddress, updatePairPools, ethPrice])
 
   return pairPools
 }

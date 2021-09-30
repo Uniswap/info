@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import { Flex, Text } from 'rebass'
 import { ChevronUp, ChevronDown } from 'react-feather'
@@ -36,11 +36,6 @@ const ClickableText = styled(Text)`
   }
   user-select: none;
   text-transform: uppercase;
-`
-
-const DataText = styled(Flex)`
-  color: ${({ theme }) => theme.text7};
-  flex-direction: column;
 `
 
 const LoadMoreButtonContainer = styled.div`
