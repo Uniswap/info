@@ -21,6 +21,9 @@ export function getTimeframe(timeWindow) {
   // based on window, get starttime
   let utcStartTime
   switch (timeWindow) {
+    case timeframeOptions.THERE_DAYS:
+      utcStartTime = utcEndTime.subtract(3, 'day').endOf('day').unix() - 1
+      break
     case timeframeOptions.WEEK:
       utcStartTime = utcEndTime.subtract(1, 'week').endOf('day').unix() - 1
       break
