@@ -3,7 +3,7 @@ import { BigNumber } from 'bignumber.js'
 import dayjs from 'dayjs'
 import { ethers } from 'ethers'
 import utc from 'dayjs/plugin/utc'
-import { client, blockClient } from '../apollo/client'
+import { client } from '../apollo/client'
 import { GET_BLOCK, GET_BLOCKS, SHARE_VALUE } from '../apollo/queries'
 import { Text } from 'rebass'
 import _Decimal from 'decimal.js-light'
@@ -149,15 +149,15 @@ export async function splitQuery(query, localClient, vars, list, skipCount = 100
  * @param {Int} timestamp in seconds
  */
 export async function getBlockFromTimestamp(timestamp) {
-  let result = await blockClient.query({
-    query: GET_BLOCK,
-    variables: {
-      timestampFrom: timestamp,
-      timestampTo: timestamp + 600,
-    },
-    fetchPolicy: 'cache-first',
-  })
-  return result?.data?.blocks?.[0]?.number
+  // let result = await blockClient.query({
+  //   query: GET_BLOCK,
+  //   variables: {
+  //     timestampFrom: timestamp,
+  //     timestampTo: timestamp + 600,
+  //   },
+  //   fetchPolicy: 'cache-first',
+  // })
+  // return result?.data?.blocks?.[0]?.number
 }
 
 /**
@@ -172,19 +172,19 @@ export async function getBlocksFromTimestamps(timestamps, skipCount = 500) {
     return []
   }
 
-  let fetchedData = await splitQuery(GET_BLOCKS, blockClient, [], timestamps, skipCount)
+  //let fetchedData = await splitQuery(GET_BLOCKS, blockClient, [], timestamps, skipCount)
 
   let blocks = []
-  if (fetchedData) {
-    for (var t in fetchedData) {
-      if (fetchedData[t].length > 0) {
-        blocks.push({
-          timestamp: t.split('t')[1],
-          number: fetchedData[t][0]['number'],
-        })
-      }
-    }
-  }
+  // if (fetchedData) {
+  //   for (var t in fetchedData) {
+  //     if (fetchedData[t].length > 0) {
+  //       blocks.push({
+  //         timestamp: t.split('t')[1],
+  //         number: fetchedData[t][0]['number'],
+  //       })
+  //     }
+  //   }
+  // }
   return blocks
 }
 
