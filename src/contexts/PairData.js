@@ -14,6 +14,7 @@ import {
   FILTERED_TRANSACTIONS_HYDRA,
   PAIRS_HISTORICAL_BULK_HYDRA,
   PAIR_DATA_HYDRA,
+  PAIR_CHART_HYDRA,
 } from '../apollo/queries'
 
 import { useEthPrice } from './GlobalData'
@@ -232,7 +233,7 @@ async function getBulkPairData(pairList, ethPrice) {
         return result
       })
     )
-    
+
     let oneDayData = oneDayResult?.data?.pairs.reduce((obj, cur, i) => {
       return { ...obj, [cur.id]: cur }
     }, {})
@@ -406,8 +407,16 @@ const getPairChartData = async (pairAddress) => {
     let allFound = false
     let skip = 0
     while (!allFound) {
-      let result = await client.query({
-        query: PAIR_CHART,
+      // let result = await client.query({
+      //   query: PAIR_CHART,
+      //   variables: {
+      //     pairAddress: pairAddress,
+      //     skip,
+      //   },
+      //   fetchPolicy: 'cache-first',
+      // })
+      let result = await clientHydra.query({
+        query: PAIR_CHART_HYDRA,
         variables: {
           pairAddress: pairAddress,
           skip,

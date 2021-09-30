@@ -114,7 +114,7 @@ export function getTimestampsForChanges() {
   return [t1, t2, tWeek]
 }
 
-export async function splitQuery(query, localClient, vars, list, skipCount = 100, isMine = false) {
+export async function splitQuery(query, localClient, vars, list, skipCount = 100) {
   let fetchedData = {}
   let allFound = false
   let skip = 0
@@ -193,9 +193,8 @@ export async function getBlocksFromTimestamps(timestamps, skipCount = 500) {
   if (timestamps?.length === 0) {
     return []
   }
-
-  // let fetchedData = await splitQuery(GET_BLOCKS, blockClient, [], timestamps, skipCount)
-  let fetchedData = await splitQuery(GET_BLOCKS_HYDRA, clientHydra, [], timestamps, skipCount, true)
+  
+  let fetchedData = await splitQuery(GET_BLOCKS_HYDRA, clientHydra, [], timestamps, skipCount)
   fetchedData = transformDataHydra(fetchedData)
   let blocks = []
   if (fetchedData) {

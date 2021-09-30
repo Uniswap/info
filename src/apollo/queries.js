@@ -147,6 +147,28 @@ export const PRICES_BY_BLOCK = (tokenAddress, blocks) => {
   return gql(queryString)
 }
 
+export const PRICES_BY_BLOCK_HYDRA = (tokenAddress, blocks) => {
+  let queryString = 'query blocks {'
+  queryString += blocks.map(
+    (block) => `
+      t${block.timestamp}:token(id:"${tokenAddress}", block: { number: ${block.number} }) { 
+        derivedHYDRA
+      }
+    `
+  )
+  queryString += ','
+  queryString += blocks.map(
+    (block) => `
+      b${block.timestamp}: bundle(id:"1", block: { number: ${block.number} }) { 
+        hydraPrice
+      }
+    `
+  )
+
+  queryString += '}'
+  return gql(queryString)
+}
+
 // export const TOP_LPS_PER_PAIRS = gql`
 //   query lps($pair: Bytes!) {
 //     liquidityPositions(where: { pair: $pair }, orderBy: liquidityTokenBalance, orderDirection: desc, first: 10) {
@@ -438,9 +460,22 @@ export const USER_TRANSACTIONS = gql`
   }
 `
 
-export const PAIR_CHART = gql`
-  query pairDayDatas($pairAddress: Bytes!, $skip: Int!) {
-    pairDayDatas(first: 1000, skip: $skip, orderBy: date, orderDirection: asc, where: { pairAddress: $pairAddress }) {
+// export const PAIR_CHART = gql`
+//   query pairDayDatas($pairAddress: Bytes!, $skip: Int!) {
+//     pairDayDatas(first: 1000, skip: $skip, orderBy: date, orderDirection: asc, where: { pairAddress: $pairAddress }) {
+//       id
+//       date
+//       dailyVolumeToken0
+//       dailyVolumeToken1
+//       dailyVolumeUSD
+//       reserveUSD
+//     }
+//   }
+// `
+
+export const PAIR_CHART_HYDRA = gql`
+  query pairDayDatas($pairAddress: String!, $skip: Int!) {
+    pairDayDatas(first: 1000, skip: $skip, orderBy: "date", orderDirection: "asc", where: { pairAddress: $pairAddress }) {
       id
       date
       dailyVolumeToken0
@@ -451,19 +486,19 @@ export const PAIR_CHART = gql`
   }
 `
 
-export const PAIR_DAY_DATA = gql`
-  query pairDayDatas($pairAddress: Bytes!, $date: Int!) {
-    pairDayDatas(first: 1, orderBy: date, orderDirection: desc, where: { pairAddress: $pairAddress, date_lt: $date }) {
-      id
-      date
-      dailyVolumeToken0
-      dailyVolumeToken1
-      dailyVolumeUSD
-      totalSupply
-      reserveUSD
-    }
-  }
-`
+// export const PAIR_DAY_DATA = gql`
+//   query pairDayDatas($pairAddress: Bytes!, $date: Int!) {
+//     pairDayDatas(first: 1, orderBy: date, orderDirection: desc, where: { pairAddress: $pairAddress, date_lt: $date }) {
+//       id
+//       date
+//       dailyVolumeToken0
+//       dailyVolumeToken1
+//       dailyVolumeUSD
+//       totalSupply
+//       reserveUSD
+//     }
+//   }
+// `
 
 export const PAIR_DAY_DATA_BULK = (pairs, startTimestamp) => {
   let pairsString = `[`
@@ -488,37 +523,51 @@ export const PAIR_DAY_DATA_BULK = (pairs, startTimestamp) => {
   return gql(queryString)
 }
 
-export const GLOBAL_CHART = gql`
-  query uniswapDayDatas($startTime: Int!, $skip: Int!) {
-    uniswapDayDatas(first: 1000, skip: $skip, where: { date_gt: $startTime }, orderBy: date, orderDirection: asc) {
+// export const GLOBAL_CHART = gql`
+//   query uniswapDayDatas($startTime: Int!, $skip: Int!) {
+//     uniswapDayDatas(first: 1000, skip: $skip, where: { date_gt: $startTime }, orderBy: date, orderDirection: asc) {
+//       id
+//       date
+//       totalVolumeUSD
+//       dailyVolumeUSD
+//       dailyVolumeETH
+//       totalLiquidityUSD
+//       totalLiquidityETH
+//     }
+//   }
+// `
+
+export const GLOBAL_CHART_HYDRA = gql`
+  query hydraswapDayDatas($startTime: Int!, $skip: Int!) {
+    hydraswapDayDatas(first: 1000, skip: $skip, where: { date_gt: $startTime }, orderBy: "date", orderDirection: "asc") {
       id
       date
       totalVolumeUSD
       dailyVolumeUSD
-      dailyVolumeETH
+      dailyVolumeHYDRA
       totalLiquidityUSD
-      totalLiquidityETH
+      totalLiquidityHYDRA
     }
   }
 `
 
-export const GLOBAL_DATA = (block) => {
-  const queryString = ` query uniswapFactories {
-      uniswapFactories(
-       ${block ? `block: { number: ${block}}` : ``} 
-       where: { id: "${FACTORY_ADDRESS}" }) {
-        id
-        totalVolumeUSD
-        totalVolumeETH
-        untrackedVolumeUSD
-        totalLiquidityUSD
-        totalLiquidityETH
-        txCount
-        pairCount
-      }
-    }`
-  return gql(queryString)
-}
+// export const GLOBAL_DATA = (block) => {
+//   const queryString = ` query uniswapFactories {
+//       uniswapFactories(
+//        ${block ? `block: { number: ${block}}` : ``} 
+//        where: { id: "${FACTORY_ADDRESS}" }) {
+//         id
+//         totalVolumeUSD
+//         totalVolumeETH
+//         untrackedVolumeUSD
+//         totalLiquidityUSD
+//         totalLiquidityETH
+//         txCount
+//         pairCount
+//       }
+//     }`
+//   return gql(queryString)
+// }
 
 export const GLOBAL_DATA_HYDRA = (block) => {
   const queryString = ` query Query {
@@ -691,21 +740,44 @@ export const ALL_TOKENS = gql`
   }
 `
 
-export const TOKEN_SEARCH = gql`
+// export const TOKEN_SEARCH = gql`
+//   query tokens($value: String, $id: String) {
+//     asSymbol: tokens(where: { symbol_contains: $value }, orderBy: totalLiquidity, orderDirection: desc) {
+//       id
+//       symbol
+//       name
+//       totalLiquidity
+//     }
+//     asName: tokens(where: { name_contains: $value }, orderBy: totalLiquidity, orderDirection: desc) {
+//       id
+//       symbol
+//       name
+//       totalLiquidity
+//     }
+//     asAddress: tokens(where: { id: $id }, orderBy: totalLiquidity, orderDirection: desc) {
+//       id
+//       symbol
+//       name
+//       totalLiquidity
+//     }
+//   }
+// `
+
+export const TOKEN_SEARCH_HYDRA = gql`
   query tokens($value: String, $id: String) {
-    asSymbol: tokens(where: { symbol_contains: $value }, orderBy: totalLiquidity, orderDirection: desc) {
+    asSymbol: tokens(where: { symbol_contains: $value }, orderBy: "totalLiquidity", orderDirection: "desc") {
       id
       symbol
       name
       totalLiquidity
     }
-    asName: tokens(where: { name_contains: $value }, orderBy: totalLiquidity, orderDirection: desc) {
+    asName: tokens(where: { name_contains: $value }, orderBy: "totalLiquidity", orderDirection: "desc") {
       id
       symbol
       name
       totalLiquidity
     }
-    asAddress: tokens(where: { id: $id }, orderBy: totalLiquidity, orderDirection: desc) {
+    asAddress: tokens(where: { id: $id }, orderBy: "totalLiquidity", orderDirection: "desc") {
       id
       symbol
       name
@@ -714,17 +786,61 @@ export const TOKEN_SEARCH = gql`
   }
 `
 
-export const PAIR_SEARCH = gql`
-  query pairs($tokens: [Bytes]!, $id: String) {
+// export const PAIR_SEARCH = gql`
+//   query pairs($tokens: [Bytes]!, $id: String) {
+//     as0: pairs(where: { token0_in: $tokens }) {
+//       id
+//       token0 {
+//         id
+//         symbol
+//         name
+//       }
+//       token1 {
+//         id
+//         symbol
+//         name
+//       }
+//     }
+//     as1: pairs(where: { token1_in: $tokens }) {
+//       id
+//       token0 {
+//         id
+//         symbol
+//         name
+//       }
+//       token1 {
+//         id
+//         symbol
+//         name
+//       }
+//     }
+//     asAddress: pairs(where: { id: $id }) {
+//       id
+//       token0 {
+//         id
+//         symbol
+//         name
+//       }
+//       token1 {
+//         id
+//         symbol
+//         name
+//       }
+//     }
+//   }
+// `
+
+export const PAIR_SEARCH_HYDRA = gql`
+  query pairs($tokens: [String!], $id: String) {
     as0: pairs(where: { token0_in: $tokens }) {
       id
       token0 {
-        id
+        tokenAddress
         symbol
         name
       }
       token1 {
-        id
+        tokenAddress
         symbol
         name
       }
@@ -732,12 +848,12 @@ export const PAIR_SEARCH = gql`
     as1: pairs(where: { token1_in: $tokens }) {
       id
       token0 {
-        id
+        tokenAddress
         symbol
         name
       }
       token1 {
-        id
+        tokenAddress
         symbol
         name
       }
@@ -745,12 +861,12 @@ export const PAIR_SEARCH = gql`
     asAddress: pairs(where: { id: $id }) {
       id
       token0 {
-        id
+        tokenAddress
         symbol
         name
       }
       token1 {
-        id
+        tokenAddress
         symbol
         name
       }
@@ -794,37 +910,37 @@ export const ALL_PAIRS_HYDRA = gql`
   }
 `
 
-const PairFields = `
-  fragment PairFields on Pair {
-    id
-    txCount
-    token0 {
-      id
-      symbol
-      name
-      totalLiquidity
-      derivedETH
-    }
-    token1 {
-      id
-      symbol
-      name
-      totalLiquidity
-      derivedETH
-    }
-    reserve0
-    reserve1
-    reserveUSD
-    totalSupply
-    trackedReserveETH
-    reserveETH
-    volumeUSD
-    untrackedVolumeUSD
-    token0Price
-    token1Price
-    createdAtTimestamp
-  }
-`
+// const PairFields = `
+//   fragment PairFields on Pair {
+//     id
+//     txCount
+//     token0 {
+//       id
+//       symbol
+//       name
+//       totalLiquidity
+//       derivedETH
+//     }
+//     token1 {
+//       id
+//       symbol
+//       name
+//       totalLiquidity
+//       derivedETH
+//     }
+//     reserve0
+//     reserve1
+//     reserveUSD
+//     totalSupply
+//     trackedReserveETH
+//     reserveETH
+//     volumeUSD
+//     untrackedVolumeUSD
+//     token0Price
+//     token1Price
+//     createdAtTimestamp
+//   }
+// `
 
 const PairFieldsHYDRA = `
   fragment PairFieldsHYDRA on Pair {
@@ -977,35 +1093,51 @@ export const PAIRS_HISTORICAL_BULK_HYDRA = (block, pairs) => {
   return gql(queryString)
 }
 
-export const TOKEN_CHART = gql`
+// export const TOKEN_CHART = gql`
+//   query tokenDayDatas($tokenAddr: String!, $skip: Int!) {
+//     tokenDayDatas(first: 1000, skip: $skip, orderBy: date, orderDirection: asc, where: { token: $tokenAddr }) {
+//       id
+//       date
+//       priceUSD
+//       totalLiquidityToken
+//       totalLiquidityUSD
+//       totalLiquidityETH
+//       dailyVolumeETH
+//       dailyVolumeToken
+//       dailyVolumeUSD
+//     }
+//   }
+// `
+
+export const TOKEN_CHART_HYDRA = gql`
   query tokenDayDatas($tokenAddr: String!, $skip: Int!) {
-    tokenDayDatas(first: 1000, skip: $skip, orderBy: date, orderDirection: asc, where: { token: $tokenAddr }) {
+    tokenDayDatas(first: 1000, skip: $skip, orderBy: "date", orderDirection: "asc", where: { token: $tokenAddr }) {
       id
       date
       priceUSD
       totalLiquidityToken
       totalLiquidityUSD
-      totalLiquidityETH
-      dailyVolumeETH
+      totalLiquidityHYDRA
+      dailyVolumeHYDRA
       dailyVolumeToken
       dailyVolumeUSD
     }
   }
 `
 
-const TokenFields = `
-  fragment TokenFields on Token {
-    id
-    name
-    symbol
-    derivedETH
-    tradeVolume
-    tradeVolumeUSD
-    untrackedVolumeUSD
-    totalLiquidity
-    txCount
-  }
-`
+// const TokenFields = `
+//   fragment TokenFields on Token {
+//     id
+//     name
+//     symbol
+//     derivedETH
+//     tradeVolume
+//     tradeVolumeUSD
+//     untrackedVolumeUSD
+//     totalLiquidity
+//     txCount
+//   }
+// `
 const TokenFieldsHydra = `
   fragment TokenFields on Token {
     id
@@ -1021,14 +1153,15 @@ const TokenFieldsHydra = `
 `
 
 // used for getting top tokens by daily volume
-export const TOKEN_TOP_DAY_DATAS = gql`
-  query tokenDayDatas($date: Int) {
-    tokenDayDatas(first: 50, orderBy: totalLiquidityUSD, orderDirection: desc, where: { date_gt: $date }) {
-      id
-      date
-    }
-  }
-`
+
+// export const TOKEN_TOP_DAY_DATAS = gql`
+//   query tokenDayDatas($date: Int) {
+//     tokenDayDatas(first: 50, orderBy: totalLiquidityUSD, orderDirection: desc, where: { date_gt: $date }) {
+//       id
+//       date
+//     }
+//   }
+// `
 
 export const TOKEN_TOP_DAY_DATAS_HYDRA = gql`
   query tokenDayDatas($date: String!) {

@@ -14,8 +14,8 @@ import { useAllPairsInUniswap, useAllTokensInUniswap } from '../../contexts/Glob
 import { TOKEN_BLACKLIST, PAIR_BLACKLIST } from '../../constants'
 
 import { transparentize } from 'polished'
-import { client } from '../../apollo/client'
-import { PAIR_SEARCH, TOKEN_SEARCH } from '../../apollo/queries'
+import { client, clientHydra } from '../../apollo/client'
+import { PAIR_SEARCH, PAIR_SEARCH_HYDRA, TOKEN_SEARCH, TOKEN_SEARCH_HYDRA } from '../../apollo/queries'
 import FormattedName from '../FormattedName'
 import { TYPE } from '../../Theme'
 import { updateNameData } from '../../utils/data'
@@ -184,22 +184,47 @@ export const Search = ({ small = false }) => {
     async function fetchData() {
       try {
         if (value?.length > 0) {
-          let tokens = await client.query({
-            query: TOKEN_SEARCH,
+          // let tokens = await client.query({
+          //   query: TOKEN_SEARCH,
+          //   variables: {
+          //     value: value ? value.toUpperCase() : '',
+          //     id: value,
+          //   },
+          // })
+          let tokens = await clientHydra.query({
+            query: TOKEN_SEARCH_HYDRA,
             variables: {
               value: value ? value.toUpperCase() : '',
               id: value,
             },
           })
 
-          let pairs = await client.query({
-            query: PAIR_SEARCH,
+          // let pairs = await client.query({
+          //   query: PAIR_SEARCH,
+          //   variables: {
+          //     tokens: tokens.data.asSymbol?.map((t) => t.id),
+          //     id: value,
+          //   },
+          // })
+          let pairs = await clientHydra.query({
+            query: PAIR_SEARCH_HYDRA,
             variables: {
               tokens: tokens.data.asSymbol?.map((t) => t.id),
               id: value,
             },
           })
-
+          pairs.data.as0.forEach(pair => {
+            pair.token0.id = pair.token0.tokenAddress
+            pair.token1.id = pair.token1.tokenAddress
+          })
+          pairs.data.as1.forEach(pair => {
+            pair.token0.id = pair.token0.tokenAddress
+            pair.token1.id = pair.token1.tokenAddress
+          })
+          pairs.data.asAddress.forEach(pair => {
+            pair.token0.id = pair.token0.tokenAddress
+            pair.token1.id = pair.token1.tokenAddress
+          })
           setSearchedPairs(
             updateNameData(pairs.data.as0)
               .concat(updateNameData(pairs.data.as1))

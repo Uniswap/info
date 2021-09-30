@@ -13,6 +13,8 @@ import {
   TOKENS_HISTORICAL_BULK_HYDRA,
   TOKEN_DATA_HYDRA,
   FILTERED_TRANSACTIONS_HYDRA,
+  TOKEN_CHART_HYDRA,
+  PRICES_BY_BLOCK_HYDRA,
 } from '../apollo/queries'
 
 import { useEthPrice } from './GlobalData'
@@ -369,7 +371,7 @@ const getTopTokens = async (ethPrice, ethPriceOld) => {
           // new tokens
           if (!oneDayHistory && data) {
             data.oneDayVolumeUSD = data.tradeVolumeUSD
-            data.oneDayVolumeETH = data.tradeVolume * data.derivedHYDRA
+            data.oneDayVolumeHYDRA = data.tradeVolume * data.derivedHYDRA
             data.oneDayTxns = data.txCount
           }
 
@@ -530,7 +532,7 @@ const getTokenData = async (address, ethPrice, ethPriceOld) => {
     // new tokens
     if (!oneDayData && data) {
       data.oneDayVolumeUSD = data.tradeVolumeUSD
-      data.oneDayVolumeETH = data.tradeVolume * data.derivedHYDRA
+      data.oneDayVolumeHYDRA = data.tradeVolume * data.derivedHYDRA
       data.oneDayTxns = data.txCount
     }
 
@@ -648,18 +650,18 @@ const getIntervalTokenData = async (tokenAddress, startTime, interval = 3600, la
         return parseFloat(b.number) <= parseFloat(latestBlock)
       })
     }
-
     let result = await splitQuery(PRICES_BY_BLOCK, client, [tokenAddress], blocks, 50)
+    // let result = await splitQuery(PRICES_BY_BLOCK_HYDRA, clientHydra, [tokenAddress], blocks, 50)
 
     // format token ETH price results
     let values = []
     for (var row in result) {
       let timestamp = row.split('t')[1]
-      let derivedETH = parseFloat(result[row]?.derivedHYDRA)
+      let derivedHYDRA = parseFloat(result[row]?.derivedHYDRA)
       if (timestamp) {
         values.push({
           timestamp,
-          derivedETH,
+          derivedHYDRA,
         })
       }
     }
@@ -703,8 +705,16 @@ const getTokenChartData = async (tokenAddress) => {
     let allFound = false
     let skip = 0
     while (!allFound) {
-      let result = await client.query({
-        query: TOKEN_CHART,
+      // let result = await client.query({
+      //   query: TOKEN_CHART,
+      //   variables: {
+      //     tokenAddr: tokenAddress,
+      //     skip,
+      //   },
+      //   fetchPolicy: 'cache-first',
+      // })
+      let result = await clientHydra.query({
+        query: TOKEN_CHART_HYDRA,
         variables: {
           tokenAddr: tokenAddress,
           skip,
