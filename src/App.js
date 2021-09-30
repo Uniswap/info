@@ -37,7 +37,8 @@ const AppWrapper = styled.div`
 const ContentWrapper = styled.div`
   background-image: url(${BackgroundDesktop});
   background-repeat: no-repeat;
-  background-size: 100% 100%;
+  background-size: contain;
+  background-color: #020711;
   min-height: 100vh;
   @media (max-width: 576px) {
     background-image: url(${BackgroundMobile});
