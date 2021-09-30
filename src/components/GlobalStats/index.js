@@ -27,7 +27,7 @@ const StyledGlobalStats = styled.div`
 `
 
 export default function GlobalStats() {
-  const { oneDayVolumeUSD, oneDayTxns, pairCount, oneDayFeeUSD } = useGlobalData()
+  const { oneDayTxns, pairCount, oneDayFeeUSD } = useGlobalData()
   const [ethPrice] = useEthPrice()
   const formattedEthPrice = ethPrice ? formattedNum(ethPrice, true) : '-'
   const oneDayFees = oneDayFeeUSD ? formattedNum(oneDayFeeUSD, true) : ''

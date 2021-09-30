@@ -65,8 +65,8 @@ const TokenChart = ({ address, color, base }) => {
 
   // hourly and daily price data based on the current time window
   const data5m3days = useTokenPriceData(address, timeframeOptions.THERE_DAYS, 300)
-  const data5mWeek = useTokenPriceData(address, timeframeOptions.WEEK, 300)
-  const data5mMonth = useTokenPriceData(address, timeframeOptions.MONTH, 300)
+  // const data5mWeek = useTokenPriceData(address, timeframeOptions.WEEK, 300)
+  // const data5mMonth = useTokenPriceData(address, timeframeOptions.MONTH, 300)
   const dataHourly3days = useTokenPriceData(address, timeframeOptions.THERE_DAYS, 3600)
   const dataHourlyWeek = useTokenPriceData(address, timeframeOptions.WEEK, 3600)
   const dataHourlyMonth = useTokenPriceData(address, timeframeOptions.MONTH, 3600)
@@ -74,14 +74,14 @@ const TokenChart = ({ address, color, base }) => {
   const priceData =
     timeWindow === timeframeOptions.MONTH
       ? // monthly selected
-        frequency === DATA_FREQUENCY.FIVE_MINUTES
-        ? data5mMonth
-        : dataHourlyMonth
+        // frequency === DATA_FREQUENCY.FIVE_MINUTES
+        // ? data5mMonth :
+        dataHourlyMonth
       : // weekly selected
       timeWindow === timeframeOptions.WEEK
-      ? frequency === DATA_FREQUENCY.FIVE_MINUTES
-        ? data5mWeek
-        : dataHourlyWeek
+      ? // frequency === DATA_FREQUENCY.FIVE_MINUTES
+        //     ? data5mWeek :
+        dataHourlyWeek
       : // 3 days selected
       frequency === DATA_FREQUENCY.FIVE_MINUTES
       ? data5m3days
@@ -173,15 +173,17 @@ const TokenChart = ({ address, color, base }) => {
             </RowFixed>
             {chartFilter === CHART_VIEW.PRICE && (
               <AutoRow gap="4px">
-                <PriceOption
-                  active={frequency === DATA_FREQUENCY.FIVE_MINUTES}
-                  onClick={() => {
-                    setTimeWindow(timeframeOptions.THERE_DAYS)
-                    setFrequency(DATA_FREQUENCY.FIVE_MINUTES)
-                  }}
-                >
-                  5m
-                </PriceOption>
+                {timeWindow === timeframeOptions.THERE_DAYS && (
+                  <PriceOption
+                    active={frequency === DATA_FREQUENCY.FIVE_MINUTES}
+                    onClick={() => {
+                      setTimeWindow(timeframeOptions.THERE_DAYS)
+                      setFrequency(DATA_FREQUENCY.FIVE_MINUTES)
+                    }}
+                  >
+                    5m
+                  </PriceOption>
+                )}
                 <PriceOption
                   active={frequency === DATA_FREQUENCY.HOUR}
                   onClick={() => setFrequency(DATA_FREQUENCY.HOUR)}

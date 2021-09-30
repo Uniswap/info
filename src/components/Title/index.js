@@ -1,11 +1,10 @@
 import React, { useRef } from 'react'
-import { useHistory, NavLink } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 import styled from 'styled-components'
 import { useMedia } from 'react-use'
 import { Flex } from 'rebass'
 import { Menu as MenuIcon, List, Repeat, Monitor } from 'react-feather'
 
-import { KNC_ADDRESS } from '../../constants'
 import Link, { BasicLink } from '../Link'
 import { AutoColumn } from '../Column'
 import { RowFixed, AutoRow } from '../Row'
