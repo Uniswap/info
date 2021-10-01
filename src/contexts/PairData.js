@@ -15,6 +15,7 @@ import {
   PAIRS_HISTORICAL_BULK_HYDRA,
   PAIR_DATA_HYDRA,
   PAIR_CHART_HYDRA,
+  HOURLY_PAIR_RATES_HYDRA,
 } from '../apollo/queries'
 
 import { useEthPrice } from './GlobalData'
@@ -191,15 +192,7 @@ export default function Provider({ children }) {
 async function getBulkPairData(pairList, ethPrice) {
   const [t1, t2, tWeek] = getTimestampsForChanges()
   let [{ number: b1 }, { number: b2 }, { number: bWeek }] = await getBlocksFromTimestamps([t1, t2, tWeek])
-  // console.log('pair list ->', pairList)
   try {
-    // let current = await client.query({
-    //   query: PAIRS_BULK,
-    //   variables: {
-    //     allPairs: pairList,
-    //   },
-    //   fetchPolicy: 'cache-first',
-    // })
     let current = await clientHydra.query({
       query: PAIRS_BULK_HYDRA,
       variables: {
@@ -207,7 +200,6 @@ async function getBulkPairData(pairList, ethPrice) {
       },
       fetchPolicy: 'cache-first',
     })
-    // console.log('current pairs ->', current);
     if (current) {
       current.data.pairs.forEach(async (pair) => {
         pair.id = pair.pairAddress
@@ -215,15 +207,6 @@ async function getBulkPairData(pairList, ethPrice) {
         pair.token1.id = pair.token1.tokenAddress
       })
     }
-    // let [oneDayResult, twoDayResult, oneWeekResult] = await Promise.all(
-    //   [b1, b2, bWeek].map(async (block) => {
-    //     let result = client.query({
-    //       query: PAIRS_HISTORICAL_BULK(block, pairList),
-    //       fetchPolicy: 'cache-first',
-    //     })
-    //     return result
-    //   })
-    // )
     let [oneDayResult, twoDayResult, oneWeekResult] = await Promise.all(
       [b1, b2, bWeek].map(async (block) => {
         let result = clientHydra.query({
@@ -252,10 +235,6 @@ async function getBulkPairData(pairList, ethPrice) {
           let data = pair
           let oneDayHistory = oneDayData?.[pair.id]
           if (!oneDayHistory) {
-            // let newData = await client.query({
-            //   query: PAIR_DATA(pair.id, b1),
-            //   fetchPolicy: 'cache-first',
-            // })
             let newData = await clientHydra.query({
               query: PAIR_DATA_HYDRA(pair.id, b1),
               fetchPolicy: 'cache-first',
@@ -264,10 +243,6 @@ async function getBulkPairData(pairList, ethPrice) {
           }
           let twoDayHistory = twoDayData?.[pair.id]
           if (!twoDayHistory) {
-            // let newData = await client.query({
-            //   query: PAIR_DATA(pair.id, b2),
-            //   fetchPolicy: 'cache-first',
-            // })
             let newData = await clientHydra.query({
               query: PAIR_DATA_HYDRA(pair.id, b2),
               fetchPolicy: 'cache-first',
@@ -276,10 +251,6 @@ async function getBulkPairData(pairList, ethPrice) {
           }
           let oneWeekHistory = oneWeekData?.[pair.id]
           if (!oneWeekHistory) {
-            // let newData = await client.query({
-            //   query: PAIR_DATA(pair.id, bWeek),
-            //   fetchPolicy: 'cache-first',
-            // })
             let newData = await clientHydra.query({
               query: PAIR_DATA_HYDRA(pair.id, bWeek),
               fetchPolicy: 'cache-first',
@@ -290,7 +261,6 @@ async function getBulkPairData(pairList, ethPrice) {
           return data
         })
     )
-    // console.log('pair data ->', pairData);
     return pairData
   } catch (e) {
     console.log(e)
@@ -358,13 +328,6 @@ const getPairTransactions = async (pairAddress) => {
   const transactions = {}
 
   try {
-    // let result = await client.query({
-    //   query: FILTERED_TRANSACTIONS,
-    //   variables: {
-    //     allPairs: [pairAddress],
-    //   },
-    //   fetchPolicy: 'no-cache',
-    // })
     let result = await clientHydra.query({
       query: FILTERED_TRANSACTIONS_HYDRA,
       variables: {
@@ -407,14 +370,6 @@ const getPairChartData = async (pairAddress) => {
     let allFound = false
     let skip = 0
     while (!allFound) {
-      // let result = await client.query({
-      //   query: PAIR_CHART,
-      //   variables: {
-      //     pairAddress: pairAddress,
-      //     skip,
-      //   },
-      //   fetchPolicy: 'cache-first',
-      // })
       let result = await clientHydra.query({
         query: PAIR_CHART_HYDRA,
         variables: {
@@ -505,7 +460,8 @@ const getHourlyRateData = async (pairAddress, startTime, latestBlock) => {
       })
     }
 
-    const result = await splitQuery(HOURLY_PAIR_RATES, client, [pairAddress], blocks, 100)
+    // const result = await splitQuery(HOURLY_PAIR_RATES, client, [pairAddress], blocks, 100)
+    const result = await splitQuery(HOURLY_PAIR_RATES_HYDRA, clientHydra, [pairAddress], blocks, 100)
 
     // format token ETH price results
     let values = []
@@ -550,25 +506,16 @@ export function Updater() {
   useEffect(() => {
     async function getData() {
       // get top pairs by reserves
-      // let {
-      //   data: { pairs },
-      // } = await client.query({
-      //   query: PAIRS_CURRENT,
-      //   fetchPolicy: 'cache-first',
-      // })
-
       let {
         data: { pairs },
       } = await clientHydra.query({
         query: PAIRS_CURRENT_HYDRA,
         fetchPolicy: 'cache-first',
       })
-      // console.log('pairs pak ->', pairs);
       // format as array of addresses
       const formattedPairs = pairs.map((pair) => {
         return pair.pairAddress
       })
-      // console.log('formatedPairs ->', formattedPairs);
       // get data for every pair in list
       let topPairs = await getBulkPairData(formattedPairs, ethPrice)
       topPairs && updateTopPairs(topPairs)
@@ -611,7 +558,6 @@ export function useDataForList(pairList) {
 
   const [stale, setStale] = useState(false)
   const [fetched, setFetched] = useState([])
-
   // reset
   useEffect(() => {
     if (pairList) {

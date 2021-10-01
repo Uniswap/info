@@ -45,7 +45,7 @@ const DATA_FREQUENCY = {
 const TokenChart = ({ address, color, base }) => {
   // settings for the window and candle width
   const [chartFilter, setChartFilter] = useState(CHART_VIEW.PRICE)
-  const [frequency, setFrequency] = useState(DATA_FREQUENCY.HOUR)
+  const [frequency, setFrequency] = useState(DATA_FREQUENCY.DAY)
 
   const [darkMode] = useDarkModeManager()
   const textColor = darkMode ? 'white' : 'black'
@@ -60,7 +60,7 @@ const TokenChart = ({ address, color, base }) => {
 
   let chartData = useTokenChartData(address)
 
-  const [timeWindow, setTimeWindow] = useState(timeframeOptions.WEEK)
+  const [timeWindow, setTimeWindow] = useState(timeframeOptions.MONTH)
   const prevWindow = usePrevious(timeWindow)
 
   // hourly and daily price data based on the current time window
