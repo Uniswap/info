@@ -165,7 +165,7 @@ export async function getBlockFromTimestampHYDRA(timestamp) {
     query: GET_BLOCK_HYDRA,
     variables: {
       timestampFrom: timestamp,
-      timestampTo: timestamp + 600,
+      timestampTo: timestamp + 3000,
     },
     fetchPolicy: 'cache-first',
   })

@@ -256,49 +256,24 @@ async function getGlobalData(ethPrice, oldEthPrice) {
     })
     data = resultHydra.data.hydraswapFactories[0]
 
-    // let resultEth = await client.query({
-    //   query: GLOBAL_DATA(),
-    //   fetchPolicy: 'cache-first',
-    // })
-    // console.log('GLOBAL_DATA() Eth->', resultEth);
-    // data = resultEth.data.uniswapFactories[0]
-
-
-    // fetch the historical data
-    // let oneDayResult = await client.query({
-    //   query: GLOBAL_DATA(oneDayBlock?.number),
-    //   fetchPolicy: 'cache-first',
-    // })
-    console.log('oneDayBlock', oneDayBlock);
     let oneDayResult = await clientHydra.query({
       query: GLOBAL_DATA_HYDRA(oneDayBlock?.number),
       fetchPolicy: 'cache-first',
     })
     oneDayData = oneDayResult.data.hydraswapFactories[0]
-    // let twoDayResult = await client.query({
-    //   query: GLOBAL_DATA(twoDayBlock?.number),
-    //   fetchPolicy: 'cache-first',
-    // })
+ 
     let twoDayResult = await clientHydra.query({
       query: GLOBAL_DATA_HYDRA(twoDayBlock?.number),
       fetchPolicy: 'cache-first',
     })
     twoDayData = twoDayResult.data.hydraswapFactories[0]
 
-    // let oneWeekResult = await client.query({
-    //   query: GLOBAL_DATA(oneWeekBlock?.number),
-    //   fetchPolicy: 'cache-first',
-    // })
     let oneWeekResult = await clientHydra.query({
       query: GLOBAL_DATA_HYDRA(oneWeekBlock?.number),
       fetchPolicy: 'cache-first',
     })
     const oneWeekData = oneWeekResult.data.hydraswapFactories[0]
 
-    // let twoWeekResult = await client.query({
-    //   query: GLOBAL_DATA(twoWeekBlock?.number),
-    //   fetchPolicy: 'cache-first',
-    // })
     let twoWeekResult = await clientHydra.query({
       query: GLOBAL_DATA_HYDRA(twoWeekBlock?.number),
       fetchPolicy: 'cache-first',
@@ -364,14 +339,6 @@ const getChartData = async (oldestDateToFetch, offsetData) => {
 
   try {
     while (!allFound) {
-      // let result = await client.query({
-      //   query: GLOBAL_CHART,
-      //   variables: {
-      //     startTime: oldestDateToFetch,
-      //     skip,
-      //   },
-      //   fetchPolicy: 'cache-first',
-      // })
       let result = await clientHydra.query({
         query: GLOBAL_CHART_HYDRA,
         variables: {
@@ -470,10 +437,6 @@ const getGlobalTransactions = async () => {
   let transactions = {}
 
   try {
-    // let result = await client.query({
-    //   query: GLOBAL_TXNS,
-    //   fetchPolicy: 'cache-first',
-    // })
     let result = await clientHydra.query({
       query: GLOBAL_TXNS_HYDRA,
       fetchPolicy: 'cache-first',
@@ -527,7 +490,7 @@ const getEthPrice = async () => {
   let ethPrice = 0
   let ethPriceOneDay = 0
   let priceChangeETH = 0
-
+  console.log('utcOneDayBack->', utcOneDayBack);
   try {
     let oneDayBlock = await getBlockFromTimestampHYDRA(utcOneDayBack)
     // let oneDayBlock = await getBlockFromTimestamp(utcOneDayBack)
@@ -540,14 +503,6 @@ const getEthPrice = async () => {
       query: HYDRA_PRICE(oneDayBlock),
       fetchPolicy: 'cache-first',
     })
-    // let result = await client.query({
-    //   query: ETH_PRICE(),
-    //   fetchPolicy: 'cache-first',
-    // })
-    // let resultOneDay = await client.query({
-    //   query: ETH_PRICE(oneDayBlock),
-    //   fetchPolicy: 'cache-first',
-    // })
     const currentPrice = result?.data?.bundles[0]?.hydraPrice
     const oneDayBackPrice = resultOneDay?.data?.bundles[0]?.hydraPrice
     priceChangeETH = getPercentChange(currentPrice, oneDayBackPrice)
@@ -572,13 +527,6 @@ async function getAllPairsOnUniswap() {
     let pairs = []
     let skipCount = 0
     while (!allFound) {
-      // let result = await client.query({
-      //   query: ALL_PAIRS,
-      //   variables: {
-      //     skip: skipCount,
-      //   },
-      //   fetchPolicy: 'cache-first',
-      // })
       let result = await clientHydra.query({
         query: ALL_PAIRS_HYDRA,
         variables: {
@@ -593,7 +541,6 @@ async function getAllPairsOnUniswap() {
         pair.token1.id = pair.token1.tokenAddress
         result.data.pairs[i] = pair
       }
-      // console.log('pairs result ->', result)
       skipCount = skipCount + PAIRS_TO_FETCH
       pairs = pairs.concat(result?.data?.pairs)
       if (result?.data?.pairs.length < PAIRS_TO_FETCH || pairs.length > PAIRS_TO_FETCH) {
@@ -628,7 +575,6 @@ async function getAllTokensOnUniswap() {
       }
       skipCount = skipCount += TOKENS_TO_FETCH
     }
-    // console.log('all token ->', tokens);
     return tokens
   } catch (e) {
     console.log(e)
@@ -764,7 +710,6 @@ export function useTopLps() {
   let topLps = state?.topLps
 
   const allPairs = useAllPairData()
-  // console.log('all pairs ->', allPairs);
   useEffect(() => {
     async function fetchData() {
       // get top 20 by reserves
@@ -777,13 +722,6 @@ export function useTopLps() {
         topPairs.map(async (pair) => {
           // for each one, fetch top LPs
           try {
-            // const { data: results } = await client.query({
-            //   query: TOP_LPS_PER_PAIRS,
-            //   variables: {
-            //     pair: pair.toString(),
-            //   },
-            //   fetchPolicy: 'cache-first',
-            // })
             const { data: results } = await clientHydra.query({
               query: TOP_LPS_PER_PAIRS_HYDRA,
               variables: {
@@ -792,7 +730,6 @@ export function useTopLps() {
               fetchPolicy: 'cache-first',
             })
             results.liquidityPositions.forEach((lp) => (lp.pair.id = lp.pair.pairAddress))
-            // console.log('results.liquidityPositions ->', results);
             if (results) {
               return results.liquidityPositions
             }

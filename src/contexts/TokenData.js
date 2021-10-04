@@ -231,68 +231,37 @@ const getTopTokens = async (ethPrice, ethPriceOld) => {
   const utcCurrentTime = dayjs()
   const utcOneDayBack = utcCurrentTime.subtract(1, 'day').unix()
   const utcTwoDaysBack = utcCurrentTime.subtract(2, 'day').unix()
-  // let oneDayBlock = await getBlockFromTimestamp(utcOneDayBack)
   let oneDayBlock = await getBlockFromTimestampHYDRA(utcOneDayBack)
-  // console.log('oneDayBlockEth ->', oneDayBlockEth);
-  console.log('oneDayBlockHydra ->', oneDayBlock);
-  // let twoDayBlock = await getBlockFromTimestamp(utcTwoDaysBack)
   let twoDayBlock = await getBlockFromTimestampHYDRA(utcTwoDaysBack)
 
   try {
     // need to get the top tokens by liquidity by need token day datas
     const currentDate = parseInt(Date.now() / 86400 / 1000) * 86400 - 86400
-    // let tokenids = await client.query({
-    //   query: TOKEN_TOP_DAY_DATAS,
-    //   fetchPolicy: 'network-only',
-    //   variables: { date: currentDate },
-    // })
-    // console.log('tokenidseth->', tokenidseth)
-
     let tokenids = await clientHydra.query({
       query: TOKEN_TOP_DAY_DATAS_HYDRA,
       fetchPolicy: 'network-only',
       variables: { date: currentDate + '' },
     })
-    // const ids = tokenids?.data?.tokenDayDatas?.reduce((accum, entry) => {
-    //   accum.push(entry.id.slice(0, 42))
-    //   return accum
-    // }, [])
 
     const ids = tokenids?.data?.tokenDayDatas?.reduce((accum, entry) => {
       accum.push(entry.id.slice(0, 40))
       return accum
     }, [])
-    // let current = await client.query({
-    //   query: TOKENS_HISTORICAL_BULK(ids),
-    //   fetchPolicy: 'cache-first',
-    // })
-    // console.log('currentEth =>', current);
 
     let current = await clientHydra.query({
       query: TOKENS_HISTORICAL_BULK_HYDRA(ids),
       fetchPolicy: 'cache-first',
     })
-    // console.log('currentHydra ->', current);
 
-    // let oneDayResult = await client.query({
-    //   query: TOKENS_HISTORICAL_BULK(ids, oneDayBlock),
-    //   fetchPolicy: 'cache-first',
-    // })
     let oneDayResult = await clientHydra.query({
       query: TOKENS_HISTORICAL_BULK_HYDRA(ids, oneDayBlock),
       fetchPolicy: 'cache-first',
     })
-    // console.log('oneDayResult ->', oneDayResult);
 
-    // let twoDayResult = await client.query({
-    //   query: TOKENS_HISTORICAL_BULK(ids, twoDayBlock),
-    //   fetchPolicy: 'cache-first',
-    // })
     let twoDayResult = await clientHydra.query({
       query: TOKENS_HISTORICAL_BULK_HYDRA(ids, twoDayBlock),
       fetchPolicy: 'cache-first',
     })
-    // console.log('twoDayResult ->', twoDayResult);
     let oneDayData = oneDayResult?.data?.tokens.reduce((obj, cur, i) => {
       return { ...obj, [cur.id]: cur }
     }, {})
@@ -314,22 +283,13 @@ const getTopTokens = async (ethPrice, ethPriceOld) => {
 
           // catch the case where token wasnt in top list in previous days
           if (!oneDayHistory) {
-            // let oneDayResult = await client.query({
-            //   query: TOKEN_DATA(token.id, oneDayBlock),
-            //   fetchPolicy: 'cache-first',
-            // })
             let oneDayResult = await clientHydra.query({
               query: TOKEN_DATA_HYDRA(token.id, oneDayBlock),
               fetchPolicy: 'cache-first',
             })
             oneDayHistory = oneDayResult.data.tokens[0]
-            console.log('TOKEN_DATA(token.id, oneDayBlock) ->', oneDayResult);
           }
           if (!twoDayHistory) {
-            // let twoDayResult = await client.query({
-            //   query: TOKEN_DATA(token.id, twoDayBlock),
-            //   fetchPolicy: 'cache-first',
-            // })
             let twoDayResult = await clientHydra.query({
               query: TOKEN_DATA_HYDRA(token.id, twoDayBlock),
               fetchPolicy: 'cache-first',
@@ -413,8 +373,6 @@ const getTokenData = async (address, ethPrice, ethPriceOld) => {
   const utcCurrentTime = dayjs()
   const utcOneDayBack = utcCurrentTime.subtract(1, 'day').startOf('minute').unix()
   const utcTwoDaysBack = utcCurrentTime.subtract(2, 'day').startOf('minute').unix()
-  // let oneDayBlock = await getBlockFromTimestamp(utcOneDayBack)
-  // let twoDayBlock = await getBlockFromTimestamp(utcTwoDaysBack)
   let oneDayBlock = await getBlockFromTimestampHYDRA(utcOneDayBack)
   let twoDayBlock = await getBlockFromTimestampHYDRA(utcTwoDaysBack)
 
@@ -425,34 +383,21 @@ const getTokenData = async (address, ethPrice, ethPriceOld) => {
 
   try {
     // fetch all current and historical data
-    // let result = await client.query({
-    //   query: TOKEN_DATA(address),
-    //   fetchPolicy: 'cache-first',
-    // })
     let result = await clientHydra.query({
       query: TOKEN_DATA_HYDRA(address),
       fetchPolicy: 'cache-first',
     })
     data = result?.data?.tokens?.[0]
-    console.log('result ->',result);
+
     // get results from 24 hours in past
-    // let oneDayResult = await client.query({
-    //   query: TOKEN_DATA(address, oneDayBlock),
-    //   fetchPolicy: 'cache-first',
-    // })
     let oneDayResult = await clientHydra.query({
       query: TOKEN_DATA_HYDRA(address, oneDayBlock),
       fetchPolicy: 'cache-first',
     })
     oneDayData = oneDayResult.data.tokens[0]
-    console.log('oneDayData ->',oneDayData);
 
 
     // get results from 48 hours in past
-    // let twoDayResult = await client.query({
-    //   query: TOKEN_DATA(address, twoDayBlock),
-    //   fetchPolicy: 'cache-first',
-    // })
     let twoDayResult = await clientHydra.query({
       query: TOKEN_DATA_HYDRA(address, twoDayBlock),
       fetchPolicy: 'cache-first',
@@ -461,10 +406,6 @@ const getTokenData = async (address, ethPrice, ethPriceOld) => {
 
     // catch the case where token wasnt in top list in previous days
     if (!oneDayData) {
-      // let oneDayResult = await client.query({
-      //   query: TOKEN_DATA(address, oneDayBlock),
-      //   fetchPolicy: 'cache-first',
-      // })
       let oneDayResult = await clientHydra.query({
         query: TOKEN_DATA_HYDRA(address, oneDayBlock),
         fetchPolicy: 'cache-first',
@@ -472,10 +413,6 @@ const getTokenData = async (address, ethPrice, ethPriceOld) => {
       oneDayData = oneDayResult.data.tokens[0]
     }
     if (!twoDayData) {
-      // let twoDayResult = await client.query({
-      //   query: TOKEN_DATA(address, twoDayBlock),
-      //   fetchPolicy: 'cache-first',
-      // })
       let twoDayResult = await clientHydra.query({
         query: TOKEN_DATA_HYDRA(address, twoDayBlock),
         fetchPolicy: 'cache-first',
@@ -561,14 +498,6 @@ const getTokenData = async (address, ethPrice, ethPriceOld) => {
 const getTokenTransactions = async (allPairsFormatted) => {
   const transactions = {}
   try {
-    // let result = await client.query({
-    //   query: FILTERED_TRANSACTIONS,
-    //   variables: {
-    //     allPairs: allPairsFormatted,
-    //   },
-    //   fetchPolicy: 'cache-first',
-    // })
-    // console.log('allPairsFormatted ->', allPairsFormatted);
     let result = await clientHydra.query({
       query: FILTERED_TRANSACTIONS_HYDRA,
       variables: {
@@ -603,10 +532,6 @@ const getTokenTransactions = async (allPairsFormatted) => {
 const getTokenPairs = async (tokenAddress) => {
   try {
     // fetch all current and historical data
-    // let result = await client.query({
-    //   query: TOKEN_DATA(tokenAddress),
-    //   fetchPolicy: 'cache-first',
-    // })
     let result = await clientHydra.query({
       query: TOKEN_DATA_HYDRA(tokenAddress),
       fetchPolicy: 'cache-first',
@@ -650,8 +575,8 @@ const getIntervalTokenData = async (tokenAddress, startTime, interval = 3600, la
         return parseFloat(b.number) <= parseFloat(latestBlock)
       })
     }
-    let result = await splitQuery(PRICES_BY_BLOCK, client, [tokenAddress], blocks, 50)
-    // let result = await splitQuery(PRICES_BY_BLOCK_HYDRA, clientHydra, [tokenAddress], blocks, 50)
+    // let result = await splitQuery(PRICES_BY_BLOCK, client, [tokenAddress], blocks, 50)
+    let result = await splitQuery(PRICES_BY_BLOCK_HYDRA, clientHydra, [tokenAddress], blocks, 50)
 
     // format token ETH price results
     let values = []
@@ -705,14 +630,6 @@ const getTokenChartData = async (tokenAddress) => {
     let allFound = false
     let skip = 0
     while (!allFound) {
-      // let result = await client.query({
-      //   query: TOKEN_CHART,
-      //   variables: {
-      //     tokenAddr: tokenAddress,
-      //     skip,
-      //   },
-      //   fetchPolicy: 'cache-first',
-      // })
       let result = await clientHydra.query({
         query: TOKEN_CHART_HYDRA,
         variables: {
