@@ -172,16 +172,6 @@ export async function getBlockFromTimestampHYDRA(timestamp) {
   return result?.data?.blocks?.[0]?.number + ''
 }
 
-function transformDataHydra(data) {
-  const transformed = {}
-  for (let i = 0; i < data?.blocks?.length; i++) {
-    const block = data.blocks[i]
-    block.number = block.height + ''
-    transformed['t' + block.timestamp_from] = [block]
-  }
-  return transformed
-}
-
 /**
  * @notice Fetches block objects for an array of timestamps.
  * @dev blocks are returned in chronological order (ASC) regardless of input.
@@ -195,7 +185,6 @@ export async function getBlocksFromTimestamps(timestamps, skipCount = 500) {
   }
   
   let fetchedData = await splitQuery(GET_BLOCKS_HYDRA, clientHydra, [], timestamps, skipCount)
-  fetchedData = transformDataHydra(fetchedData)
   let blocks = []
   if (fetchedData) {
     for (var t in fetchedData) {
@@ -253,7 +242,6 @@ export async function getShareValueOverTime(pairAddress, timestamps) {
     query: SHARE_VALUE(pairAddress, blocks),
     fetchPolicy: 'cache-first',
   })
-
   let values = []
   for (var row in result?.data) {
     let timestamp = row.split('t')[1]

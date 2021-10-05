@@ -7,6 +7,7 @@ import copy from 'copy-to-clipboard'
 
 export function useColor(tokenAddress, token) {
   const [color, setColor] = useState('#2172E5')
+  tokenAddress = undefined
   if (tokenAddress) {
     const path = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${isAddress(
       tokenAddress

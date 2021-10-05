@@ -1,9 +1,25 @@
 import gql from 'graphql-tag'
 import { FACTORY_ADDRESS, BUNDLE_ID } from '../constants'
 
-export const SUBGRAPH_HEALTH = gql`
+// export const SUBGRAPH_HEALTH = gql`
+//   query health {
+//     indexingStatusForCurrentVersion(subgraphName: "uniswap/uniswap-v2") {
+//       synced
+//       health
+//       chains {
+//         chainHeadBlock {
+//           number
+//         }
+//         latestBlock {
+//           number
+//         }
+//       }
+//     }
+//   }
+// `
+export const SUBGRAPH_HEALTH_HYDRA = gql`
   query health {
-    indexingStatusForCurrentVersion(subgraphName: "uniswap/uniswap-v2") {
+    indexingStatusForCurrentVersion {
       synced
       health
       chains {
@@ -67,7 +83,7 @@ export const GET_BLOCK_HYDRA = gql`
       first: 1
       orderBy: "timestamp"
       orderDirection: "asc"
-      timestamps: { timestamps_gt: [$timestampFrom], timestamps_lt: [$timestampTo] }
+      where: { timestamp_gt: $timestampFrom, timestamp_lt: $timestampTo }
     ) {
       id
       number
@@ -90,20 +106,15 @@ export const GET_BLOCK_HYDRA = gql`
 // }
 
 export const GET_BLOCKS_HYDRA = (timestamps) => {
-  let queryString = `query blocks { 
-    blocks(
-      timestamps: { 
-        timestamps_gt: [${timestamps}],
-        timestamps_lt: [${timestamps.map((timestamp) => timestamp + 600)}] 
-      },
-      first: 1,
-      orderBy: "timestamp",
-      orderDirection: "desc"
-    ) {
-      height,
-      timestamp_from
-    }
-  }`
+  let queryString = 'query blocks {'
+  queryString += timestamps.map((timestamp) => {
+    return `t${timestamp}:blocks(first: 1, orderBy: "timestamp", orderDirection: "desc", where: { timestamp_gt: ${timestamp}, timestamp_lt: ${
+      timestamp + 3000
+    } }) {
+      number
+    }`
+  })
+  queryString += '}'
   return gql(queryString)
 }
 

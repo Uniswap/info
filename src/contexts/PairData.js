@@ -462,7 +462,6 @@ const getHourlyRateData = async (pairAddress, startTime, latestBlock) => {
 
     // const result = await splitQuery(HOURLY_PAIR_RATES, client, [pairAddress], blocks, 100)
     const result = await splitQuery(HOURLY_PAIR_RATES_HYDRA, clientHydra, [pairAddress], blocks, 100)
-
     // format token ETH price results
     let values = []
     for (var row in result) {
