@@ -4,7 +4,14 @@ import { isAddress } from '../../utils/index.js'
 import EthereumLogo from '../../assets/eth.png'
 
 const BAD_IMAGES = {}
-
+const BAD_ADDRESSES = [
+  '84c83f8ad670c57796ce252263ebcd70dc719247',
+  '54529f2f53d645ddf2116abd07ac1a9eb841ff31',
+  '72634dc37f9ac7a69fdb5b16605e386fa5586dec',
+  '3b5ca2f02a2e10b22efb8f3e0925a10c54f84bad',
+  '2e78dd2e82b9d19ff7768a293dd507d8d7548534',
+  '24bdcf8c25b056c29ed1a32a61c44a13b8a9db08',
+]
 const Inline = styled.div`
   display: flex;
   align-items: center;
@@ -71,8 +78,11 @@ export default function TokenLogo({ address, header = false, size = '24px', ...r
     )
   }
 
-  const path = `https://raw.githubusercontent.com/t3dkich/hydraJson/main/icons/${address}.png`
-
+  let path = `https://raw.githubusercontent.com/t3dkich/hydraJson/main/icons/${address}.png`
+  BAD_ADDRESSES.forEach((addr) => {
+    if (addr === address) path = ''
+  })
+  
   return (
     <Inline>
       <Image

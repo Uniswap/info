@@ -3,8 +3,8 @@ import { timeframeOptions, SUPPORTED_LIST_URLS__NO_ENS } from '../constants'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import getTokenList from '../utils/tokenLists'
-import { healthClient } from '../apollo/client'
-import { SUBGRAPH_HEALTH } from '../apollo/queries'
+import { clientHydra, healthClient } from '../apollo/client'
+import { SUBGRAPH_HEALTH, SUBGRAPH_HEALTH_HYDRA } from '../apollo/queries'
 dayjs.extend(utc)
 
 const UPDATE = 'UPDATE'
@@ -174,9 +174,9 @@ export function useLatestBlocks() {
 
   useEffect(() => {
     async function fetch() {
-      healthClient
+      clientHydra
         .query({
-          query: SUBGRAPH_HEALTH,
+          query: SUBGRAPH_HEALTH_HYDRA,
         })
         .then((res) => {
           const syncedBlock = res.data.indexingStatusForCurrentVersion.chains[0].latestBlock.number

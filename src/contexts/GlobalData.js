@@ -490,10 +490,8 @@ const getEthPrice = async () => {
   let ethPrice = 0
   let ethPriceOneDay = 0
   let priceChangeETH = 0
-  console.log('utcOneDayBack->', utcOneDayBack);
   try {
     let oneDayBlock = await getBlockFromTimestampHYDRA(utcOneDayBack)
-    // let oneDayBlock = await getBlockFromTimestamp(utcOneDayBack)
     
     let result = await clientHydra.query({
       query: HYDRA_PRICE(),
