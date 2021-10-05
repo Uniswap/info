@@ -55,6 +55,7 @@ const DesktopWrapper = styled.div`
   flex-direction: column;
   justify-content: space-between;
   height: 100vh;
+  overflow-y: scroll;
 `
 
 const MobileWrapper = styled.div`
@@ -184,7 +185,7 @@ function SideNav({ history }) {
               </AutoColumn>
             )}
           </AutoColumn>
-          <AutoColumn gap="0.5rem" style={{ marginLeft: '.75rem', marginBottom: '4rem' }}>
+          <AutoColumn gap="0.5rem" style={{ marginLeft: '.75rem', marginBottom: '4rem', marginTop: '1.5rem' }}>
             <HeaderText>
               <Link href="https://github.com/dynamic-amm/dmm-info" external>
                 Github
