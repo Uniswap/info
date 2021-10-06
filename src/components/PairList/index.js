@@ -68,13 +68,13 @@ const DashGrid = styled.div`
 
   @media screen and (min-width: 1080px) {
     padding: 0 1.125rem;
-    grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr 1fr;
-    grid-template-areas: ' name liq vol volWeek fees apy';
+    grid-template-columns: 1.5fr 1fr 1fr 1fr;
+    grid-template-areas: ' name liq vol volWeek';
   }
 
   @media screen and (min-width: 1200px) {
-    grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr 1fr;
-    grid-template-areas: ' name liq vol volWeek fees apy';
+    grid-template-columns: 1.5fr 1fr 1fr 1fr;
+    grid-template-areas: ' name liq vol volWeek';
   }
 `
 
@@ -219,12 +219,12 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10, useTracked = fals
           <DataText area="liq">{formatDataText(liquidity, pairData.trackedReserveUSD)}</DataText>
           <DataText area="vol">{formatDataText(volume, pairData.oneDayVolumeUSD)}</DataText>
           {!below1080 && <DataText area="volWeek">{formatDataText(weekVolume, pairData.oneWeekVolumeUSD)}</DataText>}
-          {!below1080 && <DataText area="fees">{formatDataText(fees, pairData.oneDayVolumeUSD)}</DataText>}
+          {/* {!below1080 && <DataText area="fees">{formatDataText(fees, pairData.oneDayVolumeUSD)}</DataText>}
           {!below1080 && (
             <DataText area="apy">
               {formatDataText(apy, pairData.oneDayVolumeUSD, pairData.oneDayVolumeUSD === 0)}
             </DataText>
-          )}
+          )} */}
         </DashGrid>
       )
     } else {
@@ -309,7 +309,7 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10, useTracked = fals
             </ClickableText>
           </Flex>
         )}
-        {!below1080 && (
+        {/* {!below1080 && (
           <Flex alignItems="center" justifyContent="flexEnd">
             <ClickableText
               area="fees"
@@ -335,7 +335,7 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10, useTracked = fals
             </ClickableText>
             <QuestionHelper text={'Based on 24hr volume annualized'} />
           </Flex>
-        )}
+        )} */}
       </DashGrid>
       <Divider />
       <List p={0}>{!pairList ? <LocalLoader /> : pairList}</List>
