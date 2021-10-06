@@ -255,13 +255,13 @@ async function getGlobalData(ethPrice, oldEthPrice) {
       fetchPolicy: 'cache-first',
     })
     data = resultHydra.data.hydraswapFactories[0]
-
+    
     let oneDayResult = await clientHydra.query({
       query: GLOBAL_DATA_HYDRA(oneDayBlock?.number),
       fetchPolicy: 'cache-first',
     })
     oneDayData = oneDayResult.data.hydraswapFactories[0]
- 
+
     let twoDayResult = await clientHydra.query({
       query: GLOBAL_DATA_HYDRA(twoDayBlock?.number),
       fetchPolicy: 'cache-first',
@@ -318,7 +318,6 @@ async function getGlobalData(ethPrice, oldEthPrice) {
   } catch (e) {
     console.log(e)
   }
-  
   return data
 }
 
@@ -513,8 +512,8 @@ const getEthPrice = async () => {
   return [ethPrice, ethPriceOneDay, priceChangeETH]
 }
 
-const PAIRS_TO_FETCH = 500
-const TOKENS_TO_FETCH = 500
+const PAIRS_TO_FETCH = 10
+const TOKENS_TO_FETCH = 10
 
 /**
  * Loop through every pair on uniswap, used for search
