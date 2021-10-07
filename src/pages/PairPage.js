@@ -273,7 +273,7 @@ function PairPage({ pairAddress, history }) {
                     flexDirection: below1080 ? 'row-reverse' : 'initial',
                   }}
                 >
-                  {!!!savedPairs[pairAddress] && !below1080 ? (
+                  {/* {!!!savedPairs[pairAddress] && !below1080 ? (
                     <Hover onClick={() => addPair(pairAddress, token0.id, token1.id, token0.symbol, token1.symbol)}>
                       <StyledIcon>
                         <PlusCircle style={{ marginRight: '0.5rem' }} />
@@ -294,7 +294,7 @@ function PairPage({ pairAddress, history }) {
                     <ButtonDark ml={!below1080 && '.5rem'} mr={below1080 && '.5rem'} color={backgroundColor}>
                       Trade
                     </ButtonDark>
-                  </Link>
+                  </Link> */}
                 </RowFixed>
               </div>
             </AutoColumn>
