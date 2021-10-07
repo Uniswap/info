@@ -48,7 +48,7 @@ export default function GlobalStats() {
               style={{ position: 'relative' }}
             >
               HYDRA Price: <Medium>{formattedEthPrice}</Medium>
-              {showPriceCard && <UniPrice />}
+              {/* {showPriceCard && <UniPrice />} */}
             </TYPE.main>
           )}
 

@@ -245,7 +245,7 @@ function TokenPage({ address, history }) {
                   )}
                 </RowFixed>
               </RowFixed>
-              <span>
+              {/* <span>
                 <RowFixed ml={below500 ? '0' : '2.5rem'} mt={below500 ? '1rem' : '0'}>
                   {!!!savedTokens[address] && !below800 ? (
                     <Hover onClick={() => addToken(address, symbol)}>
@@ -269,7 +269,7 @@ function TokenPage({ address, history }) {
                     </ButtonDark>
                   </Link>
                 </RowFixed>
-              </span>
+              </span> */}
             </RowBetween>
 
             <>

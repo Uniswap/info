@@ -26,11 +26,9 @@ const AppWrapper = styled.div`
 `
 const ContentWrapper = styled.div`
   display: grid;
-  grid-template-columns: ${({ open }) => (open ? '220px 1fr 200px' : '220px 1fr 64px')};
+  grid-template-columns: ${({ open }) => (open ? '220px 1fr 0px' : '220px 1fr 0px')};
 
-  @media screen and (max-width: 1400px) {
-    grid-template-columns: 220px 1fr;
-  }
+ 
 
   @media screen and (max-width: 1080px) {
     grid-template-columns: 1fr;
@@ -55,6 +53,7 @@ const Right = styled.div`
 `
 
 const Center = styled.div`
+  width: 100%;
   height: 100%;
   z-index: 9999;
   transition: width 0.25s ease;
@@ -85,9 +84,9 @@ const LayoutWrapper = ({ children, savedOpen, setSavedOpen }) => {
       <ContentWrapper open={savedOpen}>
         <SideNav />
         <Center id="center">{children}</Center>
-        <Right open={savedOpen}>
+        {/* <Right open={savedOpen}>
           <PinnedData open={savedOpen} setSavedOpen={setSavedOpen} />
-        </Right>
+        </Right> */}
       </ContentWrapper>
     </>
   )
