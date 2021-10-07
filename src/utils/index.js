@@ -10,6 +10,7 @@ import _Decimal from 'decimal.js-light'
 import toFormat from 'toformat'
 import { timeframeOptions, WETH_ADDRESS, KNC_ADDRESS } from '../constants'
 import Numeral from 'numeral'
+import { OverflowTooltip } from '../components/Tooltip'
 
 // format libraries
 const Decimal = toFormat(_Decimal)
@@ -449,7 +450,13 @@ export function formattedPercent(percent, useBrackets = false) {
   }
   if (fixedPercent > 0) {
     if (fixedPercent > 100) {
-      return <Text fontWeight={500} color="green">{`+${percent?.toFixed(0).toLocaleString()}%`}</Text>
+      return (
+        <Text fontWeight={500} color="green">
+          <OverflowTooltip text={`+${percent?.toFixed(0).toLocaleString()}%`}>{`+${percent
+            ?.toFixed(0)
+            .toLocaleString()}%`}</OverflowTooltip>
+        </Text>
+      )
     } else {
       return <Text fontWeight={500} color="green">{`+${fixedPercent}%`}</Text>
     }

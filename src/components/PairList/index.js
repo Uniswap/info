@@ -14,6 +14,7 @@ import DoubleTokenLogo from '../DoubleLogo'
 import FormattedName from '../FormattedName'
 import QuestionHelper from '../QuestionHelper'
 import { TYPE } from '../../Theme'
+import { OverflowTooltip } from '../Tooltip'
 
 dayjs.extend(utc)
 
@@ -58,18 +59,18 @@ const DashGrid = styled.div`
 
   @media screen and (min-width: 740px) {
     padding: 0 1.125rem;
-    grid-template-columns: 1.5fr 1fr 1fr;
+    grid-template-columns: 2fr 1fr 1fr;
     grid-template-areas: ' name liq vol pool ';
   }
 
   @media screen and (min-width: 1080px) {
     padding: 0 1.125rem;
-    grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr 1fr;
+    grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr;
     grid-template-areas: ' name liq vol volWeek fees apy';
   }
 
   @media screen and (min-width: 1200px) {
-    grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr 1fr;
+    grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr;
     grid-template-areas: ' name liq vol volWeek fees apy';
   }
 `
@@ -185,9 +186,15 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
               />
             </CustomLink>
           </DataText>
-          <DataText area="liq">{formattedNum(liquidity, true)}</DataText>
+          <DataText area="liq">
+            <OverflowTooltip text={formattedNum(liquidity, true)}>{formattedNum(liquidity, true)}</OverflowTooltip>
+          </DataText>
           <DataText area="vol">{formattedNum(volume, true)}</DataText>
-          {!below1080 && <DataText area="volWeek">{formattedNum(weekVolume, true)}</DataText>}
+          {!below1080 && (
+            <DataText area="volWeek">
+              <OverflowTooltip text={formattedNum(weekVolume, true)}>{formattedNum(weekVolume, true)}</OverflowTooltip>
+            </DataText>
+          )}
           {!below1080 && <DataText area="fees">{formattedNum(oneDayFee, true)}</DataText>}
           {!below1080 && <DataText area="apy">{apy}</DataText>}
         </DashGrid>
@@ -216,10 +223,10 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
       .map((pairAddress, index) => {
         return (
           pairAddress && (
-            <div key={index}>
+            <React.Fragment key={index}>
               <ListItem key={index} index={(page - 1) * ITEMS_PER_PAGE + index + 1} pairAddress={pairAddress} />
               <Divider />
-            </div>
+            </React.Fragment>
           )
         )
       })
