@@ -14,7 +14,6 @@ import DoubleTokenLogo from '../DoubleLogo'
 import FormattedName from '../FormattedName'
 import QuestionHelper from '../QuestionHelper'
 import { TYPE } from '../../Theme'
-import { OverflowTooltip } from '../Tooltip'
 
 dayjs.extend(utc)
 
@@ -186,15 +185,9 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
               />
             </CustomLink>
           </DataText>
-          <DataText area="liq">
-            <OverflowTooltip text={formattedNum(liquidity, true)}>{formattedNum(liquidity, true)}</OverflowTooltip>
-          </DataText>
+          <DataText area="liq">{formattedNum(liquidity, true)}</DataText>
           <DataText area="vol">{formattedNum(volume, true)}</DataText>
-          {!below1080 && (
-            <DataText area="volWeek">
-              <OverflowTooltip text={formattedNum(weekVolume, true)}>{formattedNum(weekVolume, true)}</OverflowTooltip>
-            </DataText>
-          )}
+          {!below1080 && <DataText area="volWeek">{formattedNum(weekVolume, true)}</DataText>}
           {!below1080 && <DataText area="fees">{formattedNum(oneDayFee, true)}</DataText>}
           {!below1080 && <DataText area="apy">{apy}</DataText>}
         </DashGrid>
