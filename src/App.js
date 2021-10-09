@@ -20,7 +20,7 @@ import AccountLookup from './pages/AccountLookup'
 import { OVERVIEW_TOKEN_BLACKLIST, PAIR_BLACKLIST } from './constants'
 import LocalLoader from './components/LocalLoader'
 import { ButtonDark } from './components/ButtonStyled'
-import { useLatestBlocks } from './contexts/Application'
+import { useExchangeClient, useLatestBlocks } from './contexts/Application'
 
 const AppWrapper = styled.div`
   position: relative;
@@ -115,6 +115,7 @@ function App() {
   const globalData = useGlobalData()
   const globalChartData = useGlobalChartData()
   const [latestBlock, headBlock] = useLatestBlocks()
+  const exchangeSubgraphClient = useExchangeClient()
 
   const [dismissed, markAsDismissed] = useState(false)
 
@@ -122,7 +123,7 @@ function App() {
   const showWarning = headBlock && latestBlock ? headBlock - latestBlock > BLOCK_DIFFERENCE_THRESHOLD : false
 
   return (
-    <ApolloProvider client={client}>
+    <ApolloProvider client={exchangeSubgraphClient || client}>
       <AppWrapper>
         {!dismissed && showWarning && (
           <WarningWrapper>
