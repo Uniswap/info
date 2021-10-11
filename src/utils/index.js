@@ -345,7 +345,7 @@ export const formatNumber = (num) => {
 
 // using a currency library here in case we want to add more in future
 export const formatDollarAmount = (num, digits) => {
-  const formatter = new Intl.NumberFormat([], {
+  const formatter = new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
     minimumFractionDigits: digits,
