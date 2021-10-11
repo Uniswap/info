@@ -1,6 +1,16 @@
 import gql from 'graphql-tag'
 import { FACTORY_ADDRESS, BUNDLE_ID } from '../constants'
 
+export const SUBGRAPH_BLOCK_NUMBER = () => gql`
+  query block_number {
+    _meta {
+      block {
+        number
+      }
+    }
+  }
+`
+
 export const SUBGRAPH_HEALTH = (subgraphName) => {
   return gql(`
     query health {

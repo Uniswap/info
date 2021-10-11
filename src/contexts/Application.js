@@ -5,6 +5,7 @@ import utc from 'dayjs/plugin/utc'
 import getTokenList from '../utils/tokenLists'
 import { healthClient } from '../apollo/client'
 import { SUBGRAPH_HEALTH } from '../apollo/queries'
+import { getExchangeSubgraphClient } from '../apollo/manager'
 dayjs.extend(utc)
 
 const UPDATE = 'UPDATE'
@@ -14,6 +15,7 @@ const UPDATED_SUPPORTED_TOKENS = 'UPDATED_SUPPORTED_TOKENS'
 const UPDATE_LATEST_BLOCK = 'UPDATE_LATEST_BLOCK'
 const UPDATE_HEAD_BLOCK = 'UPDATE_HEAD_BLOCK'
 const UPDATE_OPEN_MODAL = 'UPDATE_OPEN_MODAL'
+const UPDATE_EXCHANGE_SUBGRAPH_CLIENT = 'UPDATE_EXCHANGE_SUBGRAPH_CLIENT'
 
 const SUPPORTED_TOKENS = 'SUPPORTED_TOKENS'
 const TIME_KEY = 'TIME_KEY'
@@ -22,6 +24,7 @@ const SESSION_START = 'SESSION_START'
 const LATEST_BLOCK = 'LATEST_BLOCK'
 const HEAD_BLOCK = 'HEAD_BLOCK'
 const OPEN_MODAL = 'OPEN_MODAL'
+const EXCHANGE_SUBGRAPH_CLIENT = 'EXCHANGE_SUBGRAPH_CLIENT'
 
 const ApplicationContext = createContext()
 
@@ -85,6 +88,14 @@ function reducer(state, { type, payload }) {
       }
     }
 
+    case UPDATE_EXCHANGE_SUBGRAPH_CLIENT: {
+      const { exchangeSubgraphClient } = payload
+      return {
+        ...state,
+        [EXCHANGE_SUBGRAPH_CLIENT]: exchangeSubgraphClient,
+      }
+    }
+
     default: {
       throw Error(`Unexpected action type in DataContext reducer: '${type}'.`)
     }
@@ -95,6 +106,7 @@ const INITIAL_STATE = {
   CURRENCY: 'USD',
   TIME_KEY: timeframeOptions.ALL_TIME,
   OPEN_MODAL: null,
+  EXCHANGE_SUBGRAPH_CLIENT: null,
 }
 
 export default function Provider({ children }) {
@@ -164,6 +176,15 @@ export default function Provider({ children }) {
     })
   }, [])
 
+  const updateExchangeSubgraphClient = useCallback((exchangeSubgraphClient) => {
+    dispatch({
+      type: UPDATE_EXCHANGE_SUBGRAPH_CLIENT,
+      payload: {
+        exchangeSubgraphClient,
+      },
+    })
+  }, [])
+
   return (
     <ApplicationContext.Provider
       value={useMemo(
@@ -177,6 +198,7 @@ export default function Provider({ children }) {
             updateLatestBlock,
             updateHeadBlock,
             updateOpenModal,
+            updateExchangeSubgraphClient,
           },
         ],
         [
@@ -188,6 +210,7 @@ export default function Provider({ children }) {
           updateLatestBlock,
           updateHeadBlock,
           updateOpenModal,
+          updateExchangeSubgraphClient,
         ]
       )}
     >
@@ -215,7 +238,7 @@ export function useLatestBlocks() {
           updateHeadBlock(headBlock)
         }
       } catch (e) {
-        console.log(e)
+        console.error(e)
       }
     }
     if (!latestBlock) {
@@ -340,4 +363,30 @@ export function useToggleMenuModal() {
 
 export function useToggleNetworkModal() {
   return useToggleModal(ApplicationModal.NETWORK)
+}
+
+export function useExchangeClient() {
+  const [state, { updateExchangeSubgraphClient }] = useApplicationContext()
+  const exchangeSubgraphClient = state?.[EXCHANGE_SUBGRAPH_CLIENT]
+  const chainId = parseInt(process.env.REACT_APP_CHAIN_ID)
+
+  useEffect(() => {
+    async function fetchExchangeClient() {
+      try {
+        const client = await getExchangeSubgraphClient(chainId)
+
+        if (client) {
+          updateExchangeSubgraphClient(client)
+        }
+      } catch (err) {
+        console.error(err)
+      }
+    }
+
+    if (!exchangeSubgraphClient) {
+      fetchExchangeClient()
+    }
+  }, [chainId, exchangeSubgraphClient, updateExchangeSubgraphClient])
+
+  return exchangeSubgraphClient
 }
