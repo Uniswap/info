@@ -67,3 +67,14 @@ export const ANALYTICS_URLS = {
   56: 'https://bsc-info.dmm.exchange',
   43114: 'https://avax-info.dmm.exchange',
 }
+
+export const ChainId = {
+  MAINNET: 1,
+  ROPSTEN: 3,
+  MATIC: 137,
+  MUMBAI: 80001,
+  BSCTESTNET: 97,
+  BSCMAINNET: 56,
+  AVAXTESTNET: 43113,
+  AVAXMAINNET: 43114,
+}
