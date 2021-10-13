@@ -6,6 +6,13 @@ const AVALANCHE_TOKEN_LIST = {
     decimals: 18,
     logoURI: 'https://i.imgur.com/jXxS6uW.png',
   },
+  '0x961C8c0B1aaD0c0b10a51FeF6a867E3091BCef17': {
+    address: '0x961C8c0B1aaD0c0b10a51FeF6a867E3091BCef17',
+    symbol: 'DYP',
+    name: 'DeFiYieldProtocol',
+    decimals: 18,
+    logoURI: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x961C8c0B1aaD0c0b10a51FeF6a867E3091BCef17/logo.png',
+  },
   '0xd1c3f94DE7e5B45fa4eDBBA472491a9f4B166FC4': {
     address: '0xd1c3f94DE7e5B45fa4eDBBA472491a9f4B166FC4',
     symbol: 'XAVA',
