@@ -62,11 +62,11 @@ export default function GlobalStats() {
               Pairs: <Medium>{localNumber(pairCount)}</Medium>
             </TYPE.main>
           )}
-          {!below1295 && (
+          {/* {!below1295 && (
             <TYPE.main mr={'1rem'}>
               Fees (24H): <Medium>{oneDayFees}</Medium>&nbsp;
             </TYPE.main>
-          )}
+          )} */}
         </RowFixed>
       </RowBetween>
     </Header>
