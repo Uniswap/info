@@ -36,6 +36,20 @@ elif [[ "$TRAVIS_BRANCH" == "main" ]]; then
   cp build/index.html build-matic-index
   mv build build-matic
   echo "Finished running build"
+
+  echo "Start running build"
+  yarn build-bsc
+  mkdir build-bsc-index
+  cp build/index.html build-bsc-index
+  mv build build-bsc
+  echo "Finished running build"
+
+  echo "Start running build"
+  yarn build-avax
+  mkdir build-avax-index
+  cp build/index.html build-avax-index
+  mv build build-avax
+  echo "Finished running build"
 else
     echo "Branch is not set for auto-build."
     exit 0
