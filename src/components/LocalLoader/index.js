@@ -3,9 +3,8 @@ import styled, { css, keyframes } from 'styled-components'
 import { useDarkModeManager } from '../../contexts/LocalStorage'
 
 const pulse = keyframes`
-  0% { transform: scale(1); }
-  60% { transform: scale(1.1); }
-  100% { transform: scale(1); }
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 `
 
 const Wrapper = styled.div`
@@ -27,9 +26,9 @@ const Wrapper = styled.div`
 `
 
 const AnimatedImg = styled.div`
-  animation: ${pulse} 800ms linear infinite;
+  animation: ${pulse} 3500ms linear infinite;
   & > * {
-    width: 72px;
+    width: 120px;
   }
 `
 
