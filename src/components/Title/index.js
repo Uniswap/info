@@ -9,7 +9,7 @@ import Link, { BasicLink } from '../Link'
 import { AutoColumn } from '../Column'
 import { RowFixed, AutoRow } from '../Row'
 import SwitchNetworkButton from '../SwitcNetworkButton'
-import Logo from '../../assets/logo_white.svg'
+import Logo from '../../assets/logo.svg'
 import { ApplicationModal, useModalOpen, useToggleMenuModal } from '../../contexts/Application'
 import { useOnClickOutside } from '../../hooks'
 import SocialLinks from '../SocialLinks'
@@ -121,7 +121,7 @@ export default function Title() {
       <Flex alignItems="center" style={{ justifyContent: 'space-between' }}>
         <RowFixed>
           <DMMIcon id="link" onClick={() => history.push('/')}>
-            <img width={below1080 ? '50px' : '100px'} src={Logo} alt="logo" />
+            <img width={below1080 ? '80px' : '120px'} src={Logo} alt="logo" />
           </DMMIcon>
         </RowFixed>
         {below1080 && (
