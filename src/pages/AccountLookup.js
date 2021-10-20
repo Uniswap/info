@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import 'feather-icons'
 import { withRouter } from 'react-router-dom'
-import { TYPE } from '../Theme'
+import { ThemedBackground, TYPE } from '../Theme'
 import { PageWrapper, FullWrapper } from '../components'
 import Panel from '../components/Panel'
 import LPList from '../components/LPList'
@@ -12,6 +12,8 @@ import LocalLoader from '../components/LocalLoader'
 import { RowBetween } from '../components/Row'
 import { useMedia } from 'react-use'
 import Search from '../components/Search'
+import { transparentize } from 'polished'
+import useTheme from '../hooks/useTheme'
 
 const AccountWrapper = styled.div`
   @media screen and (max-width: 600px) {
@@ -21,6 +23,7 @@ const AccountWrapper = styled.div`
 
 function AccountLookup() {
   // scroll to top
+  const theme = useTheme()
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [])
@@ -31,6 +34,8 @@ function AccountLookup() {
 
   return (
     <PageWrapper>
+      <ThemedBackground backgroundColor={transparentize(0.6, theme.hydraBlue)} />
+
       <FullWrapper>
         <RowBetween>
           <TYPE.largeHeader>Wallet analytics</TYPE.largeHeader>

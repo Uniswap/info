@@ -161,6 +161,7 @@ function SideNav({ history }) {
                 </BasicLink>
               </AutoColumn>
             )}
+            <Toggle isActive={isDark} toggle={toggleDarkMode} />
           </AutoColumn>
           {/* <AutoColumn gap="0.5rem" style={{ marginLeft: '.75rem', marginBottom: '4rem' }}>
             <HeaderText>
@@ -188,8 +189,8 @@ function SideNav({ history }) {
                 Twitter
               </Link>
             </HeaderText>
-            <Toggle isActive={isDark} toggle={toggleDarkMode} />
           </AutoColumn> */}
+
           {!below1180 && (
             <Polling style={{ marginLeft: '.5rem' }}>
               <PollingDot />

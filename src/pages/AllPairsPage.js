@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import 'feather-icons'
 
-import { TYPE } from '../Theme'
+import { ThemedBackground, TYPE } from '../Theme'
 import Panel from '../components/Panel'
 import { useAllPairData } from '../contexts/PairData'
 import PairList from '../components/PairList'
@@ -11,9 +11,12 @@ import Search from '../components/Search'
 import { useMedia } from 'react-use'
 import QuestionHelper from '../components/QuestionHelper'
 import CheckBox from '../components/Checkbox'
+import { transparentize } from 'polished'
+import useTheme from '../hooks/useTheme'
 
 function AllPairsPage() {
   const allPairs = useAllPairData()
+  const theme = useTheme()
 
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -25,6 +28,7 @@ function AllPairsPage() {
 
   return (
     <PageWrapper>
+      <ThemedBackground backgroundColor={transparentize(0.6, theme.hydraBlue)} />
       <FullWrapper>
         <RowBetween>
           <TYPE.largeHeader>Top Pairs</TYPE.largeHeader>

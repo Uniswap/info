@@ -191,7 +191,7 @@ function TokenPage({ address, history }) {
 
   return (
     <PageWrapper>
-      <ThemedBackground backgroundColor={transparentize(0.6, backgroundColor)} />
+      <ThemedBackground backgroundColor={transparentize(0.6, '#026fc2')} />
       <Warning
         type={'token'}
         show={!dismissed && listedTokens && !listedTokens.includes(address)}

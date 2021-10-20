@@ -17,7 +17,7 @@ const theme = (darkMode, color) => ({
   panelColor: darkMode ? 'rgba(255, 255, 255, 0)' : 'rgba(255, 255, 255, 0)',
   backgroundColor: darkMode ? '#212429' : '#F7F8FA',
 
-  uniswapPink: darkMode ? '#ff007a' : 'black',
+  hydraBlue: darkMode ? '#026fc2' : 'black',
 
   concreteGray: darkMode ? '#292C2F' : '#FAFAFA',
   inputBackground: darkMode ? '#1F1F1F' : '#FAFAFA',
@@ -43,22 +43,22 @@ const theme = (darkMode, color) => ({
 
   //specialty colors
   modalBG: darkMode ? 'rgba(0,0,0,0.85)' : 'rgba(0,0,0,0.6)',
-  advancedBG: darkMode ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.4)',
+  advancedBG: darkMode ? '#212429' : 'rgba(255,255,255,0.4)',
   onlyLight: darkMode ? '#22242a' : 'transparent',
   divider: darkMode ? 'rgba(43, 43, 43, 0.435)' : 'rgba(43, 43, 43, 0.035)',
 
   //primary colors
-  primary1: darkMode ? '#2172E5' : '#ff007a',
+  primary1: darkMode ? '#2172E5' : '#026fc2',
   primary2: darkMode ? '#3680E7' : '#FF8CC3',
   primary3: darkMode ? '#4D8FEA' : '#FF99C9',
   primary4: darkMode ? '#376bad70' : '#F6DDE8',
   primary5: darkMode ? '#153d6f70' : '#FDEAF1',
 
   // color text
-  primaryText1: darkMode ? '#6da8ff' : '#ff007a',
+  primaryText1: darkMode ? '#6da8ff' : '#026fc2',
 
   // secondary colors
-  secondary1: darkMode ? '#2172E5' : '#ff007a',
+  secondary1: darkMode ? '#2172E5' : '#026fc2',
   secondary2: darkMode ? '#17000b26' : '#F6DDE8',
   secondary3: darkMode ? '#17000b26' : '#FDEAF1',
 
@@ -72,7 +72,7 @@ const theme = (darkMode, color) => ({
   link: '#2172E5',
   blue: '2f80ed',
 
-  background: darkMode ? 'black' : `radial-gradient(50% 50% at 50% 50%, #ff007a30 0%, #fff 0%)`,
+  background: darkMode ? 'black' : `radial-gradient(50% 50% at 50% 50%, #026fc230 0%, #fff 0%)`,
 })
 
 const TextWrapper = styled(Text)`
@@ -146,7 +146,7 @@ export const ThemedBackground = styled.div`
   mix-blend-mode: color;
   background: ${({ backgroundColor }) =>
     `radial-gradient(50% 50% at 50% 50%, ${backgroundColor} 0%, rgba(255, 255, 255, 0) 100%)`};
-  position: absolute;
+  position: fixed;
   top: 0px;
   left: 0px;
   /* z-index: ; */
@@ -156,9 +156,13 @@ export const ThemedBackground = styled.div`
 
 export const GlobalStyle = createGlobalStyle`
   @import url('https://rsms.me/inter/inter.css');
-  html { font-family: 'Inter', sans-serif; }
+  @import url('https://fonts.googleapis.com/css2?family=Fira+Sans:ital,wght@0,400;0,600;1,200&display=swap');
+  html, input, textarea, button {
+    font-family: 'Fira Sans', sans-serif;
+    font-display: fallback;
+  }
   @supports (font-variation-settings: normal) {
-    html { font-family: 'Inter var', sans-serif; }
+    html { font-family: 'Fira Sans', sans-serif;}
   }
   
   html,

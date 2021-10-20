@@ -25,6 +25,7 @@ import { CustomLink } from '../components/Link'
 import { PageWrapper, ContentWrapper } from '../components'
 import CheckBox from '../components/Checkbox'
 import QuestionHelper from '../components/QuestionHelper'
+import useTheme from '../hooks/useTheme'
 
 const ListOptions = styled(AutoRow)`
   height: 40px;
@@ -48,7 +49,7 @@ const GridRow = styled.div`
 
 function GlobalPage() {
   // console.log('global page');
-
+  const theme = useTheme()
   // get data for lists and totals
   const allPairs = useAllPairData()
   const allTokens = useAllTokenData()
@@ -73,7 +74,7 @@ function GlobalPage() {
 
   return (
     <PageWrapper>
-      <ThemedBackground backgroundColor={transparentize(0.6, '#ff007a')} />
+      <ThemedBackground backgroundColor={transparentize(0.6, theme.hydraBlue)} />
       <ContentWrapper>
         <div>
           <AutoColumn gap="24px" style={{ paddingBottom: below800 ? '0' : '24px' }}>

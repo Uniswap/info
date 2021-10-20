@@ -2,19 +2,22 @@ import React, { useEffect } from 'react'
 import 'feather-icons'
 
 import TopTokenList from '../components/TokenList'
-import { TYPE } from '../Theme'
+import { ThemedBackground, TYPE } from '../Theme'
 import Panel from '../components/Panel'
 import { useAllTokenData } from '../contexts/TokenData'
 import { PageWrapper, FullWrapper } from '../components'
 import { RowBetween } from '../components/Row'
 import Search from '../components/Search'
 import { useMedia } from 'react-use'
+import { transparentize } from 'polished'
+import useTheme from '../hooks/useTheme'
+
 // import CheckBox from '../components/Checkbox'
 // import QuestionHelper from '../components/QuestionHelper'
 
 function AllTokensPage() {
   const allTokens = useAllTokenData()
-
+  const theme = useTheme()
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [])
@@ -25,6 +28,8 @@ function AllTokensPage() {
 
   return (
     <PageWrapper>
+      <ThemedBackground backgroundColor={transparentize(0.6, theme.hydraBlue)} />
+
       <FullWrapper>
         <RowBetween>
           <TYPE.largeHeader>Top Tokens</TYPE.largeHeader>
