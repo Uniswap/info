@@ -33,7 +33,7 @@ const SwitchNetworkButton = () => {
 
   const toggleNetworkModal = useToggleNetworkModal()
 
-  if (![1, 137, 56, 43114].includes(chainId)) {
+  if (![1, 137, 56, 43114, 250].includes(chainId)) {
     return null
   }
 
