@@ -97,6 +97,8 @@
     "build-bsc-staging": "env-cmd -f .env.bsc.staging react-scripts build",
     "build-bsc": "env-cmd -f .env.bsc react-scripts build",
     "build-avax": "env-cmd -f .env.avax react-scripts build",
+    "build-fantom": "env-cmd -f .env.fantom react-scripts build",
+    "build-fantom-staging": "env-cmd -f .env.fantom.staging react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

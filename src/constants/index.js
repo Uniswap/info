@@ -19,6 +19,8 @@ export const SUPPORTED_LIST_URLS__NO_ENS =
     ? ['https://tokens.pancakeswap.finance/pancakeswap-extended.json']
     : String(process.env.REACT_APP_CHAIN_ID) === '43114'
     ? ['https://raw.githubusercontent.com/pangolindex/tokenlists/main/ab.tokenlist.json']
+    : String(process.env.REACT_APP_CHAIN_ID === '250')
+    ? ['https://raw.githubusercontent.com/SpookySwap/spooky-info/master/src/constants/token/spookyswap.json']
     : ['https://gateway.ipfs.io/ipns/tokens.uniswap.org']
 
 // hide from overview list
@@ -66,6 +68,7 @@ export const ANALYTICS_URLS = {
   137: 'https://polygon-info.dmm.exchange',
   56: 'https://bsc-info.dmm.exchange',
   43114: 'https://avax-info.dmm.exchange',
+  250: 'https://fantom-info.dmm.exchange'
 }
 
 export const ChainId = {
@@ -77,4 +80,5 @@ export const ChainId = {
   BSCMAINNET: 56,
   AVAXTESTNET: 43113,
   AVAXMAINNET: 43114,
+  FANTOM: 250,
 }

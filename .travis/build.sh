@@ -16,12 +16,19 @@ elif [[ "$TRAVIS_BRANCH" == "staging" ]]; then
   yarn build-staging
   mv build build-staging
   echo "Finished running build-eth-staging"
+
   yarn build-matic-staging
   mv build build-matic-staging
   echo "Finished running matic-staging"
+
   yarn build-bsc-staging
   mv build build-bsc-staging
   echo "Finished running matic-staging"
+
+  echo "Start build fantom-staging"
+  yarn build-fantom-staging
+  mv build build-fantom-staging
+  echo "Finished running fantom-staging"
 elif [[ "$TRAVIS_BRANCH" == "main" ]]; then
   echo "Start running build"
   yarn build-production
@@ -50,6 +57,14 @@ elif [[ "$TRAVIS_BRANCH" == "main" ]]; then
   cp build/index.html build-avax-index
   mv build build-avax
   echo "Finished running build"
+
+  echo "Start running build"
+  yarn build-fantom
+  mkdir build-fantom-index
+  cp build/index.html build-fantom-index
+  mv build build-fantom
+  echo "Finished running build"
+
 else
     echo "Branch is not set for auto-build."
     exit 0
