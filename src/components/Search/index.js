@@ -47,13 +47,13 @@ const Wrapper = styled.div`
   box-sizing: border-box;
   box-shadow: ${({ open, small }) =>
     !open && !small
-      ? '0px 24px 32px rgba(0, 0, 0, 0.04), 0px 16px 24px rgba(0, 0, 0, 0.04), 0px 4px 8px rgba(0, 0, 0, 0.04), 0px 0px 1px rgba(0, 0, 0, 0.04) '
+      ? '0px 10px 12px rgba(0, 0, 0, 0.04), 0px 16px 24px rgba(0, 0, 0, 0.04), 0px 4px 8px rgba(0, 0, 0, 0.04), 0px 0px 1px rgba(0, 0, 0, 0.04) '
       : 'none'};
   @media screen and (max-width: 500px) {
     background: ${({ theme }) => theme.bg6};
     box-shadow: ${({ open }) =>
       !open
-        ? '0px 24px 32px rgba(0, 0, 0, 0.04), 0px 16px 24px rgba(0, 0, 0, 0.04), 0px 4px 8px rgba(0, 0, 0, 0.04), 0px 0px 1px rgba(0, 0, 0, 0.04) '
+        ? '0px 10px 12px rgba(0, 0, 0, 0.04), 0px 16px 24px rgba(0, 0, 0, 0.04), 0px 4px 8px rgba(0, 0, 0, 0.04), 0px 0px 1px rgba(0, 0, 0, 0.04) '
         : 'none'};
   }
 `
@@ -213,15 +213,15 @@ export const Search = ({ small = false }) => {
               id: value,
             },
           })
-          pairs.data.as0.forEach(pair => {
+          pairs.data.as0.forEach((pair) => {
             pair.token0.id = pair.token0.tokenAddress
             pair.token1.id = pair.token1.tokenAddress
           })
-          pairs.data.as1.forEach(pair => {
+          pairs.data.as1.forEach((pair) => {
             pair.token0.id = pair.token0.tokenAddress
             pair.token1.id = pair.token1.tokenAddress
           })
-          pairs.data.asAddress.forEach(pair => {
+          pairs.data.asAddress.forEach((pair) => {
             pair.token0.id = pair.token0.tokenAddress
             pair.token1.id = pair.token1.tokenAddress
           })

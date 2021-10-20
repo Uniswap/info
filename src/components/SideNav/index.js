@@ -1,6 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
-import { AutoColumn } from '../Column'
+import { AutoColumn, ColumnCenter } from '../Column'
 import Title from '../Title'
 import { BasicLink } from '../Link'
 import { useMedia } from 'react-use'
@@ -161,7 +161,10 @@ function SideNav({ history }) {
                 </BasicLink>
               </AutoColumn>
             )}
-            <Toggle isActive={isDark} toggle={toggleDarkMode} />
+            <ColumnCenter style={{ marginLeft: '-0.75rem' }}>
+              <Toggle isActive={isDark} toggle={toggleDarkMode} />
+            </ColumnCenter>
+            <img style={{ width: 150, opacity: 0.15 }} src={require('../../assets/hydra-guard.png')} />
           </AutoColumn>
           {/* <AutoColumn gap="0.5rem" style={{ marginLeft: '.75rem', marginBottom: '4rem' }}>
             <HeaderText>
