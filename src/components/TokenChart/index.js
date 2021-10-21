@@ -153,11 +153,12 @@ const TokenChart = ({ address, color, base }) => {
             <RowFixed>
               <OptionButton
                 customTokenChart="true"
-                active={chartFilter === CHART_VIEW.LIQUIDITY}
-                onClick={() => setChartFilter(CHART_VIEW.LIQUIDITY)}
-                style={{ marginRight: '12px' }}
+                active={chartFilter === CHART_VIEW.PRICE}
+                onClick={() => {
+                  setChartFilter(CHART_VIEW.PRICE)
+                }}
               >
-                Liquidity
+                Price
               </OptionButton>
               <OptionButton
                 customTokenChart="true"
@@ -169,12 +170,11 @@ const TokenChart = ({ address, color, base }) => {
               </OptionButton>
               <OptionButton
                 customTokenChart="true"
-                active={chartFilter === CHART_VIEW.PRICE}
-                onClick={() => {
-                  setChartFilter(CHART_VIEW.PRICE)
-                }}
+                active={chartFilter === CHART_VIEW.LIQUIDITY}
+                onClick={() => setChartFilter(CHART_VIEW.LIQUIDITY)}
+                style={{ marginRight: '12px' }}
               >
-                Price
+                Liquidity
               </OptionButton>
             </RowFixed>
             {chartFilter === CHART_VIEW.PRICE && (
@@ -206,7 +206,7 @@ const TokenChart = ({ address, color, base }) => {
               </AutoRow>
             )}
           </AutoColumn>
-          <AutoRow justify="flex-end" gap="6px" align="flex-start">
+          <AutoRow justify="flex-end" gap="6px" align="flex-start" style={{ width: 'auto' }}>
             <OptionButton
               customTokenChart="true"
               active={timeWindow === timeframeOptions.WEEK}

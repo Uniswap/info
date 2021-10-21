@@ -39,7 +39,7 @@ const CHART_VIEW = {
 }
 
 const PairChart = ({ address, color, base0, base1 }) => {
-  const [chartFilter, setChartFilter] = useState(CHART_VIEW.LIQUIDITY)
+  const [chartFilter, setChartFilter] = useState(CHART_VIEW.RATE1)
 
   const [timeWindow, setTimeWindow] = useState(timeframeOptions.MONTH)
 
@@ -125,23 +125,13 @@ const PairChart = ({ address, color, base0, base1 }) => {
           <AutoRow gap="6px" style={{ flexWrap: 'nowrap' }}>
             <OptionButton
               customTokenChart
-              active={chartFilter === CHART_VIEW.LIQUIDITY}
+              active={chartFilter === CHART_VIEW.RATE1}
               onClick={() => {
-                setTimeWindow(timeframeOptions.ALL_TIME)
-                setChartFilter(CHART_VIEW.LIQUIDITY)
+                setTimeWindow(timeframeOptions.WEEK)
+                setChartFilter(CHART_VIEW.RATE1)
               }}
             >
-              Liquidity
-            </OptionButton>
-            <OptionButton
-              customTokenChart
-              active={chartFilter === CHART_VIEW.VOLUME}
-              onClick={() => {
-                setTimeWindow(timeframeOptions.ALL_TIME)
-                setChartFilter(CHART_VIEW.VOLUME)
-              }}
-            >
-              Volume
+              {pairData.token0 ? formattedSymbol0 + '/' + formattedSymbol1 : '-'}
             </OptionButton>
             <OptionButton
               customTokenChart
@@ -155,13 +145,23 @@ const PairChart = ({ address, color, base0, base1 }) => {
             </OptionButton>
             <OptionButton
               customTokenChart
-              active={chartFilter === CHART_VIEW.RATE1}
+              active={chartFilter === CHART_VIEW.VOLUME}
               onClick={() => {
-                setTimeWindow(timeframeOptions.WEEK)
-                setChartFilter(CHART_VIEW.RATE1)
+                setTimeWindow(timeframeOptions.ALL_TIME)
+                setChartFilter(CHART_VIEW.VOLUME)
               }}
             >
-              {pairData.token0 ? formattedSymbol0 + '/' + formattedSymbol1 : '-'}
+              Volume
+            </OptionButton>
+            <OptionButton
+              customTokenChart
+              active={chartFilter === CHART_VIEW.LIQUIDITY}
+              onClick={() => {
+                setTimeWindow(timeframeOptions.ALL_TIME)
+                setChartFilter(CHART_VIEW.LIQUIDITY)
+              }}
+            >
+              Liquidity
             </OptionButton>
           </AutoRow>
           <AutoRow justify="flex-end" gap="6px">
@@ -191,7 +191,12 @@ const PairChart = ({ address, color, base0, base1 }) => {
       )}
       {chartFilter === CHART_VIEW.LIQUIDITY && (
         <ResponsiveContainer aspect={aspect}>
-          <AreaChart margin={{ top: 0, right: 10, bottom: 6, left: 0 }} barCategoryGap={1} data={chartData} fillOpacity="1">
+          <AreaChart
+            margin={{ top: 0, right: 10, bottom: 6, left: 0 }}
+            barCategoryGap={1}
+            data={chartData}
+            fillOpacity="1"
+          >
             <defs>
               <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor={color} stopOpacity={0.35} />

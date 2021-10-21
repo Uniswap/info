@@ -1,19 +1,21 @@
-import React from "react";
-import styled from "styled-components/macro";
-import { CustomContainer } from "./styled";
-import LogoText from "../../assets/_logo.svg";
-import BackgroundFooter from "../../assets/footer.png";
-import BackgroundFooterMobile from "../../assets/footer-mobile.png";
-import Facebook from "../../assets/facebook.svg";
-import FacebookActive from "../../assets/facebook_active.svg";
-import Twitter from "../../assets/twitter.svg";
-import TwitterActive from "../../assets/twitter_active.svg";
-import Github from "../../assets/github.svg";
-import GithubActive from "../../assets/github_active.svg";
-import Reddit from "../../assets/reddit.svg";
-import RedditActive from "../../assets/reddit_active.svg";
-import Telegram from "../../assets/telegram.svg";
-import TelegramActive from "../../assets/telegram_active.svg";
+import React from 'react'
+import styled from 'styled-components/macro'
+import { CustomContainer } from './styled'
+import LogoText from '../../assets/_logo.svg'
+import BackgroundFooter from '../../assets/footer.png'
+import BackgroundFooterMobile from '../../assets/footer-mobile.png'
+import Facebook from '../../assets/facebook.svg'
+import FacebookActive from '../../assets/facebook_active.svg'
+import Twitter from '../../assets/twitter.svg'
+import TwitterActive from '../../assets/twitter_active.svg'
+import Github from '../../assets/github.svg'
+import GithubActive from '../../assets/github_active.svg'
+import Reddit from '../../assets/reddit.svg'
+import RedditActive from '../../assets/reddit_active.svg'
+import Telegram from '../../assets/telegram.svg'
+import TelegramActive from '../../assets/telegram_active.svg'
+import Substack from '../../assets/substack.svg'
+import SubstackActive from '../../assets/substack_active.svg'
 
 const CustomFooter = styled.div`
   display: block;
@@ -109,6 +111,12 @@ const CustomFooter = styled.div`
               background-image: url(${TelegramActive});
             }
           }
+          &.icon-substack {
+            background-image: url(${Substack});
+            &:hover {
+              background-image: url(${SubstackActive});
+            }
+          }
           &.icon-facebook {
             background-image: url(${Facebook});
             &:hover {
@@ -141,7 +149,7 @@ const CustomFooter = styled.div`
   .text-muted {
     color: #6c757d !important;
   }
-`;
+`
 
 export default function Footer() {
   return (
@@ -159,24 +167,24 @@ export default function Footer() {
           <div className="col-md-6 col-12 tomo-footer__social">
             <ul>
               <li className="list-inline-item">
-                <div className="icon icon-telegram" />
+                <a href="https://t.me/facchainofficial">
+                  <div className="icon icon-telegram" />
+                </a>
               </li>
               <li className="list-inline-item">
-                <div className="icon icon-facebook" />
+                <a href="https://twitter.com/fac_chain">
+                  <div className="icon icon-twitter" />
+                </a>
               </li>
               <li className="list-inline-item">
-                <div className="icon icon-twitter" />
-              </li>
-              <li className="list-inline-item">
-                <div className="icon icon-github" />
-              </li>
-              <li className="list-inline-item">
-                <div className="icon icon-reddit" />
+                <a href="https://factorychain.substack.com/">
+                  <div className="icon icon-substack" />
+                </a>
               </li>
             </ul>
           </div>
         </div>
       </CustomContainer>
     </CustomFooter>
-  );
+  )
 }
