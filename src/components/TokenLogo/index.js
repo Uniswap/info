@@ -18,7 +18,8 @@ import { getMumbaiTokenLogoURL } from '../../utils/mumbaiTokenMapping'
 import { getBscTestnetTokenLogoURL } from '../../utils/bscTestnetTokenMapping'
 import { getBscTokenLogoURL } from '../../utils/bscTokenMapping'
 import { getAvaxTokenLogoURL } from '../../utils/avaxTokenMapping'
-import {getFantomTokenLogoURL} from '../../utils/fantomTokenMapping'
+import { getFantomTokenLogoURL } from '../../utils/fantomTokenMapping'
+import FANTOM_TOKEN_LIST from '../../constants/tokenLists/fantom.tokenlist'
 
 const BAD_IMAGES = {}
 
@@ -236,9 +237,9 @@ export default function TokenLogo({ address, header = false, size = '24px', ...r
       break
 
     case '250':
-      // if (formattedAddress && FANTOM_TOKEN_LIST[formattedAddress]) {
-      //   return getCustomLogo({ address, src: FANTOM_TOKEN_LIST[formattedAddress].logoURI, size, setError, ...rest })
-      // }
+      if (formattedAddress && FANTOM_TOKEN_LIST[formattedAddress]) {
+        return getCustomLogo({ address, src: FANTOM_TOKEN_LIST[formattedAddress].logoURI, size, setError, ...rest })
+      }
       path = getFantomTokenLogoURL(address)
       break
 
@@ -266,6 +267,7 @@ export default function TokenLogo({ address, header = false, size = '24px', ...r
         {...rest}
         alt={''}
         src={path}
+        srcSet=""
         size={size}
         onError={(event) => {
           BAD_IMAGES[address] = true
