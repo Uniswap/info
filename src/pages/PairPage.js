@@ -315,7 +315,7 @@ function PairPage({ pairAddress, history }) {
                   <TYPE.main fontSize={'16px'} lineHeight={1} fontWeight={500} ml={'4px'}>
                     {token0 && token1
                       ? `1 ${formattedSymbol0} = ${token0Rate} ${formattedSymbol1} ${
-                          parseFloat(token0?.derivedBNB) ? '(' + token0Rate + ')' : ''
+                          parseFloat(token0?.derivedBNB) ? '($' + token0Rate + ')' : ''
                         }`
                       : '-'}
                   </TYPE.main>
