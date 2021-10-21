@@ -190,6 +190,7 @@ const LayoutWrapper = ({ children, savedOpen, setSavedOpen }) => {
               isActive={(match, { pathname }) => {
                 return Boolean(match) || pathname.startsWith('/token')
               }}
+              className="d-none hidden-token"
             >
               Tokens
             </StyledNavLink>
@@ -235,7 +236,7 @@ function App() {
           <BrowserRouter>
             <Route component={GoogleAnalyticsReporter} />
             <Switch>
-              <Route
+              {/* <Route
                 exacts
                 strict
                 path="/token/:tokenAddress"
@@ -253,7 +254,7 @@ function App() {
                     return <Redirect to="/home" />
                   }
                 }}
-              />
+              /> */}
               <Route
                 exacts
                 strict

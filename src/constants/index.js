@@ -32,6 +32,8 @@ export const TOKEN_BLACKLIST = [
   '0x3d7e683fc9c86b4d653c9e47ca12517440fad14e',
   '0xfae9c647ad7d89e738aba720acf09af93dc535f7',
   '0x7296368fe9bcb25d3ecc19af13655b907818cc09',
+
+  '0x36b34daf9afec4bc98710c958316f0d766627b5f', // WFAC
 ]
 
 // pair blacklist
@@ -40,6 +42,8 @@ export const PAIR_BLACKLIST = [
   '0x97cb8cbe91227ba87fc21aaf52c4212d245da3f8',
   '0x1acba73121d5f63d8ea40bdc64edb594bd88ed09',
   '0x7d7e813082ef6c143277c71786e5be626ec77b20',
+  '0x38abdb966d133709f056827dcf786b13c48db59e', // WFAC - FUSD
+  '0x682eb88a6a8a6195747245302bca493377b5e2fa', // FPVU - WFAC
 ]
 
 // warnings to display if page contains info about blocked token

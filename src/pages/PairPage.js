@@ -309,19 +309,19 @@ function PairPage({ pairAddress, history }) {
                 flexWrap: 'wrap',
               }}
             >
-              <FixedPanel onClick={() => history.push(`/token/${token0?.id}`)}>
+              <FixedPanel>
                 <RowFixed>
                   <TokenLogo address={token0?.id} size={'16px'} />
                   <TYPE.main fontSize={'16px'} lineHeight={1} fontWeight={500} ml={'4px'}>
                     {token0 && token1
                       ? `1 ${formattedSymbol0} = ${token0Rate} ${formattedSymbol1} ${
-                          parseFloat(token0?.derivedBNB) ? '(' + token0USD + ')' : ''
+                          parseFloat(token0?.derivedBNB) ? '(' + token0Rate + ')' : ''
                         }`
                       : '-'}
                   </TYPE.main>
                 </RowFixed>
               </FixedPanel>
-              <FixedPanel onClick={() => history.push(`/token/${token1?.id}`)}>
+              <FixedPanel onClick={() => history.push(`/token/${token1?.id}`)} className="d-none hidden-token">
                 <RowFixed>
                   <TokenLogo address={token1?.id} size={'16px'} />
                   <TYPE.main fontSize={'16px'} lineHeight={1} fontWeight={500} ml={'4px'}>
@@ -460,7 +460,7 @@ function PairPage({ pairAddress, history }) {
               >
                 <TokenDetailsLayout>
                   <Column>
-                    <TYPE.main style={{fontSize: '12px', fontWeight: 'bold'}}>Pair Name</TYPE.main>
+                    <TYPE.main style={{ fontSize: '12px', fontWeight: 'bold' }}>Pair Name</TYPE.main>
                     <TYPE.main style={{ marginTop: '.5rem' }}>
                       <RowFixed>
                         <FormattedName text={token0?.symbol ?? ''} maxCharacters={8} />
@@ -470,7 +470,7 @@ function PairPage({ pairAddress, history }) {
                     </TYPE.main>
                   </Column>
                   <Column>
-                    <TYPE.main style={{fontSize: '12px', fontWeight: 'bold'}}>Pair Address</TYPE.main>
+                    <TYPE.main style={{ fontSize: '12px', fontWeight: 'bold' }}>Pair Address</TYPE.main>
                     <AutoRow align="flex-end">
                       <TYPE.main style={{ marginTop: '.5rem' }}>
                         {pairAddress.slice(0, 6) + '...' + pairAddress.slice(38, 42)}
@@ -480,7 +480,7 @@ function PairPage({ pairAddress, history }) {
                   </Column>
                   <Column>
                     <TYPE.main>
-                      <RowFixed style={{fontSize: '12px', fontWeight: 'bold'}}>
+                      <RowFixed style={{ fontSize: '12px', fontWeight: 'bold' }}>
                         <FormattedName text={token0?.symbol ?? ''} maxCharacters={8} />{' '}
                         <span style={{ marginLeft: '4px' }}>Address</span>
                       </RowFixed>
@@ -494,7 +494,7 @@ function PairPage({ pairAddress, history }) {
                   </Column>
                   <Column>
                     <TYPE.main>
-                      <RowFixed style={{fontSize: '12px', fontWeight: 'bold'}}>
+                      <RowFixed style={{ fontSize: '12px', fontWeight: 'bold' }}>
                         <FormattedName text={token1?.symbol ?? ''} maxCharacters={8} />{' '}
                         <span style={{ marginLeft: '4px' }}>Address</span>
                       </RowFixed>
