@@ -221,7 +221,7 @@ const ListItem = ({ pool, oddRow }) => {
       <DataText grid-area="add_liquidity" style={{ alignItems: 'flex-start' }}>
         {
           <Link
-            href={`${process.env.REACT_APP_DMM_SWAP_URL}add/${pool.token0.id}/${pool.token1.id}/${pool.id}`}
+            href={`${process.env.REACT_APP_DMM_SWAP_URL}add/${pool.token0.id}/${pool.token1.id}/${pool.id}?networkId=${process.env.REACT_APP_CHAIN_ID}`}
             target="_blank"
           >
             <ButtonEmpty padding="0" width="fit-content" style={{ padding: 0 }}>
