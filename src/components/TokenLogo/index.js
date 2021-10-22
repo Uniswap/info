@@ -12,11 +12,14 @@ import EthereumLogo from '../../assets/eth.png'
 import PolygonLogo from '../../assets/polygon.png'
 import BnbLogo from '../../assets/bnb.png'
 import AvaxLogo from '../../assets/avax.png'
+import FantomLogo from '../../assets/networks/fantom-network.png'
 import { getMaticTokenLogoURL } from '../../utils/maticTokenMapping'
 import { getMumbaiTokenLogoURL } from '../../utils/mumbaiTokenMapping'
 import { getBscTestnetTokenLogoURL } from '../../utils/bscTestnetTokenMapping'
 import { getBscTokenLogoURL } from '../../utils/bscTokenMapping'
 import { getAvaxTokenLogoURL } from '../../utils/avaxTokenMapping'
+import { getFantomTokenLogoURL } from '../../utils/fantomTokenMapping'
+import FANTOM_TOKEN_LIST from '../../constants/tokenLists/fantom.tokenlist'
 
 const BAD_IMAGES = {}
 
@@ -128,6 +131,20 @@ export function getNativeTokenLogo({ size = '24px', ...rest }) {
           />
         </StyledNativeTokenLogo>
       )
+
+    case '250':
+      return (
+        <StyledNativeTokenLogo size={size} {...rest}>
+          <img
+            src={FantomLogo}
+            style={{
+              boxShadow: '0px 6px 10px rgba(0, 0, 0, 0.075)',
+              borderRadius: '24px',
+            }}
+            alt=""
+          />
+        </StyledNativeTokenLogo>
+      )
     default:
       return (
         <StyledNativeTokenLogo size={size} {...rest}>
@@ -219,6 +236,13 @@ export default function TokenLogo({ address, header = false, size = '24px', ...r
       path = getAvaxTokenLogoURL(address)
       break
 
+    case '250':
+      if (formattedAddress && FANTOM_TOKEN_LIST[formattedAddress]) {
+        return getCustomLogo({ address, src: FANTOM_TOKEN_LIST[formattedAddress].logoURI, size, setError, ...rest })
+      }
+      path = getFantomTokenLogoURL(address)
+      break
+
     default:
       if (formattedAddress && ETHEREUM_TOKEN_LIST[formattedAddress]) {
         return getCustomLogo({ address, src: ETHEREUM_TOKEN_LIST[formattedAddress].logoURI, size, setError, ...rest })
@@ -243,6 +267,7 @@ export default function TokenLogo({ address, header = false, size = '24px', ...r
         {...rest}
         alt={''}
         src={path}
+        srcSet=""
         size={size}
         onError={(event) => {
           BAD_IMAGES[address] = true

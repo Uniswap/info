@@ -246,7 +246,7 @@ function App() {
             </Switch>
           </BrowserRouter>
         ) : (
-          <LocalLoader fill="true" />
+          <LocalLoader fill="true" size="150px"/>
         )}
       </AppWrapper>
     </ApolloProvider>

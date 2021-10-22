@@ -549,6 +549,8 @@ export function getNativeTokenSymbol() {
       return 'BNB'
     case '43114':
       return 'AVAX'
+    case '250':
+      return 'FTM'
     default:
       return 'ETH'
   }
@@ -566,6 +568,8 @@ export function getNativeTokenWrappedName() {
       return 'BNB (Wrapped)'
     case '43114':
       return 'AVAX (Wrapped)'
+    case '250':
+      return 'FTM (Wrapped)'
     default:
       return 'Ether (Wrapped)'
   }
@@ -583,6 +587,8 @@ export function getEtherscanLinkText() {
       return 'Bscscan'
     case '43114':
       return 'C-Chain Explorer'
+    case '250':
+      return 'Ftmscan'
     default:
       return 'Etherscan'
   }
@@ -600,6 +606,8 @@ export function getNetworkName() {
       return 'BSC'
     case '43114':
       return 'AVAX'
+    case '250':
+      return 'Fantom'
     default:
       return 'Ethereum'
   }
@@ -617,6 +625,8 @@ export function getDefaultAddLiquidityUrl() {
       return `${process.env.REACT_APP_DMM_SWAP_URL}pools/BNB`
     case '43114':
       return `${process.env.REACT_APP_DMM_SWAP_URL}pools/AVAX`
+    case '250':
+      return `${process.env.REACT_APP_DMM_SWAP_URL}pools/FTM`
     default:
       return `${process.env.REACT_APP_DMM_SWAP_URL}pools/ETH/${KNC_ADDRESS}`
   }
