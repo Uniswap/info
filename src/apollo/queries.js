@@ -71,6 +71,20 @@ export const GET_BLOCKS = (timestamps) => {
   return gql(queryString)
 }
 
+// cheating
+export const GET_BLOCKS_ALL = (timestamps) => {
+  let queryString = 'query blocks {'
+  queryString += timestamps.map((timestamp) => {
+    return `t${timestamp}:blocks(first: 1, orderBy: timestamp, orderDirection: desc, where: { timestamp_gt: ${0}, timestamp_lt: ${
+      timestamp + 600
+    } }) {
+      number
+    }`
+  })
+  queryString += '}'
+  return gql(queryString)
+}
+
 export const POSITIONS_BY_BLOCK = (account, blocks) => {
   let queryString = 'query blocks {'
   queryString += blocks.map(

@@ -19,7 +19,7 @@ import TxnList from '../components/TxnList'
 import Loader from '../components/LocalLoader'
 import { BasicLink } from '../components/Link'
 import Search from '../components/Search'
-import { formattedNum, formattedPercent, getPoolLink, getSwapLink, shortenAddress } from '../utils'
+import { divideByRate, formattedNum, formattedPercent, getPoolLink, getSwapLink, shortenAddress } from '../utils'
 import { useColor } from '../hooks'
 import { usePairData, usePairTransactions } from '../contexts/PairData'
 import { TYPE, ThemedBackground } from '../Theme'
@@ -146,12 +146,20 @@ function PairPage({ pairAddress, history }) {
   const transactions = usePairTransactions(pairAddress)
   const backgroundColor = theme.link
 
-  const formattedLiquidity = reserveUSD ? formattedNum(reserveUSD, true) : formattedNum(trackedReserveUSD, true)
+  // rates
+  const token0Rate = reserve0 && reserve1 ? formattedNum(reserve1 / reserve0) : '-'
+  const token1Rate = reserve0 && reserve1 ? formattedNum(reserve0 / reserve1) : '-'
+
+  const formattedLiquidity = reserveUSD
+    ? formattedNum(divideByRate(reserveUSD, token0Rate), true)
+    : formattedNum(divideByRate(trackedReserveUSD, token0Rate), true)
   const usingUntrackedLiquidity = !trackedReserveUSD && !!reserveUSD
   const liquidityChange = formattedPercent(liquidityChangeUSD)
 
   // volume
-  const volume = !!oneDayVolumeUSD ? formattedNum(oneDayVolumeUSD, true) : formattedNum(oneDayVolumeUntracked, true)
+  const volume = !!oneDayVolumeUSD
+    ? formattedNum(divideByRate(oneDayVolumeUSD, token0Rate), true)
+    : formattedNum(divideByRate(oneDayVolumeUntracked, token0Rate), true)
   const usingUtVolume = oneDayVolumeUSD === 0 && !!oneDayVolumeUntracked
   const volumeChange = formattedPercent(!usingUtVolume ? volumeChangeUSD : volumeChangeUntracked)
 
@@ -161,8 +169,8 @@ function PairPage({ pairAddress, history }) {
   const fees =
     oneDayVolumeUSD || oneDayVolumeUSD === 0
       ? usingUtVolume
-        ? formattedNum(oneDayVolumeUntracked * 0.003, true)
-        : formattedNum(oneDayVolumeUSD * 0.003, true)
+        ? formattedNum(divideByRate(oneDayVolumeUntracked * 0.003, token0Rate), true)
+        : formattedNum(divideByRate(oneDayVolumeUSD * 0.003, token0Rate), true)
       : '-'
 
   // token data for usd
@@ -172,10 +180,6 @@ function PairPage({ pairAddress, history }) {
 
   const token1USD =
     token1?.derivedBNB && ethPrice ? formattedNum(parseFloat(token1.derivedBNB) * parseFloat(ethPrice), true) : ''
-
-  // rates
-  const token0Rate = reserve0 && reserve1 ? formattedNum(reserve1 / reserve0) : '-'
-  const token1Rate = reserve0 && reserve1 ? formattedNum(reserve0 / reserve1) : '-'
 
   // formatted symbols for overflow
   const formattedSymbol0 = token0?.symbol.length > 6 ? token0?.symbol.slice(0, 5) + '...' : token0?.symbol

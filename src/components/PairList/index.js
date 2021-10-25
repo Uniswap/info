@@ -9,13 +9,14 @@ import styled, { ThemeContext } from 'styled-components'
 import { CustomLink } from '../Link'
 import { Divider } from '../../components'
 import { withRouter } from 'react-router-dom'
-import { formattedNum, formattedPercent } from '../../utils'
+import { divideByRate, formattedNum, formattedPercent } from '../../utils'
 import DoubleTokenLogo from '../DoubleLogo'
 import FormattedName from '../FormattedName'
 import QuestionHelper from '../QuestionHelper'
 import { TYPE } from '../../Theme'
 import { PAIR_BLACKLIST } from '../../constants'
 import { AutoColumn } from '../Column'
+import { usePairData } from '../../contexts/PairData'
 
 dayjs.extend(utc)
 
@@ -177,15 +178,17 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10, useTracked = fals
 
   const ListItem = ({ pairAddress, index }) => {
     const pairData = pairs[pairAddress]
+    const { reserve0, reserve1 } = usePairData(pairAddress)
+    const token0Rate = reserve0 && reserve1 ? formattedNum(reserve1 / reserve0) : '-'
 
     if (pairData && pairData.token0 && pairData.token1) {
       const liquidity = formattedNum(
-        !!pairData.trackedReserveUSD ? pairData.trackedReserveUSD : pairData.reserveUSD,
+        divideByRate(!!pairData.trackedReserveUSD ? pairData.trackedReserveUSD : pairData.reserveUSD, token0Rate),
         true
       )
 
       const volume = formattedNum(
-        pairData.oneDayVolumeUSD ? pairData.oneDayVolumeUSD : pairData.oneDayVolumeUntracked,
+        divideByRate(pairData.oneDayVolumeUSD ? pairData.oneDayVolumeUSD : pairData.oneDayVolumeUntracked, token0Rate),
         true
       )
 
@@ -195,12 +198,18 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10, useTracked = fals
       )
 
       const weekVolume = formattedNum(
-        pairData.oneWeekVolumeUSD ? pairData.oneWeekVolumeUSD : pairData.oneWeekVolumeUntracked,
+        divideByRate(
+          pairData.oneWeekVolumeUSD ? pairData.oneWeekVolumeUSD : pairData.oneWeekVolumeUntracked,
+          token0Rate
+        ),
         true
       )
 
       const fees = formattedNum(
-        pairData.oneDayVolumeUSD ? pairData.oneDayVolumeUSD * 0.003 : pairData.oneDayVolumeUntracked * 0.003,
+        divideByRate(
+          pairData.oneDayVolumeUSD ? pairData.oneDayVolumeUSD * 0.003 : pairData.oneDayVolumeUntracked * 0.003,
+          token0Rate
+        ),
         true
       )
 

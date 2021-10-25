@@ -4,7 +4,7 @@ import dayjs from 'dayjs'
 import { ethers } from 'ethers'
 import utc from 'dayjs/plugin/utc'
 import { client, blockClient } from '../apollo/client'
-import { GET_BLOCK, GET_BLOCKS, SHARE_VALUE } from '../apollo/queries'
+import { GET_BLOCK, GET_BLOCKS, SHARE_VALUE, GET_BLOCKS_ALL } from '../apollo/queries'
 import { Text } from 'rebass'
 import _Decimal from 'decimal.js-light'
 import toFormat from 'toformat'
@@ -174,7 +174,8 @@ export async function getBlocksFromTimestamps(timestamps, skipCount = 500) {
     return []
   }
 
-  let fetchedData = await splitQuery(GET_BLOCKS, blockClient, [], timestamps, skipCount)
+  // let fetchedData = await splitQuery(GET_BLOCKS, blockClient, [], timestamps, skipCount)
+  let fetchedData = await splitQuery(GET_BLOCKS_ALL, blockClient, [], timestamps, skipCount)
 
   let blocks = []
   if (fetchedData) {
@@ -351,6 +352,10 @@ export const toSignificant = (number, significantDigits) => {
   Decimal.set({ precision: significantDigits + 1, rounding: Decimal.ROUND_UP })
   const updated = new Decimal(number).toSignificantDigits(significantDigits)
   return updated.toFormat(updated.decimalPlaces(), { groupSeparator: '' })
+}
+
+export const divideByRate = (number, rate = 1) => {
+  return number / rate
 }
 
 export const formattedNum = (number, usd = false, acceptNegatives = false) => {
