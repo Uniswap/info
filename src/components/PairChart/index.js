@@ -66,7 +66,11 @@ const PairChart = ({ address, color, base0, base1 }) => {
   // get data for pair, and rates
   const pairData = usePairData(address)
   let chartData = usePairChartData(address)
-  const hourlyData = usePairRateData(address, timeWindow, timeWindow === timeframeOptions.THERE_DAYS ? 300 : 3600)
+  const hourlyData = usePairRateData(
+    address,
+    timeWindow,
+    timeWindow === timeframeOptions.ONE_DAY ? 60 : timeWindow === timeframeOptions.THERE_DAYS ? 300 : 3600
+  )
   const hourlyRate0 = hourlyData && hourlyData[0]
   const hourlyRate1 = hourlyData && hourlyData[1]
 
@@ -170,7 +174,15 @@ const PairChart = ({ address, color, base0, base1 }) => {
               {pairData.token0 ? formattedSymbol1 + '/' + formattedSymbol0 : '-'}
             </OptionButton>
           </AutoRow>
+
           <AutoRow justify="flex-end" gap="6px" style={{ width: 'fit-content' }}>
+            <OptionButton
+              active={timeWindow === timeframeOptions.ONE_DAY}
+              onClick={() => setTimeWindow(timeframeOptions.ONE_DAY)}
+            >
+              1D
+            </OptionButton>
+
             <OptionButton
               active={timeWindow === timeframeOptions.THERE_DAYS}
               onClick={() => setTimeWindow(timeframeOptions.THERE_DAYS)}
