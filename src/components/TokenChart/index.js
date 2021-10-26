@@ -37,6 +37,7 @@ const CHART_VIEW = {
 }
 
 const DATA_FREQUENCY = {
+  ONE_MINUTE: 'ONE_MINUTE',
   FIVE_MINUTES: 'FIVE_MINUTES',
   HOUR: 'HOUR',
   LINE: 'LINE',
@@ -64,6 +65,7 @@ const TokenChart = ({ address, color, base }) => {
   const prevWindow = usePrevious(timeWindow)
 
   // hourly and daily price data based on the current time window
+  const data1m1day = useTokenPriceData(address, timeframeOptions.ONE_DAY, 60)
   const data5m3days = useTokenPriceData(address, timeframeOptions.THERE_DAYS, 300)
   // const data5mWeek = useTokenPriceData(address, timeframeOptions.WEEK, 300)
   // const data5mMonth = useTokenPriceData(address, timeframeOptions.MONTH, 300)
@@ -72,7 +74,9 @@ const TokenChart = ({ address, color, base }) => {
   const dataHourlyMonth = useTokenPriceData(address, timeframeOptions.MONTH, 3600)
 
   const priceData =
-    timeWindow === timeframeOptions.MONTH
+    timeWindow === timeframeOptions.ONE_DAY
+      ? data1m1day
+      : timeWindow === timeframeOptions.MONTH
       ? // monthly selected
         // frequency === DATA_FREQUENCY.FIVE_MINUTES
         // ? data5mMonth :
@@ -101,6 +105,10 @@ const TokenChart = ({ address, color, base }) => {
 
     if (timeWindow === timeframeOptions.MONTH && prevWindow && prevWindow !== timeframeOptions.MONTH) {
       setFrequency(DATA_FREQUENCY.HOUR)
+    }
+
+    if (timeWindow === timeframeOptions.ONE_DAY && prevWindow && prevWindow !== timeframeOptions.ONE_DAY) {
+      setFrequency(DATA_FREQUENCY.ONE_MINUTE)
     }
   }, [prevWindow, timeWindow])
 
@@ -173,6 +181,18 @@ const TokenChart = ({ address, color, base }) => {
             </RowFixed>
             {chartFilter === CHART_VIEW.PRICE && (
               <AutoRow gap="4px">
+                {timeWindow === timeframeOptions.ONE_DAY && (
+                  <PriceOption
+                    active={frequency === DATA_FREQUENCY.ONE_MINUTE}
+                    onClick={() => {
+                      setTimeWindow(timeframeOptions.ONE_DAY)
+                      setFrequency(DATA_FREQUENCY.ONE_MINUTE)
+                    }}
+                  >
+                    1m
+                  </PriceOption>
+                )}
+
                 {timeWindow === timeframeOptions.THERE_DAYS && (
                   <PriceOption
                     active={frequency === DATA_FREQUENCY.FIVE_MINUTES}
@@ -184,22 +204,33 @@ const TokenChart = ({ address, color, base }) => {
                     5m
                   </PriceOption>
                 )}
-                <PriceOption
-                  active={frequency === DATA_FREQUENCY.HOUR}
-                  onClick={() => setFrequency(DATA_FREQUENCY.HOUR)}
-                >
-                  H
-                </PriceOption>
-                <PriceOption
-                  active={frequency === DATA_FREQUENCY.LINE}
-                  onClick={() => setFrequency(DATA_FREQUENCY.LINE)}
-                >
-                  <Activity size={14} />
-                </PriceOption>
+                {timeWindow !== timeframeOptions.ONE_DAY && (
+                  <>
+                    <PriceOption
+                      active={frequency === DATA_FREQUENCY.HOUR}
+                      onClick={() => setFrequency(DATA_FREQUENCY.HOUR)}
+                    >
+                      H
+                    </PriceOption>
+                    <PriceOption
+                      active={frequency === DATA_FREQUENCY.LINE}
+                      onClick={() => setFrequency(DATA_FREQUENCY.LINE)}
+                    >
+                      <Activity size={14} />
+                    </PriceOption>
+                  </>
+                )}
               </AutoRow>
             )}
           </AutoColumn>
           <AutoRow justify="flex-end" gap="6px" align="flex-start" style={{ width: 'fit-content' }}>
+            <OptionButton
+              active={timeWindow === timeframeOptions.ONE_DAY}
+              onClick={() => setTimeWindow(timeframeOptions.ONE_DAY)}
+            >
+              1D
+            </OptionButton>
+
             <OptionButton
               active={timeWindow === timeframeOptions.THERE_DAYS}
               onClick={() => setTimeWindow(timeframeOptions.THERE_DAYS)}

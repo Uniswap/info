@@ -3,6 +3,7 @@ export const FACTORY_ADDRESS = process.env.REACT_APP_FACTORY_ADDRESS || '0x06395
 export const BUNDLE_ID = '1'
 
 export const timeframeOptions = {
+  ONE_DAY: '1 day',
   THERE_DAYS: '3 days',
   WEEK: '1 week',
   MONTH: '1 month',
@@ -68,7 +69,7 @@ export const ANALYTICS_URLS = {
   137: 'https://polygon-info.dmm.exchange',
   56: 'https://bsc-info.dmm.exchange',
   43114: 'https://avax-info.dmm.exchange',
-  250: 'https://fantom-info.dmm.exchange'
+  250: 'https://fantom-info.dmm.exchange',
 }
 
 export const ChainId = {
