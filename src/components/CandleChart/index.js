@@ -26,14 +26,7 @@ const IconWrapper = styled.div`
   }
 `
 
-const CandleStickChart = ({
-  data,
-  width,
-  height = 300,
-  base,
-  margin = true,
-  valueFormatter = (val) => formattedNum(val, true),
-}) => {
+const CandleStickChart = ({ data, width, height = 300, base, valueFormatter = (val) => formattedNum(val, true) }) => {
   // reference for DOM element to create with chart
   const ref = useRef()
 
@@ -141,8 +134,8 @@ const CandleStickChart = ({
       toolTip.className = 'three-line-legend'
       ref.current.appendChild(toolTip)
       toolTip.style.display = 'block'
-      toolTip.style.left = (margin ? 116 : 10) + 'px'
-      toolTip.style.top = 50 + 'px'
+      toolTip.style.top = -40 + 'px'
+      toolTip.style.right = 1 + 'rem'
       toolTip.style.backgroundColor = 'transparent'
 
       // get the title of the chart
@@ -182,7 +175,7 @@ const CandleStickChart = ({
 
       setChartCreated(chart)
     }
-  }, [chartCreated, formattedData, width, height, valueFormatter, base, margin, textColor])
+  }, [chartCreated, formattedData, width, height, valueFormatter, base, textColor])
 
   // responsiveness
   useEffect(() => {
@@ -194,7 +187,7 @@ const CandleStickChart = ({
 
   return (
     <div>
-      <div ref={ref} id="test-id" />
+      <div ref={ref} id="test-id" style={{ position: 'absolute' }} />
       <IconWrapper>
         <Play
           onClick={() => {

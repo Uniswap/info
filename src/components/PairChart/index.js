@@ -176,12 +176,14 @@ const PairChart = ({ address, color, base0, base1 }) => {
           </AutoRow>
 
           <AutoRow justify="flex-end" gap="6px" style={{ width: 'fit-content' }}>
-            <OptionButton
-              active={timeWindow === timeframeOptions.ONE_DAY}
-              onClick={() => setTimeWindow(timeframeOptions.ONE_DAY)}
-            >
-              1D
-            </OptionButton>
+            {[CHART_VIEW.RATE1, CHART_VIEW.RATE0].includes(chartFilter) && (
+              <OptionButton
+                active={timeWindow === timeframeOptions.ONE_DAY}
+                onClick={() => setTimeWindow(timeframeOptions.ONE_DAY)}
+              >
+                1D
+              </OptionButton>
+            )}
 
             <OptionButton
               active={timeWindow === timeframeOptions.THERE_DAYS}
