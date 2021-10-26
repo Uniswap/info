@@ -158,14 +158,20 @@ const TokenChart = ({ address, color, base }) => {
             <RowFixed>
               <OptionButton
                 active={chartFilter === CHART_VIEW.LIQUIDITY}
-                onClick={() => setChartFilter(CHART_VIEW.LIQUIDITY)}
+                onClick={() => {
+                  setChartFilter(CHART_VIEW.LIQUIDITY)
+                  setTimeWindow(timeframeOptions.THERE_DAYS)
+                }}
                 style={{ marginRight: '6px' }}
               >
                 Liquidity
               </OptionButton>
               <OptionButton
                 active={chartFilter === CHART_VIEW.VOLUME}
-                onClick={() => setChartFilter(CHART_VIEW.VOLUME)}
+                onClick={() => {
+                  setTimeWindow(timeframeOptions.THERE_DAYS)
+                  setChartFilter(CHART_VIEW.VOLUME)
+                }}
                 style={{ marginRight: '6px' }}
               >
                 Volume
@@ -224,12 +230,14 @@ const TokenChart = ({ address, color, base }) => {
             )}
           </AutoColumn>
           <AutoRow justify="flex-end" gap="6px" align="flex-start" style={{ width: 'fit-content' }}>
-            <OptionButton
-              active={timeWindow === timeframeOptions.ONE_DAY}
-              onClick={() => setTimeWindow(timeframeOptions.ONE_DAY)}
-            >
-              1D
-            </OptionButton>
+            {chartFilter === CHART_VIEW.PRICE && (
+              <OptionButton
+                active={timeWindow === timeframeOptions.ONE_DAY}
+                onClick={() => setTimeWindow(timeframeOptions.ONE_DAY)}
+              >
+                1D
+              </OptionButton>
+            )}
 
             <OptionButton
               active={timeWindow === timeframeOptions.THERE_DAYS}

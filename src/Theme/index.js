@@ -238,7 +238,6 @@ export const GlobalStyle = createGlobalStyle`
   }
 
 .three-line-legend {
-	width: 100%;
 	height: 70px;
 	position: absolute;
 	padding: 8px;
@@ -251,7 +250,6 @@ export const GlobalStyle = createGlobalStyle`
 }
 
 .three-line-legend-dark {
-	width: 100%;
 	height: 70px;
 	position: absolute;
 	padding: 8px;
