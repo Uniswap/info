@@ -111,7 +111,7 @@ function GlobalPage() {
               </Panel>
             </Box>
           )} */}
-          <CustomRow>
+          <CustomRow className="d-none">
             <Col xs={12} md={6}>
               <Panel style={{ height: '100%', minHeight: '300px' }}>
                 <GlobalChart display="liquidity" />
