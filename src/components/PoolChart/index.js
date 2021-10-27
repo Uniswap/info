@@ -117,6 +117,7 @@ const PoolChart = ({ address, color, base0, base1 }) => {
 
   const aspect = below1080 ? 60 / 20 : below1600 ? 60 / 40 : 60 / 32
 
+  const { ONE_DAY, ...timeWindowOptionsExcept1Day } = timeframeOptions
   return (
     <ChartWrapper>
       {below600 ? (
@@ -124,7 +125,10 @@ const PoolChart = ({ address, color, base0, base1 }) => {
           <DropdownSelect
             options={CHART_VIEW}
             active={chartFilter}
-            setActive={setChartFilter}
+            setActive={(value) => {
+              setChartFilter(value)
+              if ([CHART_VIEW.LIQUIDITY, CHART_VIEW.VOLUME].includes(value)) setTimeWindow(timeframeOptions.MONTH)
+            }}
             color={color}
             optionTitles={{
               ...CHART_VIEW,
@@ -132,7 +136,16 @@ const PoolChart = ({ address, color, base0, base1 }) => {
               RATE1: poolData.token0 ? formattedSymbol0 + '/' + formattedSymbol1 : '-',
             }}
           />
-          <DropdownSelect options={timeframeOptions} active={timeWindow} setActive={setTimeWindow} color={color} />
+          <DropdownSelect
+            options={
+              [CHART_VIEW.LIQUIDITY, CHART_VIEW.VOLUME].includes(chartFilter)
+                ? timeWindowOptionsExcept1Day
+                : timeframeOptions
+            }
+            active={timeWindow}
+            setActive={setTimeWindow}
+            color={color}
+          />
         </RowBetween>
       ) : (
         <OptionsRow>

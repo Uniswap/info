@@ -311,7 +311,7 @@ export function getTimestampRange(timestamp_from, period_length, periods) {
   return timestamps
 }
 
-export const toNiceDateYear = (date) => dayjs.utc(dayjs.unix(date)).format('MMMM DD, YYYY')
+export const toNiceDateYear = (date) => dayjs.utc(dayjs.unix(date)).format('MMMM DD h:mm A, YYYY')
 
 export const isAddress = (value) => {
   try {

@@ -33,7 +33,6 @@ export function OverflowTooltip({ children, ...rest }) {
 
   const compareSize = () => {
     const compare = textElementRef.current.scrollWidth > textElementRef.current.clientWidth
-    console.log('compare: ', compare)
     setHover(compare)
   }
 
