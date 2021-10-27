@@ -10,6 +10,7 @@ import { CustomContainer, CustomNavbar, CustomNavbarToggle, CustomNavbarCollapse
 
 const FactoryDomain = process.env.REACT_APP_FACCHAIN_DOMAIN
 const SwapDomain = process.env.REACT_APP_SWAP_DOMAIN
+const BridgeDomain = process.env.REACT_APP_BRIDGE_DOMAIN
 
 export default function Header() {
   return (
@@ -26,9 +27,7 @@ export default function Header() {
           <CustomNavbarCollapse id="nav_collapse">
             <Nav className="mx-auto">
               <Nav.Item>
-                <Nav.Link href={FactoryDomain} target="_blank">
-                  Home
-                </Nav.Link>
+                <Nav.Link href={FactoryDomain}>Home</Nav.Link>
               </Nav.Item>
               <Dropdown as={Nav.Item}>
                 <Dropdown.Toggle as={Nav.Link}>Transactions</Dropdown.Toggle>
@@ -82,7 +81,9 @@ export default function Header() {
               </Dropdown>
 
               <Dropdown as={Nav.Item}>
-                <Dropdown.Toggle as={Nav.Link}>Trade</Dropdown.Toggle>
+                <Dropdown.Toggle as={Nav.Link} active>
+                  Trade
+                </Dropdown.Toggle>
                 <Dropdown.Menu>
                   <Dropdown.Item href={SwapDomain + '/#/swap'} target="_blank">
                     Swap
@@ -90,8 +91,13 @@ export default function Header() {
                   <Dropdown.Item href={SwapDomain + '/#/pool/v2'} target="_blank">
                     Liquidity
                   </Dropdown.Item>
+                  <Dropdown.Item href={'#'}>Charts</Dropdown.Item>
                 </Dropdown.Menu>
               </Dropdown>
+
+              <Nav.Item>
+                <Nav.Link href={BridgeDomain}>Bridge</Nav.Link>
+              </Nav.Item>
             </Nav>
           </CustomNavbarCollapse>
         </CustomContainer>
