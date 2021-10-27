@@ -22,6 +22,9 @@ export function getTimeframe(timeWindow) {
   // based on window, get starttime
   let utcStartTime
   switch (timeWindow) {
+    case timeframeOptions.ONE_DAY:
+      utcStartTime = utcEndTime.subtract(1, 'day').endOf('day').unix() - 1
+      break
     case timeframeOptions.THERE_DAYS:
       utcStartTime = utcEndTime.subtract(3, 'day').endOf('day').unix() - 1
       break
@@ -130,29 +133,27 @@ export function getTimestampsForChanges() {
 
 export async function splitQuery(query, localClient, vars, list, skipCount = 100) {
   let fetchedData = {}
-  let allFound = false
-  let skip = 0
 
-  while (!allFound) {
-    let end = list.length
-    if (skip + skipCount < list.length) {
-      end = skip + skipCount
-    }
-    let sliced = list.slice(skip, end)
-    let result = await localClient.query({
-      query: query(...vars, sliced),
-      fetchPolicy: 'cache-first',
-    })
+  const promises = []
+
+  for (let i = 0; i < list.length; i += skipCount) {
+    const sliced = list.slice(i, i + skipCount)
+    promises.push(
+      localClient.query({
+        query: query(...vars, sliced),
+        fetchPolicy: 'cache-first',
+      })
+    )
+  }
+
+  let res = await Promise.all(promises)
+
+  res.forEach((result) => {
     fetchedData = {
       ...fetchedData,
       ...result.data,
     }
-    if (Object.keys(result.data).length < skipCount || skip + skipCount > list.length) {
-      allFound = true
-    } else {
-      skip += skipCount
-    }
-  }
+  })
 
   return fetchedData
 }
@@ -310,7 +311,7 @@ export function getTimestampRange(timestamp_from, period_length, periods) {
   return timestamps
 }
 
-export const toNiceDateYear = (date) => dayjs.utc(dayjs.unix(date)).format('MMMM DD, YYYY')
+export const toNiceDateYear = (date) => dayjs.utc(dayjs.unix(date)).format('MMMM DD h:mm A, YYYY')
 
 export const isAddress = (value) => {
   try {

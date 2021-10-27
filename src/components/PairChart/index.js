@@ -66,7 +66,11 @@ const PairChart = ({ address, color, base0, base1 }) => {
   // get data for pair, and rates
   const pairData = usePairData(address)
   let chartData = usePairChartData(address)
-  const hourlyData = usePairRateData(address, timeWindow, timeWindow === timeframeOptions.THERE_DAYS ? 300 : 3600)
+  const hourlyData = usePairRateData(
+    address,
+    timeWindow,
+    timeWindow === timeframeOptions.ONE_DAY ? 60 : timeWindow === timeframeOptions.THERE_DAYS ? 300 : 3600
+  )
   const hourlyRate0 = hourlyData && hourlyData[0]
   const hourlyRate1 = hourlyData && hourlyData[1]
 
@@ -113,6 +117,7 @@ const PairChart = ({ address, color, base0, base1 }) => {
 
   const aspect = below1080 ? 60 / 20 : below1600 ? 60 / 32 : 60 / 24
 
+  const { ONE_DAY, ...timeWindowOptionsExcept1Day } = timeframeOptions
   return (
     <ChartWrapper>
       {below600 ? (
@@ -120,7 +125,10 @@ const PairChart = ({ address, color, base0, base1 }) => {
           <DropdownSelect
             options={CHART_VIEW}
             active={chartFilter}
-            setActive={setChartFilter}
+            setActive={(value) => {
+              setChartFilter(value)
+              if ([CHART_VIEW.LIQUIDITY, CHART_VIEW.VOLUME].includes(value)) setTimeWindow(timeframeOptions.MONTH)
+            }}
             color={color}
             optionTitles={{
               ...CHART_VIEW,
@@ -128,7 +136,16 @@ const PairChart = ({ address, color, base0, base1 }) => {
               RATE1: pairData.token0 ? formattedSymbol1 + '/' + formattedSymbol0 : '-',
             }}
           />
-          <DropdownSelect options={timeframeOptions} active={timeWindow} setActive={setTimeWindow} color={color} />
+          <DropdownSelect
+            options={
+              [CHART_VIEW.LIQUIDITY, CHART_VIEW.VOLUME].includes(chartFilter)
+                ? timeWindowOptionsExcept1Day
+                : timeframeOptions
+            }
+            active={timeWindow}
+            setActive={setTimeWindow}
+            color={color}
+          />
         </RowBetween>
       ) : (
         <OptionsRow>
@@ -170,7 +187,17 @@ const PairChart = ({ address, color, base0, base1 }) => {
               {pairData.token0 ? formattedSymbol1 + '/' + formattedSymbol0 : '-'}
             </OptionButton>
           </AutoRow>
+
           <AutoRow justify="flex-end" gap="6px" style={{ width: 'fit-content' }}>
+            {[CHART_VIEW.RATE1, CHART_VIEW.RATE0].includes(chartFilter) && (
+              <OptionButton
+                active={timeWindow === timeframeOptions.ONE_DAY}
+                onClick={() => setTimeWindow(timeframeOptions.ONE_DAY)}
+              >
+                1D
+              </OptionButton>
+            )}
+
             <OptionButton
               active={timeWindow === timeframeOptions.THERE_DAYS}
               onClick={() => setTimeWindow(timeframeOptions.THERE_DAYS)}

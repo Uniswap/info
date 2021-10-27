@@ -37,6 +37,7 @@ const CHART_VIEW = {
 }
 
 const DATA_FREQUENCY = {
+  ONE_MINUTE: 'ONE_MINUTE',
   FIVE_MINUTES: 'FIVE_MINUTES',
   HOUR: 'HOUR',
   LINE: 'LINE',
@@ -64,6 +65,7 @@ const TokenChart = ({ address, color, base }) => {
   const prevWindow = usePrevious(timeWindow)
 
   // hourly and daily price data based on the current time window
+  const data1m1day = useTokenPriceData(address, timeframeOptions.ONE_DAY, 60)
   const data5m3days = useTokenPriceData(address, timeframeOptions.THERE_DAYS, 300)
   // const data5mWeek = useTokenPriceData(address, timeframeOptions.WEEK, 300)
   // const data5mMonth = useTokenPriceData(address, timeframeOptions.MONTH, 300)
@@ -72,7 +74,9 @@ const TokenChart = ({ address, color, base }) => {
   const dataHourlyMonth = useTokenPriceData(address, timeframeOptions.MONTH, 3600)
 
   const priceData =
-    timeWindow === timeframeOptions.MONTH
+    timeWindow === timeframeOptions.ONE_DAY
+      ? data1m1day
+      : timeWindow === timeframeOptions.MONTH
       ? // monthly selected
         // frequency === DATA_FREQUENCY.FIVE_MINUTES
         // ? data5mMonth :
@@ -102,13 +106,16 @@ const TokenChart = ({ address, color, base }) => {
     if (timeWindow === timeframeOptions.MONTH && prevWindow && prevWindow !== timeframeOptions.MONTH) {
       setFrequency(DATA_FREQUENCY.HOUR)
     }
+
+    if (timeWindow === timeframeOptions.ONE_DAY && prevWindow && prevWindow !== timeframeOptions.ONE_DAY) {
+      setFrequency(DATA_FREQUENCY.ONE_MINUTE)
+    }
   }, [prevWindow, timeWindow])
 
   const below1080 = useMedia('(max-width: 1080px)')
   const below600 = useMedia('(max-width: 600px)')
 
   let utcStartTime = getTimeframe(timeWindow)
-  const domain = [(dataMin) => (dataMin > utcStartTime ? dataMin : utcStartTime), 'dataMax']
   const aspect = below1080 ? 60 / 32 : below600 ? 60 / 42 : 60 / 22
 
   chartData = chartData?.filter((entry) => entry.date >= utcStartTime)
@@ -128,12 +135,31 @@ const TokenChart = ({ address, color, base }) => {
     return () => window.removeEventListener('resize', handleResize)
   }, [isClient, width]) // Empty array ensures that effect is only run on mount and unmount
 
+  const { ONE_DAY, ...timeWindowOptionsExcept1Day } = timeframeOptions
   return (
     <ChartWrapper>
       {below600 ? (
         <RowBetween mb={40}>
-          <DropdownSelect options={CHART_VIEW} active={chartFilter} setActive={setChartFilter} color={color} />
-          <DropdownSelect options={timeframeOptions} active={timeWindow} setActive={setTimeWindow} color={color} />
+          <DropdownSelect
+            options={CHART_VIEW}
+            active={chartFilter}
+            setActive={(value) => {
+              setChartFilter(value)
+              if (value === CHART_VIEW.LIQUIDITY || value === CHART_VIEW.VOLUME)
+                setTimeWindow(timeframeOptions.THERE_DAYS)
+            }}
+            color={color}
+          />
+          <DropdownSelect
+            options={
+              [CHART_VIEW.LIQUIDITY, CHART_VIEW.VOLUME].includes(chartFilter)
+                ? timeWindowOptionsExcept1Day
+                : timeframeOptions
+            }
+            active={timeWindow}
+            setActive={setTimeWindow}
+            color={color}
+          />
         </RowBetween>
       ) : (
         <RowBetween
@@ -150,14 +176,20 @@ const TokenChart = ({ address, color, base }) => {
             <RowFixed>
               <OptionButton
                 active={chartFilter === CHART_VIEW.LIQUIDITY}
-                onClick={() => setChartFilter(CHART_VIEW.LIQUIDITY)}
+                onClick={() => {
+                  setChartFilter(CHART_VIEW.LIQUIDITY)
+                  setTimeWindow(timeframeOptions.THERE_DAYS)
+                }}
                 style={{ marginRight: '6px' }}
               >
                 Liquidity
               </OptionButton>
               <OptionButton
                 active={chartFilter === CHART_VIEW.VOLUME}
-                onClick={() => setChartFilter(CHART_VIEW.VOLUME)}
+                onClick={() => {
+                  setChartFilter(CHART_VIEW.VOLUME)
+                  setTimeWindow(timeframeOptions.THERE_DAYS)
+                }}
                 style={{ marginRight: '6px' }}
               >
                 Volume
@@ -173,6 +205,18 @@ const TokenChart = ({ address, color, base }) => {
             </RowFixed>
             {chartFilter === CHART_VIEW.PRICE && (
               <AutoRow gap="4px">
+                {timeWindow === timeframeOptions.ONE_DAY && (
+                  <PriceOption
+                    active={frequency === DATA_FREQUENCY.ONE_MINUTE}
+                    onClick={() => {
+                      setTimeWindow(timeframeOptions.ONE_DAY)
+                      setFrequency(DATA_FREQUENCY.ONE_MINUTE)
+                    }}
+                  >
+                    1m
+                  </PriceOption>
+                )}
+
                 {timeWindow === timeframeOptions.THERE_DAYS && (
                   <PriceOption
                     active={frequency === DATA_FREQUENCY.FIVE_MINUTES}
@@ -184,22 +228,35 @@ const TokenChart = ({ address, color, base }) => {
                     5m
                   </PriceOption>
                 )}
-                <PriceOption
-                  active={frequency === DATA_FREQUENCY.HOUR}
-                  onClick={() => setFrequency(DATA_FREQUENCY.HOUR)}
-                >
-                  H
-                </PriceOption>
-                <PriceOption
-                  active={frequency === DATA_FREQUENCY.LINE}
-                  onClick={() => setFrequency(DATA_FREQUENCY.LINE)}
-                >
-                  <Activity size={14} />
-                </PriceOption>
+                <>
+                  {timeWindow !== timeframeOptions.ONE_DAY && (
+                    <PriceOption
+                      active={frequency === DATA_FREQUENCY.HOUR}
+                      onClick={() => setFrequency(DATA_FREQUENCY.HOUR)}
+                    >
+                      H
+                    </PriceOption>
+                  )}
+                  <PriceOption
+                    active={frequency === DATA_FREQUENCY.LINE}
+                    onClick={() => setFrequency(DATA_FREQUENCY.LINE)}
+                  >
+                    <Activity size={14} />
+                  </PriceOption>
+                </>
               </AutoRow>
             )}
           </AutoColumn>
           <AutoRow justify="flex-end" gap="6px" align="flex-start" style={{ width: 'fit-content' }}>
+            {chartFilter === CHART_VIEW.PRICE && (
+              <OptionButton
+                active={timeWindow === timeframeOptions.ONE_DAY}
+                onClick={() => setTimeWindow(timeframeOptions.ONE_DAY)}
+              >
+                1D
+              </OptionButton>
+            )}
+
             <OptionButton
               active={timeWindow === timeframeOptions.THERE_DAYS}
               onClick={() => setTimeWindow(timeframeOptions.THERE_DAYS)}
@@ -281,10 +338,10 @@ const TokenChart = ({ address, color, base }) => {
           </AreaChart>
         </ResponsiveContainer>
       )}
-      {chartFilter === CHART_VIEW.PRICE &&
-        (frequency === DATA_FREQUENCY.LINE ? (
+      {[CHART_VIEW.PRICE, CHART_VIEW.LINE_PRICE].includes(chartFilter) &&
+        (frequency === DATA_FREQUENCY.LINE || CHART_VIEW.LINE_PRICE === chartFilter ? (
           <ResponsiveContainer aspect={below1080 ? 60 / 32 : 60 / 16}>
-            <AreaChart margin={{ top: 0, right: 10, bottom: 6, left: 0 }} barCategoryGap={1} data={chartData}>
+            <AreaChart margin={{ top: 0, right: 10, bottom: 6, left: 0 }} barCategoryGap={1} data={priceData}>
               <defs>
                 <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor={color} stopOpacity={0.35} />
@@ -298,25 +355,21 @@ const TokenChart = ({ address, color, base }) => {
                 tickMargin={16}
                 minTickGap={120}
                 tickFormatter={(tick) => toNiceDate(tick)}
-                dataKey="date"
+                dataKey="timestamp"
                 tick={{ fill: textColor }}
-                type={'number'}
-                domain={domain}
+                domain={['dataMin', 'dataMax']}
               />
               <YAxis
                 type="number"
+                dataKey="open"
                 orientation="right"
                 tickFormatter={(tick) => '$' + toK(tick)}
-                axisLine={false}
-                tickLine={false}
-                interval="preserveEnd"
-                minTickGap={80}
-                yAxisId={0}
+                domain={['auto', 'auto']}
                 tick={{ fill: textColor }}
               />
               <Tooltip
                 cursor={true}
-                formatter={(val) => formattedNum(val, true)}
+                formatter={(val) => formattedNum(val.toString(), true)}
                 labelFormatter={(label) => toNiceDateYear(label)}
                 labelStyle={{ paddingTop: 4 }}
                 contentStyle={{
@@ -329,7 +382,7 @@ const TokenChart = ({ address, color, base }) => {
               />
               <Area
                 key={'other'}
-                dataKey={'priceUSD'}
+                dataKey={'open'}
                 stackId="2"
                 strokeWidth={2}
                 dot={false}
