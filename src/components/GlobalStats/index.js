@@ -47,7 +47,7 @@ export default function GlobalStats() {
               }}
               style={{ position: 'relative' }}
             >
-              FAC Price: <Medium>{formattedEthPrice}</Medium>
+              FAC Price: <Medium>{'$1'}</Medium>
               {showPriceCard && <UniPrice />}
             </TYPE.main>
           )}

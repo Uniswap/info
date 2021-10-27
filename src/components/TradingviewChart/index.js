@@ -2,12 +2,14 @@ import React, { useState, useEffect, useRef } from 'react'
 import { createChart } from 'lightweight-charts'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
-import { formattedNum } from '../../utils'
+import { divideByRate, formattedNum } from '../../utils'
 import styled from 'styled-components'
 import { usePrevious } from 'react-use'
 import { Play } from 'react-feather'
 import { useDarkModeManager } from '../../contexts/LocalStorage'
 import { IconWrapper } from '..'
+import { useAllTokenData } from '../../contexts/TokenData'
+import { TOKENS } from '../../constants'
 
 dayjs.extend(utc)
 
@@ -40,6 +42,9 @@ const TradingViewChart = ({
   const [chartCreated, setChartCreated] = useState(false)
   const dataPrev = usePrevious(data)
 
+  const allTokens = useAllTokenData()
+  const priceFUSD = allTokens[TOKENS.FUSD]?.priceUSD || 1
+
   useEffect(() => {
     if (data !== dataPrev && chartCreated && type === CHART_TYPES.BAR) {
       // remove the tooltip element
@@ -55,7 +60,7 @@ const TradingViewChart = ({
   const formattedData = data?.map((entry) => {
     return {
       time: dayjs.unix(entry.date).utc().format('YYYY-MM-DD'),
-      value: parseFloat(entry[field]),
+      value: parseFloat(divideByRate(entry[field], priceFUSD)),
     }
   })
 
@@ -170,7 +175,7 @@ const TradingViewChart = ({
             type === CHART_TYPES.BAR && !useWeekly ? '(24hr)' : ''
           }</div>` +
           `<div style="font-size: 22px; margin: 4px 0 0 20px; color:${textColor}" >` +
-          formattedNum(base ?? 0, true) +
+          formattedNum(divideByRate(base, priceFUSD) ?? 0, true) +
           `<span style="margin-left: 10px; font-size: 16px; color: ${color};">${formattedPercentChange}</span>` +
           '</div>'
       }

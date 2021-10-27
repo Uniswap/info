@@ -150,6 +150,7 @@ const PairChart = ({ address, color, base0, base1 }) => {
                 setTimeWindow(timeframeOptions.ALL_TIME)
                 setChartFilter(CHART_VIEW.VOLUME)
               }}
+              className="d-none"
             >
               Volume
             </OptionButton>
@@ -160,6 +161,7 @@ const PairChart = ({ address, color, base0, base1 }) => {
                 setTimeWindow(timeframeOptions.ALL_TIME)
                 setChartFilter(CHART_VIEW.LIQUIDITY)
               }}
+              className="d-none"
             >
               Liquidity
             </OptionButton>

@@ -74,8 +74,8 @@ const DashGrid = styled.div`
 
   @media screen and (min-width: 780px) {
     max-width: 1320px;
-    grid-template-columns: 1.2fr 1fr 1fr 1fr 1fr;
-    grid-template-areas: 'txn value amountToken amountOther time';
+    grid-template-columns: 1.2fr 1fr 1fr 1fr;
+    grid-template-areas: 'txn amountToken amountOther time';
 
     > * {
       &:first-child {
@@ -86,8 +86,8 @@ const DashGrid = styled.div`
 
   @media screen and (min-width: 1080px) {
     max-width: 1320px;
-    grid-template-columns: 1.2fr 1fr 1fr 1fr 1fr 1fr;
-    grid-template-areas: 'txn value amountToken amountOther account time';
+    grid-template-columns: 1.2fr 1fr 1fr 1fr 1fr;
+    grid-template-areas: 'txn amountToken amountOther account time';
   }
 `
 
@@ -277,7 +277,7 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
             {getTransactionType(item.type, item.token1Symbol, item.token0Symbol)}
           </Link>
         </DataText>
-        <DataText area="value">
+        <DataText area="value" className="d-none">
           {currency === 'BNB' ? 'Ξ ' + formattedNum(item.valueETH) : formattedNum(item.amountUSD, true)}
         </DataText>
         {!below780 && (
@@ -320,7 +320,7 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
           </RowFixed>
         )}
 
-        <Flex alignItems="center" justifyContent="flexStart">
+        <Flex alignItems="center" justifyContent="flexStart" className="d-none">
           <ClickableText
             color="textDim"
             area="value"

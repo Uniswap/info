@@ -14,9 +14,9 @@ import DoubleTokenLogo from '../DoubleLogo'
 import FormattedName from '../FormattedName'
 import QuestionHelper from '../QuestionHelper'
 import { TYPE } from '../../Theme'
-import { PAIR_BLACKLIST } from '../../constants'
+import { PAIR_BLACKLIST, TOKENS } from '../../constants'
 import { AutoColumn } from '../Column'
-import { usePairData } from '../../contexts/PairData'
+import { useAllTokenData } from '../../contexts/TokenData'
 
 dayjs.extend(utc)
 
@@ -178,17 +178,17 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10, useTracked = fals
 
   const ListItem = ({ pairAddress, index }) => {
     const pairData = pairs[pairAddress]
-    const { reserve0, reserve1 } = usePairData(pairAddress)
-    const token0Rate = reserve0 && reserve1 ? formattedNum(reserve1 / reserve0) : '-'
+    const allTokens = useAllTokenData()
+    const priceFUSD = allTokens[TOKENS.FUSD]?.priceUSD || 1
 
     if (pairData && pairData.token0 && pairData.token1) {
       const liquidity = formattedNum(
-        divideByRate(!!pairData.trackedReserveUSD ? pairData.trackedReserveUSD : pairData.reserveUSD, token0Rate),
+        divideByRate(!!pairData.trackedReserveUSD ? pairData.trackedReserveUSD : pairData.reserveUSD, priceFUSD),
         true
       )
 
       const volume = formattedNum(
-        divideByRate(pairData.oneDayVolumeUSD ? pairData.oneDayVolumeUSD : pairData.oneDayVolumeUntracked, token0Rate),
+        divideByRate(pairData.oneDayVolumeUSD ? pairData.oneDayVolumeUSD : pairData.oneDayVolumeUntracked, priceFUSD),
         true
       )
 
@@ -200,7 +200,7 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10, useTracked = fals
       const weekVolume = formattedNum(
         divideByRate(
           pairData.oneWeekVolumeUSD ? pairData.oneWeekVolumeUSD : pairData.oneWeekVolumeUntracked,
-          token0Rate
+          priceFUSD
         ),
         true
       )
@@ -208,7 +208,7 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10, useTracked = fals
       const fees = formattedNum(
         divideByRate(
           pairData.oneDayVolumeUSD ? pairData.oneDayVolumeUSD * 0.003 : pairData.oneDayVolumeUntracked * 0.003,
-          token0Rate
+          priceFUSD
         ),
         true
       )

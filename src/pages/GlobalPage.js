@@ -130,7 +130,7 @@ function GlobalPage() {
               </Panel>
             </AutoColumn>
           )} */}
-          <ListOptions gap="10px" style={{ marginTop: '2rem', marginBottom: '.5rem' }}>
+          <ListOptions gap="10px" style={{ marginTop: '2rem', marginBottom: '.5rem' }} className="d-none">
             <RowBetween>
               <TYPE.main fontSize={'1.125rem'} style={{ whiteSpace: 'nowrap' }}>
                 Top Tokens
@@ -138,7 +138,7 @@ function GlobalPage() {
               <CustomLink to={'/tokens'}>See All</CustomLink>
             </RowBetween>
           </ListOptions>
-          <Panel style={{ marginTop: '6px', padding: '1.125rem 0 ' }}>
+          <Panel style={{ marginTop: '6px', padding: '1.125rem 0 ' }} className="d-none">
             <TopTokenList tokens={allTokens} />
           </Panel>
           <ListOptions gap="10px" style={{ marginTop: '2rem', marginBottom: '.5rem' }}>

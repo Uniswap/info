@@ -184,7 +184,7 @@ const LayoutWrapper = ({ children, savedOpen, setSavedOpen }) => {
             >
               Pools
             </StyledNavLink>
-            <StyledNavLink
+            {/* <StyledNavLink
               id={`charts-nav-link`}
               to={'/tokens'}
               isActive={(match, { pathname }) => {
@@ -192,7 +192,7 @@ const LayoutWrapper = ({ children, savedOpen, setSavedOpen }) => {
               }}
             >
               Tokens
-            </StyledNavLink>
+            </StyledNavLink> */}
           </HeaderLinks>
           {!below800 && !match && <Search small={true} />}
         </NavWrapper>
@@ -235,7 +235,7 @@ function App() {
           <BrowserRouter>
             <Route component={GoogleAnalyticsReporter} />
             <Switch>
-              <Route
+              {/* <Route
                 exacts
                 strict
                 path="/token/:tokenAddress"
@@ -253,7 +253,7 @@ function App() {
                     return <Redirect to="/home" />
                   }
                 }}
-              />
+              /> */}
               <Route
                 exacts
                 strict
@@ -296,11 +296,11 @@ function App() {
                 </LayoutWrapper>
               </Route>
 
-              <Route path="/tokens">
+              {/* <Route path="/tokens">
                 <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
                   <AllTokensPage />
                 </LayoutWrapper>
-              </Route>
+              </Route> */}
 
               <Route path="/pools">
                 <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>

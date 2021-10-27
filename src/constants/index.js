@@ -68,3 +68,7 @@ export const TRACKED_OVERRIDES = [
   '0x45804880de22913dafe09f4980848ece6ecbaf78',
   '0x709f7b10f22eb62b05913b59b92ddd372d4e2152',
 ]
+
+export const TOKENS = {
+  FUSD: '0xd18f0b04bece380d21af2d5b7e9d40e9745a8cd3',
+}

@@ -22,6 +22,7 @@ import Search from '../components/Search'
 import { divideByRate, formattedNum, formattedPercent, getPoolLink, getSwapLink, shortenAddress } from '../utils'
 import { useColor } from '../hooks'
 import { usePairData, usePairTransactions } from '../contexts/PairData'
+import { useAllTokenData } from '../contexts/TokenData'
 import { TYPE, ThemedBackground } from '../Theme'
 import { transparentize } from 'polished'
 import CopyHelper from '../components/Copy'
@@ -37,7 +38,7 @@ import { Bookmark, PlusCircle, AlertCircle } from 'react-feather'
 import FormattedName from '../components/FormattedName'
 import { useListedTokens } from '../contexts/Application'
 import HoverText from '../components/HoverText'
-import { UNTRACKED_COPY, PAIR_BLACKLIST, BLOCKED_WARNINGS } from '../constants'
+import { UNTRACKED_COPY, PAIR_BLACKLIST, BLOCKED_WARNINGS, TOKENS } from '../constants'
 import useTheme from '../hooks/useTheme'
 
 const DashboardWrapper = styled.div`
@@ -142,6 +143,8 @@ function PairPage({ pairAddress, history }) {
   useEffect(() => {
     document.querySelector('body').scrollTo(0, 0)
   }, [])
+  const allTokens = useAllTokenData()
+  const priceFUSD = allTokens[TOKENS.FUSD]?.priceUSD || 1
 
   const transactions = usePairTransactions(pairAddress)
   const backgroundColor = theme.link
@@ -151,15 +154,15 @@ function PairPage({ pairAddress, history }) {
   const token1Rate = reserve0 && reserve1 ? formattedNum(reserve0 / reserve1) : '-'
 
   const formattedLiquidity = reserveUSD
-    ? formattedNum(divideByRate(reserveUSD, token0Rate), true)
-    : formattedNum(divideByRate(trackedReserveUSD, token0Rate), true)
+    ? formattedNum(divideByRate(reserveUSD, priceFUSD), true)
+    : formattedNum(divideByRate(trackedReserveUSD, priceFUSD), true)
   const usingUntrackedLiquidity = !trackedReserveUSD && !!reserveUSD
   const liquidityChange = formattedPercent(liquidityChangeUSD)
 
   // volume
   const volume = !!oneDayVolumeUSD
-    ? formattedNum(divideByRate(oneDayVolumeUSD, token0Rate), true)
-    : formattedNum(divideByRate(oneDayVolumeUntracked, token0Rate), true)
+    ? formattedNum(divideByRate(oneDayVolumeUSD, priceFUSD), true)
+    : formattedNum(divideByRate(oneDayVolumeUntracked, priceFUSD), true)
   const usingUtVolume = oneDayVolumeUSD === 0 && !!oneDayVolumeUntracked
   const volumeChange = formattedPercent(!usingUtVolume ? volumeChangeUSD : volumeChangeUntracked)
 
@@ -169,8 +172,8 @@ function PairPage({ pairAddress, history }) {
   const fees =
     oneDayVolumeUSD || oneDayVolumeUSD === 0
       ? usingUtVolume
-        ? formattedNum(divideByRate(oneDayVolumeUntracked * 0.003, token0Rate), true)
-        : formattedNum(divideByRate(oneDayVolumeUSD * 0.003, token0Rate), true)
+        ? formattedNum(divideByRate(oneDayVolumeUntracked * 0.003, priceFUSD), true)
+        : formattedNum(divideByRate(oneDayVolumeUSD * 0.003, priceFUSD), true)
       : '-'
 
   // token data for usd
