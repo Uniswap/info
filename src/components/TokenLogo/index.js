@@ -15,7 +15,6 @@ const Inline = styled.div`
 const Image = styled.img`
   width: ${({ size }) => size};
   height: ${({ size }) => size};
-  background-color: white;
   border-radius: 50%;
   box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.075);
 `
@@ -79,9 +78,9 @@ export default function TokenLogo({ address, header = false, size = '24px', ...r
   const getPath = (address) => {
     try {
       const validateAddress = ethers.utils.getAddress(address.toLowerCase())
-      return require(`../../assets/${validateAddress}.png`)
+      return `https://factorychain.github.io/assets/blockchains/ethereum/assets/${address.toLowerCase()}/logo.png`
     } catch (e) {
-      return "";
+      return ''
     }
   }
 

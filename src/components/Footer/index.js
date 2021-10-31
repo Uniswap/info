@@ -161,7 +161,7 @@ export default function Footer() {
               <span className="copyright">
                 <img src={LogoText} alt="FacScan" />
               </span>
-              <code className="text-muted copyright__code">Factory/stable/linux-amd64/golang</code>
+              <code className="text-muted copyright__code">© 2021 FactoryChain. All rights reserved.</code>
             </p>
           </div>
           <div className="col-md-6 col-12 tomo-footer__social">
