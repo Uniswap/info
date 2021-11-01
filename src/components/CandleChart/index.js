@@ -134,8 +134,8 @@ const CandleStickChart = ({ data, width, height = 300, base, valueFormatter = (v
       toolTip.className = 'three-line-legend'
       ref.current.appendChild(toolTip)
       toolTip.style.display = 'block'
-      toolTip.style.top = -40 + 'px'
-      toolTip.style.right = 1 + 'rem'
+      toolTip.style.top = '44px'
+      toolTip.style.right = '2rem'
       toolTip.style.backgroundColor = 'transparent'
 
       // get the title of the chart
@@ -186,8 +186,8 @@ const CandleStickChart = ({ data, width, height = 300, base, valueFormatter = (v
   }, [chartCreated, height, width])
 
   return (
-    <div>
-      <div ref={ref} id="test-id" style={{ position: 'absolute' }} />
+    <>
+      <div ref={ref} id="test-id" />
       <IconWrapper>
         <Play
           onClick={() => {
@@ -195,7 +195,7 @@ const CandleStickChart = ({ data, width, height = 300, base, valueFormatter = (v
           }}
         />
       </IconWrapper>
-    </div>
+    </>
   )
 }
 
