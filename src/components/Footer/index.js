@@ -149,6 +149,12 @@ const CustomFooter = styled.div`
   .text-muted {
     color: #6c757d !important;
   }
+
+  @media screen and (min-width: 1440px) {
+    width: 1316px;
+    padding: 0;
+    margin: 0 auto;
+  }
 `
 
 export default function Footer() {

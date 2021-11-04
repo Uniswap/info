@@ -65,6 +65,11 @@ const Center = styled.div`
   z-index: 9999;
   transition: width 0.25s ease;
   min-height: calc(100vh - 316px);
+  @media screen and (min-width: 1440px) {
+    width: 1316px;
+    padding: 0;
+    margin: 0 auto;
+  }
 `
 
 const WarningWrapper = styled.div`
@@ -156,6 +161,9 @@ export const NavWrapper = styled.div`
   }
   @media screen and (max-width: 576px) {
     margin: 40px auto 4px;
+  }
+  @media screen and (min-width: 1440px) {
+    width: 1316px !important;
   }
 `
 
