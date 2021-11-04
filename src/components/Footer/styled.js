@@ -1,11 +1,11 @@
-import styled from "styled-components/macro";
-import Navbar from "react-bootstrap/Navbar";
-import Container from "react-bootstrap/Container";
-import BackgroundHeaderDesktop from "../../assets/background-header.png";
-import BackgroundHeaderMobile from "../../assets/header-mobile.png";
-import DropdownHeader from "../../assets/header-dropdown.png";
-import ArrowDown from "../../assets/arrow-down.png";
-import Highlight from "../../assets/highlight.png";
+import styled from 'styled-components/macro'
+import Navbar from 'react-bootstrap/Navbar'
+import Container from 'react-bootstrap/Container'
+import BackgroundHeaderDesktop from '../../assets/background-header.png'
+import BackgroundHeaderMobile from '../../assets/header-mobile.png'
+import DropdownHeader from '../../assets/header-dropdown.png'
+import ArrowDown from '../../assets/arrow-down.png'
+import Highlight from '../../assets/highlight.png'
 
 export const CustomNavbar = styled(Navbar)`
   transition: all 0.5s ease;
@@ -39,11 +39,11 @@ export const CustomNavbar = styled(Navbar)`
       margin-left: 1rem;
     }
   }
-`;
+`
 export const CustomContainer = styled(Container)`
   height: 100%;
 
-  ${props =>
+  ${(props) =>
     props.withbackground
       ? `
       @media (min-width: 576px) {
@@ -52,8 +52,8 @@ export const CustomContainer = styled(Container)`
         background-size: 100% 100%;
       }
   `
-      : ""}
-  ${props =>
+      : ''}
+  ${(props) =>
     props.wide
       ? `
   @media (min-width: 1025px) {
@@ -61,11 +61,11 @@ export const CustomContainer = styled(Container)`
   }
 
   @media (min-width: 1281px) {
-    max-width: 90% !important;
+    max-width: 100% !important;
   }
   `
-      : ""}
-`;
+      : ''}
+`
 
 export const CustomNavbarToggle = styled(Navbar.Toggle)`
   width: 50px;
@@ -91,7 +91,7 @@ export const CustomNavbarToggle = styled(Navbar.Toggle)`
   img {
     margin: auto;
   }
-`;
+`
 export const CustomNavbarCollapse = styled(Navbar.Collapse)`
   height: 100%;
   margin-right: 7%;
@@ -174,7 +174,7 @@ export const CustomNavbarCollapse = styled(Navbar.Collapse)`
         display: inline-block;
         font-size: 12px;
         margin-left: 10px;
-        content: "";
+        content: '';
         width: 16px;
         height: 16px;
         position: relative;
@@ -211,7 +211,7 @@ export const CustomNavbarCollapse = styled(Navbar.Collapse)`
         padding: 0 20px;
 
         &::before {
-          content: "";
+          content: '';
           position: absolute;
           bottom: 0;
           left: 0;
@@ -262,4 +262,4 @@ export const CustomNavbarCollapse = styled(Navbar.Collapse)`
       }
     }
   }
-`;
+`

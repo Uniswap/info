@@ -25,7 +25,7 @@ const CustomFooter = styled.div`
     background-repeat: no-repeat;
     background-size: 100% 100%;
     height: 120px;
-    padding: 0 85px;
+    padding: 0 3rem;
     @media (max-width: 576px) {
       background-image: url(${BackgroundFooterMobile});
       padding: 0 15px;
