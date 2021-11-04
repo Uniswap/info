@@ -6,7 +6,7 @@ const domain = process.env.REACT_APP_GRAPH_DOMAIN
 
 export const client = new ApolloClient({
   link: new HttpLink({
-    uri: `${domain}/subgraphs/name/swap/exchange`,
+    uri: `${domain}/subgraphs/name/exchange`,
   }),
   cache: new InMemoryCache(),
   shouldBatch: true,
