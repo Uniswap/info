@@ -364,7 +364,7 @@ export const formatNumber = (num) => {
 var priceFormatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
   currency: 'USD',
-  minimumFractionDigits: 2,
+  minimumFractionDigits: 3,
 })
 
 export const toSignificant = (number, significantDigits) => {

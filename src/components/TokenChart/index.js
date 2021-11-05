@@ -296,7 +296,7 @@ const TokenChart = ({ address, color, base }) => {
                 type="number"
                 dataKey="open"
                 orientation="right"
-                tickFormatter={(tick) => '$' + toK(tick)}
+                tickFormatter={(tick) => formattedNum(tick, true)}
                 domain={['auto', 'auto']}
                 tick={{ fill: textColor }}
               />
