@@ -14,6 +14,7 @@ import DropdownSelect from '../DropdownSelect'
 import CandleStickChart from '../CandleChart'
 import LocalLoader from '../LocalLoader'
 import { useDarkModeManager } from '../../contexts/LocalStorage'
+import useTheme from '../../hooks/useTheme'
 
 const ChartWrapper = styled.div`
   height: 100%;
@@ -27,6 +28,7 @@ const ChartWrapper = styled.div`
 const OptionsRow = styled.div`
   display: flex;
   flex-direction: row;
+  justify-content: space-between;
   width: 100%;
   margin-bottom: 40px;
 `
@@ -45,6 +47,7 @@ const PairChart = ({ address, color, base0, base1 }) => {
 
   const [darkMode] = useDarkModeManager()
   const textColor = darkMode ? 'white' : 'black'
+  const theme = useTheme()
 
   // update the width on a window resize
   const ref = useRef()
@@ -69,7 +72,13 @@ const PairChart = ({ address, color, base0, base1 }) => {
   const hourlyData = usePairRateData(
     address,
     timeWindow,
-    timeWindow === timeframeOptions.ONE_DAY ? 60 : timeWindow === timeframeOptions.THERE_DAYS ? 300 : 3600
+    timeWindow === timeframeOptions.FOUR_HOURS
+      ? 30
+      : timeWindow === timeframeOptions.ONE_DAY
+      ? 120
+      : timeWindow === timeframeOptions.THERE_DAYS
+      ? 300
+      : 3600
   )
   const hourlyRate0 = hourlyData && hourlyData[0]
   const hourlyRate1 = hourlyData && hourlyData[1]
@@ -117,7 +126,8 @@ const PairChart = ({ address, color, base0, base1 }) => {
 
   const aspect = below1080 ? 60 / 20 : below1600 ? 60 / 32 : 60 / 24
 
-  const { ONE_DAY, ...timeWindowOptionsExcept1Day } = timeframeOptions
+  const { ONE_DAY, FOUR_HOURS, ALL_TIME, ...timeWindowOptionsExcept1Day } = timeframeOptions
+  const { ALL_TIME: alltime, ...timeWindowOptionsExceptAllTime } = timeframeOptions
   return (
     <ChartWrapper>
       {below600 ? (
@@ -140,7 +150,7 @@ const PairChart = ({ address, color, base0, base1 }) => {
             options={
               [CHART_VIEW.LIQUIDITY, CHART_VIEW.VOLUME].includes(chartFilter)
                 ? timeWindowOptionsExcept1Day
-                : timeframeOptions
+                : timeWindowOptionsExceptAllTime
             }
             active={timeWindow}
             setActive={setTimeWindow}
@@ -149,13 +159,14 @@ const PairChart = ({ address, color, base0, base1 }) => {
         </RowBetween>
       ) : (
         <OptionsRow>
-          <AutoRow gap="6px" style={{ flexWrap: 'nowrap' }}>
+          <AutoRow style={{ background: theme.buttonBlack, borderRadius: '999px', width: 'fit-content' }}>
             <OptionButton
               active={chartFilter === CHART_VIEW.LIQUIDITY}
               onClick={() => {
                 setTimeWindow(timeframeOptions.MONTH)
                 setChartFilter(CHART_VIEW.LIQUIDITY)
               }}
+              style={{ padding: '6px 12px', borderRadius: '999px' }}
             >
               Liquidity
             </OptionButton>
@@ -165,37 +176,49 @@ const PairChart = ({ address, color, base0, base1 }) => {
                 setTimeWindow(timeframeOptions.MONTH)
                 setChartFilter(CHART_VIEW.VOLUME)
               }}
+              style={{ padding: '6px 12px', borderRadius: '999px' }}
             >
               Volume
             </OptionButton>
             <OptionButton
               active={chartFilter === CHART_VIEW.RATE0}
               onClick={() => {
-                setTimeWindow(timeframeOptions.THERE_DAYS)
+                setTimeWindow(timeframeOptions.ONE_DAY)
                 setChartFilter(CHART_VIEW.RATE0)
               }}
+              style={{ padding: '6px 12px', borderRadius: '999px' }}
             >
               {pairData.token0 ? formattedSymbol0 + '/' + formattedSymbol1 : '-'}
             </OptionButton>
             <OptionButton
               active={chartFilter === CHART_VIEW.RATE1}
               onClick={() => {
-                setTimeWindow(timeframeOptions.THERE_DAYS)
+                setTimeWindow(timeframeOptions.ONE_DAY)
                 setChartFilter(CHART_VIEW.RATE1)
               }}
+              style={{ padding: '6px 12px', borderRadius: '999px' }}
             >
               {pairData.token0 ? formattedSymbol1 + '/' + formattedSymbol0 : '-'}
             </OptionButton>
           </AutoRow>
 
-          <AutoRow justify="flex-end" gap="6px" style={{ width: 'fit-content' }}>
+          <AutoRow justify="flex-end" style={{ width: 'fit-content', gap: '6px' }}>
             {[CHART_VIEW.RATE1, CHART_VIEW.RATE0].includes(chartFilter) && (
-              <OptionButton
-                active={timeWindow === timeframeOptions.ONE_DAY}
-                onClick={() => setTimeWindow(timeframeOptions.ONE_DAY)}
-              >
-                1D
-              </OptionButton>
+              <>
+                <OptionButton
+                  active={timeWindow === timeframeOptions.FOUR_HOURS}
+                  onClick={() => setTimeWindow(timeframeOptions.FOUR_HOURS)}
+                >
+                  4H
+                </OptionButton>
+
+                <OptionButton
+                  active={timeWindow === timeframeOptions.ONE_DAY}
+                  onClick={() => setTimeWindow(timeframeOptions.ONE_DAY)}
+                >
+                  1D
+                </OptionButton>
+              </>
             )}
 
             <OptionButton

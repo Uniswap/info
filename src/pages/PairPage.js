@@ -4,7 +4,7 @@ import 'feather-icons'
 import { Link as LinkScroll } from 'react-scroll'
 import styled from 'styled-components'
 import Panel from '../components/Panel'
-import { PageWrapper, ContentWrapperLarge, StyledIcon } from '../components/index'
+import { PageWrapper, ContentWrapperLarge } from '../components/index'
 import { AutoRow, RowBetween, RowFixed } from '../components/Row'
 import Column, { AutoColumn } from '../components/Column'
 import { ButtonOutlined, ButtonDark } from '../components/ButtonStyled'
@@ -26,10 +26,10 @@ import { Hover } from '../components'
 import { useEthPrice } from '../contexts/GlobalData'
 import Warning from '../components/Warning'
 import { usePathDismissed, useSavedPairs } from '../contexts/LocalStorage'
-
-import { Bookmark, PlusCircle } from 'react-feather'
 import FormattedName from '../components/FormattedName'
 import { useListedTokens } from '../contexts/Application'
+import bookMark from '../assets/bookmark.svg'
+import bookMarkOutline from '../assets/bookmark_outline.svg'
 
 const DashboardWrapper = styled.div`
   width: 100%;
@@ -200,7 +200,7 @@ function PairPage({ pairAddress, history }) {
     })
   }, [])
 
-  const [savedPairs, addPair] = useSavedPairs()
+  const [savedPairs, addPair, removePair] = useSavedPairs()
 
   const listedTokens = useListedTokens()
 
@@ -262,14 +262,18 @@ function PairPage({ pairAddress, history }) {
                 >
                   {!!!savedPairs[pairAddress] && !below1080 ? (
                     <Hover onClick={() => addPair(pairAddress, token0.id, token1.id, token0.symbol, token1.symbol)}>
-                      <StyledIcon>
-                        <PlusCircle style={{ marginRight: '0.5rem' }} />
-                      </StyledIcon>
+                      <img
+                        src={bookMarkOutline}
+                        width={24}
+                        height={24}
+                        alt="BookMark"
+                        style={{ marginRight: '0.5rem' }}
+                      />
                     </Hover>
                   ) : !below1080 ? (
-                    <StyledIcon>
-                      <Bookmark style={{ marginRight: '0.5rem', opacity: 0.4 }} />
-                    </StyledIcon>
+                    <Hover onClick={() => removePair(pairAddress)}>
+                      <img src={bookMark} width={24} height={24} alt="BookMarked" style={{ marginRight: '0.5rem' }} />
+                    </Hover>
                   ) : (
                     <></>
                   )}

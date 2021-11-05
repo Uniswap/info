@@ -364,7 +364,7 @@ export const formatNumber = (num) => {
 var priceFormatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
   currency: 'USD',
-  minimumFractionDigits: 2,
+  minimumFractionDigits: 3,
 })
 
 export const toSignificant = (number, significantDigits) => {
@@ -431,7 +431,7 @@ export function formattedPercent(percent, useBrackets = false) {
 
   if (percent < 0.0001 && percent > 0) {
     return (
-      <Text fontWeight={500} color="green">
+      <Text fontWeight={500} color="#31CB9E">
         {'< 0.0001%'}
       </Text>
     )
@@ -439,7 +439,7 @@ export function formattedPercent(percent, useBrackets = false) {
 
   if (percent < 0 && percent > -0.0001) {
     return (
-      <Text fontWeight={500} color="red">
+      <Text fontWeight={500} color="#FF537B">
         {'< 0.0001%'}
       </Text>
     )
@@ -452,17 +452,17 @@ export function formattedPercent(percent, useBrackets = false) {
   if (fixedPercent > 0) {
     if (fixedPercent > 100) {
       return (
-        <Text fontWeight={500} color="green">
+        <Text fontWeight={500} color="#31CB9E">
           <OverflowTooltip text={`+${percent?.toFixed(0).toLocaleString()}%`}>{`+${percent
             ?.toFixed(0)
             .toLocaleString()}%`}</OverflowTooltip>
         </Text>
       )
     } else {
-      return <Text fontWeight={500} color="green">{`+${fixedPercent}%`}</Text>
+      return <Text fontWeight={500} color="#31CB9E">{`+${fixedPercent}%`}</Text>
     }
   } else {
-    return <Text fontWeight={500} color="red">{`${fixedPercent}%`}</Text>
+    return <Text fontWeight={500} color="#FF537B">{`${fixedPercent}%`}</Text>
   }
 }
 

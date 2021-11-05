@@ -19,7 +19,7 @@ const panelPseudo = css`
 
 const Panel = styled(RebassBox)`
   position: relative;
-  background-color: ${({ theme }) => theme.advancedBG};
+  background-color: ${({ theme }) => theme.background};
   padding: 1.25rem;
   width: 100%;
   height: 100%;
@@ -27,8 +27,8 @@ const Panel = styled(RebassBox)`
   flex-direction: column;
   justify-content: flex-start;
   border-radius: 8px;
-  border: 1px solid ${({ theme }) => theme.bg3};
-  box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.05); /* box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.01), 0px 4px 8px rgba(0, 0, 0, 0.01), 0px 16px 24px rgba(0, 0, 0, 0.01), 0px 24px 32px rgba(0, 0, 0, 0.01); */
+  border: 1px solid ${({ theme }) => theme.border};
+  /* box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.05); /* box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.01), 0px 4px 8px rgba(0, 0, 0, 0.01), 0px 16px 24px rgba(0, 0, 0, 0.01), 0px 24px 32px rgba(0, 0, 0, 0.01); */
   :hover {
     cursor: ${({ hover }) => hover && 'pointer'};
     border: ${({ hover, theme }) => hover && '1px solid' + theme.bg5};
@@ -61,10 +61,6 @@ const Panel = styled(RebassBox)`
     `};
 
   ${(props) => !props.last && panelPseudo}
-
-  @media screen and (max-width: 960px) {
-    background-color: transparent;
-  }
 `
 
 export default Panel

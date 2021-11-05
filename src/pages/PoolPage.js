@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import { withRouter } from 'react-router-dom'
 import 'feather-icons'
-import { Bookmark } from 'react-feather'
 import { transparentize } from 'polished'
 import styled from 'styled-components'
 import { useMedia } from 'react-use'
 
-import { PageWrapper, ContentWrapperLarge, StyledIcon, Hover } from '../components'
+import { PageWrapper, ContentWrapperLarge, Hover } from '../components'
 import Panel from '../components/Panel'
 import { AutoRow, RowBetween, RowFixed } from '../components/Row'
 import Column, { AutoColumn } from '../components/Column'
@@ -22,7 +21,6 @@ import CopyHelper from '../components/Copy'
 import Warning from '../components/Warning'
 import DoubleTokenLogo from '../components/DoubleLogo'
 import TokenLogo from '../components/TokenLogo'
-import AddBookmark from '../components/Icons/AddBookmark'
 import { TYPE, ThemedBackground } from '../Theme'
 import { usePoolData, usePoolTransactions } from '../contexts/PoolData'
 import { useEthPrice } from '../contexts/GlobalData'
@@ -37,6 +35,8 @@ import {
   getSwapLink,
   shortenAddress,
 } from '../utils'
+import bookMark from '../assets/bookmark.svg'
+import bookMarkOutline from '../assets/bookmark_outline.svg'
 
 const DashboardWrapper = styled.div`
   width: 100%;
@@ -225,7 +225,7 @@ function PoolPage({ poolAddress, history }) {
     })
   }, [])
 
-  const [savedPools, addPool] = useSavedPools()
+  const [savedPools, addPool, removePool] = useSavedPools()
 
   const listedTokens = useListedTokens()
 
@@ -290,14 +290,18 @@ function PoolPage({ poolAddress, history }) {
                 >
                   {!!!savedPools[poolAddress] && !below1080 ? (
                     <Hover onClick={() => addPool(poolAddress, token0.id, token1.id, token0.symbol, token1.symbol)}>
-                      <StyledIcon style={{ marginRight: '0.5rem' }}>
-                        <AddBookmark />
-                      </StyledIcon>
+                      <img
+                        src={bookMarkOutline}
+                        width={24}
+                        height={24}
+                        alt="BookMark"
+                        style={{ marginRight: '0.5rem' }}
+                      />
                     </Hover>
                   ) : !below1080 ? (
-                    <StyledIcon>
-                      <Bookmark style={{ marginRight: '0.5rem', opacity: 0.4 }} />
-                    </StyledIcon>
+                    <Hover onClick={() => removePool(poolAddress)}>
+                      <img src={bookMark} width={24} height={24} alt="BookMarked" style={{ marginRight: '0.5rem' }} />
+                    </Hover>
                   ) : (
                     <></>
                   )}

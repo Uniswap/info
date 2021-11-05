@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import styled from 'styled-components'
 
 import Row, { RowBetween } from '../Row'
@@ -6,13 +6,14 @@ import { AutoColumn } from '../Column'
 import { ChevronDown as Arrow } from 'react-feather'
 import { TYPE } from '../../Theme'
 import { StyledIcon } from '..'
+import { useOnClickOutside } from '../../hooks'
 
 const Wrapper = styled.div`
   z-index: 20;
   position: relative;
-  background-color: ${({ theme }) => theme.panelColor};
+  background-color: ${({ theme }) => theme.buttonBlack};
   border: 1px solid ${({ open, color }) => (open ? color : 'rgba(0, 0, 0, 0.15);')};
-  width: 100px;
+  width: 110px;
   padding: 4px 10px;
   padding-right: 6px;
   border-radius: 8px;
@@ -30,7 +31,7 @@ const Dropdown = styled.div`
   top: 34px;
   padding-top: 40px;
   width: calc(100% - 40px);
-  background-color: ${({ theme }) => theme.bg1};
+  background-color: ${({ theme }) => theme.buttonBlack};
   border: 1px solid rgba(0, 0, 0, 0.15);
   padding: 10px 10px;
   border-radius: 8px;
@@ -51,6 +52,8 @@ const ArrowStyled = styled(Arrow)`
 
 const DropdownSelect = ({ options, active, setActive, color, optionTitles }) => {
   const [showDropdown, toggleDropdown] = useState(false)
+  const node = useRef()
+  useOnClickOutside(node, showDropdown ? toggleDropdown : undefined)
 
   return (
     <Wrapper open={showDropdown} color={color}>
@@ -61,7 +64,7 @@ const DropdownSelect = ({ options, active, setActive, color, optionTitles }) => 
         </StyledIcon>
       </RowBetween>
       {showDropdown && (
-        <Dropdown>
+        <Dropdown ref={node}>
           <AutoColumn gap="20px">
             {Object.keys(options).map((key, index) => {
               let option = options[key]

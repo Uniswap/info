@@ -1,10 +1,10 @@
 import React from 'react'
 
-const DiscordIcon = ({ width, height }) => {
+const DiscordIcon = ({ width, height, color }) => {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width={width || 18} height={height || 14} viewBox="0 0 18 14">
       <g fill="none" fillRule="evenodd" strokeLinecap="round" strokeLinejoin="round">
-        <g stroke="#FFF" strokeWidth=".8">
+        <g stroke={color || '#fff'} strokeWidth=".8">
           <g>
             <g>
               <path

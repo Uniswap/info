@@ -24,27 +24,33 @@ import { useDataForList } from '../contexts/PairData'
 import { useEffect } from 'react'
 import Warning from '../components/Warning'
 import { usePathDismissed, useSavedTokens } from '../contexts/LocalStorage'
-import { Hover, PageWrapper, ContentWrapper, StyledIcon } from '../components'
-import { PlusCircle, Bookmark } from 'react-feather'
+import { Hover, PageWrapper, ContentWrapper } from '../components'
 import FormattedName from '../components/FormattedName'
 import { useListedTokens } from '../contexts/Application'
+import bookMark from '../assets/bookmark.svg'
+import bookMarkOutline from '../assets/bookmark_outline.svg'
 
 const DashboardWrapper = styled.div`
   width: 100%;
 `
 
 const PanelWrapper = styled.div`
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   grid-template-rows: max-content;
-  gap: 6px;
+  gap: 12px;
   display: inline-grid;
   width: 100%;
   align-items: start;
-  @media screen and (max-width: 1024px) {
+
+  @media screen and (max-width: 1280px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @media screen and (max-width: 768px) {
     grid-template-columns: 1fr;
     align-items: stretch;
     > * {
-      grid-column: 1 / 4;
+      grid-column: 1 / 5;
     }
 
     > * {
@@ -165,17 +171,17 @@ function TokenPage({ address, history }) {
   // transactions
   const txnChangeFormatted = formattedPercent(txnChange)
 
-  const below1080 = useMedia('(max-width: 1080px)')
-  const below800 = useMedia('(max-width: 800px)')
+  const below1280 = useMedia('(max-width: 1280px)')
+  const below768 = useMedia('(max-width: 768px)')
   const below600 = useMedia('(max-width: 600px)')
   const below500 = useMedia('(max-width: 500px)')
 
   // format for long symbol
-  const LENGTH = below1080 ? 10 : 16
+  const LENGTH = below1280 ? 10 : 16
   const formattedSymbol = symbol?.length > LENGTH ? symbol.slice(0, LENGTH) + '...' : symbol
 
   const [dismissed, markAsDismissed] = usePathDismissed(history.location.pathname)
-  const [savedTokens, addToken] = useSavedTokens()
+  const [savedTokens, addToken, removeToken] = useSavedTokens()
   const listedTokens = useListedTokens()
 
   useEffect(() => {
@@ -216,7 +222,7 @@ function TokenPage({ address, history }) {
         </RowBetween>
 
         <WarningGrouping>
-          <DashboardWrapper style={{ marginTop: below1080 ? '0' : '1rem' }}>
+          <DashboardWrapper style={{ marginTop: below1280 ? '0' : '1rem' }}>
             <RowBetween
               style={{
                 flexWrap: 'wrap',
@@ -227,13 +233,13 @@ function TokenPage({ address, history }) {
               <RowFixed style={{ flexWrap: 'wrap' }}>
                 <RowFixed style={{ alignItems: 'baseline' }}>
                   <TokenLogo address={address} size="32px" style={{ alignSelf: 'center' }} />
-                  <TYPE.main fontSize={below1080 ? '1.5rem' : '2rem'} fontWeight={500} style={{ margin: '0 1rem' }}>
+                  <TYPE.main fontSize={below1280 ? '1.5rem' : '2rem'} fontWeight={500} style={{ margin: '0 1rem' }}>
                     <RowFixed gap="6px">
                       <FormattedName text={name ? name + ' ' : ''} maxCharacters={16} style={{ marginRight: '6px' }} />{' '}
                       {formattedSymbol ? `(${formattedSymbol})` : ''}
                     </RowFixed>
                   </TYPE.main>{' '}
-                  {!below1080 && (
+                  {!below768 && (
                     <>
                       <TYPE.main fontSize={'1.5rem'} fontWeight={500} style={{ marginRight: '1rem' }}>
                         {price}
@@ -245,16 +251,20 @@ function TokenPage({ address, history }) {
               </RowFixed>
               <span>
                 <RowFixed ml={below500 ? '0' : '2.5rem'} mt={below500 ? '1rem' : '0'}>
-                  {!!!savedTokens[address] && !below800 ? (
+                  {!!!savedTokens[address] && !below768 ? (
                     <Hover onClick={() => addToken(address, symbol)}>
-                      <StyledIcon>
-                        <PlusCircle style={{ marginRight: '0.5rem' }} />
-                      </StyledIcon>
+                      <img
+                        src={bookMarkOutline}
+                        width={24}
+                        height={24}
+                        alt="BookMark"
+                        style={{ marginRight: '0.5rem' }}
+                      />
                     </Hover>
-                  ) : !below1080 ? (
-                    <StyledIcon>
-                      <Bookmark style={{ marginRight: '0.5rem', opacity: 0.4 }} />
-                    </StyledIcon>
+                  ) : !below1280 ? (
+                    <Hover onClick={() => removeToken(address)}>
+                      <img src={bookMark} width={24} height={24} alt="BookMarked" style={{ marginRight: '0.5rem' }} />
+                    </Hover>
                   ) : (
                     <></>
                   )}
@@ -269,7 +279,7 @@ function TokenPage({ address, history }) {
                   >
                     <ButtonDark
                       ml={'.5rem'}
-                      mr={below1080 && '.5rem'}
+                      mr={below1280 && '.5rem'}
                       color={backgroundColor}
                       style={{ padding: '11px 22px' }}
                     >
@@ -280,20 +290,18 @@ function TokenPage({ address, history }) {
               </span>
             </RowBetween>
             <>
-              <PanelWrapper style={{ marginTop: below1080 ? '0' : '1rem' }}>
-                {below1080 && price && (
+              <PanelWrapper style={{ marginTop: below1280 ? '0' : '1rem' }}>
+                {below768 && price && (
                   <Panel>
                     <AutoColumn gap="20px">
                       <RowBetween>
                         <TYPE.main>Price</TYPE.main>
-                        <div />
+                        <TYPE.main>{priceChange}</TYPE.main>
                       </RowBetween>
                       <RowBetween align="flex-end">
-                        {' '}
                         <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={500}>
                           {price}
                         </TYPE.main>
-                        <TYPE.main>{priceChange}</TYPE.main>
                       </RowBetween>
                     </AutoColumn>
                   </Panel>
@@ -302,13 +310,12 @@ function TokenPage({ address, history }) {
                   <AutoColumn gap="20px">
                     <RowBetween>
                       <TYPE.main>Total Liquidity</TYPE.main>
-                      <div />
+                      <TYPE.main>{liquidityChange}</TYPE.main>
                     </RowBetween>
                     <RowBetween align="flex-end">
                       <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={500}>
                         {liquidity}
                       </TYPE.main>
-                      <TYPE.main>{liquidityChange}</TYPE.main>
                     </RowBetween>
                   </AutoColumn>
                 </Panel>
@@ -316,13 +323,12 @@ function TokenPage({ address, history }) {
                   <AutoColumn gap="20px">
                     <RowBetween>
                       <TYPE.main>Volume (24hrs) {usingUtVolume && '(Untracked)'}</TYPE.main>
-                      <div />
+                      <TYPE.main>{volumeChange}</TYPE.main>
                     </RowBetween>
                     <RowBetween align="flex-end">
                       <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={500}>
                         {volume}
                       </TYPE.main>
-                      <TYPE.main>{volumeChange}</TYPE.main>
                     </RowBetween>
                   </AutoColumn>
                 </Panel>
@@ -331,20 +337,19 @@ function TokenPage({ address, history }) {
                   <AutoColumn gap="20px">
                     <RowBetween>
                       <TYPE.main>Transactions (24hrs)</TYPE.main>
-                      <div />
+                      <TYPE.main>{txnChangeFormatted}</TYPE.main>
                     </RowBetween>
                     <RowBetween align="flex-end">
                       <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={500}>
                         {oneDayTxns ? localNumber(oneDayTxns) : oneDayTxns === 0 ? 0 : '-'}
                       </TYPE.main>
-                      <TYPE.main>{txnChangeFormatted}</TYPE.main>
                     </RowBetween>
                   </AutoColumn>
                 </Panel>
                 <Panel
                   style={{
-                    gridColumn: below1080 ? '1' : '2/4',
-                    gridRow: below1080 ? '' : '1/4',
+                    gridColumn: below768 ? '1/5' : below1280 ? '1/4' : '2/5',
+                    gridRow: below1280 ? '' : '1/4',
                   }}
                 >
                   <TokenChart address={address} color={backgroundColor} base={priceUSD} />

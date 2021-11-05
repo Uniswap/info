@@ -3,7 +3,7 @@ import { useHistory } from 'react-router-dom'
 import styled from 'styled-components'
 import { useMedia } from 'react-use'
 import { Flex } from 'rebass'
-import { Menu as MenuIcon, List, Repeat, Monitor } from 'react-feather'
+import { Menu as MenuIcon, List, Repeat, Monitor, Sun, Moon } from 'react-feather'
 
 import Link, { BasicLink } from '../Link'
 import { AutoColumn } from '../Column'
@@ -13,6 +13,7 @@ import Logo from '../../assets/logo.svg'
 import { ApplicationModal, useModalOpen, useToggleMenuModal } from '../../contexts/Application'
 import { useOnClickOutside } from '../../hooks'
 import SocialLinks from '../SocialLinks'
+import { useDarkModeManager } from '../../contexts/LocalStorage'
 import { getDefaultAddLiquidityUrl, addNetworkIdQueryString } from '../../utils'
 
 const TitleWrapper = styled.div`
@@ -31,15 +32,22 @@ const DMMIcon = styled(Link)`
   }
 `
 
+const Divider = styled.div`
+  height: 1px;
+  background: ${({ theme }) => theme.border};
+`
+
 const Option = styled.div`
-  font-weight: 500;
-  font-size: 14px;
-  opacity: ${({ activeText }) => (activeText ? 1 : 0.6)};
-  color: ${({ theme }) => theme.white};
+  font-weight: ${({ activeText }) => (activeText ? 600 : 500)};
+  font-size: 16px;
+  color: ${({ theme, activeText }) => (activeText ? theme.text : theme.subText)};
   display: flex;
+  align-items: center;
+  cursor: pointer;
   margin-left: 12px;
+
   :hover {
-    opacity: 1;
+    color: ${({ theme }) => theme.text};
   }
 `
 
@@ -75,7 +83,7 @@ const StyledMenuButton = styled.button`
 
 const MenuFlyout = styled.span`
   width: fit-content;
-  background-color: ${({ theme }) => theme.bg3};
+  background-color: ${({ theme }) => theme.background};
   box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.01), 0px 4px 8px rgba(0, 0, 0, 0.04), 0px 16px 24px rgba(0, 0, 0, 0.04),
     0px 24px 32px rgba(0, 0, 0, 0.01);
   border-radius: 12px;
@@ -95,16 +103,15 @@ const MenuFlyout = styled.span`
 
 const HeaderText = styled.div`
   margin-right: 0.75rem;
-  font-size: 0.825rem;
-  font-weight: 500;
+  font-size: 0.75rem;
   display: inline-box;
   display: -webkit-inline-box;
-  opacity: 0.8;
-  :hover {
-    opacity: 1;
-  }
   a {
-    color: ${({ theme }) => theme.white};
+    color: ${({ theme }) => theme.subText};
+  }
+
+  a:hover {
+    color: ${({ theme }) => theme.text};
   }
 `
 
@@ -112,6 +119,7 @@ export default function Title() {
   const history = useHistory()
   const below1080 = useMedia('(max-width: 1080px)')
   const node = useRef()
+  const [isDark, toggleDarkMode] = useDarkModeManager()
   const menuModalOpen = useModalOpen(ApplicationModal.MENU)
   const toggleMenuModal = useToggleMenuModal()
   useOnClickOutside(node, menuModalOpen ? toggleMenuModal : undefined)
@@ -193,6 +201,17 @@ export default function Title() {
                 Liquidity
               </Option>
             </Link>
+
+            <Divider />
+
+            <Option onClick={toggleDarkMode} style={{ marginLeft: 0 }}>
+              {!isDark ? (
+                <Sun size={16} style={{ marginRight: '.75rem' }} />
+              ) : (
+                <Moon size={16} style={{ marginRight: '.75rem' }} />
+              )}
+              {isDark ? 'Light Theme' : 'Dark Theme'}
+            </Option>
           </AutoColumn>
 
           <AutoColumn gap="0.5rem" style={{ marginTop: '4rem' }}>
