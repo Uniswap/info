@@ -10,7 +10,7 @@ import { StyledIcon } from '..'
 const Wrapper = styled.div`
   z-index: 20;
   position: relative;
-  background-color: ${({ theme }) => theme.panelColor};
+  background-color: ${({ theme }) => theme.buttonBlack};
   border: 1px solid ${({ open, color }) => (open ? color : 'rgba(0, 0, 0, 0.15);')};
   width: 100px;
   padding: 4px 10px;
@@ -30,7 +30,7 @@ const Dropdown = styled.div`
   top: 34px;
   padding-top: 40px;
   width: calc(100% - 40px);
-  background-color: ${({ theme }) => theme.bg1};
+  background-color: ${({ theme }) => theme.buttonBlack};
   border: 1px solid rgba(0, 0, 0, 0.15);
   padding: 10px 10px;
   border-radius: 8px;

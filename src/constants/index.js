@@ -3,6 +3,7 @@ export const FACTORY_ADDRESS = process.env.REACT_APP_FACTORY_ADDRESS || '0x06395
 export const BUNDLE_ID = '1'
 
 export const timeframeOptions = {
+  FOUR_HOURS: '4 hours',
   ONE_DAY: '1 day',
   THERE_DAYS: '3 days',
   WEEK: '1 week',

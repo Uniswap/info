@@ -516,6 +516,12 @@ export function useHourlyRateData(poolAddress, timeWindow, frequency) {
     let startTime
 
     switch (timeWindow) {
+      case timeframeOptions.FOUR_HOURS:
+        startTime = currentTime.subtract(4, 'hour').startOf('second').unix()
+        break
+      case timeframeOptions.ONE_DAY:
+        startTime = currentTime.subtract(1, 'day').startOf('minute').unix()
+        break
       case timeframeOptions.THERE_DAYS:
         startTime = currentTime.subtract(3, 'day').startOf('hour').unix()
         break

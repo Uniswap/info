@@ -1,26 +1,24 @@
 import React from 'react'
 import styled from 'styled-components'
 import { withRouter } from 'react-router-dom'
-import { TrendingUp, List, PieChart, Disc, Repeat, Monitor } from 'react-feather'
+import { TrendingUp, List, PieChart, Disc, Repeat, Monitor, Sun, Moon } from 'react-feather'
 import { useMedia } from 'react-use'
 
 import { AutoRow } from '../Row'
 import { AutoColumn } from '../Column'
 import Title from '../Title'
 import { BasicLink } from '../Link'
-import { TYPE } from '../../Theme'
 import Link from '../Link'
 import NetworkModal from '../NetworkModal'
 import SwitchNetworkButton from '../SwitcNetworkButton'
 import { ApplicationModal, useModalOpen, useSessionStart } from '../../contexts/Application'
 import { useDarkModeManager } from '../../contexts/LocalStorage'
-import Toggle from '../Toggle'
 import SocialLinks from '../SocialLinks'
 import { getDefaultAddLiquidityUrl, addNetworkIdQueryString } from '../../utils'
 
 const Wrapper = styled.div`
   height: ${({ isMobile }) => (isMobile ? 'initial' : '100vh')};
-  background-color: ${({ theme }) => theme.sidebar};
+  background-color: ${({ theme }) => theme.background};
   color: ${({ theme }) => theme.text1};
   padding: 0.5rem 0.5rem 0.5rem 0.75rem;
   position: sticky;
@@ -40,14 +38,21 @@ const Wrapper = styled.div`
 `
 
 const Option = styled.div`
-  font-weight: 500;
-  font-size: 14px;
-  opacity: ${({ activeText }) => (activeText ? 1 : 0.6)};
-  color: ${({ theme }) => theme.white};
+  font-weight: ${({ activeText }) => (activeText ? 600 : 500)};
+  font-size: 16px;
+  color: ${({ theme, activeText }) => (activeText ? theme.text : theme.subText)};
   display: flex;
+  align-items: center;
+  cursor: pointer;
+
   :hover {
-    opacity: 1;
+    color: ${({ theme }) => theme.text};
   }
+`
+
+const Divider = styled.div`
+  height: 1px;
+  background: ${({ theme }) => theme.border};
 `
 
 const DesktopWrapper = styled.div`
@@ -66,16 +71,15 @@ const MobileWrapper = styled.div`
 
 const HeaderText = styled.div`
   margin-right: 0.75rem;
-  font-size: 0.825rem;
-  font-weight: 500;
+  font-size: 0.75rem;
   display: inline-box;
   display: -webkit-inline-box;
-  opacity: 0.8;
-  :hover {
-    opacity: 1;
-  }
   a {
-    color: ${({ theme }) => theme.white};
+    color: ${({ theme }) => theme.subText};
+  }
+
+  a:hover {
+    color: ${({ theme }) => theme.text};
   }
 `
 
@@ -85,11 +89,12 @@ const Polling = styled.div`
   left: 0;
   bottom: 0;
   padding: 1rem;
-  color: white;
-  opacity: 0.4;
+  font-size: 10px;
+  color: ${({ theme }) => theme.subText};
   transition: opacity 0.25s ease;
-  :hover {
-    opacity: 1;
+
+  a {
+    color: ${({ theme }) => theme.subText};
   }
 `
 const PollingDot = styled.div`
@@ -127,7 +132,7 @@ function SideNav({ history }) {
               <AutoColumn gap="1.25rem" style={{ marginTop: '1rem' }}>
                 <BasicLink to="/home">
                   <Option activeText={history.location.pathname === '/home' ?? undefined}>
-                    <TrendingUp size={20} style={{ marginRight: '.75rem' }} />
+                    <TrendingUp size={16} style={{ marginRight: '.75rem' }} />
                     Summary
                   </Option>
                 </BasicLink>
@@ -139,7 +144,7 @@ function SideNav({ history }) {
                       undefined
                     }
                   >
-                    <Disc size={20} style={{ marginRight: '.75rem' }} />
+                    <Disc size={16} style={{ marginRight: '.75rem' }} />
                     Tokens
                   </Option>
                 </BasicLink>
@@ -151,7 +156,7 @@ function SideNav({ history }) {
                       undefined
                     }
                   >
-                    <PieChart size={20} style={{ marginRight: '.75rem' }} />
+                    <PieChart size={16} style={{ marginRight: '.75rem' }} />
                     Pairs
                   </Option>
                 </BasicLink>
@@ -164,28 +169,39 @@ function SideNav({ history }) {
                       undefined
                     }
                   >
-                    <List size={20} style={{ marginRight: '.75rem' }} />
+                    <List size={16} style={{ marginRight: '.75rem' }} />
                     Wallet Data
                   </Option>
                 </BasicLink>
 
                 <Link href={addNetworkIdQueryString(process.env.REACT_APP_DMM_SWAP_URL)} external>
                   <Option>
-                    <Repeat size={20} style={{ marginRight: '.75rem' }} />
+                    <Repeat size={16} style={{ marginRight: '.75rem' }} />
                     Trade
                   </Option>
                 </Link>
 
                 <Link href={addNetworkIdQueryString(getDefaultAddLiquidityUrl())} external>
                   <Option>
-                    <Monitor size={20} style={{ marginRight: '.75rem' }} />
+                    <Monitor size={16} style={{ marginRight: '.75rem' }} />
                     Liquidity
                   </Option>
                 </Link>
+
+                <Divider />
+
+                <Option onClick={toggleDarkMode}>
+                  {!isDark ? (
+                    <Sun size={16} style={{ marginRight: '.75rem' }} />
+                  ) : (
+                    <Moon size={16} style={{ marginRight: '.75rem' }} />
+                  )}
+                  {isDark ? 'Light Theme' : 'Dark Theme'}
+                </Option>
               </AutoColumn>
             )}
           </AutoColumn>
-          <AutoColumn gap="0.5rem" style={{ marginLeft: '.75rem', marginBottom: '4rem', marginTop: '1.5rem' }}>
+          <AutoColumn gap="0.5rem" style={{ marginLeft: '.75rem', marginBottom: '3.5rem', marginTop: '1.5rem' }}>
             <HeaderText>
               <Link href="https://github.com/dynamic-amm/dmm-info" external>
                 Github
@@ -208,17 +224,14 @@ function SideNav({ history }) {
             </HeaderText>
             <SocialLinks />
             <HeaderText>
-              <Link>(c) dmm.exchange</Link>
+              <Link>© dmm.exchange</Link>
             </HeaderText>
-            <Toggle isActive={isDark} toggle={toggleDarkMode} />
           </AutoColumn>
           {!below1180 && (
             <Polling style={{ marginLeft: '.5rem' }}>
               <PollingDot />
-              <a href="/" style={{ color: 'white' }}>
-                <TYPE.small color={'white'}>
-                  Updated {!!seconds ? seconds + 's' : '-'} ago <br />
-                </TYPE.small>
+              <a href="/">
+                Updated {!!seconds ? seconds + 's' : '-'} ago <br />
               </a>
             </Polling>
           )}

@@ -6,6 +6,7 @@ import { usePrevious } from 'react-use'
 import styled from 'styled-components'
 import { Play } from 'react-feather'
 import { useDarkModeManager } from '../../contexts/LocalStorage'
+import useTheme from '../../hooks/useTheme'
 
 const IconWrapper = styled.div`
   position: absolute;
@@ -56,6 +57,7 @@ const CandleStickChart = ({ data, width, height = 300, base, valueFormatter = (v
 
   const [darkMode] = useDarkModeManager()
   const textColor = darkMode ? 'white' : 'black'
+  const theme = useTheme()
   const previousTheme = usePrevious(darkMode)
 
   // reset the chart if theme switches
@@ -97,10 +99,10 @@ const CandleStickChart = ({ data, width, height = 300, base, valueFormatter = (v
         },
         grid: {
           vertLines: {
-            color: 'rgba(197, 203, 206, 0.5)',
+            color: darkMode ? '#40505A4d' : '#C2C2C233',
           },
           horzLines: {
-            color: 'rgba(197, 203, 206, 0.5)',
+            color: darkMode ? '#40505A4d' : '#C2C2C233',
           },
         },
         crosshair: {
@@ -119,12 +121,12 @@ const CandleStickChart = ({ data, width, height = 300, base, valueFormatter = (v
       })
 
       var candleSeries = chart.addCandlestickSeries({
-        upColor: 'green',
-        downColor: 'red',
-        borderDownColor: 'red',
-        borderUpColor: 'green',
-        wickDownColor: 'red',
-        wickUpColor: 'green',
+        upColor: '#31CB9E',
+        downColor: '#FF537B',
+        borderDownColor: '#FF537B',
+        borderUpColor: '#31CB9E',
+        wickDownColor: '#FF537B',
+        wickUpColor: '#31CB9E',
       })
 
       candleSeries.setData(formattedData)
@@ -134,8 +136,8 @@ const CandleStickChart = ({ data, width, height = 300, base, valueFormatter = (v
       toolTip.className = 'three-line-legend'
       ref.current.appendChild(toolTip)
       toolTip.style.display = 'block'
-      toolTip.style.top = '44px'
-      toolTip.style.right = '2rem'
+      toolTip.style.top = '48px'
+      toolTip.style.left = '0.75rem'
       toolTip.style.backgroundColor = 'transparent'
 
       // get the title of the chart
@@ -159,11 +161,11 @@ const CandleStickChart = ({ data, width, height = 300, base, valueFormatter = (v
           setLastBarText()
         } else {
           var price = param.seriesPrices.get(candleSeries).close
-          const time = dayjs.unix(param.time).format('MM/DD h:mm A')
+          const time = dayjs.unix(param.time).format('MM/DD h:mm:ss A')
           toolTip.innerHTML =
-            `<div style="font-size: 22px; margin: 4px 0px; color: ${textColor}">` +
+            `<div style="font-size: 22px; margin: 4px 0px; color: ${theme.text}">` +
             valueFormatter(price) +
-            `<span style="font-size: 12px; margin: 4px 6px; color: ${textColor}">` +
+            `<span style="font-size: 12px; margin: 4px 6px; color: ${theme.subText}">` +
             time +
             ' UTC' +
             '</span>' +
@@ -175,7 +177,7 @@ const CandleStickChart = ({ data, width, height = 300, base, valueFormatter = (v
 
       setChartCreated(chart)
     }
-  }, [chartCreated, formattedData, width, height, valueFormatter, base, textColor])
+  }, [theme.subText, theme.text, chartCreated, formattedData, width, height, valueFormatter, base, textColor, darkMode])
 
   // responsiveness
   useEffect(() => {

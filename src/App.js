@@ -50,7 +50,7 @@ const Right = styled.div`
   width: ${({ open }) => (open ? '220px' : '64px')};
   height: ${({ open }) => (open ? 'fit-content' : '64px')};
   overflow: auto;
-  background-color: ${({ theme }) => theme.onlyLight};
+  background-color: ${({ theme }) => theme.background};
   @media screen and (max-width: 1400px) {
     display: none;
   }
@@ -61,7 +61,7 @@ const Center = styled.div`
   height: 100%;
   z-index: 10;
   transition: width 0.25s ease;
-  background-color: ${({ theme }) => theme.onlyLight};
+  background-color: ${({ theme }) => theme.buttonBlack};
 `
 
 const WarningWrapper = styled.div`
@@ -246,7 +246,7 @@ function App() {
             </Switch>
           </BrowserRouter>
         ) : (
-          <LocalLoader fill="true" size="150px"/>
+          <LocalLoader fill="true" size="150px" />
         )}
       </AppWrapper>
     </ApolloProvider>

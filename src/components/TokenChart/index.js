@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
+import { Text } from 'rebass'
 import styled from 'styled-components'
 import { Area, XAxis, YAxis, ResponsiveContainer, Tooltip, AreaChart, BarChart, Bar } from 'recharts'
 import { AutoRow, RowBetween, RowFixed } from '../Row'
@@ -13,20 +14,16 @@ import DropdownSelect from '../DropdownSelect'
 import CandleStickChart from '../CandleChart'
 import LocalLoader from '../LocalLoader'
 import { AutoColumn } from '../Column'
-import { Activity } from 'react-feather'
 import { useDarkModeManager } from '../../contexts/LocalStorage'
+import useTheme from '../../hooks/useTheme'
 
 const ChartWrapper = styled.div`
   height: 100%;
-  min-height: 300px;
+  min-height: 350px;
 
   @media screen and (max-width: 600px) {
     min-height: 200px;
   }
-`
-
-const PriceOption = styled(OptionButton)`
-  border-radius: 2px;
 `
 
 const CHART_VIEW = {
@@ -36,19 +33,12 @@ const CHART_VIEW = {
   LINE_PRICE: 'Price (Line)',
 }
 
-const DATA_FREQUENCY = {
-  ONE_MINUTE: 'ONE_MINUTE',
-  FIVE_MINUTES: 'FIVE_MINUTES',
-  HOUR: 'HOUR',
-  LINE: 'LINE',
-}
-
 const TokenChart = ({ address, color, base }) => {
   // settings for the window and candle width
   const [chartFilter, setChartFilter] = useState(CHART_VIEW.PRICE)
-  const [frequency, setFrequency] = useState(DATA_FREQUENCY.FIVE_MINUTES)
 
   const [darkMode] = useDarkModeManager()
+  const theme = useTheme()
   const textColor = darkMode ? 'white' : 'black'
 
   // reset view on new address
@@ -62,61 +52,24 @@ const TokenChart = ({ address, color, base }) => {
   let chartData = useTokenChartData(address)
 
   const [timeWindow, setTimeWindow] = useState(timeframeOptions.THERE_DAYS)
-  const prevWindow = usePrevious(timeWindow)
 
-  // hourly and daily price data based on the current time window
-  const data1m1day = useTokenPriceData(address, timeframeOptions.ONE_DAY, 60)
-  const data5m3days = useTokenPriceData(address, timeframeOptions.THERE_DAYS, 300)
-  // const data5mWeek = useTokenPriceData(address, timeframeOptions.WEEK, 300)
-  // const data5mMonth = useTokenPriceData(address, timeframeOptions.MONTH, 300)
-  const dataHourly3days = useTokenPriceData(address, timeframeOptions.THERE_DAYS, 3600)
-  const dataHourlyWeek = useTokenPriceData(address, timeframeOptions.WEEK, 3600)
-  const dataHourlyMonth = useTokenPriceData(address, timeframeOptions.MONTH, 3600)
-
-  const priceData =
-    timeWindow === timeframeOptions.ONE_DAY
-      ? data1m1day
-      : timeWindow === timeframeOptions.MONTH
-      ? // monthly selected
-        // frequency === DATA_FREQUENCY.FIVE_MINUTES
-        // ? data5mMonth :
-        dataHourlyMonth
-      : // weekly selected
-      timeWindow === timeframeOptions.WEEK
-      ? // frequency === DATA_FREQUENCY.FIVE_MINUTES
-        //     ? data5mWeek :
-        dataHourlyWeek
-      : // 3 days selected
-      frequency === DATA_FREQUENCY.FIVE_MINUTES
-      ? data5m3days
-      : dataHourly3days
-
-  // switch to 5m data when switched to 3 days window
-  // switch to hourly data when switched to week window
-  // switch to hourly data if switched to month window
-  useEffect(() => {
-    if (timeWindow === timeframeOptions.THERE_DAYS && prevWindow && prevWindow !== timeframeOptions.THERE_DAYS) {
-      setFrequency(DATA_FREQUENCY.FIVE_MINUTES)
-    }
-
-    if (timeWindow === timeframeOptions.WEEK && prevWindow && prevWindow !== timeframeOptions.WEEK) {
-      setFrequency(DATA_FREQUENCY.HOUR)
-    }
-
-    if (timeWindow === timeframeOptions.MONTH && prevWindow && prevWindow !== timeframeOptions.MONTH) {
-      setFrequency(DATA_FREQUENCY.HOUR)
-    }
-
-    if (timeWindow === timeframeOptions.ONE_DAY && prevWindow && prevWindow !== timeframeOptions.ONE_DAY) {
-      setFrequency(DATA_FREQUENCY.ONE_MINUTE)
-    }
-  }, [prevWindow, timeWindow])
+  const priceData = useTokenPriceData(
+    address,
+    timeWindow,
+    timeWindow === timeframeOptions.FOUR_HOURS
+      ? 30
+      : timeWindow === timeframeOptions.ONE_DAY
+      ? 120
+      : timeWindow === timeframeOptions.THERE_DAYS
+      ? 300
+      : 3600
+  )
 
   const below1080 = useMedia('(max-width: 1080px)')
   const below600 = useMedia('(max-width: 600px)')
 
   let utcStartTime = getTimeframe(timeWindow)
-  const aspect = below1080 ? 60 / 32 : below600 ? 60 / 42 : 60 / 22
+  const aspect = below1080 ? 60 / 30 : below600 ? 60 / 42 : 60 / 20
 
   chartData = chartData?.filter((entry) => entry.date >= utcStartTime)
 
@@ -135,11 +88,12 @@ const TokenChart = ({ address, color, base }) => {
     return () => window.removeEventListener('resize', handleResize)
   }, [isClient, width]) // Empty array ensures that effect is only run on mount and unmount
 
-  const { ONE_DAY, ...timeWindowOptionsExcept1Day } = timeframeOptions
+  const { ONE_DAY, FOUR_HOURS, ALL_TIME, ...timeWindowOptionsExcept1Day } = timeframeOptions
+  const { ALL_TIME: alltime, ...timeWindowOptionsExceptAllTime } = timeframeOptions
   return (
     <ChartWrapper>
       {below600 ? (
-        <RowBetween mb={40}>
+        <RowBetween mb={20}>
           <DropdownSelect
             options={CHART_VIEW}
             active={chartFilter}
@@ -154,7 +108,7 @@ const TokenChart = ({ address, color, base }) => {
             options={
               [CHART_VIEW.LIQUIDITY, CHART_VIEW.VOLUME].includes(chartFilter)
                 ? timeWindowOptionsExcept1Day
-                : timeframeOptions
+                : timeWindowOptionsExceptAllTime
             }
             active={timeWindow}
             setActive={setTimeWindow}
@@ -162,120 +116,100 @@ const TokenChart = ({ address, color, base }) => {
           />
         </RowBetween>
       ) : (
-        <RowBetween
-          mb={
-            chartFilter === CHART_VIEW.LIQUIDITY ||
-            chartFilter === CHART_VIEW.VOLUME ||
-            (chartFilter === CHART_VIEW.PRICE && frequency === DATA_FREQUENCY.LINE)
-              ? 40
-              : 0
-          }
-          align="flex-start"
-        >
-          <AutoColumn gap="8px">
-            <RowFixed>
-              <OptionButton
-                active={chartFilter === CHART_VIEW.LIQUIDITY}
-                onClick={() => {
-                  setChartFilter(CHART_VIEW.LIQUIDITY)
-                  setTimeWindow(timeframeOptions.THERE_DAYS)
-                }}
-                style={{ marginRight: '6px' }}
-              >
-                Liquidity
-              </OptionButton>
-              <OptionButton
-                active={chartFilter === CHART_VIEW.VOLUME}
-                onClick={() => {
-                  setChartFilter(CHART_VIEW.VOLUME)
-                  setTimeWindow(timeframeOptions.THERE_DAYS)
-                }}
-                style={{ marginRight: '6px' }}
-              >
-                Volume
-              </OptionButton>
-              <OptionButton
-                active={chartFilter === CHART_VIEW.PRICE}
-                onClick={() => {
-                  setChartFilter(CHART_VIEW.PRICE)
-                }}
-              >
-                Price
-              </OptionButton>
-            </RowFixed>
-            {chartFilter === CHART_VIEW.PRICE && (
-              <AutoRow gap="4px">
-                {timeWindow === timeframeOptions.ONE_DAY && (
-                  <PriceOption
-                    active={frequency === DATA_FREQUENCY.ONE_MINUTE}
-                    onClick={() => {
-                      setTimeWindow(timeframeOptions.ONE_DAY)
-                      setFrequency(DATA_FREQUENCY.ONE_MINUTE)
-                    }}
-                  >
-                    1m
-                  </PriceOption>
-                )}
+        <RowBetween mb={20} align="flex-start">
+          <RowFixed style={{ background: theme.buttonBlack, borderRadius: '999px' }}>
+            <OptionButton
+              active={chartFilter === CHART_VIEW.PRICE}
+              onClick={() => {
+                setChartFilter(CHART_VIEW.PRICE)
+              }}
+              style={{ padding: '6px 12px', borderRadius: '999px' }}
+            >
+              Price
+            </OptionButton>
 
-                {timeWindow === timeframeOptions.THERE_DAYS && (
-                  <PriceOption
-                    active={frequency === DATA_FREQUENCY.FIVE_MINUTES}
-                    onClick={() => {
-                      setTimeWindow(timeframeOptions.THERE_DAYS)
-                      setFrequency(DATA_FREQUENCY.FIVE_MINUTES)
-                    }}
-                  >
-                    5m
-                  </PriceOption>
-                )}
+            <OptionButton
+              active={chartFilter === CHART_VIEW.LINE_PRICE}
+              onClick={() => {
+                setChartFilter(CHART_VIEW.LINE_PRICE)
+              }}
+              style={{ padding: '6px 12px', borderRadius: '999px' }}
+            >
+              Price (Line)
+            </OptionButton>
+
+            <OptionButton
+              active={chartFilter === CHART_VIEW.LIQUIDITY}
+              onClick={() => {
+                setChartFilter(CHART_VIEW.LIQUIDITY)
+                setTimeWindow(timeframeOptions.THERE_DAYS)
+              }}
+              style={{ padding: '6px 12px', borderRadius: '999px' }}
+            >
+              Liquidity
+            </OptionButton>
+            <OptionButton
+              active={chartFilter === CHART_VIEW.VOLUME}
+              onClick={() => {
+                setChartFilter(CHART_VIEW.VOLUME)
+                setTimeWindow(timeframeOptions.THERE_DAYS)
+              }}
+              style={{ padding: '6px 12px', borderRadius: '999px' }}
+            >
+              Volume
+            </OptionButton>
+          </RowFixed>
+          <AutoColumn justify="flex-end">
+            <AutoRow justify="flex-end" align="flex-start" style={{ width: 'fit-content', gap: '6px' }}>
+              {[CHART_VIEW.PRICE, CHART_VIEW.LINE_PRICE].includes(chartFilter) && (
                 <>
-                  {timeWindow !== timeframeOptions.ONE_DAY && (
-                    <PriceOption
-                      active={frequency === DATA_FREQUENCY.HOUR}
-                      onClick={() => setFrequency(DATA_FREQUENCY.HOUR)}
-                    >
-                      H
-                    </PriceOption>
-                  )}
-                  <PriceOption
-                    active={frequency === DATA_FREQUENCY.LINE}
-                    onClick={() => setFrequency(DATA_FREQUENCY.LINE)}
+                  <OptionButton
+                    active={timeWindow === timeframeOptions.FOUR_HOURS}
+                    onClick={() => setTimeWindow(timeframeOptions.FOUR_HOURS)}
                   >
-                    <Activity size={14} />
-                  </PriceOption>
-                </>
-              </AutoRow>
-            )}
-          </AutoColumn>
-          <AutoRow justify="flex-end" gap="6px" align="flex-start" style={{ width: 'fit-content' }}>
-            {chartFilter === CHART_VIEW.PRICE && (
-              <OptionButton
-                active={timeWindow === timeframeOptions.ONE_DAY}
-                onClick={() => setTimeWindow(timeframeOptions.ONE_DAY)}
-              >
-                1D
-              </OptionButton>
-            )}
+                    4H
+                  </OptionButton>
 
-            <OptionButton
-              active={timeWindow === timeframeOptions.THERE_DAYS}
-              onClick={() => setTimeWindow(timeframeOptions.THERE_DAYS)}
-            >
-              3D
-            </OptionButton>
-            <OptionButton
-              active={timeWindow === timeframeOptions.WEEK}
-              onClick={() => setTimeWindow(timeframeOptions.WEEK)}
-            >
-              1W
-            </OptionButton>
-            <OptionButton
-              active={timeWindow === timeframeOptions.MONTH}
-              onClick={() => setTimeWindow(timeframeOptions.MONTH)}
-            >
-              1M
-            </OptionButton>
-          </AutoRow>
+                  <OptionButton
+                    active={timeWindow === timeframeOptions.ONE_DAY}
+                    onClick={() => setTimeWindow(timeframeOptions.ONE_DAY)}
+                  >
+                    1D
+                  </OptionButton>
+                </>
+              )}
+
+              <OptionButton
+                active={timeWindow === timeframeOptions.THERE_DAYS}
+                onClick={() => setTimeWindow(timeframeOptions.THERE_DAYS)}
+              >
+                3D
+              </OptionButton>
+              <OptionButton
+                active={timeWindow === timeframeOptions.WEEK}
+                onClick={() => setTimeWindow(timeframeOptions.WEEK)}
+              >
+                1W
+              </OptionButton>
+              <OptionButton
+                active={timeWindow === timeframeOptions.MONTH}
+                onClick={() => setTimeWindow(timeframeOptions.MONTH)}
+              >
+                1M
+              </OptionButton>
+            </AutoRow>
+            <Text color={theme.subText} fontSize={10} marginTop="12px">
+              {![CHART_VIEW.LINE_PRICE, CHART_VIEW.PRICE].includes(chartFilter)
+                ? ' '
+                : timeWindow === timeframeOptions.FOUR_HOURS
+                ? '30s'
+                : timeWindow === timeframeOptions.ONE_DAY
+                ? '2 Mins'
+                : timeWindow === timeframeOptions.THERE_DAYS
+                ? '5 Mins'
+                : '1 Hr'}
+            </Text>
+          </AutoColumn>
         </RowBetween>
       )}
       {chartFilter === CHART_VIEW.LIQUIDITY && chartData && (
@@ -339,8 +273,8 @@ const TokenChart = ({ address, color, base }) => {
         </ResponsiveContainer>
       )}
       {[CHART_VIEW.PRICE, CHART_VIEW.LINE_PRICE].includes(chartFilter) &&
-        (frequency === DATA_FREQUENCY.LINE || CHART_VIEW.LINE_PRICE === chartFilter ? (
-          <ResponsiveContainer aspect={below1080 ? 60 / 32 : 60 / 16}>
+        (priceData && CHART_VIEW.LINE_PRICE === chartFilter ? (
+          <ResponsiveContainer aspect={aspect}>
             <AreaChart margin={{ top: 0, right: 10, bottom: 6, left: 0 }} barCategoryGap={1} data={priceData}>
               <defs>
                 <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
@@ -351,7 +285,6 @@ const TokenChart = ({ address, color, base }) => {
               <XAxis
                 tickLine={false}
                 axisLine={false}
-                interval="preserveEnd"
                 tickMargin={16}
                 minTickGap={120}
                 tickFormatter={(tick) => toNiceDate(tick)}

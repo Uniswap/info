@@ -12,9 +12,10 @@ const ButtonWrapper = styled(ButtonOutlined)`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px 12px;
+  padding: 10px 12px;
   border-radius: 8px;
-  border: 1px solid #40505a;
+  background: ${({ theme }) => theme.buttonBlack};
+  border: none;
 `
 
 const NetworkWrapper = styled.div`
@@ -24,8 +25,8 @@ const NetworkWrapper = styled.div`
 
 const NetworkLabel = styled.span`
   font-size: 16px;
-  font-weight: 600;
-  color: ${({ theme }) => theme.text8};
+  font-weight: 500;
+  color: ${({ theme }) => theme.primary};
 `
 
 const SwitchNetworkButton = () => {

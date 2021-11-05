@@ -34,7 +34,6 @@ const Image = styled.img`
   height: ${({ size }) => size};
   background-color: white;
   border-radius: 50%;
-  box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.075);
 `
 
 const StyledNativeTokenLogo = styled.div`

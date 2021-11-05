@@ -69,6 +69,63 @@ const ETHEREUM_TOKEN_LIST = {
     decimals: 18,
     logoURI: 'https://i.imgur.com/Fp31dDB.png',
   },
+  '0x7F3EDcdD180Dbe4819Bd98FeE8929b5cEdB3AdEB': {
+    chainId: 1,
+    address: '0x7F3EDcdD180Dbe4819Bd98FeE8929b5cEdB3AdEB',
+    symbol: 'XTK',
+    name: 'xToken',
+    decimals: 18,
+  },
+  '0xd7DCd9B99787C619b4D57979521258D1A7267ad7': {
+    chainId: 1,
+    address: '0xd7DCd9B99787C619b4D57979521258D1A7267ad7',
+    symbol: 'EVRY',
+    name: 'Evrynet Token',
+    decimals: 18,
+    logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/11458.png',
+  },
+  '0x656C00e1BcD96f256F224AD9112FF426Ef053733': {
+    chainId: 1,
+    address: '0x656C00e1BcD96f256F224AD9112FF426Ef053733',
+    symbol: 'EFI',
+    name: 'Efinity Token',
+    decimals: 18,
+  },
+  '0x0C0F2b41F758d66bB8e694693B0f9e6FaE726499': {
+    chainId: 1,
+    address: '0x0C0F2b41F758d66bB8e694693B0f9e6FaE726499',
+    symbol: 'UND',
+    name: 'Unbound Dollar',
+    decimals: 18,
+    logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/7848.png',
+  },
+  '0x431ad2ff6a9C365805eBaD47Ee021148d6f7DBe0': {
+    chainId: 1,
+    address: '0x431ad2ff6a9C365805eBaD47Ee021148d6f7DBe0',
+    symbol: 'DF',
+    name: 'dForce',
+    decimals: 18,
+    logoURI:
+      'https://raw.githubusercontent.com/dforce-network/documents/2eea27372fda6a207f60fba4274ad68008d63694/logos/Lending/DF.svg',
+  },
+  '0x0a5E677a6A24b2F1A2Bf4F3bFfC443231d2fDEc8': {
+    chainId: 1,
+    address: '0x0a5E677a6A24b2F1A2Bf4F3bFfC443231d2fDEc8',
+    symbol: 'USX',
+    name: 'dForce USD',
+    decimals: 18,
+    logoURI:
+      'https://raw.githubusercontent.com/dforce-network/documents/2eea27372fda6a207f60fba4274ad68008d63694/logos/Lending/USX.svg',
+  },
+  '0xb986F3a2d91d3704Dc974A24FB735dCc5E3C1E70': {
+    chainId: 1,
+    address: '0xb986F3a2d91d3704Dc974A24FB735dCc5E3C1E70',
+    symbol: 'EUX',
+    name: 'dForce EUR',
+    decimals: 18,
+    logoURI:
+      'https://raw.githubusercontent.com/dforce-network/documents/2eea27372fda6a207f60fba4274ad68008d63694/logos/Lending/EUX.svg',
+  },
 }
 
 export default ETHEREUM_TOKEN_LIST

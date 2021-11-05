@@ -8,7 +8,7 @@ import { urls } from '../utils'
 
 const Divider = styled(Box)`
   height: 1px;
-  background-color: ${({ theme }) => theme.divider};
+  background-color: ${({ theme }) => `${theme.border}4d`};
 `
 
 export const IconWrapper = styled.div`
@@ -56,7 +56,7 @@ export const Hover = styled.div`
 `
 
 export const StyledIcon = styled.div`
-  color: ${({ theme }) => theme.text1};
+  color: ${({ theme }) => theme.subText};
 `
 
 const EmptyCard = styled.div`
