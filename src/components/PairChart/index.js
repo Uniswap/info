@@ -183,7 +183,7 @@ const PairChart = ({ address, color, base0, base1 }) => {
             <OptionButton
               active={chartFilter === CHART_VIEW.RATE0}
               onClick={() => {
-                setTimeWindow(timeframeOptions.THERE_DAYS)
+                setTimeWindow(timeframeOptions.ONE_DAY)
                 setChartFilter(CHART_VIEW.RATE0)
               }}
               style={{ padding: '6px 12px', borderRadius: '999px' }}
@@ -193,7 +193,7 @@ const PairChart = ({ address, color, base0, base1 }) => {
             <OptionButton
               active={chartFilter === CHART_VIEW.RATE1}
               onClick={() => {
-                setTimeWindow(timeframeOptions.THERE_DAYS)
+                setTimeWindow(timeframeOptions.ONE_DAY)
                 setChartFilter(CHART_VIEW.RATE1)
               }}
               style={{ padding: '6px 12px', borderRadius: '999px' }}

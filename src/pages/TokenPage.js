@@ -24,10 +24,11 @@ import { useDataForList } from '../contexts/PairData'
 import { useEffect } from 'react'
 import Warning from '../components/Warning'
 import { usePathDismissed, useSavedTokens } from '../contexts/LocalStorage'
-import { Hover, PageWrapper, ContentWrapper, StyledIcon } from '../components'
-import { PlusCircle, Bookmark } from 'react-feather'
+import { Hover, PageWrapper, ContentWrapper } from '../components'
 import FormattedName from '../components/FormattedName'
 import { useListedTokens } from '../contexts/Application'
+import bookMark from '../assets/bookmark.svg'
+import bookMarkOutline from '../assets/bookmark_outline.svg'
 
 const DashboardWrapper = styled.div`
   width: 100%;
@@ -180,7 +181,7 @@ function TokenPage({ address, history }) {
   const formattedSymbol = symbol?.length > LENGTH ? symbol.slice(0, LENGTH) + '...' : symbol
 
   const [dismissed, markAsDismissed] = usePathDismissed(history.location.pathname)
-  const [savedTokens, addToken] = useSavedTokens()
+  const [savedTokens, addToken, removeToken] = useSavedTokens()
   const listedTokens = useListedTokens()
 
   useEffect(() => {
@@ -252,14 +253,18 @@ function TokenPage({ address, history }) {
                 <RowFixed ml={below500 ? '0' : '2.5rem'} mt={below500 ? '1rem' : '0'}>
                   {!!!savedTokens[address] && !below768 ? (
                     <Hover onClick={() => addToken(address, symbol)}>
-                      <StyledIcon>
-                        <PlusCircle style={{ marginRight: '0.5rem' }} />
-                      </StyledIcon>
+                      <img
+                        src={bookMarkOutline}
+                        width={24}
+                        height={24}
+                        alt="BookMark"
+                        style={{ marginRight: '0.5rem' }}
+                      />
                     </Hover>
                   ) : !below1280 ? (
-                    <StyledIcon>
-                      <Bookmark style={{ marginRight: '0.5rem', opacity: 0.4 }} />
-                    </StyledIcon>
+                    <Hover onClick={() => removeToken(address)}>
+                      <img src={bookMark} width={24} height={24} alt="BookMarked" style={{ marginRight: '0.5rem' }} />
+                    </Hover>
                   ) : (
                     <></>
                   )}

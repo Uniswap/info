@@ -116,7 +116,7 @@ const CandleStickChart = ({ data, width, height = 300, base, valueFormatter = (v
           borderColor: 'rgba(197, 203, 206, 0.8)',
         },
         localization: {
-          priceFormatter: (val) => formattedNum(val),
+          priceFormatter: (val) => formattedNum(val, true),
         },
       })
 

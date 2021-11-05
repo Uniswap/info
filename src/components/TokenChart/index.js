@@ -51,7 +51,7 @@ const TokenChart = ({ address, color, base }) => {
 
   let chartData = useTokenChartData(address)
 
-  const [timeWindow, setTimeWindow] = useState(timeframeOptions.THERE_DAYS)
+  const [timeWindow, setTimeWindow] = useState(timeframeOptions.ONE_DAY)
 
   const priceData = useTokenPriceData(
     address,
