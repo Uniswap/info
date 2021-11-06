@@ -47,6 +47,8 @@ const POLYGON_TOKEN_LIST = {
     symbol: 'PGX',
     name: 'Pegaxy Stone',
     decimals: 18,
+    logoURI:
+      'https://raw.githubusercontent.com/stevepegaxy/assets/master/blockchains/polygon/assets/0xc1c93D475dc82Fe72DBC7074d55f5a734F8cEEAE/logo.png',
   },
 }
 
