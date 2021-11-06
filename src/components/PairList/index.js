@@ -14,6 +14,7 @@ import DoubleTokenLogo from '../DoubleLogo'
 import FormattedName from '../FormattedName'
 import QuestionHelper from '../QuestionHelper'
 import { TYPE } from '../../Theme'
+import { MAX_ALLOW_APY } from '../../constants'
 
 dayjs.extend(utc)
 
@@ -162,7 +163,10 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
 
       const oneDayFee = pairData.oneDayFeeUSD ? pairData.oneDayFeeUSD : pairData.oneDayFeeUntracked
 
-      const apy = formattedPercent((oneDayFee * 365 * 100) / liquidity)
+      const apy =
+        (oneDayFee * 365 * 100) / liquidity < MAX_ALLOW_APY
+          ? formattedPercent((oneDayFee * 365 * 100) / liquidity)
+          : '--'
 
       const weekVolume = pairData.oneWeekVolumeUSD ? pairData.oneWeekVolumeUSD : pairData.oneWeekVolumeUntracked
 
