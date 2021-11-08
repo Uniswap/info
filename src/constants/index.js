@@ -84,3 +84,5 @@ export const ChainId = {
   AVAXMAINNET: 43114,
   FANTOM: 250,
 }
+
+export const MAX_ALLOW_APY = 2000

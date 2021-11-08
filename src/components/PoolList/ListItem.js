@@ -11,6 +11,7 @@ import { MouseoverTooltip } from '../Tooltip'
 import CopyHelper from '../Copy'
 import { TYPE } from '../../Theme'
 import { shortenAddress, formattedNum } from '../../utils'
+import { MAX_ALLOW_APY } from '../../constants'
 
 const TableRow = styled.div`
   display: grid;
@@ -170,7 +171,7 @@ export const ItemCard = ({ pool }) => {
         </GridItem>
         <GridItem noBorder>
           <DataTitle>APY</DataTitle>
-          <DataText>{`${oneYearFL}%`}</DataText>
+          <DataText>{oneYearFL < MAX_ALLOW_APY ? `${oneYearFL}%` : '--'} </DataText>
         </GridItem>
       </StyledItemCard>
     </div>
@@ -217,7 +218,7 @@ const ListItem = ({ pool, oddRow }) => {
       <DataText grid-area="vol">{formatDataText(formattedNum(volume, true), pool.oneDayVolumeUSD)}</DataText>
       <DataText grid-area="fee">{formatDataText(formattedNum(oneDayFee, true), pool.oneDayFeeUSD)}</DataText>
       <DataText grid-area="amp">{formattedNum(amp.toPrecision(5))}</DataText>
-      <DataText grid-area="fl">{`${oneYearFL}%`}</DataText>
+      <DataText grid-area="fl">{oneYearFL < MAX_ALLOW_APY ? `${oneYearFL}%` : '--'}</DataText>
       <DataText grid-area="add_liquidity" style={{ alignItems: 'flex-start' }}>
         {
           <Link
