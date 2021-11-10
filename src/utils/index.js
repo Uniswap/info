@@ -396,8 +396,8 @@ export const formattedNum = (number, usd = false, acceptNegatives = false) => {
 
   if (num > 1000) {
     return usd
-      ? '$' + Number(parseFloat(num).toFixed(0)).toLocaleString()
-      : '' + Number(parseFloat(num).toFixed(0)).toLocaleString()
+      ? '$' + Number(parseFloat(num).toFixed(0)).toLocaleString('en-US')
+      : '' + Number(parseFloat(num).toFixed(0)).toLocaleString('en-US')
   }
 
   if (usd) {
@@ -453,9 +453,9 @@ export function formattedPercent(percent, useBrackets = false) {
     if (fixedPercent > 100) {
       return (
         <Text fontWeight={500} color="#31CB9E">
-          <OverflowTooltip text={`+${percent?.toFixed(0).toLocaleString()}%`}>{`+${percent
+          <OverflowTooltip text={`+${percent?.toFixed(0).toLocaleString('en-US')}%`}>{`+${percent
             ?.toFixed(0)
-            .toLocaleString()}%`}</OverflowTooltip>
+            .toLocaleString('en-US')}%`}</OverflowTooltip>
         </Text>
       )
     } else {
