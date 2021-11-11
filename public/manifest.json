@@ -1,6 +1,6 @@
 {
-  "short_name": "Uniswap Info",
-  "name": "View statistics for Uniswap exchanges.",
+  "short_name": "Casper Uniswap Info",
+  "name": "View statistics for Casper Uniswap exchanges.",
   "icons": [
     {
       "src": "favicon.ico",

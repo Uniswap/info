@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect, useState } from 'react'
 
-import { client } from '../apollo/client'
+import { client, v2client } from '../apollo/client'
 import {
   PAIR_DATA,
   PAIR_CHART,
@@ -224,7 +224,7 @@ async function getBulkPairData(pairList, ethPrice) {
           let data = pair
           let oneDayHistory = oneDayData?.[pair.id]
           if (!oneDayHistory) {
-            let newData = await client.query({
+            let newData = await v2client.query({
               query: PAIR_DATA(pair.id, b1),
               fetchPolicy: 'cache-first',
             })
@@ -232,7 +232,7 @@ async function getBulkPairData(pairList, ethPrice) {
           }
           let twoDayHistory = twoDayData?.[pair.id]
           if (!twoDayHistory) {
-            let newData = await client.query({
+            let newData = await v2client.query({
               query: PAIR_DATA(pair.id, b2),
               fetchPolicy: 'cache-first',
             })
@@ -240,7 +240,7 @@ async function getBulkPairData(pairList, ethPrice) {
           }
           let oneWeekHistory = oneWeekData?.[pair.id]
           if (!oneWeekHistory) {
-            let newData = await client.query({
+            let newData = await v2client.query({
               query: PAIR_DATA(pair.id, bWeek),
               fetchPolicy: 'cache-first',
             })
@@ -481,7 +481,7 @@ export function Updater() {
       // get top pairs by reserves
       let {
         data: { pairs },
-      } = await client.query({
+      } = await v2client.query({
         query: PAIRS_CURRENT,
         fetchPolicy: 'cache-first',
       })
