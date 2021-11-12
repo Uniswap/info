@@ -90,6 +90,7 @@ const ETHEREUM_TOKEN_LIST = {
     symbol: 'EFI',
     name: 'Efinity Token',
     decimals: 18,
+    logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/8985.png',
   },
   '0x0C0F2b41F758d66bB8e694693B0f9e6FaE726499': {
     chainId: 1,

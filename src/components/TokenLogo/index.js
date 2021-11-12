@@ -243,7 +243,7 @@ export default function TokenLogo({ address, header = false, size = '24px', ...r
       break
 
     default:
-      if (formattedAddress && ETHEREUM_TOKEN_LIST[formattedAddress]) {
+      if (formattedAddress && ETHEREUM_TOKEN_LIST[formattedAddress]?.logoURI) {
         return getCustomLogo({ address, src: ETHEREUM_TOKEN_LIST[formattedAddress].logoURI, size, setError, ...rest })
       }
 
