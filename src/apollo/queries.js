@@ -114,22 +114,10 @@ export const SUBGRAPH_HEALTH = gql`
 //   return gql(queryString)
 // }
 
-export const TOP_LPS_PER_PAIRS = gql`
-  query lps($pair: String!) {
-    liquidityPositions(first: 10, id: $pair) {
-      user {
-        id
-      }
-      pair {
-        id
-      }
-      liquidityTokenBalance
-    }
-  }
-`
+//changed query
 // export const TOP_LPS_PER_PAIRS = gql`
-//   query lps($pair: Bytes!) {
-//     liquidityPositions(where: { pair: $pair }, orderBy: liquidityTokenBalance, orderDirection: desc, first: 10) {
+//   query liquiditypositions($pair: String!) {
+//     liquiditypositions(first: 10, id: $pair) {
 //       user {
 //         id
 //       }
@@ -140,6 +128,19 @@ export const TOP_LPS_PER_PAIRS = gql`
 //     }
 //   }
 // `
+export const TOP_LPS_PER_PAIRS = gql`
+  query lps($pair: Bytes!) {
+    liquidityPositions(where: { pair: $pair }, orderBy: liquidityTokenBalance, orderDirection: desc, first: 10) {
+      user {
+        id
+      }
+      pair {
+        id
+      }
+      liquidityTokenBalance
+    }
+  }
+`
 export const HOURLY_PAIR_RATES = (pairAddress, blocks) => {
   let queryString = 'query blocks {'
   queryString += blocks.map(
@@ -185,6 +186,26 @@ export const SHARE_VALUE = (pairAddress, blocks) => {
   queryString += '}'
   return gql(queryString)
 }
+//changed query
+// export const ETH_PRICE = (block) => {
+//   const queryString = block
+//     ? `
+//     query bundle {
+//       bundle(id: ${BUNDLE_ID}) {
+//         id
+//         ethPrice
+//       }
+//     }
+//   `
+//     : ` query bundle {
+//       bundle(id: ${BUNDLE_ID}) {
+//         id
+//         ethPrice
+//       }
+//     }
+//   `
+//   return gql(queryString)
+// }
 
 export const ETH_PRICE = (block) => {
   const queryString = block
@@ -205,6 +226,17 @@ export const ETH_PRICE = (block) => {
   `
   return gql(queryString)
 }
+//changed query
+// export const USER = (block, account) => {
+//   const queryString = `
+//     query user {
+//       user(id: "${account}") {
+//         liquidityPositions
+//       }
+//     }
+// `
+//   return gql(queryString)
+// }
 
 export const USER = (block, account) => {
   const queryString = `
@@ -217,6 +249,39 @@ export const USER = (block, account) => {
   return gql(queryString)
 }
 
+//changed query
+// export const USER_MINTS_BUNRS_PER_PAIR = gql`
+//   query events($user: String!, $pair: String!) {
+//     mints(to: $user, pair: $pair) {
+//       amountUSD
+//       amount0
+//       amount1
+//       timestamp
+//       pair {
+//         token0 {
+//           id
+//         }
+//         token1 {
+//           id
+//         }
+//       }
+//     }
+//     burns(sender: $user, pair: $pair) {
+//       amountUSD
+//       amount0
+//       amount1
+//       timestamp
+//       pair {
+//         token0 {
+//           id
+//         }
+//         token1 {
+//           id
+//         }
+//       }
+//     }
+//   }
+// `
 export const USER_MINTS_BUNRS_PER_PAIR = gql`
   query events($user: Bytes!, $pair: Bytes!) {
     mints(where: { to: $user, pair: $pair }) {
@@ -258,6 +323,34 @@ export const USER_MINTS_BUNRS_PER_PAIR = gql`
 //   }
 // `
 
+//changed query
+// export const USER_HISTORY = gql`
+//   query snapshots($user: String!, $skip: Int!) {
+//     liquiditypositionsnapshots(first: 1000, skip: $skip, user: $user) {
+//       timestamp
+//       reserveUSD
+//       liquidityTokenBalance
+//       liquidityTokenTotalSupply
+//       reserve0
+//       reserve1
+//       token0PriceUSD
+//       token1PriceUSD
+//       pair {
+//         id
+//         reserve0
+//         reserve1
+//         reserveUSD
+//         token0 {
+//           id
+//         }
+//         token1 {
+//           id
+//         }
+//       }
+//     }
+//   }
+// `
+
 export const USER_HISTORY = gql`
   query snapshots($user: Bytes!, $skip: Int!) {
     liquidityPositionSnapshots(first: 1000, skip: $skip, where: { user: $user }) {
@@ -284,7 +377,30 @@ export const USER_HISTORY = gql`
     }
   }
 `
-
+// export const USER_POSITIONS = gql`
+//   query liquidityPositionsagainstuserId($user: String!) {
+//     liquidityPositionsagainstuserId(user: $user) {
+//       pair {
+//         id
+//         reserve0
+//         reserve1
+//         reserveUSD
+//         token0 {
+//           id
+//           symbol
+//           derivedETH
+//         }
+//         token1 {
+//           id
+//           symbol
+//           derivedETH
+//         }
+//         totalSupply
+//       }
+//       liquidityTokenBalance
+//     }
+//   }
+// `
 export const USER_POSITIONS = gql`
   query liquidityPositions($user: Bytes!) {
     liquidityPositions(where: { user: $user }) {
@@ -309,7 +425,76 @@ export const USER_POSITIONS = gql`
     }
   }
 `
-
+// export const USER_TRANSACTIONS = gql`
+//   query transactions($user: String!) {
+//     mints(to: $user) {
+//       id
+//       transaction {
+//         id
+//         timestamp
+//       }
+//       pair {
+//         id
+//         token0 {
+//           id
+//           symbol
+//         }
+//         token1 {
+//           id
+//           symbol
+//         }
+//       }
+//       to
+//       liquidity
+//       amount0
+//       amount1
+//       amountUSD
+//     }
+//     burns(sender: $user) {
+//       id
+//       transaction {
+//         id
+//         timestamp
+//       }
+//       pair {
+//         id
+//         token0 {
+//           symbol
+//         }
+//         token1 {
+//           symbol
+//         }
+//       }
+//       sender
+//       to
+//       liquidity
+//       amount0
+//       amount1
+//       amountUSD
+//     }
+//     swaps(to: $user) {
+//       id
+//       transaction {
+//         id
+//         timestamp
+//       }
+//       pair {
+//         token0 {
+//           symbol
+//         }
+//         token1 {
+//           symbol
+//         }
+//       }
+//       amount0In
+//       amount0Out
+//       amount1In
+//       amount1Out
+//       amountUSD
+//       to
+//     }
+//   }
+// `
 export const USER_TRANSACTIONS = gql`
   query transactions($user: Bytes!) {
     mints(orderBy: timestamp, orderDirection: desc, where: { to: $user }) {
@@ -670,27 +855,27 @@ export const PAIRS_CURRENT = gql`
   }
 `
 
-// export const PAIR_DATA = (pairAddress, block) => {
-//   const queryString = `
-//     ${PairFields}
-//     query pairs {
-//       pairs(${block ? `block: {number: ${block}}` : ``} where: { id: "${pairAddress}"} ) {
-//         ...PairFields
-//       }
-//     }`
-//   return gql(queryString)
-// }
-
 export const PAIR_DATA = (pairAddress, block) => {
   const queryString = `
     ${PairFields}
-    query pair ($id: String!){
-      pair(id: "${pairAddress}" ) {
+    query pairs {
+      pairs(${block ? `block: {number: ${block}}` : ``} where: { id: "${pairAddress}"} ) {
         ...PairFields
       }
     }`
   return gql(queryString)
 }
+
+// export const PAIR_DATA = (pairAddress, block) => {
+//   const queryString = `
+//     ${PairFields}
+//     query pair ($id: String!){
+//       pair(id: "${pairAddress}" ) {
+//         ...PairFields
+//       }
+//     }`
+//   return gql(queryString)
+// }
 // export const MINING_POSITIONS = (account) => {
 //   const queryString = `
 //     query users {
@@ -744,24 +929,9 @@ export const PAIRS_HISTORICAL_BULK = (block, pairs) => {
   `
   return gql(queryString)
 }
-export const TOKEN_CHART = gql`
-  query tokendaydatas($tokenAddr: String!, $skip: Int!) {
-    tokendaydatas(first: 1000, skip: $skip, id: $tokenAddr) {
-      id
-      date
-      priceUSD
-      totalLiquidityToken
-      totalLiquidityUSD
-      totalLiquidityETH
-      dailyVolumeETH
-      dailyVolumeToken
-      dailyVolumeUSD
-    }
-  }
-`
 // export const TOKEN_CHART = gql`
-//   query tokenDayDatas($tokenAddr: String!, $skip: Int!) {
-//     tokenDayDatas(first: 1000, skip: $skip, orderBy: date, orderDirection: asc, where: { token: $tokenAddr }) {
+//   query tokendaydatas($tokenAddr: String!, $skip: Int!) {
+//     tokendaydatas(first: 1000, skip: $skip, id: $tokenAddr) {
 //       id
 //       date
 //       priceUSD
@@ -774,6 +944,21 @@ export const TOKEN_CHART = gql`
 //     }
 //   }
 // `
+export const TOKEN_CHART = gql`
+  query tokenDayDatas($tokenAddr: String!, $skip: Int!) {
+    tokenDayDatas(first: 1000, skip: $skip, orderBy: date, orderDirection: asc, where: { token: $tokenAddr }) {
+      id
+      date
+      priceUSD
+      totalLiquidityToken
+      totalLiquidityUSD
+      totalLiquidityETH
+      dailyVolumeETH
+      dailyVolumeToken
+      dailyVolumeUSD
+    }
+  }
+`
 
 const TokenFields = `
   fragment TokenFields on Token {

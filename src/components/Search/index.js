@@ -184,7 +184,7 @@ export const Search = ({ small = false }) => {
     async function fetchData() {
       try {
         if (value?.length > 0) {
-          let tokens = await v2client.query({
+          let tokens = await client.query({
             query: TOKEN_SEARCH,
             variables: {
               value: value ? value.toUpperCase() : '',
@@ -192,7 +192,7 @@ export const Search = ({ small = false }) => {
             },
           })
 
-          let pairs = await v2client.query({
+          let pairs = await client.query({
             query: PAIR_SEARCH,
             variables: {
               tokens: tokens.data.asSymbol?.map((t) => t.id),

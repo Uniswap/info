@@ -224,7 +224,7 @@ async function getBulkPairData(pairList, ethPrice) {
           let data = pair
           let oneDayHistory = oneDayData?.[pair.id]
           if (!oneDayHistory) {
-            let newData = await v2client.query({
+            let newData = await client.query({
               query: PAIR_DATA(pair.id, b1),
               fetchPolicy: 'cache-first',
             })
@@ -232,7 +232,7 @@ async function getBulkPairData(pairList, ethPrice) {
           }
           let twoDayHistory = twoDayData?.[pair.id]
           if (!twoDayHistory) {
-            let newData = await v2client.query({
+            let newData = await client.query({
               query: PAIR_DATA(pair.id, b2),
               fetchPolicy: 'cache-first',
             })
@@ -240,7 +240,7 @@ async function getBulkPairData(pairList, ethPrice) {
           }
           let oneWeekHistory = oneWeekData?.[pair.id]
           if (!oneWeekHistory) {
-            let newData = await v2client.query({
+            let newData = await client.query({
               query: PAIR_DATA(pair.id, bWeek),
               fetchPolicy: 'cache-first',
             })
@@ -481,7 +481,7 @@ export function Updater() {
       // get top pairs by reserves
       let {
         data: { pairs },
-      } = await v2client.query({
+      } = await client.query({
         query: PAIRS_CURRENT,
         fetchPolicy: 'cache-first',
       })

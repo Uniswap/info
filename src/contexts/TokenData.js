@@ -337,7 +337,7 @@ const getTopTokens = async (ethPrice, ethPriceOld) => {
 
           // HOTFIX for Aave
           if (data.id === '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9') {
-            const aaveData = await v2client.query({
+            const aaveData = await client.query({
               query: PAIR_DATA('0xdfc14d2af169b0d36c4eff567ada9b2e0cae044f'),
               fetchPolicy: 'cache-first',
             })
@@ -473,7 +473,7 @@ const getTokenData = async (address, ethPrice, ethPriceOld) => {
 
     // HOTFIX for Aave
     if (data.id === '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9') {
-      const aaveData = await v2client.query({
+      const aaveData = await client.query({
         query: PAIR_DATA('0xdfc14d2af169b0d36c4eff567ada9b2e0cae044f'),
         fetchPolicy: 'cache-first',
       })
@@ -608,7 +608,7 @@ const getTokenChartData = async (tokenAddress) => {
     let allFound = false
     let skip = 0
     while (!allFound) {
-      let result = await v2client.query({
+      let result = await client.query({
         query: TOKEN_CHART,
         variables: {
           tokenAddr: tokenAddress,
