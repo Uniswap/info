@@ -4,6 +4,7 @@ import { HttpLink } from 'apollo-link-http'
 
 const domain = process.env.REACT_APP_GRAPH_DOMAIN
 
+// change here
 export const client = new ApolloClient({
   link: new HttpLink({
     uri: `${domain}/subgraphs/name/swap/exchange`,
@@ -36,9 +37,10 @@ export const stakingClient = new ApolloClient({
   shouldBatch: true,
 })
 
+// change here
 export const blockClient = new ApolloClient({
   link: new HttpLink({
-    uri: `${domain}/subgraphs/name/pancakeswap/blocks`,
+    uri: `${domain}/subgraphs/name/swap/blocks`,
   }),
   cache: new InMemoryCache(),
 })
