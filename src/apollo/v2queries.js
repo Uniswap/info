@@ -1,6 +1,7 @@
 import gql from 'graphql-tag'
 import { FACTORY_ADDRESS, BUNDLE_ID } from '../constants'
 
+const Factory_Address = "0c43750a82af3dfb01472b92c9c42011b3681d93632617e0fa2388752c4af869";
 export const SUBGRAPH_HEALTH = gql`
   query health {
     indexingStatusForCurrentVersion(subgraphName: "uniswap/uniswap-v2") {
@@ -20,7 +21,7 @@ export const SUBGRAPH_HEALTH = gql`
 
 //ok
 //changed query
-export const PRICES_BY_BLOCK = (tokenAddress, blocks) => {
+export const PRICES_BY_BLOCK2 = (tokenAddress, blocks) => {
   let queryString = 'query blocks {'
   queryString += blocks.map(
     (block) => `
@@ -377,7 +378,7 @@ export const GLOBAL_CHART = gql`
 //changed query
 export const GLOBAL_DATA = (block) => {
   const queryString = ` query uniswapfactory {
-    uniswapfactory(id: "${FACTORY_ADDRESS}") {
+    uniswapfactory(id: "${Factory_Address}") {
         id
         totalVolumeUSD
         totalVolumeETH
@@ -460,7 +461,7 @@ export const GLOBAL_TXNS = gql`
 `
 //Ok
 //changed query
-export const ALL_TOKENS = gql`
+export const ALL_TOKENS2 = gql`
   query tokens($skip: Int!) {
     tokens(first: 500, skip: $skip) {
       id
@@ -543,7 +544,7 @@ export const PAIR_SEARCH = gql`
 //Ok
 //orderBy: trackedReserveETH, orderDirection: desc
 //changed query
-export const ALL_PAIRS = gql`
+export const ALL_PAIRS2 = gql`
   query pairs($skip: Int!) {
     pairs(first: 500, skip: $skip) {
       id
@@ -604,15 +605,19 @@ export const PAIRS_CURRENT = gql`
 `
 //Ok
 //changed query
-export const PAIR_DATA = (pairAddress, block) => {
-  const queryString = `
-    ${PairFields}
-    query pairbyId {
-      pairbyId(id: "${pairAddress}" ) {
-        ...PairFields
-      }
-    }`
+export const PAIR_DATA2 = (pairAddress, block) => {
+
+  let pairString = `"${pairAddress}"`
+  let queryString = `
+  ${PairFields}
+  query pairbyId {
+    pairbyId(id: ${pairString} ) {
+      ...PairFields
+    }
+  }
+  `
   return gql(queryString)
+
 }
 
 //Ok
@@ -631,14 +636,16 @@ export const PAIRS_BULK = gql`
 //orderBy: trackedReserveETH, orderDirection: desc
 //changed query
 export const PAIRS_HISTORICAL_BULK = (block, pairs) => {
+
   let pairsString = `[`
   pairs.map((pair) => {
-    return (pairsString += `"${pair}"`)
+    return (pairsString += `"${pair}",`)
   })
   pairsString += ']'
+  // console.log("pairsString", pairsString);
   let queryString = `
-  query pairsbyid {
-    pairsbyid(first: 200, id: ${pairsString} ) {
+  query pairsbyId {
+    pairsbyId(first: 200, id: ${pairsString} ) {
       id
       reserveUSD
       trackedReserveETH
@@ -653,7 +660,7 @@ export const PAIRS_HISTORICAL_BULK = (block, pairs) => {
 //ok
 //orderBy: date, orderDirection: asc,
 //changed query
-export const TOKEN_CHART = gql`
+export const TOKEN_CHART2 = gql`
   query tokendaydatas($tokenAddr: String!, $skip: Int!) {
     tokendaydatas(first: 1000, skip: $skip, token: $tokenAddr) {
       id
@@ -686,8 +693,8 @@ const TokenFields = `
 //Ok
 //orderBy: totalLiquidityUSD, orderDirection: desc
 //changed query
-export const TOKEN_TOP_DAY_DATAS = gql`
-  query tokendaydatasbydate($date: Int) {
+export const TOKEN_TOP_DAY_DATAS2 = gql`
+  query tokendaydatasbydate($date: String) {
     tokendaydatasbydate(first: 50, date: $date) {
       id
       date
@@ -697,12 +704,14 @@ export const TOKEN_TOP_DAY_DATAS = gql`
 
 //Ok
 //changed query
-export const TOKENS_HISTORICAL_BULK = (tokens, block) => {
+export const TOKENS_HISTORICAL_BULK2 = (tokens, block) => {
+  // console.log("tokens", tokens);
   let tokenString = `[`
   tokens.map((token) => {
     return (tokenString += `"${token}",`)
   })
   tokenString += ']'
+  // console.log("tokenString", tokenString);
   let queryString = `
   query tokensbyId {
     tokensbyId(first: 50,id: ${tokenString} ) {
@@ -724,7 +733,7 @@ export const TOKENS_HISTORICAL_BULK = (tokens, block) => {
 //Ok
 //orderBy: reserveUSD, orderDirection: desc
 //changed query
-export const TOKEN_DATA = (tokenAddress, block) => {
+export const TOKEN_DATA2 = (tokenAddress, block) => {
   const queryString = `
     ${TokenFields}
     query tokens {

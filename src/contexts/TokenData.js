@@ -10,6 +10,15 @@ import {
   PAIR_DATA,
   TOKENS_HISTORICAL_BULK,
 } from '../apollo/queries'
+import {
+  TOKEN_DATA2,
+  // FILTERED_TRANSACTIONS2,
+  TOKEN_CHART2,
+  TOKEN_TOP_DAY_DATAS2,
+  PRICES_BY_BLOCK2,
+  PAIR_DATA2,
+  TOKENS_HISTORICAL_BULK2,
+} from '../apollo/v2queries'
 
 import { useEthPrice } from './GlobalData'
 
@@ -224,135 +233,158 @@ const getTopTokens = async (ethPrice, ethPriceOld) => {
   const utcCurrentTime = dayjs()
   const utcOneDayBack = utcCurrentTime.subtract(1, 'day').unix()
   const utcTwoDaysBack = utcCurrentTime.subtract(2, 'day').unix()
-  let oneDayBlock = await getBlockFromTimestamp(utcOneDayBack)
-  let twoDayBlock = await getBlockFromTimestamp(utcTwoDaysBack)
+  // let oneDayBlock = await getBlockFromTimestamp(utcOneDayBack)
+  // let twoDayBlock = await getBlockFromTimestamp(utcTwoDaysBack)
 
   try {
     // need to get the top tokens by liquidity by need token day datas
-    const currentDate = parseInt(Date.now() / 86400 / 1000) * 86400 - 86400
-
-    let tokenids = await client.query({
-      query: TOKEN_TOP_DAY_DATAS,
+    // const currentDate = parseInt(Date.now() / 86400 / 1000) * 86400 - 86400
+    // console.log(currentDate);
+    const date = "1636464775865.0002";
+    // console.log(date);
+    // let tokenids = await client.query({
+    //   query: TOKEN_TOP_DAY_DATAS,
+    //   fetchPolicy: 'network-only',
+    //   variables: { date: currentDate },
+    // })
+    let tokenids2 = await v2client.query({
+      query: TOKEN_TOP_DAY_DATAS2,
       fetchPolicy: 'network-only',
-      variables: { date: currentDate },
+      variables: { date: date },
     })
 
-    const ids = tokenids?.data?.tokenDayDatas?.reduce((accum, entry) => {
-      accum.push(entry.id.slice(0, 42))
+    // console.log("tokenids", tokenids);
+    // console.log("tokenids2", tokenids2);
+    // const ids = tokenids?.data?.tokenDayDatas?.reduce((accum, entry) => {
+    //   accum.push(entry.id.slice(0, 42))
+    //   return accum
+    // }, [])
+    const ids2 = tokenids2?.data?.tokendaydatasbydate?.reduce((accum, entry) => {
+      accum.push(entry.id.slice(0, 64))
       return accum
     }, [])
+    // console.log("ids", ids);
+    // console.log("ids2", ids2);
 
-    let current = await client.query({
-      query: TOKENS_HISTORICAL_BULK(ids),
+    // let current = await client.query({
+    //   query: TOKENS_HISTORICAL_BULK(ids),
+    //   fetchPolicy: 'cache-first',
+    // })
+    // console.log("Current", current);
+
+    let current2 = await v2client.query({
+      query: TOKENS_HISTORICAL_BULK2(ids2),
       fetchPolicy: 'cache-first',
     })
+    // console.log("Current", current2);
+    // let oneDayResult = await client.query({
+    //   query: TOKENS_HISTORICAL_BULK(ids, oneDayBlock),
+    //   fetchPolicy: 'cache-first',
+    // })
 
-    let oneDayResult = await client.query({
-      query: TOKENS_HISTORICAL_BULK(ids, oneDayBlock),
-      fetchPolicy: 'cache-first',
-    })
+    // let twoDayResult = await client.query({
+    //   query: TOKENS_HISTORICAL_BULK(ids, twoDayBlock),
+    //   fetchPolicy: 'cache-first',
+    // })
 
-    let twoDayResult = await client.query({
-      query: TOKENS_HISTORICAL_BULK(ids, twoDayBlock),
-      fetchPolicy: 'cache-first',
-    })
-
-    let oneDayData = oneDayResult?.data?.tokens.reduce((obj, cur, i) => {
-      return { ...obj, [cur.id]: cur }
-    }, {})
-
-    let twoDayData = twoDayResult?.data?.tokens.reduce((obj, cur, i) => {
-      return { ...obj, [cur.id]: cur }
-    }, {})
+    //     let oneDayData = oneDayResult?.data?.tokens.reduce((obj, cur, i) => {
+    //       return { ...obj, [cur.id]: cur }
+    //     }, {})
+    // console.log();
+    //     let twoDayData = twoDayResult?.data?.tokens.reduce((obj, cur, i) => {
+    //       return { ...obj, [cur.id]: cur }
+    //     }, {})
 
     let bulkResults = await Promise.all(
-      current &&
-        oneDayData &&
-        twoDayData &&
-        current?.data?.tokens.map(async (token) => {
-          let data = token
+      current2 &&
+      // oneDayData &&
+      // twoDayData &&
+      current2?.data?.tokensbyId.map(async (token) => {
+        let data = token
 
-          // let liquidityDataThisToken = liquidityData?.[token.id]
-          let oneDayHistory = oneDayData?.[token.id]
-          let twoDayHistory = twoDayData?.[token.id]
+        // let liquidityDataThisToken = liquidityData?.[token.id]
+        // let oneDayHistory = oneDayData?.[token.id]
+        // let twoDayHistory = twoDayData?.[token.id]
 
-          // catch the case where token wasnt in top list in previous days
-          if (!oneDayHistory) {
-            let oneDayResult = await client.query({
-              query: TOKEN_DATA(token.id, oneDayBlock),
-              fetchPolicy: 'cache-first',
-            })
-            oneDayHistory = oneDayResult.data.tokens[0]
-          }
-          if (!twoDayHistory) {
-            let twoDayResult = await client.query({
-              query: TOKEN_DATA(token.id, twoDayBlock),
-              fetchPolicy: 'cache-first',
-            })
-            twoDayHistory = twoDayResult.data.tokens[0]
-          }
+        // catch the case where token wasnt in top list in previous days
+        // if (!oneDayHistory) {
+        //   let oneDayResult = await client.query({
+        //     query: TOKEN_DATA(token.id, oneDayBlock),
+        //     fetchPolicy: 'cache-first',
+        //   })
+        //   oneDayHistory = oneDayResult.data.tokens[0]
+        // }
+        // if (!twoDayHistory) {
+        //   let twoDayResult = await client.query({
+        //     query: TOKEN_DATA(token.id, twoDayBlock),
+        //     fetchPolicy: 'cache-first',
+        //   })
+        //   twoDayHistory = twoDayResult.data.tokens[0]
+        // }
 
-          // calculate percentage changes and daily changes
-          const [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentChange(
-            data.tradeVolumeUSD,
-            oneDayHistory?.tradeVolumeUSD ?? 0,
-            twoDayHistory?.tradeVolumeUSD ?? 0
-          )
-          const [oneDayTxns, txnChange] = get2DayPercentChange(
-            data.txCount,
-            oneDayHistory?.txCount ?? 0,
-            twoDayHistory?.txCount ?? 0
-          )
+        // calculate percentage changes and daily changes
+        // const [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentChange(
+        //   data.tradeVolumeUSD,
+        //   oneDayHistory?.tradeVolumeUSD ?? 0,
+        //   twoDayHistory?.tradeVolumeUSD ?? 0
+        // )
+        // const [oneDayTxns, txnChange] = get2DayPercentChange(
+        //   data.txCount,
+        //   oneDayHistory?.txCount ?? 0,
+        //   twoDayHistory?.txCount ?? 0
+        // )
 
-          const currentLiquidityUSD = data?.totalLiquidity * ethPrice * data?.derivedETH
-          const oldLiquidityUSD = oneDayHistory?.totalLiquidity * ethPriceOld * oneDayHistory?.derivedETH
+        const currentLiquidityUSD = data?.totalLiquidity * ethPrice * data?.derivedETH
+        // const oldLiquidityUSD = oneDayHistory?.totalLiquidity * ethPriceOld * oneDayHistory?.derivedETH
 
-          // percent changes
-          const priceChangeUSD = getPercentChange(
-            data?.derivedETH * ethPrice,
-            oneDayHistory?.derivedETH ? oneDayHistory?.derivedETH * ethPriceOld : 0
-          )
+        // percent changes
+        // const priceChangeUSD = getPercentChange(
+        //   data?.derivedETH * ethPrice,
+        //   oneDayHistory?.derivedETH ? oneDayHistory?.derivedETH * ethPriceOld : 0
+        // )
 
-          // set data
-          data.priceUSD = data?.derivedETH * ethPrice
-          data.totalLiquidityUSD = currentLiquidityUSD
-          data.oneDayVolumeUSD = parseFloat(oneDayVolumeUSD)
-          data.volumeChangeUSD = volumeChangeUSD
-          data.priceChangeUSD = priceChangeUSD
-          data.liquidityChangeUSD = getPercentChange(currentLiquidityUSD ?? 0, oldLiquidityUSD ?? 0)
-          data.oneDayTxns = oneDayTxns
-          data.txnChange = txnChange
+        // set data
+        data.priceUSD = data?.derivedETH * ethPrice
+        data.totalLiquidityUSD = currentLiquidityUSD
+        // data.oneDayVolumeUSD = parseFloat(oneDayVolumeUSD)
+        // data.volumeChangeUSD = volumeChangeUSD
+        // data.priceChangeUSD = priceChangeUSD
+        // data.liquidityChangeUSD = getPercentChange(currentLiquidityUSD ?? 0, oldLiquidityUSD ?? 0)
+        // data.oneDayTxns = oneDayTxns
+        // data.txnChange = txnChange
 
-          // new tokens
-          if (!oneDayHistory && data) {
-            data.oneDayVolumeUSD = data.tradeVolumeUSD
-            data.oneDayVolumeETH = data.tradeVolume * data.derivedETH
-            data.oneDayTxns = data.txCount
-          }
+        // new tokens
+        // if (!oneDayHistory && data) {
+        //   data.oneDayVolumeUSD = data.tradeVolumeUSD
+        //   data.oneDayVolumeETH = data.tradeVolume * data.derivedETH
+        //   data.oneDayTxns = data.txCount
+        // }
 
-          // update name data for
-          updateNameData({
-            token0: data,
-          })
-
-          // HOTFIX for Aave
-          if (data.id === '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9') {
-            const aaveData = await client.query({
-              query: PAIR_DATA('0xdfc14d2af169b0d36c4eff567ada9b2e0cae044f'),
-              fetchPolicy: 'cache-first',
-            })
-            const result = aaveData.data.pairs[0]
-            data.totalLiquidityUSD = parseFloat(result.reserveUSD) / 2
-            data.liquidityChangeUSD = 0
-            data.priceChangeUSD = 0
-          }
-
-          // used for custom adjustments
-          data.oneDayData = oneDayHistory
-          data.twoDayData = twoDayHistory
-
-          return data
+        // update name data for
+        updateNameData({
+          token0: data,
         })
+
+        // HOTFIX for Aave
+        if (data.id === '1c5aa6218dc7f5c90571c21098a961d727db1d307bbd317ebdc6c69d6ed27faa') {
+          const aaveData = await v2client.query({
+            query: PAIR_DATA2('7a9f9108bf97fc357aa33b6f7eb800ee66e15e7d9cc1b87e0cb5687b72e119e5'),
+            fetchPolicy: 'cache-first',
+          })
+          // console.log("aaveData", aaveData);
+          const result = aaveData.data.pairbyId[0]
+          // console.log("result", result);
+          data.totalLiquidityUSD = parseFloat(result.reserveUSD) / 2
+          data.liquidityChangeUSD = 0
+          data.priceChangeUSD = 0
+        }
+
+        // used for custom adjustments
+        // data.oneDayData = oneDayHistory
+        // data.twoDayData = twoDayHistory
+
+        return data
+      })
     )
 
     return bulkResults
@@ -367,104 +399,105 @@ const getTokenData = async (address, ethPrice, ethPriceOld) => {
   const utcCurrentTime = dayjs()
   const utcOneDayBack = utcCurrentTime.subtract(1, 'day').startOf('minute').unix()
   const utcTwoDaysBack = utcCurrentTime.subtract(2, 'day').startOf('minute').unix()
-  let oneDayBlock = await getBlockFromTimestamp(utcOneDayBack)
-  let twoDayBlock = await getBlockFromTimestamp(utcTwoDaysBack)
+  // let oneDayBlock = await getBlockFromTimestamp(utcOneDayBack)
+  // let twoDayBlock = await getBlockFromTimestamp(utcTwoDaysBack)
 
   // initialize data arrays
   let data = {}
-  let oneDayData = {}
-  let twoDayData = {}
+  // let oneDayData = {}
+  // let twoDayData = {}
 
   try {
     // fetch all current and historical data
-    let result = await client.query({
-      query: TOKEN_DATA(address),
+    let result = await v2client.query({
+      query: TOKEN_DATA2(address),
       fetchPolicy: 'cache-first',
     })
+    console.log("Token_data", result);
     data = result?.data?.tokens?.[0]
 
     // get results from 24 hours in past
-    let oneDayResult = await client.query({
-      query: TOKEN_DATA(address, oneDayBlock),
-      fetchPolicy: 'cache-first',
-    })
-    oneDayData = oneDayResult.data.tokens[0]
+    // let oneDayResult = await client.query({
+    //   query: TOKEN_DATA(address, oneDayBlock),
+    //   fetchPolicy: 'cache-first',
+    // })
+    // oneDayData = oneDayResult.data.tokens[0]
 
-    // get results from 48 hours in past
-    let twoDayResult = await client.query({
-      query: TOKEN_DATA(address, twoDayBlock),
-      fetchPolicy: 'cache-first',
-    })
-    twoDayData = twoDayResult.data.tokens[0]
+    // // get results from 48 hours in past
+    // let twoDayResult = await client.query({
+    //   query: TOKEN_DATA(address, twoDayBlock),
+    //   fetchPolicy: 'cache-first',
+    // })
+    // twoDayData = twoDayResult.data.tokens[0]
 
     // catch the case where token wasnt in top list in previous days
-    if (!oneDayData) {
-      let oneDayResult = await client.query({
-        query: TOKEN_DATA(address, oneDayBlock),
-        fetchPolicy: 'cache-first',
-      })
-      oneDayData = oneDayResult.data.tokens[0]
-    }
-    if (!twoDayData) {
-      let twoDayResult = await client.query({
-        query: TOKEN_DATA(address, twoDayBlock),
-        fetchPolicy: 'cache-first',
-      })
-      twoDayData = twoDayResult.data.tokens[0]
-    }
+    // if (!oneDayData) {
+    //   let oneDayResult = await client.query({
+    //     query: TOKEN_DATA(address, oneDayBlock),
+    //     fetchPolicy: 'cache-first',
+    //   })
+    //   oneDayData = oneDayResult.data.tokens[0]
+    // }
+    // if (!twoDayData) {
+    //   let twoDayResult = await client.query({
+    //     query: TOKEN_DATA(address, twoDayBlock),
+    //     fetchPolicy: 'cache-first',
+    //   })
+    //   twoDayData = twoDayResult.data.tokens[0]
+    // }
 
     // calculate percentage changes and daily changes
-    const [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentChange(
-      data.tradeVolumeUSD,
-      oneDayData?.tradeVolumeUSD ?? 0,
-      twoDayData?.tradeVolumeUSD ?? 0
-    )
+    // const [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentChange(
+    //   data.tradeVolumeUSD,
+    //   oneDayData?.tradeVolumeUSD ?? 0,
+    //   twoDayData?.tradeVolumeUSD ?? 0
+    // )
 
     // calculate percentage changes and daily changes
-    const [oneDayVolumeUT, volumeChangeUT] = get2DayPercentChange(
-      data.untrackedVolumeUSD,
-      oneDayData?.untrackedVolumeUSD ?? 0,
-      twoDayData?.untrackedVolumeUSD ?? 0
-    )
+    // const [oneDayVolumeUT, volumeChangeUT] = get2DayPercentChange(
+    //   data.untrackedVolumeUSD,
+    //   oneDayData?.untrackedVolumeUSD ?? 0,
+    //   twoDayData?.untrackedVolumeUSD ?? 0
+    // )
 
     // calculate percentage changes and daily changes
-    const [oneDayTxns, txnChange] = get2DayPercentChange(
-      data.txCount,
-      oneDayData?.txCount ?? 0,
-      twoDayData?.txCount ?? 0
-    )
+    // const [oneDayTxns, txnChange] = get2DayPercentChange(
+    //   data.txCount,
+    //   oneDayData?.txCount ?? 0,
+    //   twoDayData?.txCount ?? 0
+    // )
 
-    const priceChangeUSD = getPercentChange(
-      data?.derivedETH * ethPrice,
-      parseFloat(oneDayData?.derivedETH ?? 0) * ethPriceOld
-    )
+    // const priceChangeUSD = getPercentChange(
+    //   data?.derivedETH * ethPrice,
+    //   parseFloat(oneDayData?.derivedETH ?? 0) * ethPriceOld
+    // )
 
     const currentLiquidityUSD = data?.totalLiquidity * ethPrice * data?.derivedETH
-    const oldLiquidityUSD = oneDayData?.totalLiquidity * ethPriceOld * oneDayData?.derivedETH
+    // const oldLiquidityUSD = oneDayData?.totalLiquidity * ethPriceOld * oneDayData?.derivedETH
 
     // set data
     data.priceUSD = data?.derivedETH * ethPrice
     data.totalLiquidityUSD = currentLiquidityUSD
-    data.oneDayVolumeUSD = oneDayVolumeUSD
-    data.volumeChangeUSD = volumeChangeUSD
-    data.priceChangeUSD = priceChangeUSD
-    data.oneDayVolumeUT = oneDayVolumeUT
-    data.volumeChangeUT = volumeChangeUT
-    const liquidityChangeUSD = getPercentChange(currentLiquidityUSD ?? 0, oldLiquidityUSD ?? 0)
-    data.liquidityChangeUSD = liquidityChangeUSD
-    data.oneDayTxns = oneDayTxns
-    data.txnChange = txnChange
+    // data.oneDayVolumeUSD = oneDayVolumeUSD
+    // data.volumeChangeUSD = volumeChangeUSD
+    // data.priceChangeUSD = priceChangeUSD
+    // data.oneDayVolumeUT = oneDayVolumeUT
+    // data.volumeChangeUT = volumeChangeUT
+    // const liquidityChangeUSD = getPercentChange(currentLiquidityUSD ?? 0, oldLiquidityUSD ?? 0)
+    // data.liquidityChangeUSD = liquidityChangeUSD
+    // data.oneDayTxns = oneDayTxns
+    // data.txnChange = txnChange
 
     // used for custom adjustments
-    data.oneDayData = oneDayData?.[address]
-    data.twoDayData = twoDayData?.[address]
+    // data.oneDayData = oneDayData?.[address]
+    // data.twoDayData = twoDayData?.[address]
 
     // new tokens
-    if (!oneDayData && data) {
-      data.oneDayVolumeUSD = data.tradeVolumeUSD
-      data.oneDayVolumeETH = data.tradeVolume * data.derivedETH
-      data.oneDayTxns = data.txCount
-    }
+    // if (!oneDayData && data) {
+    //   data.oneDayVolumeUSD = data.tradeVolumeUSD
+    //   data.oneDayVolumeETH = data.tradeVolume * data.derivedETH
+    //   data.oneDayTxns = data.txCount
+    // }
 
     // update name data for
     updateNameData({
@@ -472,12 +505,13 @@ const getTokenData = async (address, ethPrice, ethPriceOld) => {
     })
 
     // HOTFIX for Aave
-    if (data.id === '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9') {
-      const aaveData = await client.query({
-        query: PAIR_DATA('0xdfc14d2af169b0d36c4eff567ada9b2e0cae044f'),
+    if (data.id === '1c5aa6218dc7f5c90571c21098a961d727db1d307bbd317ebdc6c69d6ed27faa') {
+      const aaveData = await v2client.query({
+        query: PAIR_DATA2('7a9f9108bf97fc357aa33b6f7eb800ee66e15e7d9cc1b87e0cb5687b72e119e5'),
         fetchPolicy: 'cache-first',
       })
-      const result = aaveData.data.pairs[0]
+      const result = aaveData.data.pairbyId[0]
+      // console.log("result", result);
       data.totalLiquidityUSD = parseFloat(result.reserveUSD) / 2
       data.liquidityChangeUSD = 0
       data.priceChangeUSD = 0
@@ -510,10 +544,11 @@ const getTokenTransactions = async (allPairsFormatted) => {
 const getTokenPairs = async (tokenAddress) => {
   try {
     // fetch all current and historical data
-    let result = await client.query({
-      query: TOKEN_DATA(tokenAddress),
+    let result = await v2client.query({
+      query: TOKEN_DATA2(tokenAddress),
       fetchPolicy: 'cache-first',
     })
+    console.log("Token_data", result);
     return result.data?.['pairs0'].concat(result.data?.['pairs1'])
   } catch (e) {
     console.log(e)
@@ -553,8 +588,8 @@ const getIntervalTokenData = async (tokenAddress, startTime, interval = 3600, la
       })
     }
 
-    let result = await splitQuery(PRICES_BY_BLOCK, client, [tokenAddress], blocks, 50)
-
+    let result = await splitQuery(PRICES_BY_BLOCK2, v2client, [tokenAddress], blocks, 50)
+    console.log("result", result);
     // format token ETH price results
     let values = []
     for (var row in result) {
@@ -607,19 +642,20 @@ const getTokenChartData = async (tokenAddress) => {
     let allFound = false
     let skip = 0
     while (!allFound) {
-      let result = await client.query({
-        query: TOKEN_CHART,
+      let result = await v2client.query({
+        query: TOKEN_CHART2,
         variables: {
           tokenAddr: tokenAddress,
           skip,
         },
         fetchPolicy: 'cache-first',
       })
-      if (result.data.tokenDayDatas.length < 1000) {
+      console.log("token_chart", result);
+      if (result.data.tokendaydatas.length < 1000) {
         allFound = true
       }
       skip += 1000
-      data = data.concat(result.data.tokenDayDatas)
+      data = data.concat(result.data.tokendaydatas)
     }
 
     let dayIndexSet = new Set()
@@ -753,9 +789,9 @@ export function useTokenDataCombined(tokenAddresses) {
           if (res) {
             const newVolume = res
               ? res?.reduce(function (acc, entry) {
-                  acc = acc + parseFloat(entry.oneDayVolumeUSD)
-                  return acc
-                }, 0)
+                acc = acc + parseFloat(entry.oneDayVolumeUSD)
+                return acc
+              }, 0)
               : 0
             updateCombinedVolume(newVolume)
           }
@@ -774,7 +810,6 @@ export function useTokenDataCombined(tokenAddresses) {
 
 export function useTokenChartDataCombined(tokenAddresses) {
   const [state, { updateChartData }] = useTokenDataContext()
-
   const datas = useMemo(() => {
     return (
       tokenAddresses &&

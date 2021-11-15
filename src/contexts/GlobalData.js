@@ -19,6 +19,15 @@ import {
   ALL_TOKENS,
   TOP_LPS_PER_PAIRS,
 } from '../apollo/queries'
+import {
+  // GLOBAL_DATA2,
+  // GLOBAL_TXNS2,
+  // GLOBAL_CHART2,
+  // ETH_PRICE2,
+  ALL_PAIRS2,
+  ALL_TOKENS2,
+  // TOP_LPS_PER_PAIRS2,
+} from '../apollo/v2queries'
 import weekOfYear from 'dayjs/plugin/weekOfYear'
 import { useAllPairData } from './PairData'
 import { useTokenChartDataCombined } from './TokenData'
@@ -32,14 +41,16 @@ const UPDATE_ALL_TOKENS_IN_UNISWAP = 'UPDATE_ALL_TOKENS_IN_UNISWAP'
 const UPDATE_TOP_LPS = 'UPDATE_TOP_LPS'
 
 const offsetVolumes = [
-  '0x9ea3b5b4ec044b70375236a281986106457b20ef',
-  '0x05934eba98486693aaec2d00b0e9ce918e37dc3f',
-  '0x3d7e683fc9c86b4d653c9e47ca12517440fad14e',
-  '0xfae9c647ad7d89e738aba720acf09af93dc535f7',
-  '0x7296368fe9bcb25d3ecc19af13655b907818cc09',
+  '1c5aa6218dc7f5c90571c21098a961d727db1d307bbd317ebdc6c69d6ed27faa',
+  'fca1efeb1b2a642fb817680e48c57eb57043032cf3cb2edfe72ad5c698e01247',
+  // '0x9ea3b5b4ec044b70375236a281986106457b20ef',
+  // '0x05934eba98486693aaec2d00b0e9ce918e37dc3f',
+  // '0x3d7e683fc9c86b4d653c9e47ca12517440fad14e',
+  // '0xfae9c647ad7d89e738aba720acf09af93dc535f7',
+  // '0x7296368fe9bcb25d3ecc19af13655b907818cc09',
 ]
 
-/// format dayjs with the libraries that we need
+// format dayjs with the libraries that we need
 dayjs.extend(utc)
 dayjs.extend(weekOfYear)
 
@@ -509,13 +520,14 @@ async function getAllPairsOnUniswap() {
     let pairs = []
     let skipCount = 0
     while (!allFound) {
-      let result = await client.query({
-        query: ALL_PAIRS,
+      let result = await v2client.query({
+        query: ALL_PAIRS2,
         variables: {
           skip: skipCount,
         },
         fetchPolicy: 'cache-first',
       })
+      console.log("all_pairs", result);
       skipCount = skipCount + PAIRS_TO_FETCH
       pairs = pairs.concat(result?.data?.pairs)
       if (result?.data?.pairs.length < PAIRS_TO_FETCH || pairs.length > PAIRS_TO_FETCH) {
@@ -537,13 +549,14 @@ async function getAllTokensOnUniswap() {
     let skipCount = 0
     let tokens = []
     while (!allFound) {
-      let result = await client.query({
-        query: ALL_TOKENS,
+      let result = await v2client.query({
+        query: ALL_TOKENS2,
         variables: {
           skip: skipCount,
         },
         fetchPolicy: 'cache-first',
       })
+      console.log("result", result);
       tokens = tokens.concat(result?.data?.tokens)
       if (result?.data?.tokens?.length < TOKENS_TO_FETCH || tokens.length > TOKENS_TO_FETCH) {
         allFound = true
