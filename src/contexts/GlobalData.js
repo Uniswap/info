@@ -39,7 +39,7 @@ const offsetVolumes = [
   '0x7296368fe9bcb25d3ecc19af13655b907818cc09',
 ]
 
-// format dayjs with the libraries that we need
+/// format dayjs with the libraries that we need
 dayjs.extend(utc)
 dayjs.extend(weekOfYear)
 
@@ -708,7 +708,7 @@ export function useTopLps() {
             if (results) {
               return results.liquidityPositions
             }
-          } catch (e) {}
+          } catch (e) { }
         })
       )
 
