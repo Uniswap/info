@@ -553,8 +553,7 @@ const getIntervalTokenData = async (tokenAddress, startTime, interval = 3600, la
       })
     }
 
-    let result = []
-    //await splitQuery(PRICES_BY_BLOCK, client, [tokenAddress], blocks, 50)
+    let result = await splitQuery(PRICES_BY_BLOCK, client, [tokenAddress], blocks, 50)
 
     // format token ETH price results
     let values = []

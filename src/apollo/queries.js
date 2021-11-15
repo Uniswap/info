@@ -1,5 +1,6 @@
 import gql from 'graphql-tag'
 import { FACTORY_ADDRESS, BUNDLE_ID } from '../constants'
+import { usePairTransactions } from '../contexts/PairData'
 
 export const SUBGRAPH_HEALTH = gql`
   query health {
@@ -92,27 +93,27 @@ export const SUBGRAPH_HEALTH = gql`
 //   return gql(queryString)
 // }
 
-// export const PRICES_BY_BLOCK = (tokenAddress, blocks) => {
-//   let queryString = 'query blocks {'
-//   queryString += blocks.map(
-//     (block) => `
-//       t${block.timestamp}:token(id:"${tokenAddress}", block: { number: ${block.number} }) {
-//         derivedETH
-//       }
-//     `
-//   )
-//   queryString += ','
-//   queryString += blocks.map(
-//     (block) => `
-//       b${block.timestamp}: bundle(id:"1", block: { number: ${block.number} }) {
-//         ethPrice
-//       }
-//     `
-//   )
+export const PRICES_BY_BLOCK = (tokenAddress, blocks) => {
+  let queryString = 'query blocks {'
+  queryString += blocks.map(
+    (block) => `
+      t${block.timestamp}:token(id:"${tokenAddress}", block: { number: ${block.number} }) {
+        derivedETH
+      }
+    `
+  )
+  queryString += ','
+  queryString += blocks.map(
+    (block) => `
+      b${block.timestamp}: bundle(id:"1", block: { number: ${block.number} }) {
+        ethPrice
+      }
+    `
+  )
 
-//   queryString += '}'
-//   return gql(queryString)
-// }
+  queryString += '}'
+  return gql(queryString)
+}
 
 //changed query
 // export const TOP_LPS_PER_PAIRS = gql`
@@ -427,74 +428,77 @@ export const USER_POSITIONS = gql`
 `
 // export const USER_TRANSACTIONS = gql`
 //   query transactions($user: String!) {
-//     mints(to: $user) {
-//       id
-//       transaction {
+//   transactions(user: $user)
+//   {
+//       mints[{
 //         id
-//         timestamp
-//       }
-//       pair {
-//         id
-//         token0 {
+//         transaction {
 //           id
-//           symbol
+//           timestamp
 //         }
-//         token1 {
+//         pair {
 //           id
-//           symbol
+//           token0 {
+//             id
+//             symbol
+//           }
+//           token1 {
+//             id
+//             symbol
+//           }
 //         }
-//       }
-//       to
-//       liquidity
-//       amount0
-//       amount1
-//       amountUSD
-//     }
-//     burns(sender: $user) {
-//       id
-//       transaction {
+//         to
+//         liquidity
+//         amount0
+//         amount1
+//         amountUSD
+//       }]
+//       burns[{
 //         id
-//         timestamp
-//       }
-//       pair {
+//         transaction {
+//           id
+//           timestamp
+//         }
+//         pair {
+//           id
+//           token0 {
+//             symbol
+//           }
+//           token1 {
+//             symbol
+//           }
+//         }
+//         sender
+//         to
+//         liquidity
+//         amount0
+//         amount1
+//         amountUSD
+//       }]
+//       swaps[{
 //         id
-//         token0 {
-//           symbol
+//         transaction {
+//           id
+//           timestamp
 //         }
-//         token1 {
-//           symbol
+//         pair {
+//           token0 {
+//             symbol
+//           }
+//           token1 {
+//             symbol
+//           }
 //         }
-//       }
-//       sender
-//       to
-//       liquidity
-//       amount0
-//       amount1
-//       amountUSD
-//     }
-//     swaps(to: $user) {
-//       id
-//       transaction {
-//         id
-//         timestamp
-//       }
-//       pair {
-//         token0 {
-//           symbol
-//         }
-//         token1 {
-//           symbol
-//         }
-//       }
-//       amount0In
-//       amount0Out
-//       amount1In
-//       amount1Out
-//       amountUSD
-//       to
+//         amount0In
+//         amount0Out
+//         amount1In
+//         amount1Out
+//         amountUSD
+//         to
+//       }]
 //     }
 //   }
-// `
+//   `
 export const USER_TRANSACTIONS = gql`
   query transactions($user: Bytes!) {
     mints(orderBy: timestamp, orderDirection: desc, where: { to: $user }) {
@@ -1069,7 +1073,23 @@ export const TOKENS_HISTORICAL_BULK = (tokens, block) => {
 //   `
 //   return gql(queryString)
 // }
-
+// export const TOKEN_DATA = (tokenAddress, block) => {
+//   const queryString = `
+//     ${TokenFields}
+//     query tokens {
+//       tokens(${block ? `block : {number: ${block}}` : ``} where: {id:"${tokenAddress}"}) {
+//         ...TokenFields
+//       }
+//       pairs0: pairs(where: {token0: "${tokenAddress}"}, first: 50, orderBy: reserveUSD, orderDirection: desc){
+//         id
+//       }
+//       pairs1: pairs(where: {token1: "${tokenAddress}"}, first: 50, orderBy: reserveUSD, orderDirection: desc){
+//         id
+//       }
+//     }
+//   `
+//   return gql(queryString)
+// }
 export const TOKEN_DATA = (tokenAddress, block) => {
   const queryString = `
     ${TokenFields}
