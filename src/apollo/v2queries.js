@@ -21,7 +21,7 @@ export const SUBGRAPH_HEALTH = gql`
 
 //ok
 //changed query
-export const PRICES_BY_BLOCK2 = (tokenAddress, blocks) => {
+export const PRICES_BY_BLOCK = (tokenAddress, blocks) => {
   let queryString = 'query blocks {'
   queryString += blocks.map(
     (block) => `
@@ -377,8 +377,9 @@ export const GLOBAL_CHART = gql`
 //Ok
 //changed query
 export const GLOBAL_DATA = (block) => {
+  let factoryaddress = `"${Factory_Address}"`
   const queryString = ` query uniswapfactory {
-    uniswapfactory(id: "${Factory_Address}") {
+    uniswapfactory(id: ${factoryaddress}) {
         id
         totalVolumeUSD
         totalVolumeETH
@@ -461,7 +462,7 @@ export const GLOBAL_TXNS = gql`
 `
 //Ok
 //changed query
-export const ALL_TOKENS2 = gql`
+export const ALL_TOKENS = gql`
   query tokens($skip: Int!) {
     tokens(first: 500, skip: $skip) {
       id
@@ -475,7 +476,7 @@ export const ALL_TOKENS2 = gql`
 //changed query
 //orderBy: totalLiquidity, orderDirection: desc
 export const TOKEN_SEARCH = gql`
-  query tokens($value: String, $id: String) {
+  query tokens($value: String!, $id: String!) {
     asSymbol: tokensbysymbol(symbol: $value) {
       id
       symbol
@@ -544,7 +545,7 @@ export const PAIR_SEARCH = gql`
 //Ok
 //orderBy: trackedReserveETH, orderDirection: desc
 //changed query
-export const ALL_PAIRS2 = gql`
+export const ALL_PAIRS = gql`
   query pairs($skip: Int!) {
     pairs(first: 500, skip: $skip) {
       id
@@ -605,7 +606,7 @@ export const PAIRS_CURRENT = gql`
 `
 //Ok
 //changed query
-export const PAIR_DATA2 = (pairAddress, block) => {
+export const PAIR_DATA = (pairAddress, block) => {
 
   let pairString = `"${pairAddress}"`
   let queryString = `
@@ -660,7 +661,7 @@ export const PAIRS_HISTORICAL_BULK = (block, pairs) => {
 //ok
 //orderBy: date, orderDirection: asc,
 //changed query
-export const TOKEN_CHART2 = gql`
+export const TOKEN_CHART = gql`
   query tokendaydatas($tokenAddr: String!, $skip: Int!) {
     tokendaydatas(first: 1000, skip: $skip, token: $tokenAddr) {
       id
@@ -693,7 +694,7 @@ const TokenFields = `
 //Ok
 //orderBy: totalLiquidityUSD, orderDirection: desc
 //changed query
-export const TOKEN_TOP_DAY_DATAS2 = gql`
+export const TOKEN_TOP_DAY_DATAS = gql`
   query tokendaydatasbydate($date: String) {
     tokendaydatasbydate(first: 50, date: $date) {
       id
@@ -704,7 +705,7 @@ export const TOKEN_TOP_DAY_DATAS2 = gql`
 
 //Ok
 //changed query
-export const TOKENS_HISTORICAL_BULK2 = (tokens, block) => {
+export const TOKENS_HISTORICAL_BULK = (tokens, block) => {
   // console.log("tokens", tokens);
   let tokenString = `[`
   tokens.map((token) => {
@@ -733,7 +734,7 @@ export const TOKENS_HISTORICAL_BULK2 = (tokens, block) => {
 //Ok
 //orderBy: reserveUSD, orderDirection: desc
 //changed query
-export const TOKEN_DATA2 = (tokenAddress, block) => {
+export const TOKEN_DATA = (tokenAddress, block) => {
   const queryString = `
     ${TokenFields}
     query tokens {
@@ -755,7 +756,7 @@ export const TOKEN_DATA2 = (tokenAddress, block) => {
 //changed query
 export const FILTERED_TRANSACTIONS = gql`
   query ($allPairs: [String]!) {
-    mints(first: 20, pair: $allPairs) {
+    mintsallpairs(first: 20, pair: $allPairs) {
       transactionid
       transactiontimestamp
 
@@ -775,7 +776,7 @@ export const FILTERED_TRANSACTIONS = gql`
       amount1
       amountUSD
     }
-    burns(first: 20, pair: $allPairs) {
+    burnsallpairs(first: 20, pair: $allPairs) {
       transactionid
       transactiontimestamp
       pair {
@@ -794,7 +795,7 @@ export const FILTERED_TRANSACTIONS = gql`
       amount1
       amountUSD
     }
-    swaps(first: 30, pair: $allPairs) {
+    swapsallpairs(first: 30, pair: $allPairs) {
       transactionid
       transactiontimestamp
       id

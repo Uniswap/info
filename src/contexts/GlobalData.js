@@ -11,21 +11,21 @@ import {
   getTimeframe,
 } from '../utils'
 import {
-  GLOBAL_DATA,
-  GLOBAL_TXNS,
+  // GLOBAL_DATA,
+  // GLOBAL_TXNS,
   GLOBAL_CHART,
   ETH_PRICE,
-  ALL_PAIRS,
-  ALL_TOKENS,
+  // ALL_PAIRS,
+  // ALL_TOKENS,
   TOP_LPS_PER_PAIRS,
 } from '../apollo/queries'
 import {
-  // GLOBAL_DATA2,
-  // GLOBAL_TXNS2,
+  GLOBAL_DATA,
+  GLOBAL_TXNS,
   // GLOBAL_CHART2,
   // ETH_PRICE2,
-  ALL_PAIRS2,
-  ALL_TOKENS2,
+  ALL_PAIRS,
+  ALL_TOKENS,
   // TOP_LPS_PER_PAIRS2,
 } from '../apollo/v2queries'
 import weekOfYear from 'dayjs/plugin/weekOfYear'
@@ -254,36 +254,37 @@ async function getGlobalData(ethPrice, oldEthPrice) {
     ])
 
     // fetch the global data
-    let result = await client.query({
+    let result = await v2client.query({
       query: GLOBAL_DATA(),
       fetchPolicy: 'cache-first',
     })
-    data = result.data.uniswapFactories[0]
+    console.log("result", result);
+    data = result.data.uniswapfactory
 
     // fetch the historical data
-    let oneDayResult = await client.query({
+    let oneDayResult = await v2client.query({
       query: GLOBAL_DATA(oneDayBlock?.number),
       fetchPolicy: 'cache-first',
     })
-    oneDayData = oneDayResult.data.uniswapFactories[0]
+    oneDayData = oneDayResult.data.uniswapfactory
 
-    let twoDayResult = await client.query({
+    let twoDayResult = await v2client.query({
       query: GLOBAL_DATA(twoDayBlock?.number),
       fetchPolicy: 'cache-first',
     })
-    twoDayData = twoDayResult.data.uniswapFactories[0]
+    twoDayData = twoDayResult.data.uniswapfactory
 
-    let oneWeekResult = await client.query({
+    let oneWeekResult = await v2client.query({
       query: GLOBAL_DATA(oneWeekBlock?.number),
       fetchPolicy: 'cache-first',
     })
-    const oneWeekData = oneWeekResult.data.uniswapFactories[0]
+    const oneWeekData = oneWeekResult.data.uniswapfactory
 
-    let twoWeekResult = await client.query({
+    let twoWeekResult = await v2client.query({
       query: GLOBAL_DATA(twoWeekBlock?.number),
       fetchPolicy: 'cache-first',
     })
-    const twoWeekData = twoWeekResult.data.uniswapFactories[0]
+    const twoWeekData = twoWeekResult.data.uniswapfactory
 
     if (data && oneDayData && twoDayData && twoWeekData) {
       let [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentChange(
@@ -442,10 +443,11 @@ const getGlobalTransactions = async () => {
   let transactions = {}
 
   try {
-    let result = await client.query({
+    let result = await v2client.query({
       query: GLOBAL_TXNS,
       fetchPolicy: 'cache-first',
     })
+    console.log("Global_TX", result);
     transactions.mints = []
     transactions.burns = []
     transactions.swaps = []
@@ -521,13 +523,13 @@ async function getAllPairsOnUniswap() {
     let skipCount = 0
     while (!allFound) {
       let result = await v2client.query({
-        query: ALL_PAIRS2,
+        query: ALL_PAIRS,
         variables: {
           skip: skipCount,
         },
         fetchPolicy: 'cache-first',
       })
-      console.log("all_pairs", result);
+      // console.log("all_pairs", result);
       skipCount = skipCount + PAIRS_TO_FETCH
       pairs = pairs.concat(result?.data?.pairs)
       if (result?.data?.pairs.length < PAIRS_TO_FETCH || pairs.length > PAIRS_TO_FETCH) {
@@ -550,13 +552,13 @@ async function getAllTokensOnUniswap() {
     let tokens = []
     while (!allFound) {
       let result = await v2client.query({
-        query: ALL_TOKENS2,
+        query: ALL_TOKENS,
         variables: {
           skip: skipCount,
         },
         fetchPolicy: 'cache-first',
       })
-      console.log("result", result);
+      // console.log("result", result);
       tokens = tokens.concat(result?.data?.tokens)
       if (result?.data?.tokens?.length < TOKENS_TO_FETCH || tokens.length > TOKENS_TO_FETCH) {
         allFound = true

@@ -187,8 +187,8 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
       if (transactions.mints.length > 0) {
         transactions.mints.map((mint) => {
           let newTxn = {}
-          newTxn.hash = mint.transaction.id
-          newTxn.timestamp = mint.transaction.timestamp
+          newTxn.hash = mint.transactionid
+          newTxn.timestamp = mint.transactiontimestamp
           newTxn.type = TXN_TYPE.ADD
           newTxn.token0Amount = mint.amount0
           newTxn.token1Amount = mint.amount1
@@ -202,8 +202,8 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
       if (transactions.burns.length > 0) {
         transactions.burns.map((burn) => {
           let newTxn = {}
-          newTxn.hash = burn.transaction.id
-          newTxn.timestamp = burn.transaction.timestamp
+          newTxn.hash = burn.transactionid
+          newTxn.timestamp = burn.transactiontimestamp
           newTxn.type = TXN_TYPE.REMOVE
           newTxn.token0Amount = burn.amount0
           newTxn.token1Amount = burn.amount1
@@ -233,8 +233,8 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
             newTxn.token1Amount = Math.abs(netToken0)
           }
 
-          newTxn.hash = swap.transaction.id
-          newTxn.timestamp = swap.transaction.timestamp
+          newTxn.hash = swap.transactionid
+          newTxn.timestamp = swap.transactiontimestamp
           newTxn.type = TXN_TYPE.SWAP
 
           newTxn.amountUSD = swap.amountUSD

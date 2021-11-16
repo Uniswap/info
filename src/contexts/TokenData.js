@@ -1,6 +1,15 @@
 import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect } from 'react'
 
 import { client, v2client } from '../apollo/client'
+// import {
+//   // TOKEN_DATA,
+//   // FILTERED_TRANSACTIONS,
+//   // TOKEN_CHART,
+//   // TOKEN_TOP_DAY_DATAS,
+//   // PRICES_BY_BLOCK,
+//   // PAIR_DATA,
+//   // TOKENS_HISTORICAL_BULK,
+// } from '../apollo/queries'
 import {
   TOKEN_DATA,
   FILTERED_TRANSACTIONS,
@@ -9,15 +18,6 @@ import {
   PRICES_BY_BLOCK,
   PAIR_DATA,
   TOKENS_HISTORICAL_BULK,
-} from '../apollo/queries'
-import {
-  TOKEN_DATA2,
-  // FILTERED_TRANSACTIONS2,
-  TOKEN_CHART2,
-  TOKEN_TOP_DAY_DATAS2,
-  PRICES_BY_BLOCK2,
-  PAIR_DATA2,
-  TOKENS_HISTORICAL_BULK2,
 } from '../apollo/v2queries'
 
 import { useEthPrice } from './GlobalData'
@@ -248,7 +248,7 @@ const getTopTokens = async (ethPrice, ethPriceOld) => {
     //   variables: { date: currentDate },
     // })
     let tokenids2 = await v2client.query({
-      query: TOKEN_TOP_DAY_DATAS2,
+      query: TOKEN_TOP_DAY_DATAS,
       fetchPolicy: 'network-only',
       variables: { date: date },
     })
@@ -273,7 +273,7 @@ const getTopTokens = async (ethPrice, ethPriceOld) => {
     // console.log("Current", current);
 
     let current2 = await v2client.query({
-      query: TOKENS_HISTORICAL_BULK2(ids2),
+      query: TOKENS_HISTORICAL_BULK(ids2),
       fetchPolicy: 'cache-first',
     })
     // console.log("Current", current2);
@@ -301,6 +301,7 @@ const getTopTokens = async (ethPrice, ethPriceOld) => {
       // twoDayData &&
       current2?.data?.tokensbyId.map(async (token) => {
         let data = token
+        console.log("data", data);
 
         // let liquidityDataThisToken = liquidityData?.[token.id]
         // let oneDayHistory = oneDayData?.[token.id]
@@ -368,7 +369,7 @@ const getTopTokens = async (ethPrice, ethPriceOld) => {
         // HOTFIX for Aave
         if (data.id === '1c5aa6218dc7f5c90571c21098a961d727db1d307bbd317ebdc6c69d6ed27faa') {
           const aaveData = await v2client.query({
-            query: PAIR_DATA2('7a9f9108bf97fc357aa33b6f7eb800ee66e15e7d9cc1b87e0cb5687b72e119e5'),
+            query: PAIR_DATA('7a9f9108bf97fc357aa33b6f7eb800ee66e15e7d9cc1b87e0cb5687b72e119e5'),
             fetchPolicy: 'cache-first',
           })
           // console.log("aaveData", aaveData);
@@ -409,13 +410,14 @@ const getTokenData = async (address, ethPrice, ethPriceOld) => {
 
   try {
     // fetch all current and historical data
+    // console.log("address", address);
     let result = await v2client.query({
-      query: TOKEN_DATA2(address),
+      query: TOKEN_DATA(address),
       fetchPolicy: 'cache-first',
     })
-    console.log("Token_data", result);
-    data = result?.data?.tokens?.[0]
-
+    // console.log("Token_data", result);
+    data = result?.data?.tokenbyId;
+    // console.log("data", data);
     // get results from 24 hours in past
     // let oneDayResult = await client.query({
     //   query: TOKEN_DATA(address, oneDayBlock),
@@ -507,7 +509,7 @@ const getTokenData = async (address, ethPrice, ethPriceOld) => {
     // HOTFIX for Aave
     if (data.id === '1c5aa6218dc7f5c90571c21098a961d727db1d307bbd317ebdc6c69d6ed27faa') {
       const aaveData = await v2client.query({
-        query: PAIR_DATA2('7a9f9108bf97fc357aa33b6f7eb800ee66e15e7d9cc1b87e0cb5687b72e119e5'),
+        query: PAIR_DATA('7a9f9108bf97fc357aa33b6f7eb800ee66e15e7d9cc1b87e0cb5687b72e119e5'),
         fetchPolicy: 'cache-first',
       })
       const result = aaveData.data.pairbyId[0]
@@ -525,16 +527,16 @@ const getTokenData = async (address, ethPrice, ethPriceOld) => {
 const getTokenTransactions = async (allPairsFormatted) => {
   const transactions = {}
   try {
-    let result = await client.query({
+    let result = await v2client.query({
       query: FILTERED_TRANSACTIONS,
       variables: {
         allPairs: allPairsFormatted,
       },
       fetchPolicy: 'cache-first',
     })
-    transactions.mints = result.data.mints
-    transactions.burns = result.data.burns
-    transactions.swaps = result.data.swaps
+    transactions.mints = result.data.mintsallpairs
+    transactions.burns = result.data.burnsallpairs
+    transactions.swaps = result.data.swapsallpairs
   } catch (e) {
     console.log(e)
   }
@@ -545,7 +547,7 @@ const getTokenPairs = async (tokenAddress) => {
   try {
     // fetch all current and historical data
     let result = await v2client.query({
-      query: TOKEN_DATA2(tokenAddress),
+      query: TOKEN_DATA(tokenAddress),
       fetchPolicy: 'cache-first',
     })
     console.log("Token_data", result);
@@ -588,7 +590,7 @@ const getIntervalTokenData = async (tokenAddress, startTime, interval = 3600, la
       })
     }
 
-    let result = await splitQuery(PRICES_BY_BLOCK2, v2client, [tokenAddress], blocks, 50)
+    let result = await splitQuery(PRICES_BY_BLOCK, v2client, [tokenAddress], blocks, 50)
     console.log("result", result);
     // format token ETH price results
     let values = []
@@ -643,14 +645,14 @@ const getTokenChartData = async (tokenAddress) => {
     let skip = 0
     while (!allFound) {
       let result = await v2client.query({
-        query: TOKEN_CHART2,
+        query: TOKEN_CHART,
         variables: {
           tokenAddr: tokenAddress,
           skip,
         },
         fetchPolicy: 'cache-first',
       })
-      console.log("token_chart", result);
+      // console.log("token_chart", result);
       if (result.data.tokendaydatas.length < 1000) {
         allFound = true
       }
@@ -724,6 +726,7 @@ export function useTokenData(tokenAddress) {
     if (!tokenData && ethPrice && ethPriceOld
       // && isAddress(tokenAddress)
     ) {
+      console.log("tokenAddress", tokenAddress);
       getTokenData(tokenAddress, ethPrice, ethPriceOld).then((data) => {
         update(tokenAddress, data)
       })

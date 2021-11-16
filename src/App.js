@@ -135,7 +135,7 @@ function App() {
                     return (
 
                       <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
-                        {console.log("savedOpen", savedOpen)}
+                        {console.log("match.params.tokenAddress.toLowerCase()", match.params.tokenAddress.toLowerCase())}
                         <TokenPage address={match.params.tokenAddress.toLowerCase()} />
                       </LayoutWrapper>
                     )
