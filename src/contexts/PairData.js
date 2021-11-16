@@ -219,6 +219,7 @@ async function getBulkPairData(pairList, ethPrice) {
     )
     console.log("oneDayResult", oneDayResult);
     let oneDayData = oneDayResult?.data?.pairsbyId.reduce((obj, cur, i) => {
+      console.log("cur", cur);
       return { ...obj, [cur.id]: cur }
     }, {})
 
@@ -607,7 +608,9 @@ export function usePairData(pairAddress) {
         data && update(pairAddress, data[0])
       }
     }
-    if (!pairData && pairAddress && ethPrice && isAddress(pairAddress)) {
+    if (!pairData && pairAddress && ethPrice
+      // && isAddress(pairAddress)
+    ) {
       fetchData()
     }
   }, [pairAddress, pairData, update, ethPrice])

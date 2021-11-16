@@ -721,7 +721,9 @@ export function useTokenData(tokenAddress) {
   const tokenData = state?.[tokenAddress]
 
   useEffect(() => {
-    if (!tokenData && ethPrice && ethPriceOld && isAddress(tokenAddress)) {
+    if (!tokenData && ethPrice && ethPriceOld
+      // && isAddress(tokenAddress)
+    ) {
       getTokenData(tokenAddress, ethPrice, ethPriceOld).then((data) => {
         update(tokenAddress, data)
       })
@@ -764,7 +766,9 @@ export function useTokenPairs(tokenAddress) {
       let allPairs = await getTokenPairs(tokenAddress)
       updateAllPairs(tokenAddress, allPairs)
     }
-    if (!tokenPairs && isAddress(tokenAddress)) {
+    if (!tokenPairs
+      // && isAddress(tokenAddress)
+    ) {
       fetchData()
     }
   }, [tokenAddress, tokenPairs, updateAllPairs])

@@ -12,7 +12,7 @@ import AccountPage from './pages/AccountPage'
 import AllTokensPage from './pages/AllTokensPage'
 import AllPairsPage from './pages/AllPairsPage'
 import PinnedData from './components/PinnedData'
-
+import { ethers } from 'ethers'
 import SideNav from './components/SideNav'
 import AccountLookup from './pages/AccountLookup'
 import LocalLoader from './components/LocalLoader'
@@ -116,9 +116,9 @@ function App() {
           </WarningWrapper>
         )}
         {globalData &&
-        Object.keys(globalData).length > 0 &&
-        globalChartData &&
-        Object.keys(globalChartData).length > 0 ? (
+          Object.keys(globalData).length > 0 &&
+          globalChartData &&
+          Object.keys(globalChartData).length > 0 ? (
           <BrowserRouter>
             <Route component={GoogleAnalyticsReporter} />
             <Switch>
@@ -127,12 +127,15 @@ function App() {
                 strict
                 path="/token/:tokenAddress"
                 render={({ match }) => {
+                  console.log("match.params", match.params.tokenAddress);
                   if (
-                    isAddress(match.params.tokenAddress.toLowerCase()) &&
+                    // isAddress(match.params.tokenAddress.toLowerCase()) &&
                     !Object.keys(TOKEN_BLACKLIST).includes(match.params.tokenAddress.toLowerCase())
                   ) {
                     return (
+
                       <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
+                        {console.log("savedOpen", savedOpen)}
                         <TokenPage address={match.params.tokenAddress.toLowerCase()} />
                       </LayoutWrapper>
                     )
@@ -147,7 +150,7 @@ function App() {
                 path="/pair/:pairAddress"
                 render={({ match }) => {
                   if (
-                    isAddress(match.params.pairAddress.toLowerCase()) &&
+                    // isAddress(match.params.pairAddress.toLowerCase()) &&
                     !Object.keys(PAIR_BLACKLIST).includes(match.params.pairAddress.toLowerCase())
                   ) {
                     return (

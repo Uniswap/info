@@ -135,7 +135,8 @@ function PairPage({ pairAddress, history }) {
     volumeChangeUntracked,
     liquidityChangeUSD,
   } = usePairData(pairAddress)
-
+  console.log("reserve0", reserve0);
+  console.log("reserve1", reserve1);
   useEffect(() => {
     document.querySelector('body').scrollTo(0, 0)
   }, [])
@@ -311,9 +312,8 @@ function PairPage({ pairAddress, history }) {
                   <TokenLogo address={token0?.id} size={'16px'} />
                   <TYPE.main fontSize={'16px'} lineHeight={1} fontWeight={500} ml={'4px'}>
                     {token0 && token1
-                      ? `1 ${formattedSymbol0} = ${token0Rate} ${formattedSymbol1} ${
-                          parseFloat(token0?.derivedETH) ? '(' + token0USD + ')' : ''
-                        }`
+                      ? `1 ${formattedSymbol0} = ${token0Rate} ${formattedSymbol1} ${parseFloat(token0?.derivedETH) ? '(' + token0USD + ')' : ''
+                      }`
                       : '-'}
                   </TYPE.main>
                 </RowFixed>
@@ -323,9 +323,8 @@ function PairPage({ pairAddress, history }) {
                   <TokenLogo address={token1?.id} size={'16px'} />
                   <TYPE.main fontSize={'16px'} lineHeight={1} fontWeight={500} ml={'4px'}>
                     {token0 && token1
-                      ? `1 ${formattedSymbol1} = ${token1Rate} ${formattedSymbol0}  ${
-                          parseFloat(token1?.derivedETH) ? '(' + token1USD + ')' : ''
-                        }`
+                      ? `1 ${formattedSymbol1} = ${token1Rate} ${formattedSymbol0}  ${parseFloat(token1?.derivedETH) ? '(' + token1USD + ')' : ''
+                      }`
                       : '-'}
                   </TYPE.main>
                 </RowFixed>
@@ -423,12 +422,12 @@ function PairPage({ pairAddress, history }) {
                     gridRow: below1080 ? '' : '1/5',
                   }}
                 >
-                  <PairChart
+                  {/* <PairChart
                     address={pairAddress}
                     color={backgroundColor}
                     base0={reserve1 / reserve0}
                     base1={reserve0 / reserve1}
-                  />
+                  /> */}
                 </Panel>
               </PanelWrapper>
               <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
