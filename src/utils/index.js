@@ -3,8 +3,8 @@ import { BigNumber } from 'bignumber.js'
 import dayjs from 'dayjs'
 import { ethers } from 'ethers'
 import utc from 'dayjs/plugin/utc'
-import { client } from '../apollo/client'
-import { GET_BLOCK, GET_BLOCKS, SHARE_VALUE } from '../apollo/queries'
+import { v2client } from '../apollo/client'
+import { SHARE_VALUE } from '../apollo/v2queries'
 import { Text } from 'rebass'
 import _Decimal from 'decimal.js-light'
 import toFormat from 'toformat'
@@ -223,46 +223,52 @@ export async function getShareValueOverTime(pairAddress, timestamps) {
 
   // get blocks based on timestamps
   const blocks = await getBlocksFromTimestamps(timestamps)
-
+  console.log("blocks", blocks);
+  console.log("pairAddress", pairAddress);
   // get historical share values with time travel queries
-  let result = await client.query({
+  let result = await v2client.query({
     query: SHARE_VALUE(pairAddress, blocks),
     fetchPolicy: 'cache-first',
   })
+  console.log("SHARE_VALUE", result);
 
   let values = []
-  for (var row in result?.data) {
-    let timestamp = row.split('t')[1]
-    let sharePriceUsd = parseFloat(result.data[row]?.reserveUSD) / parseFloat(result.data[row]?.totalSupply)
-    if (timestamp) {
-      values.push({
-        timestamp,
-        sharePriceUsd,
-        totalSupply: result.data[row].totalSupply,
-        reserve0: result.data[row].reserve0,
-        reserve1: result.data[row].reserve1,
-        reserveUSD: result.data[row].reserveUSD,
-        token0DerivedETH: result.data[row].token0.derivedETH,
-        token1DerivedETH: result.data[row].token1.derivedETH,
-        roiUsd: values && values[0] ? sharePriceUsd / values[0]['sharePriceUsd'] : 1,
-        ethPrice: 0,
-        token0PriceUSD: 0,
-        token1PriceUSD: 0,
-      })
-    }
+  // for (var row in result?.data) {
+  // console.log("row", row);
+  let timestamp = result?.data.t[0]
+  console.log("timestamp", timestamp);
+  let sharePriceUsd = parseFloat(result.data?.t[0].reserveUSD) / parseFloat(result.data?.t[0].totalSupply)
+  if (timestamp) {
+    values.push({
+      timestamp,
+      sharePriceUsd,
+      totalSupply: result.data.t[0].totalSupply,
+      reserve0: result.data.t[0].reserve0,
+      reserve1: result.data.t[0].reserve1,
+      reserveUSD: result.data.t[0].reserveUSD,
+      token0DerivedETH: result.data.t[0].token0.derivedETH,
+      token1DerivedETH: result.data.t[0].token1.derivedETH,
+      roiUsd: values && values[0] ? sharePriceUsd / values[0]['sharePriceUsd'] : 1,
+      ethPrice: 0,
+      token0PriceUSD: 0,
+      token1PriceUSD: 0,
+    })
   }
+  // console.log("values0", values);
+  // }
 
   // add eth prices
   let index = 0
-  for (var brow in result?.data) {
-    let timestamp = brow.split('b')[1]
-    if (timestamp) {
-      values[index].ethPrice = result.data[brow].ethPrice
-      values[index].token0PriceUSD = result.data[brow].ethPrice * values[index].token0DerivedETH
-      values[index].token1PriceUSD = result.data[brow].ethPrice * values[index].token1DerivedETH
-      index += 1
-    }
+  // for (var brow in result?.data) {
+  timestamp = result?.data.b
+  console.log("timestamp", timestamp);
+  if (timestamp) {
+    values[index].ethPrice = result.data.b.ethPrice
+    values[index].token0PriceUSD = result.data.b.ethPrice * values[index].token0DerivedETH
+    values[index].token1PriceUSD = result.data.b.ethPrice * values[index].token1DerivedETH
   }
+  // }
+  // console.log("values1", values);
 
   return values
 }

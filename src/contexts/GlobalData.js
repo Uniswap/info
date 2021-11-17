@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect, useState } from 'react'
-import { client, v2client } from '../apollo/client'
+import { v2client } from '../apollo/client'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { useTimeframe } from './Application'
@@ -11,22 +11,13 @@ import {
   getTimeframe,
 } from '../utils'
 import {
-  // GLOBAL_DATA,
-  // GLOBAL_TXNS,
-  GLOBAL_CHART,
-  ETH_PRICE,
-  // ALL_PAIRS,
-  // ALL_TOKENS,
-  TOP_LPS_PER_PAIRS,
-} from '../apollo/queries'
-import {
   GLOBAL_DATA,
   GLOBAL_TXNS,
-  // GLOBAL_CHART2,
-  // ETH_PRICE2,
+  GLOBAL_CHART,
+  ETH_PRICE,
   ALL_PAIRS,
   ALL_TOKENS,
-  // TOP_LPS_PER_PAIRS2,
+  TOP_LPS_PER_PAIRS,
 } from '../apollo/v2queries'
 import weekOfYear from 'dayjs/plugin/weekOfYear'
 import { useAllPairData } from './PairData'
@@ -258,7 +249,7 @@ async function getGlobalData(ethPrice, oldEthPrice) {
       query: GLOBAL_DATA(),
       fetchPolicy: 'cache-first',
     })
-    console.log("result", result);
+    // console.log("result", result);
     data = result.data.uniswapfactory
 
     // fetch the historical data
@@ -344,18 +335,22 @@ const getChartData = async (oldestDateToFetch, offsetData) => {
   let allFound = false
 
   try {
+    // console.log("oldestDateToFetch", oldestDateToFetch);
+    const date = "1636464775865.0002";
+    // console.log("date", date);
     while (!allFound) {
-      let result = await client.query({
+      let result = await v2client.query({
         query: GLOBAL_CHART,
         variables: {
-          startTime: oldestDateToFetch,
+          startTime: date,
           skip,
         },
         fetchPolicy: 'cache-first',
       })
+      // console.log("GLOBAL_CHART", result);
       skip += 1000
-      data = data.concat(result.data.uniswapDayDatas)
-      if (result.data.uniswapDayDatas.length < 1000) {
+      data = data.concat(result.data.uniswapdaydatasbydate)
+      if (result.data.uniswapdaydatasbydate.length < 1000) {
         allFound = true
       }
     }
@@ -447,7 +442,7 @@ const getGlobalTransactions = async () => {
       query: GLOBAL_TXNS,
       fetchPolicy: 'cache-first',
     })
-    console.log("Global_TX", result);
+    // console.log("Global_TX", result);
     transactions.mints = []
     transactions.burns = []
     transactions.swaps = []
@@ -490,19 +485,27 @@ const getEthPrice = async () => {
 
   try {
     let oneDayBlock = await getBlockFromTimestamp(utcOneDayBack)
-    let result = await client.query({
+    let result = await v2client.query({
       query: ETH_PRICE(),
       fetchPolicy: 'cache-first',
     })
-    let resultOneDay = await client.query({
+    // console.log("ETH_PRICE", result);
+    let resultOneDay = await v2client.query({
       query: ETH_PRICE(oneDayBlock),
       fetchPolicy: 'cache-first',
     })
-    const currentPrice = result?.data?.bundles[0]?.ethPrice
-    const oneDayBackPrice = resultOneDay?.data?.bundles[0]?.ethPrice
+    // console.log("ETH_PRICE2", resultOneDay);
+    const currentPrice = result?.data?.bundle?.ethPrice
+    const oneDayBackPrice = resultOneDay?.data?.bundle?.ethPrice
+    // console.log("currentPrice", currentPrice);
+    // console.log("oneDayBackPrice", oneDayBackPrice);
     priceChangeETH = getPercentChange(currentPrice, oneDayBackPrice)
+    // console.log("priceChangeETH", priceChangeETH);
     ethPrice = currentPrice
     ethPriceOneDay = oneDayBackPrice
+    // ethPrice = 1
+    // ethPriceOneDay = 1
+    // priceChangeETH = 1
   } catch (e) {
     console.log(e)
   }
@@ -713,15 +716,16 @@ export function useTopLps() {
         topPairs.map(async (pair) => {
           // for each one, fetch top LPs
           try {
-            const { data: results } = await client.query({
+            const { data: results } = await v2client.query({
               query: TOP_LPS_PER_PAIRS,
               variables: {
                 pair: pair.toString(),
               },
               fetchPolicy: 'cache-first',
             })
+            // console.log("TOP_LPS_PER_PAIRS", results);
             if (results) {
-              return results.liquidityPositions
+              return results.liquiditypositions
             }
           } catch (e) { }
         })

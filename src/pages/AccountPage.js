@@ -101,8 +101,8 @@ function AccountPage({ account }) {
   let totalSwappedUSD = useMemo(() => {
     return transactions?.swaps
       ? transactions?.swaps.reduce((total, swap) => {
-          return total + parseFloat(swap.amountUSD)
-        }, 0)
+        return total + parseFloat(swap.amountUSD)
+      }, 0)
       : 0
   }, [transactions])
 
@@ -127,7 +127,7 @@ function AccountPage({ account }) {
   const [activePosition, setActivePosition] = useState()
 
   const dynamicPositions = activePosition ? [activePosition] : positions
-
+  console.log("dynamicPositions", dynamicPositions);
   const aggregateFees = dynamicPositions?.reduce(function (total, position) {
     return total + position.fees.sum
   }, 0)
@@ -135,12 +135,12 @@ function AccountPage({ account }) {
   const positionValue = useMemo(() => {
     return dynamicPositions
       ? dynamicPositions.reduce((total, position) => {
-          return (
-            total +
-            (parseFloat(position?.liquidityTokenBalance) / parseFloat(position?.pair?.totalSupply)) *
-              position?.pair?.reserveUSD
-          )
-        }, 0)
+        return (
+          total +
+          (parseFloat(position?.liquidityTokenBalance) / parseFloat(position?.pair?.totalSupply)) *
+          position?.pair?.reserveUSD
+        )
+      }, 0)
       : null
   }, [dynamicPositions])
 
@@ -157,7 +157,7 @@ function AccountPage({ account }) {
   const [savedAccounts, addAccount, removeAccount] = useSavedAccounts()
   const isBookmarked = savedAccounts.includes(account)
   const handleBookmarkClick = useCallback(() => {
-    ;(isBookmarked ? removeAccount : addAccount)(account)
+    ; (isBookmarked ? removeAccount : addAccount)(account)
   }, [account, isBookmarked, addAccount, removeAccount])
 
   return (
@@ -168,7 +168,7 @@ function AccountPage({ account }) {
             <BasicLink to="/accounts">{'Accounts '}</BasicLink>→{' '}
             <Link lineHeight={'145.23%'} href={'https://etherscan.io/address/' + account} target="_blank">
               {' '}
-              {account?.slice(0, 42)}{' '}
+              {account?.slice(0, 64)}{' '}
             </Link>
           </TYPE.body>
           {!below600 && <Search small={true} />}
@@ -176,7 +176,7 @@ function AccountPage({ account }) {
         <Header>
           <RowBetween>
             <span>
-              <TYPE.header fontSize={24}>{account?.slice(0, 6) + '...' + account?.slice(38, 42)}</TYPE.header>
+              <TYPE.header fontSize={24}>{account?.slice(0, 6) + '...' + account?.slice(60, 64)}</TYPE.header>
               <Link lineHeight={'145.23%'} href={'https://etherscan.io/address/' + account} target="_blank">
                 <TYPE.main fontSize={14}>View on Etherscan</TYPE.main>
               </Link>
@@ -273,8 +273,8 @@ function AccountPage({ account }) {
                       {positionValue
                         ? formattedNum(positionValue, true)
                         : positionValue === 0
-                        ? formattedNum(0, true)
-                        : '-'}
+                          ? formattedNum(0, true)
+                          : '-'}
                     </TYPE.header>
                   </RowFixed>
                 </AutoColumn>

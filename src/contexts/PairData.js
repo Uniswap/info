@@ -1,15 +1,6 @@
 import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect, useState } from 'react'
 
-import { client, v2client } from '../apollo/client'
-// import {
-//   // PAIR_DATA,
-//   // PAIR_CHART,
-//   // FILTERED_TRANSACTIONS,
-//   // PAIRS_CURRENT,
-//   // PAIRS_BULK,
-//   // PAIRS_HISTORICAL_BULK,
-//   // HOURLY_PAIR_RATES,
-// } from '../apollo/queries'
+import { v2client } from '../apollo/client'
 import {
   PAIR_DATA,
   PAIR_CHART,
@@ -197,7 +188,7 @@ async function getBulkPairData(pairList, ethPrice) {
   //await getBlocksFromTimestamps([t1, t2, tWeek])
 
   try {
-    console.log("pairList", pairList);
+    // console.log("pairList", pairList);
     let current = await v2client.query({
       query: PAIRS_BULK,
       variables: {
@@ -337,7 +328,7 @@ const getPairTransactions = async (pairAddress) => {
       },
       fetchPolicy: 'no-cache',
     })
-    console.log("FILTERED_TRANSACTIONS", result);
+    // console.log("FILTERED_TRANSACTIONS", result);
     transactions.mints = result.data.mintsallpairs
     transactions.burns = result.data.burnsallpairs
     transactions.swaps = result.data.swapsallpairs
@@ -353,7 +344,8 @@ const getPairChartData = async (pairAddress) => {
   const utcEndTime = dayjs.utc()
   let utcStartTime = utcEndTime.subtract(1, 'year').startOf('minute')
   let startTime = utcStartTime.unix() - 1
-
+  // let startTime = 1636464775865.0002;
+  // console.log("startTime", startTime);
   try {
     let allFound = false
     let skip = 0
@@ -366,10 +358,10 @@ const getPairChartData = async (pairAddress) => {
         },
         fetchPolicy: 'cache-first',
       })
-      console.log("PAIR_CHART", result);
+      // console.log("PAIR_CHART", result);
       skip += 1000
-      data = data.concat(result.data.pairDayDatas)
-      if (result.data.pairDayDatas.length < 1000) {
+      data = data.concat(result.data.pairdaydatasbypairAddress)
+      if (result.data.pairdaydatasbypairAddress.length < 1000) {
         allFound = true
       }
     }
@@ -639,7 +631,7 @@ export function usePairTransactions(pairAddress) {
 
 export function usePairChartData(pairAddress) {
   const [state, { updateChartData }] = usePairDataContext()
-  console.log("state", state);
+  // console.log("state", state);
   const chartData = state?.[pairAddress]?.chartData
 
   useEffect(() => {

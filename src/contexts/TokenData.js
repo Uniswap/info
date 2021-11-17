@@ -1,15 +1,6 @@
 import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect } from 'react'
 
-import { client, v2client } from '../apollo/client'
-// import {
-//   // TOKEN_DATA,
-//   // FILTERED_TRANSACTIONS,
-//   // TOKEN_CHART,
-//   // TOKEN_TOP_DAY_DATAS,
-//   // PRICES_BY_BLOCK,
-//   // PAIR_DATA,
-//   // TOKENS_HISTORICAL_BULK,
-// } from '../apollo/queries'
+import { v2client } from '../apollo/client'
 import {
   TOKEN_DATA,
   FILTERED_TRANSACTIONS,
@@ -301,7 +292,7 @@ const getTopTokens = async (ethPrice, ethPriceOld) => {
       // twoDayData &&
       current2?.data?.tokensbyId.map(async (token) => {
         let data = token
-        console.log("data", data);
+        // console.log("data", data);
 
         // let liquidityDataThisToken = liquidityData?.[token.id]
         // let oneDayHistory = oneDayData?.[token.id]
@@ -550,7 +541,7 @@ const getTokenPairs = async (tokenAddress) => {
       query: TOKEN_DATA(tokenAddress),
       fetchPolicy: 'cache-first',
     })
-    console.log("Token_data", result);
+    // console.log("Token_data", result);
     return result.data?.['pairs0'].concat(result.data?.['pairs1'])
   } catch (e) {
     console.log(e)
@@ -591,7 +582,7 @@ const getIntervalTokenData = async (tokenAddress, startTime, interval = 3600, la
     }
 
     let result = await splitQuery(PRICES_BY_BLOCK, v2client, [tokenAddress], blocks, 50)
-    console.log("result", result);
+    // console.log("result", result);
     // format token ETH price results
     let values = []
     for (var row in result) {
@@ -726,7 +717,7 @@ export function useTokenData(tokenAddress) {
     if (!tokenData && ethPrice && ethPriceOld
       // && isAddress(tokenAddress)
     ) {
-      console.log("tokenAddress", tokenAddress);
+      // console.log("tokenAddress", tokenAddress);
       getTokenData(tokenAddress, ethPrice, ethPriceOld).then((data) => {
         update(tokenAddress, data)
       })

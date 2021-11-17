@@ -14,8 +14,7 @@ import { useAllPairsInUniswap, useAllTokensInUniswap } from '../../contexts/Glob
 import { TOKEN_BLACKLIST, PAIR_BLACKLIST } from '../../constants'
 
 import { transparentize } from 'polished'
-import { client, v2client } from '../../apollo/client'
-// import { PAIR_SEARCH, TOKEN_SEARCH } from '../../apollo/queries'
+import { v2client } from '../../apollo/client'
 import { PAIR_SEARCH, TOKEN_SEARCH } from '../../apollo/v2queries'
 import FormattedName from '../FormattedName'
 import { TYPE } from '../../Theme'
@@ -192,7 +191,7 @@ export const Search = ({ small = false }) => {
               id: value,
             },
           })
-          console.log("tokens", tokens);
+          // console.log("tokens", tokens);
           let pairs = await v2client.query({
             query: PAIR_SEARCH,
             variables: {

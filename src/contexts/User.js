@@ -1,13 +1,12 @@
 import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect, useState } from 'react'
 import { useAllPairData, usePairData } from './PairData'
-import { client } from '../apollo/client'
+import { v2client } from '../apollo/client'
 import {
   USER_TRANSACTIONS,
   USER_POSITIONS,
   USER_HISTORY,
   PAIR_DAY_DATA_BULK,
-  MINING_POSITIONS,
-} from '../apollo/queries'
+} from '../apollo/v2queries'
 import { useTimeframe, useStartTimestamp } from './Application'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
@@ -166,15 +165,21 @@ export function useUserTransactions(account) {
   useEffect(() => {
     async function fetchData(account) {
       try {
-        let result = await client.query({
+        let transactions = {};
+        let result = await v2client.query({
           query: USER_TRANSACTIONS,
           variables: {
             user: account,
           },
           fetchPolicy: 'no-cache',
         })
+        console.log("USER_TRANSACTIONS", result);
+
+        transactions.mints = result.data.mint
+        transactions.burns = result.data.burn
+        transactions.swaps = result.data.swaps
         if (result?.data) {
-          updateTransactions(account, result?.data)
+          updateTransactions(account, transactions)
         }
       } catch (e) {
         console.log(e)
@@ -204,7 +209,7 @@ export function useUserSnapshots(account) {
         let allResults = []
         let found = false
         while (!found) {
-          let result = await client.query({
+          let result = await v2client.query({
             query: USER_HISTORY,
             variables: {
               skip: skip,
@@ -212,8 +217,9 @@ export function useUserSnapshots(account) {
             },
             fetchPolicy: 'cache-first',
           })
-          allResults = allResults.concat(result.data.liquidityPositionSnapshots)
-          if (result.data.liquidityPositionSnapshots.length < 1000) {
+          console.log("USER_HISTORY", result);
+          allResults = allResults.concat(result.data.liquiditypositionsnapshots)
+          if (result.data.liquiditypositionsnapshots.length < 1000) {
             found = true
           } else {
             skip += 1000
@@ -245,19 +251,23 @@ export function useUserPositionChart(position, account) {
   const [state, { updateUserPairReturns }] = useUserContext()
 
   // get oldest date of data to fetch
-  const startDateTimestamp = useStartTimestamp()
+  // const startDateTimestamp = useStartTimestamp()
+  const startDateTimestamp = 1636464775865.0002;
 
   // get users adds and removes on this pair
   const snapshots = useUserSnapshots(account)
+  console.log("snapshots", snapshots);
+  console.log("position", position);
   const pairSnapshots =
     snapshots &&
     position &&
     snapshots.filter((currentSnapshot) => {
       return currentSnapshot.pair.id === position.pair.id
     })
-
+  console.log("pairSnapshots", pairSnapshots);
   // get data needed for calculations
   const currentPairData = usePairData(pairAddress)
+  console.log("currentPairData", currentPairData);
   const [currentETHPrice] = useEthPrice()
 
   // formatetd array to return for chart data
@@ -271,6 +281,7 @@ export function useUserPositionChart(position, account) {
         pairSnapshots,
         currentETHPrice
       )
+      console.log("fetchedData", fetchedData);
       updateUserPairReturns(account, pairAddress, fetchedData)
     }
     if (
@@ -362,11 +373,11 @@ export function useUserLiquidityChart(account) {
 
       // get all day datas where date is in this list, and pair is in pair list
       let {
-        data: { pairDayDatas },
-      } = await client.query({
-        query: PAIR_DAY_DATA_BULK(pairs, startDateTimestamp),
+        data: { pairdaydatas },
+      } = await v2client.query({
+        query: PAIR_DAY_DATA_BULK(pairs, "1636464775865.0002"),
       })
-
+      console.log("pairdaydatas", pairdaydatas);
       const formattedHistory = []
 
       // map of current pair => ownership %
@@ -399,7 +410,7 @@ export function useUserLiquidityChart(account) {
 
         const relavantDayDatas = Object.keys(ownershipPerPair).map((pairAddress) => {
           // find last day data after timestamp update
-          const dayDatasForThisPair = pairDayDatas.filter((dayData) => {
+          const dayDatasForThisPair = pairdaydatas.filter((dayData) => {
             return dayData.pairAddress === pairAddress
           })
           // find the most recent reference to pair liquidity data
@@ -420,7 +431,7 @@ export function useUserLiquidityChart(account) {
               totalUSD +
               (ownershipPerPair[dayData.pairAddress]
                 ? (parseFloat(ownershipPerPair[dayData.pairAddress].lpTokenBalance) / parseFloat(dayData.totalSupply)) *
-                  parseFloat(dayData.reserveUSD)
+                parseFloat(dayData.reserveUSD)
                 : 0))
           } else {
             return totalUSD
@@ -453,17 +464,19 @@ export function useUserPositions(account) {
   useEffect(() => {
     async function fetchData(account) {
       try {
-        let result = await client.query({
+        let result = await v2client.query({
           query: USER_POSITIONS,
           variables: {
             user: account,
           },
           fetchPolicy: 'no-cache',
         })
-        if (result?.data?.liquidityPositions) {
+        console.log("USER_POSITIONS", result);
+        if (result?.data?.liquidityPositionsagainstuserId) {
           let formattedPositions = await Promise.all(
-            result?.data?.liquidityPositions.map(async (positionData) => {
+            result?.data?.liquidityPositionsagainstuserId.map(async (positionData) => {
               const returnData = await getLPReturnsOnPair(account, positionData.pair, ethPrice, snapshots)
+              console.log("returnData", returnData);
               return {
                 ...positionData,
                 ...returnData,

@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
 import { ApolloProvider } from 'react-apollo'
-import { client } from './apollo/client'
+import { v2client } from './apollo/client'
 import { Route, Switch, BrowserRouter, Redirect } from 'react-router-dom'
 import GlobalPage from './pages/GlobalPage'
 import TokenPage from './pages/TokenPage'
@@ -106,15 +106,15 @@ function App() {
   const showWarning = headBlock && latestBlock ? headBlock - latestBlock > BLOCK_DIFFERENCE_THRESHOLD : false
 
   return (
-    <ApolloProvider client={client}>
+    <ApolloProvider client={v2client}>
       <AppWrapper>
-        {showWarning && (
+        {/* {showWarning && (
           <WarningWrapper>
             <WarningBanner>
               {`Warning: The data on this site has only synced to Ethereum block ${latestBlock} (out of ${headBlock}). Please check back soon.`}
             </WarningBanner>
           </WarningWrapper>
-        )}
+        )} */}
         {globalData &&
           Object.keys(globalData).length > 0 &&
           globalChartData &&
@@ -127,7 +127,7 @@ function App() {
                 strict
                 path="/token/:tokenAddress"
                 render={({ match }) => {
-                  console.log("match.params", match.params.tokenAddress);
+                  // console.log("match.params", match.params.tokenAddress);
                   if (
                     // isAddress(match.params.tokenAddress.toLowerCase()) &&
                     !Object.keys(TOKEN_BLACKLIST).includes(match.params.tokenAddress.toLowerCase())
@@ -135,7 +135,7 @@ function App() {
                     return (
 
                       <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
-                        {console.log("match.params.tokenAddress.toLowerCase()", match.params.tokenAddress.toLowerCase())}
+                        {/* {console.log("match.params.tokenAddress.toLowerCase()", match.params.tokenAddress.toLowerCase())} */}
                         <TokenPage address={match.params.tokenAddress.toLowerCase()} />
                       </LayoutWrapper>
                     )
@@ -168,15 +168,15 @@ function App() {
                 strict
                 path="/account/:accountAddress"
                 render={({ match }) => {
-                  if (isAddress(match.params.accountAddress.toLowerCase())) {
-                    return (
-                      <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
-                        <AccountPage account={match.params.accountAddress.toLowerCase()} />
-                      </LayoutWrapper>
-                    )
-                  } else {
-                    return <Redirect to="/home" />
-                  }
+                  // if (isAddress(match.params.accountAddress.toLowerCase())) {
+                  return (
+                    <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
+                      <AccountPage account={match.params.accountAddress.toLowerCase()} />
+                    </LayoutWrapper>
+                  )
+                  // } else {
+                  //   return <Redirect to="/home" />
+                  // }
                 }}
               />
 

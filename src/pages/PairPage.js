@@ -422,12 +422,12 @@ function PairPage({ pairAddress, history }) {
                     gridRow: below1080 ? '' : '1/5',
                   }}
                 >
-                  {/* <PairChart
+                  <PairChart
                     address={pairAddress}
                     color={backgroundColor}
                     base0={reserve1 / reserve0}
                     base1={reserve0 / reserve1}
-                  /> */}
+                  />
                 </Panel>
               </PanelWrapper>
               <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>

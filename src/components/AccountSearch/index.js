@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useMedia } from 'react-use'
 import 'feather-icons'
 import { withRouter } from 'react-router-dom'
 import styled from 'styled-components'
@@ -73,17 +74,19 @@ const DashGrid = styled.div`
   }
 `
 
+
 function AccountSearch({ history, small }) {
+  const below800 = useMedia('(max-width: 800px)')
   const [accountValue, setAccountValue] = useState()
   const [savedAccounts, addAccount, removeAccount] = useSavedAccounts()
 
   function handleAccountSearch() {
-    if (isAddress(accountValue)) {
-      history.push('/account/' + accountValue)
-      if (!savedAccounts.includes(accountValue)) {
-        addAccount(accountValue)
-      }
+    // if (isAddress(accountValue)) {
+    history.push('/account/' + accountValue)
+    if (!savedAccounts.includes(accountValue)) {
+      addAccount(accountValue)
     }
+    // }
   }
 
   return (
@@ -120,7 +123,11 @@ function AccountSearch({ history, small }) {
                       justifyContent="space-between"
                       onClick={() => history.push('/account/' + account)}
                     >
-                      <AccountLink>{account?.slice(0, 42)}</AccountLink>
+
+                      <AccountLink>
+                        {below800 ? account?.slice(0, 12) + '...' + account?.slice(52, 64) : account?.slice(0, 64)}
+                        {/* {account?.slice(0, 14) + '...' + account?.slice(50, 64)} */}
+                      </AccountLink>
                       <Hover
                         onClick={(e) => {
                           e.stopPropagation()
@@ -150,9 +157,9 @@ function AccountSearch({ history, small }) {
                   <RowBetween key={account}>
                     <ButtonFaded onClick={() => history.push('/account/' + account)}>
                       {small ? (
-                        <TYPE.header>{account?.slice(0, 6) + '...' + account?.slice(38, 42)}</TYPE.header>
+                        <TYPE.header>{account?.slice(0, 6) + '...' + account?.slice(60, 64)}</TYPE.header>
                       ) : (
-                        <AccountLink>{account?.slice(0, 42)}</AccountLink>
+                        <AccountLink>{account?.slice(0, 64)}</AccountLink>
                       )}
                     </ButtonFaded>
                     <Hover onClick={() => removeAccount(account)}>

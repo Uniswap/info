@@ -78,11 +78,41 @@ export const HOURLY_PAIR_RATES = (pairAddress, blocks) => {
 
 //Ok
 //changed query
+// export const SHARE_VALUE = (pairAddress, blocks) => {
+//   let pair = `"${pairAddress}"`
+//   let queryString = 'query blocks {'
+//   queryString += blocks.map(
+//     (block) => `
+//       t${block.timestamp}:pairbyid(id:${pair}) {
+//         reserve0
+//         reserve1
+//         reserveUSD
+//         totalSupply
+//         token0{
+//           derivedETH
+//         }
+//         token1{
+//           derivedETH
+//         }
+//       }
+//     `
+//   )
+//   queryString += ','
+//   queryString += blocks.map(
+//     (block) => `
+//       b${block.timestamp}: bundle(id:"1") {
+//         ethPrice
+//       }
+//     `
+//   )
+//   queryString += '}'
+//   return gql(queryString)
+// }
 export const SHARE_VALUE = (pairAddress, blocks) => {
-  let queryString = 'query blocks {'
-  queryString += blocks.map(
-    (block) => `
-      t${block.timestamp}:pairbyid(id:"${pairAddress}") {
+  let pair = `"${pairAddress}"`
+  let queryString = `
+    query blocks {
+      t:pairbyId(id:${pair}) {
         reserve0
         reserve1
         reserveUSD
@@ -94,35 +124,18 @@ export const SHARE_VALUE = (pairAddress, blocks) => {
           derivedETH
         }
       }
-    `
-  )
-  queryString += ','
-  queryString += blocks.map(
-    (block) => `
-      b${block.timestamp}: bundle(id:"1") {
-        ethPrice
-      }
-    `
-  )
-
-  queryString += '}'
-  return gql(queryString)
-}
-
-//Ok
-//changed query
-export const ETH_PRICE = (block) => {
-  const queryString = block
-    ? `
-    query bundle {
-      bundle(id: ${BUNDLE_ID}) {
-        id
+      b: bundle(id:"1") {
         ethPrice
       }
     }
   `
-    : ` query bundle {
-      bundle(id: ${BUNDLE_ID}) {
+  return gql(queryString)
+}
+//Ok
+//changed query
+export const ETH_PRICE = (block) => {
+  const queryString = ` query bundle {
+      bundle(id: "1") {
         id
         ethPrice
       }
@@ -134,16 +147,16 @@ export const ETH_PRICE = (block) => {
 // liquidityPositions should be an object
 //Ok
 //changed query
-export const USER = (block, account) => {
-  const queryString = `
-    query user {
-      user(id: "${account}") {
-        liquidityPositions
-      }
-    }
-`
-  return gql(queryString)
-}
+// export const USER = (block, account) => {
+//   const queryString = `
+//     query user {
+//       user(id: "${account}") {
+//         liquidityPositions
+//       }
+//     }
+// `
+//   return gql(queryString)
+// }
 
 // in progress
 //changed query
@@ -237,67 +250,65 @@ export const USER_POSITIONS = gql`
 //changed query
 export const USER_TRANSACTIONS = gql`
   query transactions($user: String!) {
-    transactions(user: $user) {
-      mints {
+    mint(to: $user) {
+      id
+      transactionid
+      transactiontimestamp
+      pair {
         id
-        transactionid
-        transactiontimestamp
-        pair {
+        token0 {
           id
-          token0 {
-            id
-            symbol
-          }
-          token1 {
-            id
-            symbol
-          }
+          symbol
         }
-        to
-        liquidity
-        amount0
-        amount1
-        amountUSD
-      }
-      burns {
-        id
-        transactionid
-        transactiontimestamp
-        pair {
+        token1 {
           id
-          token0 {
-            symbol
-          }
-          token1 {
-            symbol
-          }
+          symbol
         }
-        sender
-        to
-        liquidity
-        amount0
-        amount1
-        amountUSD
       }
-      swaps {
+      to
+      liquidity
+      amount0
+      amount1
+      amountUSD
+    }
+    burn(sender: $user) {
+      id
+      transactionid
+      transactiontimestamp
+      pair {
         id
-        transactionid
-        transactiontimestamp
-        pair {
-          token0 {
-            symbol
-          }
-          token1 {
-            symbol
-          }
+        token0 {
+          symbol
         }
-        amount0In
-        amount0Out
-        amount1In
-        amount1Out
-        amountUSD
-        to
+        token1 {
+          symbol
+        }
       }
+      sender
+      to
+      liquidity
+      amount0
+      amount1
+      amountUSD
+    }
+    swaps(to: $user) {
+      id
+      transactionid
+      transactiontimestamp
+      pair {
+        token0 {
+          symbol
+        }
+        token1 {
+          symbol
+        }
+      }
+      amount0In
+      amount0Out
+      amount1In
+      amount1Out
+      amountUSD
+      to
     }
   }
 `
@@ -319,31 +330,32 @@ export const PAIR_CHART = gql`
 //Ok
 // orderBy: date, orderDirection: desc,
 //changed query
-export const PAIR_DAY_DATA = gql`
-  query pairdaydata($pairAddress: String!, $date: Int!) {
-    pairdaydata(first: 1, pairAddress: $pairAddress, date: $date) {
-      id
-      date
-      dailyVolumeToken0
-      dailyVolumeToken1
-      dailyVolumeUSD
-      totalSupply
-      reserveUSD
-    }
-  }
-`
+// export const PAIR_DAY_DATA = gql`
+//   query pairdaydata($pairAddress: String!, $date: Int!) {
+//     pairdaydata(first: 1, pairAddress: $pairAddress, date: $date) {
+//       id
+//       date
+//       dailyVolumeToken0
+//       dailyVolumeToken1
+//       dailyVolumeUSD
+//       totalSupply
+//       reserveUSD
+//     }
+//   }
+// `
 //Ok
 //orderBy: date, orderDirection: asc,
 //changed query
 export const PAIR_DAY_DATA_BULK = (pairs, startTimestamp) => {
+  let time = `"${startTimestamp}"`
   let pairsString = `[`
   pairs.map((pair) => {
     return (pairsString += `"${pair}"`)
   })
   pairsString += ']'
   const queryString = `
-    query days {
-      pairdaydatas(first: 1000, pairAddress: ${pairsString}, date: ${startTimestamp}) {
+    query pairdaydatas {
+      pairdaydatas(first: 1000, pairAddress: ${pairsString}, date: ${time}) {
         id
         pairAddress
         date
@@ -353,7 +365,7 @@ export const PAIR_DAY_DATA_BULK = (pairs, startTimestamp) => {
         totalSupply
         reserveUSD
       }
-    } 
+    }
 `
   return gql(queryString)
 }
@@ -362,7 +374,7 @@ export const PAIR_DAY_DATA_BULK = (pairs, startTimestamp) => {
 // orderBy: date, orderDirection: asc
 //changed query
 export const GLOBAL_CHART = gql`
-  query uniswapdaydatasbydate($startTime: Int!, $skip: Int!) {
+  query uniswapdaydatasbydate($startTime: String!, $skip: Int!) {
     uniswapdaydatasbydate(first: 1000, skip: $skip, date: $startTime) {
       id
       date
