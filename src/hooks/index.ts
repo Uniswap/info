@@ -4,14 +4,14 @@ import Vibrant from 'node-vibrant'
 import { hex } from 'wcag-contrast'
 import { isAddress } from '../utils'
 import copy from 'copy-to-clipboard'
-
+import CSPR from '../assets/cspr.png'
 export function useColor(tokenAddress, token) {
   const [color, setColor] = useState('#2172E5')
   if (tokenAddress) {
-    const path = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${tokenAddress
-      }/logo.png`
-    if (path) {
-      Vibrant.from(path).getPalette((err, palette) => {
+    // const path = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${tokenAddress
+    //   }/logo.png`
+    if (CSPR) {
+      Vibrant.from(CSPR).getPalette((err, palette) => {
         if (palette && palette.Vibrant) {
           let detectedHex = palette.Vibrant.hex
           let AAscore = hex(detectedHex, '#FFF')

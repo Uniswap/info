@@ -281,6 +281,6 @@ export function useListedTokens() {
       fetchList()
     }
   }, [updateSupportedTokens, supportedTokens])
-
+  console.log("supportedTokens", supportedTokens);
   return supportedTokens
 }
