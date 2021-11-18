@@ -188,7 +188,7 @@ async function getBulkPairData(pairList, ethPrice) {
   //await getBlocksFromTimestamps([t1, t2, tWeek])
 
   try {
-    // console.log("pairList", pairList);
+    console.log("pairList", pairList);
     let current = await v2client.query({
       query: PAIRS_BULK,
       variables: {
@@ -196,7 +196,7 @@ async function getBulkPairData(pairList, ethPrice) {
       },
       fetchPolicy: 'cache-first',
     })
-    // console.log("current", current);
+    console.log("PAIRS_BULK", current);
 
     let [oneDayResult, twoDayResult, oneWeekResult] = await Promise.all(
       [b1, b2, bWeek].map(async (block) => {
@@ -204,7 +204,7 @@ async function getBulkPairData(pairList, ethPrice) {
           query: PAIRS_HISTORICAL_BULK(block, pairList),
           fetchPolicy: 'cache-first',
         })
-        // console.log("PAIRS_HISTORICAL_BULK", result);
+        console.log("PAIRS_HISTORICAL_BULK", result);
         return result
       })
     )
@@ -328,7 +328,7 @@ const getPairTransactions = async (pairAddress) => {
       },
       fetchPolicy: 'no-cache',
     })
-    // console.log("FILTERED_TRANSACTIONS", result);
+    console.log("FILTERED_TRANSACTIONS", result);
     transactions.mints = result.data.mintsallpairs
     transactions.burns = result.data.burnsallpairs
     transactions.swaps = result.data.swapsallpairs
@@ -344,7 +344,7 @@ const getPairChartData = async (pairAddress) => {
   const utcEndTime = dayjs.utc()
   let utcStartTime = utcEndTime.subtract(1, 'year').startOf('minute')
   let startTime = utcStartTime.unix() - 1
-  // let startTime = 1636464775865.0002;
+  // let startTime = 1637232662;
   // console.log("startTime", startTime);
   try {
     let allFound = false
@@ -358,7 +358,7 @@ const getPairChartData = async (pairAddress) => {
         },
         fetchPolicy: 'cache-first',
       })
-      // console.log("PAIR_CHART", result);
+      console.log("PAIR_CHART", result);
       skip += 1000
       data = data.concat(result.data.pairdaydatasbypairAddress)
       if (result.data.pairdaydatasbypairAddress.length < 1000) {
@@ -492,7 +492,7 @@ export function Updater() {
         query: PAIRS_CURRENT,
         fetchPolicy: 'cache-first',
       })
-      // console.log("pairs", pairs);
+      console.log("PAIRS_CURRENT", pairs);
       // format as array of addresses
       const formattedPairs = pairs.map((pair) => {
         return pair.id

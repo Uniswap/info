@@ -1,7 +1,7 @@
 import gql from 'graphql-tag'
 import { FACTORY_ADDRESS, BUNDLE_ID } from '../constants'
 
-const Factory_Address = "0c43750a82af3dfb01472b92c9c42011b3681d93632617e0fa2388752c4af869";
+const Factory_Address = "735edd4bb553cb8ef4408becbce9e5564a92d97094245c9d2d6ff2bbe6ceda43";
 export const SUBGRAPH_HEALTH = gql`
   query health {
     indexingStatusForCurrentVersion(subgraphName: "uniswap/uniswap-v2") {

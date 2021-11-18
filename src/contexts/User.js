@@ -252,7 +252,7 @@ export function useUserPositionChart(position, account) {
 
   // get oldest date of data to fetch
   // const startDateTimestamp = useStartTimestamp()
-  const startDateTimestamp = 1636464775865.0002;
+  const startDateTimestamp = 1637232662;
 
   // get users adds and removes on this pair
   const snapshots = useUserSnapshots(account)
@@ -375,7 +375,7 @@ export function useUserLiquidityChart(account) {
       let {
         data: { pairdaydatas },
       } = await v2client.query({
-        query: PAIR_DAY_DATA_BULK(pairs, "1636464775865.0002"),
+        query: PAIR_DAY_DATA_BULK(pairs, "1637234132"),
       })
       console.log("pairdaydatas", pairdaydatas);
       const formattedHistory = []

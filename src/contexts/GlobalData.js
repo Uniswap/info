@@ -32,8 +32,8 @@ const UPDATE_ALL_TOKENS_IN_UNISWAP = 'UPDATE_ALL_TOKENS_IN_UNISWAP'
 const UPDATE_TOP_LPS = 'UPDATE_TOP_LPS'
 
 const offsetVolumes = [
-  '1c5aa6218dc7f5c90571c21098a961d727db1d307bbd317ebdc6c69d6ed27faa',
-  'fca1efeb1b2a642fb817680e48c57eb57043032cf3cb2edfe72ad5c698e01247',
+  'f5b45ffd5273c94befa572ca4b3f05a57892611aa7c668a021eed2be93e9b76e',
+  'c5afe9ac0deddaf3090603b1cc1b71b9c030218ff97f7c4067a48402803fea16',
   // '0x9ea3b5b4ec044b70375236a281986106457b20ef',
   // '0x05934eba98486693aaec2d00b0e9ce918e37dc3f',
   // '0x3d7e683fc9c86b4d653c9e47ca12517440fad14e',
@@ -48,6 +48,7 @@ dayjs.extend(weekOfYear)
 const GlobalDataContext = createContext()
 
 function useGlobalDataContext() {
+  // console.log("GlobalDataContext", GlobalDataContext);
   return useContext(GlobalDataContext)
 }
 
@@ -249,7 +250,7 @@ async function getGlobalData(ethPrice, oldEthPrice) {
       query: GLOBAL_DATA(),
       fetchPolicy: 'cache-first',
     })
-    // console.log("result", result);
+    console.log("GLOBAL_DATA()", result);
     data = result.data.uniswapfactory
 
     // fetch the historical data
@@ -336,8 +337,8 @@ const getChartData = async (oldestDateToFetch, offsetData) => {
 
   try {
     // console.log("oldestDateToFetch", oldestDateToFetch);
-    const date = "1636464775865.0002";
-    // console.log("date", date);
+    const date = "1637234132";
+    console.log("date", date);
     while (!allFound) {
       let result = await v2client.query({
         query: GLOBAL_CHART,
@@ -347,7 +348,7 @@ const getChartData = async (oldestDateToFetch, offsetData) => {
         },
         fetchPolicy: 'cache-first',
       })
-      // console.log("GLOBAL_CHART", result);
+      console.log("GLOBAL_CHART", result);
       skip += 1000
       data = data.concat(result.data.uniswapdaydatasbydate)
       if (result.data.uniswapdaydatasbydate.length < 1000) {
@@ -370,6 +371,7 @@ const getChartData = async (oldestDateToFetch, offsetData) => {
 
       // fill in empty days ( there will be no day datas if no trades made that day )
       let timestamp = data[0].date ? data[0].date : oldestDateToFetch
+      // console.log("timestamp", timestamp);
       let latestLiquidityUSD = data[0].totalLiquidityUSD
       let latestDayDats = data[0].mostLiquidTokens
       let index = 1
@@ -395,6 +397,7 @@ const getChartData = async (oldestDateToFetch, offsetData) => {
 
     // format weekly data for weekly sized chunks
     data = data.sort((a, b) => (parseInt(a.date) > parseInt(b.date) ? 1 : -1))
+
     let startIndexWeekly = -1
     let currentWeek = -1
 
@@ -442,7 +445,7 @@ const getGlobalTransactions = async () => {
       query: GLOBAL_TXNS,
       fetchPolicy: 'cache-first',
     })
-    // console.log("Global_TX", result);
+    console.log("Global_TX", result);
     transactions.mints = []
     transactions.burns = []
     transactions.swaps = []
@@ -561,7 +564,7 @@ async function getAllTokensOnUniswap() {
         },
         fetchPolicy: 'cache-first',
       })
-      // console.log("result", result);
+      // console.log("ALL_TOKENS", result);
       tokens = tokens.concat(result?.data?.tokens)
       if (result?.data?.tokens?.length < TOKENS_TO_FETCH || tokens.length > TOKENS_TO_FETCH) {
         allFound = true
@@ -588,7 +591,7 @@ export function useGlobalData() {
   useEffect(() => {
     async function fetchData() {
       let globalData = await getGlobalData(ethPrice, oldEthPrice)
-
+      // console.log("globalData =", globalData);
       globalData && update(globalData)
 
       let allPairs = await getAllPairsOnUniswap()
@@ -601,7 +604,7 @@ export function useGlobalData() {
       fetchData()
     }
   }, [ethPrice, oldEthPrice, update, data, updateAllPairsInUniswap, updateAllTokensInUniswap])
-
+  // console.log("useGlobalData", data);
   return data || {}
 }
 
@@ -610,6 +613,7 @@ export function useGlobalChartData() {
   const [oldestDateFetch, setOldestDateFetched] = useState()
   const [activeWindow] = useTimeframe()
 
+  // console.log("state", state);
   const chartDataDaily = state?.chartData?.daily
   const chartDataWeekly = state?.chartData?.weekly
 
@@ -638,6 +642,7 @@ export function useGlobalChartData() {
     async function fetchData() {
       // historical stuff for chart
       let [newChartData, newWeeklyData] = await getChartData(oldestDateFetch, combinedData)
+      // console.log("newChartData", newChartData);
       updateChart(newChartData, newWeeklyData)
     }
     if (oldestDateFetch && !(chartDataDaily && chartDataWeekly) && combinedData) {
@@ -645,6 +650,8 @@ export function useGlobalChartData() {
     }
   }, [chartDataDaily, chartDataWeekly, combinedData, oldestDateFetch, updateChart])
 
+  // console.log("chartDataDaily", chartDataDaily);
+  // console.log("chartDataWeekly", chartDataWeekly);
   return [chartDataDaily, chartDataWeekly]
 }
 

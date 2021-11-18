@@ -231,7 +231,7 @@ const getTopTokens = async (ethPrice, ethPriceOld) => {
     // need to get the top tokens by liquidity by need token day datas
     // const currentDate = parseInt(Date.now() / 86400 / 1000) * 86400 - 86400
     // console.log(currentDate);
-    const date = "1636464775865.0002";
+    const date = "1637234132";
     // console.log(date);
     // let tokenids = await client.query({
     //   query: TOKEN_TOP_DAY_DATAS,
@@ -245,7 +245,7 @@ const getTopTokens = async (ethPrice, ethPriceOld) => {
     })
 
     // console.log("tokenids", tokenids);
-    // console.log("tokenids2", tokenids2);
+    console.log("tokenids2", tokenids2);
     // const ids = tokenids?.data?.tokenDayDatas?.reduce((accum, entry) => {
     //   accum.push(entry.id.slice(0, 42))
     //   return accum
@@ -267,7 +267,7 @@ const getTopTokens = async (ethPrice, ethPriceOld) => {
       query: TOKENS_HISTORICAL_BULK(ids2),
       fetchPolicy: 'cache-first',
     })
-    // console.log("Current", current2);
+    console.log("Current", current2);
     // let oneDayResult = await client.query({
     //   query: TOKENS_HISTORICAL_BULK(ids, oneDayBlock),
     //   fetchPolicy: 'cache-first',
@@ -292,7 +292,7 @@ const getTopTokens = async (ethPrice, ethPriceOld) => {
       // twoDayData &&
       current2?.data?.tokensbyId.map(async (token) => {
         let data = token
-        // console.log("data", data);
+        console.log("data", data);
 
         // let liquidityDataThisToken = liquidityData?.[token.id]
         // let oneDayHistory = oneDayData?.[token.id]
@@ -358,14 +358,14 @@ const getTopTokens = async (ethPrice, ethPriceOld) => {
         })
 
         // HOTFIX for Aave
-        if (data.id === '1c5aa6218dc7f5c90571c21098a961d727db1d307bbd317ebdc6c69d6ed27faa') {
+        if (data.id === 'f5b45ffd5273c94befa572ca4b3f05a57892611aa7c668a021eed2be93e9b76e') {
           const aaveData = await v2client.query({
-            query: PAIR_DATA('7a9f9108bf97fc357aa33b6f7eb800ee66e15e7d9cc1b87e0cb5687b72e119e5'),
+            query: PAIR_DATA('c667c7c29947b3500406a79ec47947d7eb320e92a00c68351eaa7c7bc96e3d31'),
             fetchPolicy: 'cache-first',
           })
-          // console.log("aaveData", aaveData);
+          console.log("aaveData", aaveData);
           const result = aaveData.data.pairbyId[0]
-          // console.log("result", result);
+          console.log("result", result);
           data.totalLiquidityUSD = parseFloat(result.reserveUSD) / 2
           data.liquidityChangeUSD = 0
           data.priceChangeUSD = 0
@@ -498,9 +498,9 @@ const getTokenData = async (address, ethPrice, ethPriceOld) => {
     })
 
     // HOTFIX for Aave
-    if (data.id === '1c5aa6218dc7f5c90571c21098a961d727db1d307bbd317ebdc6c69d6ed27faa') {
+    if (data.id === 'f5b45ffd5273c94befa572ca4b3f05a57892611aa7c668a021eed2be93e9b76e') {
       const aaveData = await v2client.query({
-        query: PAIR_DATA('7a9f9108bf97fc357aa33b6f7eb800ee66e15e7d9cc1b87e0cb5687b72e119e5'),
+        query: PAIR_DATA('c667c7c29947b3500406a79ec47947d7eb320e92a00c68351eaa7c7bc96e3d31'),
         fetchPolicy: 'cache-first',
       })
       const result = aaveData.data.pairbyId[0]
