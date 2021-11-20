@@ -1,8 +1,7 @@
 import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect, useState } from 'react'
-import { client } from '../apollo/client'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
-import { useTimeframe } from './Application'
+import { useTimeframe, useExchangeClient } from './Application'
 import {
   getPercentChange,
   // getBlockFromTimestamp,
@@ -212,7 +211,7 @@ export default function Provider({ children }) {
  * @param {*} ethPrice
  * @param {*} oldEthPrice
  */
-async function getGlobalData(ethPrice, oldEthPrice) {
+async function getGlobalData(client, ethPrice, oldEthPrice) {
   // data for each day , historic data used for % changes
   let data = {}
   let oneDayData = {}
@@ -321,7 +320,7 @@ async function getGlobalData(ethPrice, oldEthPrice) {
  * on main page
  * @param {*} oldestDateToFetch // start of window to fetch from
  */
-const getChartData = async (oldestDateToFetch) => {
+const getChartData = async (client, oldestDateToFetch) => {
   let data = []
   let weeklyData = []
   const utcEndTime = dayjs.utc()
@@ -406,7 +405,7 @@ const getChartData = async (oldestDateToFetch) => {
 /**
  * Get and format transactions for global page
  */
-const getGlobalTransactions = async () => {
+const getGlobalTransactions = async (client) => {
   let transactions = {}
 
   try {
@@ -445,7 +444,11 @@ const getGlobalTransactions = async () => {
 /**
  * Gets the current price  of ETH, 24 hour price, and % change between them
  */
-const getEthPrice = async () => {
+const getEthPrice = async (client) => {
+  if (!client) {
+    return [0, 0, 0]
+  }
+
   const utcCurrentTime = dayjs()
   const utcOneDayBack = utcCurrentTime.subtract(1, 'day').startOf('minute').unix()
 
@@ -481,7 +484,7 @@ const TOKENS_TO_FETCH = 500
 /**
  * Loop through every pair on uniswap, used for search
  */
-async function getAllPairsOnUniswap() {
+async function getAllPairsOnUniswap(client) {
   try {
     let allFound = false
     let pairs = []
@@ -509,7 +512,7 @@ async function getAllPairsOnUniswap() {
 /**
  * Loop through every token on uniswap, used for search
  */
-async function getAllTokensOnUniswap() {
+async function getAllTokensOnUniswap(client) {
   try {
     let allFound = false
     let skipCount = 0
@@ -538,6 +541,7 @@ async function getAllTokensOnUniswap() {
  * Hook that fetches overview data, plus all tokens and pairs for search
  */
 export function useGlobalData() {
+  const exchangeSubgraphClient = useExchangeClient()
   const [state, { update, updateAllPairsInUniswap, updateAllTokensInUniswap }] = useGlobalDataContext()
   const [ethPrice, oldEthPrice] = useEthPrice()
 
@@ -545,25 +549,26 @@ export function useGlobalData() {
 
   useEffect(() => {
     async function fetchData() {
-      let globalData = await getGlobalData(ethPrice, oldEthPrice)
+      let globalData = await getGlobalData(exchangeSubgraphClient, ethPrice, oldEthPrice)
       globalData && update(globalData)
 
-      let allPairs = await getAllPairsOnUniswap()
+      let allPairs = await getAllPairsOnUniswap(exchangeSubgraphClient)
       updateAllPairsInUniswap(allPairs)
 
-      let allTokens = await getAllTokensOnUniswap()
+      let allTokens = await getAllTokensOnUniswap(exchangeSubgraphClient)
       updateAllTokensInUniswap(allTokens)
     }
 
     if (!data && ethPrice && oldEthPrice) {
       fetchData()
     }
-  }, [ethPrice, oldEthPrice, update, data, updateAllPairsInUniswap, updateAllTokensInUniswap])
+  }, [ethPrice, oldEthPrice, update, data, updateAllPairsInUniswap, updateAllTokensInUniswap, exchangeSubgraphClient])
 
   return data || {}
 }
 
 export function useGlobalChartData() {
+  const exchangeSubgraphClient = useExchangeClient()
   const [state, { updateChart }] = useGlobalDataContext()
   const [oldestDateFetch, setOldestDateFetched] = useState()
   const [activeWindow] = useTimeframe()
@@ -591,45 +596,47 @@ export function useGlobalChartData() {
   useEffect(() => {
     async function fetchData() {
       // historical stuff for chart
-      let [newChartData, newWeeklyData] = await getChartData(oldestDateFetch)
+      let [newChartData, newWeeklyData] = await getChartData(exchangeSubgraphClient, oldestDateFetch)
       updateChart(newChartData, newWeeklyData)
     }
     if (oldestDateFetch && !(chartDataDaily && chartDataWeekly)) {
       fetchData()
     }
-  }, [chartDataDaily, chartDataWeekly, oldestDateFetch, updateChart])
+  }, [chartDataDaily, chartDataWeekly, oldestDateFetch, updateChart, exchangeSubgraphClient])
 
   return [chartDataDaily, chartDataWeekly]
 }
 
 export function useGlobalTransactions() {
+  const exchangeSubgraphClient = useExchangeClient()
   const [state, { updateTransactions }] = useGlobalDataContext()
   const transactions = state?.transactions
   useEffect(() => {
     async function fetchData() {
       if (!transactions) {
-        let txns = await getGlobalTransactions()
+        let txns = await getGlobalTransactions(exchangeSubgraphClient)
         updateTransactions(txns)
       }
     }
     fetchData()
-  }, [updateTransactions, transactions])
+  }, [updateTransactions, transactions, exchangeSubgraphClient])
   return transactions
 }
 
 export function useEthPrice() {
+  const exchangeSubgraphClient = useExchangeClient()
   const [state, { updateEthPrice }] = useGlobalDataContext()
   const ethPrice = state?.[ETH_PRICE_KEY]
   const ethPriceOld = state?.['oneDayPrice']
   useEffect(() => {
     async function checkForEthPrice() {
       if (!ethPrice) {
-        let [newPrice, oneDayPrice, priceChange] = await getEthPrice()
+        let [newPrice, oneDayPrice, priceChange] = await getEthPrice(exchangeSubgraphClient)
         updateEthPrice(newPrice, oneDayPrice, priceChange)
       }
     }
     checkForEthPrice()
-  }, [ethPrice, updateEthPrice])
+  }, [ethPrice, updateEthPrice, exchangeSubgraphClient])
 
   return [ethPrice, ethPriceOld]
 }
@@ -653,6 +660,7 @@ export function useAllTokensInUniswap() {
  * @TODO Not a perfect lookup needs improvement
  */
 export function useTopLps() {
+  const exchangeSubgraphClient = useExchangeClient()
   const [state, { updateTopLps }] = useGlobalDataContext()
   let topLps = state?.topLps
 
@@ -670,7 +678,7 @@ export function useTopLps() {
         topPools.map(async (pool) => {
           // for each one, fetch top LPs
           try {
-            const { data: results } = await client.query({
+            const { data: results } = await exchangeSubgraphClient.query({
               query: TOP_LPS_PER_POOLS,
               variables: {
                 pool: pool.toString(),
