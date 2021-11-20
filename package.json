@@ -86,6 +86,8 @@
     "start-bsc-staging": "env-cmd -f .env.bsc.staging react-scripts start",
     "start-bsc": "env-cmd -f .env.bsc react-scripts start",
     "start-avax": "env-cmd -f .env.avax react-scripts start",
+    "start-fantom": "env-cmd -f .env.fantom react-scripts start",
+    "start-fantom-staging": "env-cmd -f .env.fantom.staging react-scripts start",
     "build": "react-scripts build",
     "build-ropsten": "env-cmd -f .env.ropsten react-scripts build",
     "build-staging": "env-cmd -f .env.staging react-scripts build",

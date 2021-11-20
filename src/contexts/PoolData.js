@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect, useState } from 'react'
 
-import { client } from '../apollo/client'
 import {
   POOL_DATA,
   POOL_CHART,
@@ -28,7 +27,7 @@ import { getBlocksFromTimestamps } from '../utils'
 // import { getBlockFromTimestamp, getBlocksFromTimestamps } from '../utils/mocks'
 
 import { timeframeOptions, WETH_ADDRESS } from '../constants'
-import { useLatestBlocks } from './Application'
+import { useExchangeClient, useLatestBlocks } from './Application'
 import { getNativeTokenSymbol, getNativeTokenWrappedName } from '../utils'
 
 const UPDATE = 'UPDATE'
@@ -185,7 +184,7 @@ export default function Provider({ children }) {
   )
 }
 
-export async function getBulkPoolData(poolList, ethPrice) {
+export async function getBulkPoolData(client, poolList, ethPrice) {
   const [t1, t2, tWeek] = getTimestampsForChanges()
   let [{ number: b1 }, { number: b2 }, { number: bWeek }] = await getBlocksFromTimestamps([t1, t2, tWeek])
 
@@ -319,7 +318,7 @@ function parseData(data, oneDayData, twoDayData, oneWeekData, ethPrice, oneDayBl
   return data
 }
 
-const getPoolTransactions = async (poolAddress) => {
+const getPoolTransactions = async (client, poolAddress) => {
   const transactions = {}
 
   try {
@@ -340,7 +339,7 @@ const getPoolTransactions = async (poolAddress) => {
   return transactions
 }
 
-const getPoolChartData = async (poolAddress) => {
+const getPoolChartData = async (client, poolAddress) => {
   let data = []
   const utcEndTime = dayjs.utc()
   let utcStartTime = utcEndTime.subtract(1, 'year').startOf('minute')
@@ -407,7 +406,7 @@ const getPoolChartData = async (poolAddress) => {
   return data
 }
 
-const getHourlyRateData = async (poolAddress, startTime, latestBlock, frequency) => {
+const getHourlyRateData = async (client, poolAddress, startTime, latestBlock, frequency) => {
   try {
     const utcEndTime = dayjs.utc()
     let time = startTime
@@ -480,6 +479,7 @@ const getHourlyRateData = async (poolAddress, startTime, latestBlock, frequency)
 }
 
 export function Updater() {
+  const exchangeSubgraphClient = useExchangeClient()
   const [, { updateTopPools }] = usePoolDataContext()
   const [ethPrice] = useEthPrice()
   useEffect(() => {
@@ -487,7 +487,7 @@ export function Updater() {
       // get top pools by reserves
       let {
         data: { pools },
-      } = await client.query({
+      } = await exchangeSubgraphClient.query({
         query: POOLS_CURRENT,
         fetchPolicy: 'cache-first',
       })
@@ -498,15 +498,16 @@ export function Updater() {
       })
 
       // get data for every pool in list
-      let topPools = await getBulkPoolData(formattedPools, ethPrice)
+      let topPools = await getBulkPoolData(exchangeSubgraphClient, formattedPools, ethPrice)
       topPools && updateTopPools(topPools)
     }
     ethPrice && getData()
-  }, [ethPrice, updateTopPools])
+  }, [ethPrice, updateTopPools, exchangeSubgraphClient])
   return null
 }
 
 export function useHourlyRateData(poolAddress, timeWindow, frequency) {
+  const exchangeSubgraphClient = useExchangeClient()
   const [state, { updateHourlyData }] = usePoolDataContext()
   const chartData = state?.[poolAddress]?.hourlyData?.[timeWindow]
   const [latestBlock] = useLatestBlocks()
@@ -537,13 +538,13 @@ export function useHourlyRateData(poolAddress, timeWindow, frequency) {
     }
 
     async function fetch() {
-      let data = await getHourlyRateData(poolAddress, startTime, latestBlock, frequency)
+      let data = await getHourlyRateData(exchangeSubgraphClient, poolAddress, startTime, latestBlock, frequency)
       updateHourlyData(poolAddress, data, timeWindow)
     }
     if (!chartData) {
       fetch()
     }
-  }, [chartData, timeWindow, poolAddress, updateHourlyData, latestBlock, frequency])
+  }, [chartData, timeWindow, poolAddress, updateHourlyData, latestBlock, frequency, exchangeSubgraphClient])
 
   return chartData
 }
@@ -553,6 +554,7 @@ export function useHourlyRateData(poolAddress, timeWindow, frequency) {
  * store these updates to reduce future redundant calls
  */
 export function useDataForList(poolList) {
+  const exchangeSubgraphClient = useExchangeClient()
   const [state] = usePoolDataContext()
   const [ethPrice] = useEthPrice()
 
@@ -582,6 +584,7 @@ export function useDataForList(poolList) {
       })
 
       let newPoolData = await getBulkPoolData(
+        exchangeSubgraphClient,
         unfetched.map((pool) => {
           return pool
         }),
@@ -593,7 +596,7 @@ export function useDataForList(poolList) {
       setStale(true)
       fetchNewPoolData()
     }
-  }, [ethPrice, state, poolList, stale, fetched])
+  }, [ethPrice, state, poolList, stale, fetched, exchangeSubgraphClient])
 
   let formattedFetch =
     fetched &&
@@ -608,6 +611,7 @@ export function useDataForList(poolList) {
  * Get all the current and 24hr changes for a pool
  */
 export function usePoolData(poolAddress) {
+  const exchangeSubgraphClient = useExchangeClient()
   const [state, { update }] = usePoolDataContext()
   const [ethPrice] = useEthPrice()
   const poolData = state?.[poolAddress]
@@ -615,14 +619,14 @@ export function usePoolData(poolAddress) {
   useEffect(() => {
     async function fetchData() {
       if (!poolData && poolAddress) {
-        let data = await getBulkPoolData([poolAddress], ethPrice)
+        let data = await getBulkPoolData(exchangeSubgraphClient, [poolAddress], ethPrice)
         data && update(poolAddress, data[0])
       }
     }
     if (!poolData && poolAddress && ethPrice && isAddress(poolAddress)) {
       fetchData()
     }
-  }, [poolAddress, poolData, update, ethPrice])
+  }, [poolAddress, poolData, update, ethPrice, exchangeSubgraphClient])
 
   return poolData || {}
 }
@@ -631,33 +635,35 @@ export function usePoolData(poolAddress) {
  * Get most recent txns for a pool
  */
 export function usePoolTransactions(poolAddress) {
+  const exchangeSubgraphClient = useExchangeClient()
   const [state, { updatePoolTxns }] = usePoolDataContext()
   const poolTxns = state?.[poolAddress]?.txns
   useEffect(() => {
     async function checkForTxns() {
       if (!poolTxns) {
-        let transactions = await getPoolTransactions(poolAddress)
+        let transactions = await getPoolTransactions(exchangeSubgraphClient, poolAddress)
         updatePoolTxns(poolAddress, transactions)
       }
     }
     checkForTxns()
-  }, [poolTxns, poolAddress, updatePoolTxns])
+  }, [poolTxns, poolAddress, updatePoolTxns, exchangeSubgraphClient])
   return poolTxns
 }
 
 export function usePoolChartData(poolAddress) {
+  const exchangeSubgraphClient = useExchangeClient()
   const [state, { updateChartData }] = usePoolDataContext()
   const chartData = state?.[poolAddress]?.chartData
 
   useEffect(() => {
     async function checkForChartData() {
       if (!chartData) {
-        let data = await getPoolChartData(poolAddress)
+        let data = await getPoolChartData(exchangeSubgraphClient, poolAddress)
         updateChartData(poolAddress, data)
       }
     }
     checkForChartData()
-  }, [chartData, poolAddress, updateChartData])
+  }, [chartData, poolAddress, updateChartData, exchangeSubgraphClient])
   return chartData
 }
 

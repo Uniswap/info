@@ -3,7 +3,7 @@ import { timeframeOptions, SUPPORTED_LIST_URLS__NO_ENS, KNC_ADDRESS } from '../c
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import getTokenList from '../utils/tokenLists'
-import { healthClient } from '../apollo/client'
+import { client, healthClient } from '../apollo/client'
 import { SUBGRAPH_HEALTH } from '../apollo/queries'
 import { getExchangeSubgraphClient } from '../apollo/manager'
 dayjs.extend(utc)
@@ -388,5 +388,5 @@ export function useExchangeClient() {
     }
   }, [chainId, exchangeSubgraphClient, updateExchangeSubgraphClient])
 
-  return exchangeSubgraphClient
+  return exchangeSubgraphClient || client
 }
