@@ -6,6 +6,7 @@ import TokenLogo from '../TokenLogo'
 import { Search as SearchIcon, X } from 'react-feather'
 import { BasicLink } from '../Link'
 
+import { useExchangeClient } from '../../contexts/Application'
 import { useAllTokenData, useTokenData } from '../../contexts/TokenData'
 import { useAllPairData, usePairData } from '../../contexts/PairData'
 import DoubleTokenLogo from '../DoubleLogo'
@@ -14,7 +15,6 @@ import { useAllPairsInUniswap, useAllTokensInUniswap } from '../../contexts/Glob
 import { OVERVIEW_TOKEN_BLACKLIST, PAIR_BLACKLIST, WETH_ADDRESS } from '../../constants'
 
 import { transparentize } from 'polished'
-import { client } from '../../apollo/client'
 import { PAIR_SEARCH, TOKEN_SEARCH } from '../../apollo/queries'
 import FormattedName from '../FormattedName'
 import { TYPE } from '../../Theme'
@@ -143,6 +143,7 @@ const Blue = styled.span`
 `
 
 export const Search = ({ small = false }) => {
+  const exchangeSubgraphClient = useExchangeClient()
   let allTokens = useAllTokensInUniswap()
   const allTokenData = useAllTokenData()
 
@@ -177,7 +178,7 @@ export const Search = ({ small = false }) => {
     async function fetchData() {
       try {
         if (value?.length > 0) {
-          let tokens = await client.query({
+          let tokens = await exchangeSubgraphClient.query({
             variables: {
               value: value ? value.toUpperCase() : '',
               id: value,
@@ -185,7 +186,7 @@ export const Search = ({ small = false }) => {
             query: TOKEN_SEARCH,
           })
 
-          let pairs = await client.query({
+          let pairs = await exchangeSubgraphClient.query({
             query: PAIR_SEARCH,
             variables: {
               tokens: tokens.data.asSymbol?.map((t) => t.id),
@@ -201,7 +202,7 @@ export const Search = ({ small = false }) => {
       }
     }
     fetchData()
-  }, [value])
+  }, [exchangeSubgraphClient, value])
 
   function escapeRegExp(string) {
     return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') // $& means the whole matched string

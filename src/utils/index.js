@@ -3,7 +3,7 @@ import { BigNumber } from 'bignumber.js'
 import dayjs from 'dayjs'
 import { ethers } from 'ethers'
 import utc from 'dayjs/plugin/utc'
-import { blockClient, client } from '../apollo/client'
+import { blockClient } from '../apollo/client'
 import { GET_BLOCK, GET_BLOCKS, SHARE_VALUE } from '../apollo/queries'
 import { Text } from 'rebass'
 import _Decimal from 'decimal.js-light'
@@ -215,7 +215,7 @@ export async function getBlocksFromTimestamps(timestamps, skipCount = 500) {
   return blocks
 }
 
-export async function getLiquidityTokenBalanceOvertime(account, timestamps) {
+export async function getLiquidityTokenBalanceOvertime(client, account, timestamps) {
   // get blocks based on timestamps
   const blocks = await getBlocksFromTimestamps(timestamps)
 
@@ -243,7 +243,7 @@ export async function getLiquidityTokenBalanceOvertime(account, timestamps) {
  * @param {String} pairAddress
  * @param {Array} timestamps
  */
-export async function getShareValueOverTime(pairAddress, timestamps) {
+export async function getShareValueOverTime(client, pairAddress, timestamps) {
   if (!timestamps) {
     const utcCurrentTime = dayjs()
     const utcSevenDaysBack = utcCurrentTime.subtract(8, 'day').unix()

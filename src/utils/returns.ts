@@ -1,5 +1,7 @@
+import { ApolloClient } from 'apollo-client'
+import { NormalizedCacheObject } from 'apollo-cache-inmemory'
+
 import { USER_MINTS_BUNRS_PER_PAIR } from '../apollo/queries'
-import { client } from '../apollo/client'
 import dayjs from 'dayjs'
 import { getShareValueOverTime } from '.'
 import { WETH_ADDRESS } from '../constants'
@@ -50,7 +52,11 @@ function formatPricesForEarlyTimestamps(position): Position {
   return position
 }
 
-async function getPrincipalForUserPerPair(user: string, pairAddress: string) {
+async function getPrincipalForUserPerPair(
+  client: ApolloClient<NormalizedCacheObject>,
+  user: string,
+  pairAddress: string
+) {
   let usd = 0
   let amount0 = 0
   let amount1 = 0
@@ -164,7 +170,13 @@ export function getMetricsForPositionWindow(positionT0: Position, positionT1: Po
  * @param pairSnapshots // history of entries and exits for lp on this pair
  * @param currentETHPrice // current price of eth used for usd conversions
  */
-export async function getHistoricalPairReturns(startDateTimestamp, currentPairData, pairSnapshots, currentETHPrice) {
+export async function getHistoricalPairReturns(
+  client,
+  startDateTimestamp,
+  currentPairData,
+  pairSnapshots,
+  currentETHPrice
+) {
   // catch case where data not puplated yet
   if (!currentPairData.createdAtTimestamp) {
     return []
@@ -187,7 +199,7 @@ export async function getHistoricalPairReturns(startDateTimestamp, currentPairDa
     dayIndex = dayIndex + 1
   }
 
-  const shareValues = await getShareValueOverTime(currentPairData.id, dayTimestamps)
+  const shareValues = await getShareValueOverTime(client, currentPairData.id, dayTimestamps)
   const shareValuesFormatted = {}
   if (shareValues && shareValues.length) {
     shareValues.forEach((share) => {
@@ -258,9 +270,15 @@ export async function getHistoricalPairReturns(startDateTimestamp, currentPairDa
  * @param pair
  * @param ethPrice
  */
-export async function getLPReturnsOnPair(user: string, pair, ethPrice: number, snapshots) {
+export async function getLPReturnsOnPair(
+  client: ApolloClient<NormalizedCacheObject>,
+  user: string,
+  pair,
+  ethPrice: number,
+  snapshots
+) {
   // initialize values
-  const principal = await getPrincipalForUserPerPair(user, pair.id)
+  const principal = await getPrincipalForUserPerPair(client, user, pair.id)
   let hodlReturn = 0
   let netReturn = 0
   let uniswapReturn = 0
