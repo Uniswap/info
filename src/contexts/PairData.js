@@ -695,7 +695,7 @@ export function usePairPools(pairAddress) {
         })
 
         // get data for every pool in list
-        let pairPoolsData = await getBulkPoolData(formattedPools, ethPrice)
+        let pairPoolsData = await getBulkPoolData(exchangeSubgraphClient, formattedPools, ethPrice)
         pairPoolsData && updatePairPools(pairAddress, pairPoolsData)
       }
     }
