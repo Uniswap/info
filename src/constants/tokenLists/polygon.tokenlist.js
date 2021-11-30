@@ -50,6 +50,15 @@ const POLYGON_TOKEN_LIST = {
     logoURI:
       'https://raw.githubusercontent.com/stevepegaxy/assets/master/blockchains/polygon/assets/0xc1c93D475dc82Fe72DBC7074d55f5a734F8cEEAE/logo.png',
   },
+  '0xcC1B9517460D8aE86fe576f614d091fCa65a28Fc': {
+    chainId: 137,
+    address: '0xcC1B9517460D8aE86fe576f614d091fCa65a28Fc',
+    symbol: 'VIS',
+    name: 'Vigorus',
+    decimals: 18,
+    logoURI:
+      'https://raw.githubusercontent.com/stevepegaxy/assets/master/blockchains/polygon/assets/0xcC1B9517460D8aE86fe576f614d091fCa65a28Fc/logo.png',
+  },
 }
 
 export default POLYGON_TOKEN_LIST
