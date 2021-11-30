@@ -26,6 +26,10 @@ const EXCHANGE_SUBGRAPH_URLS = {
     'https://api.thegraph.com/subgraphs/name/dynamic-amm/dmm-exchange-avax',
   ],
   avalancheTestnet: ['https://api.thegraph.com/subgraphs/name/ducquangkstn/dmm-exchange-fuij'],
+  fantom: [
+    'https://api.thegraph.com/subgraphs/name/dynamic-amm/dmm-exchange-ftm',
+    'https://fantom-subgraph.knstats.com/subgraphs/name/dynamic-amm/dmm-exchange-ftm',
+  ],
 }
 
 export function getExchangeSubgraphUrls(networkId) {
@@ -59,6 +63,8 @@ export function getExchangeSubgraphUrls(networkId) {
       return EXCHANGE_SUBGRAPH_URLS.avalanche
     case ChainId.AVAXTESTNET:
       return EXCHANGE_SUBGRAPH_URLS.avalancheTestnet
+    case ChainId.FANTOM:
+      return EXCHANGE_SUBGRAPH_URLS.fantom
     default:
       return EXCHANGE_SUBGRAPH_URLS.mainnet
   }
