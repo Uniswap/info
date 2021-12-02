@@ -13,6 +13,32 @@ if [[ "$TRAVIS_BRANCH" == "develop" ]]; then
   echo "Finished running build-ropsten"
 elif [[ "$TRAVIS_BRANCH" == "staging" ]]; then
   echo "Start running build"
+  yarn build-production
+  mv build build-production
+  echo "Finished running build"
+
+  echo "Start running build"
+  yarn build-matic
+  mv build build-matic
+  echo "Finished running build"
+
+  echo "Start running build"
+  yarn build-bsc
+  mv build build-bsc
+  echo "Finished running build"
+
+  echo "Start running build"
+  yarn build-avax
+  mv build build-avax
+  echo "Finished running build"
+
+  echo "Start running build"
+  yarn build-fantom
+  mv build build-fantom
+  echo "Finished running build"
+
+
+  echo "Start running build"
   yarn build-staging
   mv build build-staging
   echo "Finished running build-eth-staging"

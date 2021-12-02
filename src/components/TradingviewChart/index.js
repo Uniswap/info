@@ -8,6 +8,7 @@ import { usePrevious } from 'react-use'
 import { Play } from 'react-feather'
 import { useDarkModeManager } from '../../contexts/LocalStorage'
 import { IconWrapper } from '..'
+import useTheme from '../../hooks/useTheme'
 
 dayjs.extend(utc)
 
@@ -62,6 +63,7 @@ const TradingViewChart = ({
   // adjust the scale based on the type of chart
   const topScale = type === CHART_TYPES.AREA ? 0.32 : 0.2
 
+  const theme = useTheme()
   const [darkMode] = useDarkModeManager()
   const textColor = darkMode ? 'white' : 'black'
   const previousTheme = usePrevious(darkMode)
@@ -129,7 +131,7 @@ const TradingViewChart = ({
       var series =
         type === CHART_TYPES.BAR
           ? chart.addHistogramSeries({
-              color: '#08a1e7',
+              color: theme.primary,
               priceFormat: {
                 type: 'volume',
               },
@@ -137,13 +139,13 @@ const TradingViewChart = ({
                 top: 0.32,
                 bottom: 0,
               },
-              lineColor: '#08a1e7',
+              lineColor: theme.primary,
               lineWidth: 3,
             })
           : chart.addAreaSeries({
-              topColor: '#08a1e7',
-              bottomColor: 'rgba(8, 161, 231, 0)',
-              lineColor: '#08a1e7',
+              topColor: theme.primary,
+              bottomColor: theme.primary + '00',
+              lineColor: theme.primary,
               lineWidth: 3,
             })
 
@@ -227,6 +229,7 @@ const TradingViewChart = ({
     type,
     useWeekly,
     width,
+    theme.primary,
   ])
 
   // responsiveness

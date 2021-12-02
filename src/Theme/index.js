@@ -35,7 +35,7 @@ const theme = (darkMode, color) => ({
   panelColor: darkMode ? 'rgba(255, 255, 255, 0)' : 'rgba(255, 255, 255, 0)',
   backgroundColor: darkMode ? '#212429' : '#F7F8FA',
 
-  uniswapPink: darkMode ? '#08a1e7' : 'black',
+  uniswapPink: darkMode ? '#31CB9E' : 'black',
 
   concreteGray: darkMode ? '#292C2F' : '#FAFAFA',
   inputBackground: darkMode ? '#1F1F1F' : '#FAFAFA',
@@ -63,8 +63,6 @@ const theme = (darkMode, color) => ({
   bg5: darkMode ? '#565A69' : '#888D9B',
   bg6: darkMode ? '#243036' : '#FFFFFF',
   bg7: darkMode ? '#303e46' : '#FFFFFF',
-  bg8: darkMode ? '#0078b0' : '#b3e5fc',
-  bg12: darkMode ? '#11171a' : '#f5f5f5',
 
   //specialty colors
   modalBG: darkMode ? 'rgba(0,0,0,.425)' : 'rgba(0,0,0,0.3)',
@@ -72,20 +70,17 @@ const theme = (darkMode, color) => ({
   onlyLight: darkMode ? '#222c31' : 'transparent',
   divider: darkMode ? 'rgba(43, 43, 43, 0.435)' : 'rgba(43, 43, 43, 0.035)',
 
-  primary: '#08A1E7',
+  primary: '#31CB9E',
 
   //primary colors
-  primary1: darkMode ? '#2172E5' : '#08a1e7',
+  primary1: '#31CB9E',
   primary2: darkMode ? '#3680E7' : '#FF8CC3',
   primary3: darkMode ? '#4D8FEA' : '#FF99C9',
   primary4: darkMode ? '#376bad70' : '#F6DDE8',
   primary5: darkMode ? '#153d6f70' : '#FDEAF1',
 
-  // color text
-  primaryText1: darkMode ? '#6da8ff' : '#08a1e7',
-
   // secondary colors
-  secondary1: darkMode ? '#2172E5' : '#08a1e7',
+  secondary1: darkMode ? '#2172E5' : '#31CB9E',
   secondary2: darkMode ? '#17000b26' : '#F6DDE8',
   secondary3: darkMode ? '#17000b26' : '#FDEAF1',
 
@@ -95,8 +90,9 @@ const theme = (darkMode, color) => ({
   // border: darkMode ? '#4c5f69' : '#859aa5',
 
   // table colors
+  tableHeader: darkMode ? '#303E46' : '#F9F9F9',
   oddRow: darkMode ? '#283339' : '#f4f4f4',
-  evenRow: darkMode ? '#303e46' : '#ffffff',
+  evenRow: darkMode ? '#303e46' : '#F9F9F9',
 
   // other
   red1: '#FF537B',
@@ -110,13 +106,12 @@ const theme = (darkMode, color) => ({
   warningBorder: darkMode ? '#303e46' : '#ffaf01',
   warningTextColor: darkMode ? '#859aa5' : '#1d272b',
 
-  // background: darkMode ? 'black' : `radial-gradient(50% 50% at 50% 50%, #08a1e730 0%, #fff 0%)`,
-
   buttonBlack: darkMode ? '#11171A' : '#F5F5F5',
   background: darkMode ? '#243036' : '#FFFFFF',
   text: darkMode ? '#FFFFFF' : '#3A3A3A',
+  textReverse: !darkMode ? '#FFFFFF' : '#3A3A3A',
   subText: darkMode ? '#A7B6BD' : '#5C6468',
-  border: darkMode ? '#40505A' : '#C2C2C2',
+  border: darkMode ? '#40505A' : '#E9E9E9',
 
   // media queries
   mediaWidth: mediaWidthTemplates,
@@ -206,6 +201,18 @@ export const GlobalStyle = createGlobalStyle`
     html { font-family: 'Inter var', sans-serif; }
   }
 
+  html, input, textarea, button {
+    font-family: 'Work Sans', 'Inter', sans-serif;
+    font-display: fallback;
+  }
+  @supports (font-variation-settings: normal) {
+    html, input, textarea, button {
+      font-family: 'Work Sans', 'Inter var', sans-serif;
+    }
+  }
+
+
+
   html,
   body {
     margin: 0;
@@ -225,7 +232,7 @@ export const GlobalStyle = createGlobalStyle`
   }
 
   ::-webkit-scrollbar {
-    width: 8px;
+    width: 6px;
     height: 8px;
   }
 
@@ -281,7 +288,7 @@ export const GlobalStyle = createGlobalStyle`
   html {
     font-size: 1rem;
     font-variant: none;
-    color: 'black';
+    color: ${({ theme }) => theme.text};
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0);

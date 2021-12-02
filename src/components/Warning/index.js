@@ -10,6 +10,7 @@ import { Hover } from '..'
 import Link from '../Link'
 import { useMedia } from 'react-use'
 import { getNetworkName, getEtherscanLinkText } from '../../utils'
+import useTheme from '../../hooks/useTheme'
 
 const WarningWrapper = styled.div`
   border-radius: 8px;
@@ -58,6 +59,7 @@ export default function Warning({ type, show, setShow, address }) {
   )
 
   const contractTypeLabel = type === 'token' ? 'token' : 'pool'
+  const theme = useTheme()
 
   return (
     <WarningWrapper show={show}>
@@ -77,7 +79,7 @@ export default function Warning({ type, show, setShow, address }) {
               <Hover style={{ marginTop: '10px' }}>
                 <Link
                   lineHeight={'145.23%'}
-                  color={'#08a1e7'}
+                  color={theme.primary}
                   href={`${process.env.REACT_APP_ETHERSCAN_URL}/address/${address}`}
                   target="_blank"
                 >
@@ -87,7 +89,7 @@ export default function Warning({ type, show, setShow, address }) {
             )}
             <RowBetween style={{ marginTop: '20px' }}>
               <div />
-              <ButtonDark color={'#08a1e7'} style={{ minWidth: '140px' }} onClick={() => setShow(false)}>
+              <ButtonDark color={theme.primary} style={{ minWidth: '140px' }} onClick={() => setShow(false)}>
                 I understand
               </ButtonDark>
             </RowBetween>
@@ -100,7 +102,7 @@ export default function Warning({ type, show, setShow, address }) {
               <Hover>
                 <Link
                   lineHeight={'145.23%'}
-                  color={'#08a1e7'}
+                  color={theme.primary}
                   href={`${process.env.REACT_APP_ETHERSCAN_URL}/address/${address}`}
                   target="_blank"
                 >
@@ -108,7 +110,7 @@ export default function Warning({ type, show, setShow, address }) {
                 </Link>
               </Hover>
             )}
-            <ButtonDark color={'#08a1e7'} style={{ minWidth: '140px' }} onClick={() => setShow(false)}>
+            <ButtonDark color={theme.primary} style={{ minWidth: '140px' }} onClick={() => setShow(false)}>
               I understand
             </ButtonDark>
           </RowBetween>

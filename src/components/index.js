@@ -8,7 +8,7 @@ import { urls } from '../utils'
 
 const Divider = styled(Box)`
   height: 1px;
-  background-color: ${({ theme }) => `${theme.border}4d`};
+  background-color: ${({ theme }) => `${theme.border}99`};
 `
 
 export const IconWrapper = styled.div`

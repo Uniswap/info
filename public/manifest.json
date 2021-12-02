@@ -1,9 +1,9 @@
 {
-  "short_name": "Uniswap Info",
-  "name": "View statistics for Uniswap exchanges.",
+  "short_name": "KyberSwap Analytics",
+  "name": "View statistics for KyberSwap exchanges.",
   "icons": [
     {
-      "src": "favicon.ico",
+      "src": "favicon.ico?version=1",
       "sizes": "64x64 32x32 24x24 16x16",
       "type": "image/x-icon"
     }

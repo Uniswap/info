@@ -12,6 +12,7 @@ import { useUserLiquidityChart } from '../../contexts/User'
 import LocalLoader from '../LocalLoader'
 import { useDarkModeManager } from '../../contexts/LocalStorage'
 import { TYPE } from '../../Theme'
+import useTheme from '../../hooks/useTheme'
 
 const ChartWrapper = styled.div`
   height: 100%;
@@ -27,6 +28,7 @@ const UserChart = ({ account }) => {
 
   const [timeWindow, setTimeWindow] = useState(timeframeOptions.ALL_TIME)
   let utcStartTime = getTimeframe(timeWindow)
+  const theme = useTheme()
 
   const below600 = useMedia('(max-width: 600px)')
   const above1600 = useMedia('(min-width: 1600px)')
@@ -38,47 +40,49 @@ const UserChart = ({ account }) => {
   const [darkMode] = useDarkModeManager()
   const textColor = darkMode ? 'white' : 'black'
 
+  const { ONE_DAY, THERE_DAYS, FOUR_HOURS, ...rest } = timeframeOptions
+
   return (
     <ChartWrapper>
       {below600 ? (
         <RowBetween mb={40}>
           <div />
-          <DropdownSelect options={timeframeOptions} active={timeWindow} setActive={setTimeWindow} color={'#08a1e7'} />
+          <DropdownSelect options={rest} active={timeWindow} setActive={setTimeWindow} color={theme.primary} />
         </RowBetween>
       ) : (
-          <RowBetween mb={40}>
-            <AutoRow gap="10px">
-              <TYPE.main>Liquidity Value</TYPE.main>
-            </AutoRow>
-            <AutoRow justify="flex-end" gap="4px">
-              <OptionButton
-                active={timeWindow === timeframeOptions.MONTH}
-                onClick={() => setTimeWindow(timeframeOptions.MONTH)}
-              >
-                1M
+        <RowBetween mb={40}>
+          <AutoRow gap="10px">
+            <TYPE.main>Liquidity Value</TYPE.main>
+          </AutoRow>
+          <AutoRow justify="flex-end" gap="4px">
+            <OptionButton
+              active={timeWindow === timeframeOptions.MONTH}
+              onClick={() => setTimeWindow(timeframeOptions.MONTH)}
+            >
+              1M
             </OptionButton>
-              <OptionButton
-                active={timeWindow === timeframeOptions.WEEK}
-                onClick={() => setTimeWindow(timeframeOptions.WEEK)}
-              >
-                1W
+            <OptionButton
+              active={timeWindow === timeframeOptions.WEEK}
+              onClick={() => setTimeWindow(timeframeOptions.WEEK)}
+            >
+              1W
             </OptionButton>
-              <OptionButton
-                active={timeWindow === timeframeOptions.ALL_TIME}
-                onClick={() => setTimeWindow(timeframeOptions.ALL_TIME)}
-              >
-                All
+            <OptionButton
+              active={timeWindow === timeframeOptions.ALL_TIME}
+              onClick={() => setTimeWindow(timeframeOptions.ALL_TIME)}
+            >
+              All
             </OptionButton>
-            </AutoRow>
-          </RowBetween>
-        )}
+          </AutoRow>
+        </RowBetween>
+      )}
       {chartData ? (
         <ResponsiveContainer aspect={aspect} style={{ height: 'inherit' }}>
           <AreaChart margin={{ top: 0, right: 10, bottom: 6, left: 0 }} barCategoryGap={1} data={chartData}>
             <defs>
               <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor={'#08a1e7'} stopOpacity={0.35} />
-                <stop offset="95%" stopColor={'#08a1e7'} stopOpacity={0} />
+                <stop offset="5%" stopColor={theme.primary} stopOpacity={0.35} />
+                <stop offset="95%" stopColor={theme.primary} stopOpacity={0} />
               </linearGradient>
             </defs>
             <XAxis
@@ -112,7 +116,7 @@ const UserChart = ({ account }) => {
               contentStyle={{
                 padding: '10px 14px',
                 borderRadius: 10,
-                borderColor: '#08a1e7',
+                borderColor: theme.primary,
                 color: 'black',
               }}
               wrapperStyle={{ top: -70, left: -10 }}
@@ -126,14 +130,14 @@ const UserChart = ({ account }) => {
               type="monotone"
               name={'Liquidity'}
               yAxisId={0}
-              stroke={darken(0.12, '#08a1e7')}
+              stroke={darken(0.12, theme.primary)}
               fill="url(#colorUv)"
             />
           </AreaChart>
         </ResponsiveContainer>
       ) : (
-          <LocalLoader />
-        )}
+        <LocalLoader />
+      )}
     </ChartWrapper>
   )
 }

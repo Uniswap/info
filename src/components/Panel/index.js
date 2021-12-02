@@ -34,7 +34,7 @@ const Panel = styled(RebassBox)`
     border: ${({ hover, theme }) => hover && '1px solid' + theme.bg5};
   }
 
-  ${(props) => props.background && `background-color: ${props.theme.advancedBG};`}
+  ${(props) => props.background && `background-color: ${props.theme.background};`}
 
   ${(props) => (props.area ? `grid-area: ${props.area};` : null)}
 

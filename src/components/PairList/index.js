@@ -15,6 +15,7 @@ import FormattedName from '../FormattedName'
 import QuestionHelper from '../QuestionHelper'
 import { TYPE } from '../../Theme'
 import { MAX_ALLOW_APY } from '../../constants'
+import useTheme from '../../hooks/useTheme'
 
 dayjs.extend(utc)
 
@@ -22,8 +23,7 @@ const PageButtons = styled.div`
   width: 100%;
   display: flex;
   justify-content: center;
-  margin-top: 2em;
-  margin-bottom: 0.5em;
+  margin: 1.25rem 0;
 `
 
 const Arrow = styled.div`
@@ -45,7 +45,7 @@ const DashGrid = styled.div`
   grid-gap: 1em;
   grid-template-columns: 100px 1fr 1fr;
   grid-template-areas: 'name liq vol';
-  padding: 0 1.125rem;
+  padding: 0;
 
   > * {
     justify-content: flex-end;
@@ -58,13 +58,11 @@ const DashGrid = styled.div`
   }
 
   @media screen and (min-width: 740px) {
-    padding: 0 1.125rem;
     grid-template-columns: 2fr 1fr 1fr;
     grid-template-areas: ' name liq vol pool ';
   }
 
   @media screen and (min-width: 1080px) {
-    padding: 0 1.125rem;
     grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr;
     grid-template-areas: ' name liq vol volWeek fees apy';
   }
@@ -73,6 +71,12 @@ const DashGrid = styled.div`
     grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr;
     grid-template-areas: ' name liq vol volWeek fees apy';
   }
+`
+const TableHeader = styled(DashGrid)`
+  background: ${({ theme }) => theme.tableHeader};
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  padding: 20px;
 `
 
 const ListWrapper = styled.div``
@@ -85,6 +89,10 @@ const ClickableText = styled(Text)`
   }
   text-align: end;
   user-select: none;
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 500;
+  color: ${({ theme }) => theme.subText};
 `
 
 const DataText = styled(Flex)`
@@ -124,7 +132,7 @@ const FIELD_TO_VALUE = (field, useTracked = false) => {
   }
 }
 
-function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
+function PairList({ pairs, color, disbaleLinks, maxItems = 5 }) {
   const below600 = useMedia('(max-width: 600px)')
   const below740 = useMedia('(max-width: 740px)')
   const below1080 = useMedia('(max-width: 1080px)')
@@ -171,7 +179,7 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
       const weekVolume = pairData.oneWeekVolumeUSD ? pairData.oneWeekVolumeUSD : pairData.oneWeekVolumeUntracked
 
       return (
-        <DashGrid style={{ height: '48px' }} disbaleLinks={disbaleLinks} focus={true}>
+        <DashGrid style={{ height: '56px' }} disbaleLinks={disbaleLinks} focus={true}>
           <DataText area="name" fontWeight="500">
             {!below600 && <div style={{ marginRight: '20px', width: '10px' }}>{index}</div>}
             <DoubleTokenLogo
@@ -220,23 +228,23 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
       .map((pairAddress, index) => {
         return (
           pairAddress && (
-            <React.Fragment key={index}>
+            <div key={index} style={{ padding: '0 20px' }}>
               <ListItem key={index} index={(page - 1) * ITEMS_PER_PAGE + index + 1} pairAddress={pairAddress} />
               <Divider />
-            </React.Fragment>
+            </div>
           )
         )
       })
 
+  const theme = useTheme()
+
   return (
     <ListWrapper>
-      <DashGrid
-        center={true}
-        disbaleLinks={disbaleLinks}
-        style={{ height: 'fit-content', padding: '0 1.125rem 1rem 1.125rem' }}
-      >
+      <TableHeader center={true} disbaleLinks={disbaleLinks} style={{ height: 'fit-content' }}>
         <Flex alignItems="center" justifyContent="flexStart">
-          <TYPE.main area="name">Name</TYPE.main>
+          <Text fontWeight="500" fontSize="12px" color={theme.subText}>
+            NAME
+          </Text>
         </Flex>
         <Flex alignItems="center" justifyContent="flexEnd">
           <ClickableText
@@ -257,7 +265,7 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
               setSortDirection(sortedColumn !== SORT_FIELD.VOL ? true : !sortDirection)
             }}
           >
-            Volume (24hrs)
+            Volume (24H)
             {sortedColumn === SORT_FIELD.VOL ? (!sortDirection ? '↑' : '↓') : ''}
           </ClickableText>
         </Flex>
@@ -283,7 +291,7 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
                 setSortDirection(sortedColumn !== SORT_FIELD.FEES ? true : !sortDirection)
               }}
             >
-              Fees (24hr) {sortedColumn === SORT_FIELD.FEES ? (!sortDirection ? '↑' : '↓') : ''}
+              Fees (24H) {sortedColumn === SORT_FIELD.FEES ? (!sortDirection ? '↑' : '↓') : ''}
             </ClickableText>
           </Flex>
         )}
@@ -296,12 +304,12 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
                 setSortDirection(sortedColumn !== SORT_FIELD.APY ? true : !sortDirection)
               }}
             >
-              1y Fees / Liquidity {sortedColumn === SORT_FIELD.APY ? (!sortDirection ? '↑' : '↓') : ''}
+              APR {sortedColumn === SORT_FIELD.APY ? (!sortDirection ? '↑' : '↓') : ''}
             </ClickableText>
-            <QuestionHelper text={'Based on 24hr volume annualized'} />
+            <QuestionHelper text={'Estimated return based on yearly fees of the pool'} />
           </Flex>
         )}
-      </DashGrid>
+      </TableHeader>
       <Divider />
       <List p={0}>{!pairList ? <LocalLoader /> : pairList}</List>
       <PageButtons>

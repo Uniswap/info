@@ -66,11 +66,11 @@ export const KNCL_ADDRESS =
     : '0x7B2810576aa1cce68F2B118CeF1F36467c648F92'
 
 export const ANALYTICS_URLS = {
-  1: 'https://info.dmm.exchange',
-  137: 'https://polygon-info.dmm.exchange',
-  56: 'https://bsc-info.dmm.exchange',
-  43114: 'https://avax-info.dmm.exchange',
-  250: 'https://fantom-info.dmm.exchange',
+  1: 'https://analytics.kyberswap.com',
+  137: 'https://polygon-analytics.kyberswap.com',
+  56: 'https://bsc-analytics.kyberswap.com',
+  43114: 'https://avax-analytics.kyberswap.com',
+  250: 'https://fantom-analytics.kyberswap.com',
 }
 
 export const ChainId = {
@@ -86,3 +86,6 @@ export const ChainId = {
 }
 
 export const MAX_ALLOW_APY = 2000
+
+export const AMP_HINT =
+  'Stands for amplification factor. Each pool can have its own AMP. Pools with a higher AMP provide higher capital efficiency within a particular price range'

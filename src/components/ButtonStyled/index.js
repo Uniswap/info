@@ -14,7 +14,6 @@ const Base = styled(RebassButton)`
   cursor: pointer;
   outline: none;
   border: 1px solid transparent;
-  outline: none;
   border-bottom-right-radius: ${({ open }) => open && '0'};
   border-bottom-left-radius: ${({ open }) => open && '0'};
 `
@@ -64,7 +63,7 @@ export const ButtonLight = styled(Base)`
   color: ${({ color, theme }) => (color ? darken(0.1, color) : theme.primary1)};
 
   min-width: fit-content;
-  border-radius: 12px;
+  border-radius: 4px;
   white-space: nowrap;
 
   a {
@@ -119,15 +118,15 @@ export function ButtonDropdown({ disabled = false, children, open, ...rest }) {
 }
 
 export const ButtonDark = styled(Base)`
-  background-color: ${({ color, theme }) => (color ? color : theme.primary1)};
-  color: white;
-  width: fit-content;
+  background-color: ${({ color, theme }) => (color ? color : theme.primary)};
+  color: ${({ theme }) => theme.textReverse};
+  min-width: fit-content;
   font-size: 12px;
-  border-radius: 5.5px;
+  border-radius: 4px;
   white-space: nowrap;
 
   :hover {
-    background-color: ${({ color, theme }) => (color ? darken(0.1, color) : darken(0.1, theme.primary1))};
+    background-color: ${({ color, theme }) => (color ? darken(0.1, color) : darken(0.1, theme.primary))};
   }
 `
 
@@ -183,13 +182,13 @@ export const ButtonEmpty = styled(Base)`
   align-items: center;
 
   &:focus {
-    text-decoration: underline;
+    color: ${({ theme }) => darken(0.1, theme.primary1)};
   }
   &:hover {
-    text-decoration: underline;
+    color: ${({ theme }) => darken(0.1, theme.primary1)};
   }
   &:active {
-    text-decoration: underline;
+    color: ${({ theme }) => darken(0.1, theme.primary1)};
   }
   &:disabled {
     opacity: 50%;

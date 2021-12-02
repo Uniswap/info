@@ -131,7 +131,7 @@ const PairChart = ({ address, color, base0, base1 }) => {
   return (
     <ChartWrapper>
       {below600 ? (
-        <RowBetween mb={40}>
+        <RowBetween mb={80}>
           <DropdownSelect
             options={CHART_VIEW}
             active={chartFilter}

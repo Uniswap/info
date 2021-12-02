@@ -6,7 +6,7 @@ import styled from 'styled-components'
 import { useMedia } from 'react-use'
 
 import { PageWrapper, ContentWrapperLarge, Hover } from '../components'
-import Panel from '../components/Panel'
+import RawPanel from '../components/Panel'
 import { AutoRow, RowBetween, RowFixed } from '../components/Row'
 import Column, { AutoColumn } from '../components/Column'
 import { ButtonDark, ButtonOutlined } from '../components/ButtonStyled'
@@ -37,19 +37,25 @@ import {
 } from '../utils'
 import bookMark from '../assets/bookmark.svg'
 import bookMarkOutline from '../assets/bookmark_outline.svg'
+import useTheme from '../hooks/useTheme'
+import { Flex } from 'rebass'
 
 const DashboardWrapper = styled.div`
   width: 100%;
 `
 
+const Panel = styled(RawPanel)`
+  padding: 1rem;
+`
+
 const PanelWrapper = styled.div`
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: max-content;
-  gap: 6px;
+  gap: 16px;
   display: inline-grid;
   width: 100%;
   align-items: start;
-  @media screen and (max-width: 1024px) {
+  @media screen and (max-width: 1080px) {
     grid-template-columns: 1fr;
     align-items: stretch;
     > * {
@@ -67,15 +73,15 @@ const PanelWrapper = styled.div`
 const TokenDetailsLayout = styled.div`
   display: inline-grid;
   width: 100%;
-  grid-template-columns: auto auto auto auto 1fr;
-  column-gap: 60px;
+  grid-template-columns: auto auto auto auto auto;
+  column-gap: 30px;
   align-items: start;
 
   &:last-child {
     align-items: center;
     justify-items: end;
   }
-  @media screen and (max-width: 1024px) {
+  @media screen and (max-width: 1150px) {
     grid-template-columns: 1fr;
     align-items: stretch;
     > * {
@@ -98,21 +104,6 @@ const FixedPanel = styled(Panel)`
   :hover {
     cursor: pointer;
     background-color: ${({ theme }) => theme.bg2};
-  }
-`
-
-const PriceRangePanel = styled(Panel)`
-  height: 100%;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-
-  @media screen and (max-width: 1024px) {
-    grid-template-columns: 1fr;
-
-    > * {
-      margin-bottom: 1rem;
-    }
   }
 `
 
@@ -155,8 +146,10 @@ function PoolPage({ poolAddress, history }) {
     document.querySelector('body').scrollTo(0, 0)
   }, [])
 
+  const theme = useTheme()
+
   const transactions = usePoolTransactions(poolAddress)
-  const backgroundColor = '#08a1e7'
+  const backgroundColor = theme.primary
 
   // liquidity
   const liquidity = reserveUSD ? formattedNum(reserveUSD, true) : '-'
@@ -307,9 +300,7 @@ function PoolPage({ poolAddress, history }) {
                   )}
 
                   <Link external href={getPoolLink(token0?.id, token1?.id, false, poolAddress)}>
-                    <ButtonOutlined color="#08a1e7" borderColor="#08a1e7" style={{ padding: '11px 22px' }}>
-                      + Add Liquidity
-                    </ButtonOutlined>
+                    <ButtonOutlined style={{ padding: '11px 22px' }}>+ Add Liquidity</ButtonOutlined>
                   </Link>
                   <Link external href={getSwapLink(token0?.id, token1?.id)}>
                     <ButtonDark
@@ -362,9 +353,11 @@ function PoolPage({ poolAddress, history }) {
               {!below1080 && <TYPE.main fontSize={'1.125rem'}>Pool Stats</TYPE.main>}
               <PanelWrapper style={{ marginTop: '1.5rem' }}>
                 <Panel style={{ height: '100%' }}>
-                  <AutoColumn gap="20px">
+                  <AutoColumn gap="12px">
                     <RowBetween>
-                      <TYPE.main fontSize={12}>Total Liquidity {!usingTracked ? '(Untracked)' : ''}</TYPE.main>
+                      <TYPE.main fontSize={12} color={theme.subText}>
+                        Total Liquidity {!usingTracked ? '(Untracked)' : ''}
+                      </TYPE.main>
                       <div />
                     </RowBetween>
                     <RowBetween align="flex-end">
@@ -376,9 +369,11 @@ function PoolPage({ poolAddress, history }) {
                   </AutoColumn>
                 </Panel>
                 <Panel style={{ height: '100%' }}>
-                  <AutoColumn gap="20px">
+                  <AutoColumn gap="12px">
                     <RowBetween>
-                      <TYPE.main fontSize={12}>Volume (24hrs) {usingUtVolume && '(Untracked)'}</TYPE.main>
+                      <TYPE.main fontSize={12} color={theme.subText}>
+                        Volume (24H) {usingUtVolume && '(Untracked)'}
+                      </TYPE.main>
                       <div />
                     </RowBetween>
                     <RowBetween align="flex-end">
@@ -390,9 +385,11 @@ function PoolPage({ poolAddress, history }) {
                   </AutoColumn>
                 </Panel>
                 <Panel style={{ height: '100%' }}>
-                  <AutoColumn gap="20px">
+                  <AutoColumn gap="12px">
                     <RowBetween>
-                      <TYPE.main fontSize={12}>Fees (24hrs)</TYPE.main>
+                      <TYPE.main fontSize={12} color={theme.subText}>
+                        Fees (24H)
+                      </TYPE.main>
                       <div />
                     </RowBetween>
                     <RowBetween align="flex-end">
@@ -405,9 +402,11 @@ function PoolPage({ poolAddress, history }) {
                 </Panel>
 
                 <Panel style={{ height: '100%' }}>
-                  <AutoColumn gap="20px">
+                  <AutoColumn gap="12px">
                     <RowBetween>
-                      <TYPE.main fontSize={12}>Pooled Tokens</TYPE.main>
+                      <TYPE.main fontSize={12} color={theme.subText}>
+                        Pooled Tokens
+                      </TYPE.main>
                       <div />
                     </RowBetween>
                     <Hover onClick={() => history.push(`/token/${token0?.id}`)} fade={true}>
@@ -435,103 +434,105 @@ function PoolPage({ poolAddress, history }) {
                   </AutoColumn>
                 </Panel>
                 <Panel style={{ height: '100%' }}>
-                  <AutoColumn gap="20px">
+                  <AutoColumn gap="12px">
                     <RowBetween>
-                      <TYPE.main fontSize={12}>Ratio</TYPE.main>
+                      <TYPE.main fontSize={12} color={theme.subText}>
+                        Ratio
+                      </TYPE.main>
                       <div />
                     </RowBetween>
                     <RowFixed>
-                      <TokenLogo address={token0?.id} />
                       <TYPE.main fontSize={14} lineHeight={1} fontWeight={500}>
                         <RowFixed>
-                          <FormattedName text={token0?.symbol ?? ''} maxCharacters={8} margin={true} />
                           {percentToken0 ? formattedTokenRatio(percentToken0) : ''}
+                          <FormattedName text={token0?.symbol ?? ''} maxCharacters={8} margin={true} />
                         </RowFixed>
                       </TYPE.main>
-                      <div style={{ color: 'white', margin: '0 8px' }}>•</div>
-                      <TokenLogo address={token1?.id} />
+                      <div style={{ color: 'white', margin: '0 8px' }}>-</div>
                       <TYPE.main fontSize={14} lineHeight={1} fontWeight={500}>
                         <RowFixed>
-                          <FormattedName text={token1?.symbol ?? ''} maxCharacters={8} margin={true} />
                           {percentToken1 ? formattedTokenRatio(percentToken1) : ''}
+                          <FormattedName text={token1?.symbol ?? ''} maxCharacters={8} margin={true} />
                         </RowFixed>
                       </TYPE.main>
                     </RowFixed>
                   </AutoColumn>
                 </Panel>
-                <PriceRangePanel>
-                  <AutoColumn gap="20px">
-                    <RowFixed>
-                      <TYPE.main fontSize={12}>
-                        Price Range{' '}
+                <Panel>
+                  <TYPE.main fontSize={12} color={theme.subText} style={{ marginBottom: '12px' }}>
+                    Active Price Range
+                  </TYPE.main>
+
+                  <Flex sx={{ gap: '12px' }} justifyContent="space-between">
+                    <Flex sx={{ gap: '12px' }} flexDirection="column">
+                      <TYPE.main color={theme.subText}>
                         <FormattedName
                           text={token0?.symbol ?? ''}
                           maxCharacters={8}
-                          margin={true}
-                          style={{ display: 'inline-block' }}
+                          style={{ display: 'inline-block', color: theme.subText }}
                         />
                         /
                         <FormattedName
                           text={token1?.symbol ?? ''}
                           maxCharacters={8}
-                          style={{ display: 'inline-block' }}
+                          style={{ display: 'inline-block', color: theme.subText }}
                         />
                       </TYPE.main>
-                    </RowFixed>
 
-                    <RowBetween align="flex-end">
-                      <TYPE.main fontSize={14} lineHeight={1} fontWeight={500} style={{ display: 'inline-block' }}>
-                        {token1PriceMin === '0'
-                          ? '0.00'
-                          : token1PriceMin === '-1'
-                          ? '♾️'
-                          : parseFloat(token1PriceMin).toPrecision(6)}{' '}
-                        -{' '}
+                      <TYPE.main>
+                        Max{' '}
                         {token1PriceMax === '0'
                           ? '0.00'
                           : token1PriceMax === '-1'
                           ? '♾️'
                           : parseFloat(token1PriceMax).toPrecision(6)}
                       </TYPE.main>
-                    </RowBetween>
-                  </AutoColumn>
 
-                  <AutoColumn gap="20px">
-                    <RowFixed>
-                      <TYPE.main fontSize={12}>
-                        Price Range{' '}
+                      <TYPE.main>
+                        Min{' '}
+                        {token1PriceMin === '0'
+                          ? '0.00'
+                          : token1PriceMin === '-1'
+                          ? '♾️'
+                          : parseFloat(token1PriceMin).toPrecision(6)}
+                      </TYPE.main>
+                    </Flex>
+
+                    <Flex sx={{ gap: '12px' }} flexDirection="column" alignItems="flex-end">
+                      <TYPE.main color={theme.subText}>
                         <FormattedName
                           text={token1?.symbol ?? ''}
                           maxCharacters={8}
-                          margin={true}
-                          style={{ display: 'inline-block' }}
+                          style={{ display: 'inline-block', color: theme.subText }}
                         />
                         /
                         <FormattedName
                           text={token0?.symbol ?? ''}
                           maxCharacters={8}
-                          style={{ display: 'inline-block' }}
+                          style={{ display: 'inline-block', color: theme.subText }}
                         />
                       </TYPE.main>
-                    </RowFixed>
 
-                    <RowBetween align="flex-end">
-                      <TYPE.main fontSize={14} lineHeight={1} fontWeight={500} style={{ display: 'inline-block' }}>
-                        {token0PriceMin === '0'
-                          ? '0.00'
-                          : token0PriceMin === '-1'
-                          ? '♾️'
-                          : parseFloat(token0PriceMin).toPrecision(6)}{' '}
-                        -{' '}
+                      <TYPE.main>
+                        Max{' '}
                         {token0PriceMax === '0'
                           ? '0.00'
                           : token0PriceMax === '-1'
                           ? '♾️'
                           : parseFloat(token0PriceMax).toPrecision(6)}
                       </TYPE.main>
-                    </RowBetween>
-                  </AutoColumn>
-                </PriceRangePanel>
+
+                      <TYPE.main>
+                        Min{' '}
+                        {token0PriceMin === '0'
+                          ? '0.00'
+                          : token0PriceMin === '-1'
+                          ? '‚Äö√¥√¶√î‚àè√®'
+                          : parseFloat(token0PriceMin).toPrecision(6)}
+                      </TYPE.main>
+                    </Flex>
+                  </Flex>
+                </Panel>
                 <Panel
                   style={{
                     gridColumn: below1080 ? '1' : '2/4',
@@ -552,6 +553,7 @@ function PoolPage({ poolAddress, history }) {
               <Panel
                 style={{
                   marginTop: '1.5rem',
+                  padding: 0,
                 }}
               >
                 {transactions ? <TxnList transactions={transactions} /> : <Loader />}
@@ -568,8 +570,10 @@ function PoolPage({ poolAddress, history }) {
               >
                 <TokenDetailsLayout>
                   <Column>
-                    <TYPE.main>Pool Name</TYPE.main>
-                    <TYPE.main style={{ marginTop: '.5rem' }}>
+                    <TYPE.main color={theme.subText} fontSize="12px">
+                      POOL NAME
+                    </TYPE.main>
+                    <TYPE.main style={{ marginTop: '.75rem' }} fontSize="18px">
                       <RowFixed>
                         <FormattedName text={token0?.symbol ?? ''} maxCharacters={8} />
                         -
@@ -578,33 +582,35 @@ function PoolPage({ poolAddress, history }) {
                     </TYPE.main>
                   </Column>
                   <Column>
-                    <TYPE.main>Pool Address</TYPE.main>
+                    <TYPE.main color={theme.subText} fontSize="12px">
+                      POOL ADDRESS
+                    </TYPE.main>
                     <AutoRow align="flex-end">
-                      <TYPE.main style={{ marginTop: '.5rem' }}>
+                      <TYPE.main style={{ marginTop: '.75rem' }} fontSize="18px">
                         {poolAddress.slice(0, 6) + '...' + poolAddress.slice(38, 42)}
                       </TYPE.main>
                       <CopyHelper toCopy={poolAddress} />
                     </AutoRow>
                   </Column>
                   <Column>
-                    <TYPE.main>
+                    <TYPE.main color={theme.subText}>
                       <RowFixed>
-                        <FormattedName text={token0?.symbol ?? ''} maxCharacters={8} />{' '}
-                        <span style={{ marginLeft: '4px' }}>Address</span>
+                        <FormattedName style={{ color: theme.subText }} text={token0?.symbol ?? ''} maxCharacters={8} />{' '}
+                        <span style={{ marginLeft: '4px' }}>ADDRESS</span>
                       </RowFixed>
                     </TYPE.main>
                     <AutoRow align="flex-end">
-                      <TYPE.main style={{ marginTop: '.5rem' }}>
+                      <TYPE.main style={{ marginTop: '.75rem' }} fontSize="18px">
                         {token0 && token0.id.slice(0, 6) + '...' + token0.id.slice(38, 42)}
                       </TYPE.main>
                       <CopyHelper toCopy={token0?.id} />
                     </AutoRow>
                   </Column>
                   <Column>
-                    <TYPE.main>
+                    <TYPE.main color={theme.subText}>
                       <RowFixed>
-                        <FormattedName text={token1?.symbol ?? ''} maxCharacters={8} />{' '}
-                        <span style={{ marginLeft: '4px' }}>Address</span>
+                        <FormattedName style={{ color: theme.subText }} text={token1?.symbol ?? ''} maxCharacters={8} />{' '}
+                        <span style={{ marginLeft: '4px' }}>ADDRESS</span>
                       </RowFixed>
                     </TYPE.main>
                     <AutoRow align="flex-end">
@@ -614,15 +620,11 @@ function PoolPage({ poolAddress, history }) {
                       <CopyHelper toCopy={token1?.id} />
                     </AutoRow>
                   </Column>
-                  <ButtonOutlined color="#08a1e7" borderColor="#08a1e7" style={{ padding: '11px 22px' }}>
-                    <Link
-                      color={backgroundColor}
-                      external
-                      href={`${process.env.REACT_APP_ETHERSCAN_URL}/address/${poolAddress}`}
-                    >
+                  <Link external href={`${process.env.REACT_APP_ETHERSCAN_URL}/address/${poolAddress}`}>
+                    <ButtonDark color={backgroundColor} style={{ padding: '11px 22px' }}>
                       {`View on ${getEtherscanLinkText()}`} ↗
-                    </Link>
-                  </ButtonOutlined>
+                    </ButtonDark>
+                  </Link>
                 </TokenDetailsLayout>
               </Panel>
             </>

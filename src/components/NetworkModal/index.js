@@ -44,13 +44,13 @@ const ListItem = styled.div`
   align-items: center;
   padding: 8px 16px;
   border-radius: 8px;
-  background-color: ${({ theme, selected }) => (selected ? theme.bg8 : theme.bg12)};
+  background-color: ${({ theme, selected }) => (selected ? theme.primary : theme.buttonBlack)};
 `
 
 const NetworkLabel = styled.span`
   font-size: 16px;
   font-weight: 600;
-  color: ${({ theme }) => theme.text8};
+  color: ${({ theme }) => theme.text};
 `
 
 const SelectNetworkButton = styled(ButtonEmpty)`
