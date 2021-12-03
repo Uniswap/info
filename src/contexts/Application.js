@@ -4,7 +4,7 @@ import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import getTokenList from '../utils/tokenLists'
 import { client, healthClient } from '../apollo/client'
-import { SUBGRAPH_HEALTH } from '../apollo/queries'
+import { SUBGRAPH_HEALTH, SUBGRAPH_BLOCK_NUMBER } from '../apollo/queries'
 import { getExchangeSubgraphClient } from '../apollo/manager'
 dayjs.extend(utc)
 
@@ -238,7 +238,19 @@ export function useLatestBlocks() {
           updateHeadBlock(headBlock)
         }
       } catch (e) {
-        console.error(e)
+        console.log('Can not fetch from health client, fetch from exchange client instead ...')
+
+        const res = await client.query({
+          query: SUBGRAPH_BLOCK_NUMBER(),
+        })
+        const latestBlock = res.data._meta.block.number
+
+        if (latestBlock) {
+          updateLatestBlock(latestBlock)
+          updateHeadBlock(latestBlock)
+        } else {
+          console.error(e)
+        }
       }
     }
     if (!latestBlock) {

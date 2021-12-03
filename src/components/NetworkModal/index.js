@@ -6,7 +6,7 @@ import { ApplicationModal, useModalOpen, useToggleNetworkModal } from '../../con
 import Modal from '../Modal'
 import ModalHeader from '../ModalHeader'
 import { ButtonEmpty } from '../ButtonStyled'
-import { ANALYTICS_URLS } from '../../constants'
+import { ANALYTICS_URLS, ChainId } from '../../constants'
 import { useOnClickOutside } from '../../hooks'
 
 const ModalContentWrapper = styled.div`
@@ -96,7 +96,14 @@ export default function NetworkModal() {
         <InstructionText>You are currently on {NETWORK_LABEL[chainId]} Analytics page. Switch network?</InstructionText>
 
         <NetworkList>
-          {[1, 137, 56, 43114, 250].map((key, i) => {
+          {[
+            ChainId.MAINNET,
+            ChainId.MATIC,
+            ChainId.BSCMAINNET,
+            ChainId.AVAXMAINNET,
+            ChainId.FANTOM,
+            ChainId.CRONOS,
+          ].map((key, i) => {
             if (chainId === key) {
               return (
                 <SelectNetworkButton key={i} padding="0">

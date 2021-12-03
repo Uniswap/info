@@ -1,6 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 
+import { ChainId } from '../../constants'
 import { NETWORK_ICON, NETWORK_LABEL } from '../../constants/networks'
 import { ButtonOutlined } from '../ButtonStyled'
 import { useToggleNetworkModal } from '../../contexts/Application'
@@ -41,7 +42,11 @@ const SwitchNetworkButton = () => {
   const toggleNetworkModal = useToggleNetworkModal()
   const below576 = useMedia('(max-width: 576px)')
 
-  if (![1, 137, 56, 43114, 250].includes(chainId)) {
+  if (
+    ![ChainId.MAINNET, ChainId.MATIC, ChainId.BSCMAINNET, ChainId.AVAXMAINNET, ChainId.FANTOM, ChainId.CRONOS].includes(
+      chainId
+    )
+  ) {
     return null
   }
 

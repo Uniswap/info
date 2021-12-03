@@ -55,7 +55,7 @@ export default async function getTokenList(listUrl: string): Promise<TokenList> 
 
     // Bypass validator for Matic network
     // Because the Uniswap token schema will fail on Quickswap tokens list
-    if (['137', '56', '43114', '250'].includes(String(process.env.REACT_APP_CHAIN_ID))) {
+    if (['137', '56', '43114', '250', '25'].includes(String(process.env.REACT_APP_CHAIN_ID))) {
       return json
     }
 

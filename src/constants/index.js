@@ -71,6 +71,7 @@ export const ANALYTICS_URLS = {
   56: 'https://bsc-analytics.kyberswap.com',
   43114: 'https://avax-analytics.kyberswap.com',
   250: 'https://fantom-analytics.kyberswap.com',
+  25: 'https://cronos-analytics.kyberswap.com',
 }
 
 export const ChainId = {
@@ -83,6 +84,8 @@ export const ChainId = {
   AVAXTESTNET: 43113,
   AVAXMAINNET: 43114,
   FANTOM: 250,
+  CRONOSTESTNET: 338,
+  CRONOS: 25,
 }
 
 export const MAX_ALLOW_APY = 2000
