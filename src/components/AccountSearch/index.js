@@ -96,7 +96,7 @@ function AccountSearch({ history, small }) {
           <AutoRow>
             <Wrapper>
               <Input
-                placeholder="0x..."
+                placeholder="Search by account public key."
                 onChange={(e) => {
                   setAccountValue(e.target.value)
                 }}

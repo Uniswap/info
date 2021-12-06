@@ -166,7 +166,7 @@ function AccountPage({ account }) {
         <RowBetween>
           <TYPE.body>
             <BasicLink to="/accounts">{'Accounts '}</BasicLink>→{' '}
-            <Link lineHeight={'145.23%'} href={'https://etherscan.io/address/' + account} target="_blank">
+            <Link lineHeight={'145.23%'} href={'https://testnet.cspr.live/account/' + account} target="_blank">
               {' '}
               {account?.slice(0, 64)}{' '}
             </Link>
@@ -177,8 +177,8 @@ function AccountPage({ account }) {
           <RowBetween>
             <span>
               <TYPE.header fontSize={24}>{account?.slice(0, 6) + '...' + account?.slice(60, 64)}</TYPE.header>
-              <Link lineHeight={'145.23%'} href={'https://etherscan.io/address/' + account} target="_blank">
-                <TYPE.main fontSize={14}>View on Etherscan</TYPE.main>
+              <Link lineHeight={'145.23%'} href={'https://testnet.cspr.live/account/' + account} target="_blank">
+                <TYPE.main fontSize={14}>View on Casper Live</TYPE.main>
               </Link>
             </span>
             <AccountWrapper>

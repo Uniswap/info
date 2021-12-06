@@ -9,7 +9,7 @@ import Link, { CustomLink } from '../Link'
 import { Divider } from '..'
 import DoubleTokenLogo from '../DoubleLogo'
 import { withRouter } from 'react-router-dom'
-import { formattedNum, getUniswapAppLink } from '../../utils'
+import { formattedNum, getCasperswapAppLink } from '../../utils'
 import { AutoColumn } from '../Column'
 import { RowFixed } from '../Row'
 import { ButtonLight } from '../ButtonStyled'
@@ -44,7 +44,7 @@ const DashGrid = styled.div`
   display: grid;
   grid-gap: 1em;
   grid-template-columns: 5px 0.5fr 1fr;
-  grid-template-areas: 'number name uniswap';
+  grid-template-areas: 'number name casperswap';
   align-items: flex-start;
   padding: 20px 0;
 
@@ -61,17 +61,17 @@ const DashGrid = styled.div`
 
   @media screen and (min-width: 1200px) {
     grid-template-columns: 35px 2.5fr 1fr;
-    grid-template-areas: 'number name uniswap';
+    grid-template-areas: 'number name casperswap';
   }
 
   @media screen and (max-width: 740px) {
     grid-template-columns: 2.5fr 1fr;
-    grid-template-areas: 'name uniswap';
+    grid-template-areas: 'name casperswap';
   }
 
   @media screen and (max-width: 500px) {
     grid-template-columns: 2.5fr 1fr;
-    grid-template-areas: 'name uniswap';
+    grid-template-areas: 'name casperswap';
   }
 `
 
@@ -103,7 +103,7 @@ const DataText = styled(Flex)`
 
 const SORT_FIELD = {
   VALUE: 'VALUE',
-  UNISWAP_RETURN: 'UNISWAP_RETURN',
+  CASPERSWAP_RETURN: 'CASPERWAP_RETURN',
 }
 
 function MiningPositionList({ miningPositions }) {
@@ -160,18 +160,18 @@ function MiningPositionList({ miningPositions }) {
               </TYPE.main>
             </CustomLink>
             <RowFixed gap="8px" justify="flex-start">
-              <Link external href={getUniswapAppLink(firstPairAddress)} style={{ marginRight: '.5rem' }}>
+              <Link external href={getCasperswapAppLink(firstPairAddress)} style={{ marginRight: '.5rem' }}>
                 <ButtonLight style={{ padding: '4px 6px', borderRadius: '4px' }}>Stake More</ButtonLight>
               </Link>
               {pairPercentage > 0 && (
-                <Link external href={getUniswapAppLink(firstPairAddress)}>
+                <Link external href={getCasperswapAppLink(firstPairAddress)}>
                   <ButtonLight style={{ padding: '4px 6px', borderRadius: '4px' }}>Withdraw</ButtonLight>
                 </Link>
               )}
             </RowFixed>
           </AutoColumn>
         </DataText>
-        <DataText area="uniswap">
+        <DataText area="casperswap">
           <AutoColumn gap="12px" justify="flex-end">
             <TYPE.main>{formattedNum(pairPercentage * valueUSD, true, true)}</TYPE.main>
             <AutoColumn gap="4px" justify="flex-end">
@@ -235,7 +235,7 @@ function MiningPositionList({ miningPositions }) {
         </Flex>
         <Flex alignItems="center" justifyContent="flexEnd">
           <ClickableText
-            area="uniswap"
+            area="casperswap"
             onClick={(e) => {
               setSortedColumn(SORT_FIELD.VALUE)
               setSortDirection(sortedColumn !== SORT_FIELD.VALUE ? true : !sortDirection)

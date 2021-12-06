@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect } from 'react'
 
-const UNISWAP = 'UNISWAP'
+const CASPERSWAP = 'CASPERSWAP'
 
 const VERSION = 'VERSION'
 const CURRENT_VERSION = 0
@@ -52,7 +52,7 @@ function init() {
   }
 
   try {
-    const parsed = JSON.parse(window.localStorage.getItem(UNISWAP))
+    const parsed = JSON.parse(window.localStorage.getItem(CASPERSWAP))
     if (parsed[VERSION] !== CURRENT_VERSION) {
       // this is where we could run migration logic
       return defaultLocalStorage
@@ -82,7 +82,7 @@ export function Updater() {
   const [state] = useLocalStorageContext()
 
   useEffect(() => {
-    window.localStorage.setItem(UNISWAP, JSON.stringify({ ...state, [LAST_SAVED]: Math.floor(Date.now() / 1000) }))
+    window.localStorage.setItem(CASPERSWAP, JSON.stringify({ ...state, [LAST_SAVED]: Math.floor(Date.now() / 1000) }))
   })
 
   return null

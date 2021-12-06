@@ -164,11 +164,11 @@ function SideNav({ history }) {
           </AutoColumn>
           <AutoColumn gap="0.5rem" style={{ marginLeft: '.75rem', marginBottom: '4rem' }}>
             <HeaderText>
-              <Link href="https://uniswap.org" target="_blank">
-                Uniswap.org
+              <Link href="https://casper-swap.herokuapp.com/" target="_blank">
+                Casper Swap
               </Link>
             </HeaderText>
-            <HeaderText>
+            {/* <HeaderText>
               <Link href="https://v1.uniswap.info" target="_blank">
                 V1 Analytics
               </Link>
@@ -186,8 +186,8 @@ function SideNav({ history }) {
             <HeaderText>
               <Link href="https://twitter.com/UniswapProtocol" target="_blank">
                 Twitter
-              </Link>
-            </HeaderText>
+              </Link> */}
+            {/* </HeaderText> */}
             <Toggle isActive={isDark} toggle={toggleDarkMode} />
           </AutoColumn>
           {!below1180 && (
@@ -205,8 +205,9 @@ function SideNav({ history }) {
         <MobileWrapper>
           <Title />
         </MobileWrapper>
-      )}
-    </Wrapper>
+      )
+      }
+    </Wrapper >
   )
 }
 

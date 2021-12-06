@@ -430,10 +430,10 @@ export const Search = ({ small = false }) => {
               : below410
                 ? 'Search...'
                 : below470
-                  ? 'Search Casper Uniswap...'
+                  ? 'Search Casper Swap...'
                   : below700
                     ? 'Search pairs and tokens...'
-                    : 'Search Casper Uniswap pairs and tokens...'
+                    : 'Search Casper Swap pairs and tokens...'
           }
           value={value}
           onChange={(e) => {

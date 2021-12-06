@@ -204,7 +204,7 @@ function PairPage({ pairAddress, history }) {
             <TYPE.light style={{ textAlign: 'center' }}>
               {BLOCKED_WARNINGS[pairAddress] ?? `This pair is not supported.`}
             </TYPE.light>
-            <Link external={true} href={'https://etherscan.io/address/' + pairAddress}>{`More about ${shortenAddress(
+            <Link external={true} href={'https://testnet.cspr.live/account/' + pairAddress}>{`More about ${shortenAddress(
               pairAddress
             )}`}</Link>
           </AutoColumn>
@@ -499,8 +499,8 @@ function PairPage({ pairAddress, history }) {
                     </AutoRow>
                   </Column>
                   <ButtonLight color={backgroundColor}>
-                    <Link color={backgroundColor} external href={'https://etherscan.io/address/' + pairAddress}>
-                      View on Etherscan ↗
+                    <Link color={backgroundColor} external href={'https://testnet.cspr.live/account/' + pairAddress}>
+                      View on Casper Live ↗
                     </Link>
                   </ButtonLight>
                 </TokenDetailsLayout>

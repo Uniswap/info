@@ -11,7 +11,7 @@ export const priceOverrides = [
 interface ReturnMetrics {
   hodleReturn: number // difference in asset values t0 -> t1 with t0 deposit amounts
   netReturn: number // net return from t0 -> t1
-  uniswapReturn: number // netReturn - hodlReturn
+  casperswapReturn: number // netReturn - hodlReturn
   impLoss: number
   fees: number
 }
@@ -147,7 +147,7 @@ export function getMetricsForPositionWindow(positionT0: Position, positionT1: Po
   const assetValueT1 = token0_amount_t0 * positionT1.token0PriceUSD + token1_amount_t0 * positionT1.token1PriceUSD
 
   const imp_loss_usd = no_fees_usd - assetValueT1
-  const uniswap_return = difference_fees_usd + imp_loss_usd
+  const casperswap_return = difference_fees_usd + imp_loss_usd
 
   // get net value change for combined data
   const netValueT0 = t0Ownership * positionT0.reserveUSD
@@ -156,7 +156,7 @@ export function getMetricsForPositionWindow(positionT0: Position, positionT1: Po
   return {
     hodleReturn: assetValueT1 - assetValueT0,
     netReturn: netValueT1 - netValueT0,
-    uniswapReturn: uniswap_return,
+    casperswapReturn: casperswap_return,
     impLoss: imp_loss_usd,
     fees: difference_fees_usd,
   }
@@ -280,7 +280,7 @@ export async function getLPReturnsOnPair(user: string, pair, ethPrice: number, s
   const principal = await getPrincipalForUserPerPair(user, pair.id)
   let hodlReturn = 0
   let netReturn = 0
-  let uniswapReturn = 0
+  let casperswapReturn = 0
   let fees = 0
 
   snapshots = snapshots.filter((entry) => {
@@ -315,7 +315,7 @@ export async function getLPReturnsOnPair(user: string, pair, ethPrice: number, s
 
     hodlReturn = hodlReturn + results.hodleReturn
     netReturn = netReturn + results.netReturn
-    uniswapReturn = uniswapReturn + results.uniswapReturn
+    casperswapReturn = casperswapReturn + results.casperswapReturn
     fees = fees + results.fees
   }
 
@@ -324,8 +324,8 @@ export async function getLPReturnsOnPair(user: string, pair, ethPrice: number, s
     net: {
       return: netReturn,
     },
-    uniswap: {
-      return: uniswapReturn,
+    casperswap: {
+      return: casperswapReturn,
     },
     fees: {
       sum: fees,

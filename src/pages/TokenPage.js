@@ -179,7 +179,7 @@ function TokenPage({ address, history }) {
             <TYPE.light style={{ textAlign: 'center' }}>
               {BLOCKED_WARNINGS[address] ?? `This token is not supported.`}
             </TYPE.light>
-            <Link external={true} href={'https://etherscan.io/address/' + address}>{`More about ${shortenAddress(
+            <Link external={true} href={'https://testnet.cspr.live/account/' + address}>{`More about ${shortenAddress(
               address
             )}`}</Link>
           </AutoColumn>
@@ -207,7 +207,7 @@ function TokenPage({ address, history }) {
               style={{ width: 'fit-content' }}
               color={backgroundColor}
               external
-              href={'https://etherscan.io/address/' + address}
+              href={'https://testnet.cspr.live/account/' + address}
             >
               <Text style={{ marginLeft: '.15rem' }} fontSize={'14px'} fontWeight={400}>
                 ({address.slice(0, 8) + '...' + address.slice(36, 42)})
@@ -420,8 +420,8 @@ function TokenPage({ address, history }) {
                     </AutoRow>
                   </Column>
                   <ButtonLight color={backgroundColor}>
-                    <Link color={backgroundColor} external href={'https://etherscan.io/address/' + address}>
-                      View on Etherscan ↗
+                    <Link color={backgroundColor} external href={'https://testnet.cspr.live/account/' + address}>
+                      View on Casper Live ↗
                     </Link>
                   </ButtonLight>
                 </TokenDetailsLayout>
