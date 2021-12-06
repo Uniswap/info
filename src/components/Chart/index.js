@@ -63,8 +63,8 @@ const Chart = ({ data, chartOption, currencyUnit, symbol }) => {
               strokeWidth={2}
               dot={false}
               type="monotone"
-              name={currencyUnit === 'ETH' ? 'Price (ETH/' + symbol + ')' : 'Price (USD/' + symbol + ')'}
-              dataKey={currencyUnit === 'ETH' ? 'ethPerToken' : 'tokenPriceUSD'}
+              name={currencyUnit === 'CSPR' ? 'Price (CSPR/' + symbol + ')' : 'Price (USD/' + symbol + ')'}
+              dataKey={currencyUnit === 'CSPR' ? 'csprPerToken' : 'tokenPriceUSD'}
               yAxisId={2}
               fill="var(--c-token)"
               opacity={'0.4'}
@@ -74,7 +74,7 @@ const Chart = ({ data, chartOption, currencyUnit, symbol }) => {
               strokeWidth={2}
               dot={false}
               type="monotone"
-              name={currencyUnit === 'USD' ? 'Inverse (' + symbol + '/USD)' : 'Inverse (' + symbol + '/ETH)'}
+              name={currencyUnit === 'USD' ? 'Inverse (' + symbol + '/USD)' : 'Inverse (' + symbol + '/CSPR)'}
               dataKey={currencyUnit === 'USD' ? 'tokensPerUSD' : 'tokensPerEth'}
               yAxisId={3}
               fill="var(--c-token)"
@@ -153,8 +153,8 @@ const Chart = ({ data, chartOption, currencyUnit, symbol }) => {
               strokeWidth={2}
               dot={false}
               type="monotone"
-              name={'Total Liquidity' + (currencyUnit === 'USD' ? ' (USD)' : ' (ETH)')}
-              dataKey={currencyUnit === 'USD' ? 'usdLiquidity' : 'ethLiquidity'}
+              name={'Total Liquidity' + (currencyUnit === 'USD' ? ' (USD)' : ' (CSPR)')}
+              dataKey={currencyUnit === 'USD' ? 'usdLiquidity' : 'csprLiquidity'}
               yAxisId={0}
               fill="var(--c-token)"
               opacity={'0.4'}
@@ -163,7 +163,7 @@ const Chart = ({ data, chartOption, currencyUnit, symbol }) => {
             <Area
               type="monotone"
               name={'Eth Balance'}
-              dataKey={'ethBalance'}
+              dataKey={'csprBalance'}
               fill="var(--c-token)"
               opacity={'0'}
               stroke="var(--c-token)"
@@ -222,8 +222,8 @@ const Chart = ({ data, chartOption, currencyUnit, symbol }) => {
             />
             <Bar
               type="monotone"
-              name={'Volume' + (currencyUnit === 'USD' ? ' (USD)' : ' (ETH)')}
-              dataKey={currencyUnit === 'USD' ? 'usdVolume' : 'ethVolume'}
+              name={'Volume' + (currencyUnit === 'USD' ? ' (USD)' : ' (CSPR)')}
+              dataKey={currencyUnit === 'USD' ? 'usdVolume' : 'csprVolume'}
               fill="var(--c-token)"
               opacity={'0.4'}
               yAxisId={0}

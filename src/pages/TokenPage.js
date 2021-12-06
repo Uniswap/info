@@ -364,7 +364,7 @@ function TokenPage({ address, history }) {
                   setChecked={() => setUseTracked(!useTracked)}
                   text={'Hide untracked pairs'}
                 />
-                <QuestionHelper text="USD amounts may be inaccurate in low liquiidty pairs or pairs without ETH or stablecoins." />
+                <QuestionHelper text="USD amounts may be inaccurate in low liquiidty pairs or pairs without CSPR or stablecoins." />
               </AutoRow>
             </RowBetween>
             <Panel

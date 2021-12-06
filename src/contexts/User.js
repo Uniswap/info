@@ -10,7 +10,7 @@ import {
 import { useTimeframe, useStartTimestamp } from './Application'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
-import { useEthPrice } from './GlobalData'
+import { useCsprPrice } from './GlobalData'
 import { getLPReturnsOnPair, getHistoricalPairReturns } from '../utils/returns'
 import { timeframeOptions } from '../constants'
 
@@ -268,7 +268,7 @@ export function useUserPositionChart(position, account) {
   // get data needed for calculations
   const currentPairData = usePairData(pairAddress)
   console.log("currentPairData", currentPairData);
-  const [currentETHPrice] = useEthPrice()
+  const [currentETHPrice] = useCsprPrice()
 
   // formatetd array to return for chart data
   const formattedHistory = state?.[account]?.[USER_PAIR_RETURNS_KEY]?.[pairAddress]
@@ -459,7 +459,7 @@ export function useUserPositions(account) {
   const positions = state?.[account]?.[POSITIONS_KEY]
 
   const snapshots = useUserSnapshots(account)
-  const [ethPrice] = useEthPrice()
+  const [ethPrice] = useCsprPrice()
 
   useEffect(() => {
     async function fetchData(account) {

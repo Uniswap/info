@@ -582,7 +582,7 @@ async function getAllTokensOnUniswap() {
  */
 export function useGlobalData() {
   const [state, { update, updateAllPairsInUniswap, updateAllTokensInUniswap }] = useGlobalDataContext()
-  const [ethPrice, oldEthPrice] = useEthPrice()
+  const [ethPrice, oldEthPrice] = useCsprPrice()
 
   const data = state?.globalData
 
@@ -670,7 +670,7 @@ export function useGlobalTransactions() {
   return transactions
 }
 
-export function useEthPrice() {
+export function useCsprPrice() {
   const [state, { updateEthPrice }] = useGlobalDataContext()
   const ethPrice = state?.[ETH_PRICE_KEY]
   const ethPriceOld = state?.['oneDayPrice']

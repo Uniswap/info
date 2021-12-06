@@ -42,13 +42,13 @@ export function getPoolLink(token0Address, token1Address = null, remove = false)
     return (
       `https://casper-swap.herokuapp.com/#/` +
       (remove ? `remove` : `add`) +
-      `/v2/${token0Address === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' ? 'ETH' : token0Address}/${'ETH'}`
+      `/v2/${token0Address === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' ? 'CSPR' : token0Address}/${'CSPR'}`
     )
   } else {
     return (
       `https://casper-swap.herokuapp.com/#/` +
       (remove ? `remove` : `add`) +
-      `/v2/${token0Address === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' ? 'ETH' : token0Address}/${token1Address === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' ? 'ETH' : token1Address
+      `/v2/${token0Address === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' ? 'CSPR' : token0Address}/${token1Address === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' ? 'CSPR' : token1Address
       }`
     )
   }
@@ -58,13 +58,13 @@ export function getSwapLink(token0Address, token1Address = null) {
   if (!token1Address) {
     return `https://casper-swap.herokuapp.com/#/swap?inputCurrency=${token0Address}`
   } else {
-    return `https://casper-swap.herokuapp.com/#/swap?inputCurrency=${token0Address === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' ? 'ETH' : token0Address
-      }&outputCurrency=${token1Address === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' ? 'ETH' : token1Address}`
+    return `https://casper-swap.herokuapp.com/#/swap?inputCurrency=${token0Address === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' ? 'CSPR' : token0Address
+      }&outputCurrency=${token1Address === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' ? 'CSPR' : token1Address}`
   }
 }
 
 export function getMiningPoolLink(token0Address) {
-  return `https://casper-swap.herokuapp.com/#/uni/ETH/${token0Address}`
+  return `https://casper-swap.herokuapp.com/#/uni/CSPR/${token0Address}`
 }
 
 export function getCasperswapAppLink(linkVariable) {
@@ -73,7 +73,7 @@ export function getCasperswapAppLink(linkVariable) {
     return baseCasperswapUrl
   }
 
-  return `${baseCasperswapUrl}/ETH/${linkVariable}`
+  return `${baseCasperswapUrl}/CSPR/${linkVariable}`
 }
 
 export function localNumber(val) {
@@ -249,7 +249,7 @@ export async function getShareValueOverTime(pairAddress, timestamps) {
       token0DerivedETH: result.data.t[0].token0.derivedETH,
       token1DerivedETH: result.data.t[0].token1.derivedETH,
       roiUsd: values && values[0] ? sharePriceUsd / values[0]['sharePriceUsd'] : 1,
-      ethPrice: 0,
+      csprPrice: 0,
       token0PriceUSD: 0,
       token1PriceUSD: 0,
     })
@@ -263,9 +263,9 @@ export async function getShareValueOverTime(pairAddress, timestamps) {
   timestamp = result?.data.b
   console.log("timestamp", timestamp);
   if (timestamp) {
-    values[index].ethPrice = result.data.b.ethPrice
-    values[index].token0PriceUSD = result.data.b.ethPrice * values[index].token0DerivedETH
-    values[index].token1PriceUSD = result.data.b.ethPrice * values[index].token1DerivedETH
+    values[index].csprPrice = result.data.b.csprPrice
+    values[index].token0PriceUSD = result.data.b.csprPrice * values[index].token0DerivedETH
+    values[index].token1PriceUSD = result.data.b.csprPrice * values[index].token1DerivedETH
   }
   // }
   // console.log("values1", values);

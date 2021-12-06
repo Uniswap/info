@@ -167,9 +167,9 @@ export function getMetricsForPositionWindow(positionT0: Position, positionT1: Po
  * @param startDateTimestamp // day to start tracking at
  * @param currentPairData // current stat of the pair
  * @param pairSnapshots // history of entries and exits for lp on this pair
- * @param currentETHPrice // current price of eth used for usd conversions
+ * @param currentCSPRPrice // current price of eth used for usd conversions
  */
-export async function getHistoricalPairReturns(startDateTimestamp, currentPairData, pairSnapshots, currentETHPrice) {
+export async function getHistoricalPairReturns(startDateTimestamp, currentPairData, pairSnapshots, currentCSPRPrice) {
   // catch case where data not puplated yet
   console.log("currentPairData.createdAtTimestamp", currentPairData.createdAtTimestamp);
 
@@ -244,8 +244,8 @@ export async function getHistoricalPairReturns(startDateTimestamp, currentPairDa
         reserve0: currentPairData.reserve0,
         reserve1: currentPairData.reserve1,
         reserveUSD: currentPairData.reserveUSD,
-        token0PriceUSD: currentPairData.token0.derivedETH * currentETHPrice,
-        token1PriceUSD: currentPairData.token1.derivedETH * currentETHPrice,
+        token0PriceUSD: currentPairData.token0.derivedETH * currentCSPRPrice,
+        token1PriceUSD: currentPairData.token1.derivedETH * currentCSPRPrice,
       }
     }
 
@@ -273,9 +273,9 @@ export async function getHistoricalPairReturns(startDateTimestamp, currentPairDa
  * For a given pair and user, get the return metrics
  * @param user
  * @param pair
- * @param ethPrice
+ * @param csprPrice
  */
-export async function getLPReturnsOnPair(user: string, pair, ethPrice: number, snapshots) {
+export async function getLPReturnsOnPair(user: string, pair, csprPrice: number, snapshots) {
   // initialize values
   const principal = await getPrincipalForUserPerPair(user, pair.id)
   let hodlReturn = 0
@@ -295,8 +295,8 @@ export async function getLPReturnsOnPair(user: string, pair, ethPrice: number, s
     reserve0: pair.reserve0,
     reserve1: pair.reserve1,
     reserveUSD: pair.reserveUSD,
-    token0PriceUSD: pair.token0.derivedETH * ethPrice,
-    token1PriceUSD: pair.token1.derivedETH * ethPrice,
+    token0PriceUSD: pair.token0.derivedETH * csprPrice,
+    token1PriceUSD: pair.token1.derivedETH * csprPrice,
   }
 
 
