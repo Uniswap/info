@@ -13,6 +13,7 @@ import { formattedNum, shortenAddress } from '../../utils'
 import { TYPE } from '../../Theme'
 import DoubleTokenLogo from '../DoubleLogo'
 import { RowFixed } from '../Row'
+import useTheme from '../../hooks/useTheme'
 
 dayjs.extend(utc)
 
@@ -20,8 +21,7 @@ const PageButtons = styled.div`
   width: 100%;
   display: flex;
   justify-content: center;
-  margin-top: 2em;
-  margin-bottom: 0.5em;
+  margin: 1.25em 0;
 `
 
 const Arrow = styled.div`
@@ -43,7 +43,7 @@ const DashGrid = styled.div`
   grid-gap: 1em;
   grid-template-columns: 10px 1.5fr 1fr 1fr 1fr;
   grid-template-areas: 'number name pair pool value';
-  padding: 0 4px;
+  padding: 0;
 
   > * {
     justify-content: flex-end;
@@ -58,6 +58,13 @@ const DashGrid = styled.div`
     grid-template-columns: 1fr 1fr 1fr;
     grid-template-areas: 'name pool value';
   }
+`
+
+const TableHeader = styled(DashGrid)`
+  background: ${({ theme }) => theme.tableHeader};
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  padding: 20px;
 `
 
 const ListWrapper = styled.div``
@@ -102,7 +109,7 @@ function LPList({ lps, disbaleLinks, maxItems = 10 }) {
 
   const ListItem = ({ lp, index }) => {
     return (
-      <DashGrid style={{ height: '48px' }} disbaleLinks={disbaleLinks} focus={true}>
+      <DashGrid style={{ height: '56px' }} disbaleLinks={disbaleLinks} focus={true}>
         {!below1024 && (
           <DataText area="number" fontWeight="500">
             {index}
@@ -161,9 +168,11 @@ function LPList({ lps, disbaleLinks, maxItems = 10 }) {
       )
     })
 
+  const theme = useTheme()
+
   return (
     <ListWrapper>
-      <DashGrid center={true} disbaleLinks={disbaleLinks} style={{ height: 'fit-content', padding: ' 0 0 1rem 0' }}>
+      <TableHeader center={true} disbaleLinks={disbaleLinks} style={{ height: 'fit-content' }}>
         {!below1024 && (
           <Flex alignItems="center" justifyContent="flex-start">
             <TYPE.main area="number">#</TYPE.main>
@@ -174,7 +183,9 @@ function LPList({ lps, disbaleLinks, maxItems = 10 }) {
           justifyContent="flex-start"
           style={{ marginLeft: below600 ? 0 : '1rem', whiteSpace: 'nowrap' }}
         >
-          <TYPE.main area="name">Account</TYPE.main>
+          <TYPE.main area="name" color={theme.subText} fontSize="12px">
+            ACCOUNT
+          </TYPE.main>
         </Flex>
         {/* {!below1080 && (
           <Flex alignItems="center" justifyContent="flexEnd">
@@ -183,18 +194,24 @@ function LPList({ lps, disbaleLinks, maxItems = 10 }) {
         )} */}
         {!below600 && (
           <Flex alignItems="center" justifyContent="flexEnd">
-            <TYPE.main area="pair">Pair</TYPE.main>
+            <TYPE.main area="name" color={theme.subText} fontSize="12px">
+              PAIR
+            </TYPE.main>
           </Flex>
         )}
         <Flex alignItems="center" justifyContent="flexEnd">
-          <TYPE.main area="pool">Pool</TYPE.main>
+          <TYPE.main area="name" color={theme.subText} fontSize="12px">
+            POOL
+          </TYPE.main>
         </Flex>
         <Flex alignItems="center" justifyContent="flexEnd">
-          <TYPE.main area="value">Value</TYPE.main>
+          <TYPE.main area="name" color={theme.subText} fontSize="12px">
+            VALUE
+          </TYPE.main>
         </Flex>
-      </DashGrid>
+      </TableHeader>
       <Divider />
-      <List p={0}>{!lpList ? <LocalLoader /> : lpList}</List>
+      <List p="0 20px">{!lpList ? <LocalLoader /> : lpList}</List>
       <PageButtons>
         <div onClick={() => setPage(page === 1 ? page : page - 1)}>
           <Arrow faded={page === 1 ? true : false}>←</Arrow>

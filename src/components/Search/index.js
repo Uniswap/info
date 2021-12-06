@@ -10,11 +10,9 @@ import { useExchangeClient } from '../../contexts/Application'
 import { useAllTokenData, useTokenData } from '../../contexts/TokenData'
 import { useAllPairData, usePairData } from '../../contexts/PairData'
 import DoubleTokenLogo from '../DoubleLogo'
-import { useMedia } from 'react-use'
 import { useAllPairsInUniswap, useAllTokensInUniswap } from '../../contexts/GlobalData'
 import { OVERVIEW_TOKEN_BLACKLIST, PAIR_BLACKLIST, WETH_ADDRESS } from '../../constants'
 
-import { transparentize } from 'polished'
 import { PAIR_SEARCH, TOKEN_SEARCH } from '../../apollo/queries'
 import FormattedName from '../FormattedName'
 import { TYPE } from '../../Theme'
@@ -45,17 +43,6 @@ const Wrapper = styled.div`
   width: 100%;
   min-width: 300px;
   box-sizing: border-box;
-  box-shadow: ${({ open, small }) =>
-    !open && !small
-      ? '0px 24px 32px rgba(0, 0, 0, 0.04), 0px 16px 24px rgba(0, 0, 0, 0.04), 0px 4px 8px rgba(0, 0, 0, 0.04), 0px 0px 1px rgba(0, 0, 0, 0.04) '
-      : 'none'};
-  @media screen and (max-width: 500px) {
-    background: ${({ theme }) => transparentize(0.4, theme.bg1)};
-    box-shadow: ${({ open }) =>
-      !open
-        ? '0px 24px 32px rgba(0, 0, 0, 0.04), 0px 16px 24px rgba(0, 0, 0, 0.04), 0px 4px 8px rgba(0, 0, 0, 0.04), 0px 0px 1px rgba(0, 0, 0, 0.04) '
-        : 'none'};
-  }
 `
 const Input = styled.input`
   position: relative;
@@ -67,7 +54,7 @@ const Input = styled.input`
   outline: none;
   width: 100%;
   color: ${({ theme }) => theme.text1};
-  font-size: ${({ large }) => (large ? '20px' : '14px')};
+  font-size: 14px;
 
   ::placeholder {
     color: ${({ theme }) => theme.text3};
@@ -86,8 +73,8 @@ const SearchIconLarge = styled(SearchIcon)`
 
 const CloseIcon = styled(X)`
   height: 20px;
+  padding: 8px;
   width: 20px;
-  margin-right: 0.5rem;
   position: absolute;
   right: 10px;
   color: ${({ theme }) => theme.text3};
@@ -136,7 +123,7 @@ const Gray = styled.span`
 `
 
 const Blue = styled.span`
-  color: #2172e5;
+  color: ${({ theme }) => theme.primary};
   :hover {
     cursor: pointer;
   }
@@ -158,10 +145,6 @@ export const Search = ({ small = false }) => {
   // fetch new data on tokens and pairs if needed
   useTokenData(value)
   usePairData(value)
-
-  const below700 = useMedia('(max-width: 700px)')
-  const below470 = useMedia('(max-width: 470px)')
-  const below410 = useMedia('(max-width: 410px)')
 
   useEffect(() => {
     if (value !== '') {
@@ -418,15 +401,7 @@ export const Search = ({ small = false }) => {
           large={!small}
           type={'text'}
           ref={wrapperRef}
-          placeholder={
-            below410
-              ? 'Search...'
-              : below470
-              ? 'Search DMM ...'
-              : below700
-              ? 'Search pairs and tokens...'
-              : 'Search DMM pairs and tokens...'
-          }
+          placeholder={'Search pairs and tokens...'}
           value={value}
           onChange={(e) => {
             setValue(e.target.value)
@@ -437,7 +412,16 @@ export const Search = ({ small = false }) => {
             }
           }}
         />
-        {!showMenu ? <SearchIconLarge /> : <CloseIcon onClick={() => toggleMenu(false)} />}
+        {!showMenu ? (
+          <SearchIconLarge />
+        ) : (
+          <CloseIcon
+            onClick={() => {
+              setValue('')
+              toggleMenu(false)
+            }}
+          />
+        )}
       </Wrapper>
       <Menu hide={!showMenu} ref={menuRef}>
         <Heading>

@@ -69,7 +69,7 @@ const TokenChart = ({ address, color, base }) => {
   const below600 = useMedia('(max-width: 600px)')
 
   let utcStartTime = getTimeframe(timeWindow)
-  const aspect = below1080 ? 60 / 30 : below600 ? 60 / 42 : 60 / 20
+  const aspect = below600 ? 60 / 42 : below1080 ? 60 / 30 : 60 / 20
 
   chartData = chartData?.filter((entry) => entry.date >= utcStartTime)
 

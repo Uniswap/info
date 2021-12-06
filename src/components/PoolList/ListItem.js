@@ -3,24 +3,24 @@ import styled from 'styled-components'
 import { Flex } from 'rebass'
 
 import { AutoColumn } from '../Column'
-import { ButtonEmpty } from '../ButtonStyled'
+import { ButtonLight } from '../ButtonStyled'
 import WarningLeftIcon from '../Icons/WarningLeftIcon'
-import AddCircle from '../Icons/AddCircle'
 import Link, { CustomLink } from '../Link'
 import { MouseoverTooltip } from '../Tooltip'
 import CopyHelper from '../Copy'
 import { TYPE } from '../../Theme'
 import { shortenAddress, formattedNum } from '../../utils'
 import { MAX_ALLOW_APY } from '../../constants'
+import useTheme from '../../hooks/useTheme'
 
 const TableRow = styled.div`
   display: grid;
   grid-gap: 1em;
   grid-template-columns: repeat(8, 1fr);
   grid-template-areas: 'pool ratio liq vol fee amp fl add_liquidity';
-  padding: 15px 36px 13px 26px;
-  font-size: 12px;
-  align-items: flex-start;
+  padding: 16px 36px 14px 26px;
+  font-size: 14px;
+  align-items: center;
   height: fit-content;
   position: relative;
   opacity: ${({ fade }) => (fade ? '0.6' : '1')};
@@ -28,7 +28,7 @@ const TableRow = styled.div`
   border: 1px solid transparent;
 
   &:hover {
-    border: 1px solid #4a636f;
+    border: 1px solid ${({ theme }) => theme.border};
   }
 `
 
@@ -36,15 +36,11 @@ const StyledItemCard = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-column-gap: 4px;
-  border-radius: 10px;
   margin-bottom: 0;
   padding: 8px 20px 4px 20px;
   background-color: ${({ theme }) => theme.bg7};
   font-size: 12px;
-
-  @media screen and (max-width: 960px) {
-    margin-bottom: 20px;
-  }
+  border-bottom: 1px solid ${({ theme }) => theme.border};
 `
 
 const GridItem = styled.div`
@@ -57,7 +53,8 @@ const GridItem = styled.div`
 const DataTitle = styled.div`
   display: flex;
   align-items: center;
-  color: ${({ theme }) => theme.text6};
+  color: ${({ theme }) => theme.subText};
+  font-weight: 500;
   &:hover {
     opacity: 0.6;
   }
@@ -67,7 +64,7 @@ const DataTitle = styled.div`
 `
 
 const DataText = styled(Flex)`
-  color: ${({ theme }) => theme.text7};
+  color: ${({ theme }) => theme.text};
   flex-direction: column;
 `
 
@@ -111,6 +108,7 @@ export const ItemCard = ({ pool }) => {
 
   const oneYearFL = getOneYearFL(liquidity, oneDayFee).toFixed(2)
 
+  const theme = useTheme()
   return (
     <div>
       {isWarning && (
@@ -126,21 +124,21 @@ export const ItemCard = ({ pool }) => {
           <DataTitle>Pool</DataTitle>
           <DataText grid-area="pool">
             <PoolAddressContainer>
-              {shortenPoolAddress}
+              <CustomLink to={`/pool/${pool.id}`} style={{ cursor: 'pointer' }}>
+                {shortenPoolAddress}
+              </CustomLink>
               <CopyHelper toCopy={pool.id} />
             </PoolAddressContainer>
           </DataText>
         </GridItem>
 
         <GridItem>
-          <DataText style={{ alignItems: 'flex-end' }}>
+          <DataText style={{ alignItems: 'flex-end', color: theme.primary }}>
             <Link
               href={`${process.env.REACT_APP_DMM_SWAP_URL}add/${pool.token0.id}/${pool.token1.id}/${pool.id}`}
               target="_blank"
             >
-              <ButtonEmpty padding="0" width="fit-content" style={{ padding: 0 }}>
-                <AddCircle />
-              </ButtonEmpty>
+              <ButtonLight>+ Add</ButtonLight>
             </Link>
           </DataText>
         </GridItem>
@@ -170,7 +168,7 @@ export const ItemCard = ({ pool }) => {
           <DataText>{formattedNum(amp.toPrecision(5))}</DataText>
         </GridItem>
         <GridItem noBorder>
-          <DataTitle>APY</DataTitle>
+          <DataTitle>APR</DataTitle>
           <DataText>{oneYearFL < MAX_ALLOW_APY ? `${oneYearFL}%` : '--'} </DataText>
         </GridItem>
       </StyledItemCard>
@@ -198,6 +196,8 @@ const ListItem = ({ pool, oddRow }) => {
 
   const oneYearFL = getOneYearFL(liquidity, oneDayFee).toFixed(2)
 
+  const theme = useTheme()
+
   return (
     <TableRow oddRow={oddRow}>
       {isWarning && (
@@ -208,26 +208,36 @@ const ListItem = ({ pool, oddRow }) => {
         </div>
       )}
       <CustomLink to={`/pool/${pool.id}`} style={{ cursor: 'pointer' }}>
-        <DataText grid-area="pool">{shortenPoolAddress}</DataText>
+        <DataText grid-area="pool" style={{ color: theme.primary }}>
+          {shortenPoolAddress}
+        </DataText>
       </CustomLink>
       <DataText grid-area="ratio">
         <div>{`• ${percentToken0.toFixed(2) ?? '.'}% ${pool.token0.symbol}`}</div>
         <div>{`• ${percentToken1.toFixed(2) ?? '.'}% ${pool.token1.symbol}`}</div>
       </DataText>
-      <DataText grid-area="liq">{formatDataText(formattedNum(liquidity, true), pool.trackedReserveUSD)}</DataText>
-      <DataText grid-area="vol">{formatDataText(formattedNum(volume, true), pool.oneDayVolumeUSD)}</DataText>
-      <DataText grid-area="fee">{formatDataText(formattedNum(oneDayFee, true), pool.oneDayFeeUSD)}</DataText>
-      <DataText grid-area="amp">{formattedNum(amp.toPrecision(5))}</DataText>
-      <DataText grid-area="fl">{oneYearFL < MAX_ALLOW_APY ? `${oneYearFL}%` : '--'}</DataText>
-      <DataText grid-area="add_liquidity" style={{ alignItems: 'flex-start' }}>
+      <DataText grid-area="liq" alignItems="flex-end">
+        {formatDataText(formattedNum(liquidity, true), pool.trackedReserveUSD)}
+      </DataText>
+      <DataText grid-area="vol" alignItems="flex-end">
+        {formatDataText(formattedNum(volume, true), pool.oneDayVolumeUSD)}
+      </DataText>
+      <DataText grid-area="fee" alignItems="flex-end">
+        {formatDataText(formattedNum(oneDayFee, true), pool.oneDayFeeUSD)}
+      </DataText>
+      <DataText grid-area="amp" alignItems="flex-end">
+        {formattedNum(amp.toPrecision(5))}
+      </DataText>
+      <DataText grid-area="fl" style={{ color: '#0FAAA2' }} alignItems="flex-end">
+        {oneYearFL < MAX_ALLOW_APY ? `${oneYearFL}%` : '--'}
+      </DataText>
+      <DataText grid-area="add_liquidity" alignItems="flex-end">
         {
           <Link
             href={`${process.env.REACT_APP_DMM_SWAP_URL}add/${pool.token0.id}/${pool.token1.id}/${pool.id}?networkId=${process.env.REACT_APP_CHAIN_ID}`}
             target="_blank"
           >
-            <ButtonEmpty padding="0" width="fit-content" style={{ padding: 0 }}>
-              <AddCircle />
-            </ButtonEmpty>
+            <ButtonLight>+ Add</ButtonLight>
           </Link>
         }
       </DataText>

@@ -5,10 +5,10 @@ import { NETWORK_ICON, NETWORK_LABEL } from '../../constants/networks'
 import { ButtonOutlined } from '../ButtonStyled'
 import { useToggleNetworkModal } from '../../contexts/Application'
 import SwitchNetworkIcon from '../../assets/networks/switch-network.svg'
+import { useMedia } from 'react-use'
 
 const ButtonWrapper = styled(ButtonOutlined)`
   width: 100%;
-  min-width: 170px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -16,6 +16,11 @@ const ButtonWrapper = styled(ButtonOutlined)`
   border-radius: 8px;
   background: ${({ theme }) => theme.buttonBlack};
   border: none;
+  z-index: 1000;
+
+  &:hover {
+    box-shadow: none;
+  }
 `
 
 const NetworkWrapper = styled.div`
@@ -23,16 +28,18 @@ const NetworkWrapper = styled.div`
   align-items: center;
 `
 
-const NetworkLabel = styled.span`
+const NetworkLabel = styled.div`
   font-size: 16px;
-  font-weight: 500;
+  font-weight: 600;
   color: ${({ theme }) => theme.primary};
+  margin-left: 10px;
 `
 
 const SwitchNetworkButton = () => {
   const chainId = parseInt(process.env.REACT_APP_CHAIN_ID)
 
   const toggleNetworkModal = useToggleNetworkModal()
+  const below576 = useMedia('(max-width: 576px)')
 
   if (![1, 137, 56, 43114, 250].includes(chainId)) {
     return null
@@ -41,10 +48,10 @@ const SwitchNetworkButton = () => {
   return (
     <ButtonWrapper onClick={toggleNetworkModal}>
       <NetworkWrapper>
-        <img src={NETWORK_ICON[chainId]} alt="Network Icon" style={{ width: '20px', marginRight: '10px' }} />
-        <NetworkLabel>{NETWORK_LABEL[chainId]}</NetworkLabel>
+        <img src={NETWORK_ICON[chainId]} alt="Network Icon" style={{ width: '20px' }} />
+        {!below576 && <NetworkLabel>{NETWORK_LABEL[chainId]}</NetworkLabel>}
       </NetworkWrapper>
-      <img src={SwitchNetworkIcon} alt="Switch Network Icon" />
+      <img src={SwitchNetworkIcon} alt="Switch Network Icon" style={{ marginTop: '4px', marginLeft: '6px' }} />
     </ButtonWrapper>
   )
 }

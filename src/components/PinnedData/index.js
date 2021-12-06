@@ -14,14 +14,13 @@ import FormattedName from '../FormattedName'
 import { shortenAddress } from '../../utils'
 
 const RightColumn = styled.div`
-  position: fixed;
+  position: sticky;
   right: 0;
   top: 0px;
   height: 100vh;
   width: ${({ open }) => (open ? '160px' : '23px')};
   padding: 1.25rem;
-  border-left: ${({ theme, open }) => '1px solid ' + theme.bg3};
-  background-color: ${({ theme }) => theme.onlyLight};
+  background-color: ${({ theme }) => theme.background};
   z-index: 9999;
   overflow: auto;
   :hover {

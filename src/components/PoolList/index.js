@@ -9,6 +9,8 @@ import InfoHelper from '../InfoHelper'
 import Loader from '../LocalLoader'
 import { getHealthFactor } from '../../utils/dmm'
 import ListItem, { ItemCard } from './ListItem'
+import useTheme from '../../hooks/useTheme'
+import { AMP_HINT } from '../../constants'
 
 const TableHeader = styled.div`
   display: grid;
@@ -146,7 +148,7 @@ const PoolList = ({ pools, maxItems = 10 }) => {
             }
           />
         </Flex>
-        <Flex alignItems="center" justifyContent="flexEnd">
+        <Flex alignItems="center" justifyContent="flex-end">
           <ClickableText
             onClick={() => {
               setSortedColumn(SORT_FIELD.LIQ)
@@ -165,7 +167,7 @@ const PoolList = ({ pools, maxItems = 10 }) => {
             )}
           </ClickableText>
         </Flex>
-        <Flex alignItems="center">
+        <Flex alignItems="center" justifyContent="flex-end">
           <ClickableText
             onClick={() => {
               setSortedColumn(SORT_FIELD.VOL)
@@ -185,7 +187,7 @@ const PoolList = ({ pools, maxItems = 10 }) => {
           </ClickableText>
         </Flex>
 
-        <Flex alignItems="center" justifyContent="flexEnd">
+        <Flex alignItems="center" justifyContent="flex-end">
           <ClickableText
             onClick={() => {
               setSortedColumn(SORT_FIELD.FEES)
@@ -205,23 +207,19 @@ const PoolList = ({ pools, maxItems = 10 }) => {
           </ClickableText>
         </Flex>
 
-        <Flex alignItems="center" justifyContent="flexEnd">
+        <Flex alignItems="center" justifyContent="flex-end">
           <ClickableText>AMP</ClickableText>
-          <InfoHelper
-            text={
-              'Amplification Factor. Higher AMP, higher capital efficiency within a price range. Higher AMP recommended for more stable pairs, lower AMP for more volatile pairs.'
-            }
-          />
+          <InfoHelper text={AMP_HINT} />
         </Flex>
 
-        <Flex alignItems="center" justifyContent="flexEnd">
+        <Flex alignItems="center" justifyContent="flex-end">
           <ClickableText
             onClick={() => {
               setSortedColumn(SORT_FIELD.ONE_YEAR_FL)
               setSortDirection(sortedColumn !== SORT_FIELD.ONE_YEAR_FL ? true : !sortDirection)
             }}
           >
-            APY
+            APR
             {sortedColumn === SORT_FIELD.ONE_YEAR_FL ? (
               !sortDirection ? (
                 <ChevronUp size="14" style={{ marginLeft: '2px' }} />
@@ -232,10 +230,10 @@ const PoolList = ({ pools, maxItems = 10 }) => {
               ''
             )}
           </ClickableText>
-          <InfoHelper text={'1Yr Fees Collected/Liquidity based on 24H volume annualized'} />
+          <InfoHelper text={'Estimated return based on yearly fees of the pool'} />
         </Flex>
 
-        <Flex alignItems="center" justifyContent="flexEnd">
+        <Flex alignItems="center" justifyContent="flex-end">
           <ClickableText>Add Liquidity</ClickableText>
         </Flex>
       </TableHeader>
@@ -270,8 +268,9 @@ const PoolList = ({ pools, maxItems = 10 }) => {
     }
   }, [ITEMS_PER_PAGE, pools])
 
+  const theme = useTheme()
   return (
-    <div>
+    <div style={{ border: `1px solid ${theme.border}`, borderRadius: '8px', overflow: 'hidden' }}>
       {renderHeader()}
       {!poolsList ? (
         <Loader />

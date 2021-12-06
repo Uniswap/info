@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useCallback } from 'react'
+import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react'
 import styled from 'styled-components'
 import { useMedia } from 'react-use'
 import { Bookmark, Activity } from 'react-feather'
@@ -12,7 +12,7 @@ import { AutoColumn } from '../components/Column'
 import UserChart from '../components/UserChart'
 import PairReturnsChart from '../components/PairReturnsChart'
 import PositionList from '../components/PositionList'
-import { ButtonDropdown } from '../components/ButtonStyled'
+import { ButtonDropdown, ButtonDark } from '../components/ButtonStyled'
 import DoubleTokenLogo from '../components/DoubleLogo'
 import Link from '../components/Link'
 import { BasicLink } from '../components/Link'
@@ -21,10 +21,12 @@ import { TYPE } from '../Theme'
 import { useUserTransactions, useUserPositions } from '../contexts/User'
 import { useSavedAccounts } from '../contexts/LocalStorage'
 import { formattedNum, getEtherscanLinkText } from '../utils'
+import { useOnClickOutside } from '../hooks'
+import useTheme from '../hooks/useTheme'
+import { Flex, Text } from 'rebass'
 
 const AccountWrapper = styled.div`
-  background-color: rgba(255, 255, 255, 0.2);
-  padding: 6px 16px;
+  padding: 6px 16px 6px 0;
   border-radius: 100px;
   display: flex;
   align-items: center;
@@ -40,8 +42,10 @@ const DashboardWrapper = styled.div`
 const DropdownWrapper = styled.div`
   position: relative;
   margin-bottom: 1rem;
-  border: 1px solid #edeef2;
-  border-radius: 12px;
+  border: 1px solid ${({ theme }) => theme.border};
+  border-radius: 8px;
+  max-width: 400px;
+  width: 100%;
 `
 
 const Flyout = styled.div`
@@ -49,12 +53,12 @@ const Flyout = styled.div`
   top: 38px;
   left: -1px;
   width: 100%;
-  background-color: ${({ theme }) => theme.bg1};
+  background-color: ${({ theme }) => theme.background};
   z-index: 999;
-  border-bottom-right-radius: 10px;
-  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 8px;
+  border-bottom-left-radius: 8px;
   padding-top: 4px;
-  border: 1px solid #edeef2;
+  border: 1px solid ${({ theme }) => theme.border};
   border-top: none;
 `
 
@@ -65,7 +69,7 @@ const MenuRow = styled(Row)`
 
   :hover {
     cursor: pointer;
-    background-color: ${({ theme }) => theme.bg2};
+    background-color: ${({ theme }) => theme.buttonBlack};
   }
 `
 
@@ -120,9 +124,13 @@ function AccountPage({ account }) {
     }
   }, [positions])
 
+  const theme = useTheme()
+
   // settings for list view and dropdowns
   const hideLPContent = positions && positions.length === 0
   const [showDropdown, setShowDropdown] = useState(false)
+  const node = useRef()
+  useOnClickOutside(node, () => setShowDropdown(false))
   const [activePosition, setActivePosition] = useState()
 
   const dynamicPositions = activePosition ? [activePosition] : positions
@@ -170,39 +178,51 @@ function AccountPage({ account }) {
               href={`${process.env.REACT_APP_ETHERSCAN_URL}/address/${account}`}
               target="_blank"
             >
-              {' '}
-              {account?.slice(0, 42)}{' '}
+              {account?.slice(0, 42)}
             </Link>
           </TYPE.body>
           {!below600 && <Search small={true} />}
         </RowBetween>
         <Header>
-          <RowBetween>
+          <Flex
+            alignItems={below600 ? 'flex-start' : 'center'}
+            flexDirection={below600 ? 'column' : 'row'}
+            justifyContent="space-between"
+          >
             <span>
               <TYPE.header fontSize={24}>{account?.slice(0, 6) + '...' + account?.slice(38, 42)}</TYPE.header>
+            </span>
+            <AccountWrapper>
+              {!below600 && (
+                <StyledIcon>
+                  <Bookmark
+                    onClick={handleBookmarkClick}
+                    style={{ opacity: isBookmarked ? 0.8 : 0.4, cursor: 'pointer', marginRight: '16px' }}
+                  />
+                </StyledIcon>
+              )}
               <Link
                 lineHeight={'145.23%'}
                 href={`${process.env.REACT_APP_ETHERSCAN_URL}/address/${account}`}
                 target="_blank"
               >
-                <TYPE.main fontSize={14}>{`View on ${getEtherscanLinkText()}`}</TYPE.main>
+                <ButtonDark>
+                  <Text fontSize={14}>{`View on ${getEtherscanLinkText()}`}↗</Text>
+                </ButtonDark>
               </Link>
-            </span>
-            <AccountWrapper>
-              <StyledIcon>
-                <Bookmark
-                  onClick={handleBookmarkClick}
-                  style={{ opacity: isBookmarked ? 0.8 : 0.4, cursor: 'pointer' }}
-                />
-              </StyledIcon>
             </AccountWrapper>
-          </RowBetween>
+          </Flex>
         </Header>
         <DashboardWrapper>
           {showWarning && <Warning>Fees cannot currently be calculated for pairs that include AMPL.</Warning>}
           {!hideLPContent && (
-            <DropdownWrapper>
-              <ButtonDropdown width="100%" onClick={() => setShowDropdown(!showDropdown)} open={showDropdown}>
+            <DropdownWrapper ref={node}>
+              <ButtonDropdown
+                width="100%"
+                onClick={() => setShowDropdown(!showDropdown)}
+                open={showDropdown}
+                style={{ borderRadius: '8px', background: theme.background }}
+              >
                 {!activePosition && (
                   <RowFixed>
                     <StyledIcon>
@@ -270,9 +290,9 @@ function AccountPage({ account }) {
           {!hideLPContent && (
             <Panel style={{ height: '100%', marginBottom: '1rem' }}>
               <AutoRow gap="20px">
-                <AutoColumn gap="10px">
+                <AutoColumn gap="12px">
                   <RowBetween>
-                    <TYPE.body>Liquidity (Including Fees)</TYPE.body>
+                    <TYPE.body color={theme.subText}> Liquidity (Including Fees)</TYPE.body>
                     <div />
                   </RowBetween>
                   <RowFixed align="flex-end">
@@ -316,22 +336,24 @@ function AccountPage({ account }) {
           <Panel
             style={{
               marginTop: '1.5rem',
+              padding: 0,
             }}
           >
             <PositionList positions={positions} />
           </Panel>
           <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
-            Transactions
+            Latest Transactions
           </TYPE.main>{' '}
           <Panel
             style={{
               marginTop: '1.5rem',
+              padding: 0,
             }}
           >
             <TxnList transactions={transactions} />
           </Panel>
           <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
-            Wallet Stats
+            Wallet Statistics
           </TYPE.main>{' '}
           <Panel
             style={{
@@ -339,19 +361,25 @@ function AccountPage({ account }) {
             }}
           >
             <AutoRow gap="20px">
-              <AutoColumn gap="8px">
-                <TYPE.header fontSize={24}>{totalSwappedUSD ? formattedNum(totalSwappedUSD, true) : '-'}</TYPE.header>
-                <TYPE.main>Total Value Swapped</TYPE.main>
+              <AutoColumn gap="12px">
+                <TYPE.main color={theme.subText} fontSize="12px">
+                  TOTAL VALUE SWAPPED
+                </TYPE.main>
+                <TYPE.header fontSize={18}>{totalSwappedUSD ? formattedNum(totalSwappedUSD, true) : '-'}</TYPE.header>
               </AutoColumn>
-              <AutoColumn gap="8px">
-                <TYPE.header fontSize={24}>
+              <AutoColumn gap="12px">
+                <TYPE.main color={theme.subText} fontSize="12px">
+                  TOTAL FEES PAID
+                </TYPE.main>
+                <TYPE.header fontSize={18}>
                   {totalSwappedUSD ? formattedNum(totalSwappedUSD * 0.003, true) : '-'}
                 </TYPE.header>
-                <TYPE.main>Total Fees Paid</TYPE.main>
               </AutoColumn>
-              <AutoColumn gap="8px">
-                <TYPE.header fontSize={24}>{transactionCount ? transactionCount : '-'}</TYPE.header>
-                <TYPE.main>Total Transactions</TYPE.main>
+              <AutoColumn gap="12px">
+                <TYPE.main color={theme.subText} fontSize="12px">
+                  TOTAL TRANSACTIONS
+                </TYPE.main>
+                <TYPE.header fontSize={18}>{transactionCount ? transactionCount : '-'}</TYPE.header>
               </AutoColumn>
             </AutoRow>
           </Panel>

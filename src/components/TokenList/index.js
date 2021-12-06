@@ -22,8 +22,7 @@ const PageButtons = styled.div`
   width: 100%;
   display: flex;
   justify-content: center;
-  margin-top: 2em;
-  margin-bottom: 2em;
+  margin: 1.25rem 0;
 `
 
 const Arrow = styled.div`
@@ -45,7 +44,7 @@ const DashGrid = styled.div`
   grid-gap: 1em;
   grid-template-columns: 100px 1fr 1fr;
   grid-template-areas: 'name liq vol';
-  padding: 0 1.125rem;
+  padding: 0;
 
   > * {
     justify-content: flex-end;
@@ -60,8 +59,8 @@ const DashGrid = styled.div`
   @media screen and (min-width: 680px) {
     display: grid;
     grid-gap: 1em;
-    grid-template-columns: 180px 1fr 1fr 1fr;
-    grid-template-areas: 'name symbol liq vol ';
+    grid-template-columns: 180px 1fr 1fr 1fr 1fr;
+    grid-template-areas: 'name symbol liq price vol ';
 
     > * {
       justify-content: flex-end;
@@ -80,17 +79,27 @@ const DashGrid = styled.div`
     grid-template-areas: 'name symbol liq vol price change';
   }
 `
+const TableHeader = styled(DashGrid)`
+  background: ${({ theme }) => theme.tableHeader};
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  padding: 20px;
+  line-height: 20px;
+`
 
 const ListWrapper = styled.div``
 
 const ClickableText = styled(Text)`
   text-align: end;
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 500;
   &:hover {
     cursor: pointer;
     opacity: 0.6;
   }
   user-select: none;
-  color: ${({ theme }) => theme.text1};
+  color: ${({ theme }) => theme.subText};
 
   @media screen and (max-width: 640px) {
     font-size: 0.85rem;
@@ -121,7 +130,7 @@ const SORT_FIELD = {
 }
 
 // @TODO rework into virtualized list
-function TopTokenList({ tokens, itemMax = 10 }) {
+function TopTokenList({ tokens, itemMax = 5 }) {
   // page state
   const [page, setPage] = useState(1)
   const [maxPage, setMaxPage] = useState(1)
@@ -178,7 +187,7 @@ function TopTokenList({ tokens, itemMax = 10 }) {
 
   const ListItem = ({ item, index }) => {
     return (
-      <DashGrid style={{ height: '48px' }} focus={true}>
+      <DashGrid style={{ height: '56px' }} focus={true}>
         <DataText area="name" fontWeight="500">
           <Row>
             {!below680 && <div style={{ marginRight: '1rem', width: '10px' }}>{index}</div>}
@@ -200,7 +209,7 @@ function TopTokenList({ tokens, itemMax = 10 }) {
         )}
         <DataText area="liq">{formattedNum(item.totalLiquidityUSD, true)}</DataText>
         <DataText area="vol">{formattedNum(item.oneDayVolumeUSD, true)}</DataText>
-        {!below1080 && (
+        {!below680 && (
           <DataText area="price" fontWeight="500">
             {formattedNum(item.priceUSD, true)}
           </DataText>
@@ -212,7 +221,7 @@ function TopTokenList({ tokens, itemMax = 10 }) {
 
   return (
     <ListWrapper>
-      <DashGrid center={true} style={{ height: 'fit-content', padding: '0 1.125rem 1rem 1.125rem' }}>
+      <TableHeader center={true} style={{ height: 'fit-content' }}>
         <Flex alignItems="center" justifyContent="flexStart">
           <ClickableText
             area="name"
@@ -258,11 +267,11 @@ function TopTokenList({ tokens, itemMax = 10 }) {
               setSortDirection(sortedColumn !== SORT_FIELD.VOL ? true : !sortDirection)
             }}
           >
-            Volume (24hrs)
+            Volume (24H)
             {sortedColumn === SORT_FIELD.VOL ? (!sortDirection ? '↑' : '↓') : ''}
           </ClickableText>
         </Flex>
-        {!below1080 && (
+        {!below680 && (
           <Flex alignItems="center">
             <ClickableText
               area="price"
@@ -284,18 +293,18 @@ function TopTokenList({ tokens, itemMax = 10 }) {
                 setSortDirection(sortedColumn !== SORT_FIELD.CHANGE ? true : !sortDirection)
               }}
             >
-              Price Change (24hrs)
+              Price Change (24H)
               {sortedColumn === SORT_FIELD.CHANGE ? (!sortDirection ? '↑' : '↓') : ''}
             </ClickableText>
           </Flex>
         )}
-      </DashGrid>
+      </TableHeader>
       <Divider />
       <List p={0}>
         {filteredList &&
           filteredList.map((item, index) => {
             return (
-              <div key={index}>
+              <div key={index} style={{ padding: '0 20px' }}>
                 <ListItem key={index} index={(page - 1) * itemMax + index + 1} item={item} />
                 <Divider />
               </div>

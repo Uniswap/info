@@ -3,7 +3,7 @@
         <g>
             <g>
                 <path d="M0 0L16 0 16 16 0 16z" transform="translate(-137.000000, -88.000000) translate(137.000000, 88.000000)"/>
-                <g stroke="#08A1E7" stroke-linecap="round" stroke-linejoin="round">
+                <g stroke="#31CB9E" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
                     <path d="M10.667 9.986L12 8.653 10.667 7.319M4.788 3.333L3.735 1.885c-.252-.346-.656-.55-1.084-.549L0 1.347M10.667 2.667L12 1.333 10.667 0" transform="translate(-137.000000, -88.000000) translate(137.000000, 88.000000) translate(2.000000, 2.666667)"/>
                     <path d="M7.212 6.667l1.053 1.448c.252.346.656.55 1.084.549L12 8.653M12 1.347l-2.65-.011c-.43-.002-.833.203-1.085.55l-4.53 6.229c-.252.346-.656.55-1.084.549L0 8.653" transform="translate(-137.000000, -88.000000) translate(137.000000, 88.000000) translate(2.000000, 2.666667)"/>
                 </g>

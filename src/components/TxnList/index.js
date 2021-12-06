@@ -15,6 +15,7 @@ import { Divider, EmptyCard } from '..'
 import DropdownSelect from '../DropdownSelect'
 import FormattedName from '../FormattedName'
 import { TYPE } from '../../Theme'
+import useTheme from '../../hooks/useTheme'
 
 dayjs.extend(utc)
 
@@ -22,12 +23,11 @@ const PageButtons = styled.div`
   width: 100%;
   display: flex;
   justify-content: center;
-  margin-top: 2em;
-  margin-bottom: 0.5em;
+  margin: 1.25rem 0;
 `
 
 const Arrow = styled.div`
-  color: #2f80ed;
+  color: ${({ theme }) => theme.primary};
   opacity: ${(props) => (props.faded ? 0.3 : 1)};
   padding: 0 20px;
   user-select: none;
@@ -66,26 +66,31 @@ const DashGrid = styled.div`
   }
 
   @media screen and (min-width: 780px) {
-    max-width: 1320px;
-    grid-template-columns: 1.2fr 1fr 1fr 1fr 1fr;
+    grid-template-columns: 1.6fr 1fr 1fr 1fr 1fr;
     grid-template-areas: 'txn value amountToken amountOther time';
 
     > * {
       &:first-child {
-        width: 180px;
+        width: fit-content;
       }
     }
   }
 
   @media screen and (min-width: 1080px) {
-    max-width: 1320px;
-    grid-template-columns: 1.2fr 1fr 1fr 1fr 1fr 1fr;
+    grid-template-columns: 1.6fr 1fr 1fr 1fr 1fr 1fr;
     grid-template-areas: 'txn value amountToken amountOther account time';
   }
 `
 
+const TableHeader = styled(DashGrid)`
+  background: ${({ theme }) => theme.tableHeader};
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  padding: 12px 20px;
+`
+
 const ClickableText = styled(Text)`
-  color: ${({ theme }) => theme.text1};
+  color: ${({ theme }) => theme.subText};
   user-select: none;
   text-align: end;
 
@@ -94,9 +99,9 @@ const ClickableText = styled(Text)`
     opacity: 0.6;
   }
 
-  @media screen and (max-width: 640px) {
-    font-size: 14px;
-  }
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 500;
 `
 
 const DataText = styled(Flex)`
@@ -115,18 +120,16 @@ const DataText = styled(Flex)`
 
 const SortText = styled.button`
   cursor: pointer;
-  font-weight: ${({ active, theme }) => (active ? 500 : 400)};
-  margin-right: 0.75rem !important;
+  font-weight: 500;
   border: none;
   background-color: transparent;
-  font-size: 1rem;
-  padding: 0px;
-  color: ${({ active, theme }) => (active ? theme.text1 : theme.text3)};
+  padding: 6px 12px;
+  color: ${({ active, theme }) => (active ? theme.text1 : theme.subText)};
+  background: ${({ active, theme }) => (active ? theme.primary : theme.buttonBlack)};
   outline: none;
-
-  @media screen and (max-width: 600px) {
-    font-size: 14px;
-  }
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 999px;
 `
 
 const SORT_FIELD = {
@@ -143,7 +146,7 @@ const TXN_TYPE = {
   REMOVE: 'Removes',
 }
 
-const ITEMS_PER_PAGE = 10
+const ITEMS_PER_PAGE = 5
 
 function getTransactionType(event, symbol0, symbol1) {
   const formattedS0 = symbol0?.length > 8 ? symbol0.slice(0, 7) + '...' : symbol0
@@ -288,7 +291,7 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
     }
 
     return (
-      <DashGrid style={{ height: '48px' }}>
+      <DashGrid style={{ height: '56px' }}>
         <DataText area="txn" fontWeight="500">
           <Link color={color} external href={urls.showTransaction(item.hash)}>
             {getTransactionType(item.type, item.token1Symbol, item.token0Symbol)}
@@ -321,15 +324,16 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
     )
   }
 
+  const theme = useTheme()
   return (
     <>
-      <DashGrid center={true} style={{ height: 'fit-content', padding: '0 0 1rem 0' }}>
+      <TableHeader center={true} style={{ height: 'fit-content' }}>
         {below780 ? (
           <RowBetween area="txn">
             <DropdownSelect options={TXN_TYPE} active={txFilter} setActive={setTxFilter} color={color} />
           </RowBetween>
         ) : (
-          <RowFixed area="txn" gap="10px" pl={4}>
+          <RowFixed area="txn" gap="10px" pl={4} style={{ borderRadius: '999px', background: theme.buttonBlack }}>
             <SortText
               onClick={() => {
                 setTxFilter(TXN_TYPE.ALL)
@@ -410,7 +414,9 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
           )}
           {!below1080 && (
             <Flex alignItems="center">
-              <TYPE.body area="account">Account</TYPE.body>
+              <TYPE.body area="account" color={theme.subText}>
+                ACCOUNT
+              </TYPE.body>
             </Flex>
           )}
           <Flex alignItems="center">
@@ -426,7 +432,7 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
             </ClickableText>
           </Flex>
         </>
-      </DashGrid>
+      </TableHeader>
       <Divider />
       <List p={0}>
         {!filteredList ? (
@@ -436,7 +442,7 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
         ) : (
           filteredList.map((item, index) => {
             return (
-              <div key={index}>
+              <div key={index} style={{ padding: '0 20px' }}>
                 <ListItem key={index} index={index + 1} item={item} />
                 <Divider />
               </div>

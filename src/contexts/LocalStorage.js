@@ -116,17 +116,19 @@ export function usePathDismissed(path) {
 
 export function useSavedAccounts() {
   const [state, { updateKey }] = useLocalStorageContext()
-  const savedAccounts = state?.[SAVED_ACCOUNTS]
+  const savedAccounts = [...new Set(state?.[SAVED_ACCOUNTS].map((acc) => acc.toLowerCase()))]
 
   function addAccount(account) {
-    let newAccounts = state?.[SAVED_ACCOUNTS]
-    newAccounts.push(account)
-    updateKey(SAVED_ACCOUNTS, newAccounts)
+    let newAccounts = state?.[SAVED_ACCOUNTS].map((acc) => acc.toLowerCase())
+    if (!newAccounts.includes(account.toLowerCase())) {
+      newAccounts.push(account)
+      updateKey(SAVED_ACCOUNTS, newAccounts)
+    }
   }
 
   function removeAccount(account) {
-    let newAccounts = state?.[SAVED_ACCOUNTS]
-    let index = newAccounts.indexOf(account)
+    let newAccounts = state?.[SAVED_ACCOUNTS].map((acc) => acc.toLowerCase())
+    let index = newAccounts.indexOf(account.toLowerCase())
     if (index > -1) {
       newAccounts.splice(index, 1)
     }

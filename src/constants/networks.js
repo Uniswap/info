@@ -9,13 +9,13 @@ export const NETWORK_ICON = {
   137: Polygon,
   56: BSC,
   43114: AVAX,
-  250: Fantom
+  250: Fantom,
 }
 
 export const NETWORK_LABEL = {
   1: 'Ethereum',
   137: 'Polygon',
   56: 'BSC',
-  43114: 'AVAX',
-  250: 'Fantom'
+  43114: 'Avalanche',
+  250: 'Fantom',
 }

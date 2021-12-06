@@ -1,6 +1,8 @@
 import React from 'react'
+import useTheme from '../../../hooks/useTheme'
 
 const FavoriteStar = ({ width, height }) => {
+  const theme = useTheme()
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width={width || 34} height={height || 33} viewBox="0 0 34 33">
       <g fill="none" fillRule="evenodd">
@@ -8,7 +10,7 @@ const FavoriteStar = ({ width, height }) => {
           <g>
             <g>
               <path
-                fill="#08A1E7"
+                fill={theme.primary}
                 d="M0.75 0.502L34.544 0.502 0.75 33.502z"
                 transform="translate(-365 -208) translate(364.25 157) translate(0 50.498)"
               />
