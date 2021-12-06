@@ -352,6 +352,11 @@ function TokenPage({ address, history }) {
                   style={{
                     gridColumn: below768 ? '1/5' : below1280 ? '1/4' : '2/5',
                     gridRow: below1280 ? '' : '1/4',
+                    ...(below768
+                      ? {
+                          padding: '16px 12px',
+                        }
+                      : {}),
                   }}
                 >
                   <TokenChart address={address} color={backgroundColor} base={priceUSD} />

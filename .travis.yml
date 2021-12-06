@@ -90,61 +90,6 @@ deploy:
     bucket: analytics.kyberswap.com
     skip_cleanup: true
     local-dir: build-production
-    cache_control: "no-cache"
-    on:
-      all_branches: true
-      condition: $TRAVIS_BRANCH =~ ^staging$
-
-  - provider: gcs
-    access_key_id: $GCS_ACCESS_KEY_ID
-    secret_access_key: $GCS_SECRET_KEY_ID
-    bucket: polygon-analytics.kyberswap.com
-    skip_cleanup: true
-    local-dir: build-matic
-    cache_control: "no-cache"
-    on:
-      all_branches: true
-      condition: $TRAVIS_BRANCH =~ ^staging$
-
-  - provider: gcs
-    access_key_id: $GCS_ACCESS_KEY_ID
-    secret_access_key: $GCS_SECRET_KEY_ID
-    bucket: bsc-analytics.kyberswap.com
-    skip_cleanup: true
-    local-dir: build-bsc
-    cache_control: "no-cache"
-    on:
-      all_branches: true
-      condition: $TRAVIS_BRANCH =~ ^staging$
-
-  - provider: gcs
-    access_key_id: $GCS_ACCESS_KEY_ID
-    secret_access_key: $GCS_SECRET_KEY_ID
-    bucket: avax-analytics.kyberswap.com
-    skip_cleanup: true
-    local-dir: build-avax
-    cache_control: "no-cache"
-    on:
-      all_branches: true
-      condition: $TRAVIS_BRANCH =~ ^staging$
-
-  - provider: gcs
-    access_key_id: $GCS_ACCESS_KEY_ID
-    secret_access_key: $GCS_SECRET_KEY_ID
-    bucket: fantom-analytics.kyberswap.com
-    skip_cleanup: true
-    local-dir: build-fantom
-    cache_control: "no-cache"
-    on:
-      all_branches: true
-      condition: $TRAVIS_BRANCH =~ ^staging$
-
-  - provider: gcs
-    access_key_id: $GCS_ACCESS_KEY_ID
-    secret_access_key: $GCS_SECRET_KEY_ID
-    bucket: info.dmm.exchange
-    skip_cleanup: true
-    local-dir: build-production
     on:
       all_branches: true
       condition: $TRAVIS_BRANCH =~ ^main$
@@ -152,7 +97,7 @@ deploy:
   - provider: gcs
     access_key_id: $GCS_ACCESS_KEY_ID
     secret_access_key: $GCS_SECRET_KEY_ID
-    bucket: info.dmm.exchange
+    bucket: analytics.kyberswap.com
     skip_cleanup: true
     local-dir: build-production-index
     cache_control: "public, max-age=30"
@@ -163,7 +108,7 @@ deploy:
   - provider: gcs
     access_key_id: $GCS_ACCESS_KEY_ID
     secret_access_key: $GCS_SECRET_KEY_ID
-    bucket: polygon-info.dmm.exchange
+    bucket: polygon-analytics.kyberswap.com
     skip_cleanup: true
     local-dir: build-matic
     on:
@@ -173,7 +118,7 @@ deploy:
   - provider: gcs
     access_key_id: $GCS_ACCESS_KEY_ID
     secret_access_key: $GCS_SECRET_KEY_ID
-    bucket: polygon-info.dmm.exchange
+    bucket: polygon-analytics.kyberswap.com
     skip_cleanup: true
     local-dir: build-matic-index
     cache_control: "public, max-age=30"
@@ -184,7 +129,7 @@ deploy:
   - provider: gcs
     access_key_id: $GCS_ACCESS_KEY_ID
     secret_access_key: $GCS_SECRET_KEY_ID
-    bucket: bsc-info.dmm.exchange
+    bucket: bsc-analytics.kyberswap.com
     skip_cleanup: true
     local-dir: build-bsc
     on:
@@ -194,7 +139,7 @@ deploy:
   - provider: gcs
     access_key_id: $GCS_ACCESS_KEY_ID
     secret_access_key: $GCS_SECRET_KEY_ID
-    bucket: bsc-info.dmm.exchange
+    bucket: bsc-analytics.kyberswap.com
     skip_cleanup: true
     local-dir: build-bsc-index
     cache_control: "public, max-age=30"
@@ -205,7 +150,7 @@ deploy:
   - provider: gcs
     access_key_id: $GCS_ACCESS_KEY_ID
     secret_access_key: $GCS_SECRET_KEY_ID
-    bucket: avax-info.dmm.exchange
+    bucket: avax-analytics.kyberswap.com
     skip_cleanup: true
     local-dir: build-avax
     on:
@@ -215,7 +160,7 @@ deploy:
   - provider: gcs
     access_key_id: $GCS_ACCESS_KEY_ID
     secret_access_key: $GCS_SECRET_KEY_ID
-    bucket: avax-info.dmm.exchange
+    bucket: avax-analytics.kyberswap.com
     skip_cleanup: true
     local-dir: build-avax-index
     cache_control: "public, max-age=30"
@@ -227,7 +172,7 @@ deploy:
   - provider: gcs
     access_key_id: $GCS_ACCESS_KEY_ID
     secret_access_key: $GCS_SECRET_KEY_ID
-    bucket: fantom-info.dmm.exchange
+    bucket: fantom-analytics.kyberswap.com
     skip_cleanup: true
     local-dir: build-fantom
     on:
@@ -237,7 +182,7 @@ deploy:
   - provider: gcs
     access_key_id: $GCS_ACCESS_KEY_ID
     secret_access_key: $GCS_SECRET_KEY_ID
-    bucket: fantom-info.dmm.exchange
+    bucket: fantom-analytics.kyberswap.com
     skip_cleanup: true
     local-dir: build-fantom-index
     cache_control: "public, max-age=30"

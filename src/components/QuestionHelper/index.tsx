@@ -7,13 +7,12 @@ const QuestionWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0.2rem;
   border: none;
   background: none;
   outline: none;
   cursor: default;
   border-radius: 36px;
-  color: ${({ theme }) => theme.text2};
+  color: ${({ theme }) => theme.subText};
 
   :hover,
   :focus {
@@ -43,7 +42,7 @@ export default function QuestionHelper({ text, disabled }: { text: string; disab
   const close = useCallback(() => setShow(false), [setShow])
 
   return (
-    <span style={{ marginLeft: 4 }}>
+    <span style={{ marginLeft: 4, display: 'flex', alignItems: 'center' }}>
       <Tooltip text={text} show={show && !disabled}>
         <QuestionWrapper onClick={open} onMouseEnter={open} onMouseLeave={close}>
           <Question size={16} />

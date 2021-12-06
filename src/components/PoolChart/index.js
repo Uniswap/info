@@ -124,7 +124,7 @@ const PoolChart = ({ address, color, base0, base1 }) => {
     }
   }
 
-  const aspect = below1080 ? 60 / 15 : below1600 ? 60 / 40 : 60 / 32
+  const aspect = below600 ? 60 / 42 : below1080 ? 60 / 15 : below1600 ? 60 / 40 : 60 / 32
 
   const { ONE_DAY, FOUR_HOURS, ALL_TIME, ...timeWindowOptionsExcept1Day } = timeframeOptions
   const { ALL_TIME: alltime, ...timeWindowOptionsExceptAllTime } = timeframeOptions

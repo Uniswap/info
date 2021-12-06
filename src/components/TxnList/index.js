@@ -66,18 +66,18 @@ const DashGrid = styled.div`
   }
 
   @media screen and (min-width: 780px) {
-    grid-template-columns: 1.4fr 1fr 1fr 1fr 1fr;
+    grid-template-columns: 1.6fr 1fr 1fr 1fr 1fr;
     grid-template-areas: 'txn value amountToken amountOther time';
 
     > * {
       &:first-child {
-        width: 248px;
+        width: fit-content;
       }
     }
   }
 
   @media screen and (min-width: 1080px) {
-    grid-template-columns: 1.4fr 1fr 1fr 1fr 1fr 1fr;
+    grid-template-columns: 1.6fr 1fr 1fr 1fr 1fr 1fr;
     grid-template-areas: 'txn value amountToken amountOther account time';
   }
 `

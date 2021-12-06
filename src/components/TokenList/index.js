@@ -59,8 +59,8 @@ const DashGrid = styled.div`
   @media screen and (min-width: 680px) {
     display: grid;
     grid-gap: 1em;
-    grid-template-columns: 180px 1fr 1fr 1fr;
-    grid-template-areas: 'name symbol liq vol ';
+    grid-template-columns: 180px 1fr 1fr 1fr 1fr;
+    grid-template-areas: 'name symbol liq price vol ';
 
     > * {
       justify-content: flex-end;
@@ -84,6 +84,7 @@ const TableHeader = styled(DashGrid)`
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
   padding: 20px;
+  line-height: 20px;
 `
 
 const ListWrapper = styled.div``
@@ -208,7 +209,7 @@ function TopTokenList({ tokens, itemMax = 5 }) {
         )}
         <DataText area="liq">{formattedNum(item.totalLiquidityUSD, true)}</DataText>
         <DataText area="vol">{formattedNum(item.oneDayVolumeUSD, true)}</DataText>
-        {!below1080 && (
+        {!below680 && (
           <DataText area="price" fontWeight="500">
             {formattedNum(item.priceUSD, true)}
           </DataText>
@@ -270,7 +271,7 @@ function TopTokenList({ tokens, itemMax = 5 }) {
             {sortedColumn === SORT_FIELD.VOL ? (!sortDirection ? '↑' : '↓') : ''}
           </ClickableText>
         </Flex>
-        {!below1080 && (
+        {!below680 && (
           <Flex alignItems="center">
             <ClickableText
               area="price"

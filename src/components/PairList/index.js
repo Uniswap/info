@@ -58,8 +58,8 @@ const DashGrid = styled.div`
   }
 
   @media screen and (min-width: 740px) {
-    grid-template-columns: 2fr 1fr 1fr;
-    grid-template-areas: ' name liq vol pool ';
+    grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+    grid-template-areas: ' name liq vol weekVolume apy ';
   }
 
   @media screen and (min-width: 1080px) {
@@ -77,6 +77,7 @@ const TableHeader = styled(DashGrid)`
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
   padding: 20px;
+  line-height: 20px;
 `
 
 const ListWrapper = styled.div``
@@ -165,10 +166,9 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 5 }) {
     const pairData = pairs[pairAddress]
 
     if (pairData && pairData.token0 && pairData.token1) {
-      const liquidity = pairData.reserveUSD ? pairData.reserveUSD : pairData.trackedReserveUSD
-
       const volume = pairData.oneDayVolumeUSD ? pairData.oneDayVolumeUSD : pairData.oneDayVolumeUntracked
 
+      const liquidity = pairData.reserveUSD ? pairData.reserveUSD : pairData.trackedReserveUSD
       const oneDayFee = pairData.oneDayFeeUSD ? pairData.oneDayFeeUSD : pairData.oneDayFeeUntracked
 
       const apy =
@@ -199,9 +199,9 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 5 }) {
           </DataText>
           <DataText area="liq">{formattedNum(liquidity, true)}</DataText>
           <DataText area="vol">{formattedNum(volume, true)}</DataText>
-          {!below1080 && <DataText area="volWeek">{formattedNum(weekVolume, true)}</DataText>}
+          {!below740 && <DataText area="volWeek">{formattedNum(weekVolume, true)}</DataText>}
           {!below1080 && <DataText area="fees">{formattedNum(oneDayFee, true)}</DataText>}
-          {!below1080 && <DataText area="apy">{apy}</DataText>}
+          {!below740 && <DataText area="apy">{apy}</DataText>}
         </DashGrid>
       )
     } else {
@@ -216,8 +216,15 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 5 }) {
         const pairA = pairs[addressA]
         const pairB = pairs[addressB]
         if (sortedColumn === SORT_FIELD.APY) {
-          const apy0 = parseFloat(pairA.oneDayVolumeUSD * 0.003 * 356 * 100) / parseFloat(pairA.reserveUSD)
-          const apy1 = parseFloat(pairB.oneDayVolumeUSD * 0.003 * 356 * 100) / parseFloat(pairB.reserveUSD)
+          const getApr = (pairData) => {
+            const liquidity = pairData.reserveUSD ? pairData.reserveUSD : pairData.trackedReserveUSD
+            const oneDayFee = pairData.oneDayFeeUSD ? pairData.oneDayFeeUSD : pairData.oneDayFeeUntracked
+            const apy = (oneDayFee * 365 * 100) / liquidity < MAX_ALLOW_APY ? (oneDayFee * 365 * 100) / liquidity : 0
+            return apy
+          }
+
+          const apy0 = getApr(pairA)
+          const apy1 = getApr(pairB)
           return apy0 > apy1 ? (sortDirection ? -1 : 1) * 1 : (sortDirection ? -1 : 1) * -1
         }
         return parseFloat(pairA[FIELD_TO_VALUE(sortedColumn)]) > parseFloat(pairB[FIELD_TO_VALUE(sortedColumn)])
@@ -228,7 +235,7 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 5 }) {
       .map((pairAddress, index) => {
         return (
           pairAddress && (
-            <div key={index} style={{ padding: '0 20px' }}>
+            <div key={pairAddress} style={{ padding: '0 20px' }}>
               <ListItem key={index} index={(page - 1) * ITEMS_PER_PAGE + index + 1} pairAddress={pairAddress} />
               <Divider />
             </div>
@@ -251,7 +258,7 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 5 }) {
             area="liq"
             onClick={(e) => {
               setSortedColumn(SORT_FIELD.LIQ)
-              setSortDirection(sortedColumn !== SORT_FIELD.LIQ ? true : !sortDirection)
+              setSortDirection((prev) => (sortedColumn !== SORT_FIELD.LIQ ? true : !prev))
             }}
           >
             Liquidity {sortedColumn === SORT_FIELD.LIQ ? (!sortDirection ? '↑' : '↓') : ''}
@@ -269,7 +276,7 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 5 }) {
             {sortedColumn === SORT_FIELD.VOL ? (!sortDirection ? '↑' : '↓') : ''}
           </ClickableText>
         </Flex>
-        {!below1080 && (
+        {!below740 && (
           <Flex alignItems="center" justifyContent="flexEnd">
             <ClickableText
               area="volWeek"
@@ -278,7 +285,7 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 5 }) {
                 setSortDirection(sortedColumn !== SORT_FIELD.VOL_7DAYS ? true : !sortDirection)
               }}
             >
-              Volume (7d) {sortedColumn === SORT_FIELD.VOL_7DAYS ? (!sortDirection ? '↑' : '↓') : ''}
+              Volume (7D) {sortedColumn === SORT_FIELD.VOL_7DAYS ? (!sortDirection ? '↑' : '↓') : ''}
             </ClickableText>
           </Flex>
         )}
@@ -295,13 +302,13 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 5 }) {
             </ClickableText>
           </Flex>
         )}
-        {!below1080 && (
+        {!below740 && (
           <Flex alignItems="center" justifyContent="flexEnd">
             <ClickableText
               area="apy"
               onClick={(e) => {
                 setSortedColumn(SORT_FIELD.APY)
-                setSortDirection(sortedColumn !== SORT_FIELD.APY ? true : !sortDirection)
+                setSortDirection((prev) => (sortedColumn !== SORT_FIELD.APY ? true : !prev))
               }}
             >
               APR {sortedColumn === SORT_FIELD.APY ? (!sortDirection ? '↑' : '↓') : ''}
