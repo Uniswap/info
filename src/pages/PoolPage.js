@@ -211,6 +211,9 @@ function PoolPage({ poolAddress, history }) {
 
   const [dismissed, markAsDismissed] = usePathDismissed(history.location.pathname)
 
+  // TODO: Remove this when Cronos has a token list
+  const noWarning = process.env.REACT_APP_CHAIN_ID === '25'
+
   useEffect(() => {
     window.scrollTo({
       behavior: 'smooth',
@@ -228,7 +231,12 @@ function PoolPage({ poolAddress, history }) {
       <span />
       <Warning
         type={'pool'}
-        show={!dismissed && listedTokens && !(listedTokens.includes(token0?.id) && listedTokens.includes(token1?.id))}
+        show={
+          !noWarning &&
+          !dismissed &&
+          listedTokens &&
+          !(listedTokens.includes(token0?.id) && listedTokens.includes(token1?.id))
+        }
         setShow={markAsDismissed}
         address={poolAddress}
       />
