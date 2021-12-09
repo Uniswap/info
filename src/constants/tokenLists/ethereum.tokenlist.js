@@ -127,6 +127,14 @@ const ETHEREUM_TOKEN_LIST = {
     logoURI:
       'https://raw.githubusercontent.com/dforce-network/documents/2eea27372fda6a207f60fba4274ad68008d63694/logos/Lending/EUX.svg',
   },
+  '0x9F52c8ecbEe10e00D9faaAc5Ee9Ba0fF6550F511': {
+    chainId: 1,
+    address: '0x9F52c8ecbEe10e00D9faaAc5Ee9Ba0fF6550F511',
+    symbol: 'SIPHER',
+    name: 'SIPHER',
+    decimals: 18,
+    logoURI: 'https://i.imgur.com/IciyqAe.jpg',
+  },
 }
 
 export default ETHEREUM_TOKEN_LIST
