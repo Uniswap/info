@@ -133,7 +133,7 @@ const ETHEREUM_TOKEN_LIST = {
     symbol: 'SIPHER',
     name: 'SIPHER',
     decimals: 18,
-    logoURI: 'https://i.imgur.com/IciyqAe.jpg',
+    logoURI: 'https://i.imgur.com/zhZo9Bx.jpg',
   },
 }
 
