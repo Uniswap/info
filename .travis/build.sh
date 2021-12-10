@@ -65,6 +65,12 @@ elif [[ "$TRAVIS_BRANCH" == "main" ]]; then
   mv build build-fantom
   echo "Finished running build"
 
+  echo "Start running build"
+  yarn build-cronos
+  mkdir build-cronos-index
+  cp build/index.html build-cronos-index
+  mv build build-cronos
+  echo "Finished running build"
 else
     echo "Branch is not set for auto-build."
     exit 0
