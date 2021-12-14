@@ -433,7 +433,7 @@ export const Search = ({ small = false }) => {
               ? 'Search Uniswap...'
               : below700
               ? 'Search pairs and tokens...'
-              : 'Search Uniswap pairs and tokens...'
+              : 'Search Xata pairs and tokens...'
           }
           value={value}
           onChange={(e) => {
