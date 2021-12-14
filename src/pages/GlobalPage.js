@@ -75,7 +75,6 @@ function GlobalPage() {
           <AutoColumn gap="24px" style={{ paddingBottom: below800 ? '0' : '24px' }}>
             <TYPE.largeHeader>{below800 ? 'Xata Analytics' : 'Xata Analytics'}</TYPE.largeHeader>
             <Search />
-            <GlobalStats />
           </AutoColumn>
           {below800 && ( // mobile card
             <Box mb={20}>
