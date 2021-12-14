@@ -57,6 +57,14 @@ const BSC_TOKEN_LIST = {
     decimals: 18,
     logoURI: 'https://zukimoba.com/images/logos/logo.png',
   },
+  '0xe91a8D2c584Ca93C7405F15c22CdFE53C29896E3': {
+    chainId: 56,
+    address: '0xe91a8D2c584Ca93C7405F15c22CdFE53C29896E3',
+    symbol: 'DEXT',
+    name: 'DEXTools',
+    decimals: 18,
+    logoURI: 'https://bscscan.com/token/images/dextools_32.png',
+  },
 }
 
 export default BSC_TOKEN_LIST
