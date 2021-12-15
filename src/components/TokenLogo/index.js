@@ -6,6 +6,8 @@ import ETHEREUM_TOKEN_LIST from '../../constants/tokenLists/ethereum.tokenlist'
 import POLYGON_TOKEN_LIST from '../../constants/tokenLists/polygon.tokenlist'
 import BSC_TOKEN_LIST from '../../constants/tokenLists/bsc.tokenlist'
 import AVALANCHE_TOKEN_LIST from '../../constants/tokenLists/avalanche.tokenlist'
+import FANTOM_TOKEN_LIST from '../../constants/tokenLists/fantom.tokenlist'
+import CRONOS_TOKEN_LIST from '../../constants/tokenLists/cronos.tokenlist'
 import { isAddress } from '../../utils/index.js'
 import PlaceHolder from '../../assets/placeholder.png'
 import EthereumLogo from '../../assets/eth.png'
@@ -13,13 +15,14 @@ import PolygonLogo from '../../assets/polygon.png'
 import BnbLogo from '../../assets/bnb.png'
 import AvaxLogo from '../../assets/avax.png'
 import FantomLogo from '../../assets/networks/fantom-network.png'
+import CronosLogo from '../../assets/cronos.svg'
 import { getMaticTokenLogoURL } from '../../utils/maticTokenMapping'
 import { getMumbaiTokenLogoURL } from '../../utils/mumbaiTokenMapping'
 import { getBscTestnetTokenLogoURL } from '../../utils/bscTestnetTokenMapping'
 import { getBscTokenLogoURL } from '../../utils/bscTokenMapping'
 import { getAvaxTokenLogoURL } from '../../utils/avaxTokenMapping'
 import { getFantomTokenLogoURL } from '../../utils/fantomTokenMapping'
-import FANTOM_TOKEN_LIST from '../../constants/tokenLists/fantom.tokenlist'
+import { getCronosTokenLogoURL } from '../../utils/cronosTokenMapping'
 
 const BAD_IMAGES = {}
 
@@ -144,6 +147,32 @@ export function getNativeTokenLogo({ size = '24px', ...rest }) {
           />
         </StyledNativeTokenLogo>
       )
+    case '338':
+      return (
+        <StyledNativeTokenLogo size={size} {...rest}>
+          <img
+            src={CronosLogo}
+            style={{
+              boxShadow: '0px 6px 10px rgba(0, 0, 0, 0.075)',
+              borderRadius: '24px',
+            }}
+            alt=""
+          />
+        </StyledNativeTokenLogo>
+      )
+    case '25':
+      return (
+        <StyledNativeTokenLogo size={size} {...rest}>
+          <img
+            src={CronosLogo}
+            style={{
+              boxShadow: '0px 6px 10px rgba(0, 0, 0, 0.075)',
+              borderRadius: '24px',
+            }}
+            alt=""
+          />
+        </StyledNativeTokenLogo>
+      )
     default:
       return (
         <StyledNativeTokenLogo size={size} {...rest}>
@@ -240,6 +269,13 @@ export default function TokenLogo({ address, header = false, size = '24px', ...r
         return getCustomLogo({ address, src: FANTOM_TOKEN_LIST[formattedAddress].logoURI, size, setError, ...rest })
       }
       path = getFantomTokenLogoURL(address)
+      break
+
+    case '25':
+      if (formattedAddress && CRONOS_TOKEN_LIST[formattedAddress]) {
+        return getCustomLogo({ address, src: CRONOS_TOKEN_LIST[formattedAddress].logoURI, size, setError, ...rest })
+      }
+      path = getCronosTokenLogoURL(address)
       break
 
     default:

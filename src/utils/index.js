@@ -552,6 +552,10 @@ export function getNativeTokenSymbol() {
       return 'AVAX'
     case '250':
       return 'FTM'
+    case '25':
+      return 'CRO'
+    case '338':
+      return 'CRO'
     default:
       return 'ETH'
   }
@@ -571,6 +575,10 @@ export function getNativeTokenWrappedName() {
       return 'AVAX (Wrapped)'
     case '250':
       return 'FTM (Wrapped)'
+    case '25':
+      return 'CRO (Wrapped)'
+    case '338':
+      return 'CRO (Wrapped)'
     default:
       return 'Ether (Wrapped)'
   }
@@ -590,6 +598,10 @@ export function getEtherscanLinkText() {
       return 'C-Chain Explorer'
     case '250':
       return 'Ftmscan'
+    case '338':
+      return 'Explorer'
+    case '25':
+      return 'Explorer'
     default:
       return 'Etherscan'
   }
@@ -609,6 +621,10 @@ export function getNetworkName() {
       return 'AVAX'
     case '250':
       return 'Fantom'
+    case '338':
+      return 'Cronos'
+    case '25':
+      return 'Cronos'
     default:
       return 'Ethereum'
   }
@@ -628,6 +644,10 @@ export function getDefaultAddLiquidityUrl() {
       return `${process.env.REACT_APP_DMM_SWAP_URL}pools/AVAX`
     case '250':
       return `${process.env.REACT_APP_DMM_SWAP_URL}pools/FTM`
+    case '25':
+      return `${process.env.REACT_APP_DMM_SWAP_URL}pools/CRO`
+    case '338':
+      return `${process.env.REACT_APP_DMM_SWAP_URL}pools/CRO`
     default:
       return `${process.env.REACT_APP_DMM_SWAP_URL}pools/ETH/${KNC_ADDRESS}`
   }

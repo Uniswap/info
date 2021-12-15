@@ -188,6 +188,9 @@ function TokenPage({ address, history }) {
   const [savedTokens, addToken, removeToken] = useSavedTokens()
   const listedTokens = useListedTokens()
 
+  // TODO: Remove this when Cronos has a token list
+  const noWarning = process.env.REACT_APP_CHAIN_ID === '25'
+
   useEffect(() => {
     window.scrollTo({
       behavior: 'smooth',
@@ -201,7 +204,7 @@ function TokenPage({ address, history }) {
 
       <Warning
         type={'token'}
-        show={!dismissed && listedTokens && !listedTokens.includes(address)}
+        show={!noWarning && !dismissed && listedTokens && !listedTokens.includes(address)}
         setShow={markAsDismissed}
         address={address}
       />
