@@ -195,6 +195,9 @@ function PairPage({ pairAddress, history }) {
 
   const [dismissed, markAsDismissed] = usePathDismissed(history.location.pathname)
 
+  // TODO: Remove this when Cronos has a token list
+  const noWarning = process.env.REACT_APP_CHAIN_ID === '25'
+
   useEffect(() => {
     window.scrollTo({
       behavior: 'smooth',
@@ -212,7 +215,12 @@ function PairPage({ pairAddress, history }) {
       <span />
       <Warning
         type={'pair'}
-        show={!dismissed && listedTokens && !(listedTokens.includes(token0?.id) && listedTokens.includes(token1?.id))}
+        show={
+          !noWarning &&
+          !dismissed &&
+          listedTokens &&
+          !(listedTokens.includes(token0?.id) && listedTokens.includes(token1?.id))
+        }
         setShow={markAsDismissed}
         address={pairAddress}
       />
