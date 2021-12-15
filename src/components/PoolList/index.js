@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { Flex, Text } from 'rebass'
-import { ChevronUp, ChevronDown } from 'react-feather'
+import { ChevronDown, ChevronUp } from 'react-feather'
 import { useMedia } from 'react-use'
 
 import { ButtonEmpty } from '../ButtonStyled'
@@ -62,77 +62,115 @@ const SORT_FIELD = {
   ONE_YEAR_FL: 3,
 }
 
-const PoolList = ({ pools, maxItems = 10 }) => {
-  const above1200 = useMedia('(min-width: 1200px)') // Extra large screen
+const SHOW_STATE = {
+  TOP_3: 0,
+  ALL: 1,
+}
 
-  // pagination
-  const [page, setPage] = useState(1)
-  const [maxPage, setMaxPage] = useState(1)
-  const ITEMS_PER_PAGE = maxItems
+const PoolList = ({ pools }) => {
+  const above1200 = useMedia('(min-width: 1200px)') // Extra large screen
 
   // sorting
   const [sortDirection, setSortDirection] = useState(true)
-  const [sortedColumn, setSortedColumn] = useState(SORT_FIELD.NONE)
+  const [sortedColumn, setSortedColumn] = useState(SORT_FIELD.LIQ)
 
-  const sortList = (poolA, poolB) => {
-    if (sortedColumn === SORT_FIELD.NONE) {
-      if (!poolA) {
-        return 1
+  const sortList = useCallback(
+    (poolA, poolB) => {
+      if (sortedColumn === SORT_FIELD.NONE) {
+        if (!poolA) {
+          return 1
+        }
+
+        if (!poolB) {
+          return -1
+        }
+
+        // Pool with AMP = 1 will be on top
+        // AMP from contract is 10000 (real value is 1)å
+        if (parseFloat(poolA.amp) === 10000) {
+          return -1
+        }
+
+        if (parseFloat(poolB.amp) === 10000) {
+          return 1
+        }
+
+        const poolAHealthFactor = getHealthFactor(poolA)
+        const poolBHealthFactor = getHealthFactor(poolB)
+
+        // Pool with better health factor will be prioritized higher
+        if (poolAHealthFactor > poolBHealthFactor) {
+          return -1
+        }
+
+        if (poolAHealthFactor < poolBHealthFactor) {
+          return 1
+        }
+
+        return 0
       }
 
-      if (!poolB) {
-        return -1
-      }
+      switch (sortedColumn) {
+        case SORT_FIELD.LIQ:
+          return parseFloat(poolA.reserveUSD) > parseFloat(poolB.reserveUSD)
+            ? (sortDirection ? -1 : 1) * 1
+            : (sortDirection ? -1 : 1) * -1
+        case SORT_FIELD.VOL:
+          return parseFloat(poolA.volumeUSD) > parseFloat(poolB.volumeUSD)
+            ? (sortDirection ? -1 : 1) * 1
+            : (sortDirection ? -1 : 1) * -1
+        case SORT_FIELD.FEES:
+          return parseFloat(poolA.feeUSD) > parseFloat(poolB.feeUSD)
+            ? (sortDirection ? -1 : 1) * 1
+            : (sortDirection ? -1 : 1) * -1
+        case SORT_FIELD.ONE_YEAR_FL:
+          const oneYearFLPoolA = getOneYearFL(poolA.reserveUSD, poolA.feeUSD)
+          const oneYearFLPoolB = getOneYearFL(poolB.reserveUSD, poolB.feeUSD)
 
-      // Pool with AMP = 1 will be on top
-      // AMP from contract is 10000 (real value is 1)å
-      if (parseFloat(poolA.amp) === 10000) {
-        return -1
-      }
-
-      if (parseFloat(poolB.amp) === 10000) {
-        return 1
-      }
-
-      const poolAHealthFactor = getHealthFactor(poolA)
-      const poolBHealthFactor = getHealthFactor(poolB)
-
-      // Pool with better health factor will be prioritized higher
-      if (poolAHealthFactor > poolBHealthFactor) {
-        return -1
-      }
-
-      if (poolAHealthFactor < poolBHealthFactor) {
-        return 1
+          return oneYearFLPoolA > oneYearFLPoolB ? (sortDirection ? -1 : 1) * 1 : (sortDirection ? -1 : 1) * -1
+        default:
+          break
       }
 
       return 0
-    }
+    },
+    [sortDirection, sortedColumn]
+  )
 
-    switch (sortedColumn) {
-      case SORT_FIELD.LIQ:
-        return parseFloat(poolA.reserveUSD) > parseFloat(poolB.reserveUSD)
-          ? (sortDirection ? -1 : 1) * 1
-          : (sortDirection ? -1 : 1) * -1
-      case SORT_FIELD.VOL:
-        return parseFloat(poolA.volumeUSD) > parseFloat(poolB.volumeUSD)
-          ? (sortDirection ? -1 : 1) * 1
-          : (sortDirection ? -1 : 1) * -1
-      case SORT_FIELD.FEES:
-        return parseFloat(poolA.feeUSD) > parseFloat(poolB.feeUSD)
-          ? (sortDirection ? -1 : 1) * 1
-          : (sortDirection ? -1 : 1) * -1
-      case SORT_FIELD.ONE_YEAR_FL:
-        const oneYearFLPoolA = getOneYearFL(poolA.reserveUSD, poolA.feeUSD)
-        const oneYearFLPoolB = getOneYearFL(poolB.reserveUSD, poolB.feeUSD)
+  const LIQUIDITY_THRESHOLD = 500
 
-        return oneYearFLPoolA > oneYearFLPoolB ? (sortDirection ? -1 : 1) * 1 : (sortDirection ? -1 : 1) * -1
-      default:
-        break
-    }
+  // Filtering.
+  const [showState, setShowState] = useState(SHOW_STATE.TOP_3)
+  useEffect(() => {
+    pools && pools.length <= 3 && setShowState(SHOW_STATE.ALL)
+  }, [pools])
 
-    return 0
-  }
+  const [renderPools, setRenderPools] = useState([])
+
+  useEffect(() => {
+    if (!pools || pools.length === 0) return
+
+    let newRenderPools = Object.keys(pools)
+      .sort((addressA, addressB) => {
+        const poolA = pools[addressA]
+        const poolB = pools[addressB]
+        return sortList(poolA, poolB)
+      })
+      .slice(0, showState === SHOW_STATE.TOP_3 ? 3 : pools.length)
+      .map((poolAddress) => {
+        return poolAddress && pools[poolAddress]
+      })
+    const isAllPoolsLiquidityLessThanThreshold = newRenderPools.every(
+      (pool) => pool.trackedReserveUSD < LIQUIDITY_THRESHOLD
+    )
+    newRenderPools =
+      showState === SHOW_STATE.TOP_3
+        ? isAllPoolsLiquidityLessThanThreshold
+          ? [newRenderPools[0]]
+          : newRenderPools.filter((pool) => pool.trackedReserveUSD >= LIQUIDITY_THRESHOLD)
+        : newRenderPools
+    setRenderPools(newRenderPools)
+  }, [pools, showState, sortList])
 
   const renderHeader = () => {
     return above1200 ? (
@@ -240,42 +278,14 @@ const PoolList = ({ pools, maxItems = 10 }) => {
     ) : null
   }
 
-  const poolsList =
-    pools &&
-    Object.keys(pools)
-      .sort((addressA, addressB) => {
-        const poolA = pools[addressA]
-        const poolB = pools[addressB]
-        return sortList(poolA, poolB)
-      })
-      .slice(0, page * ITEMS_PER_PAGE)
-      .map((poolAddress) => {
-        return poolAddress && pools[poolAddress]
-      })
-
-  useEffect(() => {
-    setMaxPage(1) // edit this to do modular
-    setPage(1)
-  }, [pools])
-
-  useEffect(() => {
-    if (pools) {
-      let extraPages = 1
-      if (Object.keys(pools).length % ITEMS_PER_PAGE === 0) {
-        extraPages = 0
-      }
-      setMaxPage(Math.floor(Object.keys(pools).length / ITEMS_PER_PAGE) + extraPages)
-    }
-  }, [ITEMS_PER_PAGE, pools])
-
   const theme = useTheme()
   return (
     <div style={{ border: `1px solid ${theme.border}`, borderRadius: '8px', overflow: 'hidden' }}>
       {renderHeader()}
-      {!poolsList ? (
+      {!renderPools ? (
         <Loader />
       ) : (
-        poolsList.map((pool, index) => {
+        renderPools.map((pool, index) => {
           if (pool) {
             return above1200 ? (
               <ListItem key={pool.id} pool={pool} oddRow={(index + 1) % 2 !== 0} />
@@ -290,9 +300,9 @@ const PoolList = ({ pools, maxItems = 10 }) => {
       <LoadMoreButtonContainer>
         <ButtonEmpty
           onClick={() => {
-            setPage(page === maxPage ? page : page + 1)
+            setShowState(SHOW_STATE.ALL)
           }}
-          disabled={page >= maxPage}
+          disabled={showState === SHOW_STATE.ALL}
           style={{ padding: '18px' }}
         >
           Show more pools
