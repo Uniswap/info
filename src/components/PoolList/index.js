@@ -110,22 +110,28 @@ const PoolList = ({ pools }) => {
         return 0
       }
 
+      const comparableOneDayVolumeA = poolA.oneDayVolumeUSD || poolA.oneDayVolumeUntracked
+      const comparableOneDayVolumeB = poolB.oneDayVolumeUSD || poolB.oneDayVolumeUntracked
+
+      const comparableOneDayFeeA = poolA.oneDayFeeUSD || poolA.oneDayFeeUntracked
+      const comparableOneDayFeeB = poolB.oneDayFeeUSD || poolB.oneDayFeeUntracked
+
       switch (sortedColumn) {
         case SORT_FIELD.LIQ:
           return parseFloat(poolA.reserveUSD) > parseFloat(poolB.reserveUSD)
             ? (sortDirection ? -1 : 1) * 1
             : (sortDirection ? -1 : 1) * -1
         case SORT_FIELD.VOL:
-          return parseFloat(poolA.volumeUSD) > parseFloat(poolB.volumeUSD)
+          return parseFloat(comparableOneDayVolumeA) > parseFloat(comparableOneDayVolumeB)
             ? (sortDirection ? -1 : 1) * 1
             : (sortDirection ? -1 : 1) * -1
         case SORT_FIELD.FEES:
-          return parseFloat(poolA.feeUSD) > parseFloat(poolB.feeUSD)
+          return parseFloat(comparableOneDayFeeA) > parseFloat(comparableOneDayFeeB)
             ? (sortDirection ? -1 : 1) * 1
             : (sortDirection ? -1 : 1) * -1
         case SORT_FIELD.ONE_YEAR_FL:
-          const oneYearFLPoolA = getOneYearFL(poolA.reserveUSD, poolA.feeUSD)
-          const oneYearFLPoolB = getOneYearFL(poolB.reserveUSD, poolB.feeUSD)
+          const oneYearFLPoolA = getOneYearFL(poolA.reserveUSD, comparableOneDayFeeA)
+          const oneYearFLPoolB = getOneYearFL(poolB.reserveUSD, comparableOneDayFeeB)
 
           return oneYearFLPoolA > oneYearFLPoolB ? (sortDirection ? -1 : 1) * 1 : (sortDirection ? -1 : 1) * -1
         default:
