@@ -24,7 +24,7 @@ import {
   getTimestampsForChanges,
   splitQuery,
 } from '../utils'
-import { timeframeOptions, TRACKED_OVERRIDES } from '../constants'
+import { timeframeOptions, TRACKED_OVERRIDES_PAIRS, TRACKED_OVERRIDES_TOKENS } from '../constants'
 import { useLatestBlocks } from './Application'
 import { updateNameData } from '../utils/data'
 
@@ -299,7 +299,11 @@ function parseData(data, oneDayData, twoDayData, oneWeekData, ethPrice, oneDayBl
     data.oneWeekVolumeUSD = parseFloat(data.volumeUSD)
   }
 
-  if (TRACKED_OVERRIDES.includes(pairAddress)) {
+  if (
+    TRACKED_OVERRIDES_PAIRS.includes(pairAddress) ||
+    TRACKED_OVERRIDES_TOKENS.includes(data.token0.id) ||
+    TRACKED_OVERRIDES_TOKENS.includes(data.token1.id)
+  ) {
     data.oneDayVolumeUSD = oneDayVolumeUntracked
     data.oneWeekVolumeUSD = oneWeekVolumeUntracked
     data.volumeChangeUSD = volumeChangeUntracked

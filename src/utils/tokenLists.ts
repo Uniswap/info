@@ -40,7 +40,7 @@ export default async function getTokenList(listUrl: string): Promise<TokenList> 
       response = await fetch(url)
     } catch (error) {
       console.debug('Failed to fetch list', listUrl, error)
-      if (isLast) throw new Error(`Failed to download list ${listUrl}`)
+
       continue
     }
 
@@ -60,5 +60,5 @@ export default async function getTokenList(listUrl: string): Promise<TokenList> 
     }
     return json
   }
-  throw new Error('Unrecognized list URL protocol.')
+  // throw new Error('Unrecognized list URL protocol.')
 }
