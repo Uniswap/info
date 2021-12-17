@@ -194,14 +194,14 @@ export async function getBulkPoolData(client, poolList, ethPrice) {
       variables: {
         allPools: poolList,
       },
-      fetchPolicy: 'cache-first',
+      fetchPolicy: 'network-only',
     })
 
     let [oneDayResult, twoDayResult, oneWeekResult] = await Promise.all(
       [b1, b2, bWeek].map(async (block) => {
         let result = client.query({
           query: POOLS_HISTORICAL_BULK(block, poolList),
-          fetchPolicy: 'cache-first',
+          fetchPolicy: 'network-only',
         })
         return result
       })
@@ -227,7 +227,7 @@ export async function getBulkPoolData(client, poolList, ethPrice) {
           if (!oneDayHistory) {
             let newData = await client.query({
               query: POOL_DATA(pool.id, b1),
-              fetchPolicy: 'cache-first',
+              fetchPolicy: 'network-only',
             })
             oneDayHistory = newData.data.pools[0]
           }
@@ -235,7 +235,7 @@ export async function getBulkPoolData(client, poolList, ethPrice) {
           if (!twoDayHistory) {
             let newData = await client.query({
               query: POOL_DATA(pool.id, b2),
-              fetchPolicy: 'cache-first',
+              fetchPolicy: 'network-only',
             })
             twoDayHistory = newData.data.pools[0]
           }
@@ -243,7 +243,7 @@ export async function getBulkPoolData(client, poolList, ethPrice) {
           if (!oneWeekHistory) {
             let newData = await client.query({
               query: POOL_DATA(pool.id, bWeek),
-              fetchPolicy: 'cache-first',
+              fetchPolicy: 'network-only',
             })
             oneWeekHistory = newData.data.pools[0]
           }

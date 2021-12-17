@@ -201,7 +201,7 @@ const ListItem = ({ pool, oddRow }) => {
   return (
     <TableRow oddRow={oddRow}>
       {isWarning && (
-        <div style={{ position: 'absolute' }}>
+        <div style={{ position: 'absolute', top: '1px' }}>
           <MouseoverTooltip text="One token is close to 0% in the pool ratio. Pool might go inactive.">
             <WarningLeftIcon />
           </MouseoverTooltip>
