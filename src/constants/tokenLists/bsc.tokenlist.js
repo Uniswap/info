@@ -65,6 +65,14 @@ const BSC_TOKEN_LIST = {
     decimals: 18,
     logoURI: 'https://bscscan.com/token/images/dextools_32.png',
   },
+  '0xd07e82440A395f3F3551b42dA9210CD1Ef4f8B24': {
+    chainId: 56,
+    address: '0xd07e82440A395f3F3551b42dA9210CD1Ef4f8B24',
+    symbol: 'PRL',
+    name: 'Parallel',
+    decimals: 18,
+    logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/15669.png',
+  },
 }
 
 export default BSC_TOKEN_LIST
