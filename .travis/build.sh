@@ -33,42 +33,42 @@ elif [[ "$TRAVIS_BRANCH" == "main" ]]; then
   echo "Start running build"
   yarn build-production
   mkdir build-production-index
-  cp build/index.html build-production-index
+  mv build/index.html build-production-index
   mv build build-production
   echo "Finished running build"
 
   echo "Start running build"
   yarn build-matic
   mkdir build-matic-index
-  cp build/index.html build-matic-index
+  mv build/index.html build-matic-index
   mv build build-matic
   echo "Finished running build"
 
   echo "Start running build"
   yarn build-bsc
   mkdir build-bsc-index
-  cp build/index.html build-bsc-index
+  mv build/index.html build-bsc-index
   mv build build-bsc
   echo "Finished running build"
 
   echo "Start running build"
   yarn build-avax
   mkdir build-avax-index
-  cp build/index.html build-avax-index
+  mv build/index.html build-avax-index
   mv build build-avax
   echo "Finished running build"
 
   echo "Start running build"
   yarn build-fantom
   mkdir build-fantom-index
-  cp build/index.html build-fantom-index
+  mv build/index.html build-fantom-index
   mv build build-fantom
   echo "Finished running build"
 
   echo "Start running build"
   yarn build-cronos
   mkdir build-cronos-index
-  cp build/index.html build-cronos-index
+  mv build/index.html build-cronos-index
   mv build build-cronos
   echo "Finished running build"
 else
