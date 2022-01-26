@@ -73,6 +73,14 @@ const BSC_TOKEN_LIST = {
     decimals: 18,
     logoURI: 'https://i.imgur.com/99UaEcO.png',
   },
+  '0xc04a23149efdF9A63697f3Eb60705147e9f07FfD': {
+    chainId: 56,
+    address: '0xc04a23149efdF9A63697f3Eb60705147e9f07FfD',
+    symbol: 'GENI',
+    name: 'GemUni',
+    decimals: 18,
+    logoURI: 'https://i.imgur.com/f5JZgpy.png',
+  },
 }
 
 export default BSC_TOKEN_LIST

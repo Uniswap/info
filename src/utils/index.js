@@ -595,7 +595,7 @@ export function getEtherscanLinkText() {
     case '97':
       return 'Bscscan'
     case '43114':
-      return 'C-Chain Explorer'
+      return 'Snowtrace'
     case '250':
       return 'Ftmscan'
     case '338':
