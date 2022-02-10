@@ -824,7 +824,7 @@ export const PAIR_POOLS_DATA = (pairAddress, block) => {
 export const PAIRS_BULK = gql`
   ${PairFields}
   query pairs($allPairs: [Bytes]!) {
-    pairs(where: { id_in: $allPairs }, orderBy: trackedReserveETH, orderDirection: desc) {
+    pairs(where: { id_in: $allPairs }, orderBy: reserveETH, orderDirection: desc) {
       ...PairFields
     }
   }
@@ -833,7 +833,7 @@ export const PAIRS_BULK = gql`
 export const POOLS_BULK = gql`
   ${PoolFields}
   query pools($allPools: [Bytes]!) {
-    pools(where: { id_in: $allPools }, orderBy: trackedReserveETH, orderDirection: desc) {
+    pools(where: { id_in: $allPools }, orderBy: reserveETH, orderDirection: desc) {
       ...PoolFields
     }
   }
