@@ -88,7 +88,9 @@ export const ChainId = {
   CRONOS: 25,
 }
 
-export const MAX_ALLOW_APY = 2000
+// This variable to handle crazy APR which it can be wrong calculations or a bug
+// But now, for FOMO of Pagxy, updated this to 10000 (before we set 2000 for it)
+export const MAX_ALLOW_APY = 10000
 
 export const AMP_HINT =
   'Stands for amplification factor. Each pool can have its own AMP. Pools with a higher AMP provide higher capital efficiency within a particular price range'
