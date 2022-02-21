@@ -1,11 +1,17 @@
 import React, { createContext, useContext, useReducer, useMemo, useCallback, useState, useEffect } from 'react'
-import { timeframeOptions, SUPPORTED_LIST_URLS__NO_ENS, KNC_ADDRESS } from '../constants'
+import { timeframeOptions, SUPPORTED_LIST_URLS__NO_ENS, KNC_ADDRESS, ChainId } from '../constants'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import getTokenList from '../utils/tokenLists'
 import { client, healthClient } from '../apollo/client'
 import { SUBGRAPH_HEALTH, SUBGRAPH_BLOCK_NUMBER } from '../apollo/queries'
 import { getExchangeSubgraphClient } from '../apollo/manager'
+import AVALANCHE_TOKEN_LIST from '../constants/tokenLists/avalanche.tokenlist'
+import ETHEREUM_TOKEN_LIST from '../constants/tokenLists/ethereum.tokenlist'
+import BSC_TOKEN_LIST from '../constants/tokenLists/bsc.tokenlist'
+import POLYGON_TOKEN_LIST from '../constants/tokenLists/polygon.tokenlist'
+import FANTOM_TOKEN_LIST from '../constants/tokenLists/fantom.tokenlist'
+import CRONOS_TOKEN_LIST from '../constants/tokenLists/cronos.tokenlist'
 dayjs.extend(utc)
 
 const UPDATE = 'UPDATE'
@@ -329,7 +335,6 @@ export function useSessionStart() {
 export function useListedTokens() {
   const [state, { updateSupportedTokens }] = useApplicationContext()
   const supportedTokens = state?.[SUPPORTED_TOKENS]
-
   useEffect(() => {
     async function fetchList() {
       const allFetched = await SUPPORTED_LIST_URLS__NO_ENS.reduce(async (fetchedTokens, url) => {
@@ -339,6 +344,35 @@ export function useListedTokens() {
       }, Promise.resolve([]))
       let formatted = allFetched?.map((t) => t.address.toLowerCase())
       formatted.push(KNC_ADDRESS.toLowerCase())
+
+      let tokenslist = {}
+
+      const chainId = Number(process.env.REACT_APP_CHAIN_ID)
+      switch (chainId) {
+        case ChainId.AVAXMAINNET:
+          tokenslist = AVALANCHE_TOKEN_LIST
+          break
+        case ChainId.MAINNET:
+          tokenslist = ETHEREUM_TOKEN_LIST
+          break
+        case ChainId.BSCMAINNET:
+          tokenslist = BSC_TOKEN_LIST
+          break
+
+        case ChainId.MATIC:
+          tokenslist = POLYGON_TOKEN_LIST
+          break
+        case ChainId.FANTOM:
+          tokenslist = FANTOM_TOKEN_LIST
+          break
+        case ChainId.CRONOS:
+          tokenslist = CRONOS_TOKEN_LIST
+          break
+        default:
+          break
+      }
+
+      formatted = formatted.concat(Object.keys(tokenslist).map((item) => item.toLowerCase()))
       updateSupportedTokens(formatted)
     }
     if (!supportedTokens) {
