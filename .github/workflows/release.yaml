@@ -1,0 +1,115 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release version"
+        type: string
+        required: true
+
+jobs:
+  prepare:
+    runs-on: ubuntu-18.04
+    outputs:
+      version_tag: ${{ steps.version_tag.outputs.value }}
+    steps:
+      - name: Format version tag
+        shell: bash
+        id: version_tag
+        env:
+          INPUT_TAG: ${{ github.event.inputs.version }}
+        run: |
+          TAG=${INPUT_TAG#v}
+          echo "::set-output name=value::v$TAG"
+
+  build:
+    needs:
+      - prepare
+    runs-on: ubuntu-18.04
+    strategy:
+      matrix:
+        include:
+          - command: build-production
+            bucket: analytics.kyberswap.com
+          - command: build-matic
+            bucket: polygon-analytics.kyberswap.com
+          - command: build-bsc
+            bucket: bsc-analytics.kyberswap.com
+          - command: build-avax
+            bucket: avax-analytics.kyberswap.com
+          - command: build-fantom
+            bucket: fantom-analytics.kyberswap.com
+          - command: build-cronos
+            bucket: cronos-analytics.kyberswap.com
+          - command: build-arbitrum
+            bucket: arbitrum-analytics.kyberswap.com
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js 12.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+
+      - name: Gcloud Auth
+        uses: google-github-actions/auth@v0
+        with:
+          credentials_json: '${{ secrets.BUCKET_CREDENTIALS }}'
+
+      - name: Setup Gcloud SDK
+        uses: google-github-actions/setup-gcloud@v0
+
+      - name: Restore node_modules
+        uses: actions/cache@v2
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Install dependences
+        uses: bahmutov/npm-install@HEAD
+
+      - name: Yarn Build
+        env:
+          CI: false
+          REACT_APP_VERSION: ${{ github.sha }}
+        run: yarn ${{ matrix.command }}
+
+      - name: Upload to GCS
+        env:
+          BUCKET: ${{ matrix.bucket }}
+        run: |
+          gsutil -m rsync -r $PWD/build gs://$BUCKET
+          gsutil setmeta -h "Cache-Control: no-cache" gs://$BUCKET/*.html
+
+  release:
+    needs:
+      - prepare
+      - build
+    runs-on: ubuntu-18.04
+    env:
+      VERSION_TAG: ${{ needs.prepare.outputs.version_tag }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Setup Git
+        run: |
+          git config user.name "$GITHUB_ACTOR"
+          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+
+      - name: Create tag
+        run: |
+          git tag -am $VERSION_TAG $VERSION_TAG
+          git push origin "refs/tags/$VERSION_TAG"
+
+      - name: Create release
+        uses: marvinpinto/action-automatic-releases@latest
+        with:
+          repo_token: ${{ secrets.GH_PAT }}
+          automatic_release_tag: ${{ env.VERSION_TAG }}
+          prerelease: false
+          title: ${{ env.VERSION_TAG }}
