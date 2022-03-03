@@ -71,6 +71,13 @@ elif [[ "$TRAVIS_BRANCH" == "main" ]]; then
   mv build/index.html build-cronos-index
   mv build build-cronos
   echo "Finished running build"
+
+  echo "Start running build arbitrum"
+  yarn build-arbitrum
+  mkdir build-arbitrum-index
+  cp build/index.html build-arbitrum-index
+  mv build build-arbitrum
+  echo "Finished running build"
 else
     echo "Branch is not set for auto-build."
     exit 0

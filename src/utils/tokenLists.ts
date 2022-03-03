@@ -3,6 +3,7 @@ import { TokenList } from '@uniswap/token-lists'
 import schema from './scheme.json'
 // import schema from '@uniswap/token-lists/src/tokenlist.schema.json'
 import Ajv from 'ajv'
+import { ChainId } from '../constants'
 
 /**
  * Given a URI that may be ipfs, ipns, http, or https protocol, return the fetch-able http(s) URLs for the same content
@@ -55,7 +56,11 @@ export default async function getTokenList(listUrl: string): Promise<TokenList> 
 
     // Bypass validator for Matic network
     // Because the Uniswap token schema will fail on Quickswap tokens list
-    if (['137', '56', '43114', '250', '25'].includes(String(process.env.REACT_APP_CHAIN_ID))) {
+    if (
+      ['137', '56', '43114', '250', '25', ChainId.ARBITRUM, ChainId.BTTC].includes(
+        String(process.env.REACT_APP_CHAIN_ID)
+      )
+    ) {
       return json
     }
 

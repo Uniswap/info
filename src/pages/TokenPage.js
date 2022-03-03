@@ -188,8 +188,7 @@ function TokenPage({ address, history }) {
   const [savedTokens, addToken, removeToken] = useSavedTokens()
   const listedTokens = useListedTokens()
 
-  // TODO: Remove this when Cronos has a token list
-  const noWarning = process.env.REACT_APP_CHAIN_ID === '25'
+  const noWarning = ['25'].includes(process.env.REACT_APP_CHAIN_ID)
 
   useEffect(() => {
     window.scrollTo({

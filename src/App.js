@@ -63,6 +63,7 @@ const Right = styled.div`
 const Center = styled.div`
   position: relative;
   height: 100%;
+  min-height: 100vh;
   z-index: 10;
   transition: width 0.25s ease;
   background-color: ${({ theme }) => theme.buttonBlack};

@@ -526,6 +526,7 @@ export const GLOBAL_DATA = (block) => {
         pairCount
       }
     }`
+
   return gql(queryString)
 }
 

@@ -12,6 +12,8 @@ import BSC_TOKEN_LIST from '../constants/tokenLists/bsc.tokenlist'
 import POLYGON_TOKEN_LIST from '../constants/tokenLists/polygon.tokenlist'
 import FANTOM_TOKEN_LIST from '../constants/tokenLists/fantom.tokenlist'
 import CRONOS_TOKEN_LIST from '../constants/tokenLists/cronos.tokenlist'
+import ARBITRUM_TOKEN_LIST from '../constants/tokenLists/arbitrum.tokenlist'
+import BTTC_TOKEN_LIST from '../constants/tokenLists/bttc.tokenlist'
 dayjs.extend(utc)
 
 const UPDATE = 'UPDATE'
@@ -367,6 +369,12 @@ export function useListedTokens() {
           break
         case ChainId.CRONOS:
           tokenslist = CRONOS_TOKEN_LIST
+          break
+        case ChainId.ARBITRUM:
+          tokenslist = ARBITRUM_TOKEN_LIST
+          break
+        case ChainId.BTTC:
+          tokenslist = BTTC_TOKEN_LIST
           break
         default:
           break

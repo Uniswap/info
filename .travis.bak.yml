@@ -209,3 +209,24 @@ deploy:
     on:
       all_branches: true
       condition: $TRAVIS_BRANCH =~ ^main$
+
+  - provider: gcs
+    access_key_id: $GCS_ACCESS_KEY_ID
+    secret_access_key: $GCS_SECRET_KEY_ID
+    bucket: arbitrum-analytics.kyberswap.com
+    skip_cleanup: true
+    local-dir: build-arbitrum
+    on:
+      all_branches: true
+      condition: $TRAVIS_BRANCH =~ ^main$
+
+  - provider: gcs
+    access_key_id: $GCS_ACCESS_KEY_ID
+    secret_access_key: $GCS_SECRET_KEY_ID
+    bucket: arbitrum-analytics.kyberswap.com
+    skip_cleanup: true
+    local-dir: build-arbitrum-index
+    cache_control: "public, max-age=30"
+    on:
+      all_branches: true
+      condition: $TRAVIS_BRANCH =~ ^main$

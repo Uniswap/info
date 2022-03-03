@@ -65,15 +65,6 @@ export const KNCL_ADDRESS =
     ? '0xdd974D5C2e2928deA5F71b9825b8b646686BD200'
     : '0x7B2810576aa1cce68F2B118CeF1F36467c648F92'
 
-export const ANALYTICS_URLS = {
-  1: 'https://analytics.kyberswap.com',
-  137: 'https://polygon-analytics.kyberswap.com',
-  56: 'https://bsc-analytics.kyberswap.com',
-  43114: 'https://avax-analytics.kyberswap.com',
-  250: 'https://fantom-analytics.kyberswap.com',
-  25: 'https://cronos-analytics.kyberswap.com',
-}
-
 export const ChainId = {
   MAINNET: 1,
   ROPSTEN: 3,
@@ -86,6 +77,20 @@ export const ChainId = {
   FANTOM: 250,
   CRONOSTESTNET: 338,
   CRONOS: 25,
+  ARBITRUM_TESTNET: 421611,
+  ARBITRUM: 42161,
+  BTTC: 199,
+}
+
+export const ANALYTICS_URLS = {
+  1: 'https://analytics.kyberswap.com',
+  137: 'https://polygon-analytics.kyberswap.com',
+  56: 'https://bsc-analytics.kyberswap.com',
+  43114: 'https://avax-analytics.kyberswap.com',
+  250: 'https://fantom-analytics.kyberswap.com',
+  25: 'https://cronos-analytics.kyberswap.com',
+  [ChainId.ARBITRUM]: 'https://arbitrum-analytics.kyberswap.com',
+  [ChainId.BTTC]: 'https://bttc-analytics.kyberswap.com',
 }
 
 // This variable to handle crazy APR which it can be wrong calculations or a bug

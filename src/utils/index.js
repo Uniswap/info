@@ -8,7 +8,7 @@ import { GET_BLOCK, GET_BLOCKS, SHARE_VALUE } from '../apollo/queries'
 import { Text } from 'rebass'
 import _Decimal from 'decimal.js-light'
 import toFormat from 'toformat'
-import { timeframeOptions, WETH_ADDRESS, KNC_ADDRESS } from '../constants'
+import { timeframeOptions, WETH_ADDRESS, KNC_ADDRESS, ChainId } from '../constants'
 import Numeral from 'numeral'
 import { OverflowTooltip } from '../components/Tooltip'
 
@@ -602,6 +602,13 @@ export function getEtherscanLinkText() {
       return 'Explorer'
     case '25':
       return 'Explorer'
+    case '421611':
+      return 'Arbiscan'
+    case '42161':
+      return 'Arbiscan'
+    case `${ChainId.BTTC}`:
+      return 'Bttcscan'
+
     default:
       return 'Etherscan'
   }
@@ -625,6 +632,10 @@ export function getNetworkName() {
       return 'Cronos'
     case '25':
       return 'Cronos'
+    case '42161':
+      return 'Arbitrum'
+    case '421611':
+      return 'Arbitrum Rinkeby'
     default:
       return 'Ethereum'
   }
