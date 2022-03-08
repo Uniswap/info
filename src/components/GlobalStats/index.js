@@ -25,7 +25,7 @@ const Divider = styled.div`
 
 export default function GlobalStats() {
   const { oneDayTxns, oneDayFeeUSD, oneDayFeeChange, txnChange } = useGlobalData()
-  const oneDayFees = oneDayFeeUSD ? formattedNum(oneDayFeeUSD, true) : ''
+  const oneDayFees = Number.isFinite(oneDayFeeUSD) ? formattedNum(oneDayFeeUSD, true) : ''
   const theme = useTheme()
   const aggregatorVolume = useAggregatorVolume()
   const above768 = useMedia('(min-width: 768px)')

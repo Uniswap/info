@@ -105,6 +105,7 @@ export default function NetworkModal() {
             ChainId.CRONOS,
             ChainId.ARBITRUM,
             // ChainId.BTTC,
+            ChainId.VELAS,
           ].map((key, i) => {
             if (chainId === key) {
               return (

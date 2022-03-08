@@ -6,6 +6,7 @@ import Fantom from '../assets/networks/fantom-network.png'
 import Cronos from '../assets/networks/cronos-network.png'
 import Arbitrum from '../assets/networks/arbitrum-network.svg'
 import BitTorrent from '../assets/networks/bittorrent-network.png'
+import Velas from '../assets/networks/velas-network.png'
 import { ChainId } from '.'
 
 export const NETWORK_ICON = {
@@ -17,6 +18,7 @@ export const NETWORK_ICON = {
   [ChainId.CRONOS]: Cronos,
   [ChainId.ARBITRUM]: Arbitrum,
   [ChainId.BTTC]: BitTorrent,
+  [ChainId.VELAS]: Velas,
 }
 
 export const NETWORK_LABEL = {
@@ -28,4 +30,5 @@ export const NETWORK_LABEL = {
   [ChainId.CRONOS]: 'Cronos',
   [ChainId.ARBITRUM]: 'Arbitrum',
   [ChainId.BTTC]: 'BitTorrent',
+  [ChainId.VELAS]: 'Velas',
 }

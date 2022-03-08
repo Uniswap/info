@@ -35,6 +35,7 @@ const EXCHANGE_SUBGRAPH_URLS = {
   arbitrumTestnet: ['https://api.thegraph.com/subgraphs/name/viet-nv/kyberswap-arbitrum-rinkeby'],
   arbitrum: ['https://api.thegraph.com/subgraphs/name/viet-nv/kyberswap-arbitrum'],
   bttc: ['https://bttc-graph.dev.kyberengineering.io/subgraphs/name/dynamic-amm/kyberswap-bttc'],
+  velas: ['https://velas-graph.kyberengineering.io/subgraphs/name/kybernetwork/kyberswap-exchange-velas'],
 }
 
 export function getExchangeSubgraphUrls(networkId) {
@@ -80,6 +81,8 @@ export function getExchangeSubgraphUrls(networkId) {
       return EXCHANGE_SUBGRAPH_URLS.arbitrum
     case ChainId.BTTC:
       return EXCHANGE_SUBGRAPH_URLS.bttc
+    case ChainId.VELAS:
+      return EXCHANGE_SUBGRAPH_URLS.velas
     default:
       return EXCHANGE_SUBGRAPH_URLS.mainnet
   }
