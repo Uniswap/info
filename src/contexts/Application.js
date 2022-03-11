@@ -15,6 +15,7 @@ import CRONOS_TOKEN_LIST from '../constants/tokenLists/cronos.tokenlist'
 import ARBITRUM_TOKEN_LIST from '../constants/tokenLists/arbitrum.tokenlist'
 import BTTC_TOKEN_LIST from '../constants/tokenLists/bttc.tokenlist'
 import VELAS_TOKEN_LIST from '../constants/tokenLists/velas.tokenlist'
+import AURORA_TOKEN_LIST from '../constants/tokenLists/aurora.tokenlist'
 dayjs.extend(utc)
 
 const UPDATE = 'UPDATE'
@@ -379,6 +380,9 @@ export function useListedTokens() {
           break
         case ChainId.VELAS:
           tokenslist = VELAS_TOKEN_LIST
+          break
+        case ChainId.AURORA:
+          tokenslist = AURORA_TOKEN_LIST
           break
         default:
           break

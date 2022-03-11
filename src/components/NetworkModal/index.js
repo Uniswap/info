@@ -106,6 +106,7 @@ export default function NetworkModal() {
             ChainId.ARBITRUM,
             // ChainId.BTTC,
             ChainId.VELAS,
+            ChainId.AURORA,
           ].map((key, i) => {
             if (chainId === key) {
               return (

@@ -558,6 +558,8 @@ export function getNativeTokenSymbol() {
       return 'CRO'
     case '106':
       return 'VLX'
+    case `${ChainId.AURORA}`:
+      return 'ETH'
     default:
       return 'ETH'
   }
@@ -583,6 +585,8 @@ export function getNativeTokenWrappedName() {
       return 'CRO (Wrapped)'
     case '106':
       return 'VLX (Wrapped)'
+    case `${ChainId.AURORA}`:
+      return 'ETH (Wrapped)'
     default:
       return 'Ether (Wrapped)'
   }
@@ -614,7 +618,8 @@ export function getEtherscanLinkText() {
       return 'Bttcscan'
     case `${ChainId.VELAS}`:
       return 'Velas EVM Explorer'
-
+    case `${ChainId.AURORA}`:
+      return 'Aurora Explorer'
     default:
       return 'Etherscan'
   }
@@ -644,6 +649,8 @@ export function getNetworkName() {
       return 'Arbitrum Rinkeby'
     case '106':
       return 'Velas'
+    case `${ChainId.AURORA}`:
+      return 'Aurora'
     default:
       return 'Ethereum'
   }
@@ -669,6 +676,8 @@ export function getDefaultAddLiquidityUrl() {
       return `${process.env.REACT_APP_DMM_SWAP_URL}pools/CRO`
     case '106':
       return `${process.env.REACT_APP_DMM_SWAP_URL}pools/VLX`
+    case `${ChainId.AURORA}`:
+      return `${process.env.REACT_APP_DMM_SWAP_URL}pools/ETH`
     default:
       return `${process.env.REACT_APP_DMM_SWAP_URL}pools/ETH/${KNC_ADDRESS}`
   }

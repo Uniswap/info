@@ -46,6 +46,8 @@ jobs:
             bucket: arbitrum-analytics.kyberswap.com
           - command: build-velas
             bucket: velas-analytics.kyberswap.com
+          - command: build-aurora
+            bucket: aurora-analytics.kyberswap.com
     steps:
       - name: Checkout
         uses: actions/checkout@v2

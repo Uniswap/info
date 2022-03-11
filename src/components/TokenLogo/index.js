@@ -11,6 +11,7 @@ import CRONOS_TOKEN_LIST from '../../constants/tokenLists/cronos.tokenlist'
 import ARBITRUM_TOKEN_LIST from '../../constants/tokenLists/arbitrum.tokenlist'
 import BTTC_TOKEN_LIST from '../../constants/tokenLists/bttc.tokenlist'
 import VELAS_TOKEN_LIST from '../../constants/tokenLists/velas.tokenlist'
+import AURORA_TOKEN_LIST from '../../constants/tokenLists/aurora.tokenlist'
 import { isAddress } from '../../utils/index.js'
 import PlaceHolder from '../../assets/placeholder.png'
 import EthereumLogo from '../../assets/eth.png'
@@ -20,6 +21,7 @@ import AvaxLogo from '../../assets/avax.png'
 import FantomLogo from '../../assets/networks/fantom-network.png'
 import CronosLogo from '../../assets/cronos.svg'
 import VelasLogo from '../../assets/velas.png'
+import AuroraLogo from '../../assets/aurora.svg'
 import { getMaticTokenLogoURL } from '../../utils/maticTokenMapping'
 import { getMumbaiTokenLogoURL } from '../../utils/mumbaiTokenMapping'
 import { getBscTestnetTokenLogoURL } from '../../utils/bscTestnetTokenMapping'
@@ -190,6 +192,19 @@ export function getNativeTokenLogo({ size = '24px', ...rest }) {
           />
         </StyledNativeTokenLogo>
       )
+    case `${ChainId.AURORA}`:
+      return (
+        <StyledNativeTokenLogo size={size} {...rest}>
+          <img
+            src={AuroraLogo}
+            style={{
+              boxShadow: '0px 6px 10px rgba(0, 0, 0, 0.075)',
+              borderRadius: '24px',
+            }}
+            alt=""
+          />
+        </StyledNativeTokenLogo>
+      )
     default:
       return (
         <StyledNativeTokenLogo size={size} {...rest}>
@@ -307,6 +322,19 @@ export default function TokenLogo({ address, header = false, size = '24px', ...r
     case `${ChainId.VELAS}`:
       if (formattedAddress && VELAS_TOKEN_LIST[formattedAddress]) {
         return getCustomLogo({ address, src: VELAS_TOKEN_LIST[formattedAddress].logoURI, size, setError, ...rest })
+      }
+      path = 'error'
+      break
+
+    case `${ChainId.AURORA}`:
+      if (formattedAddress && AURORA_TOKEN_LIST[formattedAddress.toLowerCase()]) {
+        return getCustomLogo({
+          address,
+          src: AURORA_TOKEN_LIST[formattedAddress.toLowerCase()].logoURI,
+          size,
+          setError,
+          ...rest,
+        })
       }
       path = 'error'
       break

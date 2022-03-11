@@ -94,6 +94,7 @@
     "start-arbitrum": "env-cmd -f .env.arbitrum react-scripts start",
     "start-bttc": "env-cmd -f .env.bttc react-scripts start",
     "start-velas": "env-cmd -f .env.velas react-scripts start",
+    "start-aurora": "env-cmd -f .env.aurora react-scripts start",
     "build": "react-scripts build",
     "build-ropsten": "env-cmd -f .env.ropsten react-scripts build",
     "build-staging": "env-cmd -f .env.staging react-scripts build",
@@ -113,6 +114,7 @@
     "build-arbitrum": "env-cmd -f .env.arbitrum react-scripts build",
     "build-bttc": "env-cmd -f .env.bttc react-scripts build",
     "build-velas": "env-cmd -f .env.velas react-scripts build",
+    "build-aurora": "env-cmd -f .env.aurora react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
