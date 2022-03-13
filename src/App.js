@@ -23,7 +23,6 @@ import { ButtonDark } from './components/ButtonStyled'
 import { useExchangeClient, useLatestBlocks } from './contexts/Application'
 import useTheme from './hooks/useTheme'
 import BottomBar from './components/BottomBar'
-import KyberSwapAnounce from './components/KyberSwapAnnounce'
 
 const AppWrapper = styled.div`
   position: relative;
@@ -105,7 +104,6 @@ const Marginer = styled.div`
 const LayoutWrapper = ({ children, savedOpen, setSavedOpen }) => {
   return (
     <>
-      <KyberSwapAnounce />
       <ContentWrapper open={savedOpen}>
         <SideNav />
         <BottomBar />
