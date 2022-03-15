@@ -1994,6 +1994,14 @@ const ARBITRUM_TOKEN_ARRAY = [
       l1GatewayAddress: '0xa3A7B6F88361F48403514059F1F16C8E78d60EeC',
     },
   },
+  {
+    chainId: 42161,
+    address: '0xFEa7a6a0B346362BF88A9e4A88416B77a57D6c2A',
+    symbol: 'MIM',
+    name: 'Magic Internet Money',
+    decimals: 18,
+    logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/162.png',
+  },
 ]
 const ARBITRUM_TOKEN_LIST = ARBITRUM_TOKEN_ARRAY.reduce((acc, cur) => {
   return {

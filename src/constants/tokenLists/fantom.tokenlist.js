@@ -547,6 +547,14 @@ const SPOOKY_TOKEN_LIST = [
     decimals: 18,
     logoURI: 'https://assets.spookyswap.finance/tokens/FONT.png',
   },
+  {
+    name: 'PaintSwap',
+    symbol: 'BRUSH',
+    address: '0x85dec8c4B2680793661bCA91a8F129607571863d',
+    chainId: 250,
+    decimals: 18,
+    logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/13229.png',
+  },
 ]
 
 const FANTOM_TOKEN_LIST = SPOOKY_TOKEN_LIST.reduce((acc, cur) => {
