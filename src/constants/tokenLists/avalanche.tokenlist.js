@@ -249,5 +249,13 @@ const AVALANCHE_TOKEN_LIST = {
     symbol: 'sAVAX',
     logoURI: 'https://i.imgur.com/lqxXmU7.png',
   },
+  '0x8729438EB15e2C8B576fCc6AeCdA6A148776C0F5': {
+    chainId: 43114,
+    address: '0x8729438EB15e2C8B576fCc6AeCdA6A148776C0F5',
+    decimals: 18,
+    name: 'BENQI',
+    symbol: 'QI',
+    logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/9288.png',
+  },
 }
 export default AVALANCHE_TOKEN_LIST
