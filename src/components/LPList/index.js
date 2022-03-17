@@ -8,7 +8,7 @@ import styled from 'styled-components'
 
 import { CustomLink } from '../Link'
 import { Divider } from '..'
-import { withRouter } from 'react-router-dom'
+import { useParams, withRouter } from 'react-router-dom'
 import { formattedNum, shortenAddress } from '../../utils'
 import { TYPE } from '../../Theme'
 import DoubleTokenLogo from '../DoubleLogo'
@@ -26,7 +26,7 @@ const PageButtons = styled.div`
 
 const Arrow = styled.div`
   color: ${({ theme }) => theme.primary1};
-  opacity: ${(props) => (props.faded ? 0.3 : 1)};
+  opacity: ${props => (props.faded ? 0.3 : 1)};
   padding: 0 20px;
   user-select: none;
   :hover {
@@ -91,6 +91,8 @@ function LPList({ lps, disbaleLinks, maxItems = 10 }) {
   const [page, setPage] = useState(1)
   const [maxPage, setMaxPage] = useState(1)
   const ITEMS_PER_PAGE = maxItems
+  const { network: currentNetworkURL } = useParams()
+  const prefixNetworkURL = currentNetworkURL ? `/${currentNetworkURL}` : ''
 
   useEffect(() => {
     setMaxPage(1) // edit this to do modular
@@ -111,11 +113,11 @@ function LPList({ lps, disbaleLinks, maxItems = 10 }) {
     return (
       <DashGrid style={{ height: '56px' }} disbaleLinks={disbaleLinks} focus={true}>
         {!below1024 && (
-          <DataText area="number" fontWeight="500">
+          <DataText area='number' fontWeight='500'>
             {index}
           </DataText>
         )}
-        <DataText area="name" fontWeight="500" justifyContent="flex-start">
+        <DataText area='name' fontWeight='500' justifyContent='flex-start'>
           <CustomLink
             style={{
               marginLeft: below600 ? 0 : '1rem',
@@ -123,7 +125,7 @@ function LPList({ lps, disbaleLinks, maxItems = 10 }) {
               textOverflow: 'ellipsis',
               overflow: 'hidden',
             }}
-            to={'/account/' + lp.user.id}
+            to={prefixNetworkURL + '/account/' + lp.user.id}
           >
             {below800 ? lp.user.id.slice(0, 5) + '...' + lp.user.id.slice(39, 42) : lp.user.id}
           </CustomLink>
@@ -137,7 +139,7 @@ function LPList({ lps, disbaleLinks, maxItems = 10 }) {
 
         {!below600 && (
           <DataText>
-            <CustomLink area="pair" to={'/pair/' + lp.pairAddress}>
+            <CustomLink area='pair' to={prefixNetworkURL + '/pair/' + lp.pairAddress}>
               <RowFixed>
                 {!below600 && <DoubleTokenLogo a0={lp.token0} a1={lp.token1} size={16} margin={true} />}
                 {lp.pairName}
@@ -147,12 +149,12 @@ function LPList({ lps, disbaleLinks, maxItems = 10 }) {
         )}
 
         <DataText>
-          <CustomLink area="pool" to={'/pool/' + lp.poolAddress}>
+          <CustomLink area='pool' to={prefixNetworkURL + '/pool/' + lp.poolAddress}>
             <RowFixed>{shortenAddress(lp.poolAddress, 3)}</RowFixed>
           </CustomLink>
         </DataText>
 
-        <DataText area="value">{formattedNum(lp.usd, true)}</DataText>
+        <DataText area='value'>{formattedNum(lp.usd, true)}</DataText>
       </DashGrid>
     )
   }
@@ -174,16 +176,12 @@ function LPList({ lps, disbaleLinks, maxItems = 10 }) {
     <ListWrapper>
       <TableHeader center={true} disbaleLinks={disbaleLinks} style={{ height: 'fit-content' }}>
         {!below1024 && (
-          <Flex alignItems="center" justifyContent="flex-start">
-            <TYPE.main area="number">#</TYPE.main>
+          <Flex alignItems='center' justifyContent='flex-start'>
+            <TYPE.main area='number'>#</TYPE.main>
           </Flex>
         )}
-        <Flex
-          alignItems="center"
-          justifyContent="flex-start"
-          style={{ marginLeft: below600 ? 0 : '1rem', whiteSpace: 'nowrap' }}
-        >
-          <TYPE.main area="name" color={theme.subText} fontSize="12px">
+        <Flex alignItems='center' justifyContent='flex-start' style={{ marginLeft: below600 ? 0 : '1rem', whiteSpace: 'nowrap' }}>
+          <TYPE.main area='name' color={theme.subText} fontSize='12px'>
             ACCOUNT
           </TYPE.main>
         </Flex>
@@ -193,25 +191,25 @@ function LPList({ lps, disbaleLinks, maxItems = 10 }) {
           </Flex>
         )} */}
         {!below600 && (
-          <Flex alignItems="center" justifyContent="flexEnd">
-            <TYPE.main area="name" color={theme.subText} fontSize="12px">
+          <Flex alignItems='center' justifyContent='flexEnd'>
+            <TYPE.main area='name' color={theme.subText} fontSize='12px'>
               PAIR
             </TYPE.main>
           </Flex>
         )}
-        <Flex alignItems="center" justifyContent="flexEnd">
-          <TYPE.main area="name" color={theme.subText} fontSize="12px">
+        <Flex alignItems='center' justifyContent='flexEnd'>
+          <TYPE.main area='name' color={theme.subText} fontSize='12px'>
             POOL
           </TYPE.main>
         </Flex>
-        <Flex alignItems="center" justifyContent="flexEnd">
-          <TYPE.main area="name" color={theme.subText} fontSize="12px">
+        <Flex alignItems='center' justifyContent='flexEnd'>
+          <TYPE.main area='name' color={theme.subText} fontSize='12px'>
             VALUE
           </TYPE.main>
         </Flex>
       </TableHeader>
       <Divider />
-      <List p="0 20px">{!lpList ? <LocalLoader /> : lpList}</List>
+      <List p='0 20px'>{!lpList ? <LocalLoader /> : lpList}</List>
       <PageButtons>
         <div onClick={() => setPage(page === 1 ? page : page - 1)}>
           <Arrow faded={page === 1 ? true : false}>←</Arrow>

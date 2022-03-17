@@ -1,10 +1,11 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import styled from 'styled-components'
 import { Text, Box } from 'rebass'
 
 import Link from './Link'
 
-import { urls } from '../utils'
+import { getUrls } from '../utils'
+import { useNetworksInfo } from '../contexts/NetworkInfo'
 
 const Divider = styled(Box)`
   height: 1px;
@@ -35,18 +36,23 @@ const Hint = ({ children, ...rest }) => (
     {children}
   </Text>
 )
+//Look like deprecated
+const Address = ({ address, token, ...rest }) => {
+  const [networksInfo] = useNetworksInfo()
+  const urls = useMemo(() => getUrls(networksInfo), [networksInfo])
 
-const Address = ({ address, token, ...rest }) => (
-  <Link
-    color="button"
-    href={token ? urls.showToken(address) : urls.showAddress(address)}
-    external
-    style={{ wordBreak: 'break-all' }}
-    {...rest}
-  >
-    {address}
-  </Link>
-)
+  return (
+    <Link
+      color='button'
+      href={token ? urls.showToken(address) : urls.showAddress(address)}
+      external
+      style={{ wordBreak: 'break-all' }}
+      {...rest}
+    >
+      {address}
+    </Link>
+  )
+}
 
 export const Hover = styled.div`
   :hover {

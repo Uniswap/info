@@ -12,26 +12,18 @@ import { ChainId } from '.'
 
 export const NETWORK_ICON = {
   [ChainId.MAINNET]: Mainnet,
+  [ChainId.ROPSTEN]: Mainnet,
   [ChainId.MATIC]: Polygon,
+  [ChainId.MUMBAI]: Polygon,
   [ChainId.BSCMAINNET]: BSC,
+  [ChainId.BSCTESTNET]: BSC,
   [ChainId.AVAXMAINNET]: AVAX,
+  [ChainId.AVAXTESTNET]: AVAX,
   [ChainId.FANTOM]: Fantom,
   [ChainId.CRONOS]: Cronos,
+  [ChainId.CRONOSTESTNET]: Cronos,
   [ChainId.ARBITRUM]: Arbitrum,
   [ChainId.BTTC]: BitTorrent,
   [ChainId.VELAS]: Velas,
   [ChainId.AURORA]: Aurora,
-}
-
-export const NETWORK_LABEL = {
-  [ChainId.MAINNET]: 'Ethereum',
-  [ChainId.MATIC]: 'Polygon',
-  [ChainId.BSCMAINNET]: 'BSC',
-  [ChainId.AVAXMAINNET]: 'Avalanche',
-  [ChainId.FANTOM]: 'Fantom',
-  [ChainId.CRONOS]: 'Cronos',
-  [ChainId.ARBITRUM]: 'Arbitrum',
-  [ChainId.BTTC]: 'BitTorrent',
-  [ChainId.VELAS]: 'Velas',
-  [ChainId.AURORA]: 'Aurora',
 }

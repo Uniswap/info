@@ -1215,8 +1215,7 @@ const ARBITRUM_TOKEN_ARRAY = [
     },
   },
   {
-    logoURI:
-      'https://assets.coingecko.com/coins/images/12381/thumb/60d18e06844a844ad75901a9_mark_only_03.png?1628674771',
+    logoURI: 'https://assets.coingecko.com/coins/images/12381/thumb/60d18e06844a844ad75901a9_mark_only_03.png?1628674771',
     chainId: 42161,
     address: '0x753D224bCf9AAFaCD81558c32341416df61D3DAC',
     name: 'Perpetual',
@@ -1575,8 +1574,7 @@ const ARBITRUM_TOKEN_ARRAY = [
     },
   },
   {
-    logoURI:
-      'https://assets.coingecko.com/coins/images/2707/thumb/UnibrightLogo_colorful_500x500_preview.png?1547036916',
+    logoURI: 'https://assets.coingecko.com/coins/images/2707/thumb/UnibrightLogo_colorful_500x500_preview.png?1547036916',
     chainId: 42161,
     address: '0x2aD62674A64E698C24831Faf824973C360430140',
     name: 'UniBright',

@@ -8,7 +8,7 @@ import styled from 'styled-components'
 
 import { CustomLink } from '../Link'
 import { Divider } from '../../components'
-import { withRouter } from 'react-router-dom'
+import { useParams, withRouter } from 'react-router-dom'
 import { formattedNum, formattedPercent } from '../../utils'
 import DoubleTokenLogo from '../DoubleLogo'
 import FormattedName from '../FormattedName'
@@ -28,7 +28,7 @@ const PageButtons = styled.div`
 
 const Arrow = styled.div`
   color: ${({ theme }) => theme.primary1};
-  opacity: ${(props) => (props.faded ? 0.3 : 1)};
+  opacity: ${props => (props.faded ? 0.3 : 1)};
   padding: 0 20px;
   user-select: none;
   :hover {
@@ -146,6 +146,8 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 5 }) {
   // sorting
   const [sortDirection, setSortDirection] = useState(true)
   const [sortedColumn, setSortedColumn] = useState(SORT_FIELD.LIQ)
+  const { network: currentNetworkURL } = useParams()
+  const prefixNetworkURL = currentNetworkURL ? `/${currentNetworkURL}` : ''
 
   useEffect(() => {
     setMaxPage(1) // edit this to do modular
@@ -172,23 +174,20 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 5 }) {
       const oneDayFee = pairData.oneDayFeeUSD ? pairData.oneDayFeeUSD : pairData.oneDayFeeUntracked
 
       const apy =
-        (oneDayFee * 365 * 100) / liquidity < MAX_ALLOW_APY
-          ? formattedPercent((oneDayFee * 365 * 100) / liquidity)
-          : '--'
+        (oneDayFee * 365 * 100) / liquidity < MAX_ALLOW_APY ? formattedPercent((oneDayFee * 365 * 100) / liquidity) : '--'
 
       const weekVolume = pairData.oneWeekVolumeUSD ? pairData.oneWeekVolumeUSD : pairData.oneWeekVolumeUntracked
 
       return (
         <DashGrid style={{ height: '56px' }} disbaleLinks={disbaleLinks} focus={true}>
-          <DataText area="name" fontWeight="500">
+          <DataText area='name' fontWeight='500'>
             {!below600 && <div style={{ marginRight: '20px', width: '10px' }}>{index}</div>}
-            <DoubleTokenLogo
-              size={below600 ? 16 : 20}
-              a0={pairData.token0.id}
-              a1={pairData.token1.id}
-              margin={!below740}
-            />
-            <CustomLink style={{ marginLeft: '20px', whiteSpace: 'nowrap' }} to={'/pair/' + pairAddress} color={color}>
+            <DoubleTokenLogo size={below600 ? 16 : 20} a0={pairData.token0.id} a1={pairData.token1.id} margin={!below740} />
+            <CustomLink
+              style={{ marginLeft: '20px', whiteSpace: 'nowrap' }}
+              to={prefixNetworkURL + '/pair/' + pairAddress}
+              color={color}
+            >
               <FormattedName
                 text={pairData.token0.symbol + '-' + pairData.token1.symbol}
                 maxCharacters={below600 ? 8 : 16}
@@ -197,11 +196,11 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 5 }) {
               />
             </CustomLink>
           </DataText>
-          <DataText area="liq">{formattedNum(liquidity, true)}</DataText>
-          <DataText area="vol">{formattedNum(volume, true)}</DataText>
-          {!below740 && <DataText area="volWeek">{formattedNum(weekVolume, true)}</DataText>}
-          {!below1080 && <DataText area="fees">{formattedNum(oneDayFee, true)}</DataText>}
-          {!below740 && <DataText area="apy">{apy}</DataText>}
+          <DataText area='liq'>{formattedNum(liquidity, true)}</DataText>
+          <DataText area='vol'>{formattedNum(volume, true)}</DataText>
+          {!below740 && <DataText area='volWeek'>{formattedNum(weekVolume, true)}</DataText>}
+          {!below1080 && <DataText area='fees'>{formattedNum(oneDayFee, true)}</DataText>}
+          {!below740 && <DataText area='apy'>{apy}</DataText>}
         </DashGrid>
       )
     } else {
@@ -216,7 +215,7 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 5 }) {
         const pairA = pairs[addressA]
         const pairB = pairs[addressB]
         if (sortedColumn === SORT_FIELD.APY) {
-          const getApr = (pairData) => {
+          const getApr = pairData => {
             const liquidity = pairData.reserveUSD ? pairData.reserveUSD : pairData.trackedReserveUSD
             const oneDayFee = pairData.oneDayFeeUSD ? pairData.oneDayFeeUSD : pairData.oneDayFeeUntracked
             const apy = (oneDayFee * 365 * 100) / liquidity < MAX_ALLOW_APY ? (oneDayFee * 365 * 100) / liquidity : 0
@@ -248,26 +247,26 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 5 }) {
   return (
     <ListWrapper>
       <TableHeader center={true} disbaleLinks={disbaleLinks} style={{ height: 'fit-content' }}>
-        <Flex alignItems="center" justifyContent="flexStart">
-          <Text fontWeight="500" fontSize="12px" color={theme.subText}>
+        <Flex alignItems='center' justifyContent='flexStart'>
+          <Text fontWeight='500' fontSize='12px' color={theme.subText}>
             NAME
           </Text>
         </Flex>
-        <Flex alignItems="center" justifyContent="flexEnd">
+        <Flex alignItems='center' justifyContent='flexEnd'>
           <ClickableText
-            area="liq"
-            onClick={(e) => {
+            area='liq'
+            onClick={e => {
               setSortedColumn(SORT_FIELD.LIQ)
-              setSortDirection((prev) => (sortedColumn !== SORT_FIELD.LIQ ? true : !prev))
+              setSortDirection(prev => (sortedColumn !== SORT_FIELD.LIQ ? true : !prev))
             }}
           >
             Liquidity {sortedColumn === SORT_FIELD.LIQ ? (!sortDirection ? '↑' : '↓') : ''}
           </ClickableText>
         </Flex>
-        <Flex alignItems="center">
+        <Flex alignItems='center'>
           <ClickableText
-            area="vol"
-            onClick={(e) => {
+            area='vol'
+            onClick={e => {
               setSortedColumn(SORT_FIELD.VOL)
               setSortDirection(sortedColumn !== SORT_FIELD.VOL ? true : !sortDirection)
             }}
@@ -277,10 +276,10 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 5 }) {
           </ClickableText>
         </Flex>
         {!below740 && (
-          <Flex alignItems="center" justifyContent="flexEnd">
+          <Flex alignItems='center' justifyContent='flexEnd'>
             <ClickableText
-              area="volWeek"
-              onClick={(e) => {
+              area='volWeek'
+              onClick={e => {
                 setSortedColumn(SORT_FIELD.VOL_7DAYS)
                 setSortDirection(sortedColumn !== SORT_FIELD.VOL_7DAYS ? true : !sortDirection)
               }}
@@ -290,10 +289,10 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 5 }) {
           </Flex>
         )}
         {!below1080 && (
-          <Flex alignItems="center" justifyContent="flexEnd">
+          <Flex alignItems='center' justifyContent='flexEnd'>
             <ClickableText
-              area="fees"
-              onClick={(e) => {
+              area='fees'
+              onClick={e => {
                 setSortedColumn(SORT_FIELD.FEES)
                 setSortDirection(sortedColumn !== SORT_FIELD.FEES ? true : !sortDirection)
               }}
@@ -303,12 +302,12 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 5 }) {
           </Flex>
         )}
         {!below740 && (
-          <Flex alignItems="center" justifyContent="flexEnd">
+          <Flex alignItems='center' justifyContent='flexEnd'>
             <ClickableText
-              area="apy"
-              onClick={(e) => {
+              area='apy'
+              onClick={e => {
                 setSortedColumn(SORT_FIELD.APY)
-                setSortDirection((prev) => (sortedColumn !== SORT_FIELD.APY ? true : !prev))
+                setSortDirection(prev => (sortedColumn !== SORT_FIELD.APY ? true : !prev))
               }}
             >
               APR {sortedColumn === SORT_FIELD.APY ? (!sortDirection ? '↑' : '↓') : ''}
@@ -318,10 +317,10 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 5 }) {
         )}
       </TableHeader>
       <Divider />
-      <List p={0}>{!pairList ? <LocalLoader /> : pairList}</List>
+      {!pairList.length ? <LocalLoader /> : <List p={0}>{pairList}</List>}
       <PageButtons>
         <div
-          onClick={(e) => {
+          onClick={e => {
             setPage(page === 1 ? page : page - 1)
           }}
         >
@@ -329,7 +328,7 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 5 }) {
         </div>
         <TYPE.body>{'Page ' + page + ' of ' + maxPage}</TYPE.body>
         <div
-          onClick={(e) => {
+          onClick={e => {
             setPage(page === maxPage ? page : page + 1)
           }}
         >

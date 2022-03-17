@@ -5,7 +5,7 @@ import styled from 'styled-components'
 import Select from 'react-select'
 
 const selectStyles = {
-  control: (styles) => ({
+  control: styles => ({
     ...styles,
     padding: '1rem',
     border: 'none',
@@ -17,7 +17,7 @@ const selectStyles = {
       borderColor: '#e1e1e1',
     },
   }),
-  valueContainer: (styles) => ({
+  valueContainer: styles => ({
     ...styles,
     padding: 0,
   }),
@@ -27,10 +27,10 @@ const selectStyles = {
 export default class Popout extends Component {
   state = { isOpen: false, value: undefined }
   toggleOpen = () => {
-    this.setState((state) => ({ isOpen: !state.isOpen }))
+    this.setState(state => ({ isOpen: !state.isOpen }))
   }
 
-  onSelectChange = (value) => {
+  onSelectChange = value => {
     this.toggleOpen()
     this.setState({ value })
   }
@@ -43,9 +43,9 @@ export default class Popout extends Component {
         onClose={this.toggleOpen}
         target={
           <Button
-            border="text"
-            color="text"
-            variant="outline"
+            border='text'
+            color='text'
+            variant='outline'
             onClick={this.toggleOpen}
             style={{
               whiteSpace: 'nowrap',
@@ -67,7 +67,7 @@ export default class Popout extends Component {
           menuIsOpen
           onChange={this.onSelectChange}
           options={this.props.data}
-          placeholder="Search..."
+          placeholder='Search...'
           styles={selectStyles}
           tabSelectsValue={false}
           value={value}
@@ -105,9 +105,9 @@ const Wrapper = styled.div`
   transition: 0.25s ease-in-out;
 `
 
-const Menu = (props) => <Wrapper {...props} />
+const Menu = props => <Wrapper {...props} />
 
-const Blanket = (props) => (
+const Blanket = props => (
   <div
     style={{
       bottom: 0,
@@ -131,7 +131,7 @@ const Dropdown = ({ children, isOpen, target, onClose }) => (
 )
 
 const DropdownIndicator = () => (
-  <span role="img" aria-label="Search">
+  <span role='img' aria-label='Search'>
     🔎
   </span>
 )

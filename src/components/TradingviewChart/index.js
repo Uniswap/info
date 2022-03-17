@@ -24,16 +24,7 @@ const Wrapper = styled.div`
 // constant height for charts
 const HEIGHT = 300
 
-const TradingViewChart = ({
-  type = CHART_TYPES.BAR,
-  data,
-  base,
-  baseChange,
-  field,
-  title,
-  width,
-  useWeekly = false,
-}) => {
+const TradingViewChart = ({ type = CHART_TYPES.BAR, data, base, baseChange, field, title, width, useWeekly = false }) => {
   // reference for DOM element to create with chart
   const ref = useRef()
 
@@ -53,7 +44,7 @@ const TradingViewChart = ({
   }, [chartCreated, data, dataPrev, type])
 
   // parese the data and format for tardingview consumption
-  const formattedData = data?.map((entry) => {
+  const formattedData = data?.map(entry => {
     return {
       time: dayjs.unix(entry.date).utc().format('YYYY-MM-DD'),
       value: parseFloat(entry[field]),
@@ -124,7 +115,7 @@ const TradingViewChart = ({
           },
         },
         localization: {
-          priceFormatter: (val) => formattedNum(val, true),
+          priceFormatter: val => formattedNum(val, true),
         },
       })
 

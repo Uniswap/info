@@ -24,6 +24,8 @@ import { formattedNum, getEtherscanLinkText } from '../utils'
 import { useOnClickOutside } from '../hooks'
 import useTheme from '../hooks/useTheme'
 import { Flex, Text } from 'rebass'
+import { useNetworksInfo } from '../contexts/NetworkInfo'
+import { useParams } from 'react-router-dom'
 
 const AccountWrapper = styled.div`
   padding: 6px 16px 6px 0;
@@ -93,12 +95,15 @@ const Warning = styled.div`
 `
 
 function AccountPage({ account }) {
+  const [networksInfo] = useNetworksInfo()
   // get data for this account
   const transactions = useUserTransactions(account)
   const positions = useUserPositions(account)
 
   // get data for user stats
   const transactionCount = transactions?.swaps?.length + transactions?.burns?.length + transactions?.mints?.length
+  const { network: currentNetworkURL } = useParams()
+  const prefixNetworkURL = currentNetworkURL ? `/${currentNetworkURL}` : ''
 
   // get derived totals
   let totalSwappedUSD = useMemo(() => {
@@ -162,22 +167,18 @@ function AccountPage({ account }) {
 
   // adding/removing account from saved accounts
   const [savedAccounts, addAccount, removeAccount] = useSavedAccounts()
-  const isBookmarked = savedAccounts.includes(account)
+  const isBookmarked = !!savedAccounts.find(savedAccount => savedAccount.address == account)
   const handleBookmarkClick = useCallback(() => {
-    ;(isBookmarked ? removeAccount : addAccount)(account)
-  }, [account, isBookmarked, addAccount, removeAccount])
+    ;(isBookmarked ? removeAccount : addAccount)(account, networksInfo.CHAIN_ID)
+  }, [isBookmarked, removeAccount, addAccount, account, networksInfo.CHAIN_ID])
 
   return (
     <PageWrapper>
       <ContentWrapper>
         <RowBetween>
           <TYPE.body>
-            <BasicLink to="/accounts">{'Accounts '}</BasicLink>→{' '}
-            <Link
-              lineHeight={'145.23%'}
-              href={`${process.env.REACT_APP_ETHERSCAN_URL}/address/${account}`}
-              target="_blank"
-            >
+            <BasicLink to={prefixNetworkURL + '/accounts'}>{'Accounts '}</BasicLink>→{' '}
+            <Link lineHeight={'145.23%'} href={`${networksInfo.ETHERSCAN_URL}/address/${account}`} target='_blank'>
               {account?.slice(0, 42)}
             </Link>
           </TYPE.body>
@@ -187,7 +188,7 @@ function AccountPage({ account }) {
           <Flex
             alignItems={below600 ? 'flex-start' : 'center'}
             flexDirection={below600 ? 'column' : 'row'}
-            justifyContent="space-between"
+            justifyContent='space-between'
           >
             <span>
               <TYPE.header fontSize={24}>{account?.slice(0, 6) + '...' + account?.slice(38, 42)}</TYPE.header>
@@ -201,13 +202,9 @@ function AccountPage({ account }) {
                   />
                 </StyledIcon>
               )}
-              <Link
-                lineHeight={'145.23%'}
-                href={`${process.env.REACT_APP_ETHERSCAN_URL}/address/${account}`}
-                target="_blank"
-              >
+              <Link lineHeight={'145.23%'} href={`${networksInfo.ETHERSCAN_URL}/address/${account}`} target='_blank'>
                 <ButtonDark>
-                  <Text fontSize={14}>{`View on ${getEtherscanLinkText()}`}↗</Text>
+                  <Text fontSize={14}>{`View on ${getEtherscanLinkText(networksInfo)}`}↗</Text>
                 </ButtonDark>
               </Link>
             </AccountWrapper>
@@ -218,7 +215,7 @@ function AccountPage({ account }) {
           {!hideLPContent && (
             <DropdownWrapper ref={node}>
               <ButtonDropdown
-                width="100%"
+                width='100%'
                 onClick={() => setShowDropdown(!showDropdown)}
                 open={showDropdown}
                 style={{ borderRadius: '8px', background: theme.background }}
@@ -242,7 +239,7 @@ function AccountPage({ account }) {
               </ButtonDropdown>
               {showDropdown && (
                 <Flyout>
-                  <AutoColumn gap="0px">
+                  <AutoColumn gap='0px'>
                     {positions?.map((p, i) => {
                       if (p.pair.token1.symbol === 'WETH') {
                         p.pair.token1.symbol = 'ETH'
@@ -289,19 +286,15 @@ function AccountPage({ account }) {
           )}
           {!hideLPContent && (
             <Panel style={{ height: '100%', marginBottom: '1rem' }}>
-              <AutoRow gap="20px">
-                <AutoColumn gap="12px">
+              <AutoRow gap='20px'>
+                <AutoColumn gap='12px'>
                   <RowBetween>
                     <TYPE.body color={theme.subText}> Liquidity (Including Fees)</TYPE.body>
                     <div />
                   </RowBetween>
-                  <RowFixed align="flex-end">
+                  <RowFixed align='flex-end'>
                     <TYPE.header fontSize={'24px'} lineHeight={1}>
-                      {positionValue
-                        ? formattedNum(positionValue, true)
-                        : positionValue === 0
-                        ? formattedNum(0, true)
-                        : '-'}
+                      {positionValue ? formattedNum(positionValue, true) : positionValue === 0 ? formattedNum(0, true) : '-'}
                     </TYPE.header>
                   </RowFixed>
                 </AutoColumn>
@@ -360,23 +353,21 @@ function AccountPage({ account }) {
               marginTop: '1.5rem',
             }}
           >
-            <AutoRow gap="20px">
-              <AutoColumn gap="12px">
-                <TYPE.main color={theme.subText} fontSize="12px">
+            <AutoRow gap='20px'>
+              <AutoColumn gap='12px'>
+                <TYPE.main color={theme.subText} fontSize='12px'>
                   TOTAL VALUE SWAPPED
                 </TYPE.main>
                 <TYPE.header fontSize={18}>{totalSwappedUSD ? formattedNum(totalSwappedUSD, true) : '-'}</TYPE.header>
               </AutoColumn>
-              <AutoColumn gap="12px">
-                <TYPE.main color={theme.subText} fontSize="12px">
+              <AutoColumn gap='12px'>
+                <TYPE.main color={theme.subText} fontSize='12px'>
                   TOTAL FEES PAID
                 </TYPE.main>
-                <TYPE.header fontSize={18}>
-                  {totalSwappedUSD ? formattedNum(totalSwappedUSD * 0.003, true) : '-'}
-                </TYPE.header>
+                <TYPE.header fontSize={18}>{totalSwappedUSD ? formattedNum(totalSwappedUSD * 0.003, true) : '-'}</TYPE.header>
               </AutoColumn>
-              <AutoColumn gap="12px">
-                <TYPE.main color={theme.subText} fontSize="12px">
+              <AutoColumn gap='12px'>
+                <TYPE.main color={theme.subText} fontSize='12px'>
                   TOTAL TRANSACTIONS
                 </TYPE.main>
                 <TYPE.header fontSize={18}>{transactionCount ? transactionCount : '-'}</TYPE.header>

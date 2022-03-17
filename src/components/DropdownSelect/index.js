@@ -57,7 +57,7 @@ const DropdownSelect = ({ options, active, setActive, color, optionTitles }) => 
 
   return (
     <Wrapper open={showDropdown} color={color}>
-      <RowBetween onClick={() => toggleDropdown(!showDropdown)} justify="center">
+      <RowBetween onClick={() => toggleDropdown(!showDropdown)} justify='center'>
         <TYPE.main>{optionTitles && optionTitles[active] ? optionTitles[active] : active}</TYPE.main>
         <StyledIcon>
           <ArrowStyled />
@@ -65,7 +65,7 @@ const DropdownSelect = ({ options, active, setActive, color, optionTitles }) => 
       </RowBetween>
       {showDropdown && (
         <Dropdown ref={node}>
-          <AutoColumn gap="20px">
+          <AutoColumn gap='20px'>
             {Object.keys(options).map((key, index) => {
               let option = options[key]
               return (
@@ -77,9 +77,7 @@ const DropdownSelect = ({ options, active, setActive, color, optionTitles }) => 
                     }}
                     key={index}
                   >
-                    <TYPE.body fontSize={14}>
-                      {optionTitles && optionTitles[key] ? optionTitles[key] : option}
-                    </TYPE.body>
+                    <TYPE.body fontSize={14}>{optionTitles && optionTitles[key] ? optionTitles[key] : option}</TYPE.body>
                   </Row>
                 )
               )

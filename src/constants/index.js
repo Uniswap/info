@@ -1,4 +1,4 @@
-export const FACTORY_ADDRESS = process.env.REACT_APP_FACTORY_ADDRESS || '0x0639542a5cd99bd5f4e85f58cb1f61d8fbe32de9'
+export const getFACTORY_ADDRESS = networkInfo => networkInfo.FACTORY_ADDRESS || '0x0639542a5cd99bd5f4e85f58cb1f61d8fbe32de9'
 
 export const BUNDLE_ID = '1'
 
@@ -14,14 +14,14 @@ export const timeframeOptions = {
 }
 
 // token list urls to fetch tokens from - use for warnings on tokens and pairs
-export const SUPPORTED_LIST_URLS__NO_ENS =
-  String(process.env.REACT_APP_CHAIN_ID) === '137'
+export const getSUPPORTED_LIST_URLS__NO_ENS = networkInfo =>
+  networkInfo.CHAIN_ID === 137
     ? ['https://unpkg.com/quickswap-default-token-list@1.0.72/build/quickswap-default.tokenlist.json']
-    : String(process.env.REACT_APP_CHAIN_ID) === '56'
+    : networkInfo.CHAIN_ID === 56
     ? ['https://tokens.pancakeswap.finance/pancakeswap-extended.json']
-    : String(process.env.REACT_APP_CHAIN_ID) === '43114'
+    : networkInfo.CHAIN_ID === 43114
     ? ['https://raw.githubusercontent.com/pangolindex/tokenlists/main/ab.tokenlist.json']
-    : String(process.env.REACT_APP_CHAIN_ID === '250')
+    : networkInfo.CHAIN_ID === 250
     ? ['https://raw.githubusercontent.com/SpookySwap/spooky-info/master/src/constants/token/spookyswap.json']
     : ['https://gateway.ipfs.io/ipns/tokens.uniswap.org']
 
@@ -56,14 +56,12 @@ export const ROPSTEN_TOKEN_LOGOS_MAPPING = {
   '0xc778417e063141139fce010982780140aa0cd5ab': '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
 }
 
-export const WETH_ADDRESS = String(process.env.REACT_APP_WETH_ADDRESS) || '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
+export const getWETH_ADDRESS = networkInfo => String(networkInfo.WETH_ADDRESS) || '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
 
-export const KNC_ADDRESS = String(process.env.REACT_APP_KNC_ADDRESS) || '0xdeFA4e8a7bcBA345F687a2f1456F5Edd9CE97202'
+export const getKNC_ADDRESS = networkInfo => String(networkInfo.KNC_ADDRESS) || '0xdeFA4e8a7bcBA345F687a2f1456F5Edd9CE97202'
 
-export const KNCL_ADDRESS =
-  String(process.env.REACT_APP_CHAIN_ID) === '1'
-    ? '0xdd974D5C2e2928deA5F71b9825b8b646686BD200'
-    : '0x7B2810576aa1cce68F2B118CeF1F36467c648F92'
+export const getKNCL_ADDRESS = networkInfo =>
+  networkInfo.CHAIN_ID === 1 ? '0xdd974D5C2e2928deA5F71b9825b8b646686BD200' : '0x7B2810576aa1cce68F2B118CeF1F36467c648F92'
 
 export const ChainId = {
   MAINNET: 1,

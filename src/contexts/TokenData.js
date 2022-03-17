@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect } from 'react'
+import merge from 'deepmerge'
 
 import {
   TOKEN_DATA,
@@ -18,23 +19,24 @@ import utc from 'dayjs/plugin/utc'
 import {
   get2DayPercentChange,
   getPercentChange,
-  // getBlockFromTimestamp,
+  getBlockFromTimestamp,
   isAddress,
-  // getBlocksFromTimestamps,
+  getBlocksFromTimestamps,
   splitQuery,
+  overwriteArrayMerge,
+  memoRequest,
 } from '../utils'
 
-// import { getBlockFromTimestamp, getBlocksFromTimestamps } from '../utils/mocks'
-import { getBlockFromTimestamp, getBlocksFromTimestamps } from '../utils'
-import { timeframeOptions, WETH_ADDRESS } from '../constants'
+import { timeframeOptions, getWETH_ADDRESS } from '../constants'
 import { useExchangeClient, useLatestBlocks } from './Application'
 import { getNativeTokenSymbol, getNativeTokenWrappedName } from '../utils'
+import { useNetworksInfo } from './NetworkInfo'
 
 const UPDATE = 'UPDATE'
 const UPDATE_TOKEN_TXNS = 'UPDATE_TOKEN_TXNS'
 const UPDATE_CHART_DATA = 'UPDATE_CHART_DATA'
 const UPDATE_PRICE_DATA = 'UPDATE_PRICE_DATA'
-const UPDATE_TOP_TOKENS = ' UPDATE_TOP_TOKENS'
+const UPDATE_TOP_TOKENS = 'UPDATE_TOP_TOKENS'
 const UPDATE_ALL_PAIRS = 'UPDATE_ALL_PAIRS'
 
 const TOKEN_PAIRS_KEY = 'TOKEN_PAIRS_KEY'
@@ -50,72 +52,35 @@ function useTokenDataContext() {
 function reducer(state, { type, payload }) {
   switch (type) {
     case UPDATE: {
-      const { tokenAddress, data } = payload
-      return {
-        ...state,
-        [tokenAddress]: {
-          ...state?.[tokenAddress],
-          ...data,
-        },
-      }
+      const { tokenAddress, data, chainId } = payload
+      if (!data) return merge(state, { [chainId]: { [tokenAddress]: { name: 'error-token' } } })
+      return merge(state, { [chainId]: { [tokenAddress]: data } })
     }
     case UPDATE_TOP_TOKENS: {
-      const { topTokens } = payload
+      const { topTokens, chainId } = payload
       let added = {}
-      topTokens &&
-        topTokens.map((token) => {
-          return (added[token.id] = token)
-        })
-      return {
-        ...state,
-        ...added,
-      }
+      topTokens && topTokens.forEach(token => (added[token.id] = token))
+      return merge(state, { [chainId]: added })
     }
-
     case UPDATE_TOKEN_TXNS: {
-      const { address, transactions } = payload
-      return {
-        ...state,
-        [address]: {
-          ...state?.[address],
-          txns: transactions,
-        },
-      }
+      const { address, transactions, chainId } = payload
+      return merge(state, { [chainId]: { [address]: { txns: transactions } } }, { arrayMerge: overwriteArrayMerge })
     }
     case UPDATE_CHART_DATA: {
-      const { address, chartData } = payload
-      return {
-        ...state,
-        [address]: {
-          ...state?.[address],
-          chartData,
-        },
-      }
+      const { address, chartData, chainId } = payload
+      return merge(state, { [chainId]: { [address]: { chartData } } }, { arrayMerge: overwriteArrayMerge })
     }
-
     case UPDATE_PRICE_DATA: {
-      const { address, data, timeWindow, interval } = payload
-      return {
-        ...state,
-        [address]: {
-          ...state?.[address],
-          [timeWindow]: {
-            ...state?.[address]?.[timeWindow],
-            [interval]: data,
-          },
-        },
-      }
+      const { address, data, timeWindow, interval, chainId } = payload
+      return merge(
+        state,
+        { [chainId]: { [address]: { [timeWindow]: { [interval]: data } } } },
+        { arrayMerge: overwriteArrayMerge }
+      )
     }
-
     case UPDATE_ALL_PAIRS: {
-      const { address, allPairs } = payload
-      return {
-        ...state,
-        [address]: {
-          ...state?.[address],
-          [TOKEN_PAIRS_KEY]: allPairs,
-        },
-      }
+      const { address, allPairs, chainId } = payload
+      return merge(state, { [chainId]: { [address]: { [TOKEN_PAIRS_KEY]: allPairs } } }, { arrayMerge: overwriteArrayMerge })
     }
     default: {
       throw Error(`Unexpected action type in DataContext reducer: '${type}'.`)
@@ -125,50 +90,52 @@ function reducer(state, { type, payload }) {
 
 export default function Provider({ children }) {
   const [state, dispatch] = useReducer(reducer, {})
-  const update = useCallback((tokenAddress, data) => {
+  const update = useCallback((tokenAddress, data, chainId) => {
     dispatch({
       type: UPDATE,
       payload: {
         tokenAddress,
         data,
+        chainId,
       },
     })
   }, [])
 
-  const updateTopTokens = useCallback((topTokens) => {
+  const updateTopTokens = useCallback((topTokens, chainId) => {
     dispatch({
       type: UPDATE_TOP_TOKENS,
       payload: {
         topTokens,
+        chainId,
       },
     })
   }, [])
 
-  const updateTokenTxns = useCallback((address, transactions) => {
+  const updateTokenTxns = useCallback((address, transactions, chainId) => {
     dispatch({
       type: UPDATE_TOKEN_TXNS,
-      payload: { address, transactions },
+      payload: { address, transactions, chainId },
     })
   }, [])
 
-  const updateChartData = useCallback((address, chartData) => {
+  const updateChartData = useCallback((address, chartData, chainId) => {
     dispatch({
       type: UPDATE_CHART_DATA,
-      payload: { address, chartData },
+      payload: { address, chartData, chainId },
     })
   }, [])
 
-  const updateAllPairs = useCallback((address, allPairs) => {
+  const updateAllPairs = useCallback((address, allPairs, chainId) => {
     dispatch({
       type: UPDATE_ALL_PAIRS,
-      payload: { address, allPairs },
+      payload: { address, allPairs, chainId },
     })
   }, [])
 
-  const updatePriceData = useCallback((address, data, timeWindow, interval) => {
+  const updatePriceData = useCallback((address, data, timeWindow, interval, chainId) => {
     dispatch({
       type: UPDATE_PRICE_DATA,
-      payload: { address, data, timeWindow, interval },
+      payload: { address, data, timeWindow, interval, chainId },
     })
   }, [])
 
@@ -194,12 +161,12 @@ export default function Provider({ children }) {
   )
 }
 
-const getTopTokens = async (client, ethPrice, ethPriceOld) => {
+const getTopTokens = async (client, ethPrice, ethPriceOld, networkInfo) => {
   const utcCurrentTime = dayjs()
   const utcOneDayBack = utcCurrentTime.subtract(1, 'day').unix()
   const utcTwoDaysBack = utcCurrentTime.subtract(2, 'day').unix()
-  let oneDayBlock = await getBlockFromTimestamp(utcOneDayBack)
-  let twoDayBlock = await getBlockFromTimestamp(utcTwoDaysBack)
+  let oneDayBlock = await getBlockFromTimestamp(utcOneDayBack, networkInfo)
+  let twoDayBlock = await getBlockFromTimestamp(utcTwoDaysBack, networkInfo)
 
   try {
     let current = await client.query({
@@ -229,7 +196,7 @@ const getTopTokens = async (client, ethPrice, ethPriceOld) => {
       current &&
         oneDayData &&
         twoDayData &&
-        current?.data?.tokens.map(async (token) => {
+        current?.data?.tokens.map(async token => {
           let data = token
 
           // let liquidityDataThisToken = liquidityData?.[token.id]
@@ -290,9 +257,9 @@ const getTopTokens = async (client, ethPrice, ethPriceOld) => {
             data.oneDayTxns = data.txCount
           }
 
-          if (data.id === WETH_ADDRESS) {
-            data.name = getNativeTokenWrappedName()
-            data.symbol = getNativeTokenSymbol()
+          if (data.id === getWETH_ADDRESS(networkInfo)) {
+            data.name = getNativeTokenWrappedName(networkInfo)
+            data.symbol = getNativeTokenSymbol(networkInfo)
           }
 
           // HOTFIX for Aave
@@ -315,16 +282,16 @@ const getTopTokens = async (client, ethPrice, ethPriceOld) => {
 
     // calculate percentage changes and daily changes
   } catch (e) {
-    console.log(e)
+    console.trace(e)
   }
 }
 
-const getTokenData = async (client, address, ethPrice, ethPriceOld) => {
+const getTokenData = async (client, address, ethPrice, ethPriceOld, networkInfo) => {
   const utcCurrentTime = dayjs()
   const utcOneDayBack = utcCurrentTime.subtract(1, 'day').startOf('minute').unix()
   const utcTwoDaysBack = utcCurrentTime.subtract(2, 'day').startOf('minute').unix()
-  let oneDayBlock = await getBlockFromTimestamp(utcOneDayBack)
-  let twoDayBlock = await getBlockFromTimestamp(utcTwoDaysBack)
+  let oneDayBlock = await getBlockFromTimestamp(utcOneDayBack, networkInfo)
+  let twoDayBlock = await getBlockFromTimestamp(utcTwoDaysBack, networkInfo)
 
   // initialize data arrays
   let data = {}
@@ -384,16 +351,9 @@ const getTokenData = async (client, address, ethPrice, ethPriceOld) => {
     )
 
     // calculate percentage changes and daily changes
-    const [oneDayTxns, txnChange] = get2DayPercentChange(
-      data.txCount,
-      oneDayData?.txCount ?? 0,
-      twoDayData?.txCount ?? 0
-    )
+    const [oneDayTxns, txnChange] = get2DayPercentChange(data.txCount, oneDayData?.txCount ?? 0, twoDayData?.txCount ?? 0)
 
-    const priceChangeUSD = getPercentChange(
-      data?.derivedETH * ethPrice,
-      parseFloat(oneDayData?.derivedETH ?? 0) * ethPriceOld
-    )
+    const priceChangeUSD = getPercentChange(data?.derivedETH * ethPrice, parseFloat(oneDayData?.derivedETH ?? 0) * ethPriceOld)
 
     const currentLiquidityUSD = data?.totalLiquidity * ethPrice * data?.derivedETH
     const oldLiquidityUSD = oneDayData?.totalLiquidity * ethPriceOld * oneDayData?.derivedETH
@@ -419,9 +379,9 @@ const getTokenData = async (client, address, ethPrice, ethPriceOld) => {
     }
 
     // fix for WETH
-    if (data.id === WETH_ADDRESS) {
-      data.name = getNativeTokenWrappedName()
-      data.symbol = getNativeTokenSymbol()
+    if (data.id === getWETH_ADDRESS(networkInfo)) {
+      data.name = getNativeTokenWrappedName(networkInfo)
+      data.symbol = getNativeTokenSymbol(networkInfo)
     }
 
     // HOTFIX for Aave
@@ -473,81 +433,84 @@ const getTokenPairs = async (client, tokenAddress) => {
   }
 }
 
-const getIntervalTokenData = async (client, tokenAddress, startTime, interval = 3600, latestBlock) => {
-  const utcEndTime = dayjs.utc()
-  let time = startTime
+const getIntervalTokenData = async (client, tokenAddress, startTime, interval = 3600, latestBlock, networkInfo) => {
+  const run = async () => {
+    const utcEndTime = dayjs.utc()
+    let time = startTime
 
-  // create an array of hour start times until we reach current hour
-  // buffer by half hour to catch case where graph isnt synced to latest block
-  const timestamps = []
-  while (time < utcEndTime.unix()) {
-    timestamps.push(time)
-    time += interval
-  }
+    // create an array of hour start times until we reach current hour
+    // buffer by half hour to catch case where graph isnt synced to latest block
+    const timestamps = []
+    while (time < utcEndTime.unix()) {
+      timestamps.push(time)
+      time += interval
+    }
 
-  // backout if invalid timestamp format
-  if (timestamps.length === 0) {
-    return []
-  }
-
-  // once you have all the timestamps, get the blocks for each timestamp in a bulk query
-  let blocks
-  try {
-    blocks = await getBlocksFromTimestamps(timestamps, 400)
-
-    // catch failing case
-    if (!blocks || blocks.length === 0) {
+    // backout if invalid timestamp format
+    if (timestamps.length === 0) {
       return []
     }
 
-    if (latestBlock) {
-      blocks = blocks.filter((b) => {
-        return parseFloat(b.number) <= parseFloat(latestBlock)
-      })
-    }
+    // once you have all the timestamps, get the blocks for each timestamp in a bulk query
+    let blocks
+    try {
+      blocks = await getBlocksFromTimestamps(timestamps, networkInfo, 400)
 
-    let result = await splitQuery(PRICES_BY_BLOCK, client, [tokenAddress], blocks, 400)
+      // catch failing case
+      if (!blocks || blocks.length === 0) {
+        return []
+      }
 
-    // format token ETH price results
-    let values = []
-    for (var row in result) {
-      let timestamp = row.split('t')[1]
-      let derivedETH = parseFloat(result[row]?.derivedETH)
-      if (timestamp) {
-        values.push({
-          timestamp,
-          derivedETH,
+      if (latestBlock) {
+        blocks = blocks.filter(b => {
+          return parseFloat(b.number) <= parseFloat(latestBlock)
         })
       }
-    }
 
-    // go through eth usd prices and assign to original values array
-    let index = 0
-    for (var brow in result) {
-      let timestamp = brow.split('b')[1]
-      if (timestamp) {
-        values[index].priceUSD = result[brow].ethPrice * values[index].derivedETH
-        index += 1
+      let result = await splitQuery(PRICES_BY_BLOCK, client, [tokenAddress], blocks, 400)
+
+      // format token ETH price results
+      let values = []
+      for (var row in result) {
+        let timestamp = row.split('t')[1]
+        let derivedETH = parseFloat(result[row]?.derivedETH)
+        if (timestamp) {
+          values.push({
+            timestamp,
+            derivedETH,
+          })
+        }
       }
+
+      // go through eth usd prices and assign to original values array
+      let index = 0
+      for (var brow in result) {
+        let timestamp = brow.split('b')[1]
+        if (timestamp) {
+          values[index].priceUSD = result[brow].ethPrice * values[index].derivedETH
+          index += 1
+        }
+      }
+
+      let formattedHistory = []
+
+      // for each hour, construct the open and close price
+      for (let i = 0; i < values.length - 1; i++) {
+        formattedHistory.push({
+          timestamp: values[i].timestamp,
+          open: parseFloat(values[i].priceUSD),
+          close: parseFloat(values[i + 1].priceUSD),
+        })
+      }
+
+      return formattedHistory
+    } catch (e) {
+      console.log(e)
+      console.log('error fetching blocks')
+      return []
     }
-
-    let formattedHistory = []
-
-    // for each hour, construct the open and close price
-    for (let i = 0; i < values.length - 1; i++) {
-      formattedHistory.push({
-        timestamp: values[i].timestamp,
-        open: parseFloat(values[i].priceUSD),
-        close: parseFloat(values[i + 1].priceUSD),
-      })
-    }
-
-    return formattedHistory
-  } catch (e) {
-    console.log(e)
-    console.log('error fetching blocks')
-    return []
   }
+  return await memoRequest(run, JSON.stringify({ tokenAddress, startTime, interval, latestBlock, networkInfo }))
 }
 
 const getTokenChartData = async (client, tokenAddress) => {
@@ -622,14 +585,19 @@ export function Updater() {
   const exchangeSubgraphClient = useExchangeClient()
   const [, { updateTopTokens }] = useTokenDataContext()
   const [ethPrice, ethPriceOld] = useEthPrice()
+  const [networksInfo] = useNetworksInfo()
+
   useEffect(() => {
+    let canceled = false
     async function getData() {
       // get top pairs for overview list
-      let topTokens = await getTopTokens(exchangeSubgraphClient, ethPrice, ethPriceOld)
-      topTokens && updateTopTokens(topTokens)
+      let topTokens = await getTopTokens(exchangeSubgraphClient, ethPrice, ethPriceOld, networksInfo)
+      !canceled && topTokens && updateTopTokens(topTokens, networksInfo.CHAIN_ID)
     }
     ethPrice && ethPriceOld && getData()
-  }, [ethPrice, ethPriceOld, updateTopTokens, exchangeSubgraphClient])
+    return () => (canceled = true)
+  }, [ethPrice, ethPriceOld, updateTopTokens, exchangeSubgraphClient, networksInfo])
+
   return null
 }
 
@@ -637,15 +605,16 @@ export function useTokenData(tokenAddress) {
   const exchangeSubgraphClient = useExchangeClient()
   const [state, { update }] = useTokenDataContext()
   const [ethPrice, ethPriceOld] = useEthPrice()
-  const tokenData = state?.[tokenAddress]
+  const [networksInfo] = useNetworksInfo()
+  const tokenData = state?.[networksInfo.CHAIN_ID]?.[tokenAddress]
 
   useEffect(() => {
     if (!tokenData && ethPrice && ethPriceOld && isAddress(tokenAddress)) {
-      getTokenData(exchangeSubgraphClient, tokenAddress, ethPrice, ethPriceOld).then((data) => {
-        update(tokenAddress, data)
+      getTokenData(exchangeSubgraphClient, tokenAddress, ethPrice, ethPriceOld, networksInfo).then(data => {
+        update(tokenAddress, data, networksInfo.CHAIN_ID)
       })
     }
-  }, [ethPrice, ethPriceOld, tokenAddress, tokenData, update, exchangeSubgraphClient])
+  }, [ethPrice, ethPriceOld, tokenAddress, tokenData, update, exchangeSubgraphClient, networksInfo])
 
   return tokenData || {}
 }
@@ -653,24 +622,20 @@ export function useTokenData(tokenAddress) {
 export function useTokenTransactions(tokenAddress) {
   const exchangeSubgraphClient = useExchangeClient()
   const [state, { updateTokenTxns }] = useTokenDataContext()
-  const tokenTxns = state?.[tokenAddress]?.txns
+  const [networksInfo] = useNetworksInfo()
+  const tokenTxns = state?.[networksInfo.CHAIN_ID]?.[tokenAddress]?.txns
 
-  const allPairsFormatted =
-    state[tokenAddress] &&
-    state[tokenAddress].TOKEN_PAIRS_KEY &&
-    state[tokenAddress].TOKEN_PAIRS_KEY.map((pair) => {
-      return pair.id
-    })
+  const allPairsFormatted = state?.[networksInfo.CHAIN_ID]?.[tokenAddress]?.TOKEN_PAIRS_KEY?.map?.(pair => pair.id)
 
   useEffect(() => {
     async function checkForTxns() {
       if (!tokenTxns && allPairsFormatted) {
         let transactions = await getTokenTransactions(exchangeSubgraphClient, allPairsFormatted)
-        updateTokenTxns(tokenAddress, transactions)
+        updateTokenTxns(tokenAddress, transactions, networksInfo.CHAIN_ID)
       }
     }
     checkForTxns()
-  }, [tokenTxns, tokenAddress, updateTokenTxns, allPairsFormatted, exchangeSubgraphClient])
+  }, [state[tokenAddress], tokenTxns, tokenAddress, updateTokenTxns, allPairsFormatted, exchangeSubgraphClient])
 
   return tokenTxns || []
 }
@@ -678,12 +643,13 @@ export function useTokenTransactions(tokenAddress) {
 export function useTokenPairs(tokenAddress) {
   const exchangeSubgraphClient = useExchangeClient()
   const [state, { updateAllPairs }] = useTokenDataContext()
-  const tokenPairs = state?.[tokenAddress]?.[TOKEN_PAIRS_KEY]
+  const [networksInfo] = useNetworksInfo()
+  const tokenPairs = state?.[networksInfo.CHAIN_ID]?.[tokenAddress]?.[TOKEN_PAIRS_KEY]
 
   useEffect(() => {
     async function fetchData() {
       let allPairs = await getTokenPairs(exchangeSubgraphClient, tokenAddress)
-      updateAllPairs(tokenAddress, allPairs)
+      updateAllPairs(tokenAddress, allPairs, networksInfo.CHAIN_ID)
     }
     if (!tokenPairs && isAddress(tokenAddress)) {
       fetchData()
@@ -696,12 +662,13 @@ export function useTokenPairs(tokenAddress) {
 export function useTokenChartData(tokenAddress) {
   const exchangeSubgraphClient = useExchangeClient()
   const [state, { updateChartData }] = useTokenDataContext()
-  const chartData = state?.[tokenAddress]?.chartData
+  const [networksInfo] = useNetworksInfo()
+  const chartData = state?.[networksInfo.CHAIN_ID]?.[tokenAddress]?.chartData
   useEffect(() => {
     async function checkForChartData() {
       if (!chartData) {
         let data = await getTokenChartData(exchangeSubgraphClient, tokenAddress)
-        updateChartData(tokenAddress, data)
+        updateChartData(tokenAddress, data, networksInfo.CHAIN_ID)
       }
     }
     checkForChartData()
@@ -719,8 +686,9 @@ export function useTokenChartData(tokenAddress) {
 export function useTokenPriceData(tokenAddress, timeWindow, interval = 3600) {
   const exchangeSubgraphClient = useExchangeClient()
   const [state, { updatePriceData }] = useTokenDataContext()
-  const chartData = state?.[tokenAddress]?.[timeWindow]?.[interval]
+  const [networksInfo] = useNetworksInfo()
   const [latestBlock] = useLatestBlocks()
+  const chartData = state?.[networksInfo.CHAIN_ID]?.[tokenAddress]?.[timeWindow]?.[interval]
 
   useEffect(() => {
     const currentTime = dayjs.utc()
@@ -748,18 +716,19 @@ export function useTokenPriceData(tokenAddress, timeWindow, interval = 3600) {
     }
 
     async function fetch() {
-      let data = await getIntervalTokenData(exchangeSubgraphClient, tokenAddress, startTime, interval, latestBlock)
-      updatePriceData(tokenAddress, data, timeWindow, interval)
+      let data = await getIntervalTokenData(exchangeSubgraphClient, tokenAddress, startTime, interval, latestBlock, networksInfo)
+      updatePriceData(tokenAddress, data, timeWindow, interval, networksInfo.CHAIN_ID)
     }
     if (!chartData) {
       fetch()
     }
-  }, [chartData, interval, timeWindow, tokenAddress, updatePriceData, latestBlock, exchangeSubgraphClient])
+  }, [chartData, interval, timeWindow, tokenAddress, updatePriceData, latestBlock, exchangeSubgraphClient, networksInfo])
 
   return chartData
 }
 
 export function useAllTokenData() {
   const [state] = useTokenDataContext()
-  return state
+  const [networksInfo] = useNetworksInfo()
+  return state?.[networksInfo.CHAIN_ID] || {}
 }

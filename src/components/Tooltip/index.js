@@ -48,7 +48,7 @@ export function OverflowTooltip({ children, ...rest }) {
   const open = useCallback(() => hoverStatus && setShow(true), [setShow, hoverStatus])
   const close = useCallback(() => setShow(false), [setShow])
   return (
-    <Tooltip {...rest} show={show} width="100%">
+    <Tooltip {...rest} show={show} width='100%'>
       <div
         onMouseEnter={open}
         onMouseLeave={close}

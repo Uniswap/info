@@ -45,7 +45,7 @@ const PairReturnsChart = ({ account, position }) => {
 
   // based on window, get starttime
   let utcStartTime = getTimeframe(timeWindow)
-  data = data?.filter((entry) => entry.date >= utcStartTime)
+  data = data?.filter(entry => entry.date >= utcStartTime)
 
   const aspect = below600 ? 60 / 42 : 60 / 16
 
@@ -90,17 +90,11 @@ const PairReturnsChart = ({ account, position }) => {
               Fees
             </OptionButton>
           </AutoRow>
-          <AutoRow justify="flex-end" gap="6px">
-            <OptionButton
-              active={timeWindow === timeframeOptions.WEEK}
-              onClick={() => setTimeWindow(timeframeOptions.WEEK)}
-            >
+          <AutoRow justify='flex-end' gap='6px'>
+            <OptionButton active={timeWindow === timeframeOptions.WEEK} onClick={() => setTimeWindow(timeframeOptions.WEEK)}>
               1W
             </OptionButton>
-            <OptionButton
-              active={timeWindow === timeframeOptions.MONTH}
-              onClick={() => setTimeWindow(timeframeOptions.MONTH)}
-            >
+            <OptionButton active={timeWindow === timeframeOptions.MONTH} onClick={() => setTimeWindow(timeframeOptions.MONTH)}>
               1M
             </OptionButton>
             <OptionButton
@@ -116,38 +110,38 @@ const PairReturnsChart = ({ account, position }) => {
         {data ? (
           <LineChart margin={{ top: 0, right: 0, bottom: 0, left: 0 }} barCategoryGap={1} data={data}>
             <defs>
-              <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor={color} stopOpacity={0.35} />
-                <stop offset="95%" stopColor={color} stopOpacity={0} />
+              <linearGradient id='colorUv' x1='0' y1='0' x2='0' y2='1'>
+                <stop offset='5%' stopColor={color} stopOpacity={0.35} />
+                <stop offset='95%' stopColor={color} stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" />
+            <CartesianGrid strokeDasharray='3 3' />
             <XAxis
               tickLine={false}
               axisLine={false}
-              interval="preserveEnd"
+              interval='preserveEnd'
               tickMargin={14}
-              tickFormatter={(tick) => toNiceDate(tick)}
-              dataKey="date"
+              tickFormatter={tick => toNiceDate(tick)}
+              dataKey='date'
               tick={{ fill: textColor }}
               type={'number'}
               domain={['dataMin', 'dataMax']}
             />
             <YAxis
-              type="number"
-              orientation="right"
-              tickFormatter={(tick) => '$' + toK(tick)}
+              type='number'
+              orientation='right'
+              tickFormatter={tick => '$' + toK(tick)}
               axisLine={false}
               tickLine={false}
-              interval="preserveStartEnd"
+              interval='preserveStartEnd'
               minTickGap={0}
               yAxisId={0}
               tick={{ fill: textColor }}
             />
             <Tooltip
               cursor={true}
-              formatter={(val) => formattedNum(val, true)}
-              labelFormatter={(label) => toNiceDateYear(label)}
+              formatter={val => formattedNum(val, true)}
+              labelFormatter={label => toNiceDateYear(label)}
               labelStyle={{ paddingTop: 4 }}
               contentStyle={{
                 padding: '10px 14px',
@@ -159,7 +153,7 @@ const PairReturnsChart = ({ account, position }) => {
             />
 
             <Line
-              type="monotone"
+              type='monotone'
               dataKey={chartView === CHART_VIEW.VALUE ? 'usdValue' : 'fees'}
               stroke={color}
               yAxisId={0}

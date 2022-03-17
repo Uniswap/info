@@ -12,6 +12,8 @@ import Wallet from './Icons/Wallet'
 import ThemeToggle from './ThemeToggle'
 import SocialLinks from './SocialLinks'
 import Link, { BasicLink } from './Link'
+import { useNetworksInfo } from '../contexts/NetworkInfo'
+import { useParams } from 'react-router-dom'
 
 const Wrapper = styled.div`
   position: fixed;
@@ -71,44 +73,44 @@ const Divider = styled.div`
 function BottomBar() {
   const seconds = useSessionStart()
   const theme = useTheme()
+  const [networksInfo] = useNetworksInfo()
 
   const node = useRef()
   const menuModalOpen = useModalOpen(ApplicationModal.MENU)
   const toggleMenuModal = useToggleMenuModal()
   useOnClickOutside(node, menuModalOpen ? toggleMenuModal : undefined)
+  const { network: currentNetworkURL } = useParams()
+  const prefixNetworkURL = currentNetworkURL ? `/${currentNetworkURL}` : ''
 
   return (
     <Wrapper ref={node}>
       <div>
         <SwitchNetworkButton />
       </div>
-      <Flex alignItems="center" color={theme.subText} fontSize="10px">
+      <Flex alignItems='center' color={theme.subText} fontSize='10px'>
         <PollingDot />
-        <a href="/">
+        <a href='/'>
           Updated {!!seconds ? seconds + 's' : '-'} ago <br />
         </a>
       </Flex>
 
-      <ButtonEmpty
-        style={{ background: theme.buttonBlack, borderRadius: '8px', padding: '6px' }}
-        onClick={toggleMenuModal}
-      >
+      <ButtonEmpty style={{ background: theme.buttonBlack, borderRadius: '8px', padding: '6px' }} onClick={toggleMenuModal}>
         <Menu color={theme.text} />
       </ButtonEmpty>
 
       {menuModalOpen && (
         <MenuFlyout>
-          <BasicLink to="/accounts" onClick={() => toggleMenuModal()}>
-            <Flex color={theme.subText} alignItems="center">
+          <BasicLink to={prefixNetworkURL + '/accounts'} onClick={() => toggleMenuModal()}>
+            <Flex color={theme.subText} alignItems='center'>
               <Wallet />
-              <Text marginLeft="8px"> Wallet Analytics</Text>
+              <Text marginLeft='8px'> Wallet Analytics</Text>
             </Flex>
           </BasicLink>
           <Divider />
-          <Link href={process.env.REACT_APP_DMM_SWAP_URL} external onClick={() => toggleMenuModal()}>
-            <Flex color={theme.subText} alignItems="center">
+          <Link href={networksInfo.DMM_SWAP_URL} external onClick={() => toggleMenuModal()}>
+            <Flex color={theme.subText} alignItems='center'>
               <Repeat size={16} />
-              <Text marginLeft="8px">Swap</Text>
+              <Text marginLeft='8px'>Swap</Text>
             </Flex>
           </Link>
           <Divider />
@@ -116,8 +118,8 @@ function BottomBar() {
 
           <div>
             <SocialLinks />
-            <Text marginTop="12px" fontSize="12px">
-              <Link href="https://kyber.network/" external>
+            <Text marginTop='12px' fontSize='12px'>
+              <Link href='https://kyber.network/' external>
                 Kyber Network
               </Link>
             </Text>

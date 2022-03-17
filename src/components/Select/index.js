@@ -72,7 +72,7 @@ const Select = ({ options, onChange, setCapEth, capEth, tokenSelect = false, pla
       options={options}
       value={placeholder}
       filterOption={customFilter}
-      getOptionLabel={(option) => (
+      getOptionLabel={option => (
         <MenuLabel>
           <LogoBox>{option.logo}</LogoBox>
           <LabelBox>{option.label}</LabelBox>
@@ -82,7 +82,7 @@ const Select = ({ options, onChange, setCapEth, capEth, tokenSelect = false, pla
       {...rest}
       components={{
         DropdownIndicator: () => (
-          <span role="img" aria-label={'viewer'} style={{ marginRight: '8px' }}>
+          <span role='img' aria-label={'viewer'} style={{ marginRight: '8px' }}>
             🔎
           </span>
         ),
@@ -91,8 +91,8 @@ const Select = ({ options, onChange, setCapEth, capEth, tokenSelect = false, pla
             <CustomMenu ref={innerRef} {...innerProps}>
               <FixedToggle>
                 <input
-                  name="isGoing"
-                  type="checkbox"
+                  name='isGoing'
+                  type='checkbox'
                   checked={capEth}
                   onChange={() => {
                     setCapEth(!capEth)

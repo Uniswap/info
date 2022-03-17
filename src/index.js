@@ -1,12 +1,13 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import ThemeProvider, { GlobalStyle } from './Theme'
-import LocalStorageContextProvider, { Updater as LocalStorageContextUpdater } from './contexts/LocalStorage'
-import TokenDataContextProvider, { Updater as TokenDataContextUpdater } from './contexts/TokenData'
+import LocalStorageContextProvider from './contexts/LocalStorage'
+import TokenDataContextProvider from './contexts/TokenData'
 import GlobalDataContextProvider from './contexts/GlobalData'
-import PairDataContextProvider, { Updater as PairDataContextUpdater } from './contexts/PairData'
-import PoolDataContextProvider, { Updater as PoolDataContextUpdater } from './contexts/PoolData'
+import PairDataContextProvider from './contexts/PairData'
+import PoolDataContextProvider from './contexts/PoolData'
 import ApplicationContextProvider from './contexts/Application'
+import NetworkInfoContextProvider from './contexts/NetworkInfo'
 import UserContextProvider from './contexts/User'
 import App from './App'
 
@@ -18,7 +19,9 @@ function ContextProviders({ children }) {
           <GlobalDataContextProvider>
             <PairDataContextProvider>
               <PoolDataContextProvider>
-                <UserContextProvider>{children}</UserContextProvider>
+                <UserContextProvider>
+                  <NetworkInfoContextProvider>{children}</NetworkInfoContextProvider>
+                </UserContextProvider>
               </PoolDataContextProvider>
             </PairDataContextProvider>
           </GlobalDataContextProvider>
@@ -28,25 +31,11 @@ function ContextProviders({ children }) {
   )
 }
 
-function Updaters() {
-  return (
-    <>
-      <LocalStorageContextUpdater />
-      <PairDataContextUpdater />
-      <PoolDataContextUpdater />
-      <TokenDataContextUpdater />
-    </>
-  )
-}
-
 ReactDOM.render(
   <ContextProviders>
-    <Updaters />
     <ThemeProvider>
-      <>
-        <GlobalStyle />
-        <App />
-      </>
+      <GlobalStyle />
+      <App />
     </ThemeProvider>
   </ContextProviders>,
   document.getElementById('root')

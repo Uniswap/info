@@ -34,11 +34,11 @@ const Panel = styled(RebassBox)`
     border: ${({ hover, theme }) => hover && '1px solid' + theme.bg5};
   }
 
-  ${(props) => props.background && `background-color: ${props.theme.background};`}
+  ${props => props.background && `background-color: ${props.theme.background};`}
 
-  ${(props) => (props.area ? `grid-area: ${props.area};` : null)}
+  ${props => (props.area ? `grid-area: ${props.area};` : null)}
 
-  ${(props) =>
+  ${props =>
     props.grouped &&
     css`
       @media only screen and (min-width: 40em) {
@@ -51,7 +51,7 @@ const Panel = styled(RebassBox)`
       }
     `}
 
-  ${(props) =>
+  ${props =>
     props.rounded &&
     css`
       border-radius: 8px;
@@ -60,7 +60,7 @@ const Panel = styled(RebassBox)`
       }
     `};
 
-  ${(props) => !props.last && panelPseudo}
+  ${props => !props.last && panelPseudo}
 `
 
 export default Panel

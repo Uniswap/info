@@ -1,9 +1,9 @@
 import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect } from 'react'
 
-const UNISWAP = 'UNISWAP'
+const KYBERSWAP = 'KYBERSWAP'
 
 const VERSION = 'VERSION'
-const CURRENT_VERSION = 0
+const CURRENT_VERSION = 1
 const LAST_SAVED = 'LAST_SAVED'
 const DISMISSED_PATHS = 'DISMISSED_PATHS'
 const SAVED_ACCOUNTS = 'SAVED_ACCOUNTS'
@@ -27,7 +27,7 @@ function reducer(state, { type, payload }) {
   switch (type) {
     case UPDATE_KEY: {
       const { key, value } = payload
-      if (!UPDATABLE_KEYS.some((k) => k === key)) {
+      if (!UPDATABLE_KEYS.some(k => k === key)) {
         throw Error(`Unexpected key in LocalStorageContext reducer: '${key}'.`)
       } else {
         return {
@@ -47,14 +47,14 @@ function init() {
     [VERSION]: CURRENT_VERSION,
     [DARK_MODE]: true,
     [DISMISSED_PATHS]: {},
-    [SAVED_ACCOUNTS]: [],
+    [SAVED_ACCOUNTS]: {},
     [SAVED_TOKENS]: {},
     [SAVED_PAIRS]: {},
     [SAVED_POOLS]: {},
   }
 
   try {
-    const parsed = JSON.parse(window.localStorage.getItem(UNISWAP))
+    const parsed = JSON.parse(window.localStorage.getItem(KYBERSWAP))
     if (parsed[VERSION] !== CURRENT_VERSION) {
       // this is where we could run migration logic
       return defaultLocalStorage
@@ -84,7 +84,7 @@ export function Updater() {
   const [state] = useLocalStorageContext()
 
   useEffect(() => {
-    window.localStorage.setItem(UNISWAP, JSON.stringify({ ...state, [LAST_SAVED]: Math.floor(Date.now() / 1000) }))
+    window.localStorage.setItem(KYBERSWAP, JSON.stringify({ ...state, [LAST_SAVED]: Math.floor(Date.now() / 1000) }))
   })
 
   return null
@@ -94,7 +94,7 @@ export function useDarkModeManager() {
   const [state, { updateKey }] = useLocalStorageContext()
   let isDarkMode = state[DARK_MODE]
   const toggleDarkMode = useCallback(
-    (value) => {
+    value => {
       updateKey(DARK_MODE, value === false || value === true ? value : !isDarkMode)
     },
     [updateKey, isDarkMode]
@@ -116,22 +116,18 @@ export function usePathDismissed(path) {
 
 export function useSavedAccounts() {
   const [state, { updateKey }] = useLocalStorageContext()
-  const savedAccounts = [...new Set(state?.[SAVED_ACCOUNTS].map((acc) => acc.toLowerCase()))]
+  const savedAccounts = Object.values(state?.[SAVED_ACCOUNTS])
 
-  function addAccount(account) {
-    let newAccounts = state?.[SAVED_ACCOUNTS].map((acc) => acc.toLowerCase())
-    if (!newAccounts.includes(account.toLowerCase())) {
-      newAccounts.push(account)
-      updateKey(SAVED_ACCOUNTS, newAccounts)
-    }
+  function addAccount(address, chainId) {
+    let currentAccounts = state?.[SAVED_ACCOUNTS]
+    address = address.toLowerCase()
+    currentAccounts[address] = { address, chainId }
+    updateKey(SAVED_ACCOUNTS, currentAccounts)
   }
 
-  function removeAccount(account) {
-    let newAccounts = state?.[SAVED_ACCOUNTS].map((acc) => acc.toLowerCase())
-    let index = newAccounts.indexOf(account.toLowerCase())
-    if (index > -1) {
-      newAccounts.splice(index, 1)
-    }
+  function removeAccount(address) {
+    let newAccounts = state?.[SAVED_ACCOUNTS]
+    delete newAccounts[address.toLowerCase()]
     updateKey(SAVED_ACCOUNTS, newAccounts)
   }
 
@@ -142,7 +138,7 @@ export function useSavedPairs() {
   const [state, { updateKey }] = useLocalStorageContext()
   const savedPairs = state?.[SAVED_PAIRS]
 
-  function addPair(address, token0Address, token1Address, token0Symbol, token1Symbol) {
+  function addPair(address, token0Address, token1Address, token0Symbol, token1Symbol, chainId) {
     let newList = state?.[SAVED_PAIRS]
     newList[address] = {
       address,
@@ -150,13 +146,14 @@ export function useSavedPairs() {
       token1Address,
       token0Symbol,
       token1Symbol,
+      chainId,
     }
     updateKey(SAVED_PAIRS, newList)
   }
 
   function removePair(address) {
     let newList = state?.[SAVED_PAIRS]
-    newList[address] = null
+    delete newList[address]
     updateKey(SAVED_PAIRS, newList)
   }
 
@@ -167,7 +164,7 @@ export function useSavedPools() {
   const [state, { updateKey }] = useLocalStorageContext()
   const savedPools = state?.[SAVED_POOLS]
 
-  function addPool(address, token0Address, token1Address, token0Symbol, token1Symbol) {
+  function addPool(address, token0Address, token1Address, token0Symbol, token1Symbol, chainId) {
     let newList = state?.[SAVED_POOLS]
     newList[address] = {
       address,
@@ -175,13 +172,14 @@ export function useSavedPools() {
       token1Address,
       token0Symbol,
       token1Symbol,
+      chainId,
     }
     updateKey(SAVED_POOLS, newList)
   }
 
   function removePool(address) {
     let newList = state?.[SAVED_POOLS]
-    newList[address] = null
+    delete newList[address]
     updateKey(SAVED_POOLS, newList)
   }
 
@@ -192,17 +190,18 @@ export function useSavedTokens() {
   const [state, { updateKey }] = useLocalStorageContext()
   const savedTokens = state?.[SAVED_TOKENS]
 
-  function addToken(address, symbol) {
+  function addToken(address, symbol, chainId) {
     let newList = state?.[SAVED_TOKENS]
     newList[address] = {
       symbol,
+      chainId,
     }
     updateKey(SAVED_TOKENS, newList)
   }
 
   function removeToken(address) {
     let newList = state?.[SAVED_TOKENS]
-    newList[address] = null
+    delete newList[address]
     updateKey(SAVED_TOKENS, newList)
   }
 

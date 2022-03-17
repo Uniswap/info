@@ -6,12 +6,13 @@ import { AutoColumn } from '../Column'
 import { TYPE } from '../../Theme'
 import { useSavedTokens, useSavedPairs, useSavedPools } from '../../contexts/LocalStorage'
 import { Hover } from '..'
-import TokenLogo from '../TokenLogo'
 import AccountSearch from '../AccountSearch'
 import { Bookmark, ChevronRight, X } from 'react-feather'
 import { ButtonFaded } from '../ButtonStyled'
 import FormattedName from '../FormattedName'
 import { shortenAddress } from '../../utils'
+import { NETWORK_ICON } from '../../constants/networks'
+import { NetworksInfoEnv } from '../../contexts/NetworkInfo'
 
 const RightColumn = styled.div`
   position: sticky;
@@ -61,7 +62,7 @@ function PinnedData({ history, open, setSavedOpen }) {
       </SavedButton>
     </RightColumn>
   ) : (
-    <RightColumn gap="1rem" open={open}>
+    <RightColumn gap='1rem' open={open}>
       <SavedButton onClick={() => setSavedOpen(false)} open={open}>
         <RowFixed>
           <StyledIcon>
@@ -74,23 +75,30 @@ function PinnedData({ history, open, setSavedOpen }) {
         </StyledIcon>
       </SavedButton>
       <AccountSearch small={true} />
-      <AutoColumn gap="40px" style={{ marginTop: '2rem' }}>
+      <AutoColumn gap='40px' style={{ marginTop: '2rem' }}>
         <AutoColumn gap={'12px'}>
           <TYPE.main>Pinned Pairs</TYPE.main>
-          {Object.keys(savedPairs).filter((key) => {
+          {Object.keys(savedPairs).filter(key => {
             return !!savedPairs[key]
           }).length > 0 ? (
             Object.keys(savedPairs)
-              .filter((address) => {
+              .filter(address => {
                 return !!savedPairs[address]
               })
-              .map((address) => {
+              .map(address => {
                 const pair = savedPairs[address]
                 return (
                   <RowBetween key={pair.address}>
-                    <ButtonFaded onClick={() => history.push('/pair/' + address)}>
+                    <ButtonFaded
+                      onClick={() =>
+                        history.push(
+                          '/' + NetworksInfoEnv.find(network => network.CHAIN_ID === pair.chainId).URL_KEY + '/pair/' + address
+                        )
+                      }
+                    >
                       <RowFixed>
-                        <TYPE.header>
+                        <img src={NETWORK_ICON[pair.chainId]} style={{ width: '14px' }} />
+                        <TYPE.header ml='6px'>
                           <FormattedName
                             text={pair.token0Symbol + '/' + pair.token1Symbol}
                             maxCharacters={12}
@@ -114,20 +122,30 @@ function PinnedData({ history, open, setSavedOpen }) {
 
         <AutoColumn gap={'12px'}>
           <TYPE.main>Pinned Pools</TYPE.main>
-          {Object.keys(savedPools).filter((key) => {
+          {Object.keys(savedPools).filter(key => {
             return !!savedPools[key]
           }).length > 0 ? (
             Object.keys(savedPools)
-              .filter((address) => {
+              .filter(address => {
                 return !!savedPools[address]
               })
-              .map((address) => {
+              .map(address => {
                 const pool = savedPools[address]
                 return (
                   <RowBetween key={pool.address}>
-                    <ButtonFaded onClick={() => history.push('/pool/' + pool.address)}>
+                    <ButtonFaded
+                      onClick={() =>
+                        history.push(
+                          '/' +
+                            NetworksInfoEnv.find(network => network.CHAIN_ID === pool.chainId).URL_KEY +
+                            '/pool/' +
+                            pool.address
+                        )
+                      }
+                    >
                       <RowFixed>
-                        <TYPE.header>
+                        <img src={NETWORK_ICON[pool.chainId]} style={{ width: '14px' }} />
+                        <TYPE.header ml='6px'>
                           <FormattedName text={shortenAddress(pool.address, 3)} maxCharacters={12} fontSize={'12px'} />
                         </TYPE.header>
                       </RowFixed>
@@ -147,21 +165,27 @@ function PinnedData({ history, open, setSavedOpen }) {
 
         <ScrollableDiv gap={'12px'}>
           <TYPE.main>Pinned Tokens</TYPE.main>
-          {Object.keys(savedTokens).filter((key) => {
+          {Object.keys(savedTokens).filter(key => {
             return !!savedTokens[key]
           }).length > 0 ? (
             Object.keys(savedTokens)
-              .filter((address) => {
+              .filter(address => {
                 return !!savedTokens[address]
               })
-              .map((address) => {
+              .map(address => {
                 const token = savedTokens[address]
                 return (
                   <RowBetween key={address}>
-                    <ButtonFaded onClick={() => history.push('/token/' + address)}>
+                    <ButtonFaded
+                      onClick={() =>
+                        history.push(
+                          '/' + NetworksInfoEnv.find(network => network.CHAIN_ID === token.chainId).URL_KEY + '/token/' + address
+                        )
+                      }
+                    >
                       <RowFixed>
-                        <TokenLogo address={address} size={'14px'} />
-                        <TYPE.header ml={'6px'}>
+                        <img src={NETWORK_ICON[token.chainId]} style={{ width: '14px' }} />
+                        <TYPE.header ml='6px'>
                           <FormattedName text={token.symbol} maxCharacters={12} fontSize={'12px'} />
                         </TYPE.header>
                       </RowFixed>

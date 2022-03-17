@@ -1,6 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
-import { withRouter } from 'react-router-dom'
+import { useHistory, useParams } from 'react-router-dom'
 import { TrendingUp, PieChart, Disc, Repeat } from 'react-feather'
 import { useMedia } from 'react-use'
 
@@ -18,6 +18,7 @@ import ThemeToggle from '../ThemeToggle'
 import { addNetworkIdQueryString } from '../../utils'
 import Wallet from '../Icons/Wallet'
 import { Text } from 'rebass'
+import { useNetworksInfo } from '../../contexts/NetworkInfo'
 
 const Wrapper = styled.div`
   height: ${({ isMobile }) => (isMobile ? 'initial' : '100vh')};
@@ -112,7 +113,7 @@ const PollingDot = styled.div`
   background-color: ${({ theme }) => theme.green1};
 `
 
-function SideNav({ history }) {
+function SideNav() {
   const below1080 = useMedia('(max-width: 1080px)')
 
   const below1180 = useMedia('(max-width: 1180px)')
@@ -122,65 +123,51 @@ function SideNav({ history }) {
   const [, toggleDarkMode] = useDarkModeManager()
 
   const networkModalOpen = useModalOpen(ApplicationModal.NETWORK)
-
+  const [networksInfo] = useNetworksInfo()
+  const { network: currentNetworkURL } = useParams()
+  const prefixNetworkURL = currentNetworkURL ? `/${currentNetworkURL}` : ''
+  const history = useHistory()
+  const currentUrl = currentNetworkURL ? history.location.pathname.split('/')[2] : history.location.pathname.split('/')[1]
   return (
     <Wrapper isMobile={below1080}>
       {!below1080 ? (
         <DesktopWrapper>
-          <AutoColumn gap="2rem">
+          <AutoColumn gap='2rem'>
             <Title />
             <AutoRow>
               <SwitchNetworkButton />
             </AutoRow>
             {!below1080 && (
-              <AutoColumn gap="2rem">
-                <BasicLink to="/home">
-                  <Option activeText={history.location.pathname === '/home' ?? undefined}>
+              <AutoColumn gap='2rem'>
+                <BasicLink to={prefixNetworkURL + `/home`}>
+                  <Option activeText={currentUrl === 'home'}>
                     <TrendingUp size={16} style={{ marginRight: '.75rem' }} />
                     Summary
                   </Option>
                 </BasicLink>
-                <BasicLink to="/tokens">
-                  <Option
-                    activeText={
-                      (history.location.pathname.split('/')[1] === 'tokens' ||
-                        history.location.pathname.split('/')[1] === 'token') ??
-                      undefined
-                    }
-                  >
+                <BasicLink to={prefixNetworkURL + `/tokens`}>
+                  <Option activeText={currentUrl === 'tokens' || currentUrl === 'token'}>
                     <Disc size={16} style={{ marginRight: '.75rem' }} />
                     Tokens
                   </Option>
                 </BasicLink>
-                <BasicLink to="/pairs">
-                  <Option
-                    activeText={
-                      (history.location.pathname.split('/')[1] === 'pairs' ||
-                        history.location.pathname.split('/')[1] === 'pair') ??
-                      undefined
-                    }
-                  >
+                <BasicLink to={prefixNetworkURL + `/pairs`}>
+                  <Option activeText={currentUrl === 'pairs' || currentUrl === 'pair'}>
                     <PieChart size={16} style={{ marginRight: '.75rem' }} />
                     Pairs
                   </Option>
                 </BasicLink>
 
-                <BasicLink to="/accounts">
-                  <Option
-                    activeText={
-                      (history.location.pathname.split('/')[1] === 'accounts' ||
-                        history.location.pathname.split('/')[1] === 'account') ??
-                      undefined
-                    }
-                  >
+                <BasicLink to={prefixNetworkURL + `/accounts`}>
+                  <Option activeText={currentUrl === 'accounts' || currentUrl === 'account'}>
                     <Wallet />
-                    <Text marginLeft="0.75rem"> Wallet Analytics</Text>
+                    <Text marginLeft='0.75rem'> Wallet Analytics</Text>
                   </Option>
                 </BasicLink>
 
                 <Divider />
 
-                <Link href={addNetworkIdQueryString(process.env.REACT_APP_DMM_SWAP_URL)} external>
+                <Link href={addNetworkIdQueryString(networksInfo.DMM_SWAP_URL, networksInfo)} external>
                   <Option>
                     <Repeat size={16} style={{ marginRight: '.75rem' }} />
                     Swap
@@ -189,22 +176,22 @@ function SideNav({ history }) {
               </AutoColumn>
             )}
           </AutoColumn>
-          <AutoColumn gap="0.75rem" style={{ marginBottom: '2.5rem', marginTop: '1.5rem' }}>
+          <AutoColumn gap='0.75rem' style={{ marginBottom: '2.5rem', marginTop: '1.5rem' }}>
             <Option onClick={toggleDarkMode}>
               <ThemeToggle />
             </Option>
 
             <SocialLinks />
             <HeaderText>
-              <Link href="https://kyber.network/" external>
+              <Link href='https://kyber.network/' external>
                 Kyber Network
               </Link>
             </HeaderText>
             {!below1180 && (
               <Polling>
                 <PollingDot />
-                <a href="/">
-                  Updated {!!seconds ? seconds + 's' : '-'} ago <br />
+                <a href='/'>
+                  Updated {seconds ? seconds + 's' : '-'} ago <br />
                 </a>
               </Polling>
             )}
@@ -221,4 +208,4 @@ function SideNav({ history }) {
   )
 }
 
-export default withRouter(SideNav)
+export default SideNav

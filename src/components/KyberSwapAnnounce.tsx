@@ -40,7 +40,7 @@ const Content = styled.div`
 function KyberSwapAnounce() {
   const below768 = useMedia('(max-width: 768px)')
 
-  const rebrandingAnnouncement = localStorage.getItem('rebranding-announcement') !== 'false'
+  const rebrandingAnnouncement = false
 
   const [show, setShow] = useState(rebrandingAnnouncement)
 
@@ -60,9 +60,9 @@ function KyberSwapAnounce() {
       {!below768 && <div />}
       <Content>
         {!below768 && <Announcement />}
-        <Text marginLeft="4px" marginRight="1rem" lineHeight="20px" color="#fff">
+        <Text marginLeft='4px' marginRight='1rem' lineHeight='20px' color='#fff'>
           dmm.exchange is now <b>KyberSwap.com</b>! Click{' '}
-          <Link external href="https://bit.ly/3EzNCif">
+          <Link external href='https://bit.ly/3EzNCif'>
             here
           </Link>{' '}
           to learn more.

@@ -16,7 +16,7 @@ export async function getBlocksFromTimestamps(timestamps, skipCount = 500) {
   const now = Math.round(Date.now() / 1000)
   const currentBlock = await getBlockFromTimestamp(now)
 
-  const arrayBlock = timestamps.map((t) => {
+  const arrayBlock = timestamps.map(t => {
     const block = Math.round(((t - genesisTimestamp) / (now - genesisTimestamp)) * currentBlock)
     return {
       timestamp: t,

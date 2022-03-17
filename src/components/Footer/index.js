@@ -10,13 +10,13 @@ const links = [
 ]
 
 const FooterLink = ({ children, ...rest }) => (
-  <Link external color="uniswappink" fontWeight={500} fontSize={12} mr={'8px'} {...rest}>
+  <Link external color='uniswappink' fontWeight={500} fontSize={12} mr={'8px'} {...rest}>
     {children}
   </Link>
 )
 
 const Footer = () => (
-  <Flex as="footer" p={24}>
+  <Flex as='footer' p={24}>
     {links.map((link, index) => (
       <FooterLink key={index} href={link.url}>
         {link.text}

@@ -1,16 +1,14 @@
-import React, { useState } from 'react'
-import { Route, Switch, BrowserRouter, Redirect } from 'react-router-dom'
+import React, { useEffect, useState } from 'react'
+import { Route, Switch, BrowserRouter, Redirect, useParams } from 'react-router-dom'
 import styled from 'styled-components'
-import { ApolloProvider } from 'react-apollo'
 import { Text } from 'rebass'
 
-import { client } from './apollo/client'
 import GlobalPage from './pages/GlobalPage'
 import TokenPage from './pages/TokenPage'
 import PairPage from './pages/PairPage'
 import PoolPage from './pages/PoolPage'
 import { useGlobalData, useGlobalChartData } from './contexts/GlobalData'
-import { getNetworkName, isAddress } from './utils'
+import { isAddress } from './utils'
 import AccountPage from './pages/AccountPage'
 import AllTokensPage from './pages/AllTokensPage'
 import AllPairsPage from './pages/AllPairsPage'
@@ -20,9 +18,15 @@ import AccountLookup from './pages/AccountLookup'
 import { OVERVIEW_TOKEN_BLACKLIST, PAIR_BLACKLIST } from './constants'
 import LocalLoader from './components/LocalLoader'
 import { ButtonDark } from './components/ButtonStyled'
-import { useExchangeClient, useLatestBlocks } from './contexts/Application'
+import { useLatestBlocks } from './contexts/Application'
 import useTheme from './hooks/useTheme'
 import BottomBar from './components/BottomBar'
+import KyberSwapAnounce from './components/KyberSwapAnnounce'
+import { NetworksInfoEnv, useNetworksInfo } from './contexts/NetworkInfo'
+import { Updater as LocalStorageContextUpdater } from './contexts/LocalStorage'
+import { Updater as TokenDataContextUpdater } from './contexts/TokenData'
+import { Updater as PairDataContextUpdater } from './contexts/PairData'
+import { Updater as PoolDataContextUpdater } from './contexts/PoolData'
 
 const AppWrapper = styled.div`
   position: relative;
@@ -98,172 +102,217 @@ const Marginer = styled.div`
   margin-top: 3rem;
 `
 
-/**
- * Wrap the component with the header and sidebar pinned tab
- */
-const LayoutWrapper = ({ children, savedOpen, setSavedOpen }) => {
+function Updaters() {
   return (
     <>
-      <ContentWrapper open={savedOpen}>
-        <SideNav />
-        <BottomBar />
-        <Center id="center">
-          {children}
-          <Marginer />
-        </Center>
-        <Right open={savedOpen}>
-          <PinnedData open={savedOpen} setSavedOpen={setSavedOpen} />
-        </Right>
-      </ContentWrapper>
+      <LocalStorageContextUpdater />
+      <PairDataContextUpdater />
+      <PoolDataContextUpdater />
+      <TokenDataContextUpdater />
     </>
   )
 }
 
-const BLOCK_DIFFERENCE_THRESHOLD = process.env.REACT_APP_CHAIN_ID === '137' ? 210 : 30
-
-function App() {
-  const [savedOpen, setSavedOpen] = useState(false)
+function AppLogicWrapper(props) {
   const theme = useTheme()
-
+  const [networksInfo] = useNetworksInfo()
   const globalData = useGlobalData()
   const globalChartData = useGlobalChartData()
   const [latestBlock, headBlock] = useLatestBlocks()
-  const exchangeSubgraphClient = useExchangeClient()
 
   const [dismissed, markAsDismissed] = useState(false)
 
   // show warning
+  const BLOCK_DIFFERENCE_THRESHOLD = networksInfo.length === 1 && networksInfo.CHAIN_ID === 137 ? 210 : 30
   const showWarning = headBlock && latestBlock ? headBlock - latestBlock > BLOCK_DIFFERENCE_THRESHOLD : false
+  return (
+    <AppWrapper>
+      {!dismissed && showWarning && (
+        <WarningWrapper>
+          <WarningBanner>
+            <div>
+              <Text fontWeight={500} fontSize={14} color={'#ffaf01'} style={{ display: 'inline' }} mr={'8px'}>
+                Warning:
+              </Text>
+              {`The data on this site has only synced to ${networksInfo.NAME} block ${latestBlock} (out of ${headBlock}). Please check back soon.`}
+            </div>
+
+            <CloseButtonWrapper>
+              <ButtonDark color={theme.primary} style={{ minWidth: '140px' }} onClick={() => markAsDismissed(true)}>
+                Close
+              </ButtonDark>
+            </CloseButtonWrapper>
+          </WarningBanner>
+        </WarningWrapper>
+      )}
+      {latestBlock &&
+      globalData &&
+      Object.keys(globalData).length > 0 &&
+      globalChartData &&
+      Object.keys(globalChartData).length > 0 ? (
+        props.children
+      ) : (
+        <LocalLoader fill='true' size='200px' />
+      )}
+      {/* {props.children} */}
+    </AppWrapper>
+  )
+}
+
+/**
+ * Wrap the component with the header and sidebar pinned tab
+ * And read network params from url, then validate it
+ */
+const LayoutWrapper = props => {
+  const { network: currentNetworkURL } = useParams()
+  const [networksInfo, updateChain] = useNetworksInfo()
+  let networkInfoFromURL = NetworksInfoEnv.find(networkInfo => networkInfo.URL_KEY === currentNetworkURL)
+
+  useEffect(() => {
+    if (!currentNetworkURL) {
+      updateChain(NetworksInfoEnv[0].ENV_KEY) //default for ETH right now, will change to handle all chain later
+    } else if (networkInfoFromURL) {
+      updateChain(networkInfoFromURL.ENV_KEY)
+    }
+  }, [currentNetworkURL, networkInfoFromURL, updateChain])
+  if (currentNetworkURL && !networkInfoFromURL) return <Redirect to='/home' />
+  if (!currentNetworkURL && !networkInfoFromURL) networkInfoFromURL = NetworksInfoEnv[0] //default for ETH right now, will change to handle all chain later
+  if (networksInfo !== networkInfoFromURL) return null
+  return (
+    <AppLogicWrapper>
+      <Updaters />
+      <KyberSwapAnounce />
+      <ContentWrapper open={props.savedOpen}>
+        <SideNav />
+        <BottomBar />
+        <Center id='center'>
+          {props.children}
+          <Marginer />
+        </Center>
+        <Right open={props.savedOpen}>
+          <PinnedData open={props.savedOpen} setSavedOpen={props.setSavedOpen} />
+        </Right>
+      </ContentWrapper>
+    </AppLogicWrapper>
+  )
+}
+
+function App() {
+  const [savedOpen, setSavedOpen] = useState(false)
 
   return (
-    <ApolloProvider client={exchangeSubgraphClient || client}>
-      <AppWrapper>
-        {!dismissed && showWarning && (
-          <WarningWrapper>
-            <WarningBanner>
-              <div>
-                <Text fontWeight={500} fontSize={14} color={'#ffaf01'} style={{ display: 'inline' }} mr={'8px'}>
-                  Warning:
-                </Text>
-                {`The data on this site has only synced to ${getNetworkName()} block ${latestBlock} (out of ${headBlock}). Please check back soon.`}
-              </div>
-
-              <CloseButtonWrapper>
-                <ButtonDark color={theme.primary} style={{ minWidth: '140px' }} onClick={() => markAsDismissed(true)}>
-                  Close
-                </ButtonDark>
-              </CloseButtonWrapper>
-            </WarningBanner>
-          </WarningWrapper>
-        )}
-        {latestBlock &&
-        globalData &&
-        Object.keys(globalData).length > 0 &&
-        globalChartData &&
-        Object.keys(globalChartData).length > 0 ? (
-          <BrowserRouter>
-            <Switch>
-              <Route
-                exacts
-                strict
-                path="/token/:tokenAddress"
-                render={({ match }) => {
-                  if (OVERVIEW_TOKEN_BLACKLIST.includes(match.params.tokenAddress.toLowerCase())) {
-                    return <Redirect to="/home" />
-                  }
-                  if (isAddress(match.params.tokenAddress.toLowerCase())) {
-                    return (
-                      <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
-                        <TokenPage address={match.params.tokenAddress.toLowerCase()} />
-                      </LayoutWrapper>
-                    )
-                  } else {
-                    return <Redirect to="/home" />
-                  }
-                }}
-              />
-              <Route
-                exacts
-                strict
-                path="/pair/:pairAddress"
-                render={({ match }) => {
-                  if (PAIR_BLACKLIST.includes(match.params.pairAddress.toLowerCase())) {
-                    return <Redirect to="/home" />
-                  }
-                  return (
-                    <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
-                      <PairPage pairAddress={match.params.pairAddress.toLowerCase()} />
-                    </LayoutWrapper>
-                  )
-                }}
-              />
-
-              <Route
-                exacts
-                strict
-                path="/pool/:poolAddress"
-                render={({ match }) => {
-                  if (PAIR_BLACKLIST.includes(match.params.poolAddress.toLowerCase())) {
-                    return <Redirect to="/home" />
-                  }
-                  return (
-                    <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
-                      <PoolPage poolAddress={match.params.poolAddress.toLowerCase()} />
-                    </LayoutWrapper>
-                  )
-                }}
-              />
-
-              <Route
-                exacts
-                strict
-                path="/account/:accountAddress"
-                render={({ match }) => {
-                  if (isAddress(match.params.accountAddress.toLowerCase())) {
-                    return (
-                      <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
-                        <AccountPage account={match.params.accountAddress.toLowerCase()} />
-                      </LayoutWrapper>
-                    )
-                  } else {
-                    return <Redirect to="/home" />
-                  }
-                }}
-              />
-
-              <Route path="/home">
+    <BrowserRouter>
+      <Switch>
+        <Route
+          exacts
+          strict
+          path='/:network?/token/:tokenAddress'
+          render={({ match }) => {
+            if (OVERVIEW_TOKEN_BLACKLIST.includes(match.params.tokenAddress.toLowerCase())) {
+              return <Redirect to={`/${match.params.network}/home`} />
+            }
+            if (isAddress(match.params.tokenAddress.toLowerCase())) {
+              return (
                 <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
-                  <GlobalPage />
+                  <TokenPage address={match.params.tokenAddress.toLowerCase()} />
                 </LayoutWrapper>
-              </Route>
+              )
+            }
+            return <Redirect to={`/${match.params.network}/home`} />
+          }}
+        />
 
-              <Route path="/tokens">
+        <Route
+          exacts
+          strict
+          path='/:network?/pair/:pairAddress'
+          render={({ match }) => {
+            if (PAIR_BLACKLIST.includes(match.params.pairAddress.toLowerCase())) {
+              return <Redirect to={`/${match.params.network}/home`} />
+            }
+            return (
+              <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
+                <PairPage pairAddress={match.params.pairAddress.toLowerCase()} />
+              </LayoutWrapper>
+            )
+          }}
+        />
+
+        <Route
+          exacts
+          strict
+          path='/:network?/pool/:poolAddress'
+          render={({ match }) => {
+            if (PAIR_BLACKLIST.includes(match.params.poolAddress.toLowerCase())) {
+              return <Redirect to={`/${match.params.network}/home`} />
+            }
+            return (
+              <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
+                <PoolPage poolAddress={match.params.poolAddress.toLowerCase()} />
+              </LayoutWrapper>
+            )
+          }}
+        />
+
+        <Route
+          exacts
+          strict
+          path='/:network?/account/:accountAddress'
+          render={({ match }) => {
+            if (isAddress(match.params.accountAddress.toLowerCase())) {
+              return (
                 <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
-                  <AllTokensPage />
+                  <AccountPage account={match.params.accountAddress.toLowerCase()} />
                 </LayoutWrapper>
-              </Route>
+              )
+            }
+            return <Redirect to={`/${match.params.network}/home`} />
+          }}
+        />
 
-              <Route path="/pairs">
-                <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
-                  <AllPairsPage />
-                </LayoutWrapper>
-              </Route>
-
-              <Route path="/accounts">
-                <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
-                  <AccountLookup />
-                </LayoutWrapper>
-              </Route>
-
-              <Redirect to="/home" />
-            </Switch>
-          </BrowserRouter>
-        ) : (
-          <LocalLoader fill="true" size="200px" />
-        )}
-      </AppWrapper>
-    </ApolloProvider>
+        <Route
+          path='/:network?/home'
+          render={() => (
+            <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
+              <GlobalPage />
+            </LayoutWrapper>
+          )}
+        />
+        <Route
+          path='/:network?/tokens'
+          render={() => (
+            <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
+              <AllTokensPage />
+            </LayoutWrapper>
+          )}
+        />
+        <Route
+          path='/:network?/pairs'
+          render={() => (
+            <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
+              <AllPairsPage />
+            </LayoutWrapper>
+          )}
+        />
+        <Route
+          path='/:network?/accounts'
+          render={() => (
+            <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
+              <AccountLookup />
+            </LayoutWrapper>
+          )}
+        />
+        <Route path='/:network?/*' render={() => <RedirectToHome />} />
+      </Switch>
+    </BrowserRouter>
   )
+}
+
+const RedirectToHome = () => {
+  const { network: currentNetworkURL } = useParams()
+  const prefixNetworkURL = currentNetworkURL ? `/${currentNetworkURL}` : ''
+
+  return <Redirect to={prefixNetworkURL + '/home'} />
 }
 
 export default App

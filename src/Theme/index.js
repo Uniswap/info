@@ -102,6 +102,7 @@ const theme = (darkMode, color) => ({
   link: '#2172E5',
   blue: '2f80ed',
   menu: '#f4f4f4',
+  warning: '#FFAF01',
   warningBackground: darkMode ? '#11171a' : '#ffffff',
   warningBorder: darkMode ? '#303e46' : '#ffaf01',
   warningTextColor: darkMode ? '#859aa5' : '#1d272b',

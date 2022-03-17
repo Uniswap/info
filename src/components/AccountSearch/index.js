@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import 'feather-icons'
-import { withRouter } from 'react-router-dom'
+import { useParams, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 import { ButtonDark } from '../ButtonStyled'
 import { isAddress } from '../../utils'
@@ -13,6 +13,7 @@ import { Divider } from '..'
 import { Flex, Text } from 'rebass'
 
 import { X } from 'react-feather'
+import { NetworksInfoEnv, useNetworksInfo } from '../../contexts/NetworkInfo'
 
 const Input = styled.input`
   position: relative;
@@ -59,12 +60,13 @@ const DashGrid = styled.div`
 function AccountSearch({ history, small, shortenAddress }) {
   const [accountValue, setAccountValue] = useState()
   const [savedAccounts, addAccount, removeAccount] = useSavedAccounts()
+  const [networksInfo] = useNetworksInfo()
 
   function handleAccountSearch() {
     if (isAddress(accountValue.trim())) {
-      history.push('/account/' + accountValue.trim())
-      if (!savedAccounts.includes(accountValue.toLowerCase().trim())) {
-        addAccount(accountValue)
+      history.push('/' + networksInfo.URL_KEY + '/account/' + accountValue.trim())
+      if (!savedAccounts.find(account => account.address === accountValue.toLowerCase().trim())) {
+        addAccount(accountValue, networksInfo.CHAIN_ID)
       }
     }
   }
@@ -74,11 +76,11 @@ function AccountSearch({ history, small, shortenAddress }) {
       {!small && (
         <Flex sx={{ gap: '1rem' }}>
           <Input
-            placeholder="Search Wallet/Account..."
-            onChange={(e) => {
+            placeholder='Search Wallet/Account...'
+            onChange={e => {
               setAccountValue(e.target.value)
             }}
-            onKeyDown={(e) => {
+            onKeyDown={e => {
               if (e.key === 'Enter') {
                 handleAccountSearch(e.target.value.trim())
               }
@@ -100,27 +102,34 @@ function AccountSearch({ history, small, shortenAddress }) {
           }}
         >
           <DashGrid center={true} style={{ height: 'fit-content', padding: '0 0 1rem 0' }}>
-            <TYPE.main area="account">Saved Accounts</TYPE.main>
+            <TYPE.main area='account'>Saved Accounts</TYPE.main>
           </DashGrid>
           {!small && <Divider />}
           {savedAccounts?.length > 0 ? (
-            savedAccounts.map((account) => {
+            savedAccounts.map(account => {
               return (
-                <DashGrid key={account} center={true} style={{ height: 'fit-content', padding: '1rem 0 0 0' }}>
+                <DashGrid key={account.address} center={true} style={{ height: 'fit-content', padding: '1rem 0 0 0' }}>
                   <Flex
-                    area="account"
-                    justifyContent="space-between"
-                    onClick={() => history.push('/account/' + account)}
+                    area='account'
+                    justifyContent='space-between'
+                    onClick={() =>
+                      history.push(
+                        '/' +
+                          NetworksInfoEnv.find(network => network.CHAIN_ID === account.chainId).URL_KEY +
+                          '/account/' +
+                          account.address
+                      )
+                    }
                   >
                     <AccountLink>
                       {shortenAddress || small
-                        ? `${account?.slice(0, 6) + '...' + account?.slice(38, 42)}`
-                        : account?.slice(0, 42)}
+                        ? `${account.address?.slice(0, 6) + '...' + account.address?.slice(38, 42)}`
+                        : account.address?.slice(0, 42)}
                     </AccountLink>
                     <Hover
-                      onClick={(e) => {
+                      onClick={e => {
                         e.stopPropagation()
-                        removeAccount(account)
+                        removeAccount(account.address)
                       }}
                     >
                       <StyledIcon>

@@ -16,7 +16,7 @@ const Wrapper = styled.div`
   height: 100%;
   width: 100%;
 
-  ${(props) =>
+  ${props =>
     props.fill && !props.height
       ? css`
           height: 100vh;
@@ -29,7 +29,7 @@ const Wrapper = styled.div`
 const AnimatedImg = styled.div`
   animation: ${pulse} 800ms linear infinite;
   & > * {
-    width: ${(props) => props.size ?? '120px'};
+    width: ${props => props.size ?? '120px'};
   }
 `
 
@@ -38,7 +38,7 @@ const LocalLoader = ({ fill, size }) => {
   return (
     <Wrapper fill={fill}>
       <AnimatedImg size={size}>
-        <img src={isDark ? '/logo-dark.svg' : '/logo.svg?version=v'} alt="loading-icon" />
+        <img src={isDark ? '/logo-dark.svg' : '/logo.svg?version=v'} alt='loading-icon' />
       </AnimatedImg>
     </Wrapper>
   )

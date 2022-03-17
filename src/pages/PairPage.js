@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { withRouter } from 'react-router-dom'
+import { useParams, withRouter } from 'react-router-dom'
 import 'feather-icons'
 import { Link as LinkScroll } from 'react-scroll'
 import styled from 'styled-components'
@@ -31,6 +31,7 @@ import { useListedTokens } from '../contexts/Application'
 import bookMark from '../assets/bookmark.svg'
 import bookMarkOutline from '../assets/bookmark_outline.svg'
 import useTheme from '../hooks/useTheme'
+import { useNetworksInfo } from '../contexts/NetworkInfo'
 
 const DashboardWrapper = styled.div`
   width: 100%;
@@ -120,6 +121,7 @@ function PairPage({ pairAddress, history }) {
 
   const pools = usePairPools(pairAddress)
   const theme = useTheme()
+  const [networksInfo] = useNetworksInfo()
 
   const backgroundColor = theme.primary
 
@@ -159,11 +161,9 @@ function PairPage({ pairAddress, history }) {
 
   // token data for usd
   const [ethPrice] = useEthPrice()
-  const token0USD =
-    token0?.derivedETH && ethPrice ? formattedNum(parseFloat(token0.derivedETH) * parseFloat(ethPrice), true) : ''
+  const token0USD = token0?.derivedETH && ethPrice ? formattedNum(parseFloat(token0.derivedETH) * parseFloat(ethPrice), true) : ''
 
-  const token1USD =
-    token1?.derivedETH && ethPrice ? formattedNum(parseFloat(token1.derivedETH) * parseFloat(ethPrice), true) : ''
+  const token1USD = token1?.derivedETH && ethPrice ? formattedNum(parseFloat(token1.derivedETH) * parseFloat(ethPrice), true) : ''
 
   // rates
   const token0Rate =
@@ -196,7 +196,7 @@ function PairPage({ pairAddress, history }) {
   const [dismissed, markAsDismissed] = usePathDismissed(history.location.pathname)
 
   // TODO: Remove this when Cronos has a token list
-  const noWarning = process.env.REACT_APP_CHAIN_ID === '25'
+  const noWarning = networksInfo.CHAIN_ID === 25
 
   useEffect(() => {
     window.scrollTo({
@@ -208,6 +208,8 @@ function PairPage({ pairAddress, history }) {
   const [savedPairs, addPair, removePair] = useSavedPairs()
 
   const listedTokens = useListedTokens()
+  const { network: currentNetworkURL } = useParams()
+  const prefixNetworkURL = currentNetworkURL ? `/${currentNetworkURL}` : ''
 
   return (
     <PageWrapper>
@@ -216,10 +218,7 @@ function PairPage({ pairAddress, history }) {
       <Warning
         type={'pair'}
         show={
-          !noWarning &&
-          !dismissed &&
-          listedTokens &&
-          !(listedTokens.includes(token0?.id) && listedTokens.includes(token1?.id))
+          !noWarning && !dismissed && listedTokens && !(listedTokens.includes(token0?.id) && listedTokens.includes(token1?.id))
         }
         setShow={markAsDismissed}
         address={pairAddress}
@@ -227,13 +226,13 @@ function PairPage({ pairAddress, history }) {
       <ContentWrapperLarge>
         <RowBetween>
           <TYPE.body>
-            <BasicLink to="/pairs">{'Pairs '}</BasicLink>→ {token0?.symbol}-{token1?.symbol}
+            <BasicLink to={prefixNetworkURL + '/pairs'}>{'Pairs '}</BasicLink>→ {token0?.symbol}-{token1?.symbol}
           </TYPE.body>
           {!below600 && <Search small={true} />}
         </RowBetween>
         <WarningGrouping>
           <DashboardWrapper>
-            <AutoColumn gap="40px" style={{ marginBottom: '1.5rem' }}>
+            <AutoColumn gap='40px' style={{ marginBottom: '1.5rem' }}>
               <div
                 style={{
                   display: 'flex',
@@ -244,15 +243,15 @@ function PairPage({ pairAddress, history }) {
               >
                 <RowFixed style={{ flexWrap: 'wrap', minWidth: '100px' }}>
                   <RowFixed>
-                    {token0 && token1 && (
-                      <DoubleTokenLogo a0={token0?.id || ''} a1={token1?.id || ''} size={32} margin={true} />
-                    )}{' '}
+                    {token0 && token1 && <DoubleTokenLogo a0={token0?.id || ''} a1={token1?.id || ''} size={32} margin={true} />}{' '}
                     <TYPE.main fontSize={below1080 ? '1.5rem' : '2rem'} style={{ margin: '0 1rem' }}>
                       {token0 && token1 ? (
                         <>
-                          <HoverSpan onClick={() => history.push(`/token/${token0?.id}`)}>{token0.symbol}</HoverSpan>
+                          <HoverSpan onClick={() => history.push(prefixNetworkURL + `/token/${token0?.id}`)}>
+                            {token0.symbol}
+                          </HoverSpan>
                           <span>-</span>
-                          <HoverSpan onClick={() => history.push(`/token/${token1?.id}`)}>
+                          <HoverSpan onClick={() => history.push(prefixNetworkURL + `/token/${token1?.id}`)}>
                             {token1.symbol}
                           </HoverSpan>{' '}
                           Pair
@@ -270,29 +269,27 @@ function PairPage({ pairAddress, history }) {
                     flexDirection: below1080 ? 'row-reverse' : 'initial',
                   }}
                 >
-                  {!!!savedPairs[pairAddress] && !below1080 ? (
-                    <Hover onClick={() => addPair(pairAddress, token0.id, token1.id, token0.symbol, token1.symbol)}>
-                      <img
-                        src={bookMarkOutline}
-                        width={24}
-                        height={24}
-                        alt="BookMark"
-                        style={{ marginRight: '0.5rem' }}
-                      />
+                  {!savedPairs[pairAddress] && !below1080 ? (
+                    <Hover
+                      onClick={() =>
+                        addPair(pairAddress, token0.id, token1.id, token0.symbol, token1.symbol, networksInfo.CHAIN_ID)
+                      }
+                    >
+                      <img src={bookMarkOutline} width={24} height={24} alt='BookMark' style={{ marginRight: '0.5rem' }} />
                     </Hover>
                   ) : !below1080 ? (
                     <Hover onClick={() => removePair(pairAddress)}>
-                      <img src={bookMark} width={24} height={24} alt="BookMarked" style={{ marginRight: '0.5rem' }} />
+                      <img src={bookMark} width={24} height={24} alt='BookMarked' style={{ marginRight: '0.5rem' }} />
                     </Hover>
                   ) : (
                     <></>
                   )}
 
-                  <LinkScroll to="topPools" spy={true} smooth={true}>
+                  <LinkScroll to='topPools' spy={true} smooth={true}>
                     <ButtonOutlined style={{ padding: '11px 22px' }}>Choose pool to add liquidity</ButtonOutlined>
                   </LinkScroll>
 
-                  <Link external href={getSwapLink(token0?.id, token1?.id)}>
+                  <Link external href={getSwapLink(token0?.id, networksInfo, token1?.id)}>
                     <ButtonDark
                       ml={!below1080 && '.5rem'}
                       mr={below1080 && '.5rem'}
@@ -306,7 +303,7 @@ function PairPage({ pairAddress, history }) {
               </div>
             </AutoColumn>
             <AutoRow
-              gap="6px"
+              gap='6px'
               style={{
                 width: 'fit-content',
                 marginTop: below900 ? '1rem' : '0',
@@ -314,7 +311,7 @@ function PairPage({ pairAddress, history }) {
                 flexWrap: 'wrap',
               }}
             >
-              <FixedPanel onClick={() => history.push(`/token/${token0?.id}`)}>
+              <FixedPanel onClick={() => history.push(prefixNetworkURL + `/token/${token0?.id}`)}>
                 <RowFixed>
                   <TokenLogo address={token0?.id} size={'16px'} />
                   <TYPE.main fontSize={'16px'} lineHeight={1} fontWeight={500} ml={'4px'}>
@@ -326,7 +323,7 @@ function PairPage({ pairAddress, history }) {
                   </TYPE.main>
                 </RowFixed>
               </FixedPanel>
-              <FixedPanel onClick={() => history.push(`/token/${token1?.id}`)}>
+              <FixedPanel onClick={() => history.push(prefixNetworkURL + `/token/${token1?.id}`)}>
                 <RowFixed>
                   <TokenLogo address={token1?.id} size={'16px'} />
                   <TYPE.main fontSize={'16px'} lineHeight={1} fontWeight={500} ml={'4px'}>
@@ -343,12 +340,12 @@ function PairPage({ pairAddress, history }) {
               {!below1080 && <TYPE.main fontSize={'1.125rem'}>Pair Stats</TYPE.main>}
               <PanelWrapper style={{ marginTop: '1.5rem' }}>
                 <Panel style={{ height: '100%' }}>
-                  <AutoColumn gap="20px">
+                  <AutoColumn gap='20px'>
                     <RowBetween>
                       <TYPE.main>Total Liquidity {!usingTracked ? '(Untracked)' : ''}</TYPE.main>
                       <div />
                     </RowBetween>
-                    <RowBetween align="flex-end">
+                    <RowBetween align='flex-end'>
                       <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={500}>
                         {formattedLiquidity}
                       </TYPE.main>
@@ -357,12 +354,12 @@ function PairPage({ pairAddress, history }) {
                   </AutoColumn>
                 </Panel>
                 <Panel style={{ height: '100%' }}>
-                  <AutoColumn gap="20px">
+                  <AutoColumn gap='20px'>
                     <RowBetween>
                       <TYPE.main>Volume (24hrs) {usingUtVolume && '(Untracked)'}</TYPE.main>
                       <div />
                     </RowBetween>
-                    <RowBetween align="flex-end">
+                    <RowBetween align='flex-end'>
                       <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={500}>
                         {volume}
                       </TYPE.main>
@@ -371,12 +368,12 @@ function PairPage({ pairAddress, history }) {
                   </AutoColumn>
                 </Panel>
                 <Panel style={{ height: '100%' }}>
-                  <AutoColumn gap="20px">
+                  <AutoColumn gap='20px'>
                     <RowBetween>
                       <TYPE.main>Fees (24hrs)</TYPE.main>
                       <div />
                     </RowBetween>
-                    <RowBetween align="flex-end">
+                    <RowBetween align='flex-end'>
                       <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={500}>
                         {fees}
                       </TYPE.main>
@@ -386,13 +383,13 @@ function PairPage({ pairAddress, history }) {
                 </Panel>
 
                 <Panel style={{ height: '100%' }}>
-                  <AutoColumn gap="20px">
+                  <AutoColumn gap='20px'>
                     <RowBetween>
                       <TYPE.main>Pooled Tokens</TYPE.main>
                       <div />
                     </RowBetween>
-                    <Hover onClick={() => history.push(`/token/${token0?.id}`)} fade={true}>
-                      <AutoRow gap="4px">
+                    <Hover onClick={() => history.push(prefixNetworkURL + `/token/${token0?.id}`)} fade={true}>
+                      <AutoRow gap='4px'>
                         <TokenLogo address={token0?.id} />
                         <TYPE.main fontSize={20} lineHeight={1} fontWeight={500}>
                           <RowFixed>
@@ -402,8 +399,8 @@ function PairPage({ pairAddress, history }) {
                         </TYPE.main>
                       </AutoRow>
                     </Hover>
-                    <Hover onClick={() => history.push(`/token/${token1?.id}`)} fade={true}>
-                      <AutoRow gap="4px">
+                    <Hover onClick={() => history.push(prefixNetworkURL + `/token/${token1?.id}`)} fade={true}>
+                      <AutoRow gap='4px'>
                         <TokenLogo address={token1?.id} />
                         <TYPE.main fontSize={20} lineHeight={1} fontWeight={500}>
                           <RowFixed>
@@ -429,7 +426,7 @@ function PairPage({ pairAddress, history }) {
                   />
                 </Panel>
               </PanelWrapper>
-              <TYPE.main id="topPools" fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
+              <TYPE.main id='topPools' fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
                 Top Pools
               </TYPE.main>
               <Panel
@@ -453,7 +450,7 @@ function PairPage({ pairAddress, history }) {
               >
                 <TokenDetailsLayout>
                   <Column>
-                    <TYPE.main color={theme.subText} fontSize="12px">
+                    <TYPE.main color={theme.subText} fontSize='12px'>
                       PAIR NAME
                     </TYPE.main>
                     <TYPE.main style={{ marginTop: '18px' }}>
@@ -465,38 +462,38 @@ function PairPage({ pairAddress, history }) {
                     </TYPE.main>
                   </Column>
                   <Column>
-                    <TYPE.main color={theme.subText} fontSize="12px">
+                    <TYPE.main color={theme.subText} fontSize='12px'>
                       PAIR ADDRESS
                     </TYPE.main>
-                    <AutoRow align="flex-end">
-                      <TYPE.main style={{ marginTop: '12px' }} fontSize="18px">
+                    <AutoRow align='flex-end'>
+                      <TYPE.main style={{ marginTop: '12px' }} fontSize='18px'>
                         {pairAddress.slice(0, 6) + '...' + pairAddress.slice(81, 85)}
                       </TYPE.main>
                       <CopyHelper toCopy={pairAddress} />
                     </AutoRow>
                   </Column>
                   <Column>
-                    <TYPE.main color={theme.subText} fontSize="12px">
+                    <TYPE.main color={theme.subText} fontSize='12px'>
                       <RowFixed>
                         <FormattedName style={{ color: theme.subText }} text={token0?.symbol ?? ''} maxCharacters={8} />{' '}
                         <span style={{ marginLeft: '4px' }}>ADDRESS</span>
                       </RowFixed>
                     </TYPE.main>
-                    <AutoRow align="flex-end">
-                      <TYPE.main style={{ marginTop: '12px' }} fontSize="18px">
+                    <AutoRow align='flex-end'>
+                      <TYPE.main style={{ marginTop: '12px' }} fontSize='18px'>
                         {token0 && token0.id.slice(0, 6) + '...' + token0.id.slice(38, 42)}
                       </TYPE.main>
                       <CopyHelper toCopy={token0?.id} />
                     </AutoRow>
                   </Column>
                   <Column>
-                    <TYPE.main fontSize="12px" color={theme.subText}>
+                    <TYPE.main fontSize='12px' color={theme.subText}>
                       <RowFixed>
                         <FormattedName style={{ color: theme.subText }} text={token1?.symbol ?? ''} maxCharacters={8} />{' '}
                         <span style={{ marginLeft: '4px' }}>ADDRESS</span>
                       </RowFixed>
                     </TYPE.main>
-                    <AutoRow align="flex-end">
+                    <AutoRow align='flex-end'>
                       <TYPE.main style={{ marginTop: '12px' }} fontSize={18}>
                         {token1 && token1.id.slice(0, 6) + '...' + token1.id.slice(38, 42)}
                       </TYPE.main>

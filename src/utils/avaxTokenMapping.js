@@ -1,4 +1,4 @@
-export const getAvaxTokenLogoURL = (address) => {
+export const getAvaxTokenLogoURL = address => {
   let uri
   if (address?.toLowerCase() === '0xc7198437980c041c805a1edcba50c1ce5db95118') {
     //usdt

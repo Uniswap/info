@@ -27,11 +27,11 @@ const IconWrapper = styled.div`
   }
 `
 
-const CandleStickChart = ({ data, width, height = 300, base, valueFormatter = (val) => formattedNum(val, true) }) => {
+const CandleStickChart = ({ data, width, height = 300, base, valueFormatter = val => formattedNum(val, true) }) => {
   // reference for DOM element to create with chart
   const ref = useRef()
 
-  const formattedData = data?.map((entry) => {
+  const formattedData = data?.map(entry => {
     return {
       time: parseFloat(entry.timestamp),
       open: parseFloat(entry.open),
@@ -116,7 +116,7 @@ const CandleStickChart = ({ data, width, height = 300, base, valueFormatter = (v
           borderColor: 'rgba(197, 203, 206, 0.8)',
         },
         localization: {
-          priceFormatter: (val) => formattedNum(val, true),
+          priceFormatter: val => formattedNum(val, true),
         },
       })
 
@@ -189,7 +189,7 @@ const CandleStickChart = ({ data, width, height = 300, base, valueFormatter = (v
 
   return (
     <>
-      <div ref={ref} id="test-id" />
+      <div ref={ref} id='test-id' />
       <IconWrapper>
         <Play
           onClick={() => {

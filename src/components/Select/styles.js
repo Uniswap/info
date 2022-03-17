@@ -18,16 +18,16 @@ export const customStyles = {
       overflow: 'hidden',
     },
   }),
-  placeholder: (styles) => ({
+  placeholder: styles => ({
     ...styles,
     color: '#6C7284',
   }),
-  input: (styles) => ({
+  input: styles => ({
     ...styles,
     color: '#6C7284',
     overflow: 'hidden',
   }),
-  singleValue: (styles) => ({
+  singleValue: styles => ({
     ...styles,
     color: '#6C7284',
     width: '100%',
@@ -36,18 +36,18 @@ export const customStyles = {
   indicatorSeparator: () => ({
     display: 'none',
   }),
-  dropdownIndicator: (styles) => ({
+  dropdownIndicator: styles => ({
     ...styles,
     color: '#6C7284',
     paddingRight: 0,
   }),
-  valueContainer: (styles) => ({
+  valueContainer: styles => ({
     ...styles,
     paddingLeft: 16,
     textAlign: 'right',
     overflow: 'scroll',
   }),
-  menuPlacer: (styles) => ({
+  menuPlacer: styles => ({
     ...styles,
   }),
   option: (styles, state) => ({
@@ -65,14 +65,14 @@ export const customStyles = {
       cursor: 'pointer',
     },
   }),
-  menu: (styles) => ({
+  menu: styles => ({
     ...styles,
     borderRadius: 16,
     boxShadow: '0 4px 8px 0 rgba(47, 128, 237, 0.1), 0 0 0 0.5px var(--c-zircon)',
     overflow: 'hidden',
     padding: 0,
   }),
-  menuList: (styles) => ({
+  menuList: styles => ({
     ...styles,
     color: color.text,
     padding: 0,
@@ -94,31 +94,31 @@ export const customStylesMobile = {
       cursor: 'pointer',
     },
   }),
-  placeholder: (styles) => ({
+  placeholder: styles => ({
     ...styles,
     color: '#6C7284',
   }),
-  input: (styles) => ({
+  input: styles => ({
     ...styles,
     color: '6C7284',
     overflow: 'hidden',
   }),
-  singleValue: (styles) => ({
+  singleValue: styles => ({
     ...styles,
     color: '#6C7284',
   }),
   indicatorSeparator: () => ({
     display: 'none',
   }),
-  dropdownIndicator: (styles) => ({
+  dropdownIndicator: styles => ({
     ...styles,
     paddingRight: 0,
   }),
-  valueContainer: (styles) => ({
+  valueContainer: styles => ({
     ...styles,
     paddingLeft: 16,
   }),
-  menuPlacer: (styles) => ({
+  menuPlacer: styles => ({
     ...styles,
   }),
   option: (styles, state) => ({
@@ -136,14 +136,14 @@ export const customStylesMobile = {
       cursor: 'pointer',
     },
   }),
-  menu: (styles) => ({
+  menu: styles => ({
     ...styles,
     borderRadius: 20,
     boxShadow: '0 4px 8px 0 rgba(47, 128, 237, 0.1), 0 0 0 0.5px var(--c-zircon)',
     overflow: 'hidden',
     paddingBottom: '12px',
   }),
-  menuList: (styles) => ({
+  menuList: styles => ({
     ...styles,
     color: color.text,
     padding: '8px',
@@ -166,15 +166,15 @@ export const customStylesTime = {
       cursor: 'pointer',
     },
   }),
-  placeholder: (styles) => ({
+  placeholder: styles => ({
     ...styles,
     color: '#6C7284',
   }),
-  input: (styles) => ({
+  input: styles => ({
     ...styles,
     color: 'transparent',
   }),
-  singleValue: (styles) => ({
+  singleValue: styles => ({
     ...styles,
     color: '#6C7284',
     width: '100%',
@@ -183,18 +183,18 @@ export const customStylesTime = {
   indicatorSeparator: () => ({
     display: 'none',
   }),
-  dropdownIndicator: (styles) => ({
+  dropdownIndicator: styles => ({
     ...styles,
     color: '#6C7284',
     paddingRight: 0,
   }),
-  valueContainer: (styles) => ({
+  valueContainer: styles => ({
     ...styles,
     paddingLeft: 16,
     overflow: 'visible',
     textAlign: 'right',
   }),
-  menuPlacer: (styles) => ({
+  menuPlacer: styles => ({
     ...styles,
   }),
   option: (styles, state) => ({
@@ -212,14 +212,14 @@ export const customStylesTime = {
       cursor: 'pointer',
     },
   }),
-  menu: (styles) => ({
+  menu: styles => ({
     ...styles,
     borderRadius: 16,
     boxShadow: '0 4px 8px 0 rgba(47, 128, 237, 0.1), 0 0 0 0.5px var(--c-zircon)',
     overflow: 'hidden',
     padding: 0,
   }),
-  menuList: (styles) => ({
+  menuList: styles => ({
     ...styles,
     color: color.text,
     padding: 0,

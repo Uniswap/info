@@ -163,17 +163,15 @@ const PoolList = ({ pools }) => {
         return sortList(poolA, poolB)
       })
       .slice(0, showState === SHOW_STATE.TOP_3 ? 3 : pools.length)
-      .map((poolAddress) => {
+      .map(poolAddress => {
         return poolAddress && pools[poolAddress]
       })
-    const isAllPoolsLiquidityLessThanThreshold = newRenderPools.every(
-      (pool) => pool.trackedReserveUSD < LIQUIDITY_THRESHOLD
-    )
+    const isAllPoolsLiquidityLessThanThreshold = newRenderPools.every(pool => pool.trackedReserveUSD < LIQUIDITY_THRESHOLD)
     newRenderPools =
       showState === SHOW_STATE.TOP_3
         ? isAllPoolsLiquidityLessThanThreshold
           ? [newRenderPools[0]]
-          : newRenderPools.filter((pool) => pool.trackedReserveUSD >= LIQUIDITY_THRESHOLD)
+          : newRenderPools.filter(pool => pool.trackedReserveUSD >= LIQUIDITY_THRESHOLD)
         : newRenderPools
     setRenderPools(newRenderPools)
   }, [pools, showState, sortList])
@@ -181,10 +179,10 @@ const PoolList = ({ pools }) => {
   const renderHeader = () => {
     return above1200 ? (
       <TableHeader>
-        <Flex alignItems="center" justifyContent="flexStart">
+        <Flex alignItems='center' justifyContent='flexStart'>
           <ClickableText>Pool</ClickableText>
         </Flex>
-        <Flex alignItems="center" justifyContent="flexEnd">
+        <Flex alignItems='center' justifyContent='flexEnd'>
           <ClickableText>Ratio</ClickableText>
           <InfoHelper
             text={
@@ -192,7 +190,7 @@ const PoolList = ({ pools }) => {
             }
           />
         </Flex>
-        <Flex alignItems="center" justifyContent="flex-end">
+        <Flex alignItems='center' justifyContent='flex-end'>
           <ClickableText
             onClick={() => {
               setSortedColumn(SORT_FIELD.LIQ)
@@ -202,16 +200,16 @@ const PoolList = ({ pools }) => {
             Liquidity
             {sortedColumn === SORT_FIELD.LIQ ? (
               !sortDirection ? (
-                <ChevronUp size="14" style={{ marginLeft: '2px' }} />
+                <ChevronUp size='14' style={{ marginLeft: '2px' }} />
               ) : (
-                <ChevronDown size="14" style={{ marginLeft: '2px' }} />
+                <ChevronDown size='14' style={{ marginLeft: '2px' }} />
               )
             ) : (
               ''
             )}
           </ClickableText>
         </Flex>
-        <Flex alignItems="center" justifyContent="flex-end">
+        <Flex alignItems='center' justifyContent='flex-end'>
           <ClickableText
             onClick={() => {
               setSortedColumn(SORT_FIELD.VOL)
@@ -221,9 +219,9 @@ const PoolList = ({ pools }) => {
             Volume (24h)
             {sortedColumn === SORT_FIELD.VOL ? (
               !sortDirection ? (
-                <ChevronUp size="14" style={{ marginLeft: '2px' }} />
+                <ChevronUp size='14' style={{ marginLeft: '2px' }} />
               ) : (
-                <ChevronDown size="14" style={{ marginLeft: '2px' }} />
+                <ChevronDown size='14' style={{ marginLeft: '2px' }} />
               )
             ) : (
               ''
@@ -231,7 +229,7 @@ const PoolList = ({ pools }) => {
           </ClickableText>
         </Flex>
 
-        <Flex alignItems="center" justifyContent="flex-end">
+        <Flex alignItems='center' justifyContent='flex-end'>
           <ClickableText
             onClick={() => {
               setSortedColumn(SORT_FIELD.FEES)
@@ -241,9 +239,9 @@ const PoolList = ({ pools }) => {
             Fee (24h)
             {sortedColumn === SORT_FIELD.FEES ? (
               !sortDirection ? (
-                <ChevronUp size="14" style={{ marginLeft: '2px' }} />
+                <ChevronUp size='14' style={{ marginLeft: '2px' }} />
               ) : (
-                <ChevronDown size="14" style={{ marginLeft: '2px' }} />
+                <ChevronDown size='14' style={{ marginLeft: '2px' }} />
               )
             ) : (
               ''
@@ -251,12 +249,12 @@ const PoolList = ({ pools }) => {
           </ClickableText>
         </Flex>
 
-        <Flex alignItems="center" justifyContent="flex-end">
+        <Flex alignItems='center' justifyContent='flex-end'>
           <ClickableText>AMP</ClickableText>
           <InfoHelper text={AMP_HINT} />
         </Flex>
 
-        <Flex alignItems="center" justifyContent="flex-end">
+        <Flex alignItems='center' justifyContent='flex-end'>
           <ClickableText
             onClick={() => {
               setSortedColumn(SORT_FIELD.ONE_YEAR_FL)
@@ -266,9 +264,9 @@ const PoolList = ({ pools }) => {
             APR
             {sortedColumn === SORT_FIELD.ONE_YEAR_FL ? (
               !sortDirection ? (
-                <ChevronUp size="14" style={{ marginLeft: '2px' }} />
+                <ChevronUp size='14' style={{ marginLeft: '2px' }} />
               ) : (
-                <ChevronDown size="14" style={{ marginLeft: '2px' }} />
+                <ChevronDown size='14' style={{ marginLeft: '2px' }} />
               )
             ) : (
               ''
@@ -277,7 +275,7 @@ const PoolList = ({ pools }) => {
           <InfoHelper text={'Estimated return based on yearly fees of the pool'} />
         </Flex>
 
-        <Flex alignItems="center" justifyContent="flex-end">
+        <Flex alignItems='center' justifyContent='flex-end'>
           <ClickableText>Add Liquidity</ClickableText>
         </Flex>
       </TableHeader>

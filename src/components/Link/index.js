@@ -10,12 +10,7 @@ const WrappedLink = ({ external, children, ...rest }) => {
   const theme = useTheme()
 
   return (
-    <RebassLink
-      target={external ? '_blank' : null}
-      rel={external ? 'noopener noreferrer' : null}
-      color={theme.primary}
-      {...rest}
-    >
+    <RebassLink target={external ? '_blank' : null} rel={external ? 'noopener noreferrer' : null} color={theme.primary} {...rest}>
       {children}
     </RebassLink>
   )

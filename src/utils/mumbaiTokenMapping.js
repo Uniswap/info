@@ -1,4 +1,4 @@
-export const getMumbaiTokenLogoURL = (address) => {
+export const getMumbaiTokenLogoURL = address => {
   let uri
 
   if (address?.toLowerCase() === '0x9c3c9283d3e44854697cd22d3faa240cfb032889') {

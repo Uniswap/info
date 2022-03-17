@@ -11,12 +11,14 @@ import { useAllTokenData, useTokenData } from '../../contexts/TokenData'
 import { useAllPairData, usePairData } from '../../contexts/PairData'
 import DoubleTokenLogo from '../DoubleLogo'
 import { useAllPairsInUniswap, useAllTokensInUniswap } from '../../contexts/GlobalData'
-import { OVERVIEW_TOKEN_BLACKLIST, PAIR_BLACKLIST, WETH_ADDRESS } from '../../constants'
+import { OVERVIEW_TOKEN_BLACKLIST, PAIR_BLACKLIST, getWETH_ADDRESS } from '../../constants'
 
 import { PAIR_SEARCH, TOKEN_SEARCH } from '../../apollo/queries'
 import FormattedName from '../FormattedName'
 import { TYPE } from '../../Theme'
 import { getNativeTokenSymbol, getNativeTokenWrappedName } from '../../utils'
+import { useNetworksInfo } from '../../contexts/NetworkInfo'
+import { useParams } from 'react-router-dom'
 
 const Container = styled.div`
   height: 48px;
@@ -133,6 +135,7 @@ export const Search = ({ small = false }) => {
   const exchangeSubgraphClient = useExchangeClient()
   let allTokens = useAllTokensInUniswap()
   const allTokenData = useAllTokenData()
+  const [networksInfo] = useNetworksInfo()
 
   let allPairs = useAllPairsInUniswap()
   const allPairData = useAllPairData()
@@ -141,6 +144,8 @@ export const Search = ({ small = false }) => {
   const [value, setValue] = useState('')
   const [, toggleShadow] = useState(false)
   const [, toggleBottomShadow] = useState(false)
+  const { network: currentNetworkURL } = useParams()
+  const prefixNetworkURL = currentNetworkURL ? `/${currentNetworkURL}` : ''
 
   // fetch new data on tokens and pairs if needed
   useTokenData(value)
@@ -172,7 +177,7 @@ export const Search = ({ small = false }) => {
           let pairs = await exchangeSubgraphClient.query({
             query: PAIR_SEARCH,
             variables: {
-              tokens: tokens.data.asSymbol?.map((t) => t.id),
+              tokens: tokens.data.asSymbol?.map(t => t.id),
               id: value,
             },
           })
@@ -193,9 +198,9 @@ export const Search = ({ small = false }) => {
 
   // add the searched tokens to the list if now found yet
   allTokens = allTokens.concat(
-    searchedTokens.filter((searchedToken) => {
+    searchedTokens.filter(searchedToken => {
       let included = false
-      allTokens.map((token) => {
+      allTokens.map(token => {
         if (token.id === searchedToken.id) {
           included = true
         }
@@ -208,7 +213,7 @@ export const Search = ({ small = false }) => {
   let uniqueTokens = []
   let found = {}
   allTokens &&
-    allTokens.map((token) => {
+    allTokens.map(token => {
       if (!found[token.id]) {
         found[token.id] = true
         uniqueTokens.push(token)
@@ -217,9 +222,9 @@ export const Search = ({ small = false }) => {
     })
 
   allPairs = allPairs.concat(
-    searchedPairs.filter((searchedPair) => {
+    searchedPairs.filter(searchedPair => {
       let included = false
-      allPairs.map((pair) => {
+      allPairs.map(pair => {
         if (pair.id === searchedPair.id) {
           included = true
         }
@@ -232,7 +237,7 @@ export const Search = ({ small = false }) => {
   let uniquePairs = []
   let pairsFound = {}
   allPairs &&
-    allPairs.map((pair) => {
+    allPairs.map(pair => {
       if (!pairsFound[pair.id]) {
         pairsFound[pair.id] = true
         uniquePairs.push(pair)
@@ -263,11 +268,11 @@ export const Search = ({ small = false }) => {
             }
             return 1
           })
-          .filter((token) => {
+          .filter(token => {
             if (OVERVIEW_TOKEN_BLACKLIST.includes(token.id)) {
               return false
             }
-            const regexMatches = Object.keys(token).map((tokenEntryKey) => {
+            const regexMatches = Object.keys(token).map(tokenEntryKey => {
               const isAddress = value.slice(0, 2) === '0x'
               if (tokenEntryKey === 'id' && isAddress) {
                 return token[tokenEntryKey].match(new RegExp(escapeRegExp(value), 'i'))
@@ -280,7 +285,7 @@ export const Search = ({ small = false }) => {
               }
               return false
             })
-            return regexMatches.some((m) => m)
+            return regexMatches.some(m => m)
           })
       : []
   }, [allTokenData, uniqueTokens, value])
@@ -302,7 +307,7 @@ export const Search = ({ small = false }) => {
             }
             return 0
           })
-          .filter((pair) => {
+          .filter(pair => {
             if (PAIR_BLACKLIST.includes(pair.id)) {
               return false
             }
@@ -322,7 +327,7 @@ export const Search = ({ small = false }) => {
                 (pair.token1.symbol.includes(pairA) || pair.token1.symbol.includes(pairB))
               )
             }
-            const regexMatches = Object.keys(pair).map((field) => {
+            const regexMatches = Object.keys(pair).map(field => {
               const isAddress = value.slice(0, 2) === '0x'
               if (field === 'id' && isAddress) {
                 return pair[field].match(new RegExp(escapeRegExp(value), 'i'))
@@ -341,7 +346,7 @@ export const Search = ({ small = false }) => {
               }
               return false
             })
-            return regexMatches.some((m) => m)
+            return regexMatches.some(m => m)
           })
       : []
   }, [allPairData, uniquePairs, value])
@@ -376,7 +381,7 @@ export const Search = ({ small = false }) => {
   const wrapperRef = useRef()
   const menuRef = useRef()
 
-  const handleClick = (e) => {
+  const handleClick = e => {
     if (
       !(menuRef.current && menuRef.current.contains(e.target)) &&
       !(wrapperRef.current && wrapperRef.current.contains(e.target))
@@ -403,7 +408,7 @@ export const Search = ({ small = false }) => {
           ref={wrapperRef}
           placeholder={'Search pairs and tokens...'}
           value={value}
-          onChange={(e) => {
+          onChange={e => {
             setValue(e.target.value)
           }}
           onFocus={() => {
@@ -434,29 +439,25 @@ export const Search = ({ small = false }) => {
             </MenuItem>
           )}
           {filteredPairList &&
-            filteredPairList.slice(0, pairsShown).map((pair) => {
-              if (pair?.token0?.id === WETH_ADDRESS) {
-                pair.token0.name = getNativeTokenWrappedName()
-                pair.token0.symbol = getNativeTokenSymbol()
+            filteredPairList.slice(0, pairsShown).map(pair => {
+              if (pair?.token0?.id === getWETH_ADDRESS(networksInfo)) {
+                pair.token0.name = getNativeTokenWrappedName(networksInfo)
+                pair.token0.symbol = getNativeTokenSymbol(networksInfo)
               }
-              if (pair?.token1.id === WETH_ADDRESS) {
-                pair.token1.name = getNativeTokenWrappedName()
-                pair.token1.symbol = getNativeTokenSymbol()
+              if (pair?.token1.id === getWETH_ADDRESS(networksInfo)) {
+                pair.token1.name = getNativeTokenWrappedName(networksInfo)
+                pair.token1.symbol = getNativeTokenSymbol(networksInfo)
               }
               return (
-                <BasicLink to={'/pair/' + pair.id} key={pair.id} onClick={onDismiss}>
+                <BasicLink to={prefixNetworkURL + '/pair/' + pair.id} key={pair.id} onClick={onDismiss}>
                   <MenuItem>
                     <DoubleTokenLogo a0={pair?.token0?.id} a1={pair?.token1?.id} margin={true} />
-                    <TYPE.body style={{ marginLeft: '10px' }}>
-                      {pair.token0.symbol + '-' + pair.token1.symbol} Pair
-                    </TYPE.body>
+                    <TYPE.body style={{ marginLeft: '10px' }}>{pair.token0.symbol + '-' + pair.token1.symbol} Pair</TYPE.body>
                   </MenuItem>
                 </BasicLink>
               )
             })}
-          <Heading
-            hide={!(Object.keys(filteredPairList).length > 3 && Object.keys(filteredPairList).length >= pairsShown)}
-          >
+          <Heading hide={!(Object.keys(filteredPairList).length > 3 && Object.keys(filteredPairList).length >= pairsShown)}>
             <Blue
               onClick={() => {
                 setPairsShown(pairsShown + 5)
@@ -475,9 +476,9 @@ export const Search = ({ small = false }) => {
               <TYPE.body>No results</TYPE.body>
             </MenuItem>
           )}
-          {filteredTokenList.slice(0, tokensShown).map((token) => {
+          {filteredTokenList.slice(0, tokensShown).map(token => {
             return (
-              <BasicLink to={'/token/' + token.id} key={token.id} onClick={onDismiss}>
+              <BasicLink to={prefixNetworkURL + '/token/' + token.id} key={token.id} onClick={onDismiss}>
                 <MenuItem>
                   <RowFixed>
                     <TokenLogo address={token.id} style={{ marginRight: '10px' }} />
@@ -489,9 +490,7 @@ export const Search = ({ small = false }) => {
             )
           })}
 
-          <Heading
-            hide={!(Object.keys(filteredTokenList).length > 3 && Object.keys(filteredTokenList).length >= tokensShown)}
-          >
+          <Heading hide={!(Object.keys(filteredTokenList).length > 3 && Object.keys(filteredTokenList).length >= tokensShown)}>
             <Blue
               onClick={() => {
                 setTokensShown(tokensShown + 5)

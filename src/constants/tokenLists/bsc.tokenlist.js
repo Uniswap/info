@@ -81,6 +81,30 @@ const BSC_TOKEN_LIST = {
     decimals: 18,
     logoURI: 'https://i.imgur.com/f5JZgpy.png',
   },
+  '0xe83cE6bfb580583bd6A62B4Be7b34fC25F02910D': {
+    name: 'Binance ABBC',
+    logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/3437.png',
+  },
+  '0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56': {
+    name: 'Binance USD',
+    logoURI: 'https://assets.coingecko.com/coins/images/9576/small/BUSD.png',
+  },
+  '0x55d398326f99059fF775485246999027B3197955': {
+    name: 'Tether USD',
+    logoURI: 'https://assets.coingecko.com/coins/images/325/small/Tether-logo.png',
+  },
+  '0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d': {
+    name: 'USD Coin',
+    logoURI: 'https://assets.coingecko.com/coins/images/6319/small/USD_Coin_icon.png',
+  },
+  '0xDe5eA375FFBDc8b25a80fe13D631E8Ba0AB4BB02': {
+    name: 'Gera',
+    logoURI: 'https://assets.coingecko.com/coins/images/13686/small/GeraCoin_Logo-icon-1000px.png',
+  },
+  '0x2170Ed0880ac9A755fd29B2688956BD959F933F8': {
+    name: 'Ethereum',
+    logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png',
+  },
   '0x5fdAb5BDbad5277B383B3482D085f4bFef68828C': {
     chainId: 56,
     address: '0x5fdAb5BDbad5277B383B3482D085f4bFef68828C',

@@ -71,7 +71,7 @@ const TokenChart = ({ address, color, base }) => {
   let utcStartTime = getTimeframe(timeWindow)
   const aspect = below600 ? 60 / 42 : below1080 ? 60 / 30 : 60 / 20
 
-  chartData = chartData?.filter((entry) => entry.date >= utcStartTime)
+  chartData = chartData?.filter(entry => entry.date >= utcStartTime)
 
   // update the width on a window resize
   const ref = useRef()
@@ -97,10 +97,9 @@ const TokenChart = ({ address, color, base }) => {
           <DropdownSelect
             options={CHART_VIEW}
             active={chartFilter}
-            setActive={(value) => {
+            setActive={value => {
               setChartFilter(value)
-              if (value === CHART_VIEW.LIQUIDITY || value === CHART_VIEW.VOLUME)
-                setTimeWindow(timeframeOptions.THERE_DAYS)
+              if (value === CHART_VIEW.LIQUIDITY || value === CHART_VIEW.VOLUME) setTimeWindow(timeframeOptions.THERE_DAYS)
             }}
             color={color}
           />
@@ -116,7 +115,7 @@ const TokenChart = ({ address, color, base }) => {
           />
         </RowBetween>
       ) : (
-        <RowBetween mb={20} align="flex-start">
+        <RowBetween mb={20} align='flex-start'>
           <RowFixed style={{ background: theme.buttonBlack, borderRadius: '999px' }}>
             <OptionButton
               active={chartFilter === CHART_VIEW.PRICE}
@@ -159,8 +158,8 @@ const TokenChart = ({ address, color, base }) => {
               Volume
             </OptionButton>
           </RowFixed>
-          <AutoColumn justify="flex-end">
-            <AutoRow justify="flex-end" align="flex-start" style={{ width: 'fit-content', gap: '6px' }}>
+          <AutoColumn justify='flex-end'>
+            <AutoRow justify='flex-end' align='flex-start' style={{ width: 'fit-content', gap: '6px' }}>
               {[CHART_VIEW.PRICE, CHART_VIEW.LINE_PRICE].includes(chartFilter) && (
                 <>
                   <OptionButton
@@ -185,20 +184,14 @@ const TokenChart = ({ address, color, base }) => {
               >
                 3D
               </OptionButton>
-              <OptionButton
-                active={timeWindow === timeframeOptions.WEEK}
-                onClick={() => setTimeWindow(timeframeOptions.WEEK)}
-              >
+              <OptionButton active={timeWindow === timeframeOptions.WEEK} onClick={() => setTimeWindow(timeframeOptions.WEEK)}>
                 1W
               </OptionButton>
-              <OptionButton
-                active={timeWindow === timeframeOptions.MONTH}
-                onClick={() => setTimeWindow(timeframeOptions.MONTH)}
-              >
+              <OptionButton active={timeWindow === timeframeOptions.MONTH} onClick={() => setTimeWindow(timeframeOptions.MONTH)}>
                 1M
               </OptionButton>
             </AutoRow>
-            <Text color={theme.subText} fontSize={10} marginTop="12px">
+            <Text color={theme.subText} fontSize={10} marginTop='12px'>
               {![CHART_VIEW.LINE_PRICE, CHART_VIEW.PRICE].includes(chartFilter)
                 ? ' '
                 : timeWindow === timeframeOptions.FOUR_HOURS
@@ -216,38 +209,38 @@ const TokenChart = ({ address, color, base }) => {
         <ResponsiveContainer aspect={aspect}>
           <AreaChart margin={{ top: 0, right: 10, bottom: 6, left: 0 }} barCategoryGap={1} data={chartData}>
             <defs>
-              <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor={color} stopOpacity={0.35} />
-                <stop offset="95%" stopColor={color} stopOpacity={0} />
+              <linearGradient id='colorUv' x1='0' y1='0' x2='0' y2='1'>
+                <stop offset='5%' stopColor={color} stopOpacity={0.35} />
+                <stop offset='95%' stopColor={color} stopOpacity={0} />
               </linearGradient>
             </defs>
             <XAxis
               tickLine={false}
               axisLine={false}
-              interval="preserveEnd"
+              interval='preserveEnd'
               tickMargin={16}
               minTickGap={120}
-              tickFormatter={(tick) => toNiceDate(tick)}
-              dataKey="date"
+              tickFormatter={tick => toNiceDate(tick)}
+              dataKey='date'
               tick={{ fill: textColor }}
               type={'number'}
               domain={['dataMin', 'dataMax']}
             />
             <YAxis
-              type="number"
-              orientation="right"
-              tickFormatter={(tick) => '$' + toK(tick)}
+              type='number'
+              orientation='right'
+              tickFormatter={tick => '$' + toK(tick)}
               axisLine={false}
               tickLine={false}
-              interval="preserveEnd"
+              interval='preserveEnd'
               minTickGap={80}
               yAxisId={0}
               tick={{ fill: textColor }}
             />
             <Tooltip
               cursor={true}
-              formatter={(val) => formattedNum(val, true)}
-              labelFormatter={(label) => toNiceDateYear(label)}
+              formatter={val => formattedNum(val, true)}
+              labelFormatter={label => toNiceDateYear(label)}
               labelStyle={{ paddingTop: 4 }}
               contentStyle={{
                 padding: '10px 14px',
@@ -260,14 +253,14 @@ const TokenChart = ({ address, color, base }) => {
             <Area
               key={'other'}
               dataKey={'totalLiquidityUSD'}
-              stackId="2"
+              stackId='2'
               strokeWidth={2}
               dot={false}
-              type="monotone"
+              type='monotone'
               name={'Liquidity'}
               yAxisId={0}
               stroke={darken(0.12, color)}
-              fill="url(#colorUv)"
+              fill='url(#colorUv)'
             />
           </AreaChart>
         </ResponsiveContainer>
@@ -277,9 +270,9 @@ const TokenChart = ({ address, color, base }) => {
           <ResponsiveContainer aspect={aspect}>
             <AreaChart margin={{ top: 0, right: 10, bottom: 6, left: 0 }} barCategoryGap={1} data={priceData}>
               <defs>
-                <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor={color} stopOpacity={0.35} />
-                  <stop offset="95%" stopColor={color} stopOpacity={0} />
+                <linearGradient id='colorUv' x1='0' y1='0' x2='0' y2='1'>
+                  <stop offset='5%' stopColor={color} stopOpacity={0.35} />
+                  <stop offset='95%' stopColor={color} stopOpacity={0} />
                 </linearGradient>
               </defs>
               <XAxis
@@ -287,23 +280,23 @@ const TokenChart = ({ address, color, base }) => {
                 axisLine={false}
                 tickMargin={16}
                 minTickGap={120}
-                tickFormatter={(tick) => toNiceDate(tick)}
-                dataKey="timestamp"
+                tickFormatter={tick => toNiceDate(tick)}
+                dataKey='timestamp'
                 tick={{ fill: textColor }}
                 domain={['dataMin', 'dataMax']}
               />
               <YAxis
-                type="number"
-                dataKey="open"
-                orientation="right"
-                tickFormatter={(tick) => formattedNum(tick, true)}
+                type='number'
+                dataKey='open'
+                orientation='right'
+                tickFormatter={tick => formattedNum(tick, true)}
                 domain={['auto', 'auto']}
                 tick={{ fill: textColor }}
               />
               <Tooltip
                 cursor={true}
-                formatter={(val) => formattedNum(val.toString(), true)}
-                labelFormatter={(label) => toNiceDateYear(label)}
+                formatter={val => formattedNum(val.toString(), true)}
+                labelFormatter={label => toNiceDateYear(label)}
                 labelStyle={{ paddingTop: 4 }}
                 contentStyle={{
                   padding: '10px 14px',
@@ -316,14 +309,14 @@ const TokenChart = ({ address, color, base }) => {
               <Area
                 key={'other'}
                 dataKey={'open'}
-                stackId="2"
+                stackId='2'
                 strokeWidth={2}
                 dot={false}
-                type="monotone"
+                type='monotone'
                 name={'Price'}
                 yAxisId={0}
                 stroke={darken(0.12, color)}
-                fill="url(#colorUv)"
+                fill='url(#colorUv)'
               />
             </AreaChart>
           </ResponsiveContainer>
@@ -341,31 +334,31 @@ const TokenChart = ({ address, color, base }) => {
             <XAxis
               tickLine={false}
               axisLine={false}
-              interval="preserveEnd"
+              interval='preserveEnd'
               minTickGap={80}
               tickMargin={14}
-              tickFormatter={(tick) => toNiceDate(tick)}
-              dataKey="date"
+              tickFormatter={tick => toNiceDate(tick)}
+              dataKey='date'
               tick={{ fill: textColor }}
               type={'number'}
               domain={['dataMin', 'dataMax']}
             />
             <YAxis
-              type="number"
+              type='number'
               axisLine={false}
               tickMargin={16}
-              tickFormatter={(tick) => '$' + toK(tick)}
+              tickFormatter={tick => '$' + toK(tick)}
               tickLine={false}
-              orientation="right"
-              interval="preserveEnd"
+              orientation='right'
+              interval='preserveEnd'
               minTickGap={80}
               yAxisId={0}
               tick={{ fill: textColor }}
             />
             <Tooltip
               cursor={{ fill: color, opacity: 0.1 }}
-              formatter={(val) => formattedNum(val, true)}
-              labelFormatter={(label) => toNiceDateYear(label)}
+              formatter={val => formattedNum(val, true)}
+              labelFormatter={label => toNiceDateYear(label)}
               labelStyle={{ paddingTop: 4 }}
               contentStyle={{
                 padding: '10px 14px',
@@ -376,7 +369,7 @@ const TokenChart = ({ address, color, base }) => {
               wrapperStyle={{ top: -70, left: -10 }}
             />
             <Bar
-              type="monotone"
+              type='monotone'
               name={'Volume'}
               dataKey={'dailyVolumeUSD'}
               fill={color}

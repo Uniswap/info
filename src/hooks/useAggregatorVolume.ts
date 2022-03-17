@@ -6,7 +6,7 @@ interface VolumeResponse {
 }
 
 export default function useAggregatorVolume(): VolumeResponse {
-  const fetcher = (url: string) => fetch(url).then((r) => r.json())
+  const fetcher = (url: string) => fetch(url).then(r => r.json())
 
   const url = `${process.env.REACT_APP_AGGREGATOR_STATS_API}/api/volume`
 

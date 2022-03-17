@@ -43,7 +43,7 @@ const GlobalChart = ({ display }) => {
     return (
       currentData &&
       Object.keys(currentData)
-        ?.map((key) => {
+        ?.map(key => {
           let item = currentData[key]
           if (item.date > utcStartTime) {
             return item
@@ -51,7 +51,7 @@ const GlobalChart = ({ display }) => {
             return
           }
         })
-        .filter((item) => {
+        .filter(item => {
           return !!item
         })
     )
@@ -80,8 +80,8 @@ const GlobalChart = ({ display }) => {
             data={dailyData}
             base={totalLiquidityUSD}
             baseChange={liquidityChangeUSD}
-            title="Liquidity"
-            field="totalLiquidityUSD"
+            title='Liquidity'
+            field='totalLiquidityUSD'
             width={width}
             type={CHART_TYPES.AREA}
           />
@@ -110,10 +110,7 @@ const GlobalChart = ({ display }) => {
             zIndex: 10,
           }}
         >
-          <OptionButton
-            active={volumeWindow === VOLUME_WINDOW.DAYS}
-            onClick={() => setVolumeWindow(VOLUME_WINDOW.DAYS)}
-          >
+          <OptionButton active={volumeWindow === VOLUME_WINDOW.DAYS} onClick={() => setVolumeWindow(VOLUME_WINDOW.DAYS)}>
             <TYPE.body>D</TYPE.body>
           </OptionButton>
           <OptionButton

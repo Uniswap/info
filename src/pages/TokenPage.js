@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { withRouter } from 'react-router-dom'
+import { useParams, withRouter } from 'react-router-dom'
 import { Text } from 'rebass'
 import styled from 'styled-components'
 import Link from '../components/Link'
@@ -12,6 +12,7 @@ import Column, { AutoColumn } from '../components/Column'
 import { ButtonDark, ButtonOutlined } from '../components/ButtonStyled'
 import TxnList from '../components/TxnList'
 import TokenChart from '../components/TokenChart'
+import NotFound from '../components/404'
 import { BasicLink } from '../components/Link'
 import Search from '../components/Search'
 import { formattedNum, formattedPercent, getEtherscanLinkText, getPoolLink, getSwapLink, localNumber } from '../utils'
@@ -30,6 +31,8 @@ import { useListedTokens } from '../contexts/Application'
 import bookMark from '../assets/bookmark.svg'
 import bookMarkOutline from '../assets/bookmark_outline.svg'
 import useTheme from '../hooks/useTheme'
+import { useNetworksInfo } from '../contexts/NetworkInfo'
+import LocalLoader from '../components/LocalLoader'
 
 const DashboardWrapper = styled.div`
   width: 100%;
@@ -109,6 +112,7 @@ function TokenPage({ address, history }) {
     oneDayTxns,
     txnChange,
   } = useTokenData(address)
+  const [networksInfo] = useNetworksInfo()
 
   useEffect(() => {
     document.querySelector('body').scrollTo(0, 0)
@@ -188,7 +192,8 @@ function TokenPage({ address, history }) {
   const [savedTokens, addToken, removeToken] = useSavedTokens()
   const listedTokens = useListedTokens()
 
-  const noWarning = ['25'].includes(process.env.REACT_APP_CHAIN_ID)
+  // TODO: Remove this when Cronos has a token list
+  const noWarning = [25].includes(networksInfo.CHAIN_ID)
 
   useEffect(() => {
     window.scrollTo({
@@ -196,8 +201,14 @@ function TokenPage({ address, history }) {
       top: 0,
     })
   }, [])
+  const { network: currentNetworkURL } = useParams()
+  const prefixNetworkURL = currentNetworkURL ? `/${currentNetworkURL}` : ''
 
-  return (
+  return !name ? (
+    <LocalLoader />
+  ) : name === 'error-token' ? (
+    <NotFound type='token' currentChainName={networksInfo.NAME} redirectLink={prefixNetworkURL + '/tokens'} />
+  ) : (
     <PageWrapper>
       <ThemedBackground backgroundColor={transparentize(0.6, backgroundColor)} />
 
@@ -209,16 +220,12 @@ function TokenPage({ address, history }) {
       />
       <ContentWrapper>
         <RowBetween style={{ flexWrap: 'wrap', alingItems: 'start' }}>
-          <AutoRow align="flex-end" style={{ width: 'fit-content' }}>
+          <AutoRow align='flex-end' style={{ width: 'fit-content' }}>
             <TYPE.body>
-              <BasicLink to="/tokens">{'Tokens '}</BasicLink>→ {symbol}
+              <BasicLink to={prefixNetworkURL + '/tokens'}>{'Tokens '}</BasicLink>→ {symbol}
               {'  '}
             </TYPE.body>
-            <Link
-              style={{ width: 'fit-content' }}
-              external
-              href={`${process.env.REACT_APP_ETHERSCAN_URL}/address/${address}`}
-            >
+            <Link style={{ width: 'fit-content' }} external href={`${networksInfo.ETHERSCAN_URL}/address/${address}`}>
               <Text style={{ marginLeft: '.15rem' }} fontSize={'14px'} fontWeight={400}>
                 ({address.slice(0, 8) + '...' + address.slice(36, 42)})
               </Text>
@@ -238,9 +245,9 @@ function TokenPage({ address, history }) {
             >
               <RowFixed style={{ flexWrap: 'wrap' }}>
                 <RowFixed style={{ alignItems: 'baseline' }}>
-                  <TokenLogo address={address} size="32px" style={{ alignSelf: 'center' }} />
+                  <TokenLogo address={address} size='32px' style={{ alignSelf: 'center' }} />
                   <TYPE.main fontSize={below1280 ? '1.5rem' : '2rem'} fontWeight={500} style={{ margin: '0 1rem' }}>
-                    <RowFixed gap="6px">
+                    <RowFixed gap='6px'>
                       <FormattedName text={name ? name + ' ' : ''} maxCharacters={16} style={{ marginRight: '6px' }} />{' '}
                       {formattedSymbol ? `(${formattedSymbol})` : ''}
                     </RowFixed>
@@ -257,36 +264,25 @@ function TokenPage({ address, history }) {
               </RowFixed>
               <span>
                 <RowFixed ml={below500 ? '0' : '2.5rem'} mt={below500 ? '1rem' : '0'}>
-                  {!!!savedTokens[address] && !below768 ? (
-                    <Hover onClick={() => addToken(address, symbol)}>
-                      <img
-                        src={bookMarkOutline}
-                        width={24}
-                        height={24}
-                        alt="BookMark"
-                        style={{ marginRight: '0.5rem' }}
-                      />
+                  {!savedTokens[address] && !below768 ? (
+                    <Hover onClick={() => addToken(address, symbol, networksInfo.CHAIN_ID)}>
+                      <img src={bookMarkOutline} width={24} height={24} alt='BookMark' style={{ marginRight: '0.5rem' }} />
                     </Hover>
                   ) : !below1280 ? (
                     <Hover onClick={() => removeToken(address)}>
-                      <img src={bookMark} width={24} height={24} alt="BookMarked" style={{ marginRight: '0.5rem' }} />
+                      <img src={bookMark} width={24} height={24} alt='BookMarked' style={{ marginRight: '0.5rem' }} />
                     </Hover>
                   ) : (
                     <></>
                   )}
-                  <Link href={getPoolLink(address)} target="_blank">
+                  <Link href={getPoolLink(address, networksInfo)} target='_blank'>
                     <ButtonOutlined style={{ padding: '11px 22px' }}>+ Add Liquidity</ButtonOutlined>
                   </Link>
                   <Link
-                    href={bestPairToken ? getSwapLink(address, bestPairToken) : getSwapLink(address)}
-                    target="_blank"
+                    href={bestPairToken ? getSwapLink(address, networksInfo, bestPairToken) : getSwapLink(address, networksInfo)}
+                    target='_blank'
                   >
-                    <ButtonDark
-                      ml={'.5rem'}
-                      mr={below1280 && '.5rem'}
-                      color={backgroundColor}
-                      style={{ padding: '11px 22px' }}
-                    >
+                    <ButtonDark ml={'.5rem'} mr={below1280 && '.5rem'} color={backgroundColor} style={{ padding: '11px 22px' }}>
                       Swap
                     </ButtonDark>
                   </Link>
@@ -297,12 +293,12 @@ function TokenPage({ address, history }) {
               <PanelWrapper style={{ marginTop: below1280 ? '0' : '1rem' }}>
                 {below768 && price && (
                   <Panel>
-                    <AutoColumn gap="20px">
+                    <AutoColumn gap='20px'>
                       <RowBetween>
                         <TYPE.main>Price</TYPE.main>
                         <TYPE.main>{priceChange}</TYPE.main>
                       </RowBetween>
-                      <RowBetween align="flex-end">
+                      <RowBetween align='flex-end'>
                         <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={500}>
                           {price}
                         </TYPE.main>
@@ -311,12 +307,12 @@ function TokenPage({ address, history }) {
                   </Panel>
                 )}
                 <Panel>
-                  <AutoColumn gap="20px">
+                  <AutoColumn gap='20px'>
                     <RowBetween>
                       <TYPE.main>Total Liquidity</TYPE.main>
                       <TYPE.main>{liquidityChange}</TYPE.main>
                     </RowBetween>
-                    <RowBetween align="flex-end">
+                    <RowBetween align='flex-end'>
                       <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={500}>
                         {liquidity}
                       </TYPE.main>
@@ -324,12 +320,12 @@ function TokenPage({ address, history }) {
                   </AutoColumn>
                 </Panel>
                 <Panel>
-                  <AutoColumn gap="20px">
+                  <AutoColumn gap='20px'>
                     <RowBetween>
                       <TYPE.main>Volume (24hrs) {usingUtVolume && '(Untracked)'}</TYPE.main>
                       <TYPE.main>{volumeChange}</TYPE.main>
                     </RowBetween>
-                    <RowBetween align="flex-end">
+                    <RowBetween align='flex-end'>
                       <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={500}>
                         {volume}
                       </TYPE.main>
@@ -338,12 +334,12 @@ function TokenPage({ address, history }) {
                 </Panel>
 
                 <Panel>
-                  <AutoColumn gap="20px">
+                  <AutoColumn gap='20px'>
                     <RowBetween>
                       <TYPE.main>Transactions (24hrs)</TYPE.main>
                       <TYPE.main>{txnChangeFormatted}</TYPE.main>
                     </RowBetween>
-                    <RowBetween align="flex-end">
+                    <RowBetween align='flex-end'>
                       <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={500}>
                         {oneDayTxns ? localNumber(oneDayTxns) : oneDayTxns === 0 ? 0 : '-'}
                       </TYPE.main>
@@ -404,27 +400,27 @@ function TokenPage({ address, history }) {
                 <TokenDetailsLayout>
                   <Column>
                     <TYPE.main color={theme.subText}>Symbol</TYPE.main>
-                    <Text style={{ marginTop: '.5rem' }} fontSize={18} fontWeight="500">
+                    <Text style={{ marginTop: '.5rem' }} fontSize={18} fontWeight='500'>
                       <FormattedName text={symbol} maxCharacters={12} />
                     </Text>
                   </Column>
                   <Column>
                     <TYPE.main color={theme.subText}>Name</TYPE.main>
-                    <TYPE.main style={{ marginTop: '.5rem' }} fontSize={18} fontWeight="500">
+                    <TYPE.main style={{ marginTop: '.5rem' }} fontSize={18} fontWeight='500'>
                       <FormattedName text={name} maxCharacters={16} />
                     </TYPE.main>
                   </Column>
                   <Column>
                     <TYPE.main color={theme.subText}>Address</TYPE.main>
-                    <AutoRow align="flex-end">
-                      <TYPE.main style={{ marginTop: '.5rem' }} fontSize={18} fontWeight="500">
+                    <AutoRow align='flex-end'>
+                      <TYPE.main style={{ marginTop: '.5rem' }} fontSize={18} fontWeight='500'>
                         {address.slice(0, 8) + '...' + address.slice(36, 42)}
                       </TYPE.main>
                       <CopyHelper toCopy={address} />
                     </AutoRow>
                   </Column>
-                  <Link external href={`${process.env.REACT_APP_ETHERSCAN_URL}/address/${address}`}>
-                    <ButtonDark color={backgroundColor}>{`View on ${getEtherscanLinkText()}`} ↗</ButtonDark>
+                  <Link external href={`${networksInfo.ETHERSCAN_URL}/address/${address}`}>
+                    <ButtonDark color={backgroundColor}>{`View on ${getEtherscanLinkText(networksInfo)}`} ↗</ButtonDark>
                   </Link>
                 </TokenDetailsLayout>
               </Panel>

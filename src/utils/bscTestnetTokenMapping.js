@@ -1,4 +1,4 @@
-export const getBscTestnetTokenLogoURL = (address) => {
+export const getBscTestnetTokenLogoURL = address => {
   let uri
 
   if (address?.toLowerCase() === '0xae13d989dac2f0debff460ac112a837c89baa7cd') {

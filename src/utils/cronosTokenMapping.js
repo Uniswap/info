@@ -1,6 +1,6 @@
 import { isAddress } from './index.js'
 
-export const getCronosTokenLogoURL = (address) => {
+export const getCronosTokenLogoURL = address => {
   let uri
 
   if (!uri) {

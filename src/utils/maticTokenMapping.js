@@ -1,4 +1,4 @@
-export const getMaticTokenLogoURL = (address) => {
+export const getMaticTokenLogoURL = address => {
   let uri
   if (address?.toLowerCase() === '0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270') {
     address = '0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0'
