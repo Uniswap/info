@@ -1,4 +1,4 @@
-name: Release
+name: "Release"
 
 on:
   workflow_dispatch:
@@ -27,27 +27,6 @@ jobs:
     needs:
       - prepare
     runs-on: ubuntu-18.04
-    strategy:
-      matrix:
-        include:
-          - command: build-production
-            bucket: analytics.kyberswap.com
-          - command: build-matic
-            bucket: polygon-analytics.kyberswap.com
-          - command: build-bsc
-            bucket: bsc-analytics.kyberswap.com
-          - command: build-avax
-            bucket: avax-analytics.kyberswap.com
-          - command: build-fantom
-            bucket: fantom-analytics.kyberswap.com
-          - command: build-cronos
-            bucket: cronos-analytics.kyberswap.com
-          - command: build-arbitrum
-            bucket: arbitrum-analytics.kyberswap.com
-          - command: build-velas
-            bucket: velas-analytics.kyberswap.com
-          - command: build-aurora
-            bucket: aurora-analytics.kyberswap.com
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -57,13 +36,8 @@ jobs:
         with:
           node-version: 12.x
 
-      - name: Gcloud Auth
-        uses: google-github-actions/auth@v0
-        with:
-          credentials_json: '${{ secrets.BUCKET_CREDENTIALS }}'
-
-      - name: Setup Gcloud SDK
-        uses: google-github-actions/setup-gcloud@v0
+      - name: Setup yarn
+        run: npm install -g yarn
 
       - name: Restore node_modules
         uses: actions/cache@v2
@@ -78,19 +52,78 @@ jobs:
         env:
           CI: false
           REACT_APP_VERSION: ${{ github.sha }}
-        run: yarn ${{ matrix.command }}
+        run: yarn build-production
 
-      - name: Upload to GCS
-        env:
-          BUCKET: ${{ matrix.bucket }}
+      - name: Save build
+        uses: actions/upload-artifact@v2
+        with:
+          name: build
+          path: build
+          if-no-files-found: error
+
+  docker:
+    needs:
+      - prepare
+      - build
+    env:
+      SERVICE: dmm-info
+      VERSION_TAG: ${{ needs.prepare.outputs.version_tag }}
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Restore build
+        uses: actions/download-artifact@v2
+        with:
+          name: build
+          path: build
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@master
+
+      - name: Gcloud Auth
+        uses: google-github-actions/auth@v0
+        with:
+          credentials_json: '${{ secrets.GCR_CREDENTIALS }}'
+
+      - name: Setup Gcloud SDK
+        uses: google-github-actions/setup-gcloud@v0
+
+      - name: Configure docker
+        run: gcloud auth configure-docker
+
+      - name: Cache Docker layers
+        uses: actions/cache@v2
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-${{ env.SERVICE }}-buildx
+
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          labels: |
+            kyber.network.schema-version=1.0
+            kyber.network.vcs-ref=${{ github.sha }}
+            kyber.network.version=${{ env.VERSION_TAG }}
+            kyber.network.name=${{ env.SERVICE }}
+          tags: |
+            asia.gcr.io/kyber-operation/core/${{ env.SERVICE }}:latest
+            asia.gcr.io/kyber-operation/core/${{ env.SERVICE }}:${{ env.VERSION_TAG }}
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache-new
+
+      - name: Move Docker cache
         run: |
-          gsutil -m rsync -r $PWD/build gs://$BUCKET
-          gsutil setmeta -h "Cache-Control: no-cache" gs://$BUCKET/*.html
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
 
   release:
     needs:
       - prepare
-      - build
+      - docker
     runs-on: ubuntu-18.04
     env:
       VERSION_TAG: ${{ needs.prepare.outputs.version_tag }}
@@ -116,4 +149,4 @@ jobs:
           repo_token: ${{ secrets.GH_PAT }}
           automatic_release_tag: ${{ env.VERSION_TAG }}
           prerelease: false
-          title: ${{ env.VERSION_TAG }}
+          title: "${{ env.VERSION_TAG }}"
