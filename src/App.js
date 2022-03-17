@@ -27,6 +27,7 @@ import { Updater as LocalStorageContextUpdater } from './contexts/LocalStorage'
 import { Updater as TokenDataContextUpdater } from './contexts/TokenData'
 import { Updater as PairDataContextUpdater } from './contexts/PairData'
 import { Updater as PoolDataContextUpdater } from './contexts/PoolData'
+import GoogleAnalyticsReporter from './components/GoogleAnalyticsReporter'
 
 const AppWrapper = styled.div`
   position: relative;
@@ -180,6 +181,7 @@ const LayoutWrapper = props => {
   if (networksInfo !== networkInfoFromURL) return null
   return (
     <AppLogicWrapper>
+      <GoogleAnalyticsReporter />
       <Updaters />
       <KyberSwapAnounce />
       <ContentWrapper open={props.savedOpen}>

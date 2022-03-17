@@ -10,6 +10,13 @@ import ApplicationContextProvider from './contexts/Application'
 import NetworkInfoContextProvider from './contexts/NetworkInfo'
 import UserContextProvider from './contexts/User'
 import App from './App'
+import ReactGA from 'react-ga'
+
+const initGoogleAnalytics = () => {
+  ReactGA.initialize('UA-207888714-1')
+}
+
+initGoogleAnalytics()
 
 function ContextProviders({ children }) {
   return (
