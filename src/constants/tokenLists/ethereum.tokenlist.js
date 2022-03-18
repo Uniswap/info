@@ -135,6 +135,14 @@ const ETHEREUM_TOKEN_LIST = {
     decimals: 18,
     logoURI: 'https://i.imgur.com/zhZo9Bx.jpg',
   },
+  '0x4d224452801aced8b2f0aebe155379bb5d594381': {
+    chainId: 1,
+    address: '0x4d224452801aced8b2f0aebe155379bb5d594381',
+    symbol: 'APE',
+    name: 'ApeCoin',
+    decimals: 18,
+    logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/18876.png',
+  },
 }
 
 export default ETHEREUM_TOKEN_LIST
