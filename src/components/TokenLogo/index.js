@@ -12,6 +12,7 @@ import ARBITRUM_TOKEN_LIST from '../../constants/tokenLists/arbitrum.tokenlist'
 import BTTC_TOKEN_LIST from '../../constants/tokenLists/bttc.tokenlist'
 import VELAS_TOKEN_LIST from '../../constants/tokenLists/velas.tokenlist'
 import AURORA_TOKEN_LIST from '../../constants/tokenLists/aurora.tokenlist'
+import OASIS_TOKEN_LIST from '../../constants/tokenLists/oasis.tokenlist'
 import { isAddress } from '../../utils/index.js'
 import PlaceHolder from '../../assets/placeholder.png'
 import EthereumLogo from '../../assets/eth.png'
@@ -22,6 +23,7 @@ import FantomLogo from '../../assets/networks/fantom-network.png'
 import CronosLogo from '../../assets/cronos.svg'
 import VelasLogo from '../../assets/velas.png'
 import AuroraLogo from '../../assets/aurora.svg'
+import OasisLogo from '../../assets/oasis.svg'
 import { getMaticTokenLogoURL } from '../../utils/maticTokenMapping'
 import { getMumbaiTokenLogoURL } from '../../utils/mumbaiTokenMapping'
 import { getBscTestnetTokenLogoURL } from '../../utils/bscTestnetTokenMapping'
@@ -206,6 +208,19 @@ export function getNativeTokenLogo({ size = '24px', chainId, ...rest }) {
           />
         </StyledNativeTokenLogo>
       )
+    case ChainId.OASIS:
+      return (
+        <StyledNativeTokenLogo size={size} {...rest}>
+          <img
+            src={OasisLogo}
+            style={{
+              boxShadow: '0px 6px 10px rgba(0, 0, 0, 0.075)',
+              borderRadius: '24px',
+            }}
+            alt=''
+          />
+        </StyledNativeTokenLogo>
+      )
     default:
       return (
         <StyledNativeTokenLogo size={size} {...rest}>
@@ -377,6 +392,13 @@ export default function TokenLogo({ address, header = false, size = '24px', ...r
     case ChainId.BTTC:
       if (formattedAddress && BTTC_TOKEN_LIST[formattedAddress]) {
         return getCustomLogo({ address, src: BTTC_TOKEN_LIST[formattedAddress].logoURI, size, setError, ...rest })
+      }
+      path = 'error'
+      break
+
+    case ChainId.OASIS:
+      if (formattedAddress && OASIS_TOKEN_LIST[formattedAddress]) {
+        return getCustomLogo({ address, src: OASIS_TOKEN_LIST[formattedAddress].logoURI, size, setError, ...rest })
       }
       path = 'error'
       break

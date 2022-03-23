@@ -574,6 +574,8 @@ export function getNativeTokenSymbol(networkInfo) {
       return 'VLX'
     case ChainId.AURORA:
       return 'ETH'
+    case ChainId.OASIS:
+      return 'ROSE'
     default:
       return 'ETH'
   }
@@ -601,6 +603,8 @@ export function getNativeTokenWrappedName(networkInfo) {
       return 'VLX (Wrapped)'
     case ChainId.AURORA:
       return 'ETH (Wrapped)'
+    case ChainId.OASIS:
+      return 'ROSE (Wrapped)'
     default:
       return 'Ether (Wrapped)'
   }
@@ -634,6 +638,8 @@ export function getEtherscanLinkText(networkInfo) {
       return 'Velas EVM Explorer'
     case ChainId.AURORA:
       return 'Aurora Explorer'
+    case ChainId.OASIS:
+      return 'Oasis Emerald Explorer'
     default:
       return 'Etherscan'
   }
@@ -661,6 +667,8 @@ export function getDefaultAddLiquidityUrl(networkInfo) {
       return `${networkInfo.DMM_SWAP_URL}pools/VLX`
     case ChainId.AURORA:
       return `${networkInfo.DMM_SWAP_URL}pools/ETH`
+    case ChainId.OASIS:
+      return `${networkInfo.DMM_SWAP_URL}pools/ROSE`
     default:
       return `${networkInfo.DMM_SWAP_URL}pools/ETH/${getKNC_ADDRESS(networkInfo)}`
   }

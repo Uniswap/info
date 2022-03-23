@@ -20,6 +20,7 @@ import ARBITRUM_TOKEN_LIST from '../constants/tokenLists/arbitrum.tokenlist'
 import BTTC_TOKEN_LIST from '../constants/tokenLists/bttc.tokenlist'
 import VELAS_TOKEN_LIST from '../constants/tokenLists/velas.tokenlist'
 import AURORA_TOKEN_LIST from '../constants/tokenLists/aurora.tokenlist'
+import OASIS_TOKEN_LIST from '../constants/tokenLists/oasis.tokenlist'
 dayjs.extend(utc)
 
 const UPDATE = 'UPDATE'
@@ -401,6 +402,9 @@ export function useListedTokens() {
           break
         case ChainId.AURORA:
           tokenslist = AURORA_TOKEN_LIST
+          break
+        case ChainId.OASIS:
+          tokenslist = OASIS_TOKEN_LIST
           break
         default:
           break

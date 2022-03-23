@@ -80,20 +80,22 @@ export const ChainId = {
   BTTC: 199,
   VELAS: 106,
   AURORA: 1313161554,
+  OASIS: 42262,
 }
 
-export const ANALYTICS_URLS = {
-  1: 'https://analytics.kyberswap.com',
-  137: 'https://polygon-analytics.kyberswap.com',
-  56: 'https://bsc-analytics.kyberswap.com',
-  43114: 'https://avax-analytics.kyberswap.com',
-  250: 'https://fantom-analytics.kyberswap.com',
-  25: 'https://cronos-analytics.kyberswap.com',
-  [ChainId.ARBITRUM]: 'https://arbitrum-analytics.kyberswap.com',
-  [ChainId.BTTC]: 'https://bttc-analytics.kyberswap.com',
-  [ChainId.VELAS]: 'https://velas-analytics.kyberswap.com',
-  [ChainId.AURORA]: 'https://aurora-analytics.kyberswap.com',
-}
+// export const ANALYTICS_URLS = {
+//   1: 'https://analytics.kyberswap.com',
+//   137: 'https://polygon-analytics.kyberswap.com',
+//   56: 'https://bsc-analytics.kyberswap.com',
+//   43114: 'https://avax-analytics.kyberswap.com',
+//   250: 'https://fantom-analytics.kyberswap.com',
+//   25: 'https://cronos-analytics.kyberswap.com',
+//   [ChainId.ARBITRUM]: 'https://arbitrum-analytics.kyberswap.com',
+//   [ChainId.BTTC]: 'https://bttc-analytics.kyberswap.com',
+//   [ChainId.VELAS]: 'https://velas-analytics.kyberswap.com',
+//   [ChainId.AURORA]: 'https://aurora-analytics.kyberswap.com',
+//   [ChainId.OASIS]: 'https://oasis-analytics.kyberswap.com',
+// }
 
 // This variable to handle crazy APR which it can be wrong calculations or a bug
 // But now, for FOMO of Pagxy, updated this to 10000 (before we set 2000 for it)

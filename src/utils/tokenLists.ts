@@ -56,7 +56,11 @@ export default async function getTokenList(listUrl: string, networkInfo: any): P
 
     // Bypass validator for Matic network
     // Because the Uniswap token schema will fail on Quickswap tokens list
-    if ([137, 56, 43114, 250, 25, ChainId.ARBITRUM, ChainId.BTTC, ChainId.VELAS, ChainId.AURORA].includes(networkInfo.CHAIN_ID)) {
+    if (
+      [137, 56, 43114, 250, 25, ChainId.ARBITRUM, ChainId.BTTC, ChainId.VELAS, ChainId.AURORA, ChainId.OASIS].includes(
+        networkInfo.CHAIN_ID
+      )
+    ) {
       return json
     }
 
