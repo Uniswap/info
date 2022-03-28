@@ -14,6 +14,7 @@ import CheckBox from '../components/Checkbox'
 
 function AllPairsPage() {
   const allPairs = useAllPairData()
+  console.log("allPairs", allPairs);
 
   useEffect(() => {
     window.scrollTo(0, 0)

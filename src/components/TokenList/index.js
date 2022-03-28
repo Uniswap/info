@@ -175,7 +175,7 @@ function TopTokenList({ tokens, itemMax = 10, useTracked = false }) {
         .slice(itemMax * (page - 1), page * itemMax)
     )
   }, [formattedTokens, itemMax, page, sortDirection, sortedColumn])
-
+  console.log("filteredList", filteredList);
   const ListItem = ({ item, index }) => {
     return (
       <DashGrid style={{ height: '48px' }} focus={true}>

@@ -14,7 +14,7 @@ import { useMedia } from 'react-use'
 
 function AllTokensPage() {
   const allTokens = useAllTokenData()
-
+  console.log("allTokens", allTokens);
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [])

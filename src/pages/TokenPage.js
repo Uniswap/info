@@ -191,12 +191,12 @@ function TokenPage({ address, history }) {
   return (
     <PageWrapper>
       <ThemedBackground backgroundColor={transparentize(0.6, backgroundColor)} />
-      <Warning
+      {/* <Warning
         type={'token'}
         show={!dismissed && listedTokens && !listedTokens.includes(address)}
         setShow={markAsDismissed}
         address={address}
-      />
+      /> */}
       <ContentWrapper>
         <RowBetween style={{ flexWrap: 'wrap', alingItems: 'start' }}>
           <AutoRow align="flex-end" style={{ width: 'fit-content' }}>
@@ -216,7 +216,7 @@ function TokenPage({ address, history }) {
           </AutoRow>
           {!below600 && <Search small={true} />}
         </RowBetween>
-        <WarningGrouping disabled={!dismissed && listedTokens && !listedTokens.includes(address)}>
+        <WarningGrouping >
           <DashboardWrapper style={{ marginTop: below1080 ? '0' : '1rem' }}>
             <RowBetween
               style={{

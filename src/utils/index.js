@@ -40,35 +40,28 @@ export function getTimeframe(timeWindow) {
 export function getPoolLink(token0Address, token1Address = null, remove = false) {
   if (!token1Address) {
     return (
-      `https://casper-swap.herokuapp.com/#/` +
-      (remove ? `remove` : `add`) +
-      `/v2/${token0Address === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' ? 'CSPR' : token0Address}/${'CSPR'}`
+      `https://casper-swap.herokuapp.com/` +
+      (remove ? `pool/removeLiquidity${token0Address === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' ? 'CSPR' : token0Address}/${'CSPR'}` : `pool/addLiquidity`)
     )
   } else {
     return (
-      `https://casper-swap.herokuapp.com/#/` +
-      (remove ? `remove` : `add`) +
-      `/v2/${token0Address === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' ? 'CSPR' : token0Address}/${token1Address === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' ? 'CSPR' : token1Address
-      }`
+      `https://casper-swap.herokuapp.com/` +
+      (remove ? `pool/removeLiquidity/${token0Address === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' ? 'CSPR' : token0Address}/${token1Address === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' ? 'CSPR' : token1Address
+        }` : `pool/addLiquidity`)
     )
   }
 }
 
 export function getSwapLink(token0Address, token1Address = null) {
-  if (!token1Address) {
-    return `https://casper-swap.herokuapp.com/#/swap?inputCurrency=${token0Address}`
-  } else {
-    return `https://casper-swap.herokuapp.com/#/swap?inputCurrency=${token0Address === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' ? 'CSPR' : token0Address
-      }&outputCurrency=${token1Address === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' ? 'CSPR' : token1Address}`
-  }
+  return `https://casper-swap.herokuapp.com/swap`
 }
 
 export function getMiningPoolLink(token0Address) {
-  return `https://casper-swap.herokuapp.com/#/uni/CSPR/${token0Address}`
+  return `https://casper-swap.herokuapp.com/pool`
 }
 
 export function getCasperswapAppLink(linkVariable) {
-  let baseCasperswapUrl = 'https://casper-swap.herokuapp.com/#/uni'
+  let baseCasperswapUrl = 'https://casper-swap.herokuapp.com/'
   if (!linkVariable) {
     return baseCasperswapUrl
   }

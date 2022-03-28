@@ -358,9 +358,9 @@ const getTopTokens = async (ethPrice, ethPriceOld) => {
         })
 
         // HOTFIX for Aave
-        if (data.id === 'f5b45ffd5273c94befa572ca4b3f05a57892611aa7c668a021eed2be93e9b76e') {
+        if (data.id === '1853ea67e80caaf81a8d96ff28ce3aaf105080f0299d9b7b7c0cb36064ee1fa9') {
           const aaveData = await v2client.query({
-            query: PAIR_DATA('c667c7c29947b3500406a79ec47947d7eb320e92a00c68351eaa7c7bc96e3d31'),
+            query: PAIR_DATA('53a8121f219ad2c6420f007a2016ed320c519579112b81d505cb15715404b264'),
             fetchPolicy: 'cache-first',
           })
           console.log("aaveData", aaveData);
@@ -406,7 +406,7 @@ const getTokenData = async (address, ethPrice, ethPriceOld) => {
       query: TOKEN_DATA(address),
       fetchPolicy: 'cache-first',
     })
-    // console.log("Token_data", result);
+    console.log("Token_data", result);
     data = result?.data?.tokenbyId;
     // console.log("data", data);
     // get results from 24 hours in past
@@ -498,9 +498,9 @@ const getTokenData = async (address, ethPrice, ethPriceOld) => {
     })
 
     // HOTFIX for Aave
-    if (data.id === 'f5b45ffd5273c94befa572ca4b3f05a57892611aa7c668a021eed2be93e9b76e') {
+    if (data.id === '1853ea67e80caaf81a8d96ff28ce3aaf105080f0299d9b7b7c0cb36064ee1fa9') {
       const aaveData = await v2client.query({
-        query: PAIR_DATA('c667c7c29947b3500406a79ec47947d7eb320e92a00c68351eaa7c7bc96e3d31'),
+        query: PAIR_DATA('53a8121f219ad2c6420f007a2016ed320c519579112b81d505cb15715404b264'),
         fetchPolicy: 'cache-first',
       })
       const result = aaveData.data.pairbyId[0]
@@ -717,7 +717,7 @@ export function useTokenData(tokenAddress) {
     if (!tokenData && ethPrice && ethPriceOld
       // && isAddress(tokenAddress)
     ) {
-      // console.log("tokenAddress", tokenAddress);
+      console.log("tokenAddresstokenAddress", tokenAddress);
       getTokenData(tokenAddress, ethPrice, ethPriceOld).then((data) => {
         update(tokenAddress, data)
       })
@@ -908,6 +908,7 @@ export function useTokenPriceData(tokenAddress, timeWindow, interval = 3600) {
 
 export function useAllTokenData() {
   const [state] = useTokenDataContext()
+  console.log("state", state);
 
   // filter out for only addresses
   return Object.keys(state)

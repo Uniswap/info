@@ -1,7 +1,7 @@
 import gql from 'graphql-tag'
 import { FACTORY_ADDRESS, BUNDLE_ID } from '../constants'
 
-const Factory_Address = "735edd4bb553cb8ef4408becbce9e5564a92d97094245c9d2d6ff2bbe6ceda43";
+const Factory_Address = "32046b7f8ca95d736e6f3fc0daa4ef636d21fc5f79cd08b5e6e4fb57df9238b9";
 export const SUBGRAPH_HEALTH = gql`
   query health {
     indexingStatusForCurrentVersion(subgraphName: "uniswap/uniswap-v2") {
@@ -747,6 +747,7 @@ export const TOKENS_HISTORICAL_BULK = (tokens, block) => {
 //orderBy: reserveUSD, orderDirection: desc
 //changed query
 export const TOKEN_DATA = (tokenAddress, block) => {
+  console.log("tokenAddress", tokenAddress);
   const queryString = `
     ${TokenFields}
     query tokens {

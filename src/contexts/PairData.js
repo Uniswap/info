@@ -493,6 +493,7 @@ export function Updater() {
         fetchPolicy: 'cache-first',
       })
       console.log("PAIRS_CURRENT", pairs);
+      console.log("ethPrice", ethPrice);
       // format as array of addresses
       const formattedPairs = pairs.map((pair) => {
         return pair.id
@@ -500,6 +501,7 @@ export function Updater() {
 
       // get data for every pair in list
       let topPairs = await getBulkPairData(formattedPairs, ethPrice)
+      console.log("topPairs", topPairs);
       topPairs && updateTopPairs(topPairs)
     }
     ethPrice && getData()
