@@ -3,7 +3,6 @@ import { Placement } from '@popperjs/core'
 import { transparentize } from 'polished'
 import { usePopper } from 'react-popper'
 import styled from 'styled-components/macro'
-import Portal from '@reach/portal'
 import useInterval from '../../hooks'
 
 const PopoverContainer = styled.div<{ show: boolean }>`
@@ -100,17 +99,15 @@ export default function Popover({ content, show, children, placement = 'auto' }:
   return (
     <>
       <ReferenceElement ref={setReferenceElement}>{children}</ReferenceElement>
-      <Portal>
-        <PopoverContainer show={show} ref={setPopperElement} style={styles.popper} {...attributes.popper}>
-          {content}
-          <Arrow
-            className={`arrow-${attributes.popper?.['data-popper-placement'] ?? ''}`}
-            ref={setArrowElement}
-            style={styles.arrow}
-            {...attributes.arrow}
-          />
-        </PopoverContainer>
-      </Portal>
+      <PopoverContainer show={show} ref={setPopperElement} style={styles.popper} {...attributes.popper}>
+        {content}
+        <Arrow
+          className={`arrow-${attributes.popper?.['data-popper-placement'] ?? ''}`}
+          ref={setArrowElement}
+          style={styles.arrow}
+          {...attributes.arrow}
+        />
+      </PopoverContainer>
     </>
   )
 }

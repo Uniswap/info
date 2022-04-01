@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import { withRouter } from 'react-router-dom'
-import 'feather-icons'
 import styled from 'styled-components/macro'
 import Panel from '../components/Panel'
 import { PageWrapper, ContentWrapperLarge, StyledIcon } from '../components/index'
@@ -106,7 +105,7 @@ const CustomFormattedName = styled(FormattedName)`
 
 function PairPage({ pairAddress, history }) {
   const { t } = useTranslation()
-  
+
   const {
     token0,
     token1,
@@ -432,14 +431,14 @@ function PairPage({ pairAddress, history }) {
                   <TYPE.light>{t('pairName')}</TYPE.light>
                   <TYPE.main style={{ marginTop: '.5rem' }}>
                     <RowFixed>
-                      <CustomFormattedName 
-                        text={token0?.symbol ?? ''} 
+                      <CustomFormattedName
+                        text={token0?.symbol ?? ''}
                         maxCharacters={8}
                       />
                       -
-                      <CustomFormattedName 
-                        text={token1?.symbol ?? ''} 
-                        maxCharacters={8} 
+                      <CustomFormattedName
+                        text={token1?.symbol ?? ''}
+                        maxCharacters={8}
                       />
                     </RowFixed>
                   </TYPE.main>

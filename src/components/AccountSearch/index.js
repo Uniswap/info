@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import 'feather-icons'
 import { withRouter } from 'react-router-dom'
 import styled from 'styled-components/macro'
 import { ButtonLight, ButtonFaded } from '../ButtonStyled'
@@ -103,7 +102,7 @@ function AccountSearch({ history, small }) {
               }}
             />
           </Wrapper>
-          <ButtonLight 
+          <ButtonLight
             style={below440 ? { width: '100%', marginTop: '1rem' } : {}}
             onClick={handleAccountSearch}
           >

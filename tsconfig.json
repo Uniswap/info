@@ -15,7 +15,7 @@
     "jsx": "preserve",
     "downlevelIteration": true,
     "allowSyntheticDefaultImports": true,
-    "types": ["react-spring", "jest"]
+    "types": ["jest"]
   },
   "exclude": ["node_modules", "cypress"],
   "include": ["**/*.js", "**/*.ts", "**/*.tsx"]
