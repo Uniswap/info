@@ -8,8 +8,8 @@ import useInterval from '../../hooks'
 const PopoverContainer = styled.div<{ show: boolean }>`
   z-index: 9999;
 
-  visibility: ${(props) => (props.show ? 'visible' : 'hidden')};
-  opacity: ${(props) => (props.show ? 1 : 0)};
+  visibility: ${props => (props.show ? 'visible' : 'hidden')};
+  opacity: ${props => (props.show ? 1 : 0)};
   transition: visibility 150ms linear, opacity 150ms linear;
 
   background: ${({ theme }) => theme.bg2};
@@ -82,28 +82,28 @@ export interface PopoverProps {
 }
 
 export default function Popover({ content, show, children, placement = 'auto' }: PopoverProps) {
-  const [referenceElement, setReferenceElement] = useState<HTMLDivElement>(null)
-  const [popperElement, setPopperElement] = useState<HTMLDivElement>(null)
-  const [arrowElement, setArrowElement] = useState<HTMLDivElement>(null)
+  const [referenceElement, setReferenceElement] = useState(null)
+  const [popperElement, setPopperElement] = useState(null)
+  const [arrowElement, setArrowElement] = useState(null)
   const { styles, update, attributes } = usePopper(referenceElement, popperElement, {
     placement,
     strategy: 'fixed',
     modifiers: [
       { name: 'offset', options: { offset: [8, 8] } },
-      { name: 'arrow', options: { element: arrowElement } },
-    ],
+      { name: 'arrow', options: { element: arrowElement } }
+    ]
   })
-
+  // @ts-ignore
   useInterval(update, show ? 100 : null)
 
   return (
     <>
-      <ReferenceElement ref={setReferenceElement}>{children}</ReferenceElement>
-      <PopoverContainer show={show} ref={setPopperElement} style={styles.popper} {...attributes.popper}>
+      <ReferenceElement ref={setReferenceElement as any}>{children}</ReferenceElement>
+      <PopoverContainer show={show} ref={setPopperElement as any} style={styles.popper} {...attributes.popper}>
         {content}
         <Arrow
           className={`arrow-${attributes.popper?.['data-popper-placement'] ?? ''}`}
-          ref={setArrowElement}
+          ref={setArrowElement as any}
           style={styles.arrow}
           {...attributes.arrow}
         />

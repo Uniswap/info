@@ -1,4 +1,3 @@
-import React from 'react'
 import styled from 'styled-components/macro'
 import { AutoColumn } from '../Column'
 import Title from '../Title'
@@ -41,7 +40,7 @@ const Option = styled.div`
   opacity: ${({ activeText }) => (activeText ? 1 : 0.6)};
   color: ${({ activeText, theme }) => (activeText ? theme.blueGrey : theme.text1)};
   display: flex;
-  padding: .5rem 1.5rem;
+  padding: 0.5rem 1.5rem;
   position: relative;
   align-items: center;
   width: 100%;
@@ -50,7 +49,9 @@ const Option = styled.div`
     opacity: 1;
   }
 
-  ${({ activeText, theme }) => activeText && `
+  ${({ activeText, theme }) =>
+    activeText &&
+    `
     background: rgba(102, 129, 167, 0.1);
     font-weight: 700;
 
@@ -243,7 +244,8 @@ function SideNav({ history }) {
               <PollingDot />
               <a href="/" style={{ color: 'activeColor' }}>
                 <TYPE.small>
-                  {`${t('updated')} ${!!seconds ? seconds + 's' : '-'} ${t('ago')}`}<br />
+                  {`${t('updated')} ${seconds ? seconds + 's' : '-'} ${t('ago')}`}
+                  <br />
                 </TYPE.small>
               </a>
             </Polling>

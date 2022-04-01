@@ -1,4 +1,3 @@
-import React from 'react'
 import { withRouter } from 'react-router-dom'
 import styled from 'styled-components/macro'
 import { RowBetween, RowFixed } from '../Row'
@@ -80,14 +79,14 @@ function PinnedData({ history, open, setSavedOpen }) {
       <AutoColumn gap="40px" style={{ marginTop: '2rem' }}>
         <AutoColumn gap={'12px'}>
           <TYPE.main>{t('pinnedPairs')}</TYPE.main>
-          {Object.keys(savedPairs).filter((key) => {
+          {Object.keys(savedPairs).filter(key => {
             return !!savedPairs[key]
           }).length > 0 ? (
             Object.keys(savedPairs)
-              .filter((address) => {
+              .filter(address => {
                 return !!savedPairs[address]
               })
-              .map((address) => {
+              .map(address => {
                 const pair = savedPairs[address]
                 return (
                   <RowBetween key={pair.address}>
@@ -116,14 +115,14 @@ function PinnedData({ history, open, setSavedOpen }) {
         </AutoColumn>
         <ScrollableDiv gap={'12px'}>
           <TYPE.main>{t('pinnedTokens')}</TYPE.main>
-          {Object.keys(savedTokens).filter((key) => {
+          {Object.keys(savedTokens).filter(key => {
             return !!savedTokens[key]
           }).length > 0 ? (
             Object.keys(savedTokens)
-              .filter((address) => {
+              .filter(address => {
                 return !!savedTokens[address]
               })
-              .map((address) => {
+              .map(address => {
                 const token = savedTokens[address]
                 return (
                   <RowBetween key={address}>

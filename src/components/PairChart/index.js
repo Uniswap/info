@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import styled from 'styled-components/macro'
 import { Area, XAxis, YAxis, ResponsiveContainer, Tooltip, AreaChart, BarChart, Bar } from 'recharts'
 import { RowBetween, AutoRow } from '../Row'
@@ -35,7 +35,7 @@ const CHART_VIEW = {
   VOLUME: 'Volume',
   LIQUIDITY: 'Liquidity',
   RATE0: 'Rate 0',
-  RATE1: 'Rate 1',
+  RATE1: 'Rate 1'
 }
 
 const PairChart = ({ address, color, base0, base1 }) => {
@@ -82,7 +82,7 @@ const PairChart = ({ address, color, base0, base1 }) => {
   const below700 = useMedia('(max-width: 700px)')
 
   let utcStartTime = getTimeframe(timeWindow)
-  chartData = chartData?.filter((entry) => entry.date >= utcStartTime)
+  chartData = chartData?.filter(entry => entry.date >= utcStartTime)
 
   if (chartData && chartData.length === 0) {
     return (
@@ -198,7 +198,7 @@ const PairChart = ({ address, color, base0, base1 }) => {
               interval="preserveEnd"
               tickMargin={14}
               minTickGap={80}
-              tickFormatter={(tick) => toNiceDate(tick)}
+              tickFormatter={tick => toNiceDate(tick)}
               dataKey="date"
               tick={{ fill: '#9D9FA2' }}
               type={'number'}
@@ -207,7 +207,7 @@ const PairChart = ({ address, color, base0, base1 }) => {
             <YAxis
               type="number"
               orientation="right"
-              tickFormatter={(tick) => '$' + toK(tick)}
+              tickFormatter={tick => '$' + toK(tick)}
               axisLine={false}
               tickLine={false}
               interval="preserveEnd"
@@ -218,8 +218,8 @@ const PairChart = ({ address, color, base0, base1 }) => {
             />
             <Tooltip
               cursor={true}
-              formatter={(val) => formattedNum(val, true)}
-              labelFormatter={(label) => toNiceDateYear(label)}
+              formatter={val => formattedNum(val, true)}
+              labelFormatter={label => toNiceDateYear(label)}
               labelStyle={{ paddingTop: 4 }}
               contentStyle={{
                 padding: '10px 14px',
@@ -288,7 +288,7 @@ const PairChart = ({ address, color, base0, base1 }) => {
               interval="preserveEnd"
               minTickGap={80}
               tickMargin={14}
-              tickFormatter={(tick) => toNiceDate(tick)}
+              tickFormatter={tick => toNiceDate(tick)}
               dataKey="date"
               tick={{ fill: textColor }}
               type={'number'}
@@ -298,7 +298,7 @@ const PairChart = ({ address, color, base0, base1 }) => {
               type="number"
               axisLine={false}
               tickMargin={16}
-              tickFormatter={(tick) => '$' + toK(tick)}
+              tickFormatter={tick => '$' + toK(tick)}
               tickLine={false}
               interval="preserveEnd"
               orientation="right"
@@ -308,14 +308,14 @@ const PairChart = ({ address, color, base0, base1 }) => {
             />
             <Tooltip
               cursor={{ fill: color, opacity: 0.1 }}
-              formatter={(val) => formattedNum(val, true)}
-              labelFormatter={(label) => toNiceDateYear(label)}
+              formatter={val => formattedNum(val, true)}
+              labelFormatter={label => toNiceDateYear(label)}
               labelStyle={{ paddingTop: 4 }}
               contentStyle={{
                 padding: '10px 14px',
                 borderRadius: 10,
                 borderColor: color,
-                color: 'black',
+                color: 'black'
               }}
               wrapperStyle={{ top: -70, left: -10 }}
             />
@@ -326,7 +326,6 @@ const PairChart = ({ address, color, base0, base1 }) => {
               fill={color}
               yAxisId={0}
               stroke={color}
-              fill={color}
             />
           </BarChart>
         </ResponsiveContainer>

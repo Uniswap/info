@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import styled from 'styled-components/macro'
 import { isAddress } from '../../utils/index.js'
 import PlaceHolder from '../../assets/placeholder.png'
@@ -42,7 +42,7 @@ export default function TokenLogo({ address, header = false, size = '24px', ...r
   if (error || BAD_IMAGES[address]) {
     return (
       <Inline>
-        <Image {...rest} alt={''} src={PlaceHolder} size={size} />
+        <Image header={header} {...rest} alt={''} src={PlaceHolder} size={size} />
       </Inline>
     )
   }
@@ -63,7 +63,7 @@ export default function TokenLogo({ address, header = false, size = '24px', ...r
           src={EthereumLogo}
           style={{
             boxShadow: '0px 6px 10px rgba(0, 0, 0, 0.075)',
-            borderRadius: '24px',
+            borderRadius: '24px'
           }}
           alt=""
         />
@@ -88,7 +88,7 @@ export default function TokenLogo({ address, header = false, size = '24px', ...r
         alt={''}
         src={path}
         size={size}
-        onError={(event) => {
+        onError={event => {
           BAD_IMAGES[address] = true
           setError(true)
           event.preventDefault()

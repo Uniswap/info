@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import TopTokenList from '../components/TokenList'
 import { TYPE } from '../Theme'
 import { useAllTokenData } from '../contexts/TokenData'

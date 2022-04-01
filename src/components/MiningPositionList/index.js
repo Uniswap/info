@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useMedia } from 'react-use'
 import dayjs from 'dayjs'
 import LocalLoader from '../LocalLoader'
@@ -28,13 +28,13 @@ const PageButtons = styled.div`
   margin-top: 2em;
 
   @media screen and (max-width: 440px) {
-    margin-top: .75rem;
+    margin-top: 0.75rem;
   }
 `
 
 const Arrow = styled.div`
   color: ${({ theme }) => theme.primary1};
-  opacity: ${(props) => (props.faded ? 0.3 : 1)};
+  opacity: ${props => (props.faded ? 0.3 : 1)};
   padding: 0 20px;
   user-select: none;
   :hover {
@@ -82,7 +82,7 @@ const DashGrid = styled.div`
   }
 
   @media screen and (max-width: 440px) {
-    padding: .75rem;
+    padding: 0.75rem;
   }
 `
 
@@ -121,7 +121,7 @@ const DataText = styled(Flex)`
 
 const SORT_FIELD = {
   VALUE: 'VALUE',
-  UNISWAP_RETURN: 'UNISWAP_RETURN',
+  UNISWAP_RETURN: 'UNISWAP_RETURN'
 }
 
 function MiningPositionList({ miningPositions }) {
@@ -246,11 +246,14 @@ function MiningPositionList({ miningPositions }) {
     <ListWrapper>
       <Panel
         style={{
-          marginTop: below440 ? '.75rem' : '1.5rem', 
+          marginTop: below440 ? '.75rem' : '1.5rem',
           padding: 0
         }}
       >
-        <DashGrid center={true} style={{ height: 'fit-content', padding: below440 ? '.75rem' : '1rem 2rem', border: 'unset' }}>
+        <DashGrid
+          center={true}
+          style={{ height: 'fit-content', padding: below440 ? '.75rem' : '1rem 2rem', border: 'unset' }}
+        >
           {!below740 && (
             <Flex alignItems="flex-start" justifyContent="flexStart">
               <ClickableText area="number">#</ClickableText>
@@ -262,12 +265,13 @@ function MiningPositionList({ miningPositions }) {
           <Flex alignItems="center" justifyContent="flexEnd">
             <ClickableText
               area="uniswap"
-              onClick={(e) => {
+              onClick={() => {
                 setSortedColumn(SORT_FIELD.VALUE)
                 setSortDirection(sortedColumn !== SORT_FIELD.VALUE ? true : !sortDirection)
               }}
             >
-              {below740 ? t('value') : t('liquidity')} {sortedColumn === SORT_FIELD.VALUE ? (!sortDirection ? '↑' : '↓') : ''}
+              {below740 ? t('value') : t('liquidity')}{' '}
+              {sortedColumn === SORT_FIELD.VALUE ? (!sortDirection ? '↑' : '↓') : ''}
             </ClickableText>
           </Flex>
         </DashGrid>

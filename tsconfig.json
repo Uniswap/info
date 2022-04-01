@@ -1,22 +1,39 @@
 {
   "compilerOptions": {
     "target": "es5",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "baseUrl": "src",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
-    "strict": false,
-    "forceConsistentCasingInFileNames": true,
-    "noEmit": true,
     "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
     "module": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
-    "downlevelIteration": true,
-    "allowSyntheticDefaultImports": true,
-    "types": ["jest"]
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "alwaysStrict": true,
+    "strictNullChecks": true,
+    "noUnusedLocals": true,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "noImplicitReturns": true,
+    "strictFunctionTypes": true,
+    "strictPropertyInitialization": true,
+    "removeComments": true,
+    "noUnusedParameters": true,
   },
-  "exclude": ["node_modules", "cypress"],
-  "include": ["**/*.js", "**/*.ts", "**/*.tsx"]
+  "include": [
+    "src",
+    "./src/**/*.ts",
+    "./src/**/*.tsx"
+  ]
 }

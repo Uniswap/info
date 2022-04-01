@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { withRouter } from 'react-router-dom'
 import { DashboardWrapper, TYPE } from '../Theme'
 import { PageWrapper, FullWrapper } from '../components'

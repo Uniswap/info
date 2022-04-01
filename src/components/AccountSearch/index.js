@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { withRouter } from 'react-router-dom'
 import styled from 'styled-components/macro'
 import { ButtonLight, ButtonFaded } from '../ButtonStyled'
@@ -34,7 +34,7 @@ const Input = styled.input`
   background: none;
   border: none;
   outline: none;
-  padding: .875rem 1rem;
+  padding: 0.875rem 1rem;
   border-radius: 12px;
   color: ${({ theme }) => theme.text1};
   background-color: ${({ theme }) => theme.bg1};
@@ -97,15 +97,12 @@ function AccountSearch({ history, small }) {
             <Input
               style={below440 ? { marginRight: '0px' } : {}}
               placeholder="0x..."
-              onChange={(e) => {
+              onChange={e => {
                 setAccountValue(e.target.value)
               }}
             />
           </Wrapper>
-          <ButtonLight
-            style={below440 ? { width: '100%', marginTop: '1rem' } : {}}
-            onClick={handleAccountSearch}
-          >
+          <ButtonLight style={below440 ? { width: '100%', marginTop: '1rem' } : {}} onClick={handleAccountSearch}>
             {t('loadAccountDetails')}
           </ButtonLight>
         </AutoRow>
@@ -119,7 +116,7 @@ function AccountSearch({ history, small }) {
             </DashGrid>
             <Divider />
             {savedAccounts?.length > 0 ? (
-              savedAccounts.map((account) => {
+              savedAccounts.map(account => {
                 return (
                   <DashGrid key={account} center={true} style={{ height: 'fit-content', padding: '1rem 0 0 0' }}>
                     <Flex
@@ -147,7 +144,7 @@ function AccountSearch({ history, small }) {
           <>
             <TYPE.main>{t('accounts')}</TYPE.main>
             {savedAccounts?.length > 0 ? (
-              savedAccounts.map((account) => {
+              savedAccounts.map(account => {
                 return (
                   <RowBetween key={account}>
                     <ButtonFaded onClick={() => history.push('/account/' + account)}>

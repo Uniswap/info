@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { withRouter } from 'react-router-dom'
 import styled from 'styled-components/macro'
 import Panel from '../components/Panel'
@@ -100,7 +100,7 @@ const WarningGrouping = styled.div`
 `
 
 const CustomFormattedName = styled(FormattedName)`
-  color: ${({ theme }) => theme.text1}
+  color: ${({ theme }) => theme.text1};
 `
 
 function PairPage({ pairAddress, history }) {
@@ -117,7 +117,7 @@ function PairPage({ pairAddress, history }) {
     volumeChangeUSD,
     oneDayVolumeUntracked,
     volumeChangeUntracked,
-    liquidityChangeUSD,
+    liquidityChangeUSD
   } = usePairData(pairAddress)
 
   useEffect(() => {
@@ -191,7 +191,7 @@ function PairPage({ pairAddress, history }) {
   useEffect(() => {
     window.scrollTo({
       behavior: 'smooth',
-      top: 0,
+      top: 0
     })
   }, [])
 
@@ -227,20 +227,28 @@ function PairPage({ pairAddress, history }) {
                   display: 'flex',
                   justifyContent: 'space-between',
                   flexWrap: 'wrap',
-                  width: '100%',
+                  width: '100%'
                 }}
               >
                 <RowFixed style={{ flexWrap: 'wrap', minWidth: '100px' }}>
                   <RowFixed>
                     {console.log(token0?.id)}
                     {token0 && token1 && (
-                      <DoubleTokenLogo a0={token0?.id || ''} a1={token1?.id || ''} size={below440 ? 22 : 32} margin={true} />
+                      <DoubleTokenLogo
+                        a0={token0?.id || ''}
+                        a1={token1?.id || ''}
+                        size={below440 ? 22 : 32}
+                        margin={true}
+                      />
                     )}{' '}
-                    <TYPE.main fontSize={!below1080 ? '2.5rem' : below440 ? '1.25rem' : '1.5rem'} style={{ margin: '0 1rem' }}>
+                    <TYPE.main
+                      fontSize={!below1080 ? '2.5rem' : below440 ? '1.25rem' : '1.5rem'}
+                      style={{ margin: '0 1rem' }}
+                    >
                       {token0 && token1 ? (
                         <>
                           <HoverSpan onClick={() => history.push(`/token/${token0?.id}`)}>{token0.symbol}</HoverSpan>
-                            <span>/</span>
+                          <span>/</span>
                           <HoverSpan onClick={() => history.push(`/token/${token1?.id}`)}>
                             {token1.symbol}
                           </HoverSpan>{' '}
@@ -254,10 +262,10 @@ function PairPage({ pairAddress, history }) {
                   ml={below900 ? '0' : '2.5rem'}
                   mt={below1080 && '1rem'}
                   style={{
-                    flexDirection: below1080 ? 'row-reverse' : 'initial',
+                    flexDirection: below1080 ? 'row-reverse' : 'initial'
                   }}
                 >
-                  {!!!savedPairs[pairAddress] && !below1080 ? (
+                  {!savedPairs[pairAddress] && !below1080 ? (
                     <Hover onClick={() => addPair(pairAddress, token0.id, token1.id, token0.symbol, token1.symbol)}>
                       <StyledIcon>
                         <PlusCircle style={{ marginRight: '0.5rem' }} />
@@ -288,13 +296,13 @@ function PairPage({ pairAddress, history }) {
                 width: 'fit-content',
                 marginTop: below900 ? '1rem' : '0',
                 marginBottom: below900 ? '0' : '2rem',
-                flexWrap: 'wrap',
+                flexWrap: 'wrap'
               }}
             >
               <FixedPanel onClick={() => history.push(`/token/${token0?.id}`)}>
                 <RowFixed>
                   <TokenLogo address={token0?.id} size={'1rem'} />
-                  <TYPE.light fontSize='.875rem' lineHeight='1rem' fontWeight={700} ml='.25rem' mr='3.75rem'>
+                  <TYPE.light fontSize=".875rem" lineHeight="1rem" fontWeight={700} ml=".25rem" mr="3.75rem">
                     {token0 && token1
                       ? `1 ${formattedSymbol0} = ${token0Rate} ${formattedSymbol1} ${
                           parseFloat(token0?.derivedETH) ? '(' + token0USD + ')' : ''
@@ -322,42 +330,54 @@ function PairPage({ pairAddress, history }) {
                 <Panel style={{ height: '100%' }}>
                   <AutoColumn gap="20px">
                     <RowBetween>
-                      <TYPE.light fontSize={14} fontWeight={500}>{t('totalLiquidity')} {!usingTracked ? `(${t('untracked')})` : ''}</TYPE.light>
+                      <TYPE.light fontSize={14} fontWeight={500}>
+                        {t('totalLiquidity')} {!usingTracked ? `(${t('untracked')})` : ''}
+                      </TYPE.light>
                       <div />
                     </RowBetween>
                     <RowBetween align="flex-end">
                       <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={500}>
                         {liquidity}
                       </TYPE.main>
-                      <TYPE.main fontSize={12} fontWeight={500}>{liquidityChange}</TYPE.main>
+                      <TYPE.main fontSize={12} fontWeight={500}>
+                        {liquidityChange}
+                      </TYPE.main>
                     </RowBetween>
                   </AutoColumn>
                 </Panel>
                 <Panel style={{ height: '100%' }}>
                   <AutoColumn gap="20px">
                     <RowBetween>
-                      <TYPE.light fontSize={14} fontWeight={500}>{t('volume24hrs')} {usingUtVolume && `(${t('untracked')})`}</TYPE.light>
+                      <TYPE.light fontSize={14} fontWeight={500}>
+                        {t('volume24hrs')} {usingUtVolume && `(${t('untracked')})`}
+                      </TYPE.light>
                       <div />
                     </RowBetween>
                     <RowBetween align="flex-end">
                       <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={500}>
                         {volume}
                       </TYPE.main>
-                      <TYPE.main fontSize={12} fontWeight={500}>{volumeChange}</TYPE.main>
+                      <TYPE.main fontSize={12} fontWeight={500}>
+                        {volumeChange}
+                      </TYPE.main>
                     </RowBetween>
                   </AutoColumn>
                 </Panel>
                 <Panel style={{ height: '100%' }}>
                   <AutoColumn gap="20px">
                     <RowBetween>
-                      <TYPE.light fontSize={14} fontWeight={500}>{t('fees24hrs')}</TYPE.light>
+                      <TYPE.light fontSize={14} fontWeight={500}>
+                        {t('fees24hrs')}
+                      </TYPE.light>
                       <div />
                     </RowBetween>
                     <RowBetween align="flex-end">
                       <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={500}>
                         {fees}
                       </TYPE.main>
-                      <TYPE.main fontSize={12} fontWeight={500}>{volumeChange}</TYPE.main>
+                      <TYPE.main fontSize={12} fontWeight={500}>
+                        {volumeChange}
+                      </TYPE.main>
                     </RowBetween>
                   </AutoColumn>
                 </Panel>
@@ -365,7 +385,9 @@ function PairPage({ pairAddress, history }) {
                 <Panel style={{ height: '100%' }}>
                   <AutoColumn gap="20px">
                     <RowBetween>
-                      <TYPE.light fontSize={14} fontWeight={500}>{t('pooledTokens')}</TYPE.light>
+                      <TYPE.light fontSize={14} fontWeight={500}>
+                        {t('pooledTokens')}
+                      </TYPE.light>
                       <div />
                     </RowBetween>
                     <Hover onClick={() => history.push(`/token/${token0?.id}`)} fade={true}>
@@ -417,12 +439,14 @@ function PairPage({ pairAddress, history }) {
           </DashboardWrapper>
           <DashboardWrapper style={{ marginTop: '1rem' }}>
             <RowBetween>
-              <TYPE.main fontSize={22} fontWeight={500}>{t('pairInformation')}</TYPE.main>{' '}
+              <TYPE.main fontSize={22} fontWeight={500}>
+                {t('pairInformation')}
+              </TYPE.main>{' '}
             </RowBetween>
             <Panel
               rounded
               style={{
-                marginTop: below440 ? '.75rem' : '1.5rem',
+                marginTop: below440 ? '.75rem' : '1.5rem'
               }}
               p={20}
             >
@@ -431,15 +455,9 @@ function PairPage({ pairAddress, history }) {
                   <TYPE.light>{t('pairName')}</TYPE.light>
                   <TYPE.main style={{ marginTop: '.5rem' }}>
                     <RowFixed>
-                      <CustomFormattedName
-                        text={token0?.symbol ?? ''}
-                        maxCharacters={8}
-                      />
+                      <CustomFormattedName text={token0?.symbol ?? ''} maxCharacters={8} />
                       -
-                      <CustomFormattedName
-                        text={token1?.symbol ?? ''}
-                        maxCharacters={8}
-                      />
+                      <CustomFormattedName text={token1?.symbol ?? ''} maxCharacters={8} />
                     </RowFixed>
                   </TYPE.main>
                 </Column>
@@ -478,7 +496,7 @@ function PairPage({ pairAddress, history }) {
                       {token1 && token1.id.slice(0, 6) + '...' + token1.id.slice(38, 42)}
                     </TYPE.main>
                     <CopyHelper toCopy={token1?.id} />
-                    </RowBetween>
+                  </RowBetween>
                 </Column>
                 <ButtonLight>
                   <Link external href={'https://etherscan.io/address/' + pairAddress}>

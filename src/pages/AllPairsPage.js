@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { TYPE } from '../Theme'
 import { useAllPairData } from '../contexts/PairData'
 import PairList from '../components/PairList'

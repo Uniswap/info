@@ -1,5 +1,5 @@
 import { transparentize } from 'polished'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import styled from 'styled-components/macro'
 import { Tooltip } from '../QuestionHelper'
 

@@ -1,4 +1,3 @@
-import React from 'react'
 import { BigNumber } from 'bignumber.js'
 import dayjs from 'dayjs'
 import { ethers } from 'ethers'
@@ -83,12 +82,12 @@ export function localNumber(val) {
   return Numeral(val).format('0,0')
 }
 
-export const toNiceDate = (date) => {
+export const toNiceDate = date => {
   let x = dayjs.utc(dayjs.unix(date)).format('MMM DD')
   return x
 }
 
-export const toWeeklyDate = (date) => {
+export const toWeeklyDate = date => {
   const formatted = dayjs.utc(dayjs.unix(date))
   date = new Date(formatted)
   const day = new Date(formatted).getDay()
@@ -119,11 +118,11 @@ export async function splitQuery(query, localClient, vars, list, skipCount = 100
     let sliced = list.slice(skip, end)
     let result = await localClient.query({
       query: query(...vars, sliced),
-      fetchPolicy: 'cache-first',
+      fetchPolicy: 'cache-first'
     })
     fetchedData = {
       ...fetchedData,
-      ...result.data,
+      ...result.data
     }
     if (Object.keys(result.data).length < skipCount || skip + skipCount > list.length) {
       allFound = true
@@ -145,9 +144,9 @@ export async function getBlockFromTimestamp(timestamp) {
     query: GET_BLOCK,
     variables: {
       timestampFrom: timestamp,
-      timestampTo: timestamp + 600,
+      timestampTo: timestamp + 600
     },
-    fetchPolicy: 'cache-first',
+    fetchPolicy: 'cache-first'
   })
   return result?.data?.blocks?.[0]?.number
 }
@@ -172,7 +171,7 @@ export async function getBlocksFromTimestamps(timestamps, skipCount = 500) {
       if (fetchedData[t].length > 0) {
         blocks.push({
           timestamp: t.split('t')[1],
-          number: fetchedData[t][0]['number'],
+          number: fetchedData[t][0]['number']
         })
       }
     }
@@ -187,7 +186,7 @@ export async function getLiquidityTokenBalanceOvertime(account, timestamps) {
   // get historical share values with time travel queries
   let result = await client.query({
     query: SHARE_VALUE(account, blocks),
-    fetchPolicy: 'cache-first',
+    fetchPolicy: 'cache-first'
   })
 
   let values = []
@@ -196,7 +195,7 @@ export async function getLiquidityTokenBalanceOvertime(account, timestamps) {
     if (timestamp) {
       values.push({
         timestamp,
-        balance: 0,
+        balance: 0
       })
     }
   }
@@ -221,7 +220,7 @@ export async function getShareValueOverTime(pairAddress, timestamps) {
   // get historical share values with time travel queries
   let result = await client.query({
     query: SHARE_VALUE(pairAddress, blocks),
-    fetchPolicy: 'cache-first',
+    fetchPolicy: 'cache-first'
   })
 
   let values = []
@@ -241,7 +240,7 @@ export async function getShareValueOverTime(pairAddress, timestamps) {
         roiUsd: values && values[0] ? sharePriceUsd / values[0]['sharePriceUsd'] : 1,
         ethPrice: 0,
         token0PriceUSD: 0,
-        token1PriceUSD: 0,
+        token1PriceUSD: 0
       })
     }
   }
@@ -276,9 +275,9 @@ export function getTimestampRange(timestamp_from, period_length, periods) {
   return timestamps
 }
 
-export const toNiceDateYear = (date) => dayjs.utc(dayjs.unix(date)).format('MMMM DD, YYYY')
+export const toNiceDateYear = date => dayjs.utc(dayjs.unix(date)).format('MMMM DD, YYYY')
 
-export const isAddress = (value) => {
+export const isAddress = value => {
   try {
     return ethers.utils.getAddress(value.toLowerCase())
   } catch {
@@ -286,22 +285,22 @@ export const isAddress = (value) => {
   }
 }
 
-export const toK = (num) => {
+export const toK = num => {
   return Numeral(num).format('0.[00]a')
 }
 
-export const setThemeColor = (theme) => document.documentElement.style.setProperty('--c-token', theme || '#333333')
+export const setThemeColor = theme => document.documentElement.style.setProperty('--c-token', theme || '#333333')
 
-export const Big = (number) => new BigNumber(number)
+export const Big = number => new BigNumber(number)
 
 export const urls = {
-  showTransaction: (tx) => `https://etherscan.io/tx/${tx}/`,
-  showAddress: (address) => `https://www.etherscan.io/address/${address}/`,
-  showToken: (address) => `https://www.etherscan.io/token/${address}/`,
-  showBlock: (block) => `https://etherscan.io/block/${block}/`,
+  showTransaction: tx => `https://etherscan.io/tx/${tx}/`,
+  showAddress: address => `https://www.etherscan.io/address/${address}/`,
+  showToken: address => `https://www.etherscan.io/token/${address}/`,
+  showBlock: block => `https://etherscan.io/block/${block}/`
 }
 
-export const formatTime = (unix) => {
+export const formatTime = unix => {
   const now = dayjs()
   const timestamp = dayjs.unix(unix)
 
@@ -321,7 +320,7 @@ export const formatTime = (unix) => {
   }
 }
 
-export const formatNumber = (num) => {
+export const formatNumber = num => {
   return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
 }
 
@@ -329,7 +328,7 @@ export const formatNumber = (num) => {
 var priceFormatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
   currency: 'USD',
-  minimumFractionDigits: 2,
+  minimumFractionDigits: 2
 })
 
 export const toSignificant = (number, significantDigits) => {
@@ -338,6 +337,7 @@ export const toSignificant = (number, significantDigits) => {
   return updated.toFormat(updated.decimalPlaces(), { groupSeparator: '' })
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const formattedNum = (number, usd = false, acceptNegatives = false) => {
   if (isNaN(number) || number === '' || number === undefined) {
     return usd ? '$0' : 0
@@ -388,7 +388,7 @@ export function rawPercent(percentRaw) {
   return percent.toFixed(0) + '%'
 }
 
-export function formattedPercent(percent, useBrackets = false) {
+export function formattedPercent(percent) {
   percent = parseFloat(percent)
   if (!percent || percent === 0) {
     return <Text fontWeight={500}>0%</Text>

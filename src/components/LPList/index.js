@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useMedia } from 'react-use'
 import dayjs from 'dayjs'
 import LocalLoader from '../LocalLoader'
@@ -26,13 +26,13 @@ const PageButtons = styled.div`
   margin-top: 2em;
 
   @media screen and (max-width: 440px) {
-    margin-top: .75rem;
+    margin-top: 0.75rem;
   }
 `
 
 const Arrow = styled.div`
   color: ${({ theme }) => theme.primary1};
-  opacity: ${(props) => (props.faded ? 0.3 : 1)};
+  opacity: ${props => (props.faded ? 0.3 : 1)};
   padding: 0 20px;
   user-select: none;
   :hover {
@@ -79,7 +79,7 @@ const DashGrid = styled.div`
   }
 
   @media screen and (max-width: 440px) {
-    padding: .75rem;
+    padding: 0.75rem;
   }
 `
 
@@ -135,7 +135,9 @@ function LPList({ lps, disbaleLinks, maxItems = 10 }) {
         )}
         <DataText area="name" fontWeight="500" justifyContent="flex-start">
           <CustomLink style={{ whiteSpace: 'nowrap' }} to={'/account/' + lp.user.id}>
-            {below800 ? lp.user.id.slice(0, 4) + '...' + (below440 ? lp.user.id.slice(39, 42) : lp.user.id.slice(38, 42)) : lp.user.id}
+            {below800
+              ? lp.user.id.slice(0, 4) + '...' + (below440 ? lp.user.id.slice(39, 42) : lp.user.id.slice(38, 42))
+              : lp.user.id}
           </CustomLink>
         </DataText>
 
@@ -173,13 +175,13 @@ function LPList({ lps, disbaleLinks, maxItems = 10 }) {
     <ListWrapper>
       <Panel
         style={{
-          marginTop: below440 ? '.75rem' : '1.5rem', 
+          marginTop: below440 ? '.75rem' : '1.5rem',
           padding: 0
         }}
       >
-        <DashGrid 
-          center={true} 
-          disbaleLinks={disbaleLinks} 
+        <DashGrid
+          center={true}
+          disbaleLinks={disbaleLinks}
           style={{ height: 'fit-content', padding: below440 ? '.75rem' : '1rem 2rem', borderTop: 'none' }}
         >
           {!below600 && (

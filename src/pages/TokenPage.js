@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { withRouter } from 'react-router-dom'
 import { Text } from 'rebass'
 import styled from 'styled-components/macro'
@@ -100,7 +100,7 @@ function TokenPage({ address, history }) {
     priceChangeUSD,
     liquidityChangeUSD,
     oneDayTxns,
-    txnChange,
+    txnChange
   } = useTokenData(address)
 
   useEffect(() => {
@@ -163,7 +163,7 @@ function TokenPage({ address, history }) {
   useEffect(() => {
     window.scrollTo({
       behavior: 'smooth',
-      top: 0,
+      top: 0
     })
   }, [])
 
@@ -202,13 +202,16 @@ function TokenPage({ address, history }) {
               style={{
                 flexWrap: 'wrap',
                 marginBottom: '2rem',
-                alignItems: 'flex-start',
+                alignItems: 'flex-start'
               }}
             >
               <RowFixed style={{ flexWrap: 'wrap' }}>
                 <RowFixed style={{ alignItems: 'baseline' }}>
                   <TokenLogo address={address} size={below440 ? '22px' : '32px'} style={{ alignSelf: 'center' }} />
-                    <TYPE.main fontSize={!below1080 ? '2.5rem' : below440 ? '1.25rem' : '1.5rem'} style={{ margin: '0 1rem' }}>
+                  <TYPE.main
+                    fontSize={!below1080 ? '2.5rem' : below440 ? '1.25rem' : '1.5rem'}
+                    style={{ margin: '0 1rem' }}
+                  >
                     <RowFixed gap="6px">
                       <FormattedName text={name ? name + ' ' : ''} maxCharacters={16} style={{ marginRight: '6px' }} />{' '}
                       {formattedSymbol ? `(${formattedSymbol})` : ''}
@@ -226,7 +229,7 @@ function TokenPage({ address, history }) {
               </RowFixed>
               <span>
                 <RowFixed ml={below500 ? '0' : '2.5rem'} mt={below500 ? '1rem' : '0'}>
-                  {!!!savedTokens[address] && !below800 ? (
+                  {!savedTokens[address] && !below800 ? (
                     <Hover onClick={() => addToken(address, symbol)}>
                       <StyledIcon>
                         <PlusCircle style={{ marginRight: '0.5rem' }} />
@@ -272,7 +275,9 @@ function TokenPage({ address, history }) {
               <Panel>
                 <AutoColumn gap="20px">
                   <RowBetween>
-                    <TYPE.light fontSize={14} fontWeight={500}>{t('totalLiquidity')}</TYPE.light>
+                    <TYPE.light fontSize={14} fontWeight={500}>
+                      {t('totalLiquidity')}
+                    </TYPE.light>
                     <div />
                   </RowBetween>
                   <RowBetween align="flex-end">
@@ -286,7 +291,9 @@ function TokenPage({ address, history }) {
               <Panel>
                 <AutoColumn gap="20px">
                   <RowBetween>
-                    <TYPE.light fontSize={14} fontWeight={500}>{t('volume24hrs')} {usingUtVolume && `(${t('untracked')})`}</TYPE.light>
+                    <TYPE.light fontSize={14} fontWeight={500}>
+                      {t('volume24hrs')} {usingUtVolume && `(${t('untracked')})`}
+                    </TYPE.light>
                     <div />
                   </RowBetween>
                   <RowBetween align="flex-end">
@@ -301,7 +308,9 @@ function TokenPage({ address, history }) {
               <Panel>
                 <AutoColumn gap="20px">
                   <RowBetween>
-                    <TYPE.light fontSize={14} fontWeight={500}>{t('transactions')} (24hrs)</TYPE.light>
+                    <TYPE.light fontSize={14} fontWeight={500}>
+                      {t('transactions')} (24hrs)
+                    </TYPE.light>
                     <div />
                   </RowBetween>
                   <RowBetween align="flex-end">
@@ -315,7 +324,7 @@ function TokenPage({ address, history }) {
               <Panel
                 style={{
                   gridColumn: !below1080 ? '2/4' : below1024 ? '1/4' : '2/-1',
-                  gridRow: below1080 ? '' : '1/4',
+                  gridRow: below1080 ? '' : '1/4'
                 }}
               >
                 <TokenChart address={address} color={backgroundColor} base={priceUSD} />
@@ -335,15 +344,19 @@ function TokenPage({ address, history }) {
           </DashboardWrapper>
 
           <DashboardWrapper style={{ marginTop: '1.5rem' }}>
-            <TYPE.main fontSize={22} fontWeight={500}>{t('transactions')}</TYPE.main>
+            <TYPE.main fontSize={22} fontWeight={500}>
+              {t('transactions')}
+            </TYPE.main>
             {transactions ? <TxnList color={backgroundColor} transactions={transactions} /> : <Loader />}
           </DashboardWrapper>
           <DashboardWrapper style={{ marginTop: '1.5rem' }}>
-            <TYPE.main fontSize={22} fontWeight={500}>Token Information</TYPE.main>
+            <TYPE.main fontSize={22} fontWeight={500}>
+              Token Information
+            </TYPE.main>
             <Panel
               rounded
               style={{
-                marginTop: below440 ? '.75rem' : '1.5rem',
+                marginTop: below440 ? '.75rem' : '1.5rem'
               }}
               p={20}
             >
@@ -366,7 +379,7 @@ function TokenPage({ address, history }) {
                     <TYPE.main style={{ marginTop: '.5rem' }} fontWeight="500">
                       {address.slice(0, 8) + '...' + address.slice(36, 42)}
                     </TYPE.main>
-                    <CopyHelper toCopy={address}/>
+                    <CopyHelper toCopy={address} />
                   </RowBetween>
                 </Column>
                 <ButtonLight color={backgroundColor}>

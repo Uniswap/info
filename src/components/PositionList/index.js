@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useMedia } from 'react-use'
 import dayjs from 'dayjs'
 import LocalLoader from '../LocalLoader'
@@ -29,13 +29,13 @@ const PageButtons = styled.div`
   margin-top: 2em;
 
   @media screen and (max-width: 440px) {
-    margin-top: .75rem;
+    margin-top: 0.75rem;
   }
 `
 
 const Arrow = styled.div`
   color: ${({ theme }) => theme.primary1};
-  opacity: ${(props) => (props.faded ? 0.3 : 1)};
+  opacity: ${props => (props.faded ? 0.3 : 1)};
   padding: 0 20px;
   user-select: none;
   :hover {
@@ -83,7 +83,7 @@ const DashGrid = styled.div`
   }
 
   @media screen and (max-width: 440px) {
-    padding: .75rem;
+    padding: 0.75rem;
   }
 `
 
@@ -109,7 +109,7 @@ const ClickableText = styled(Text)`
 const CustomLink = styled(RouterLink)`
   color: ${({ theme }) => theme.blueGrey};
   font-weight: 600;
-  cursor: pointer
+  cursor: pointer;
 `
 
 const DataText = styled(Flex)`
@@ -132,8 +132,8 @@ const ButtonsContainer = styled(RowFixed)`
 
     > a {
       margin-right: 0;
-      margin-top: .5rem;
-      
+      margin-top: 0.5rem;
+
       &:first-child {
         margin-top: 0;
       }
@@ -143,7 +143,7 @@ const ButtonsContainer = styled(RowFixed)`
 
 const SORT_FIELD = {
   VALUE: 'VALUE',
-  UNISWAP_RETURN: 'UNISWAP_RETURN',
+  UNISWAP_RETURN: 'UNISWAP_RETURN'
 }
 
 function PositionList({ positions }) {
@@ -191,10 +191,7 @@ function PositionList({ positions }) {
             <DoubleTokenLogo size={16} a0={position.pair.token0.id} a1={position.pair.token1.id} margin={!below740} />
           </AutoColumn>
           <AutoColumn gap="8px" justify="flex-start" style={{ marginLeft: '20px' }}>
-            <CustomLink 
-              to={'/pair/' + position.pair.id} 
-              style={{ whiteSpace: 'nowrap' }}
-            >
+            <CustomLink to={'/pair/' + position.pair.id} style={{ whiteSpace: 'nowrap' }}>
               {position.pair.token0.symbol + '-' + position.pair.token1.symbol}
             </CustomLink>
 
@@ -327,11 +324,14 @@ function PositionList({ positions }) {
     <ListWrapper>
       <Panel
         style={{
-          marginTop: below440 ? '.75rem' : '1.5rem', 
+          marginTop: below440 ? '.75rem' : '1.5rem',
           padding: 0
         }}
       >
-        <DashGrid center={true} style={{ height: 'fit-content', padding: below440 ? '.75rem' : '1rem 2rem', border: 'unset' }}>
+        <DashGrid
+          center={true}
+          style={{ height: 'fit-content', padding: below440 ? '.75rem' : '1rem 2rem', border: 'unset' }}
+        >
           {!below740 && (
             <Flex alignItems="flex-start" justifyContent="flexStart">
               <ClickableText area="number">#</ClickableText>
@@ -343,12 +343,13 @@ function PositionList({ positions }) {
           <Flex alignItems="center" justifyContent="flexEnd">
             <ClickableText
               area="uniswap"
-              onClick={(e) => {
+              onClick={() => {
                 setSortedColumn(SORT_FIELD.VALUE)
                 setSortDirection(sortedColumn !== SORT_FIELD.VALUE ? true : !sortDirection)
               }}
             >
-              {below740 ? t('value') : t('liquidity')} {sortedColumn === SORT_FIELD.VALUE ? (!sortDirection ? '↑' : '↓') : ''}
+              {below740 ? t('value') : t('liquidity')}{' '}
+              {sortedColumn === SORT_FIELD.VALUE ? (!sortDirection ? '↑' : '↓') : ''}
             </ClickableText>
           </Flex>
           {!below500 && (

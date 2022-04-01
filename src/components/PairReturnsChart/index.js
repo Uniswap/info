@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import styled from 'styled-components/macro'
 import { XAxis, YAxis, ResponsiveContainer, Tooltip, LineChart, Line, CartesianGrid } from 'recharts'
 import { AutoRow, RowBetween } from '../Row'
@@ -32,7 +32,7 @@ const OptionsRow = styled.div`
 
 const CHART_VIEW = {
   VALUE: 'Value',
-  FEES: 'Fees',
+  FEES: 'Fees'
 }
 
 const PairReturnsChart = ({ account, position }) => {
@@ -52,7 +52,7 @@ const PairReturnsChart = ({ account, position }) => {
 
   // based on window, get starttime
   let utcStartTime = getTimeframe(timeWindow)
-  data = data?.filter((entry) => entry.date >= utcStartTime)
+  data = data?.filter(entry => entry.date >= utcStartTime)
 
   return (
     <ChartWrapper>
@@ -108,7 +108,7 @@ const PairReturnsChart = ({ account, position }) => {
               axisLine={false}
               interval="preserveEnd"
               tickMargin={14}
-              tickFormatter={(tick) => toNiceDate(tick)}
+              tickFormatter={tick => toNiceDate(tick)}
               dataKey="date"
               tick={{ fill: textColor }}
               type={'number'}
@@ -117,7 +117,7 @@ const PairReturnsChart = ({ account, position }) => {
             <YAxis
               type="number"
               orientation="right"
-              tickFormatter={(tick) => '$' + toK(tick)}
+              tickFormatter={tick => '$' + toK(tick)}
               axisLine={false}
               tickLine={false}
               interval="preserveStartEnd"
@@ -127,14 +127,14 @@ const PairReturnsChart = ({ account, position }) => {
             />
             <Tooltip
               cursor={true}
-              formatter={(val) => formattedNum(val, true)}
-              labelFormatter={(label) => toNiceDateYear(label)}
+              formatter={val => formattedNum(val, true)}
+              labelFormatter={label => toNiceDateYear(label)}
               labelStyle={{ paddingTop: 4 }}
               contentStyle={{
                 padding: '10px 14px',
                 borderRadius: 10,
                 borderColor: color,
-                color: 'black',
+                color: 'black'
               }}
               wrapperStyle={{ top: -70, left: -10 }}
             />

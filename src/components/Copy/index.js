@@ -1,4 +1,3 @@
-import React from 'react'
 import styled from 'styled-components/macro'
 import { useCopyClipboard } from '../../hooks'
 import { CheckCircle, Copy } from 'react-feather'

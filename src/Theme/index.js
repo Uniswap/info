@@ -1,4 +1,3 @@
-import React from 'react'
 import { ThemeProvider as StyledComponentsThemeProvider, createGlobalStyle } from 'styled-components/macro'
 import { useDarkModeManager } from '../contexts/LocalStorage'
 import styled from 'styled-components/macro'
@@ -78,7 +77,7 @@ const theme = (darkMode, color) => ({
 
   lightText1: '#FAFAFA',
 
-  background: darkMode ? 'black' : `radial-gradient(50% 50% at 50% 50%, #C9A02F30 0%, #fff 0%)`,
+  background: darkMode ? 'black' : `radial-gradient(50% 50% at 50% 50%, #C9A02F30 0%, #fff 0%)`
 })
 
 const TextWrapper = styled(Text)`
@@ -112,7 +111,7 @@ export const TYPE = {
 
   pink(props) {
     return <TextWrapper fontWeight={props.faded ? 400 : 600} color={props.faded ? 'text1' : 'text1'} {...props} />
-  },
+  }
 }
 
 export const DashboardWrapper = styled.div`
@@ -134,7 +133,7 @@ export const Hover = styled.div`
 
 export const Link = styled.a.attrs({
   target: '_blank',
-  rel: 'noopener noreferrer',
+  rel: 'noopener noreferrer'
 })`
   text-decoration: none;
   cursor: pointer;
@@ -153,19 +152,18 @@ export const Link = styled.a.attrs({
 `
 
 export const GlobalStyle = createGlobalStyle`
-  @import url('https://rsms.me/inter/inter.css');
   html { font-family: 'Inter', sans-serif; }
   @supports (font-variation-settings: normal) {
     html { font-family: 'Inter var', sans-serif; }
   }
-  
+
   html,
   body {
     margin: 0;
     padding: 0;
     width: 100%;
     height: 100%;
-    font-size: 14px;    
+    font-size: 14px;
     background-color: ${({ theme }) => theme.bg6};
   }
 
@@ -180,7 +178,7 @@ export const GlobalStyle = createGlobalStyle`
       text-decoration: none
     }
   }
- 
+
 .three-line-legend {
 	width: 100%;
 	height: 70px;
@@ -215,7 +213,7 @@ export const GlobalStyle = createGlobalStyle`
 
 .tv-lightweight-charts{
   width: 100% !important;
-  
+
 
   & > * {
     width: 100% !important;

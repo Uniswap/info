@@ -1,4 +1,3 @@
-import React from 'react'
 import styled from 'styled-components/macro'
 import { Text } from 'rebass'
 import { AlertTriangle } from 'react-feather'

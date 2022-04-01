@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { withRouter } from 'react-router-dom'
 import styled from 'styled-components/macro'
 
@@ -45,7 +45,7 @@ const GridRow = styled.div`
 
 function GlobalPage() {
   const { t } = useTranslation()
-  
+
   // get data for lists and totals
   const allPairs = useAllPairData()
   const allTokens = useAllTokenData()
@@ -61,7 +61,7 @@ function GlobalPage() {
   useEffect(() => {
     document.querySelector('body').scrollTo({
       behavior: 'smooth',
-      top: 0,
+      top: 0
     })
   }, [])
 
@@ -72,7 +72,9 @@ function GlobalPage() {
           <DashboardWrapper>
             <AutoColumn gap={below440 ? '.75rem' : '1.5rem'} style={{ paddingBottom: below800 ? '0' : '24px' }}>
               <RowBetween>
-                <TYPE.largeHeader>{below800 ? t('protocolAnalytics') : `WhiteSwap ${t('protocolAnalytics')}`}</TYPE.largeHeader>
+                <TYPE.largeHeader>
+                  {below800 ? t('protocolAnalytics') : `WhiteSwap ${t('protocolAnalytics')}`}
+                </TYPE.largeHeader>
                 {!below800 && <Search small={true} />}
               </RowBetween>
               <GlobalStats />
@@ -100,7 +102,7 @@ function GlobalPage() {
                       <TYPE.light>{t('totalLiquidity')}</TYPE.light>
                     </RowBetween>
                     <RowBetween align="flex-end">
-                      <TYPE.main fontSize={below440 ? '1.25rem' : '1.5rem'}  lineHeight={1} fontWeight={600}>
+                      <TYPE.main fontSize={below440 ? '1.25rem' : '1.5rem'} lineHeight={1} fontWeight={600}>
                         {formattedNum(totalLiquidityUSD, true)}
                       </TYPE.main>
                       <TYPE.main fontSize={12}>{formattedPercent(liquidityChangeUSD)}</TYPE.main>
@@ -125,7 +127,9 @@ function GlobalPage() {
           <DashboardWrapper style={{ marginTop: '1rem' }}>
             <ListOptions gap="10px" style={{ marginBottom: '.5rem' }}>
               <RowBetween>
-                <TYPE.main fontSize={22} fontWeight={500}>{t('topTokens')}</TYPE.main>
+                <TYPE.main fontSize={22} fontWeight={500}>
+                  {t('topTokens')}
+                </TYPE.main>
                 <CustomLink to={'/tokens'}>{t('seeAll')}</CustomLink>
               </RowBetween>
             </ListOptions>
@@ -135,7 +139,9 @@ function GlobalPage() {
           <DashboardWrapper style={{ marginTop: '1rem' }}>
             <ListOptions gap="10px" style={{ marginBottom: '.5rem' }}>
               <RowBetween>
-                <TYPE.main fontSize={22} fontWeight={500}>{t('topPairs')}</TYPE.main>
+                <TYPE.main fontSize={22} fontWeight={500}>
+                  {t('topPairs')}
+                </TYPE.main>
                 <CustomLink to={'/pairs'}>{t('seeAll')}</CustomLink>
               </RowBetween>
             </ListOptions>

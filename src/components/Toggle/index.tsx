@@ -1,4 +1,3 @@
-import React from 'react'
 import styled from 'styled-components/macro'
 import { Sun, Moon } from 'react-feather'
 
@@ -29,7 +28,7 @@ const StyledToggle = styled.div`
 `
 
 const Span = styled.span`
-  padding: 0 .5rem;
+  padding: 0 0.5rem;
   color: ${({ theme }) => theme.text1};
 `
 

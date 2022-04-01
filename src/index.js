@@ -1,4 +1,3 @@
-import React from 'react'
 import ReactDOM from 'react-dom'
 import ReactGA from 'react-ga'
 import { isMobile } from 'react-device-detect'
@@ -15,15 +14,12 @@ import './i18n'
 // initialize GA
 const GOOGLE_ANALYTICS_ID = process.env.REACT_APP_GOOGLE_ANALYTICS_ID
 
-if (typeof GOOGLE_ANALYTICS_ID === 'string') {
+if (typeof GOOGLE_ANALYTICS_ID === 'string' && GOOGLE_ANALYTICS_ID !== '') {
   ReactGA.initialize(GOOGLE_ANALYTICS_ID)
   ReactGA.set({
-    customBrowserType: !isMobile
-      ? 'desktop'
-      : 'web3' in window || 'ethereum' in window
-      ? 'mobileWeb3'
-      : 'mobileRegular',
+    customBrowserType: !isMobile ? 'desktop' : 'web3' in window || 'ethereum' in window ? 'mobileWeb3' : 'mobileRegular'
   })
+  ReactGA.pageview(window.location.pathname)
 } else {
   ReactGA.initialize('test', { testMode: true, debug: true })
 }

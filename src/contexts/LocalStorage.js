@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect } from 'react'
+import { createContext, useContext, useReducer, useMemo, useCallback, useEffect } from 'react'
 
 const UNISWAP = 'UNISWAP'
 
@@ -26,12 +26,12 @@ function reducer(state, { type, payload }) {
   switch (type) {
     case UPDATE_KEY: {
       const { key, value } = payload
-      if (!UPDATABLE_KEYS.some((k) => k === key)) {
+      if (!UPDATABLE_KEYS.some(k => k === key)) {
         throw Error(`Unexpected key in LocalStorageContext reducer: '${key}'.`)
       } else {
         return {
           ...state,
-          [key]: value,
+          [key]: value
         }
       }
     }
@@ -48,7 +48,7 @@ function init() {
     [DISMISSED_PATHS]: {},
     [SAVED_ACCOUNTS]: [],
     [SAVED_TOKENS]: {},
-    [SAVED_PAIRS]: {},
+    [SAVED_PAIRS]: {}
   }
 
   try {
@@ -92,7 +92,7 @@ export function useDarkModeManager() {
   const [state, { updateKey }] = useLocalStorageContext()
   let isDarkMode = state[DARK_MODE]
   const toggleDarkMode = useCallback(
-    (value) => {
+    value => {
       updateKey(DARK_MODE, value === false || value === true ? value : !isDarkMode)
     },
     [updateKey, isDarkMode]
@@ -145,7 +145,7 @@ export function useSavedPairs() {
       token0Address,
       token1Address,
       token0Symbol,
-      token1Symbol,
+      token1Symbol
     }
     updateKey(SAVED_PAIRS, newList)
   }
@@ -166,7 +166,7 @@ export function useSavedTokens() {
   function addToken(address, symbol) {
     let newList = state?.[SAVED_TOKENS]
     newList[address] = {
-      symbol,
+      symbol
     }
     updateKey(SAVED_TOKENS, newList)
   }
