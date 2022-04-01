@@ -8,7 +8,6 @@ import styled from 'styled-components/macro'
 import Link, { CustomLink } from '../Link'
 import { Divider } from '..'
 import DoubleTokenLogo from '../DoubleLogo'
-import { withRouter } from 'react-router-dom'
 import { formattedNum, getUniswapAppLink } from '../../utils'
 import { AutoColumn } from '../Column'
 import { RowFixed } from '../Row'
@@ -291,4 +290,4 @@ function MiningPositionList({ miningPositions }) {
   )
 }
 
-export default withRouter(MiningPositionList)
+export default MiningPositionList

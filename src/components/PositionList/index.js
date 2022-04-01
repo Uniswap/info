@@ -8,7 +8,6 @@ import styled from 'styled-components/macro'
 import Link, { CustomLink as RouterLink } from '../Link'
 import { Divider } from '../../components'
 import DoubleTokenLogo from '../DoubleLogo'
-import { withRouter } from 'react-router-dom'
 import { formattedNum, getPoolLink } from '../../utils'
 import { AutoColumn } from '../Column'
 import { useEthPrice } from '../../contexts/GlobalData'
@@ -383,4 +382,4 @@ function PositionList({ positions }) {
   )
 }
 
-export default withRouter(PositionList)
+export default PositionList

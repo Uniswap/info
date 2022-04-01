@@ -1,5 +1,4 @@
 import { useEffect } from 'react'
-import { withRouter } from 'react-router-dom'
 import { DashboardWrapper, TYPE } from '../Theme'
 import { PageWrapper, FullWrapper } from '../components'
 import LPList from '../components/LPList'
@@ -56,4 +55,4 @@ function AccountLookup() {
   )
 }
 
-export default withRouter(AccountLookup)
+export default AccountLookup

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { withRouter } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import styled from 'styled-components/macro'
 import { ButtonLight, ButtonFaded } from '../ButtonStyled'
 import { AutoRow, RowBetween } from '../Row'
@@ -56,7 +56,6 @@ const Input = styled.input`
 
 const AccountLink = styled.span`
   display: flex;
-  cursor: pointer;
   color: ${({ theme }) => theme.link};
   font-size: 14px;
   font-weight: 500;
@@ -74,15 +73,16 @@ const DashGrid = styled.div`
   }
 `
 
-function AccountSearch({ history, small }) {
+function AccountSearch({ small }) {
   const { t } = useTranslation()
+  const navigate = useNavigate()
   const [accountValue, setAccountValue] = useState()
   const [savedAccounts, addAccount, removeAccount] = useSavedAccounts()
   const below440 = useMedia('(max-width: 440px)')
 
   function handleAccountSearch() {
     if (isAddress(accountValue)) {
-      history.push('/account/' + accountValue)
+      navigate('/account/' + accountValue)
       if (!savedAccounts.includes(accountValue)) {
         addAccount(accountValue)
       }
@@ -119,12 +119,10 @@ function AccountSearch({ history, small }) {
               savedAccounts.map(account => {
                 return (
                   <DashGrid key={account} center={true} style={{ height: 'fit-content', padding: '1rem 0 0 0' }}>
-                    <Flex
-                      area="account"
-                      justifyContent="space-between"
-                      onClick={() => history.push('/account/' + account)}
-                    >
-                      <AccountLink>{account?.slice(0, 42)}</AccountLink>
+                    <Flex area="account" justifyContent="space-between">
+                      <AccountLink as={Link} to={'/account/' + account}>
+                        {account?.slice(0, 42)}
+                      </AccountLink>
                       <Hover onClick={() => removeAccount(account)}>
                         <StyledIcon>
                           <X size={16} />
@@ -147,7 +145,7 @@ function AccountSearch({ history, small }) {
               savedAccounts.map(account => {
                 return (
                   <RowBetween key={account}>
-                    <ButtonFaded onClick={() => history.push('/account/' + account)}>
+                    <ButtonFaded as={Link} to={'/account/' + account}>
                       {small ? (
                         <TYPE.header>{account?.slice(0, 6) + '...' + account?.slice(38, 42)}</TYPE.header>
                       ) : (
@@ -172,4 +170,4 @@ function AccountSearch({ history, small }) {
   )
 }
 
-export default withRouter(AccountSearch)
+export default AccountSearch

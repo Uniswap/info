@@ -8,7 +8,6 @@ import styled from 'styled-components/macro'
 
 import { CustomLink } from '../Link'
 import { Divider } from '../../components'
-import { withRouter } from 'react-router-dom'
 import { formattedNum, formattedPercent } from '../../utils'
 import DoubleTokenLogo from '../DoubleLogo'
 import FormattedName from '../FormattedName'
@@ -359,4 +358,4 @@ function PairList({ pairs, disbaleLinks, maxItems = 10 }) {
   )
 }
 
-export default withRouter(PairList)
+export default PairList

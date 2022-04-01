@@ -28,7 +28,7 @@
     "react-ga": "^3.3.0",
     "react-i18next": "^11.16.2",
     "react-popper": "^2.2.5",
-    "react-router-dom": "^5.2.0",
+    "react-router-dom": "^6.3.0",
     "react-scripts": "^4.0.3",
     "react-select": "^5.2.2",
     "react-use": "^17.3.2",

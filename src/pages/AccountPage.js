@@ -2,8 +2,9 @@ import { useState, useMemo, useEffect } from 'react'
 import styled from 'styled-components/macro'
 import { useUserTransactions, useUserPositions } from '../contexts/User'
 import TxnList from '../components/TxnList'
+import { useParams, Navigate } from 'react-router-dom'
 import Panel from '../components/Panel'
-import { formattedNum } from '../utils'
+import { formattedNum, isAddress } from '../utils'
 import Row, { AutoRow, RowFixed, RowBetween } from '../components/Row'
 import { AutoColumn } from '../components/Column'
 import UserChart from '../components/UserChart'
@@ -75,15 +76,20 @@ const Warning = styled.div`
   width: calc(100% - 2rem);
 `
 
-function AccountPage({ account }) {
+function AccountPage() {
   const { t } = useTranslation()
+  const { accountAddress } = useParams()
+
+  if (!isAddress(accountAddress.toLowerCase())) {
+    return <Navigate to="/" />
+  }
 
   const below600 = useMedia('(max-width: 600px)')
   const below440 = useMedia('(max-width: 440px)')
 
   // get data for this account
-  const transactions = useUserTransactions(account)
-  const positions = useUserPositions(account)
+  const transactions = useUserTransactions(accountAddress)
+  const positions = useUserPositions(accountAddress)
   // const miningPositions = useMiningPositions(account)
 
   // get data for user stats
@@ -149,8 +155,8 @@ function AccountPage({ account }) {
         <RowBetween>
           <TYPE.body>
             <BasicLink to="/accounts">{`${t('accounts')} `}</BasicLink>→
-            <Link lineHeight={'145.23%'} href={'https://etherscan.io/address/' + account} target="_blank">
-              {account?.slice(0, 42)}
+            <Link lineHeight={'145.23%'} href={'https://etherscan.io/address/' + accountAddress} target="_blank">
+              {accountAddress?.slice(0, 42)}
             </Link>
           </TYPE.body>
           {!below600 && <Search small={true} />}
@@ -158,8 +164,10 @@ function AccountPage({ account }) {
         <Header>
           <RowBetween>
             <span>
-              <TYPE.header fontSize={24}>{account?.slice(0, 6) + '...' + account?.slice(38, 42)}</TYPE.header>
-              <Link lineHeight={'145.23%'} href={'https://etherscan.io/address/' + account} target="_blank">
+              <TYPE.header fontSize={24}>
+                {accountAddress?.slice(0, 6) + '...' + accountAddress?.slice(38, 42)}
+              </TYPE.header>
+              <Link lineHeight={'145.23%'} href={'https://etherscan.io/address/' + accountAddress} target="_blank">
                 <TYPE.main fontSize={14}>{t('viewOnEtherscan')}</TYPE.main>
               </Link>
             </span>
@@ -277,9 +285,9 @@ function AccountPage({ account }) {
         {!hideLPContent && (
           <DashboardWrapper>
             {activePosition ? (
-              <PairReturnsChart account={account} position={activePosition} />
+              <PairReturnsChart account={accountAddress} position={activePosition} />
             ) : (
-              <UserChart account={account} position={activePosition} />
+              <UserChart account={accountAddress} position={activePosition} />
             )}
           </DashboardWrapper>
         )}

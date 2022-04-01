@@ -1,5 +1,4 @@
 import { useEffect } from 'react'
-import { withRouter } from 'react-router-dom'
 import styled from 'styled-components/macro'
 
 import { AutoRow, RowBetween } from '../components/Row'
@@ -130,7 +129,7 @@ function GlobalPage() {
                 <TYPE.main fontSize={22} fontWeight={500}>
                   {t('topTokens')}
                 </TYPE.main>
-                <CustomLink to={'/tokens'}>{t('seeAll')}</CustomLink>
+                <CustomLink to="tokens">{t('seeAll')}</CustomLink>
               </RowBetween>
             </ListOptions>
             <TopTokenList tokens={allTokens} />
@@ -142,7 +141,7 @@ function GlobalPage() {
                 <TYPE.main fontSize={22} fontWeight={500}>
                   {t('topPairs')}
                 </TYPE.main>
-                <CustomLink to={'/pairs'}>{t('seeAll')}</CustomLink>
+                <CustomLink to="pairs">{t('seeAll')}</CustomLink>
               </RowBetween>
             </ListOptions>
             <PairList pairs={allPairs} />
@@ -160,4 +159,4 @@ function GlobalPage() {
   )
 }
 
-export default withRouter(GlobalPage)
+export default GlobalPage

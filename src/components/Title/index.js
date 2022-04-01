@@ -1,11 +1,11 @@
-import { useHistory } from 'react-router-dom'
 import styled from 'styled-components/macro'
 
 import { Flex } from 'rebass'
 import { RowFixed } from '../Row'
+import { Link } from 'react-router-dom'
 import Logo from '../../assets/logo_full.svg'
 
-const TitleWrapper = styled.div`
+const TitleWrapper = styled(Link)`
   text-decoration: none;
   margin: 1.25rem 1.5rem;
 
@@ -17,10 +17,8 @@ const TitleWrapper = styled.div`
 `
 
 export default function Title() {
-  const history = useHistory()
-
   return (
-    <TitleWrapper onClick={() => history.push('/')}>
+    <TitleWrapper to="/">
       <Flex alignItems="center">
         <RowFixed>
           <img src={Logo} alt="logo" />

@@ -11,7 +11,6 @@ import { Divider } from '..'
 
 import { formattedNum, formattedPercent } from '../../utils'
 import { useMedia } from 'react-use'
-import { withRouter } from 'react-router-dom'
 import { OVERVIEW_TOKEN_BLACKLIST } from '../../constants'
 import FormattedName from '../FormattedName'
 import { TYPE } from '../../Theme'
@@ -351,4 +350,4 @@ function TopTokenList({ tokens, itemMax = 10 }) {
   )
 }
 
-export default withRouter(TopTokenList)
+export default TopTokenList

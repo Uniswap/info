@@ -5,7 +5,7 @@ import { BasicLink } from '../Link'
 import { useMedia } from 'react-use'
 import { transparentize } from 'polished'
 import { TYPE } from '../../Theme'
-import { withRouter } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 import { TrendingUp, List, PieChart, Disc } from 'react-feather'
 import Link from '../Link'
 import { useSessionStart } from '../../contexts/Application'
@@ -134,8 +134,9 @@ const PollingDot = styled.div`
   background-color: ${({ theme }) => theme.green1};
 `
 
-function SideNav({ history }) {
+function SideNav() {
   const { t } = useTranslation()
+  const location = useLocation()
 
   const below1080 = useMedia('(max-width: 1080px)')
   const below1180 = useMedia('(max-width: 1180px)')
@@ -152,8 +153,8 @@ function SideNav({ history }) {
             <Title />
             {!below1080 && (
               <AutoColumn style={{ marginTop: '5.25rem' }}>
-                <BasicLink to="/home">
-                  <Option activeText={history.location.pathname === '/home' ?? undefined}>
+                <BasicLink to="/">
+                  <Option activeText={location.pathname === '/' ?? undefined}>
                     <StyledNavButton>
                       <TrendingUp size={20} />
                     </StyledNavButton>
@@ -163,8 +164,7 @@ function SideNav({ history }) {
                 <BasicLink to="/tokens">
                   <Option
                     activeText={
-                      (history.location.pathname.split('/')[1] === 'tokens' ||
-                        history.location.pathname.split('/')[1] === 'token') ??
+                      (location.pathname.split('/')[1] === 'tokens' || location.pathname.split('/')[1] === 'token') ??
                       undefined
                     }
                   >
@@ -177,8 +177,7 @@ function SideNav({ history }) {
                 <BasicLink to="/pairs">
                   <Option
                     activeText={
-                      (history.location.pathname.split('/')[1] === 'pairs' ||
-                        history.location.pathname.split('/')[1] === 'pair') ??
+                      (location.pathname.split('/')[1] === 'pairs' || location.pathname.split('/')[1] === 'pair') ??
                       undefined
                     }
                   >
@@ -192,8 +191,8 @@ function SideNav({ history }) {
                 <BasicLink to="/accounts">
                   <Option
                     activeText={
-                      (history.location.pathname.split('/')[1] === 'accounts' ||
-                        history.location.pathname.split('/')[1] === 'account') ??
+                      (location.pathname.split('/')[1] === 'accounts' ||
+                        location.pathname.split('/')[1] === 'account') ??
                       undefined
                     }
                   >
@@ -260,4 +259,4 @@ function SideNav({ history }) {
   )
 }
 
-export default withRouter(SideNav)
+export default SideNav

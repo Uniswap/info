@@ -1,4 +1,4 @@
-import { withRouter } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import styled from 'styled-components/macro'
 import { RowBetween, RowFixed } from '../Row'
 import { AutoColumn } from '../Column'
@@ -48,7 +48,7 @@ const StyledIcon = styled.div`
   color: ${({ theme }) => theme.text2};
 `
 
-function PinnedData({ history, open, setSavedOpen }) {
+function PinnedData({ open, setSavedOpen }) {
   const { t } = useTranslation()
 
   const [savedPairs, , removePair] = useSavedPairs()
@@ -90,7 +90,7 @@ function PinnedData({ history, open, setSavedOpen }) {
                 const pair = savedPairs[address]
                 return (
                   <RowBetween key={pair.address}>
-                    <ButtonFaded onClick={() => history.push('/pair/' + address)}>
+                    <ButtonFaded as={Link} to={'/pair/' + address}>
                       <RowFixed>
                         <TYPE.header>
                           <FormattedName
@@ -126,7 +126,7 @@ function PinnedData({ history, open, setSavedOpen }) {
                 const token = savedTokens[address]
                 return (
                   <RowBetween key={address}>
-                    <ButtonFaded onClick={() => history.push('/token/' + address)}>
+                    <ButtonFaded as={Link} to={'/token/' + address}>
                       <RowFixed>
                         <TokenLogo address={address} size={'14px'} />
                         <TYPE.header ml={'6px'}>
@@ -151,4 +151,4 @@ function PinnedData({ history, open, setSavedOpen }) {
   )
 }
 
-export default withRouter(PinnedData)
+export default PinnedData

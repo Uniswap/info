@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { withRouter } from 'react-router-dom'
+import { useLocation, useParams, Navigate, Link as RouterLink } from 'react-router-dom'
 import styled from 'styled-components/macro'
 import Panel from '../components/Panel'
 import { PageWrapper, ContentWrapperLarge, StyledIcon } from '../components/index'
@@ -9,7 +9,9 @@ import { ButtonLight, ButtonDark } from '../components/ButtonStyled'
 import PairChart from '../components/PairChart'
 import Link from '../components/Link'
 import TxnList from '../components/TxnList'
+import { isAddress } from '../utils'
 import Loader from '../components/LocalLoader'
+import { PAIR_BLACKLIST } from '../constants'
 import { BasicLink } from '../components/Link'
 import Search from '../components/Search'
 import { formattedNum, formattedPercent, getPoolLink, getSwapLink } from '../utils'
@@ -87,7 +89,9 @@ const FixedPanel = styled(Panel)`
   box-shadow: unset;
 `
 
-const HoverSpan = styled.span`
+const TokenSymbolLink = styled(RouterLink)`
+  color: ${({ theme }) => theme.white};
+
   :hover {
     cursor: pointer;
     opacity: 0.7;
@@ -103,8 +107,14 @@ const CustomFormattedName = styled(FormattedName)`
   color: ${({ theme }) => theme.text1};
 `
 
-function PairPage({ pairAddress, history }) {
+function PairPage() {
   const { t } = useTranslation()
+  const { pairAddress } = useParams()
+  const location = useLocation()
+
+  if (PAIR_BLACKLIST.includes(pairAddress.toLowerCase()) || !isAddress(pairAddress.toLowerCase())) {
+    return <Navigate to="/" />
+  }
 
   const {
     token0,
@@ -186,7 +196,7 @@ function PairPage({ pairAddress, history }) {
   const below600 = useMedia('(max-width: 600px)')
   const below440 = useMedia('(max-width: 440px)')
 
-  const [dismissed, markAsDismissed] = usePathDismissed(history.location.pathname)
+  const [dismissed, markAsDismissed] = usePathDismissed(location.pathname)
 
   useEffect(() => {
     window.scrollTo({
@@ -247,12 +257,9 @@ function PairPage({ pairAddress, history }) {
                     >
                       {token0 && token1 ? (
                         <>
-                          <HoverSpan onClick={() => history.push(`/token/${token0?.id}`)}>{token0.symbol}</HoverSpan>
+                          <TokenSymbolLink to={`/token/${token0?.id}`}>{token0.symbol}</TokenSymbolLink>
                           <span>/</span>
-                          <HoverSpan onClick={() => history.push(`/token/${token1?.id}`)}>
-                            {token1.symbol}
-                          </HoverSpan>{' '}
-                          {t('pair')}
+                          <TokenSymbolLink to={`/token/${token1?.id}`}>{token1.symbol}</TokenSymbolLink> {t('pair')}
                         </>
                       ) : null}
                     </TYPE.main>
@@ -299,7 +306,7 @@ function PairPage({ pairAddress, history }) {
                 flexWrap: 'wrap'
               }}
             >
-              <FixedPanel onClick={() => history.push(`/token/${token0?.id}`)}>
+              <FixedPanel as={RouterLink} to={`/token/${token0?.id}`}>
                 <RowFixed>
                   <TokenLogo address={token0?.id} size={'1rem'} />
                   <TYPE.light fontSize=".875rem" lineHeight="1rem" fontWeight={700} ml=".25rem" mr="3.75rem">
@@ -311,7 +318,7 @@ function PairPage({ pairAddress, history }) {
                   </TYPE.light>
                 </RowFixed>
               </FixedPanel>
-              <FixedPanel onClick={() => history.push(`/token/${token1?.id}`)}>
+              <FixedPanel as={RouterLink} to={`/token/${token1?.id}`}>
                 <RowFixed>
                   <TokenLogo address={token1?.id} size={'16px'} />
                   <TYPE.light fontSize={'.875rem'} lineHeight={'1rem'} fontWeight={700} ml={'.25rem'}>
@@ -390,7 +397,7 @@ function PairPage({ pairAddress, history }) {
                       </TYPE.light>
                       <div />
                     </RowBetween>
-                    <Hover onClick={() => history.push(`/token/${token0?.id}`)} fade={true}>
+                    <Hover as={RouterLink} to={`/token/${token0?.id}`} fade={true}>
                       <AutoRow gap="4px">
                         <TokenLogo address={token0?.id} />
                         <TYPE.main fontSize={20} lineHeight={1} fontWeight={500}>
@@ -401,7 +408,7 @@ function PairPage({ pairAddress, history }) {
                         </TYPE.main>
                       </AutoRow>
                     </Hover>
-                    <Hover onClick={() => history.push(`/token/${token1?.id}`)} fade={true}>
+                    <Hover as={RouterLink} to={`/token/${token1?.id}`} fade={true}>
                       <AutoRow gap="4px">
                         <TokenLogo address={token1?.id} />
                         <TYPE.main fontSize={20} lineHeight={1} fontWeight={500}>
@@ -512,4 +519,4 @@ function PairPage({ pairAddress, history }) {
   )
 }
 
-export default withRouter(PairPage)
+export default PairPage

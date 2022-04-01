@@ -2,12 +2,11 @@ import { useState } from 'react'
 import styled from 'styled-components/macro'
 import { client } from './apollo/client'
 import { ApolloProvider } from '@apollo/react-hooks'
-import { Route, Switch, BrowserRouter, Redirect } from 'react-router-dom'
+import { Route, Routes, BrowserRouter, Navigate } from 'react-router-dom'
 import GlobalPage from './pages/GlobalPage'
 import TokenPage from './pages/TokenPage'
 import PairPage from './pages/PairPage'
 import { useGlobalData, useGlobalChartData } from './contexts/GlobalData'
-import { isAddress } from './utils'
 import AccountPage from './pages/AccountPage'
 import AllTokensPage from './pages/AllTokensPage'
 import AllPairsPage from './pages/AllPairsPage'
@@ -15,7 +14,6 @@ import PinnedData from './components/PinnedData'
 
 import SideNav from './components/SideNav'
 import AccountLookup from './pages/AccountLookup'
-import { OVERVIEW_TOKEN_BLACKLIST, PAIR_BLACKLIST } from './constants'
 import LocalLoader from './components/LocalLoader'
 import { useLatestBlocks } from './contexts/Application'
 
@@ -75,23 +73,6 @@ const WarningBanner = styled.div`
   font-weight: 500;
 `
 
-/**
- * Wrap the component with the header and sidebar pinned tab
- */
-const LayoutWrapper = ({ children, savedOpen, setSavedOpen }) => {
-  return (
-    <>
-      <ContentWrapper open={savedOpen}>
-        <SideNav />
-        <Center id="center">{children}</Center>
-        <Right open={savedOpen}>
-          <PinnedData open={savedOpen} setSavedOpen={setSavedOpen} />
-        </Right>
-      </ContentWrapper>
-    </>
-  )
-}
-
 const BLOCK_DIFFERENCE_THRESHOLD = 30
 
 function App() {
@@ -120,88 +101,24 @@ function App() {
         globalChartData &&
         Object.keys(globalChartData).length > 0 ? (
           <BrowserRouter>
-            <Switch>
-              <Route
-                exacts
-                strict
-                path="/token/:tokenAddress"
-                render={({ match }) => {
-                  if (OVERVIEW_TOKEN_BLACKLIST.includes(match.params.tokenAddress.toLowerCase())) {
-                    return <Redirect to="/home" />
-                  }
-                  if (isAddress(match.params.tokenAddress.toLowerCase())) {
-                    return (
-                      <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
-                        <TokenPage address={match.params.tokenAddress.toLowerCase()} />
-                      </LayoutWrapper>
-                    )
-                  } else {
-                    return <Redirect to="/home" />
-                  }
-                }}
-              />
-              <Route
-                exacts
-                strict
-                path="/pair/:pairAddress"
-                render={({ match }) => {
-                  if (PAIR_BLACKLIST.includes(match.params.pairAddress.toLowerCase())) {
-                    return <Redirect to="/home" />
-                  }
-                  if (isAddress(match.params.pairAddress.toLowerCase())) {
-                    return (
-                      <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
-                        <PairPage pairAddress={match.params.pairAddress.toLowerCase()} />
-                      </LayoutWrapper>
-                    )
-                  } else {
-                    return <Redirect to="/home" />
-                  }
-                }}
-              />
-              <Route
-                exacts
-                strict
-                path="/account/:accountAddress"
-                render={({ match }) => {
-                  if (isAddress(match.params.accountAddress.toLowerCase())) {
-                    return (
-                      <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
-                        <AccountPage account={match.params.accountAddress.toLowerCase()} />
-                      </LayoutWrapper>
-                    )
-                  } else {
-                    return <Redirect to="/home" />
-                  }
-                }}
-              />
-
-              <Route path="/home">
-                <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
-                  <GlobalPage />
-                </LayoutWrapper>
-              </Route>
-
-              <Route path="/tokens">
-                <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
-                  <AllTokensPage />
-                </LayoutWrapper>
-              </Route>
-
-              <Route path="/pairs">
-                <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
-                  <AllPairsPage />
-                </LayoutWrapper>
-              </Route>
-
-              <Route path="/accounts">
-                <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
-                  <AccountLookup />
-                </LayoutWrapper>
-              </Route>
-
-              <Redirect to="/home" />
-            </Switch>
+            <ContentWrapper open={savedOpen}>
+              <SideNav />
+              <Center id="center">
+                <Routes>
+                  <Route path="/" element={<GlobalPage />} />
+                  <Route path="/token/:tokenAddress" element={<TokenPage />} />
+                  <Route path="/pair/:pairAddress" element={<PairPage />} />
+                  <Route path="/account/:accountAddress" element={<AccountPage />} />
+                  <Route path="tokens" element={<AllTokensPage />} />
+                  <Route path="pairs" element={<AllPairsPage />} />
+                  <Route path="accounts" element={<AccountLookup />} />
+                  <Route path="*" element={<Navigate to="/" replace />} />
+                </Routes>
+              </Center>
+              <Right open={savedOpen}>
+                <PinnedData open={savedOpen} setSavedOpen={setSavedOpen} />
+              </Right>
+            </ContentWrapper>
           </BrowserRouter>
         ) : (
           <LocalLoader fill="true" />
