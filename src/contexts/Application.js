@@ -269,12 +269,13 @@ export function useListedTokens() {
 
   useEffect(() => {
     async function fetchList() {
-      const allFetched = await SUPPORTED_LIST_URLS__NO_ENS.reduce(async (fetchedTokens, url) => {
-        const tokensSoFar = await fetchedTokens
-        const newTokens = await getTokenList(url)
-        return Promise.resolve([...tokensSoFar, ...newTokens.tokens])
-      }, Promise.resolve([]))
-      let formatted = allFetched?.map(t => t.address.toLowerCase())
+      const allFetched = await Promise.all(
+        SUPPORTED_LIST_URLS__NO_ENS.map(async url => {
+          const tokenList = await getTokenList(url)
+          return tokenList.tokens
+        })
+      )
+      let formatted = allFetched?.map(t => t.name.toLowerCase())
       updateSupportedTokens(formatted)
     }
     if (!supportedTokens) {

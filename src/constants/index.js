@@ -11,7 +11,7 @@ export const timeframeOptions = {
 }
 
 // token list urls to fetch tokens from - use for warnings on tokens and pairs
-export const SUPPORTED_LIST_URLS__NO_ENS = ['https://t1.cryptofuture.tech/assets/whiteswap-default.tokenlist.json']
+export const SUPPORTED_LIST_URLS__NO_ENS = ['https://app.ws.exchange/assets/whiteswap-default.tokenlist.json']
 
 // hide from overview list
 export const OVERVIEW_TOKEN_BLACKLIST = [
