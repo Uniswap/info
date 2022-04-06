@@ -18,39 +18,6 @@ export const SUBGRAPH_HEALTH = gql`
   }
 `
 
-export const V1_DATA_QUERY = gql`
-  query whiteSwap($date: Int!, $date2: Int!) {
-    current: whiteSwap(id: "1") {
-      totalVolumeUSD
-      totalLiquidityUSD
-      txCount
-    }
-    oneDay: whiteSwapHistoricalDatas(
-      where: { timestamp_lt: $date }
-      first: 1
-      orderBy: timestamp
-      orderDirection: desc
-    ) {
-      totalVolumeUSD
-      totalLiquidityUSD
-      txCount
-    }
-    twoDay: whiteSwapHistoricalDatas(
-      where: { timestamp_lt: $date2 }
-      first: 1
-      orderBy: timestamp
-      orderDirection: desc
-    ) {
-      totalVolumeUSD
-      totalLiquidityUSD
-      txCount
-    }
-    exchanges(first: 200, orderBy: ethBalance, orderDirection: desc) {
-      ethBalance
-    }
-  }
-`
-
 export const GET_BLOCK = gql`
   query blocks($timestampFrom: Int!, $timestampTo: Int!) {
     blocks(
@@ -75,24 +42,6 @@ export const GET_BLOCKS = timestamps => {
       number
     }`
   })
-  queryString += '}'
-  return gql(queryString)
-}
-
-export const POSITIONS_BY_BLOCK = (account, blocks) => {
-  let queryString = 'query blocks {'
-  queryString += blocks.map(
-    block => `
-      t${block.timestamp}:liquidityPositions(where: {user: "${account}"}, block: { number: ${block.number} }) {
-        liquidityTokenBalance
-        pair  {
-          id
-          totalSupply
-          reserveUSD
-        }
-      }
-    `
-  )
   queryString += '}'
   return gql(queryString)
 }
@@ -199,17 +148,6 @@ export const ETH_PRICE = block => {
   return gql(queryString)
 }
 
-export const USER = (block, account) => {
-  const queryString = `
-    query users {
-      user(id: "${account}", block: {number: ${block}}) {
-        liquidityPositions
-      }
-    }
-`
-  return gql(queryString)
-}
-
 export const USER_MINTS_BUNRS_PER_PAIR = gql`
   query events($user: Bytes!, $pair: Bytes!) {
     mints(where: { to: $user, pair: $pair }) {
@@ -239,14 +177,6 @@ export const USER_MINTS_BUNRS_PER_PAIR = gql`
           id
         }
       }
-    }
-  }
-`
-
-export const FIRST_SNAPSHOT = gql`
-  query snapshots($user: Bytes!) {
-    liquidityPositionSnapshots(first: 1, where: { user: $user }, orderBy: timestamp, orderDirection: asc) {
-      timestamp
     }
   }
 `
@@ -382,20 +312,6 @@ export const PAIR_CHART = gql`
       dailyVolumeToken0
       dailyVolumeToken1
       dailyVolumeUSD
-      reserveUSD
-    }
-  }
-`
-
-export const PAIR_DAY_DATA = gql`
-  query pairDayDatas($pairAddress: Bytes!, $date: Int!) {
-    pairDayDatas(first: 1, orderBy: date, orderDirection: desc, where: { pairAddress: $pairAddress, date_lt: $date }) {
-      id
-      date
-      dailyVolumeToken0
-      dailyVolumeToken1
-      dailyVolumeUSD
-      totalSupply
       reserveUSD
     }
   }
