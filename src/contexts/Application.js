@@ -80,8 +80,12 @@ function reducer(state, { type, payload }) {
 }
 
 const INITIAL_STATE = {
-  CURRENCY: 'USD',
-  TIME_KEY: timeframeOptions.ALL_TIME
+  [CURRENCY]: 'USD',
+  [TIME_KEY]: timeframeOptions.ALL_TIME,
+  [SESSION_START]: 0,
+  [LATEST_BLOCK]: '',
+  [HEAD_BLOCK]: '',
+  [SUPPORTED_TOKENS]: undefined
 }
 
 export default function Provider({ children }) {

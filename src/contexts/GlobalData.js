@@ -34,6 +34,22 @@ function useGlobalDataContext() {
   return useContext(GlobalDataContext)
 }
 
+const INITIAL_STATE = {
+  globalData: {},
+  chartData: {},
+  transactions: {
+    burns: [],
+    mints: [],
+    swaps: []
+  },
+  allPairs: [],
+  allTokens: [],
+  topLps: [],
+  [ETH_PRICE_KEY]: '',
+  oneDayPrice: '',
+  ethPriceChange: 0
+}
+
 function reducer(state, { type, payload }) {
   switch (type) {
     case UPDATE: {
@@ -99,7 +115,7 @@ function reducer(state, { type, payload }) {
 }
 
 export default function Provider({ children }) {
-  const [state, dispatch] = useReducer(reducer, {})
+  const [state, dispatch] = useReducer(reducer, INITIAL_STATE)
   const update = useCallback(data => {
     dispatch({
       type: UPDATE,

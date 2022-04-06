@@ -42,6 +42,8 @@ function useTokenDataContext() {
   return useContext(TokenDataContext)
 }
 
+const INITIAL_STATE = {}
+
 function reducer(state, { type, payload }) {
   switch (type) {
     case UPDATE: {
@@ -119,7 +121,7 @@ function reducer(state, { type, payload }) {
 }
 
 export default function Provider({ children }) {
-  const [state, dispatch] = useReducer(reducer, {})
+  const [state, dispatch] = useReducer(reducer, INITIAL_STATE)
   const update = useCallback((tokenAddress, data) => {
     dispatch({
       type: UPDATE,

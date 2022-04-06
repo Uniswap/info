@@ -48,6 +48,8 @@ function usePairDataContext() {
   return useContext(PairDataContext)
 }
 
+const INITIAL_STATE = {}
+
 function reducer(state, { type, payload }) {
   switch (type) {
     case UPDATE: {
@@ -115,7 +117,7 @@ function reducer(state, { type, payload }) {
 }
 
 export default function Provider({ children }) {
-  const [state, dispatch] = useReducer(reducer, {})
+  const [state, dispatch] = useReducer(reducer, INITIAL_STATE)
 
   // update pair specific data
   const update = useCallback((pairAddress, data) => {
