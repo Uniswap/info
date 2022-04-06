@@ -10,12 +10,9 @@ import {
 } from '../apollo/queries'
 import { useTimeframe, useStartTimestamp } from './Application'
 import dayjs from 'dayjs'
-import utc from 'dayjs/plugin/utc'
 import { useEthPrice } from './GlobalData'
 import { getLPReturnsOnPair, getHistoricalPairReturns } from '../utils/returns'
 import { timeframeOptions } from '../constants'
-
-dayjs.extend(utc)
 
 const UPDATE_TRANSACTIONS = 'UPDATE_TRANSACTIONS'
 const UPDATE_POSITIONS = 'UPDATE_POSITIONS '

@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useMedia } from 'react-use'
-import dayjs from 'dayjs'
 import LocalLoader from '../LocalLoader'
-import utc from 'dayjs/plugin/utc'
 import { Box, Flex, Text } from 'rebass'
 import styled from 'styled-components/macro'
 
@@ -16,8 +14,6 @@ import { TYPE } from '../../Theme'
 import { transparentize } from 'polished'
 import Panel from '../Panel'
 import { useTranslation } from 'react-i18next'
-
-dayjs.extend(utc)
 
 const PageButtons = styled.div`
   width: 100%;

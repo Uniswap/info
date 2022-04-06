@@ -1,7 +1,6 @@
 import { createContext, useContext, useReducer, useMemo, useCallback, useEffect, useState } from 'react'
 import { client } from '../apollo/client'
 import dayjs from 'dayjs'
-import utc from 'dayjs/plugin/utc'
 import { useTimeframe } from './Application'
 import {
   getPercentChange,
@@ -19,7 +18,6 @@ import {
   ALL_TOKENS,
   TOP_LPS_PER_PAIRS
 } from '../apollo/queries'
-import weekOfYear from 'dayjs/plugin/weekOfYear'
 import { useAllPairData } from './PairData'
 const UPDATE = 'UPDATE'
 const UPDATE_TXNS = 'UPDATE_TXNS'
@@ -29,10 +27,6 @@ const ETH_PRICE_KEY = 'ETH_PRICE_KEY'
 const UPDATE_ALL_PAIRS_IN_UNISWAP = 'UPDAUPDATE_ALL_PAIRS_IN_UNISWAPTE_TOP_PAIRS'
 const UPDATE_ALL_TOKENS_IN_UNISWAP = 'UPDATE_ALL_TOKENS_IN_UNISWAP'
 const UPDATE_TOP_LPS = 'UPDATE_TOP_LPS'
-
-// format dayjs with the libraries that we need
-dayjs.extend(utc)
-dayjs.extend(weekOfYear)
 
 const GlobalDataContext = createContext()
 

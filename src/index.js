@@ -8,8 +8,15 @@ import GlobalDataContextProvider from './contexts/GlobalData'
 import PairDataContextProvider, { Updater as PairDataContextUpdater } from './contexts/PairData'
 import ApplicationContextProvider from './contexts/Application'
 import UserContextProvider from './contexts/User'
+import dayjs from 'dayjs'
+import weekOfYear from 'dayjs/plugin/weekOfYear'
+import utc from 'dayjs/plugin/utc'
 import App from './App'
 import './i18n'
+
+// initialize custom dayjs plugin
+dayjs.extend(utc)
+dayjs.extend(weekOfYear)
 
 // initialize GA
 const GOOGLE_ANALYTICS_ID = process.env.REACT_APP_GOOGLE_ANALYTICS_ID

@@ -14,7 +14,6 @@ import {
 import { useEthPrice } from './GlobalData'
 
 import dayjs from 'dayjs'
-import utc from 'dayjs/plugin/utc'
 
 import {
   getPercentChange,
@@ -33,8 +32,6 @@ const UPDATE_PAIR_TXNS = 'UPDATE_PAIR_TXNS'
 const UPDATE_CHART_DATA = 'UPDATE_CHART_DATA'
 const UPDATE_TOP_PAIRS = 'UPDATE_TOP_PAIRS'
 const UPDATE_HOURLY_DATA = 'UPDATE_HOURLY_DATA'
-
-dayjs.extend(utc)
 
 export function safeAccess(object, path) {
   return object

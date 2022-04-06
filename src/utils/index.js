@@ -1,7 +1,6 @@
 import { BigNumber } from 'bignumber.js'
 import dayjs from 'dayjs'
 import { ethers } from 'ethers'
-import utc from 'dayjs/plugin/utc'
 import { client, blockClient } from '../apollo/client'
 import { GET_BLOCK, GET_BLOCKS, SHARE_VALUE } from '../apollo/queries'
 import { Text } from 'rebass'
@@ -14,7 +13,6 @@ import Numeral from 'numeral'
 const Decimal = toFormat(_Decimal)
 
 BigNumber.set({ EXPONENTIAL_AT: 50 })
-dayjs.extend(utc)
 
 export function getTimeframe(timeWindow) {
   const utcEndTime = dayjs.utc()

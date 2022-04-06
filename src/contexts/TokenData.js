@@ -14,7 +14,6 @@ import {
 import { useEthPrice } from './GlobalData'
 
 import dayjs from 'dayjs'
-import utc from 'dayjs/plugin/utc'
 
 import {
   get2DayPercentChange,
@@ -36,8 +35,6 @@ const UPDATE_TOP_TOKENS = ' UPDATE_TOP_TOKENS'
 const UPDATE_ALL_PAIRS = 'UPDATE_ALL_PAIRS'
 
 const TOKEN_PAIRS_KEY = 'TOKEN_PAIRS_KEY'
-
-dayjs.extend(utc)
 
 const TokenDataContext = createContext()
 
