@@ -254,6 +254,11 @@ export function useTimeframe() {
   return [activeTimeframe, updateTimeframe]
 }
 
+export function useActiveNetworkId() {
+  const [state] = useApplicationContext()
+  return state.ACTIVE_NETWORK.id
+}
+
 export function useStartTimestamp() {
   const [activeWindow] = useTimeframe()
   const [startDateTimestamp, setStartDateTimestamp] = useState()

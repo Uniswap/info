@@ -34,8 +34,8 @@ if (typeof GOOGLE_ANALYTICS_ID === 'string' && GOOGLE_ANALYTICS_ID !== '') {
 
 function ContextProviders({ children }) {
   return (
-    <LocalStorageContextProvider>
-      <ApplicationContextProvider>
+    <ApplicationContextProvider>
+      <LocalStorageContextProvider>
         <TokenDataContextProvider>
           <GlobalDataContextProvider>
             <PairDataContextProvider>
@@ -43,8 +43,8 @@ function ContextProviders({ children }) {
             </PairDataContextProvider>
           </GlobalDataContextProvider>
         </TokenDataContextProvider>
-      </ApplicationContextProvider>
-    </LocalStorageContextProvider>
+      </LocalStorageContextProvider>
+    </ApplicationContextProvider>
   )
 }
 

@@ -1,7 +1,7 @@
 import { createContext, useContext, useReducer, useMemo, useCallback, useEffect, useState } from 'react'
 import { client } from '../apollo/client'
 import dayjs from 'dayjs'
-import { useTimeframe } from './Application'
+import { useTimeframe, useActiveNetworkId } from './Application'
 import {
   getPercentChange,
   getBlockFromTimestamp,
@@ -19,11 +19,11 @@ import {
   TOP_LPS_PER_PAIRS
 } from '../apollo/queries'
 import { useAllPairData } from './PairData'
+import { EthereumNetworkInfo, TronNetworkInfo } from 'constants/networks'
 const UPDATE = 'UPDATE'
 const UPDATE_TXNS = 'UPDATE_TXNS'
 const UPDATE_CHART = 'UPDATE_CHART'
-const UPDATE_ETH_PRICE = 'UPDATE_ETH_PRICE'
-const ETH_PRICE_KEY = 'ETH_PRICE_KEY'
+const UPDATE_PRICE = 'UPDATE_PRICE'
 const UPDATE_ALL_PAIRS_IN_UNISWAP = 'UPDAUPDATE_ALL_PAIRS_IN_UNISWAPTE_TOP_PAIRS'
 const UPDATE_ALL_TOKENS_IN_UNISWAP = 'UPDATE_ALL_TOKENS_IN_UNISWAP'
 const UPDATE_TOP_LPS = 'UPDATE_TOP_LPS'
@@ -34,78 +34,101 @@ function useGlobalDataContext() {
   return useContext(GlobalDataContext)
 }
 
-const INITIAL_STATE = {
-  globalData: {},
-  chartData: {},
-  transactions: {
-    burns: [],
-    mints: [],
-    swaps: []
-  },
+const initialGlobalNetworkState = {
+  globalData: undefined,
+  chartData: undefined,
+  transactions: undefined,
+  topLps: undefined,
   allPairs: [],
   allTokens: [],
-  topLps: [],
-  [ETH_PRICE_KEY]: '',
+  price: '',
   oneDayPrice: '',
-  ethPriceChange: 0
+  priceChange: 0
+}
+
+const INITIAL_STATE = {
+  [EthereumNetworkInfo.id]: initialGlobalNetworkState,
+  [TronNetworkInfo.id]: initialGlobalNetworkState
 }
 
 function reducer(state, { type, payload }) {
   switch (type) {
     case UPDATE: {
-      const { data } = payload
+      const { data, networkId } = payload
       return {
         ...state,
-        globalData: data
-      }
-    }
-    case UPDATE_TXNS: {
-      const { transactions } = payload
-      return {
-        ...state,
-        transactions
-      }
-    }
-    case UPDATE_CHART: {
-      const { daily, weekly } = payload
-      return {
-        ...state,
-        chartData: {
-          daily,
-          weekly
+        [networkId]: {
+          ...state[networkId],
+          globalData: data
         }
       }
     }
-    case UPDATE_ETH_PRICE: {
-      const { ethPrice, oneDayPrice, ethPriceChange } = payload
+    case UPDATE_TXNS: {
+      const { transactions, networkId } = payload
       return {
-        [ETH_PRICE_KEY]: ethPrice,
-        oneDayPrice,
-        ethPriceChange
+        ...state,
+        [networkId]: {
+          ...state[networkId],
+          transactions
+        }
+      }
+    }
+    case UPDATE_CHART: {
+      const { daily, weekly, networkId } = payload
+      return {
+        ...state,
+        [networkId]: {
+          ...state[networkId],
+          chartData: {
+            daily,
+            weekly
+          }
+        }
+      }
+    }
+    case UPDATE_PRICE: {
+      const { price, oneDayPrice, priceChange, networkId } = payload
+      return {
+        ...state,
+        [networkId]: {
+          ...state[networkId],
+          price,
+          oneDayPrice,
+          priceChange
+        }
       }
     }
 
     case UPDATE_ALL_PAIRS_IN_UNISWAP: {
-      const { allPairs } = payload
+      const { allPairs, networkId } = payload
       return {
         ...state,
-        allPairs
+        [networkId]: {
+          ...state[networkId],
+          allPairs
+        }
       }
     }
 
     case UPDATE_ALL_TOKENS_IN_UNISWAP: {
-      const { allTokens } = payload
+      const { allTokens, networkId } = payload
       return {
         ...state,
-        allTokens
+        [networkId]: {
+          ...state[networkId],
+          allTokens
+        }
       }
     }
 
     case UPDATE_TOP_LPS: {
-      const { topLps } = payload
+      const { topLps, networkId } = payload
       return {
         ...state,
-        topLps
+        [networkId]: {
+          ...state[networkId],
+          topLps
+        }
       }
     }
     default: {
@@ -116,68 +139,75 @@ function reducer(state, { type, payload }) {
 
 export default function Provider({ children }) {
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE)
-  const update = useCallback(data => {
+  const update = useCallback(({ data, networkId }) => {
     dispatch({
       type: UPDATE,
       payload: {
-        data
+        data,
+        networkId
       }
     })
   }, [])
 
-  const updateTransactions = useCallback(transactions => {
+  const updateTransactions = useCallback(({ transactions, networkId }) => {
     dispatch({
       type: UPDATE_TXNS,
       payload: {
-        transactions
+        transactions,
+        networkId
       }
     })
   }, [])
 
-  const updateChart = useCallback((daily, weekly) => {
+  const updateChart = useCallback(({ daily, weekly, networkId }) => {
     dispatch({
       type: UPDATE_CHART,
       payload: {
         daily,
-        weekly
+        weekly,
+        networkId
       }
     })
   }, [])
 
-  const updateEthPrice = useCallback((ethPrice, oneDayPrice, ethPriceChange) => {
+  const updatePrice = useCallback(({ price, oneDayPrice, priceChange, networkId }) => {
     dispatch({
-      type: UPDATE_ETH_PRICE,
+      type: UPDATE_PRICE,
       payload: {
-        ethPrice,
+        price,
         oneDayPrice,
-        ethPriceChange
+        priceChange,
+        networkId
       }
     })
   }, [])
 
-  const updateAllPairsInUniswap = useCallback(allPairs => {
+  const updateAllPairsInUniswap = useCallback(({ allPairs, networkId }) => {
     dispatch({
       type: UPDATE_ALL_PAIRS_IN_UNISWAP,
       payload: {
-        allPairs
+        allPairs,
+        networkId
       }
     })
   }, [])
 
-  const updateAllTokensInUniswap = useCallback(allTokens => {
+  const updateAllTokensInUniswap = useCallback(({ allTokens, networkId }) => {
     dispatch({
       type: UPDATE_ALL_TOKENS_IN_UNISWAP,
       payload: {
-        allTokens
+        allTokens,
+        networkId
       }
     })
   }, [])
 
-  const updateTopLps = useCallback(topLps => {
+  const updateTopLps = useCallback(({ topLps, networkId }) => {
     dispatch({
       type: UPDATE_TOP_LPS,
       payload: {
-        topLps
+        topLps,
+        networkId
       }
     })
   }, [])
@@ -190,7 +220,7 @@ export default function Provider({ children }) {
             update,
             updateTransactions,
             updateChart,
-            updateEthPrice,
+            updatePrice,
             updateTopLps,
             updateAllPairsInUniswap,
             updateAllTokensInUniswap
@@ -202,7 +232,7 @@ export default function Provider({ children }) {
           updateTransactions,
           updateTopLps,
           updateChart,
-          updateEthPrice,
+          updatePrice,
           updateAllPairsInUniswap,
           updateAllTokensInUniswap
         ]
@@ -217,10 +247,10 @@ export default function Provider({ children }) {
  * Gets all the global data for the overview page.
  * Needs current eth price and the old eth price to get
  * 24 hour USD changes.
- * @param {*} ethPrice
- * @param {*} oldEthPrice
+ * @param {*} price
+ * @param {*} oldPrice
  */
-async function getGlobalData(ethPrice, oldEthPrice) {
+async function getGlobalData(price, oldPrice) {
   // data for each day , historic data used for % changes
   let data = {}
   let oneDayData = {}
@@ -288,10 +318,10 @@ async function getGlobalData(ethPrice, oldEthPrice) {
       )
 
       // format the total liquidity in USD
-      data.totalLiquidityUSD = data.totalLiquidityETH * ethPrice
+      data.totalLiquidityUSD = data.totalLiquidityETH * price
       const liquidityChangeUSD = getPercentChange(
-        data.totalLiquidityETH * ethPrice,
-        oneDayData.totalLiquidityETH * oldEthPrice
+        data.totalLiquidityETH * price,
+        oneDayData.totalLiquidityETH * oldPrice
       )
 
       // add relevant fields with the calculated amounts
@@ -448,13 +478,13 @@ const getGlobalTransactions = async () => {
 /**
  * Gets the current price  of ETH, 24 hour price, and % change between them
  */
-const getEthPrice = async () => {
+const getPrice = async () => {
   const utcCurrentTime = dayjs()
   const utcOneDayBack = utcCurrentTime.subtract(1, 'day').startOf('minute').unix()
 
-  let ethPrice = 0
-  let ethPriceOneDay = 0
-  let priceChangeETH = 0
+  let price = 0
+  let priceOneDay = 0
+  let priceChange = 0
 
   try {
     let oneDayBlock = await getBlockFromTimestamp(utcOneDayBack)
@@ -468,14 +498,14 @@ const getEthPrice = async () => {
     })
     const currentPrice = result?.data?.bundles[0]?.ethPrice
     const oneDayBackPrice = resultOneDay?.data?.bundles[0]?.ethPrice
-    priceChangeETH = getPercentChange(currentPrice, oneDayBackPrice)
-    ethPrice = currentPrice
-    ethPriceOneDay = oneDayBackPrice
+    priceChange = getPercentChange(currentPrice, oneDayBackPrice)
+    price = currentPrice
+    priceOneDay = oneDayBackPrice
   } catch (e) {
     console.log(e)
   }
 
-  return [ethPrice, ethPriceOneDay, priceChangeETH]
+  return [price, priceOneDay, priceChange]
 }
 
 const PAIRS_TO_FETCH = 500
@@ -542,36 +572,37 @@ async function getAllTokensOnUniswap() {
  */
 export function useGlobalData() {
   const [state, { update, updateAllPairsInUniswap, updateAllTokensInUniswap }] = useGlobalDataContext()
-  const [ethPrice, oldEthPrice] = useEthPrice()
-
-  const data = state?.globalData
+  const activeNetwork = useActiveNetworkId()
+  const [price, oldPrice] = useEthPrice()
+  const data = state[activeNetwork]?.globalData
 
   useEffect(() => {
     async function fetchData() {
-      let globalData = await getGlobalData(ethPrice, oldEthPrice)
-      globalData && update(globalData)
+      let globalData = await getGlobalData(price, oldPrice)
+      globalData && update({ data: globalData, networkId: activeNetwork })
 
       let allPairs = await getAllPairsOnUniswap()
-      updateAllPairsInUniswap(allPairs)
+      updateAllPairsInUniswap({ allPairs, networkId: activeNetwork })
 
       let allTokens = await getAllTokensOnUniswap()
-      updateAllTokensInUniswap(allTokens)
+      updateAllTokensInUniswap({ allTokens, networkId: activeNetwork })
     }
-    if (!data && ethPrice && oldEthPrice) {
+    if (!data && price && oldPrice) {
       fetchData()
     }
-  }, [ethPrice, oldEthPrice, update, data, updateAllPairsInUniswap, updateAllTokensInUniswap])
+  }, [price, oldPrice, update, data, updateAllPairsInUniswap, updateAllTokensInUniswap, activeNetwork])
 
   return data || {}
 }
 
 export function useGlobalChartData() {
   const [state, { updateChart }] = useGlobalDataContext()
+  const activeNetwork = useActiveNetworkId()
   const [oldestDateFetch, setOldestDateFetched] = useState()
   const [activeWindow] = useTimeframe()
 
-  const chartDataDaily = state?.chartData?.daily
-  const chartDataWeekly = state?.chartData?.weekly
+  const daily = state[activeNetwork]?.chartData?.daily
+  const weekly = state[activeNetwork]?.chartData?.weekly
 
   /**
    * Keep track of oldest date fetched. Used to
@@ -594,60 +625,65 @@ export function useGlobalChartData() {
     async function fetchData() {
       // historical stuff for chart
       let [newChartData, newWeeklyData] = await getChartData(oldestDateFetch)
-      updateChart(newChartData, newWeeklyData)
+      updateChart({ daily: newChartData, weekly: newWeeklyData, networkId: activeNetwork })
     }
-    if (oldestDateFetch && !(chartDataDaily && chartDataWeekly)) {
+    if (oldestDateFetch && !(daily && weekly)) {
       fetchData()
     }
-  }, [chartDataDaily, chartDataWeekly, oldestDateFetch, updateChart])
+  }, [daily, weekly, oldestDateFetch, updateChart, activeNetwork])
 
-  return [chartDataDaily, chartDataWeekly]
+  return [daily, weekly]
 }
 
 export function useGlobalTransactions() {
   const [state, { updateTransactions }] = useGlobalDataContext()
-  const transactions = state?.transactions
+  const activeNetwork = useActiveNetworkId()
+  const { transactions } = state[activeNetwork]
+
   useEffect(() => {
     async function fetchData() {
       if (!transactions) {
         let txns = await getGlobalTransactions()
-        updateTransactions(txns)
+        updateTransactions({ transactions: txns, networkId: activeNetwork })
       }
     }
     fetchData()
-  }, [updateTransactions, transactions])
+  }, [updateTransactions, transactions, activeNetwork])
   return transactions
 }
 
 export function useEthPrice() {
-  const [state, { updateEthPrice }] = useGlobalDataContext()
-  const ethPrice = state?.[ETH_PRICE_KEY]
-  const ethPriceOld = state?.['oneDayPrice']
+  const [state, { updatePrice }] = useGlobalDataContext()
+  const activeNetwork = useActiveNetworkId()
+  const { price, oneDayPrice } = state[activeNetwork]
+
   useEffect(() => {
-    async function checkForEthPrice() {
-      if (!ethPrice) {
-        let [newPrice, oneDayPrice, priceChange] = await getEthPrice()
-        updateEthPrice(newPrice, oneDayPrice, priceChange)
+    async function checkForPrice() {
+      if (!price) {
+        let [newPrice, newOneDayPrice, priceChange] = await getPrice()
+        updatePrice({ price: newPrice, oneDayPrice: newOneDayPrice, priceChange, networkId: activeNetwork })
       }
     }
-    checkForEthPrice()
-  }, [ethPrice, updateEthPrice])
+    checkForPrice()
+  }, [price, updatePrice, activeNetwork])
 
-  return [ethPrice, ethPriceOld]
+  return [price, oneDayPrice]
 }
 
 export function useAllPairsInUniswap() {
   const [state] = useGlobalDataContext()
-  let allPairs = state?.allPairs
+  const activeNetwork = useActiveNetworkId()
+  const { allPairs } = state[activeNetwork]
 
-  return allPairs || []
+  return allPairs
 }
 
 export function useAllTokensInUniswap() {
   const [state] = useGlobalDataContext()
-  let allTokens = state?.allTokens
+  const activeNetwork = useActiveNetworkId()
+  const { allTokens } = state[activeNetwork]
 
-  return allTokens || []
+  return allTokens
 }
 
 /**
@@ -656,7 +692,8 @@ export function useAllTokensInUniswap() {
  */
 export function useTopLps() {
   const [state, { updateTopLps }] = useGlobalDataContext()
-  let topLps = state?.topLps
+  const activeNetwork = useActiveNetworkId()
+  let topLps = state[activeNetwork]?.topLps
 
   const allPairs = useAllPairData()
 
@@ -710,7 +747,7 @@ export function useTopLps() {
 
       const sorted = topLps.sort((a, b) => (a.usd > b.usd ? -1 : 1))
       const shorter = sorted.splice(0, 100)
-      updateTopLps(shorter)
+      updateTopLps({ topLps: shorter, networkId: activeNetwork })
     }
 
     if (!topLps && allPairs && Object.keys(allPairs).length > 0) {
