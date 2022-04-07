@@ -1,6 +1,7 @@
 import { createContext, useContext, useReducer, useMemo, useCallback, useState, useEffect } from 'react'
-import { EthereumNetworkInfo } from '../constants/networks'
-import { timeframeOptions, SUPPORTED_LIST_URLS__NO_ENS } from '../constants'
+import { EthereumNetworkInfo, TronNetworkInfo } from '../constants/networks'
+import { timeframeOptions } from '../constants'
+import { DEFAULT_LIST_OF_LISTS } from '../constants/lists'
 import dayjs from 'dayjs'
 import getTokenList from '../utils/tokenLists'
 import { healthClient } from '../apollo/client'
@@ -72,7 +73,10 @@ function reducer(state, { type, payload }) {
       const { supportedTokens } = payload
       return {
         ...state,
-        [SUPPORTED_TOKENS]: supportedTokens
+        [SUPPORTED_TOKENS]: {
+          ...state.SUPPORTED_TOKENS,
+          [state.ACTIVE_NETWORK.id]: supportedTokens
+        }
       }
     }
 
@@ -96,7 +100,10 @@ const INITIAL_STATE = {
   [SESSION_START]: 0,
   [LATEST_BLOCK]: '',
   [HEAD_BLOCK]: '',
-  [SUPPORTED_TOKENS]: undefined,
+  [SUPPORTED_TOKENS]: {
+    [EthereumNetworkInfo.id]: [],
+    [TronNetworkInfo.id]: []
+  },
   [ACTIVE_NETWORK]: EthereumNetworkInfo
 }
 
@@ -296,23 +303,24 @@ export function useSessionStart() {
 
 export function useListedTokens() {
   const [state, { updateSupportedTokens }] = useApplicationContext()
-  const supportedTokens = state?.[SUPPORTED_TOKENS]
+  const activeNetwork = state.ACTIVE_NETWORK
+  const supportedTokens = state?.[SUPPORTED_TOKENS]?.[activeNetwork.id]
 
   useEffect(() => {
     async function fetchList() {
       const allFetched = await Promise.all(
-        SUPPORTED_LIST_URLS__NO_ENS.map(async url => {
+        DEFAULT_LIST_OF_LISTS[activeNetwork.id].map(async url => {
           const tokenList = await getTokenList(url)
           return tokenList.tokens
         })
       )
-      let formatted = allFetched?.map(t => t.name.toLowerCase())
+      let formatted = allFetched.flat()?.map(t => t.address.toLowerCase())
       updateSupportedTokens(formatted)
     }
-    if (!supportedTokens) {
+    if (supportedTokens.length === 0) {
       fetchList()
     }
-  }, [updateSupportedTokens, supportedTokens])
+  }, [updateSupportedTokens, supportedTokens, activeNetwork])
 
   return supportedTokens
 }

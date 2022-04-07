@@ -179,7 +179,7 @@ function TokenPage() {
     <PageWrapper>
       <Warning
         type={'token'}
-        show={!dismissed && listedTokens && !listedTokens.includes(tokenAddress)}
+        show={!dismissed && listedTokens.length > 0 && !listedTokens.includes(tokenAddress)}
         setShow={markAsDismissed}
         address={tokenAddress}
       />
