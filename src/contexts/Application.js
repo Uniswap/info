@@ -12,6 +12,7 @@ const UPDATE_SESSION_START = 'UPDATE_SESSION_START'
 const UPDATED_SUPPORTED_TOKENS = 'UPDATED_SUPPORTED_TOKENS'
 const UPDATE_LATEST_BLOCK = 'UPDATE_LATEST_BLOCK'
 const UPDATE_HEAD_BLOCK = 'UPDATE_HEAD_BLOCK'
+const UPDATE_ACTIVE_NETWORK = 'UPDATE_ACTIVE_NETWORK'
 
 const SUPPORTED_TOKENS = 'SUPPORTED_TOKENS'
 const TIME_KEY = 'TIME_KEY'
@@ -72,6 +73,14 @@ function reducer(state, { type, payload }) {
       return {
         ...state,
         [SUPPORTED_TOKENS]: supportedTokens
+      }
+    }
+
+    case UPDATE_ACTIVE_NETWORK: {
+      const { network } = payload
+      return {
+        ...state,
+        [ACTIVE_NETWORK]: network
       }
     }
 
@@ -149,6 +158,15 @@ export default function Provider({ children }) {
     })
   }, [])
 
+  const updateActiveNetwork = useCallback(network => {
+    dispatch({
+      type: UPDATE_ACTIVE_NETWORK,
+      payload: {
+        network
+      }
+    })
+  }, [])
+
   return (
     <ApplicationContext.Provider
       value={useMemo(
@@ -160,10 +178,20 @@ export default function Provider({ children }) {
             updateTimeframe,
             updateSupportedTokens,
             updateLatestBlock,
-            updateHeadBlock
+            updateHeadBlock,
+            updateActiveNetwork
           }
         ],
-        [state, update, updateTimeframe, updateSessionStart, updateSupportedTokens, updateLatestBlock, updateHeadBlock]
+        [
+          state,
+          update,
+          updateTimeframe,
+          updateSessionStart,
+          updateSupportedTokens,
+          updateLatestBlock,
+          updateHeadBlock,
+          updateActiveNetwork
+        ]
       )}
     >
       {children}
