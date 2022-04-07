@@ -1,4 +1,5 @@
 import { createContext, useContext, useReducer, useMemo, useCallback, useState, useEffect } from 'react'
+import { EthereumNetworkInfo } from '../constants/networks'
 import { timeframeOptions, SUPPORTED_LIST_URLS__NO_ENS } from '../constants'
 import dayjs from 'dayjs'
 import getTokenList from '../utils/tokenLists'
@@ -18,6 +19,7 @@ const CURRENCY = 'CURRENCY'
 const SESSION_START = 'SESSION_START'
 const LATEST_BLOCK = 'LATEST_BLOCK'
 const HEAD_BLOCK = 'HEAD_BLOCK'
+const ACTIVE_NETWORK = 'ACTIVE_NETWORK'
 
 const ApplicationContext = createContext()
 
@@ -85,7 +87,8 @@ const INITIAL_STATE = {
   [SESSION_START]: 0,
   [LATEST_BLOCK]: '',
   [HEAD_BLOCK]: '',
-  [SUPPORTED_TOKENS]: undefined
+  [SUPPORTED_TOKENS]: undefined,
+  [ACTIVE_NETWORK]: EthereumNetworkInfo
 }
 
 export default function Provider({ children }) {

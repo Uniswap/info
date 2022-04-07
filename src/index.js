@@ -1,4 +1,5 @@
 import ReactDOM from 'react-dom'
+import { StrictMode } from 'react'
 import ReactGA from 'react-ga'
 import { isMobile } from 'react-device-detect'
 import ThemeProvider, { GlobalStyle } from './Theme'
@@ -58,14 +59,16 @@ function Updaters() {
 }
 
 ReactDOM.render(
-  <ContextProviders>
-    <Updaters />
-    <ThemeProvider>
-      <>
-        <GlobalStyle />
-        <App />
-      </>
-    </ThemeProvider>
-  </ContextProviders>,
+  <StrictMode>
+    <ContextProviders>
+      <Updaters />
+      <ThemeProvider>
+        <>
+          <GlobalStyle />
+          <App />
+        </>
+      </ThemeProvider>
+    </ContextProviders>
+  </StrictMode>,
   document.getElementById('root')
 )
