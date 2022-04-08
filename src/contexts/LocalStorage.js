@@ -1,7 +1,8 @@
 import { createContext, useContext, useReducer, useMemo, useCallback, useEffect } from 'react'
+import { useActiveNetworkId } from './Application'
+import { EthereumNetworkInfo, TronNetworkInfo } from '../constants/networks'
 
-const UNISWAP = 'UNISWAP'
-
+const WHITE_SWAP = 'WHITE_SWAP'
 const VERSION = 'VERSION'
 const CURRENT_VERSION = 0
 const LAST_SAVED = 'LAST_SAVED'
@@ -25,14 +26,19 @@ function useLocalStorageContext() {
 function reducer(state, { type, payload }) {
   switch (type) {
     case UPDATE_KEY: {
-      const { key, value } = payload
+      const { key, value, networkId } = payload
       if (!UPDATABLE_KEYS.some(k => k === key)) {
         throw Error(`Unexpected key in LocalStorageContext reducer: '${key}'.`)
       } else {
-        return {
-          ...state,
-          [key]: value
-        }
+        return networkId
+          ? {
+              ...state,
+              [networkId]: {
+                ...state[networkId],
+                [key]: value
+              }
+            }
+          : { ...state, [key]: value }
       }
     }
     default: {
@@ -41,18 +47,24 @@ function reducer(state, { type, payload }) {
   }
 }
 
+const initialNetworkSavedState = {
+  [DISMISSED_PATHS]: {},
+  [SAVED_ACCOUNTS]: [],
+  [SAVED_TOKENS]: {},
+  [SAVED_PAIRS]: {}
+}
+
 function init() {
   const defaultLocalStorage = {
     [VERSION]: CURRENT_VERSION,
     [DARK_MODE]: true,
-    [DISMISSED_PATHS]: {},
-    [SAVED_ACCOUNTS]: [],
-    [SAVED_TOKENS]: {},
-    [SAVED_PAIRS]: {}
+    [LAST_SAVED]: 0,
+    [EthereumNetworkInfo.id]: initialNetworkSavedState,
+    [TronNetworkInfo.id]: initialNetworkSavedState
   }
 
   try {
-    const parsed = JSON.parse(window.localStorage.getItem(UNISWAP))
+    const parsed = JSON.parse(localStorage.getItem(WHITE_SWAP))
     if (parsed[VERSION] !== CURRENT_VERSION) {
       // this is where we could run migration logic
       return defaultLocalStorage
@@ -67,8 +79,8 @@ function init() {
 export default function Provider({ children }) {
   const [state, dispatch] = useReducer(reducer, undefined, init)
 
-  const updateKey = useCallback((key, value) => {
-    dispatch({ type: UPDATE_KEY, payload: { key, value } })
+  const updateKey = useCallback((key, value, networkId) => {
+    dispatch({ type: UPDATE_KEY, payload: { key, value, networkId } })
   }, [])
 
   return (
@@ -82,7 +94,7 @@ export function Updater() {
   const [state] = useLocalStorageContext()
 
   useEffect(() => {
-    window.localStorage.setItem(UNISWAP, JSON.stringify({ ...state, [LAST_SAVED]: Math.floor(Date.now() / 1000) }))
+    localStorage.setItem(WHITE_SWAP, JSON.stringify({ ...state, [LAST_SAVED]: Math.floor(Date.now() / 1000) }))
   })
 
   return null
@@ -102,11 +114,12 @@ export function useDarkModeManager() {
 
 export function usePathDismissed(path) {
   const [state, { updateKey }] = useLocalStorageContext()
-  const pathDismissed = state?.[DISMISSED_PATHS]?.[path]
+  const activeNetwork = useActiveNetworkId()
+  const pathDismissed = state[activeNetwork][DISMISSED_PATHS]?.[path]
   function dismiss() {
-    let newPaths = state?.[DISMISSED_PATHS]
+    let newPaths = state[activeNetwork][DISMISSED_PATHS]
     newPaths[path] = true
-    updateKey(DISMISSED_PATHS, newPaths)
+    updateKey(DISMISSED_PATHS, newPaths, activeNetwork)
   }
 
   return [pathDismissed, dismiss]
@@ -114,21 +127,22 @@ export function usePathDismissed(path) {
 
 export function useSavedAccounts() {
   const [state, { updateKey }] = useLocalStorageContext()
-  const savedAccounts = state?.[SAVED_ACCOUNTS]
+  const activeNetwork = useActiveNetworkId()
+  const savedAccounts = state[activeNetwork][SAVED_ACCOUNTS]
 
   function addAccount(account) {
-    let newAccounts = state?.[SAVED_ACCOUNTS]
+    let newAccounts = state[activeNetwork][SAVED_ACCOUNTS]
     newAccounts.push(account)
-    updateKey(SAVED_ACCOUNTS, newAccounts)
+    updateKey(SAVED_ACCOUNTS, newAccounts, activeNetwork)
   }
 
   function removeAccount(account) {
-    let newAccounts = state?.[SAVED_ACCOUNTS]
+    let newAccounts = state[activeNetwork][SAVED_ACCOUNTS]
     let index = newAccounts.indexOf(account)
     if (index > -1) {
       newAccounts.splice(index, 1)
     }
-    updateKey(SAVED_ACCOUNTS, newAccounts)
+    updateKey(SAVED_ACCOUNTS, newAccounts, activeNetwork)
   }
 
   return [savedAccounts, addAccount, removeAccount]
@@ -136,10 +150,11 @@ export function useSavedAccounts() {
 
 export function useSavedPairs() {
   const [state, { updateKey }] = useLocalStorageContext()
-  const savedPairs = state?.[SAVED_PAIRS]
+  const activeNetwork = useActiveNetworkId()
+  const savedPairs = state[activeNetwork][SAVED_PAIRS]
 
   function addPair(address, token0Address, token1Address, token0Symbol, token1Symbol) {
-    let newList = state?.[SAVED_PAIRS]
+    let newList = state[activeNetwork][SAVED_PAIRS]
     newList[address] = {
       address,
       token0Address,
@@ -147,13 +162,13 @@ export function useSavedPairs() {
       token0Symbol,
       token1Symbol
     }
-    updateKey(SAVED_PAIRS, newList)
+    updateKey(SAVED_PAIRS, newList, activeNetwork)
   }
 
   function removePair(address) {
-    let newList = state?.[SAVED_PAIRS]
+    let newList = state[activeNetwork][SAVED_PAIRS]
     newList[address] = null
-    updateKey(SAVED_PAIRS, newList)
+    updateKey(SAVED_PAIRS, newList, activeNetwork)
   }
 
   return [savedPairs, addPair, removePair]
@@ -161,20 +176,21 @@ export function useSavedPairs() {
 
 export function useSavedTokens() {
   const [state, { updateKey }] = useLocalStorageContext()
-  const savedTokens = state?.[SAVED_TOKENS]
+  const activeNetwork = useActiveNetworkId()
+  const savedTokens = state[activeNetwork][SAVED_TOKENS]
 
   function addToken(address, symbol) {
-    let newList = state?.[SAVED_TOKENS]
+    let newList = state[activeNetwork][SAVED_TOKENS]
     newList[address] = {
       symbol
     }
-    updateKey(SAVED_TOKENS, newList)
+    updateKey(SAVED_TOKENS, newList, activeNetwork)
   }
 
   function removeToken(address) {
-    let newList = state?.[SAVED_TOKENS]
+    let newList = state[activeNetwork][SAVED_TOKENS]
     newList[address] = null
-    updateKey(SAVED_TOKENS, newList)
+    updateKey(SAVED_TOKENS, newList, activeNetwork)
   }
 
   return [savedTokens, addToken, removeToken]
