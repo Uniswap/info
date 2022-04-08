@@ -1,4 +1,5 @@
 import { createContext, useContext, useReducer, useMemo, useCallback, useEffect } from 'react'
+import { EthereumNetworkInfo, TronNetworkInfo } from '../constants/networks'
 
 import { client } from '../apollo/client'
 import {
@@ -12,6 +13,7 @@ import {
 } from '../apollo/queries'
 
 import { useEthPrice } from './GlobalData'
+import { useActiveNetworkId } from './Application'
 
 import dayjs from 'dayjs'
 
@@ -42,22 +44,28 @@ function useTokenDataContext() {
   return useContext(TokenDataContext)
 }
 
-const INITIAL_STATE = {}
+const INITIAL_STATE = {
+  [EthereumNetworkInfo.id]: {},
+  [TronNetworkInfo.id]: {}
+}
 
 function reducer(state, { type, payload }) {
   switch (type) {
     case UPDATE: {
-      const { tokenAddress, data } = payload
+      const { tokenAddress, data, networkId } = payload
       return {
         ...state,
-        [tokenAddress]: {
-          ...state?.[tokenAddress],
-          ...data
+        [networkId]: {
+          ...state[networkId],
+          [tokenAddress]: {
+            ...state[networkId]?.[tokenAddress],
+            ...data
+          }
         }
       }
     }
     case UPDATE_TOP_TOKENS: {
-      const { topTokens } = payload
+      const { topTokens, networkId } = payload
       let added = {}
       topTokens &&
         topTokens.map(token => {
@@ -65,52 +73,67 @@ function reducer(state, { type, payload }) {
         })
       return {
         ...state,
-        ...added
+        [networkId]: {
+          ...state[networkId],
+          ...added
+        }
       }
     }
 
     case UPDATE_TOKEN_TXNS: {
-      const { address, transactions } = payload
+      const { address, transactions, networkId } = payload
       return {
         ...state,
-        [address]: {
-          ...state?.[address],
-          txns: transactions
+        [networkId]: {
+          ...state[networkId],
+          [address]: {
+            ...state[networkId]?.[address],
+            txns: transactions
+          }
         }
       }
     }
     case UPDATE_CHART_DATA: {
-      const { address, chartData } = payload
+      const { address, chartData, networkId } = payload
       return {
         ...state,
-        [address]: {
-          ...state?.[address],
-          chartData
+        [networkId]: {
+          ...state[networkId],
+          [address]: {
+            ...state[networkId]?.[address],
+            chartData
+          }
         }
       }
     }
 
     case UPDATE_PRICE_DATA: {
-      const { address, data, timeWindow, interval } = payload
+      const { address, data, timeWindow, interval, networkId } = payload
       return {
         ...state,
-        [address]: {
-          ...state?.[address],
-          [timeWindow]: {
-            ...state?.[address]?.[timeWindow],
-            [interval]: data
+        [networkId]: {
+          ...state[networkId],
+          [address]: {
+            ...state[networkId]?.[address],
+            [timeWindow]: {
+              ...state[networkId]?.[address]?.[timeWindow],
+              [interval]: data
+            }
           }
         }
       }
     }
 
     case UPDATE_ALL_PAIRS: {
-      const { address, allPairs } = payload
+      const { address, allPairs, networkId } = payload
       return {
         ...state,
-        [address]: {
-          ...state?.[address],
-          [TOKEN_PAIRS_KEY]: allPairs
+        [networkId]: {
+          ...state[networkId],
+          [address]: {
+            ...state[networkId]?.[address],
+            [TOKEN_PAIRS_KEY]: allPairs
+          }
         }
       }
     }
@@ -122,50 +145,52 @@ function reducer(state, { type, payload }) {
 
 export default function Provider({ children }) {
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE)
-  const update = useCallback((tokenAddress, data) => {
+  const update = useCallback((tokenAddress, data, networkId) => {
     dispatch({
       type: UPDATE,
       payload: {
         tokenAddress,
-        data
+        data,
+        networkId
       }
     })
   }, [])
 
-  const updateTopTokens = useCallback(topTokens => {
+  const updateTopTokens = useCallback((topTokens, networkId) => {
     dispatch({
       type: UPDATE_TOP_TOKENS,
       payload: {
-        topTokens
+        topTokens,
+        networkId
       }
     })
   }, [])
 
-  const updateTokenTxns = useCallback((address, transactions) => {
+  const updateTokenTxns = useCallback((address, transactions, networkId) => {
     dispatch({
       type: UPDATE_TOKEN_TXNS,
-      payload: { address, transactions }
+      payload: { address, transactions, networkId }
     })
   }, [])
 
-  const updateChartData = useCallback((address, chartData) => {
+  const updateChartData = useCallback((address, chartData, networkId) => {
     dispatch({
       type: UPDATE_CHART_DATA,
-      payload: { address, chartData }
+      payload: { address, chartData, networkId }
     })
   }, [])
 
-  const updateAllPairs = useCallback((address, allPairs) => {
+  const updateAllPairs = useCallback((address, allPairs, networkId) => {
     dispatch({
       type: UPDATE_ALL_PAIRS,
-      payload: { address, allPairs }
+      payload: { address, allPairs, networkId }
     })
   }, [])
 
-  const updatePriceData = useCallback((address, data, timeWindow, interval) => {
+  const updatePriceData = useCallback((address, data, timeWindow, interval, networkId) => {
     dispatch({
       type: UPDATE_PRICE_DATA,
-      payload: { address, data, timeWindow, interval }
+      payload: { address, data, timeWindow, interval, networkId }
     })
   }, [])
 
@@ -191,7 +216,7 @@ export default function Provider({ children }) {
   )
 }
 
-const getTopTokens = async (ethPrice, ethPriceOld) => {
+const getTopTokens = async (price, priceOld) => {
   const utcCurrentTime = dayjs()
   const utcOneDayBack = utcCurrentTime.subtract(1, 'day').unix()
   const utcTwoDaysBack = utcCurrentTime.subtract(2, 'day').unix()
@@ -261,17 +286,17 @@ const getTopTokens = async (ethPrice, ethPriceOld) => {
             twoDayHistory?.txCount ?? 0
           )
 
-          const currentLiquidityUSD = data?.totalLiquidity * ethPrice * data?.derivedETH
-          const oldLiquidityUSD = oneDayHistory?.totalLiquidity * ethPriceOld * oneDayHistory?.derivedETH
+          const currentLiquidityUSD = data?.totalLiquidity * price * data?.derivedETH
+          const oldLiquidityUSD = oneDayHistory?.totalLiquidity * priceOld * oneDayHistory?.derivedETH
 
           // percent changes
           const priceChangeUSD = getPercentChange(
-            data?.derivedETH * ethPrice,
-            oneDayHistory?.derivedETH ? oneDayHistory?.derivedETH * ethPriceOld : 0
+            data?.derivedETH * price,
+            oneDayHistory?.derivedETH ? oneDayHistory?.derivedETH * priceOld : 0
           )
 
           // set data
-          data.priceUSD = data?.derivedETH * ethPrice
+          data.priceUSD = data?.derivedETH * price
           data.totalLiquidityUSD = currentLiquidityUSD
           data.oneDayVolumeUSD = parseFloat(oneDayVolumeUSD)
           data.volumeChangeUSD = volumeChangeUSD
@@ -316,7 +341,7 @@ const getTopTokens = async (ethPrice, ethPriceOld) => {
   }
 }
 
-const getTokenData = async (address, ethPrice, ethPriceOld) => {
+const getTokenData = async (address, price, priceOld) => {
   const utcCurrentTime = dayjs()
   const utcOneDayBack = utcCurrentTime.subtract(1, 'day').startOf('minute').unix()
   const utcTwoDaysBack = utcCurrentTime.subtract(2, 'day').startOf('minute').unix()
@@ -388,22 +413,22 @@ const getTokenData = async (address, ethPrice, ethPriceOld) => {
     )
 
     const priceChangeUSD = getPercentChange(
-      data?.derivedETH * ethPrice,
-      parseFloat(oneDayData?.derivedETH ?? 0) * ethPriceOld
+      data?.derivedETH * price,
+      parseFloat(oneDayData?.derivedETH ?? 0) * priceOld
     )
 
-    const currentLiquidityUSD = data?.totalLiquidity * ethPrice * data?.derivedETH
-    const oldLiquidityUSD = oneDayData?.totalLiquidity * ethPriceOld * oneDayData?.derivedETH
+    const currentLiquidityUSD = data?.totalLiquidity * price * data?.derivedETH
+    const oldLiquidityUSD = oneDayData?.totalLiquidity * priceOld * oneDayData?.derivedETH
+    const liquidityChangeUSD = getPercentChange(currentLiquidityUSD ?? 0, oldLiquidityUSD ?? 0)
 
     // set data
-    data.priceUSD = data?.derivedETH * ethPrice
+    data.priceUSD = data?.derivedETH * price
     data.totalLiquidityUSD = currentLiquidityUSD
     data.oneDayVolumeUSD = oneDayVolumeUSD
     data.volumeChangeUSD = volumeChangeUSD
     data.priceChangeUSD = priceChangeUSD
     data.oneDayVolumeUT = oneDayVolumeUT
     data.volumeChangeUT = volumeChangeUT
-    const liquidityChangeUSD = getPercentChange(currentLiquidityUSD ?? 0, oldLiquidityUSD ?? 0)
     data.liquidityChangeUSD = liquidityChangeUSD
     data.oneDayTxns = oneDayTxns
     data.txnChange = txnChange
@@ -615,87 +640,92 @@ const getTokenChartData = async tokenAddress => {
 
 export function Updater() {
   const [, { updateTopTokens }] = useTokenDataContext()
-  const [ethPrice, ethPriceOld] = useEthPrice()
+  const activeNetwork = useActiveNetworkId()
+  const [price, priceOld] = useEthPrice()
+
   useEffect(() => {
-    async function getData() {
+    async function fetchData() {
       // get top pairs for overview list
-      let topTokens = await getTopTokens(ethPrice, ethPriceOld)
-      topTokens && updateTopTokens(topTokens)
+      let topTokens = await getTopTokens(price, priceOld)
+      topTokens && updateTopTokens(topTokens, activeNetwork)
     }
-    ethPrice && ethPriceOld && getData()
-  }, [ethPrice, ethPriceOld, updateTopTokens])
+    price && priceOld && fetchData()
+  }, [price, priceOld, updateTopTokens, activeNetwork])
   return null
 }
 
 export function useTokenData(tokenAddress) {
   const [state, { update }] = useTokenDataContext()
-  const [ethPrice, ethPriceOld] = useEthPrice()
-  const tokenData = state?.[tokenAddress]
+  const activeNetwork = useActiveNetworkId()
+  const [price, priceOld] = useEthPrice()
+  const tokenData = state[activeNetwork]?.[tokenAddress]
 
   useEffect(() => {
-    if (!tokenData && ethPrice && ethPriceOld && isAddress(tokenAddress)) {
-      getTokenData(tokenAddress, ethPrice, ethPriceOld).then(data => {
-        update(tokenAddress, data)
-      })
+    async function fetchData() {
+      const data = await getTokenData(tokenAddress, price, priceOld)
+      update(tokenAddress, data, activeNetwork)
     }
-  }, [ethPrice, ethPriceOld, tokenAddress, tokenData, update])
+    // TODO: isAddress only validate ETH address
+    if (!tokenData && price && priceOld && isAddress(tokenAddress)) {
+      fetchData()
+    }
+  }, [price, priceOld, tokenAddress, tokenData, update, activeNetwork])
 
   return tokenData || {}
 }
 
 export function useTokenTransactions(tokenAddress) {
   const [state, { updateTokenTxns }] = useTokenDataContext()
-  const tokenTxns = state?.[tokenAddress]?.txns
+  const activeNetwork = useActiveNetworkId()
+  const token = state[activeNetwork]?.[tokenAddress]
+  const tokenTxns = token?.txns
 
-  const allPairsFormatted =
-    state[tokenAddress] &&
-    state[tokenAddress].TOKEN_PAIRS_KEY &&
-    state[tokenAddress].TOKEN_PAIRS_KEY.map(pair => {
-      return pair.id
-    })
+  const allPairsFormatted = token && token.TOKEN_PAIRS_KEY && token.TOKEN_PAIRS_KEY.map(pair => pair.id)
 
   useEffect(() => {
     async function checkForTxns() {
       if (!tokenTxns && allPairsFormatted) {
         let transactions = await getTokenTransactions(allPairsFormatted)
-        updateTokenTxns(tokenAddress, transactions)
+        updateTokenTxns(tokenAddress, transactions, activeNetwork)
       }
     }
     checkForTxns()
-  }, [tokenTxns, tokenAddress, updateTokenTxns, allPairsFormatted])
+  }, [tokenTxns, tokenAddress, updateTokenTxns, allPairsFormatted, activeNetwork])
 
   return tokenTxns || []
 }
 
 export function useTokenPairs(tokenAddress) {
   const [state, { updateAllPairs }] = useTokenDataContext()
-  const tokenPairs = state?.[tokenAddress]?.[TOKEN_PAIRS_KEY]
+  const activeNetwork = useActiveNetworkId()
+  const tokenPairs = state[activeNetwork]?.[tokenAddress]?.[TOKEN_PAIRS_KEY]
 
   useEffect(() => {
     async function fetchData() {
       let allPairs = await getTokenPairs(tokenAddress)
-      updateAllPairs(tokenAddress, allPairs)
+      updateAllPairs(tokenAddress, allPairs, activeNetwork)
     }
     if (!tokenPairs && isAddress(tokenAddress)) {
       fetchData()
     }
-  }, [tokenAddress, tokenPairs, updateAllPairs])
+  }, [tokenAddress, tokenPairs, updateAllPairs, activeNetwork])
 
   return tokenPairs || []
 }
 
 export function useTokenChartData(tokenAddress) {
   const [state, { updateChartData }] = useTokenDataContext()
-  const chartData = state?.[tokenAddress]?.chartData
+  const activeNetwork = useActiveNetworkId()
+  const chartData = state[activeNetwork]?.[tokenAddress]?.chartData
   useEffect(() => {
     async function checkForChartData() {
       if (!chartData) {
         let data = await getTokenChartData(tokenAddress)
-        updateChartData(tokenAddress, data)
+        updateChartData(tokenAddress, data, activeNetwork)
       }
     }
     checkForChartData()
-  }, [chartData, tokenAddress, updateChartData])
+  }, [chartData, tokenAddress, updateChartData, chartData])
   return chartData
 }
 
@@ -708,7 +738,8 @@ export function useTokenChartData(tokenAddress) {
  */
 export function useTokenPriceData(tokenAddress, timeWindow, interval = 3600) {
   const [state, { updatePriceData }] = useTokenDataContext()
-  const chartData = state?.[tokenAddress]?.[timeWindow]?.[interval]
+  const activeNetwork = useActiveNetworkId()
+  const chartData = state[activeNetwork]?.[tokenAddress]?.[timeWindow]?.[interval]
   const [latestBlock] = useLatestBlocks()
 
   useEffect(() => {
@@ -719,17 +750,19 @@ export function useTokenPriceData(tokenAddress, timeWindow, interval = 3600) {
 
     async function fetch() {
       let data = await getIntervalTokenData(tokenAddress, startTime, interval, latestBlock)
-      updatePriceData(tokenAddress, data, timeWindow, interval)
+      updatePriceData(tokenAddress, data, timeWindow, interval, activeNetwork)
     }
     if (!chartData) {
       fetch()
     }
-  }, [chartData, interval, timeWindow, tokenAddress, updatePriceData, latestBlock])
+  }, [chartData, interval, timeWindow, tokenAddress, updatePriceData, latestBlock, activeNetwork])
 
   return chartData
 }
 
 export function useAllTokenData() {
   const [state] = useTokenDataContext()
-  return state
+  const activeNetwork = useActiveNetworkId()
+
+  return state[activeNetwork]
 }
