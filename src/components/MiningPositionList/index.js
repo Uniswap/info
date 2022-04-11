@@ -171,8 +171,8 @@ function MiningPositionList({ miningPositions }) {
             <DoubleTokenLogo size={16} a0={firstPairAddress} a1={secondPairAddress} margin={!below740} />
           </AutoColumn>
           <AutoColumn gap="8px" justify="flex-start" style={{ marginLeft: '20px' }}>
-            <CustomLink to={formatPath(`/pair/${pairAddress}`)}>
-              <TYPE.main style={{ whiteSpace: 'nowrap' }} to={formatPath(`/pair/`)}>
+            <CustomLink to={formatPath(`/pairs/${pairAddress}`)}>
+              <TYPE.main style={{ whiteSpace: 'nowrap' }} to={formatPath(`/pairs/`)}>
                 <FormattedName text={firstPairName + '-' + secondPairName} maxCharacters={below740 ? 10 : 18} />
               </TYPE.main>
             </CustomLink>

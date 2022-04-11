@@ -259,9 +259,9 @@ function PairPage() {
                     >
                       {token0 && token1 ? (
                         <>
-                          <TokenSymbolLink to={formatPath(`/token/${token0?.id}`)}>{token0.symbol}</TokenSymbolLink>
+                          <TokenSymbolLink to={formatPath(`/tokens/${token0?.id}`)}>{token0.symbol}</TokenSymbolLink>
                           <span>/</span>
-                          <TokenSymbolLink to={formatPath(`/token/${token1?.id}`)}>
+                          <TokenSymbolLink to={formatPath(`/tokens/${token1?.id}`)}>
                             {token1.symbol}
                           </TokenSymbolLink>{' '}
                           {t('pair')}
@@ -311,7 +311,7 @@ function PairPage() {
                 flexWrap: 'wrap'
               }}
             >
-              <FixedPanel as={RouterLink} to={formatPath(`/token/${token0?.id}`)}>
+              <FixedPanel as={RouterLink} to={formatPath(`/tokens/${token0?.id}`)}>
                 <RowFixed>
                   <TokenLogo address={token0?.id} size={'1rem'} />
                   <TYPE.light fontSize=".875rem" lineHeight="1rem" fontWeight={700} ml=".25rem" mr="3.75rem">
@@ -324,7 +324,7 @@ function PairPage() {
                 </RowFixed>
               </FixedPanel>
 
-              <FixedPanel as={RouterLink} to={formatPath(`/token/${token1?.id}`)}>
+              <FixedPanel as={RouterLink} to={formatPath(`/tokens/${token1?.id}`)}>
                 <RowFixed>
                   <TokenLogo address={token1?.id} size={'16px'} />
                   <TYPE.light fontSize={'.875rem'} lineHeight={'1rem'} fontWeight={700} ml={'.25rem'}>
@@ -403,7 +403,7 @@ function PairPage() {
                       </TYPE.light>
                       <div />
                     </RowBetween>
-                    <Hover as={RouterLink} to={formatPath(`/token/${token0?.id}`)} fade={true}>
+                    <Hover as={RouterLink} to={formatPath(`/tokens/${token0?.id}`)} fade={true}>
                       <AutoRow gap="4px">
                         <TokenLogo address={token0?.id} />
                         <TYPE.main fontSize={20} lineHeight={1} fontWeight={500}>
@@ -414,7 +414,7 @@ function PairPage() {
                         </TYPE.main>
                       </AutoRow>
                     </Hover>
-                    <Hover as={RouterLink} to={formatPath(`/token/${token1?.id}`)} fade={true}>
+                    <Hover as={RouterLink} to={formatPath(`/tokens/${token1?.id}`)} fade={true}>
                       <AutoRow gap="4px">
                         <TokenLogo address={token1?.id} />
                         <TYPE.main fontSize={20} lineHeight={1} fontWeight={500}>

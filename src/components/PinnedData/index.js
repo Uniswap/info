@@ -92,7 +92,7 @@ function PinnedData({ open, setSavedOpen }) {
                 const pair = savedPairs[address]
                 return (
                   <RowBetween key={pair.address}>
-                    <ButtonFaded as={Link} to={formatPath(`/pair/${address}`)}>
+                    <ButtonFaded as={Link} to={formatPath(`/pairs/${address}`)}>
                       <RowFixed>
                         <TYPE.header>
                           <FormattedName
@@ -128,7 +128,7 @@ function PinnedData({ open, setSavedOpen }) {
                 const token = savedTokens[address]
                 return (
                   <RowBetween key={address}>
-                    <ButtonFaded as={Link} to={formatPath(`/token/${address}`)}>
+                    <ButtonFaded as={Link} to={formatPath(`/tokens/${address}`)}>
                       <RowFixed>
                         <TokenLogo address={address} size={'14px'} />
                         <TYPE.header ml={'6px'}>

@@ -131,7 +131,7 @@ function LPList({ lps, disbaleLinks, maxItems = 10 }) {
           </DataText>
         )}
         <DataText area="name" fontWeight="500" justifyContent="flex-start">
-          <CustomLink style={{ whiteSpace: 'nowrap' }} to={formatPath(`/account/${lp.user.id}`)}>
+          <CustomLink style={{ whiteSpace: 'nowrap' }} to={formatPath(`/accounts/${lp.user.id}`)}>
             {below800
               ? lp.user.id.slice(0, 4) + '...' + (below440 ? lp.user.id.slice(39, 42) : lp.user.id.slice(38, 42))
               : lp.user.id}
@@ -145,7 +145,7 @@ function LPList({ lps, disbaleLinks, maxItems = 10 }) {
         )} */}
 
         <DataText>
-          <CustomLink area="pair" to={formatPath(`/pair/${lp.pairAddress}`)}>
+          <CustomLink area="pair" to={formatPath(`/pairs/${lp.pairAddress}`)}>
             <RowFixed style={{ textAlign: 'right' }}>
               {!below600 && <DoubleTokenLogo a0={lp.token0} a1={lp.token1} size={16} margin={true} />}
               {lp.pairName}

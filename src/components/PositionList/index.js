@@ -188,7 +188,7 @@ function PositionList({ positions }) {
             <DoubleTokenLogo size={16} a0={position.pair.token0.id} a1={position.pair.token1.id} margin={!below740} />
           </AutoColumn>
           <AutoColumn gap="8px" justify="flex-start" style={{ marginLeft: '20px' }}>
-            <CustomLink to={formatPath(`/pair/${position.pair.id}`)} style={{ whiteSpace: 'nowrap' }}>
+            <CustomLink to={formatPath(`/pairs/${position.pair.id}`)} style={{ whiteSpace: 'nowrap' }}>
               {position.pair.token0.symbol + '-' + position.pair.token1.symbol}
             </CustomLink>
 

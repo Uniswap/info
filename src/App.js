@@ -111,12 +111,12 @@ function App() {
           <Center id="center">
             <Routes>
               <Route path="/:networkID" element={<GlobalPage />} />
-              <Route path="/:networkID/token/:tokenAddress" element={<TokenPage />} />
-              <Route path="/:networkID/pair/:pairAddress" element={<PairPage />} />
-              <Route path="/:networkID/account/:accountAddress" element={<AccountPage />} />
               <Route path="/:networkID/tokens" element={<AllTokensPage />} />
+              <Route path="/:networkID/tokens/:tokenAddress" element={<TokenPage />} />
               <Route path="/:networkID/pairs" element={<AllPairsPage />} />
+              <Route path="/:networkID/pairs/:pairAddress" element={<PairPage />} />
               <Route path="/:networkID/accounts" element={<AccountLookup />} />
+              <Route path="/:networkID/accounts/:accountAddress" element={<AccountPage />} />
               <Route path="*" element={<Navigate to={formatPath('/')} replace />} />
             </Routes>
           </Center>

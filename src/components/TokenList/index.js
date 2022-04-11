@@ -206,7 +206,7 @@ function TopTokenList({ tokens, itemMax = 10 }) {
           <Row>
             {!below680 && <div style={{ marginRight: '1rem', width: '10px' }}>{index}</div>}
             <TokenLogo address={item.id} />
-            <CustomLink style={{ marginLeft: '16px', whiteSpace: 'nowrap' }} to={formatPath(`/token/${item.id}`)}>
+            <CustomLink style={{ marginLeft: '16px', whiteSpace: 'nowrap' }} to={formatPath(`/tokens/${item.id}`)}>
               <FormattedName
                 text={below680 ? item.symbol : item.name}
                 maxCharacters={below600 ? 8 : 16}

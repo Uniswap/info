@@ -84,7 +84,7 @@ function AccountSearch({ small }) {
 
   function handleAccountSearch() {
     if (isAddress(accountValue)) {
-      navigate('/account/' + accountValue)
+      navigate(`/accounts/${accountValue}`)
       if (!savedAccounts.includes(accountValue)) {
         addAccount(accountValue)
       }
@@ -122,7 +122,7 @@ function AccountSearch({ small }) {
                 return (
                   <DashGrid key={account} center={true} style={{ height: 'fit-content', padding: '1rem 0 0 0' }}>
                     <Flex area="account" justifyContent="space-between">
-                      <AccountLink as={Link} to={formatPath(`/account/${account}`)}>
+                      <AccountLink as={Link} to={formatPath(`/accounts/${account}`)}>
                         {account?.slice(0, 42)}
                       </AccountLink>
                       <Hover onClick={() => removeAccount(account)}>
@@ -147,7 +147,7 @@ function AccountSearch({ small }) {
               savedAccounts.map(account => {
                 return (
                   <RowBetween key={account}>
-                    <ButtonFaded as={Link} to={formatPath(`/account/${account}`)}>
+                    <ButtonFaded as={Link} to={formatPath(`/accounts/${account}`)}>
                       {small ? (
                         <TYPE.header>{account?.slice(0, 6) + '...' + account?.slice(38, 42)}</TYPE.header>
                       ) : (

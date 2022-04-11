@@ -198,7 +198,7 @@ function PairList({ pairs, disbaleLinks, maxItems = 10 }) {
                 margin={!below740}
               />
             )}
-            <Link to={formatPath(`/pair/${pairAddress}`)} style={{ marginLeft: below440 && 0 }}>
+            <Link to={formatPath(`/pairs/${pairAddress}`)} style={{ marginLeft: below440 && 0 }}>
               <FormattedName
                 text={pairData.token0.symbol + '-' + pairData.token1.symbol}
                 maxCharacters={below600 ? 8 : 16}
