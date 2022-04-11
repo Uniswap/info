@@ -1,5 +1,5 @@
 import { createContext, useContext, useReducer, useMemo, useCallback, useState, useEffect } from 'react'
-import { EthereumNetworkInfo, TronNetworkInfo } from '../constants/networks'
+import { EthereumNetworkInfo, TronNetworkInfo, SUPPORTED_NETWORK_VERSIONS } from '../constants/networks'
 import { timeframeOptions } from '../constants'
 import { DEFAULT_LIST_OF_LISTS } from '../constants/lists'
 import dayjs from 'dayjs'
@@ -257,6 +257,27 @@ export function useTimeframe() {
 export function useActiveNetworkId() {
   const [state] = useApplicationContext()
   return state.ACTIVE_NETWORK.id
+}
+
+export function useActiveNetwork() {
+  const [state] = useApplicationContext()
+  return state.ACTIVE_NETWORK
+}
+
+export function useUpdateActiveNetwork() {
+  const [state, { updateActiveNetwork }] = useApplicationContext()
+  const update = useCallback(newActiveNetwork => {
+    if (state.ACTIVE_NETWORK.id !== newActiveNetwork) {
+      const newNetworkInfo = SUPPORTED_NETWORK_VERSIONS.find(n => newActiveNetwork === n.route.toLowerCase())
+      if (newNetworkInfo) {
+        updateActiveNetwork(newNetworkInfo)
+      } else {
+        updateActiveNetwork(TronNetworkInfo)
+      }
+    }
+  }, [])
+
+  return update
 }
 
 export function useStartTimestamp() {

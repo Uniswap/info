@@ -1,7 +1,10 @@
 import ReactDOM from 'react-dom'
 import { StrictMode } from 'react'
+import { BrowserRouter } from 'react-router-dom'
 import ReactGA from 'react-ga'
 import { isMobile } from 'react-device-detect'
+import { client } from './apollo/client'
+import { ApolloProvider } from '@apollo/react-hooks'
 import ThemeProvider, { GlobalStyle } from './Theme'
 import LocalStorageContextProvider, { Updater as LocalStorageContextUpdater } from './contexts/LocalStorage'
 import TokenDataContextProvider, { Updater as TokenDataContextUpdater } from './contexts/TokenData'
@@ -65,7 +68,11 @@ ReactDOM.render(
       <ThemeProvider>
         <>
           <GlobalStyle />
-          <App />
+          <ApolloProvider client={client}>
+            <BrowserRouter>
+              <App />
+            </BrowserRouter>
+          </ApolloProvider>
         </>
       </ThemeProvider>
     </ContextProviders>

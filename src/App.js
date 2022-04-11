@@ -1,8 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import styled from 'styled-components/macro'
-import { client } from './apollo/client'
-import { ApolloProvider } from '@apollo/react-hooks'
-import { Route, Routes, BrowserRouter, Navigate } from 'react-router-dom'
+import { Route, Routes, Navigate, useLocation } from 'react-router-dom'
 import GlobalPage from './pages/GlobalPage'
 import TokenPage from './pages/TokenPage'
 import PairPage from './pages/PairPage'
@@ -15,7 +13,7 @@ import PinnedData from './components/PinnedData'
 import SideNav from './components/SideNav'
 import AccountLookup from './pages/AccountLookup'
 import LocalLoader from './components/LocalLoader'
-import { useLatestBlocks } from './contexts/Application'
+import { useLatestBlocks, useUpdateActiveNetwork, useActiveNetwork } from './contexts/Application'
 
 const AppWrapper = styled.div`
   position: relative;
@@ -81,50 +79,54 @@ function App() {
   const globalData = useGlobalData()
   const globalChartData = useGlobalChartData()
   const [latestBlock, headBlock] = useLatestBlocks()
+  const validateNetworkId = useUpdateActiveNetwork()
+  const activeNetwork = useActiveNetwork()
+  const location = useLocation()
 
   // show warning
   const showWarning = headBlock && latestBlock ? headBlock - latestBlock > BLOCK_DIFFERENCE_THRESHOLD : false
 
+  useEffect(() => {
+    const locationNetworkId = location.pathname.split('/')[1]
+    validateNetworkId(locationNetworkId)
+  }, [location])
+
   return (
-    <ApolloProvider client={client}>
-      <AppWrapper>
-        {showWarning && (
-          <WarningWrapper>
-            <WarningBanner>
-              {`Warning: The data on this site has only synced to Ethereum block ${latestBlock} (out of ${headBlock}). Please check back soon.`}
-            </WarningBanner>
-          </WarningWrapper>
-        )}
-        {latestBlock &&
-        globalData &&
-        Object.keys(globalData).length > 0 &&
-        globalChartData &&
-        Object.keys(globalChartData).length > 0 ? (
-          <BrowserRouter>
-            <ContentWrapper open={savedOpen}>
-              <SideNav />
-              <Center id="center">
-                <Routes>
-                  <Route path="/" element={<GlobalPage />} />
-                  <Route path="/token/:tokenAddress" element={<TokenPage />} />
-                  <Route path="/pair/:pairAddress" element={<PairPage />} />
-                  <Route path="/account/:accountAddress" element={<AccountPage />} />
-                  <Route path="tokens" element={<AllTokensPage />} />
-                  <Route path="pairs" element={<AllPairsPage />} />
-                  <Route path="accounts" element={<AccountLookup />} />
-                  <Route path="*" element={<Navigate to="/" replace />} />
-                </Routes>
-              </Center>
-              <Right open={savedOpen}>
-                <PinnedData open={savedOpen} setSavedOpen={setSavedOpen} />
-              </Right>
-            </ContentWrapper>
-          </BrowserRouter>
-        ) : (
-          <LocalLoader fill="true" />
-        )}
-      </AppWrapper>
-    </ApolloProvider>
+    <AppWrapper>
+      {showWarning && (
+        <WarningWrapper>
+          <WarningBanner>
+            {`Warning: The data on this site has only synced to Ethereum block ${latestBlock} (out of ${headBlock}). Please check back soon.`}
+          </WarningBanner>
+        </WarningWrapper>
+      )}
+      {latestBlock &&
+      globalData &&
+      Object.keys(globalData).length > 0 &&
+      globalChartData &&
+      Object.keys(globalChartData).length > 0 ? (
+        <ContentWrapper open={savedOpen}>
+          <SideNav />
+          <Center id="center">
+            <Routes>
+              <Route path="/:networkID" element={<GlobalPage />} />
+              <Route path="/:networkID/token/:tokenAddress" element={<TokenPage />} />
+              <Route path="/:networkID/pair/:pairAddress" element={<PairPage />} />
+              <Route path="/:networkID/account/:accountAddress" element={<AccountPage />} />
+              <Route path="/:networkID/tokens" element={<AllTokensPage />} />
+              <Route path="/:networkID/pairs" element={<AllPairsPage />} />
+              <Route path="/:networkID/accounts" element={<AccountLookup />} />
+              <Route path="*" element={<Navigate to={`/${activeNetwork.route}`} replace />} />
+            </Routes>
+          </Center>
+          <Right open={savedOpen}>
+            <PinnedData open={savedOpen} setSavedOpen={setSavedOpen} />
+          </Right>
+        </ContentWrapper>
+      ) : (
+        <LocalLoader fill="true" />
+      )}
+    </AppWrapper>
   )
 }
 
