@@ -5,11 +5,11 @@ import { BasicLink } from '../Link'
 import { useMedia } from 'react-use'
 import { transparentize } from 'polished'
 import { TYPE } from '../../Theme'
+import { useFormatPath } from 'hooks'
 import { useLocation } from 'react-router-dom'
 import { TrendingUp, List, PieChart, Disc } from 'react-feather'
 import Link from '../Link'
-import { useSessionStart, useActiveNetwork } from '../../contexts/Application'
-import { networkPrefix } from '../../utils'
+import { useSessionStart } from '../../contexts/Application'
 import { useDarkModeManager } from '../../contexts/LocalStorage'
 import Toggle from '../Toggle'
 import { useTranslation } from 'react-i18next'
@@ -137,7 +137,7 @@ const PollingDot = styled.div`
 
 function SideNav() {
   const { t } = useTranslation()
-  const activeNetwork = useActiveNetwork()
+  const formatPath = useFormatPath()
   const location = useLocation()
 
   const below1080 = useMedia('(max-width: 1080px)')
@@ -155,7 +155,7 @@ function SideNav() {
             <Title />
             {!below1080 && (
               <AutoColumn style={{ marginTop: '5.25rem' }}>
-                <BasicLink to={`${networkPrefix(activeNetwork)}`}>
+                <BasicLink to={formatPath('/')}>
                   <Option activeText={location.pathname === '/' ?? undefined}>
                     <StyledNavButton>
                       <TrendingUp size={20} />
@@ -163,7 +163,7 @@ function SideNav() {
                     {t('sideNav.overview')}
                   </Option>
                 </BasicLink>
-                <BasicLink to={`${networkPrefix(activeNetwork)}tokens`}>
+                <BasicLink to={formatPath('/tokens')}>
                   <Option
                     activeText={
                       (location.pathname.split('/')[1] === 'tokens' || location.pathname.split('/')[1] === 'token') ??
@@ -176,7 +176,7 @@ function SideNav() {
                     {t('sideNav.tokens')}
                   </Option>
                 </BasicLink>
-                <BasicLink to={`${networkPrefix(activeNetwork)}pairs`}>
+                <BasicLink to={formatPath('/pairs')}>
                   <Option
                     activeText={
                       (location.pathname.split('/')[1] === 'pairs' || location.pathname.split('/')[1] === 'pair') ??
@@ -190,7 +190,7 @@ function SideNav() {
                   </Option>
                 </BasicLink>
 
-                <BasicLink to={`${networkPrefix(activeNetwork)}accounts`}>
+                <BasicLink to={formatPath('/accounts')}>
                   <Option
                     activeText={
                       (location.pathname.split('/')[1] === 'accounts' ||

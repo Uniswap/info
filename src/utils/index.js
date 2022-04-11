@@ -472,6 +472,6 @@ export function isEquivalent(a, b) {
 }
 
 export function networkPrefix(activeNetwork) {
-  const prefix = '/' + activeNetwork.route.toLocaleLowerCase() + '/'
+  const prefix = '/' + activeNetwork.route.toLocaleLowerCase()
   return prefix
 }

@@ -11,12 +11,12 @@ import Search from '../components/Search'
 import GlobalStats from '../components/GlobalStats'
 
 import { useGlobalData, useGlobalTransactions } from '../contexts/GlobalData'
-import { useActiveNetwork } from '../contexts/Application'
+import { useFormatPath } from 'hooks'
 import { useAllPairData } from '../contexts/PairData'
 import { useMedia } from 'react-use'
 import Panel from '../components/Panel'
 import { useAllTokenData } from '../contexts/TokenData'
-import { formattedNum, formattedPercent, networkPrefix } from '../utils'
+import { formattedNum, formattedPercent } from '../utils'
 import { DashboardWrapper, TYPE } from '../Theme'
 import { CustomLink } from '../components/Link'
 
@@ -45,7 +45,7 @@ const GridRow = styled.div`
 
 function GlobalPage() {
   const { t } = useTranslation()
-  const activeNetwork = useActiveNetwork()
+  const formatPath = useFormatPath()
 
   // get data for lists and totals
   const allPairs = useAllPairData()
@@ -131,7 +131,7 @@ function GlobalPage() {
                 <TYPE.main fontSize={22} fontWeight={500}>
                   {t('topTokens')}
                 </TYPE.main>
-                <CustomLink to={`${networkPrefix(activeNetwork)}tokens`}>{t('seeAll')}</CustomLink>
+                <CustomLink to={formatPath('/tokens')}>{t('seeAll')}</CustomLink>
               </RowBetween>
             </ListOptions>
             <TopTokenList tokens={allTokens} />
@@ -143,7 +143,7 @@ function GlobalPage() {
                 <TYPE.main fontSize={22} fontWeight={500}>
                   {t('topPairs')}
                 </TYPE.main>
-                <CustomLink to={`${networkPrefix(activeNetwork)}pairs`}>{t('seeAll')}</CustomLink>
+                <CustomLink to={formatPath(`/pairs`)}>{t('seeAll')}</CustomLink>
               </RowBetween>
             </ListOptions>
             <PairList pairs={allPairs} />

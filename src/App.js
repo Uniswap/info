@@ -9,12 +9,12 @@ import AccountPage from './pages/AccountPage'
 import AllTokensPage from './pages/AllTokensPage'
 import AllPairsPage from './pages/AllPairsPage'
 import PinnedData from './components/PinnedData'
-import { networkPrefix } from './utils'
+import { useFormatPath } from './hooks'
 
 import SideNav from './components/SideNav'
 import AccountLookup from './pages/AccountLookup'
 import LocalLoader from './components/LocalLoader'
-import { useLatestBlocks, useUpdateActiveNetwork, useActiveNetwork } from './contexts/Application'
+import { useLatestBlocks, useUpdateActiveNetwork } from './contexts/Application'
 
 const AppWrapper = styled.div`
   position: relative;
@@ -81,7 +81,7 @@ function App() {
   const globalChartData = useGlobalChartData()
   const [latestBlock, headBlock] = useLatestBlocks()
   const validateNetworkId = useUpdateActiveNetwork()
-  const activeNetwork = useActiveNetwork()
+  const formatPath = useFormatPath()
   const location = useLocation()
 
   // show warning
@@ -117,7 +117,7 @@ function App() {
               <Route path="/:networkID/tokens" element={<AllTokensPage />} />
               <Route path="/:networkID/pairs" element={<AllPairsPage />} />
               <Route path="/:networkID/accounts" element={<AccountLookup />} />
-              <Route path="*" element={<Navigate to={networkPrefix(activeNetwork)} replace />} />
+              <Route path="*" element={<Navigate to={formatPath('/')} replace />} />
             </Routes>
           </Center>
           <Right open={savedOpen}>

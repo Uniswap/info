@@ -3,11 +3,11 @@ import { useMedia } from 'react-use'
 import LocalLoader from '../LocalLoader'
 import { Box, Flex, Text } from 'rebass'
 import styled from 'styled-components/macro'
-import { useActiveNetwork } from '../../contexts/Application'
+import { useFormatPath } from 'hooks'
 
 import { CustomLink } from '../Link'
 import { Divider } from '../../components'
-import { formattedNum, formattedPercent, networkPrefix } from '../../utils'
+import { formattedNum, formattedPercent } from '../../utils'
 import DoubleTokenLogo from '../DoubleLogo'
 import FormattedName from '../FormattedName'
 import QuestionHelper from '../QuestionHelper'
@@ -147,7 +147,7 @@ const FIELD_TO_VALUE = {
 
 function PairList({ pairs, disbaleLinks, maxItems = 10 }) {
   const { t } = useTranslation()
-  const activeNetwork = useActiveNetwork()
+  const formatPath = useFormatPath()
 
   const below440 = useMedia('(max-width: 440px)')
   const below600 = useMedia('(max-width: 600px)')
@@ -198,7 +198,7 @@ function PairList({ pairs, disbaleLinks, maxItems = 10 }) {
                 margin={!below740}
               />
             )}
-            <Link to={`${networkPrefix(activeNetwork)}pair/${pairAddress}`} style={{ marginLeft: below440 && 0 }}>
+            <Link to={formatPath(`/pair/${pairAddress}`)} style={{ marginLeft: below440 && 0 }}>
               <FormattedName
                 text={pairData.token0.symbol + '-' + pairData.token1.symbol}
                 maxCharacters={below600 ? 8 : 16}

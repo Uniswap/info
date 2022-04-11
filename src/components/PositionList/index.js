@@ -4,12 +4,12 @@ import LocalLoader from '../LocalLoader'
 import { Box, Flex, Text } from 'rebass'
 import styled from 'styled-components/macro'
 import Link, { CustomLink as RouterLink } from '../Link'
+import { useFormatPath } from 'hooks'
 import { Divider } from '../../components'
 import DoubleTokenLogo from '../DoubleLogo'
-import { formattedNum, getPoolLink, networkPrefix } from '../../utils'
+import { formattedNum, getPoolLink } from '../../utils'
 import { AutoColumn } from '../Column'
 import { useEthPrice } from '../../contexts/GlobalData'
-import { useActiveNetwork } from '../../contexts/Application'
 import { RowFixed } from '../Row'
 import { ButtonLight } from '../ButtonStyled'
 import { TYPE } from '../../Theme'
@@ -144,7 +144,7 @@ const SORT_FIELD = {
 
 function PositionList({ positions }) {
   const { t } = useTranslation()
-  const activeNetwork = useActiveNetwork()
+  const formatPath = useFormatPath()
 
   const below440 = useMedia('(max-width: 440px)')
   const below500 = useMedia('(max-width: 500px)')
@@ -188,7 +188,7 @@ function PositionList({ positions }) {
             <DoubleTokenLogo size={16} a0={position.pair.token0.id} a1={position.pair.token1.id} margin={!below740} />
           </AutoColumn>
           <AutoColumn gap="8px" justify="flex-start" style={{ marginLeft: '20px' }}>
-            <CustomLink to={`${networkPrefix(activeNetwork)}pair/${position.pair.id}`} style={{ whiteSpace: 'nowrap' }}>
+            <CustomLink to={formatPath(`/pair/${position.pair.id}`)} style={{ whiteSpace: 'nowrap' }}>
               {position.pair.token0.symbol + '-' + position.pair.token1.symbol}
             </CustomLink>
 

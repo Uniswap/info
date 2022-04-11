@@ -3,8 +3,7 @@ import styled from 'styled-components/macro'
 import { Flex } from 'rebass'
 import { RowFixed } from '../Row'
 import { Link } from 'react-router-dom'
-import { useActiveNetwork } from '../../contexts/Application'
-import { networkPrefix } from '../../utils'
+import { useFormatPath } from 'hooks'
 import Logo from '../../assets/logo_full.svg'
 
 const TitleWrapper = styled(Link)`
@@ -19,10 +18,10 @@ const TitleWrapper = styled(Link)`
 `
 
 export default function Title() {
-  const activeNetwork = useActiveNetwork()
+  const formatPath = useFormatPath()
 
   return (
-    <TitleWrapper to={`${networkPrefix(activeNetwork)}`}>
+    <TitleWrapper to={formatPath('/')}>
       <Flex alignItems="center">
         <RowFixed>
           <img src={Logo} alt="logo" />

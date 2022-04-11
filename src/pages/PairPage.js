@@ -14,7 +14,7 @@ import Loader from '../components/LocalLoader'
 import { PAIR_BLACKLIST } from '../constants'
 import { BasicLink } from '../components/Link'
 import Search from '../components/Search'
-import { formattedNum, formattedPercent, getPoolLink, getSwapLink, networkPrefix } from '../utils'
+import { formattedNum, formattedPercent, getPoolLink, getSwapLink } from '../utils'
 import { usePairData, usePairTransactions } from '../contexts/PairData'
 import { DashboardWrapper, TYPE } from '../Theme'
 import CopyHelper from '../components/Copy'
@@ -25,7 +25,7 @@ import { Hover } from '../components'
 import { useEthPrice } from '../contexts/GlobalData'
 import Warning from '../components/Warning'
 import { usePathDismissed, useSavedPairs } from '../contexts/LocalStorage'
-import { useActiveNetwork } from '../contexts/Application'
+import { useFormatPath } from 'hooks'
 import { Bookmark, PlusCircle } from 'react-feather'
 import FormattedName from '../components/FormattedName'
 import { useListedTokens } from '../contexts/Application'
@@ -110,12 +110,12 @@ const CustomFormattedName = styled(FormattedName)`
 
 function PairPage() {
   const { t } = useTranslation()
-  const activeNetwork = useActiveNetwork()
+  const formatPath = useFormatPath()
   const { pairAddress } = useParams()
   const location = useLocation()
 
   if (PAIR_BLACKLIST.includes(pairAddress.toLowerCase()) || !isAddress(pairAddress.toLowerCase())) {
-    return <Navigate to={networkPrefix(activeNetwork)} />
+    return <Navigate to={formatPath('/')} />
   }
 
   const {
@@ -223,8 +223,7 @@ function PairPage() {
       <ContentWrapperLarge>
         <RowBetween>
           <TYPE.body>
-            <BasicLink to={`${networkPrefix(activeNetwork)}pairs`}>{'Pairs '}</BasicLink>→ {token0?.symbol}-
-            {token1?.symbol}
+            <BasicLink to={formatPath('/pairs')}>{'Pairs '}</BasicLink>→ {token0?.symbol}-{token1?.symbol}
           </TYPE.body>
           {!below600 && <Search small={true} />}
         </RowBetween>
@@ -260,11 +259,9 @@ function PairPage() {
                     >
                       {token0 && token1 ? (
                         <>
-                          <TokenSymbolLink to={`${networkPrefix(activeNetwork)}token/${token0?.id}`}>
-                            {token0.symbol}
-                          </TokenSymbolLink>
+                          <TokenSymbolLink to={formatPath(`/token/${token0?.id}`)}>{token0.symbol}</TokenSymbolLink>
                           <span>/</span>
-                          <TokenSymbolLink to={`${networkPrefix(activeNetwork)}token/${token1?.id}`}>
+                          <TokenSymbolLink to={formatPath(`/token/${token1?.id}`)}>
                             {token1.symbol}
                           </TokenSymbolLink>{' '}
                           {t('pair')}
@@ -314,7 +311,7 @@ function PairPage() {
                 flexWrap: 'wrap'
               }}
             >
-              <FixedPanel as={RouterLink} to={`${networkPrefix(activeNetwork)}token/${token0?.id}`}>
+              <FixedPanel as={RouterLink} to={formatPath(`/token/${token0?.id}`)}>
                 <RowFixed>
                   <TokenLogo address={token0?.id} size={'1rem'} />
                   <TYPE.light fontSize=".875rem" lineHeight="1rem" fontWeight={700} ml=".25rem" mr="3.75rem">
@@ -327,7 +324,7 @@ function PairPage() {
                 </RowFixed>
               </FixedPanel>
 
-              <FixedPanel as={RouterLink} to={`${networkPrefix(activeNetwork)}token/${token1?.id}`}>
+              <FixedPanel as={RouterLink} to={formatPath(`/token/${token1?.id}`)}>
                 <RowFixed>
                   <TokenLogo address={token1?.id} size={'16px'} />
                   <TYPE.light fontSize={'.875rem'} lineHeight={'1rem'} fontWeight={700} ml={'.25rem'}>
@@ -406,7 +403,7 @@ function PairPage() {
                       </TYPE.light>
                       <div />
                     </RowBetween>
-                    <Hover as={RouterLink} to={`${networkPrefix(activeNetwork)}token/${token0?.id}`} fade={true}>
+                    <Hover as={RouterLink} to={formatPath(`/token/${token0?.id}`)} fade={true}>
                       <AutoRow gap="4px">
                         <TokenLogo address={token0?.id} />
                         <TYPE.main fontSize={20} lineHeight={1} fontWeight={500}>
@@ -417,7 +414,7 @@ function PairPage() {
                         </TYPE.main>
                       </AutoRow>
                     </Hover>
-                    <Hover as={RouterLink} to={`${networkPrefix(activeNetwork)}token/${token1?.id}`} fade={true}>
+                    <Hover as={RouterLink} to={formatPath(`/token/${token1?.id}`)} fade={true}>
                       <AutoRow gap="4px">
                         <TokenLogo address={token1?.id} />
                         <TYPE.main fontSize={20} lineHeight={1} fontWeight={500}>

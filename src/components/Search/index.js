@@ -6,12 +6,12 @@ import TokenLogo from '../TokenLogo'
 import { Search as SearchIcon, X } from 'react-feather'
 import { BasicLink } from '../Link'
 
+import { useFormatPath } from 'hooks'
 import { useAllTokenData, useTokenData } from '../../contexts/TokenData'
 import { useAllPairData, usePairData } from '../../contexts/PairData'
 import DoubleTokenLogo from '../DoubleLogo'
 import { useMedia } from 'react-use'
 import { useAllPairsInUniswap, useAllTokensInUniswap } from '../../contexts/GlobalData'
-import { useActiveNetwork } from '../../contexts/Application'
 import { OVERVIEW_TOKEN_BLACKLIST, PAIR_BLACKLIST } from '../../constants'
 
 import { transparentize } from 'polished'
@@ -20,7 +20,6 @@ import { PAIR_SEARCH, TOKEN_SEARCH } from '../../apollo/queries'
 import FormattedName from '../FormattedName'
 import { TYPE } from '../../Theme'
 import { updateNameData } from '../../utils/data'
-import { networkPrefix } from '../../utils'
 import { useTranslation } from 'react-i18next'
 
 const Container = styled.div`
@@ -148,7 +147,7 @@ const Blue = styled.span`
 
 export const Search = ({ small = false }) => {
   const { t } = useTranslation()
-  const activeNetwork = useActiveNetwork()
+  const formatPath = useFormatPath()
 
   let allTokens = useAllTokensInUniswap()
   const allTokenData = useAllTokenData()
@@ -462,7 +461,7 @@ export const Search = ({ small = false }) => {
               //format incorrect names
               updateNameData(pair)
               return (
-                <BasicLink to={`${networkPrefix(activeNetwork)}pair/${pair.id}`} key={pair.id} onClick={onDismiss}>
+                <BasicLink to={formatPath(`/pair/${pair.id}`)} key={pair.id} onClick={onDismiss}>
                   <MenuItem>
                     <DoubleTokenLogo a0={pair?.token0?.id} a1={pair?.token1?.id} margin={true} />
                     <TYPE.body style={{ marginLeft: '10px' }}>
@@ -495,7 +494,7 @@ export const Search = ({ small = false }) => {
           )}
           {filteredTokenList.slice(0, tokensShown).map(token => {
             return (
-              <BasicLink to={`${networkPrefix(activeNetwork)}token/${token.id}`} key={token.id} onClick={onDismiss}>
+              <BasicLink to={formatPath(`/token/${token.id}`)} key={token.id} onClick={onDismiss}>
                 <MenuItem>
                   <RowFixed>
                     <TokenLogo address={token.id} style={{ marginRight: '10px' }} />

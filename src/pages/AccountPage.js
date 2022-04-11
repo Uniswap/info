@@ -4,13 +4,13 @@ import { useUserTransactions, useUserPositions } from '../contexts/User'
 import TxnList from '../components/TxnList'
 import { useParams, Navigate } from 'react-router-dom'
 import Panel from '../components/Panel'
-import { formattedNum, isAddress, networkPrefix } from '../utils'
+import { formattedNum, isAddress } from '../utils'
 import Row, { AutoRow, RowFixed, RowBetween } from '../components/Row'
 import { AutoColumn } from '../components/Column'
 import UserChart from '../components/UserChart'
 import PairReturnsChart from '../components/PairReturnsChart'
 import PositionList from '../components/PositionList'
-import { useActiveNetwork } from '../contexts/Application'
+import { useFormatPath } from 'hooks'
 // import MiningPositionList from '../components/MiningPositionList'
 import { DashboardWrapper, TYPE } from '../Theme'
 import { ButtonDropdown } from '../components/ButtonStyled'
@@ -79,11 +79,12 @@ const Warning = styled.div`
 
 function AccountPage() {
   const { t } = useTranslation()
-  const activeNetwork = useActiveNetwork()
+  const formatPath = useFormatPath()
+
   const { accountAddress } = useParams()
 
   if (!isAddress(accountAddress.toLowerCase())) {
-    return <Navigate to={networkPrefix(activeNetwork)} />
+    return <Navigate to={formatPath('/')} />
   }
 
   const below600 = useMedia('(max-width: 600px)')
@@ -156,7 +157,7 @@ function AccountPage() {
       <ContentWrapper>
         <RowBetween>
           <TYPE.body>
-            <BasicLink to={`${networkPrefix(activeNetwork)}accounts`}>{`${t('accounts')} `}</BasicLink>→
+            <BasicLink to={formatPath('/accounts')}>{`${t('accounts')} `}</BasicLink>→
             <Link lineHeight={'145.23%'} href={'https://etherscan.io/address/' + accountAddress} target="_blank">
               {accountAddress?.slice(0, 42)}
             </Link>

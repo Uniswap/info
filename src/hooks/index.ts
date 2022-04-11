@@ -2,8 +2,9 @@ import { useState, useCallback, useEffect, useRef, RefObject } from 'react'
 import { shade } from 'polished'
 import Vibrant from 'node-vibrant'
 import { hex } from 'wcag-contrast'
-import { isAddress } from '../utils'
+import { isAddress, networkPrefix } from '../utils'
 import copy from 'copy-to-clipboard'
+import { useActiveNetwork } from 'contexts/Application'
 
 export function useColor(tokenAddress: string, token: string) {
   const [color, setColor] = useState('#2172E5')
@@ -96,4 +97,13 @@ export default function useInterval(callback: () => void, delay: null | number) 
     }
     return
   }, [delay])
+}
+
+export function useFormatPath() {
+  const activeNetwork = useActiveNetwork()
+
+  return useCallback((url?: string) => {
+    const path = networkPrefix(activeNetwork)
+    return url ? `${path}${url}` : path
+  }, [])
 }
