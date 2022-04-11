@@ -9,6 +9,7 @@ import AccountPage from './pages/AccountPage'
 import AllTokensPage from './pages/AllTokensPage'
 import AllPairsPage from './pages/AllPairsPage'
 import PinnedData from './components/PinnedData'
+import { networkPrefix } from './utils'
 
 import SideNav from './components/SideNav'
 import AccountLookup from './pages/AccountLookup'
@@ -116,7 +117,7 @@ function App() {
               <Route path="/:networkID/tokens" element={<AllTokensPage />} />
               <Route path="/:networkID/pairs" element={<AllPairsPage />} />
               <Route path="/:networkID/accounts" element={<AccountLookup />} />
-              <Route path="*" element={<Navigate to={`/${activeNetwork.route}`} replace />} />
+              <Route path="*" element={<Navigate to={networkPrefix(activeNetwork)} replace />} />
             </Routes>
           </Center>
           <Right open={savedOpen}>

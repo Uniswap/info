@@ -7,7 +7,8 @@ import { CustomLink } from '../Link'
 import Row from '../Row'
 import { Divider } from '..'
 
-import { formattedNum, formattedPercent } from '../../utils'
+import { formattedNum, formattedPercent, networkPrefix } from '../../utils'
+import { useActiveNetwork } from '../../contexts/Application'
 import { useMedia } from 'react-use'
 import { OVERVIEW_TOKEN_BLACKLIST } from '../../constants'
 import FormattedName from '../FormattedName'
@@ -142,6 +143,7 @@ const SORT_FIELD = {
 // @TODO rework into virtualized list
 function TopTokenList({ tokens, itemMax = 10 }) {
   const { t } = useTranslation()
+  const activeNetwork = useActiveNetwork()
   // page state
   const [page, setPage] = useState(1)
   const [maxPage, setMaxPage] = useState(1)
@@ -204,7 +206,10 @@ function TopTokenList({ tokens, itemMax = 10 }) {
           <Row>
             {!below680 && <div style={{ marginRight: '1rem', width: '10px' }}>{index}</div>}
             <TokenLogo address={item.id} />
-            <CustomLink style={{ marginLeft: '16px', whiteSpace: 'nowrap' }} to={'/token/' + item.id}>
+            <CustomLink
+              style={{ marginLeft: '16px', whiteSpace: 'nowrap' }}
+              to={`${networkPrefix(activeNetwork)}token/${item.id}`}
+            >
               <FormattedName
                 text={below680 ? item.symbol : item.name}
                 maxCharacters={below600 ? 8 : 16}

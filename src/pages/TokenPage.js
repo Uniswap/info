@@ -16,9 +16,10 @@ import { BasicLink } from '../components/Link'
 import Search from '../components/Search'
 import { formattedNum, formattedPercent, getPoolLink, getSwapLink, localNumber } from '../utils'
 import { useTokenData, useTokenTransactions, useTokenPairs } from '../contexts/TokenData'
+import { useActiveNetwork } from '../contexts/Application'
 import { TYPE } from '../Theme'
 import { OVERVIEW_TOKEN_BLACKLIST } from '../constants'
-import { isAddress } from '../utils'
+import { isAddress, networkPrefix } from '../utils'
 import { useColor } from '../hooks'
 import CopyHelper from '../components/Copy'
 import { useMedia } from 'react-use'
@@ -88,11 +89,12 @@ const WarningGrouping = styled.div`
 
 function TokenPage() {
   const { t } = useTranslation()
+  const activeNetwork = useActiveNetwork()
   const location = useLocation()
   const { tokenAddress } = useParams()
 
   if (OVERVIEW_TOKEN_BLACKLIST.includes(tokenAddress.toLowerCase()) || !isAddress(tokenAddress.toLowerCase())) {
-    return <Navigate to="/" />
+    return <Navigate to={networkPrefix(activeNetwork)} />
   }
 
   const {
@@ -187,7 +189,7 @@ function TokenPage() {
         <RowBetween style={{ flexWrap: 'wrap', alingItems: 'start' }}>
           <AutoRow align="flex-end" style={{ width: 'fit-content' }}>
             <TYPE.body>
-              <BasicLink to="/tokens">{`${t('tokens')} `}</BasicLink>→ {symbol}
+              <BasicLink to={`${networkPrefix(activeNetwork)}tokens`}>{`${t('tokens')} `}</BasicLink>→ {symbol}
               {'  '}
             </TYPE.body>
             <Link

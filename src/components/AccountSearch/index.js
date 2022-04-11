@@ -3,9 +3,10 @@ import { useNavigate, Link } from 'react-router-dom'
 import styled from 'styled-components/macro'
 import { ButtonLight, ButtonFaded } from '../ButtonStyled'
 import { AutoRow, RowBetween } from '../Row'
-import { isAddress } from '../../utils'
+import { isAddress, networkPrefix } from '../../utils'
 import { useSavedAccounts } from '../../contexts/LocalStorage'
 import { AutoColumn } from '../Column'
+import { useActiveNetwork } from '../../contexts/Application'
 import { TYPE } from '../../Theme'
 import { Hover, StyledIcon } from '..'
 import Panel from '../Panel'
@@ -75,6 +76,7 @@ const DashGrid = styled.div`
 
 function AccountSearch({ small }) {
   const { t } = useTranslation()
+  const activeNetwork = useActiveNetwork()
   const navigate = useNavigate()
   const [accountValue, setAccountValue] = useState()
   const [savedAccounts, addAccount, removeAccount] = useSavedAccounts()
@@ -120,7 +122,7 @@ function AccountSearch({ small }) {
                 return (
                   <DashGrid key={account} center={true} style={{ height: 'fit-content', padding: '1rem 0 0 0' }}>
                     <Flex area="account" justifyContent="space-between">
-                      <AccountLink as={Link} to={'/account/' + account}>
+                      <AccountLink as={Link} to={`${networkPrefix(activeNetwork)}account/${account}`}>
                         {account?.slice(0, 42)}
                       </AccountLink>
                       <Hover onClick={() => removeAccount(account)}>
@@ -145,7 +147,7 @@ function AccountSearch({ small }) {
               savedAccounts.map(account => {
                 return (
                   <RowBetween key={account}>
-                    <ButtonFaded as={Link} to={'/account/' + account}>
+                    <ButtonFaded as={Link} to={`${networkPrefix(activeNetwork)}account/${account}`}>
                       {small ? (
                         <TYPE.header>{account?.slice(0, 6) + '...' + account?.slice(38, 42)}</TYPE.header>
                       ) : (

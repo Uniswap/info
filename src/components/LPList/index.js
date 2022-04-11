@@ -3,10 +3,11 @@ import { useMedia } from 'react-use'
 import LocalLoader from '../LocalLoader'
 import { Box, Flex, Text } from 'rebass'
 import styled from 'styled-components/macro'
+import { useActiveNetwork } from '../../contexts/Application'
 
 import { CustomLink } from '../Link'
 import { Divider } from '..'
-import { formattedNum } from '../../utils'
+import { formattedNum, networkPrefix } from '../../utils'
 import { TYPE } from '../../Theme'
 import DoubleTokenLogo from '../DoubleLogo'
 import { RowFixed } from '../Row'
@@ -96,6 +97,7 @@ const DataText = styled(Flex)`
 
 function LPList({ lps, disbaleLinks, maxItems = 10 }) {
   const { t } = useTranslation()
+  const activeNetwork = useActiveNetwork()
   const below440 = useMedia('(max-width: 440px)')
   const below600 = useMedia('(max-width: 600px)')
   const below800 = useMedia('(max-width: 800px)')
@@ -129,7 +131,7 @@ function LPList({ lps, disbaleLinks, maxItems = 10 }) {
           </DataText>
         )}
         <DataText area="name" fontWeight="500" justifyContent="flex-start">
-          <CustomLink style={{ whiteSpace: 'nowrap' }} to={'/account/' + lp.user.id}>
+          <CustomLink style={{ whiteSpace: 'nowrap' }} to={`${networkPrefix(activeNetwork)}account/${lp.user.id}`}>
             {below800
               ? lp.user.id.slice(0, 4) + '...' + (below440 ? lp.user.id.slice(39, 42) : lp.user.id.slice(38, 42))
               : lp.user.id}
@@ -143,7 +145,7 @@ function LPList({ lps, disbaleLinks, maxItems = 10 }) {
         )} */}
 
         <DataText>
-          <CustomLink area="pair" to={'/pair/' + lp.pairAddress}>
+          <CustomLink area="pair" to={`${networkPrefix(activeNetwork)}pair/${lp.pairAddress}`}>
             <RowFixed style={{ textAlign: 'right' }}>
               {!below600 && <DoubleTokenLogo a0={lp.token0} a1={lp.token1} size={16} margin={true} />}
               {lp.pairName}

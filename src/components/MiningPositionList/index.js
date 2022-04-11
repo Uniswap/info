@@ -3,10 +3,11 @@ import { useMedia } from 'react-use'
 import LocalLoader from '../LocalLoader'
 import { Box, Flex, Text } from 'rebass'
 import styled from 'styled-components/macro'
+import { useActiveNetwork } from '../../contexts/Application'
 import Link, { CustomLink } from '../Link'
 import { Divider } from '..'
 import DoubleTokenLogo from '../DoubleLogo'
-import { formattedNum, getUniswapAppLink } from '../../utils'
+import { formattedNum, getUniswapAppLink, networkPrefix } from '../../utils'
 import { AutoColumn } from '../Column'
 import { RowFixed } from '../Row'
 import { ButtonLight } from '../ButtonStyled'
@@ -121,6 +122,7 @@ const SORT_FIELD = {
 
 function MiningPositionList({ miningPositions }) {
   const { t } = useTranslation()
+  const activeNetwork = useActiveNetwork()
 
   // const below500 = useMedia('(max-width: 500px)')
   const below440 = useMedia('(max-width: 440px)')
@@ -169,8 +171,8 @@ function MiningPositionList({ miningPositions }) {
             <DoubleTokenLogo size={16} a0={firstPairAddress} a1={secondPairAddress} margin={!below740} />
           </AutoColumn>
           <AutoColumn gap="8px" justify="flex-start" style={{ marginLeft: '20px' }}>
-            <CustomLink to={'/pair/' + pairAddress}>
-              <TYPE.main style={{ whiteSpace: 'nowrap' }} to={'/pair/'}>
+            <CustomLink to={`${networkPrefix(activeNetwork)}pair/${pairAddress}`}>
+              <TYPE.main style={{ whiteSpace: 'nowrap' }} to={`${networkPrefix(activeNetwork)}pair/`}>
                 <FormattedName text={firstPairName + '-' + secondPairName} maxCharacters={below740 ? 10 : 18} />
               </TYPE.main>
             </CustomLink>

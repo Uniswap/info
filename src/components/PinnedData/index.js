@@ -4,6 +4,8 @@ import { RowBetween, RowFixed } from '../Row'
 import { AutoColumn } from '../Column'
 import { TYPE } from '../../Theme'
 import { useSavedTokens, useSavedPairs } from '../../contexts/LocalStorage'
+import { useActiveNetwork } from '../../contexts/Application'
+import { networkPrefix } from '../../utils'
 import { Hover } from '..'
 import TokenLogo from '../TokenLogo'
 import AccountSearch from '../AccountSearch'
@@ -50,6 +52,7 @@ const StyledIcon = styled.div`
 
 function PinnedData({ open, setSavedOpen }) {
   const { t } = useTranslation()
+  const activeNetwork = useActiveNetwork()
 
   const [savedPairs, , removePair] = useSavedPairs()
   const [savedTokens, , removeToken] = useSavedTokens()
@@ -90,7 +93,7 @@ function PinnedData({ open, setSavedOpen }) {
                 const pair = savedPairs[address]
                 return (
                   <RowBetween key={pair.address}>
-                    <ButtonFaded as={Link} to={'/pair/' + address}>
+                    <ButtonFaded as={Link} to={`${networkPrefix(activeNetwork)}pair/${address}`}>
                       <RowFixed>
                         <TYPE.header>
                           <FormattedName
@@ -126,7 +129,7 @@ function PinnedData({ open, setSavedOpen }) {
                 const token = savedTokens[address]
                 return (
                   <RowBetween key={address}>
-                    <ButtonFaded as={Link} to={'/token/' + address}>
+                    <ButtonFaded as={Link} to={`${networkPrefix(activeNetwork)}token/${address}`}>
                       <RowFixed>
                         <TokenLogo address={address} size={'14px'} />
                         <TYPE.header ml={'6px'}>
