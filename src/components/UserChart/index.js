@@ -10,7 +10,7 @@ import { timeframeOptions } from '../../constants'
 import DropdownSelect from '../DropdownSelect'
 import { useUserLiquidityChart } from '../../contexts/User'
 import LocalLoader from '../LocalLoader'
-import { useDarkModeManager } from '../../contexts/LocalStorage'
+import { useDarkModeManager } from 'state/features/user/hooks'
 import { TYPE } from '../../Theme'
 import { useTranslation } from 'react-i18next'
 

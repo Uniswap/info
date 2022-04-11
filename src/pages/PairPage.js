@@ -24,11 +24,11 @@ import TokenLogo from '../components/TokenLogo'
 import { Hover } from '../components'
 import { useEthPrice } from '../contexts/GlobalData'
 import Warning from '../components/Warning'
-import { usePathDismissed, useSavedPairs } from '../contexts/LocalStorage'
+import { usePathDismissed, useSavedPairs } from 'state/features/user/hooks'
 import { useFormatPath } from 'hooks'
 import { Bookmark, PlusCircle } from 'react-feather'
 import FormattedName from '../components/FormattedName'
-import { useListedTokens } from '../contexts/Application'
+import { useListedTokens } from 'state/features/application/hooks'
 import { useTranslation } from 'react-i18next'
 
 const PanelWrapper = styled.div`
@@ -244,7 +244,6 @@ function PairPage() {
               >
                 <RowFixed style={{ flexWrap: 'wrap', minWidth: '100px' }}>
                   <RowFixed>
-                    {console.log(token0?.id)}
                     {token0 && token1 && (
                       <DoubleTokenLogo
                         a0={token0?.id || ''}

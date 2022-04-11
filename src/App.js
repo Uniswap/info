@@ -14,7 +14,7 @@ import { useFormatPath } from './hooks'
 import SideNav from './components/SideNav'
 import AccountLookup from './pages/AccountLookup'
 import LocalLoader from './components/LocalLoader'
-import { useLatestBlocks, useUpdateActiveNetwork } from './contexts/Application'
+import { useLatestBlocks, useUpdateActiveNetwork } from 'state/features/application/hooks'
 
 const AppWrapper = styled.div`
   position: relative;

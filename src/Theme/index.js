@@ -1,5 +1,5 @@
 import { ThemeProvider as StyledComponentsThemeProvider, createGlobalStyle } from 'styled-components/macro'
-import { useDarkModeManager } from '../contexts/LocalStorage'
+import { useDarkModeManager } from 'state/features/user/hooks'
 import styled from 'styled-components/macro'
 import { Text } from 'rebass'
 

@@ -5,7 +5,7 @@ import { formattedNum } from '../../utils'
 import styled from 'styled-components/macro'
 import { usePrevious } from 'react-use'
 import { Play } from 'react-feather'
-import { useDarkModeManager } from '../../contexts/LocalStorage'
+import { useDarkModeManager } from 'state/features/user/hooks'
 import { IconWrapper } from '..'
 
 export const CHART_TYPES = {

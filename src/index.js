@@ -6,15 +6,16 @@ import { isMobile } from 'react-device-detect'
 import { client } from './apollo/client'
 import { ApolloProvider } from '@apollo/react-hooks'
 import ThemeProvider, { GlobalStyle } from './Theme'
-import LocalStorageContextProvider, { Updater as LocalStorageContextUpdater } from './contexts/LocalStorage'
 import TokenDataContextProvider, { Updater as TokenDataContextUpdater } from './contexts/TokenData'
 import GlobalDataContextProvider from './contexts/GlobalData'
 import PairDataContextProvider, { Updater as PairDataContextUpdater } from './contexts/PairData'
-import ApplicationContextProvider from './contexts/Application'
 import UserContextProvider from './contexts/User'
+import { PersistGate } from 'redux-persist/integration/react'
 import dayjs from 'dayjs'
 import weekOfYear from 'dayjs/plugin/weekOfYear'
 import utc from 'dayjs/plugin/utc'
+import { store, persistor } from 'state/store'
+import { Provider } from 'react-redux'
 import App from './App'
 import './i18n'
 
@@ -37,24 +38,19 @@ if (typeof GOOGLE_ANALYTICS_ID === 'string' && GOOGLE_ANALYTICS_ID !== '') {
 
 function ContextProviders({ children }) {
   return (
-    <ApplicationContextProvider>
-      <LocalStorageContextProvider>
-        <TokenDataContextProvider>
-          <GlobalDataContextProvider>
-            <PairDataContextProvider>
-              <UserContextProvider>{children}</UserContextProvider>
-            </PairDataContextProvider>
-          </GlobalDataContextProvider>
-        </TokenDataContextProvider>
-      </LocalStorageContextProvider>
-    </ApplicationContextProvider>
+    <TokenDataContextProvider>
+      <GlobalDataContextProvider>
+        <PairDataContextProvider>
+          <UserContextProvider>{children}</UserContextProvider>
+        </PairDataContextProvider>
+      </GlobalDataContextProvider>
+    </TokenDataContextProvider>
   )
 }
 
 function Updaters() {
   return (
     <>
-      <LocalStorageContextUpdater />
       <PairDataContextUpdater />
       <TokenDataContextUpdater />
     </>
@@ -63,19 +59,23 @@ function Updaters() {
 
 ReactDOM.render(
   <StrictMode>
-    <ContextProviders>
-      <Updaters />
-      <ThemeProvider>
-        <>
-          <GlobalStyle />
-          <ApolloProvider client={client}>
-            <BrowserRouter>
-              <App />
-            </BrowserRouter>
-          </ApolloProvider>
-        </>
-      </ThemeProvider>
-    </ContextProviders>
+    <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
+        <ContextProviders>
+          <Updaters />
+          <ThemeProvider>
+            <>
+              <GlobalStyle />
+              <ApolloProvider client={client}>
+                <BrowserRouter>
+                  <App />
+                </BrowserRouter>
+              </ApolloProvider>
+            </>
+          </ThemeProvider>
+        </ContextProviders>
+      </PersistGate>
+    </Provider>
   </StrictMode>,
   document.getElementById('root')
 )

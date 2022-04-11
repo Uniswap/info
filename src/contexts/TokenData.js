@@ -13,7 +13,7 @@ import {
 } from '../apollo/queries'
 
 import { useEthPrice } from './GlobalData'
-import { useActiveNetworkId } from './Application'
+import { useActiveNetworkId, useLatestBlocks } from 'state/features/application/hooks'
 
 import dayjs from 'dayjs'
 
@@ -26,7 +26,6 @@ import {
   splitQuery
 } from '../utils'
 import { timeframeOptions } from '../constants'
-import { useLatestBlocks } from './Application'
 import { updateNameData } from '../utils/data'
 
 const UPDATE = 'UPDATE'

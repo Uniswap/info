@@ -1,7 +1,7 @@
 import { createContext, useContext, useReducer, useMemo, useCallback, useEffect, useState } from 'react'
 import { client } from '../apollo/client'
 import dayjs from 'dayjs'
-import { useTimeframe, useActiveNetworkId } from './Application'
+import { useTimeframe, useActiveNetworkId } from 'state/features/application/hooks'
 import {
   getPercentChange,
   getBlockFromTimestamp,

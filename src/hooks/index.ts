@@ -4,7 +4,7 @@ import Vibrant from 'node-vibrant'
 import { hex } from 'wcag-contrast'
 import { isAddress, networkPrefix } from '../utils'
 import copy from 'copy-to-clipboard'
-import { useActiveNetwork } from 'contexts/Application'
+import { useAppSelector } from 'state/hooks'
 
 export function useColor(tokenAddress: string, token: string) {
   const [color, setColor] = useState('#2172E5')
@@ -100,7 +100,7 @@ export default function useInterval(callback: () => void, delay: null | number) 
 }
 
 export function useFormatPath() {
-  const activeNetwork = useActiveNetwork()
+  const activeNetwork = useAppSelector(state => state.application.activeNetwork)
 
   return useCallback((url?: string) => {
     const path = networkPrefix(activeNetwork)

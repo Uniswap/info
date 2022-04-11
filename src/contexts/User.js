@@ -9,10 +9,9 @@ import {
   PAIR_DAY_DATA_BULK,
   MINING_POSITIONS
 } from '../apollo/queries'
-import { useTimeframe, useStartTimestamp } from './Application'
+import { useTimeframe, useStartTimestamp, useActiveNetworkId } from 'state/features/application/hooks'
 import dayjs from 'dayjs'
 import { useEthPrice } from './GlobalData'
-import { useActiveNetworkId } from './Application'
 import { getLPReturnsOnPair, getHistoricalPairReturns } from '../utils/returns'
 import { timeframeOptions } from '../constants'
 

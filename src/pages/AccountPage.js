@@ -82,7 +82,6 @@ function AccountPage() {
   const formatPath = useFormatPath()
 
   const { accountAddress } = useParams()
-
   if (!isAddress(accountAddress.toLowerCase())) {
     return <Navigate to={formatPath('/')} />
   }

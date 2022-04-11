@@ -9,10 +9,10 @@ import { useMedia } from 'react-use'
 import { timeframeOptions } from '../../constants'
 import DropdownSelect from '../DropdownSelect'
 import { useUserPositionChart } from '../../contexts/User'
-import { useTimeframe } from '../../contexts/Application'
+import { useTimeframe } from 'state/features/application/hooks'
 import LocalLoader from '../LocalLoader'
 import { useColor } from '../../hooks'
-import { useDarkModeManager } from '../../contexts/LocalStorage'
+import { useDarkModeManager } from 'state/features/user/hooks'
 import { useTranslation } from 'react-i18next'
 
 const ChartWrapper = styled.div`

@@ -3,7 +3,7 @@ import styled from 'styled-components/macro'
 
 import { formatTime, formattedNum, urls } from '../../utils'
 import { useMedia } from 'react-use'
-import { useCurrentCurrency } from '../../contexts/Application'
+import { useCurrentCurrency } from 'state/features/application/hooks'
 import { RowFixed, RowBetween } from '../Row'
 
 import LocalLoader from '../LocalLoader'

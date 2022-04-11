@@ -4,7 +4,7 @@ import styled from 'styled-components/macro'
 import { ButtonLight, ButtonFaded } from '../ButtonStyled'
 import { AutoRow, RowBetween } from '../Row'
 import { isAddress } from '../../utils'
-import { useSavedAccounts } from '../../contexts/LocalStorage'
+import { useSavedAccounts } from 'state/features/user/hooks'
 import { AutoColumn } from '../Column'
 import { TYPE } from '../../Theme'
 import { Hover, StyledIcon } from '..'
@@ -84,7 +84,7 @@ function AccountSearch({ small }) {
 
   function handleAccountSearch() {
     if (isAddress(accountValue)) {
-      navigate(`/accounts/${accountValue}`)
+      navigate(formatPath(`/accounts/${accountValue}`))
       if (!savedAccounts.includes(accountValue)) {
         addAccount(accountValue)
       }

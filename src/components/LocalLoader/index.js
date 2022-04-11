@@ -1,5 +1,5 @@
 import styled, { css, keyframes } from 'styled-components/macro'
-import { useDarkModeManager } from '../../contexts/LocalStorage'
+import { useDarkModeManager } from 'state/features/user/hooks'
 
 const pulse = keyframes`
   0% { transform: scale(1); }
