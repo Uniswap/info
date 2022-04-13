@@ -9,6 +9,7 @@
     "@uniswap/token-lists": "1.0.0-beta.28",
     "ajv": "^6.12.6",
     "apollo-boost": "^0.4.9",
+    "apollo-link": "^1.2.14",
     "axios": "^0.26.1",
     "bignumber.js": "^9.0.2",
     "copy-to-clipboard": "^3.3.1",

@@ -1,6 +1,6 @@
 import { createContext, useContext, useReducer, useMemo, useCallback, useEffect, useState } from 'react'
 import { useAllPairData, usePairData } from './PairData'
-import { client, stakingClient } from '../apollo/client'
+import { client } from '../apollo/client'
 import { EthereumNetworkInfo, TronNetworkInfo } from '../constants/networks'
 import {
   USER_TRANSACTIONS,
@@ -352,8 +352,11 @@ async function getUserPositions(account, price, snapshots) {
 async function getMiningPositions(account, allPairData) {
   try {
     let miningPositionData = []
-    let result = await stakingClient.query({
+    let result = await client.query({
       query: MINING_POSITIONS(account),
+      context: {
+        client: 'stake'
+      },
       fetchPolicy: 'no-cache'
     })
     if (!result?.data?.user?.miningPosition) {

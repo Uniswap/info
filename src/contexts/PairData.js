@@ -4,7 +4,6 @@ import { client } from '../apollo/client'
 import {
   PAIR_DATA,
   PAIR_CHART,
-  FILTERED_TRANSACTIONS,
   PAIRS_CURRENT,
   PAIRS_BULK,
   PAIRS_HISTORICAL_BULK,
@@ -26,6 +25,7 @@ import {
 } from '../utils'
 import { timeframeOptions } from '../constants'
 import { updateNameData } from '../utils/data'
+import { pairApi } from 'api'
 
 const UPDATE = 'UPDATE'
 const UPDATE_PAIR_TXNS = 'UPDATE_PAIR_TXNS'
@@ -321,13 +321,7 @@ const getPairTransactions = async pairAddress => {
   const transactions = {}
 
   try {
-    let result = await client.query({
-      query: FILTERED_TRANSACTIONS,
-      variables: {
-        allPairs: [pairAddress]
-      },
-      fetchPolicy: 'no-cache'
-    })
+    const result = await pairApi.getFilteredTransactions(pairAddress)
     transactions.mints = result.data.mints
     transactions.burns = result.data.burns
     transactions.swaps = result.data.swaps

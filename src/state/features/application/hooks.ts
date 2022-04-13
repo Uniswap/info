@@ -12,16 +12,19 @@ import {
   updateSupportedTokens,
   updateTimeFrame
 } from './slice'
-import { SUPPORTED_NETWORK_VERSIONS, TronNetworkInfo } from 'constants/networks'
 import { DEFAULT_LIST_OF_LISTS } from 'constants/lists'
-import { healthClient } from 'apollo/client'
 import { SUBGRAPH_HEALTH } from 'apollo/queries'
 import getTokenList from 'utils/tokenLists'
+import ApiService from 'api/ApiService'
+import { client } from 'apollo/client'
 
 async function getSubgraphStatus() {
   try {
-    const res = await healthClient.query({
-      query: SUBGRAPH_HEALTH
+    const res = await client.query({
+      query: SUBGRAPH_HEALTH,
+      context: {
+        client: 'health'
+      }
     })
     const syncedBlock = res.data.indexingStatusForCurrentVersion.chains[0].latestBlock.number
     const headBlock = res.data.indexingStatusForCurrentVersion.chains[0].chainHeadBlock.number
@@ -83,14 +86,10 @@ export function useUpdateActiveNetwork() {
   const dispatch = useAppDispatch()
   const networkId = useActiveNetworkId()
   const update = useCallback(newActiveNetwork => {
-    if (networkId !== newActiveNetwork) {
-      const newNetworkInfo = SUPPORTED_NETWORK_VERSIONS.find(n => newActiveNetwork === n.route.toLowerCase())
-      if (newNetworkInfo) {
-        dispatch(updateActiveNetwork(newNetworkInfo))
-      } else {
-        dispatch(updateActiveNetwork(TronNetworkInfo))
-      }
+    if (networkId !== newActiveNetwork.id) {
+      dispatch(updateActiveNetwork(newActiveNetwork))
     }
+    ApiService.setActiveNetwork(newActiveNetwork.id)
   }, [])
 
   return update

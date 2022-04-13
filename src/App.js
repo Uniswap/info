@@ -14,6 +14,7 @@ import { useFormatPath } from './hooks'
 import SideNav from './components/SideNav'
 import AccountLookup from './pages/AccountLookup'
 import LocalLoader from './components/LocalLoader'
+import { SUPPORTED_NETWORK_VERSIONS, TronNetworkInfo } from 'constants/networks'
 import { useLatestBlocks, useUpdateActiveNetwork } from 'state/features/application/hooks'
 
 const AppWrapper = styled.div`
@@ -89,7 +90,12 @@ function App() {
 
   useEffect(() => {
     const locationNetworkId = location.pathname.split('/')[1]
-    validateNetworkId(locationNetworkId)
+    const newNetworkInfo = SUPPORTED_NETWORK_VERSIONS.find(n => locationNetworkId === n.route.toLowerCase())
+    if (newNetworkInfo) {
+      validateNetworkId(newNetworkInfo)
+    } else {
+      validateNetworkId(TronNetworkInfo)
+    }
   }, [location])
 
   return (
