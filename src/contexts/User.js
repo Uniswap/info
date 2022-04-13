@@ -1,19 +1,12 @@
 import { createContext, useContext, useReducer, useMemo, useCallback, useEffect, useState } from 'react'
 import { useAllPairData, usePairData } from './PairData'
-import { client } from '../apollo/client'
 import { EthereumNetworkInfo, TronNetworkInfo } from '../constants/networks'
-import {
-  USER_TRANSACTIONS,
-  USER_POSITIONS,
-  USER_HISTORY,
-  PAIR_DAY_DATA_BULK,
-  MINING_POSITIONS
-} from '../apollo/queries'
 import { useTimeframe, useStartTimestamp, useActiveNetworkId } from 'state/features/application/hooks'
 import dayjs from 'dayjs'
 import { useEthPrice } from './GlobalData'
 import { getLPReturnsOnPair, getHistoricalPairReturns } from '../utils/returns'
 import { timeframeOptions } from '../constants'
+import { accountApi } from 'api'
 
 const UPDATE_TRANSACTIONS = 'UPDATE_TRANSACTIONS'
 const UPDATE_POSITIONS = 'UPDATE_POSITIONS '
@@ -187,13 +180,7 @@ export default function Provider({ children }) {
 
 async function getUserTransactions(account) {
   try {
-    let result = await client.query({
-      query: USER_TRANSACTIONS,
-      variables: {
-        user: account
-      },
-      fetchPolicy: 'no-cache'
-    })
+    let result = await accountApi.getUserTransactions(account)
     return result
   } catch (e) {
     console.log(e)
@@ -206,14 +193,7 @@ async function getUserHistory(account) {
     let allResults = []
     let found = false
     while (!found) {
-      let result = await client.query({
-        query: USER_HISTORY,
-        variables: {
-          skip: skip,
-          user: account
-        },
-        fetchPolicy: 'cache-first'
-      })
+      let result = await accountApi.getUserHistory(account, skip)
       allResults = allResults.concat(result.data.liquidityPositionSnapshots)
       if (result.data.liquidityPositionSnapshots.length < 1000) {
         found = true
@@ -254,9 +234,7 @@ async function getUserLiquidityChart(account, startDateTimestamp, history) {
   // get all day datas where date is in this list, and pair is in pair list
   let {
     data: { pairDayDatas }
-  } = await client.query({
-    query: PAIR_DAY_DATA_BULK(pairs, startDateTimestamp)
-  })
+  } = await accountApi.getUserLiquidityChart(pairs, startDateTimestamp)
 
   const formattedHistory = []
 
@@ -325,13 +303,7 @@ async function getUserLiquidityChart(account, startDateTimestamp, history) {
 
 async function getUserPositions(account, price, snapshots) {
   try {
-    let result = await client.query({
-      query: USER_POSITIONS,
-      variables: {
-        user: account
-      },
-      fetchPolicy: 'no-cache'
-    })
+    let result = await accountApi.getUserPositions(account)
     if (result?.data?.liquidityPositions) {
       let formattedPositions = await Promise.all(
         result?.data?.liquidityPositions.map(async positionData => {
@@ -352,13 +324,7 @@ async function getUserPositions(account, price, snapshots) {
 async function getMiningPositions(account, allPairData) {
   try {
     let miningPositionData = []
-    let result = await client.query({
-      query: MINING_POSITIONS(account),
-      context: {
-        client: 'stake'
-      },
-      fetchPolicy: 'no-cache'
-    })
+    let result = await accountApi.getMiningPositions(account)
     if (!result?.data?.user?.miningPosition) {
       return
     }
