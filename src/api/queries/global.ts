@@ -99,7 +99,7 @@ export const SHARE_VALUE = (pairAddress: string, blocks: Block[]) => {
   return gql(queryString)
 }
 
-export const ETH_PRICE = (block: number) => {
+export const ETH_PRICE = (block?: number) => {
   const queryString = block
     ? `
     query bundles {
@@ -133,7 +133,7 @@ export const GLOBAL_CHART = gql`
   }
 `
 
-export const GLOBAL_DATA = (block: number) => {
+export const GLOBAL_DATA = (block?: number) => {
   const queryString = ` query whiteSwapFactories {
       whiteSwapFactories(
        ${block ? `block: { number: ${block}}` : ``}

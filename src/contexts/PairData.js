@@ -1,14 +1,5 @@
 import { createContext, useContext, useReducer, useMemo, useCallback, useEffect, useState } from 'react'
 import { EthereumNetworkInfo, TronNetworkInfo } from '../constants/networks'
-import { client } from '../apollo/client'
-import {
-  PAIR_DATA,
-  PAIR_CHART,
-  PAIRS_CURRENT,
-  PAIRS_BULK,
-  PAIRS_HISTORICAL_BULK,
-  HOURLY_PAIR_RATES
-} from '../apollo/queries'
 
 import { useEthPrice } from './GlobalData'
 import { useActiveNetworkId, useLatestBlocks } from 'state/features/application/hooks'
@@ -22,9 +13,9 @@ import {
   getBlocksFromTimestamps,
   getTimestampsForChanges,
   splitQuery
-} from '../utils'
+} from 'utils'
 import { timeframeOptions } from '../constants'
-import { updateNameData } from '../utils/data'
+import { updateNameData } from 'utils/data'
 import { pairApi } from 'api'
 
 const UPDATE = 'UPDATE'
@@ -206,20 +197,11 @@ async function getBulkPairData(pairList, price) {
   let [{ number: b1 }, { number: b2 }, { number: bWeek }] = await getBlocksFromTimestamps([t1, t2, tWeek])
 
   try {
-    let current = await client.query({
-      query: PAIRS_BULK,
-      variables: {
-        allPairs: pairList
-      },
-      fetchPolicy: 'cache-first'
-    })
+    let current = await pairApi.getPairsBulk(pairList)
 
     let [oneDayResult, twoDayResult, oneWeekResult] = await Promise.all(
       [b1, b2, bWeek].map(async block => {
-        let result = client.query({
-          query: PAIRS_HISTORICAL_BULK(block, pairList),
-          fetchPolicy: 'cache-first'
-        })
+        let result = await pairApi.getPairsHistoricalBulk(block, pairList)
         return result
       })
     )
@@ -242,26 +224,17 @@ async function getBulkPairData(pairList, price) {
           let data = pair
           let oneDayHistory = oneDayData?.[pair.id]
           if (!oneDayHistory) {
-            let newData = await client.query({
-              query: PAIR_DATA(pair.id, b1),
-              fetchPolicy: 'cache-first'
-            })
+            let newData = await pairApi.getPairData(pair.id, b1)
             oneDayHistory = newData.data.pairs[0]
           }
           let twoDayHistory = twoDayData?.[pair.id]
           if (!twoDayHistory) {
-            let newData = await client.query({
-              query: PAIR_DATA(pair.id, b2),
-              fetchPolicy: 'cache-first'
-            })
+            let newData = await pairApi.getPairData(pair.id, b2)
             twoDayHistory = newData.data.pairs[0]
           }
           let oneWeekHistory = oneWeekData?.[pair.id]
           if (!oneWeekHistory) {
-            let newData = await client.query({
-              query: PAIR_DATA(pair.id, bWeek),
-              fetchPolicy: 'cache-first'
-            })
+            let newData = await pairApi.getPairData(pair.id, bWeek)
             oneWeekHistory = newData.data.pairs[0]
           }
           data = parseData(data, oneDayHistory, twoDayHistory, oneWeekHistory, price, b1)
@@ -321,7 +294,7 @@ const getPairTransactions = async pairAddress => {
   const transactions = {}
 
   try {
-    const result = await pairApi.getFilteredTransactions(pairAddress)
+    const result = await pairApi.getFilteredTransactions([pairAddress])
     transactions.mints = result.data.mints
     transactions.burns = result.data.burns
     transactions.swaps = result.data.swaps
@@ -342,14 +315,7 @@ const getPairChartData = async pairAddress => {
     let allFound = false
     let skip = 0
     while (!allFound) {
-      let result = await client.query({
-        query: PAIR_CHART,
-        variables: {
-          pairAddress: pairAddress,
-          skip
-        },
-        fetchPolicy: 'cache-first'
-      })
+      let result = await pairApi.getPairChart(pairAddress, skip)
       skip += 1000
       data = data.concat(result.data.pairDayDatas)
       if (result.data.pairDayDatas.length < 1000) {
@@ -432,7 +398,8 @@ const getHourlyRateData = async (pairAddress, startTime, latestBlock) => {
       })
     }
 
-    const result = await splitQuery(HOURLY_PAIR_RATES, client, [pairAddress], blocks, 100)
+    // TODO: refactor
+    const result = await splitQuery(params => pairApi.getPairHourlyRates(pairAddress, params), blocks)
 
     // format token ETH price results
     let values = []
@@ -481,10 +448,7 @@ export function Updater() {
       // get top pairs by reserves
       let {
         data: { pairs }
-      } = await client.query({
-        query: PAIRS_CURRENT,
-        fetchPolicy: 'cache-first'
-      })
+      } = await pairApi.getCurrentPairs()
 
       // format as array of addresses
       const formattedPairs = pairs.map(pair => {

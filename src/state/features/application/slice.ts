@@ -1,7 +1,8 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { timeframeOptions } from '../../../constants'
-import { EthereumNetworkInfo, NetworkInfo, SupportedNetwork } from 'constants/networks'
+import { NetworkInfo, SupportedNetwork } from 'constants/networks'
 import { ApplicationState } from './types'
+import { getCurrentNetwork } from 'utils'
 
 const initialState: ApplicationState = {
   currency: 'USD',
@@ -13,7 +14,7 @@ const initialState: ApplicationState = {
     [SupportedNetwork.ETHEREUM]: [],
     [SupportedNetwork.TRON]: []
   },
-  activeNetwork: EthereumNetworkInfo
+  activeNetwork: getCurrentNetwork()
 }
 
 export const applicationSlice = createSlice({

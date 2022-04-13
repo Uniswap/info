@@ -85,7 +85,7 @@ export const TOKENS_DYNAMIC = (block: number) => {
   return gql(queryString)
 }
 
-export const TOKEN_DATA = (tokenAddress: number, block: number) => {
+export const TOKEN_DATA = (tokenAddress: string, block: number) => {
   const queryString = `
     ${TokenFields}
     query tokens {
@@ -102,73 +102,3 @@ export const TOKEN_DATA = (tokenAddress: number, block: number) => {
   `
   return gql(queryString)
 }
-
-export const FILTERED_TRANSACTIONS = gql`
-  query ($allPairs: [Bytes]!) {
-    mints(first: 20, where: { pair_in: $allPairs }, orderBy: timestamp, orderDirection: desc) {
-      transaction {
-        id
-        timestamp
-      }
-      pair {
-        token0 {
-          id
-          symbol
-        }
-        token1 {
-          id
-          symbol
-        }
-      }
-      to
-      liquidity
-      amount0
-      amount1
-      amountUSD
-    }
-    burns(first: 20, where: { pair_in: $allPairs }, orderBy: timestamp, orderDirection: desc) {
-      transaction {
-        id
-        timestamp
-      }
-      pair {
-        token0 {
-          id
-          symbol
-        }
-        token1 {
-          id
-          symbol
-        }
-      }
-      sender
-      liquidity
-      amount0
-      amount1
-      amountUSD
-    }
-    swaps(first: 30, where: { pair_in: $allPairs }, orderBy: timestamp, orderDirection: desc) {
-      transaction {
-        id
-        timestamp
-      }
-      id
-      pair {
-        token0 {
-          id
-          symbol
-        }
-        token1 {
-          id
-          symbol
-        }
-      }
-      amount0In
-      amount0Out
-      amount1In
-      amount1Out
-      amountUSD
-      to
-    }
-  }
-`

@@ -1,13 +1,14 @@
 import { BigNumber } from 'bignumber.js'
 import dayjs from 'dayjs'
 import { ethers } from 'ethers'
-import { client } from '../apollo/client'
-import { GET_BLOCK, GET_BLOCKS, SHARE_VALUE } from '../apollo/queries'
 import { Text } from 'rebass'
 import _Decimal from 'decimal.js-light'
 import toFormat from 'toformat'
 import { timeframeOptions } from '../constants'
+import { SUPPORTED_NETWORK_VERSIONS } from '../constants/networks'
 import Numeral from 'numeral'
+import { globalApi } from 'api'
+import { TronNetworkInfo } from 'constants/networks'
 
 // format libraries
 const Decimal = toFormat(_Decimal)
@@ -103,7 +104,7 @@ export function getTimestampsForChanges() {
   return [t1, t2, tWeek]
 }
 
-export async function splitQuery(query, localClient, vars, list, skipCount = 100, context) {
+export async function splitQuery(callback, list, skipCount = 100) {
   let fetchedData = {}
   let allFound = false
   let skip = 0
@@ -114,11 +115,7 @@ export async function splitQuery(query, localClient, vars, list, skipCount = 100
       end = skip + skipCount
     }
     let sliced = list.slice(skip, end)
-    let result = await localClient.query({
-      query: query(...vars, sliced),
-      context,
-      fetchPolicy: 'cache-first'
-    })
+    let result = await callback(sliced)
     fetchedData = {
       ...fetchedData,
       ...result.data
@@ -139,17 +136,7 @@ export async function splitQuery(query, localClient, vars, list, skipCount = 100
  * @param {Int} timestamp in seconds
  */
 export async function getBlockFromTimestamp(timestamp) {
-  let result = await client.query({
-    query: GET_BLOCK,
-    variables: {
-      timestampFrom: timestamp,
-      timestampTo: timestamp + 600
-    },
-    context: {
-      client: 'block'
-    },
-    fetchPolicy: 'cache-first'
-  })
+  let result = await globalApi.getBlock(timestamp, timestamp + 600)
   return result?.data?.blocks?.[0]?.number
 }
 
@@ -165,7 +152,7 @@ export async function getBlocksFromTimestamps(timestamps, skipCount = 500) {
     return []
   }
 
-  let fetchedData = await splitQuery(GET_BLOCKS, client, [], timestamps, skipCount, { client: 'block' })
+  let fetchedData = await splitQuery(params => globalApi.getBlocks(params), timestamps, skipCount)
 
   let blocks = []
   if (fetchedData) {
@@ -186,10 +173,7 @@ export async function getLiquidityTokenBalanceOvertime(account, timestamps) {
   const blocks = await getBlocksFromTimestamps(timestamps)
 
   // get historical share values with time travel queries
-  let result = await client.query({
-    query: SHARE_VALUE(account, blocks),
-    fetchPolicy: 'cache-first'
-  })
+  let result = await globalApi.getShareValue(account, blocks)
 
   let values = []
   for (var row in result?.data) {
@@ -220,10 +204,7 @@ export async function getShareValueOverTime(pairAddress, timestamps) {
   const blocks = await getBlocksFromTimestamps(timestamps)
 
   // get historical share values with time travel queries
-  let result = await client.query({
-    query: SHARE_VALUE(pairAddress, blocks),
-    fetchPolicy: 'cache-first'
-  })
+  let result = await globalApi.getShareValue(pairAddress, blocks)
 
   let values = []
   for (var row in result?.data) {
@@ -478,4 +459,14 @@ export function isEquivalent(a, b) {
 export function networkPrefix(activeNetwork) {
   const prefix = '/' + activeNetwork.route.toLocaleLowerCase()
   return prefix
+}
+
+export function getCurrentNetwork() {
+  const locationNetworkId = location.pathname.split('/')[1]
+  const newNetworkInfo = SUPPORTED_NETWORK_VERSIONS.find(n => locationNetworkId === n.route.toLowerCase())
+  if (newNetworkInfo) {
+    return newNetworkInfo
+  } else {
+    return TronNetworkInfo
+  }
 }

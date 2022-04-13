@@ -154,7 +154,7 @@ export const PAIRS_CURRENT = gql`
   }
 `
 
-export const PAIR_DATA = (pairAddress: string, block: number) => {
+export const PAIR_DATA = (pairAddress: string, block?: number) => {
   const queryString = `
     ${PairFields}
     query pairs {
@@ -193,3 +193,73 @@ export const PAIRS_HISTORICAL_BULK = (block: number, pairs: string[]) => {
   `
   return gql(queryString)
 }
+
+export const FILTERED_TRANSACTIONS = gql`
+  query ($allPairs: [Bytes]!) {
+    mints(first: 20, where: { pair_in: $allPairs }, orderBy: timestamp, orderDirection: desc) {
+      transaction {
+        id
+        timestamp
+      }
+      pair {
+        token0 {
+          id
+          symbol
+        }
+        token1 {
+          id
+          symbol
+        }
+      }
+      to
+      liquidity
+      amount0
+      amount1
+      amountUSD
+    }
+    burns(first: 20, where: { pair_in: $allPairs }, orderBy: timestamp, orderDirection: desc) {
+      transaction {
+        id
+        timestamp
+      }
+      pair {
+        token0 {
+          id
+          symbol
+        }
+        token1 {
+          id
+          symbol
+        }
+      }
+      sender
+      liquidity
+      amount0
+      amount1
+      amountUSD
+    }
+    swaps(first: 30, where: { pair_in: $allPairs }, orderBy: timestamp, orderDirection: desc) {
+      transaction {
+        id
+        timestamp
+      }
+      id
+      pair {
+        token0 {
+          id
+          symbol
+        }
+        token1 {
+          id
+          symbol
+        }
+      }
+      amount0In
+      amount0Out
+      amount1In
+      amount1Out
+      amountUSD
+      to
+    }
+  }
+`

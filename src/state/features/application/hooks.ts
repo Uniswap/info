@@ -13,19 +13,13 @@ import {
   updateTimeFrame
 } from './slice'
 import { DEFAULT_LIST_OF_LISTS } from 'constants/lists'
-import { SUBGRAPH_HEALTH } from 'apollo/queries'
 import getTokenList from 'utils/tokenLists'
 import ApiService from 'api/ApiService'
-import { client } from 'apollo/client'
+import { globalApi } from 'api'
 
 async function getSubgraphStatus() {
   try {
-    const res = await client.query({
-      query: SUBGRAPH_HEALTH,
-      context: {
-        client: 'health'
-      }
-    })
+    const res = await globalApi.getHealthStatus()
     const syncedBlock = res.data.indexingStatusForCurrentVersion.chains[0].latestBlock.number
     const headBlock = res.data.indexingStatusForCurrentVersion.chains[0].chainHeadBlock.number
     return { syncedBlock, headBlock }

@@ -1,6 +1,7 @@
 import { ApolloClient, ApolloLink, HttpLink, InMemoryCache, NormalizedCacheObject } from 'apollo-boost'
 import axios, { AxiosInstance } from 'axios'
-import { SupportedNetwork, TronNetworkInfo } from 'constants/networks'
+import { SupportedNetwork } from 'constants/networks'
+import { getCurrentNetwork } from 'utils'
 import config from './config'
 
 enum GraphQlClient {
@@ -20,7 +21,7 @@ class ApiService {
   private readonly blockClientLink: HttpLink
   private readonly restApiUrl = config.restApiUrl
 
-  public readonly graphQlApi: ApolloClient<NormalizedCacheObject>
+  public readonly graphqlClient: ApolloClient<NormalizedCacheObject>
   public readonly restApi: AxiosInstance
   public activeNetwork: SupportedNetwork
 
@@ -54,7 +55,7 @@ class ApiService {
       )
     )
 
-    this.graphQlApi = new ApolloClient({
+    this.graphqlClient = new ApolloClient({
       link: directionalLink,
       cache: new InMemoryCache()
     })
@@ -64,7 +65,7 @@ class ApiService {
       headers: this.restApiHeaders
     })
 
-    this.activeNetwork = TronNetworkInfo.id
+    this.activeNetwork = getCurrentNetwork().id
   }
 
   public setActiveNetwork(network: SupportedNetwork) {

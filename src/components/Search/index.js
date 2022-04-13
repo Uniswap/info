@@ -15,12 +15,11 @@ import { useAllPairsInUniswap, useAllTokensInUniswap } from '../../contexts/Glob
 import { OVERVIEW_TOKEN_BLACKLIST, PAIR_BLACKLIST } from '../../constants'
 
 import { transparentize } from 'polished'
-import { client } from '../../apollo/client'
-import { PAIR_SEARCH, TOKEN_SEARCH } from '../../apollo/queries'
 import FormattedName from '../FormattedName'
 import { TYPE } from '../../Theme'
 import { updateNameData } from '../../utils/data'
 import { useTranslation } from 'react-i18next'
+import { pairApi, tokenApi } from 'api'
 
 const Container = styled.div`
   height: 48px;
@@ -183,21 +182,11 @@ export const Search = ({ small = false }) => {
     async function fetchData() {
       try {
         if (value?.length > 0) {
-          let tokens = await client.query({
-            variables: {
-              value: value ? value.toUpperCase() : '',
-              id: value
-            },
-            query: TOKEN_SEARCH
-          })
-
-          let pairs = await client.query({
-            query: PAIR_SEARCH,
-            variables: {
-              tokens: tokens.data.asSymbol?.map(t => t.id),
-              id: value
-            }
-          })
+          let tokens = await tokenApi.searchToken(value ? value.toUpperCase() : '', value)
+          let pairs = await pairApi.searchPair(
+            tokens.data.asSymbol?.map(t => t.id),
+            value
+          )
           setSearchedPairs(pairs.data.as0.concat(pairs.data.as1).concat(pairs.data.asAddress))
           let foundTokens = tokens.data.asSymbol.concat(tokens.data.asAddress).concat(tokens.data.asName)
           setSearchedTokens(foundTokens)

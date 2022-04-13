@@ -1,77 +1,38 @@
 import ApiService from 'api/ApiService'
 import {
-  ALL_PAIRS,
-  FILTERED_TRANSACTIONS,
-  HOURLY_PAIR_RATES,
-  PAIRS_BULK,
-  PAIRS_CURRENT,
-  PAIRS_HISTORICAL_BULK,
-  PAIR_CHART,
-  PAIR_DATA,
-  PAIR_SEARCH
-} from 'api/queries/pairs'
+  ETH_PRICE,
+  GET_BLOCK,
+  GET_BLOCKS,
+  GLOBAL_CHART,
+  GLOBAL_DATA,
+  GLOBAL_TXNS,
+  PRICES_BY_BLOCK,
+  SHARE_VALUE,
+  SUBGRAPH_HEALTH
+} from 'api/queries/global'
 import { Block } from 'api/types'
 import { SupportedNetwork } from 'constants/networks'
 
-class PairController {
-  public getFilteredTransactions(allPairs: string) {
+class GlobalController {
+  public getGlobalData(block?: number) {
     switch (ApiService.activeNetwork) {
       case SupportedNetwork.ETHEREUM:
       case SupportedNetwork.TRON:
         return ApiService.graphqlClient.query({
-          query: FILTERED_TRANSACTIONS,
+          query: GLOBAL_DATA(block),
+          fetchPolicy: 'cache-first'
+        })
+    }
+  }
+
+  public getGlobalChart(startTime: number, skip: number) {
+    switch (ApiService.activeNetwork) {
+      case SupportedNetwork.ETHEREUM:
+      case SupportedNetwork.TRON:
+        return ApiService.graphqlClient.query({
+          query: GLOBAL_CHART,
           variables: {
-            allPairs
-          },
-          fetchPolicy: 'cache-first'
-        })
-    }
-  }
-
-  public getPairData(pairAddress: string, block?: number) {
-    switch (ApiService.activeNetwork) {
-      case SupportedNetwork.ETHEREUM:
-      case SupportedNetwork.TRON:
-        return ApiService.graphqlClient.query({
-          query: PAIR_DATA(pairAddress, block),
-          fetchPolicy: 'cache-first'
-        })
-    }
-  }
-
-  public getPairsBulk(allPairs: string[]) {
-    switch (ApiService.activeNetwork) {
-      case SupportedNetwork.ETHEREUM:
-      case SupportedNetwork.TRON:
-        return ApiService.graphqlClient.query({
-          query: PAIRS_BULK,
-          variables: {
-            allPairs
-          },
-          fetchPolicy: 'cache-first'
-        })
-    }
-  }
-
-  public getPairsHistoricalBulk(block: number, pairs: string[]) {
-    switch (ApiService.activeNetwork) {
-      case SupportedNetwork.ETHEREUM:
-      case SupportedNetwork.TRON:
-        return ApiService.graphqlClient.query({
-          query: PAIRS_HISTORICAL_BULK(block, pairs),
-          fetchPolicy: 'cache-first'
-        })
-    }
-  }
-
-  public getPairChart(pairAddress: string, skip: number) {
-    switch (ApiService.activeNetwork) {
-      case SupportedNetwork.ETHEREUM:
-      case SupportedNetwork.TRON:
-        return ApiService.graphqlClient.query({
-          query: PAIR_CHART,
-          variables: {
-            pairAddress: pairAddress,
+            startTime,
             skip
           },
           fetchPolicy: 'cache-first'
@@ -79,55 +40,94 @@ class PairController {
     }
   }
 
-  public getCurrentPairs() {
+  public getGlobalTransactions() {
     switch (ApiService.activeNetwork) {
       case SupportedNetwork.ETHEREUM:
       case SupportedNetwork.TRON:
         return ApiService.graphqlClient.query({
-          query: PAIRS_CURRENT,
+          query: GLOBAL_TXNS,
           fetchPolicy: 'cache-first'
         })
     }
   }
 
-  public getAllPairs(skip: number) {
+  public getPrice(block?: number) {
     switch (ApiService.activeNetwork) {
       case SupportedNetwork.ETHEREUM:
       case SupportedNetwork.TRON:
         return ApiService.graphqlClient.query({
-          query: ALL_PAIRS,
-          variables: {
-            skip
-          },
+          query: ETH_PRICE(block),
           fetchPolicy: 'cache-first'
         })
     }
   }
 
-  public getPairHourlyRates(pairAddress: string, blocks: Block[]) {
+  public getPricesByBlock(tokenAddress: string, blocks: Block[]) {
     switch (ApiService.activeNetwork) {
       case SupportedNetwork.ETHEREUM:
       case SupportedNetwork.TRON:
         return ApiService.graphqlClient.query({
-          query: HOURLY_PAIR_RATES(pairAddress, blocks),
+          query: PRICES_BY_BLOCK(tokenAddress, blocks),
           fetchPolicy: 'cache-first'
         })
     }
   }
 
-  public searchPair(tokens: string[], id: string) {
+  public getBlocks(timestamps: number[]) {
     switch (ApiService.activeNetwork) {
       case SupportedNetwork.ETHEREUM:
       case SupportedNetwork.TRON:
         return ApiService.graphqlClient.query({
-          query: PAIR_SEARCH,
-          variables: {
-            tokens,
-            id
+          query: GET_BLOCKS(timestamps),
+          fetchPolicy: 'cache-first',
+          context: {
+            client: 'block'
           }
+        })
+    }
+  }
+
+  public getBlock(timestampFrom: number, timestampTo: number) {
+    switch (ApiService.activeNetwork) {
+      case SupportedNetwork.ETHEREUM:
+      case SupportedNetwork.TRON:
+        return ApiService.graphqlClient.query({
+          query: GET_BLOCK,
+          fetchPolicy: 'cache-first',
+          variables: {
+            timestampFrom,
+            timestampTo
+          },
+          context: {
+            client: 'block'
+          }
+        })
+    }
+  }
+
+  public getHealthStatus() {
+    switch (ApiService.activeNetwork) {
+      case SupportedNetwork.ETHEREUM:
+      case SupportedNetwork.TRON:
+        return ApiService.graphqlClient.query({
+          query: SUBGRAPH_HEALTH,
+          context: {
+            client: 'health'
+          }
+        })
+    }
+  }
+
+  public getShareValue(pairAddress: string, blocks: Block[]) {
+    switch (ApiService.activeNetwork) {
+      case SupportedNetwork.ETHEREUM:
+      case SupportedNetwork.TRON:
+        return ApiService.graphqlClient.query({
+          query: SHARE_VALUE(pairAddress, blocks),
+          fetchPolicy: 'cache-first'
         })
     }
   }
 }
 
-export default PairController
+export default GlobalController

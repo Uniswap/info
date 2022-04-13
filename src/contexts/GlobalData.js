@@ -1,5 +1,4 @@
 import { createContext, useContext, useReducer, useMemo, useCallback, useEffect, useState } from 'react'
-import { client } from '../apollo/client'
 import dayjs from 'dayjs'
 import { useTimeframe, useActiveNetworkId } from 'state/features/application/hooks'
 import {
@@ -9,17 +8,10 @@ import {
   get2DayPercentChange,
   getTimeframe
 } from '../utils'
-import {
-  GLOBAL_DATA,
-  GLOBAL_TXNS,
-  GLOBAL_CHART,
-  ETH_PRICE,
-  ALL_PAIRS,
-  ALL_TOKENS,
-  TOP_LPS_PER_PAIRS
-} from '../apollo/queries'
 import { useAllPairData } from './PairData'
 import { EthereumNetworkInfo, TronNetworkInfo } from 'constants/networks'
+import { globalApi, pairApi, tokenApi, accountApi } from 'api'
+
 const UPDATE = 'UPDATE'
 const UPDATE_TXNS = 'UPDATE_TXNS'
 const UPDATE_CHART = 'UPDATE_CHART'
@@ -273,35 +265,20 @@ async function getGlobalData(price, oldPrice) {
     ])
 
     // fetch the global data
-    let result = await client.query({
-      query: GLOBAL_DATA(),
-      fetchPolicy: 'cache-first'
-    })
+    let result = await globalApi.getGlobalData()
     data = result.data.whiteSwapFactories[0]
 
     // fetch the historical data
-    let oneDayResult = await client.query({
-      query: GLOBAL_DATA(oneDayBlock?.number),
-      fetchPolicy: 'cache-first'
-    })
+    let oneDayResult = await globalApi.getGlobalData(oneDayBlock?.number)
     oneDayData = oneDayResult.data.whiteSwapFactories[0]
 
-    let twoDayResult = await client.query({
-      query: GLOBAL_DATA(twoDayBlock?.number),
-      fetchPolicy: 'cache-first'
-    })
+    let twoDayResult = await globalApi.getGlobalData(twoDayBlock?.number)
     twoDayData = twoDayResult.data.whiteSwapFactories[0]
 
-    let oneWeekResult = await client.query({
-      query: GLOBAL_DATA(oneWeekBlock?.number),
-      fetchPolicy: 'cache-first'
-    })
+    let oneWeekResult = await globalApi.getGlobalData(oneWeekBlock?.number)
     const oneWeekData = oneWeekResult.data.whiteSwapFactories[0]
 
-    let twoWeekResult = await client.query({
-      query: GLOBAL_DATA(twoWeekBlock?.number),
-      fetchPolicy: 'cache-first'
-    })
+    let twoWeekResult = await globalApi.getGlobalData(twoWeekBlock?.number)
     const twoWeekData = twoWeekResult.data.whiteSwapFactories[0]
 
     if (data && oneDayData && twoDayData) {
@@ -363,14 +340,7 @@ const getChartData = async oldestDateToFetch => {
 
   try {
     while (!allFound) {
-      let result = await client.query({
-        query: GLOBAL_CHART,
-        variables: {
-          startTime: oldestDateToFetch,
-          skip
-        },
-        fetchPolicy: 'cache-first'
-      })
+      let result = await globalApi.getGlobalChart(oldestDateToFetch, skip)
       skip += 1000
       data = data.concat(result.data.whiteSwapDayDatas)
       if (result.data.whiteSwapDayDatas.length < 1000) {
@@ -442,10 +412,7 @@ const getGlobalTransactions = async () => {
   let transactions = {}
 
   try {
-    let result = await client.query({
-      query: GLOBAL_TXNS,
-      fetchPolicy: 'cache-first'
-    })
+    let result = await globalApi.getGlobalTransactions()
     transactions.mints = []
     transactions.burns = []
     transactions.swaps = []
@@ -488,14 +455,8 @@ const getPrice = async () => {
 
   try {
     let oneDayBlock = await getBlockFromTimestamp(utcOneDayBack)
-    let result = await client.query({
-      query: ETH_PRICE(),
-      fetchPolicy: 'cache-first'
-    })
-    let resultOneDay = await client.query({
-      query: ETH_PRICE(oneDayBlock),
-      fetchPolicy: 'cache-first'
-    })
+    let result = await globalApi.getPrice()
+    let resultOneDay = await globalApi.getPrice(oneDayBlock)
     const currentPrice = result?.data?.bundles[0]?.ethPrice
     const oneDayBackPrice = resultOneDay?.data?.bundles[0]?.ethPrice
     priceChange = getPercentChange(currentPrice, oneDayBackPrice)
@@ -520,13 +481,7 @@ async function getAllPairsOnUniswap() {
     let pairs = []
     let skipCount = 0
     while (!allFound) {
-      let result = await client.query({
-        query: ALL_PAIRS,
-        variables: {
-          skip: skipCount
-        },
-        fetchPolicy: 'cache-first'
-      })
+      let result = await pairApi.getAllPairs(skipCount)
       skipCount = skipCount + PAIRS_TO_FETCH
       pairs = pairs.concat(result?.data?.pairs)
       if (result?.data?.pairs.length < PAIRS_TO_FETCH || pairs.length > PAIRS_TO_FETCH) {
@@ -548,13 +503,7 @@ async function getAllTokensOnUniswap() {
     let skipCount = 0
     let tokens = []
     while (!allFound) {
-      let result = await client.query({
-        query: ALL_TOKENS,
-        variables: {
-          skip: skipCount
-        },
-        fetchPolicy: 'cache-first'
-      })
+      let result = await tokenApi.getAllTokens(skipCount)
       tokens = tokens.concat(result?.data?.tokens)
       if (result?.data?.tokens?.length < TOKENS_TO_FETCH || tokens.length > TOKENS_TO_FETCH) {
         allFound = true
@@ -709,13 +658,7 @@ export function useTopLps() {
         topPairs.map(async pair => {
           // for each one, fetch top LPs
           try {
-            const { data: results } = await client.query({
-              query: TOP_LPS_PER_PAIRS,
-              variables: {
-                pair: pair.toString()
-              },
-              fetchPolicy: 'cache-first'
-            })
+            const { data: results } = await accountApi.getTopLiquidityPools(pair.toString())
             if (results) {
               return results.liquidityPositions
             }

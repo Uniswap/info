@@ -3,7 +3,6 @@ import { StrictMode } from 'react'
 import { BrowserRouter } from 'react-router-dom'
 import ReactGA from 'react-ga'
 import { isMobile } from 'react-device-detect'
-import { client } from './apollo/client'
 import { ApolloProvider } from '@apollo/react-hooks'
 import ThemeProvider, { GlobalStyle } from './Theme'
 import TokenDataContextProvider, { Updater as TokenDataContextUpdater } from './contexts/TokenData'
@@ -18,6 +17,7 @@ import { store, persistor } from 'state/store'
 import { Provider } from 'react-redux'
 import App from './App'
 import './i18n'
+import ApiService from 'api/ApiService'
 
 // initialize custom dayjs plugin
 dayjs.extend(utc)
@@ -66,7 +66,7 @@ ReactDOM.render(
           <ThemeProvider>
             <>
               <GlobalStyle />
-              <ApolloProvider client={client}>
+              <ApolloProvider client={ApiService.graphqlClient}>
                 <BrowserRouter>
                   <App />
                 </BrowserRouter>

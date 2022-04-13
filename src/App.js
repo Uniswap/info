@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import styled from 'styled-components/macro'
-import { Route, Routes, Navigate, useLocation } from 'react-router-dom'
+import { Route, Routes, Navigate } from 'react-router-dom'
 import GlobalPage from './pages/GlobalPage'
 import TokenPage from './pages/TokenPage'
 import PairPage from './pages/PairPage'
@@ -14,8 +14,7 @@ import { useFormatPath } from './hooks'
 import SideNav from './components/SideNav'
 import AccountLookup from './pages/AccountLookup'
 import LocalLoader from './components/LocalLoader'
-import { SUPPORTED_NETWORK_VERSIONS, TronNetworkInfo } from 'constants/networks'
-import { useLatestBlocks, useUpdateActiveNetwork } from 'state/features/application/hooks'
+import { useLatestBlocks } from 'state/features/application/hooks'
 
 const AppWrapper = styled.div`
   position: relative;
@@ -81,22 +80,9 @@ function App() {
   const globalData = useGlobalData()
   const globalChartData = useGlobalChartData()
   const [latestBlock, headBlock] = useLatestBlocks()
-  const validateNetworkId = useUpdateActiveNetwork()
   const formatPath = useFormatPath()
-  const location = useLocation()
-
   // show warning
   const showWarning = headBlock && latestBlock ? headBlock - latestBlock > BLOCK_DIFFERENCE_THRESHOLD : false
-
-  useEffect(() => {
-    const locationNetworkId = location.pathname.split('/')[1]
-    const newNetworkInfo = SUPPORTED_NETWORK_VERSIONS.find(n => locationNetworkId === n.route.toLowerCase())
-    if (newNetworkInfo) {
-      validateNetworkId(newNetworkInfo)
-    } else {
-      validateNetworkId(TronNetworkInfo)
-    }
-  }, [location])
 
   return (
     <AppWrapper>
