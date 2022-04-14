@@ -9,7 +9,6 @@ import {
 } from 'api/queries/accounts'
 import { PAIR_DAY_DATA_BULK } from 'api/queries/pairs'
 import {
-  IAccountController,
   TopLiquidityPoolsData,
   TopLiquidityPoolsParams,
   UserHistoryParams,
@@ -18,6 +17,7 @@ import {
   UserPositionData
 } from 'api/types/AccountTypes'
 import { SupportedNetwork } from 'constants/networks'
+import IAccountController from './AccountController.interface'
 
 class AccountController implements IAccountController {
   public getUserTransactions(account: string) {

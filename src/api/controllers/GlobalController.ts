@@ -10,10 +10,11 @@ import {
   SHARE_VALUE,
   SUBGRAPH_HEALTH
 } from 'api/queries/global'
-import { Block } from 'api/types'
+import { BlockHeight } from 'api/types'
 import { SupportedNetwork } from 'constants/networks'
+import IGlobalController from './GlobalController.interface'
 
-class GlobalController {
+class GlobalController implements IGlobalController {
   public getGlobalData(block?: number) {
     switch (ApiService.activeNetwork) {
       case SupportedNetwork.ETHEREUM:
@@ -62,7 +63,7 @@ class GlobalController {
     }
   }
 
-  public getPricesByBlock(tokenAddress: string, blocks: Block[]) {
+  public getPricesByBlock(tokenAddress: string, blocks: BlockHeight[]) {
     switch (ApiService.activeNetwork) {
       case SupportedNetwork.ETHEREUM:
       case SupportedNetwork.TRON:
@@ -118,7 +119,7 @@ class GlobalController {
     }
   }
 
-  public getShareValue(pairAddress: string, blocks: Block[]) {
+  public getShareValue(pairAddress: string, blocks: BlockHeight[]) {
     switch (ApiService.activeNetwork) {
       case SupportedNetwork.ETHEREUM:
       case SupportedNetwork.TRON:

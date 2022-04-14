@@ -1,8 +1,9 @@
 import ApiService from 'api/ApiService'
 import { ALL_TOKENS, TOKENS_CURRENT, TOKENS_DYNAMIC, TOKEN_CHART, TOKEN_DATA, TOKEN_SEARCH } from 'api/queries/tokens'
 import { SupportedNetwork } from 'constants/networks'
+import ITokenController from './TokenController.interface'
 
-class TokenController {
+class TokenController implements ITokenController {
   public getCurrentTokens() {
     switch (ApiService.activeNetwork) {
       case SupportedNetwork.ETHEREUM:

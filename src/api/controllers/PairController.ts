@@ -10,10 +10,11 @@ import {
   PAIR_DATA,
   PAIR_SEARCH
 } from 'api/queries/pairs'
-import { Block } from 'api/types'
+import { BlockHeight } from 'api/types'
 import { SupportedNetwork } from 'constants/networks'
+import { IPairController } from './PairController.interface'
 
-class PairController {
+class PairController implements IPairController {
   public getFilteredTransactions(allPairs: string) {
     switch (ApiService.activeNetwork) {
       case SupportedNetwork.ETHEREUM:
@@ -104,7 +105,7 @@ class PairController {
     }
   }
 
-  public getPairHourlyRates(pairAddress: string, blocks: Block[]) {
+  public getPairHourlyRates(pairAddress: string, blocks: BlockHeight[]) {
     switch (ApiService.activeNetwork) {
       case SupportedNetwork.ETHEREUM:
       case SupportedNetwork.TRON:

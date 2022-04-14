@@ -1,8 +1,8 @@
 import { BURN_DETAILS, MINT_DETAILS, PAIR_DETAILS, PAIR_FIELDS, SWAP_DETAILS } from 'api/fragments'
-import { Block } from 'api/types'
+import { BlockHeight } from 'api/types'
 import { gql } from 'apollo-boost'
 
-export const HOURLY_PAIR_RATES = (pairAddress: string, blocks: Block[]) => {
+export const HOURLY_PAIR_RATES = (pairAddress: string, blocks: BlockHeight[]) => {
   let queryString = 'query HourlyPairRates {'
   queryString += blocks.map(
     block => `

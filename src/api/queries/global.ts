@@ -1,5 +1,5 @@
 import { BURN_DETAILS, MINT_DETAILS, SWAP_DETAILS } from 'api/fragments'
-import { Block } from 'api/types'
+import { BlockHeight } from 'api/types'
 import { gql } from 'apollo-boost'
 import { BUNDLE_ID, FACTORY_ADDRESS } from '../../constants'
 
@@ -48,7 +48,7 @@ export const GET_BLOCKS = (timestamps: number[]) => {
   return gql(queryString)
 }
 
-export const PRICES_BY_BLOCK = (tokenAddress: string, blocks: Block[]) => {
+export const PRICES_BY_BLOCK = (tokenAddress: string, blocks: BlockHeight[]) => {
   let queryString = 'query GetPriceByBlock {'
   queryString += blocks.map(
     block => `
@@ -70,7 +70,7 @@ export const PRICES_BY_BLOCK = (tokenAddress: string, blocks: Block[]) => {
   return gql(queryString)
 }
 
-export const SHARE_VALUE = (pairAddress: string, blocks: Block[]) => {
+export const SHARE_VALUE = (pairAddress: string, blocks: BlockHeight[]) => {
   let queryString = 'query GetShareValue {'
   queryString += blocks.map(
     block => `

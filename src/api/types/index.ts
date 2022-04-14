@@ -1,4 +1,4 @@
-export type Block = {
+export type BlockHeight = {
   timestamp: number
   number: number
 }
