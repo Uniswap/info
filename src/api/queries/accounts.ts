@@ -1,3 +1,4 @@
+import { BURN_DETAILS, MINT_DETAILS, SWAP_DETAILS } from 'api/fragments'
 import { gql } from 'apollo-boost'
 
 // FIXME: no swap data
@@ -87,72 +88,18 @@ export const USER_POSITIONS = gql`
 `
 
 export const USER_TRANSACTIONS = gql`
+  ${MINT_DETAILS}
+  ${BURN_DETAILS}
+  ${SWAP_DETAILS}
   query Transactions($user: Bytes!) {
     mints(orderBy: timestamp, orderDirection: desc, where: { to: $user }) {
-      id
-      transaction {
-        id
-        timestamp
-      }
-      pair {
-        id
-        token0 {
-          id
-          symbol
-        }
-        token1 {
-          id
-          symbol
-        }
-      }
-      to
-      liquidity
-      amount0
-      amount1
-      amountUSD
+      ...MintDetails
     }
     burns(orderBy: timestamp, orderDirection: desc, where: { sender: $user }) {
-      id
-      transaction {
-        id
-        timestamp
-      }
-      pair {
-        id
-        token0 {
-          symbol
-        }
-        token1 {
-          symbol
-        }
-      }
-      sender
-      to
-      liquidity
-      amount0
-      amount1
-      amountUSD
+      ...BurnDetails
     }
     swaps(orderBy: timestamp, orderDirection: desc, where: { to: $user }) {
-      id
-      transaction {
-        id
-        timestamp
-      }
-      pair {
-        token0 {
-          symbol
-        }
-        token1 {
-          symbol
-        }
-      }
-      amount0In
-      amount0Out
-      amount1In
-      amount1Out
-      amountUSD
-      to
+      ...SwapDetails
     }
   }
 `

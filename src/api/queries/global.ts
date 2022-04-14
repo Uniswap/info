@@ -1,3 +1,4 @@
+import { BURN_DETAILS, MINT_DETAILS, SWAP_DETAILS } from 'api/fragments'
 import { Block } from 'api/types'
 import { gql } from 'apollo-boost'
 import { BUNDLE_ID, FACTORY_ADDRESS } from '../../constants'
@@ -152,71 +153,19 @@ export const GLOBAL_DATA = (block?: number) => {
 }
 
 export const GLOBAL_TXNS = gql`
+  ${MINT_DETAILS}
+  ${BURN_DETAILS}
+  ${SWAP_DETAILS}
   query GlobalTransactions {
     transactions(first: 100, orderBy: timestamp, orderDirection: desc) {
       mints(orderBy: timestamp, orderDirection: desc) {
-        transaction {
-          id
-          timestamp
-        }
-        pair {
-          token0 {
-            id
-            symbol
-          }
-          token1 {
-            id
-            symbol
-          }
-        }
-        to
-        liquidity
-        amount0
-        amount1
-        amountUSD
+        ...MintDetails
       }
       burns(orderBy: timestamp, orderDirection: desc) {
-        transaction {
-          id
-          timestamp
-        }
-        pair {
-          token0 {
-            id
-            symbol
-          }
-          token1 {
-            id
-            symbol
-          }
-        }
-        sender
-        liquidity
-        amount0
-        amount1
-        amountUSD
+        ...BurnDetails
       }
       swaps(orderBy: timestamp, orderDirection: desc) {
-        transaction {
-          id
-          timestamp
-        }
-        pair {
-          token0 {
-            id
-            symbol
-          }
-          token1 {
-            id
-            symbol
-          }
-        }
-        amount0In
-        amount0Out
-        amount1In
-        amount1Out
-        amountUSD
-        to
+        ...SwapDetails
       }
     }
   }

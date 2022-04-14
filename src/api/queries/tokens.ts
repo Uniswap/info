@@ -1,35 +1,26 @@
+import { TOKEN_FIELDS, TOKEN_INFO_LIQUIDITY } from 'api/fragments'
 import { gql } from 'apollo-boost'
 
 export const ALL_TOKENS = gql`
+  ${TOKEN_INFO_LIQUIDITY}
   query AllTokens($skip: Int!) {
     tokens(first: 500, skip: $skip) {
-      id
-      name
-      symbol
-      totalLiquidity
+      ...TokenInfoLiquidity
     }
   }
 `
 
 export const TOKEN_SEARCH = gql`
+  ${TOKEN_INFO_LIQUIDITY}
   query TokenSearch($value: String, $id: String) {
     asSymbol: tokens(where: { symbol_contains: $value }, orderBy: totalLiquidity, orderDirection: desc) {
-      id
-      symbol
-      name
-      totalLiquidity
+      ...TokenInfoLiquidity
     }
     asName: tokens(where: { name_contains: $value }, orderBy: totalLiquidity, orderDirection: desc) {
-      id
-      symbol
-      name
-      totalLiquidity
+      ...TokenInfoLiquidity
     }
     asAddress: tokens(where: { id: $id }, orderBy: totalLiquidity, orderDirection: desc) {
-      id
-      symbol
-      name
-      totalLiquidity
+      ...TokenInfoLiquidity
     }
   }
 `
@@ -50,22 +41,8 @@ export const TOKEN_CHART = gql`
   }
 `
 
-const TokenFields = gql`
-  fragment TokenFields on Token {
-    id
-    name
-    symbol
-    derivedETH
-    tradeVolume
-    tradeVolumeUSD
-    untrackedVolumeUSD
-    totalLiquidity
-    txCount
-  }
-`
-
 export const TOKENS_CURRENT = gql`
-  ${TokenFields}
+  ${TOKEN_FIELDS}
   query CurrentToken {
     tokens(first: 200, orderBy: tradeVolumeUSD, orderDirection: desc) {
       ...TokenFields
@@ -74,7 +51,7 @@ export const TOKENS_CURRENT = gql`
 `
 
 export const TOKENS_DYNAMIC = gql`
-  ${TokenFields}
+  ${TOKEN_FIELDS}
   query DynamicToken($block: Int!) {
     tokens(block: { number: $block }, first: 200, orderBy: tradeVolumeUSD, orderDirection: desc) {
       ...TokenFields
@@ -83,7 +60,7 @@ export const TOKENS_DYNAMIC = gql`
 `
 
 export const TOKEN_DATA = gql`
-  ${TokenFields}
+  ${TOKEN_FIELDS}
   query TokenData($tokenAddress: String!, $block: Int) {
     tokens(block: $block, where: { id: $tokenAddress }) {
       ...TokenFields

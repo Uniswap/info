@@ -1,3 +1,4 @@
+import { BURN_DETAILS, MINT_DETAILS, PAIR_DETAILS, PAIR_FIELDS, SWAP_DETAILS } from 'api/fragments'
 import { Block } from 'api/types'
 import { gql } from 'apollo-boost'
 
@@ -53,96 +54,26 @@ export const PAIR_DAY_DATA_BULK = (pairs: string[], startTimestamp: number) => {
 }
 
 export const PAIR_SEARCH = gql`
+  ${PAIR_DETAILS}
   query PairSearch($tokens: [Bytes]!, $id: String) {
     as0: pairs(where: { token0_in: $tokens }) {
-      id
-      token0 {
-        id
-        symbol
-        name
-      }
-      token1 {
-        id
-        symbol
-        name
-      }
+      ...PairDetails
     }
     as1: pairs(where: { token1_in: $tokens }) {
-      id
-      token0 {
-        id
-        symbol
-        name
-      }
-      token1 {
-        id
-        symbol
-        name
-      }
+      ...PairDetails
     }
     asAddress: pairs(where: { id: $id }) {
-      id
-      token0 {
-        id
-        symbol
-        name
-      }
-      token1 {
-        id
-        symbol
-        name
-      }
+      ...PairDetails
     }
   }
 `
 
 export const ALL_PAIRS = gql`
+  ${PAIR_DETAILS}
   query AllPairs($skip: Int!) {
     pairs(first: 500, skip: $skip, orderBy: trackedReserveETH, orderDirection: desc) {
-      id
-      token0 {
-        id
-        symbol
-        name
-      }
-      token1 {
-        id
-        symbol
-        name
-      }
+      ...PairDetails
     }
-  }
-`
-
-const PairFields = gql`
-  fragment PairFields on Pair {
-    id
-    txCount
-    token0 {
-      id
-      symbol
-      name
-      totalLiquidity
-      derivedETH
-    }
-    token1 {
-      id
-      symbol
-      name
-      totalLiquidity
-      derivedETH
-    }
-    reserve0
-    reserve1
-    reserveUSD
-    totalSupply
-    trackedReserveETH
-    reserveETH
-    volumeUSD
-    untrackedVolumeUSD
-    token0Price
-    token1Price
-    createdAtTimestamp
   }
 `
 
@@ -156,7 +87,7 @@ export const PAIRS_CURRENT = gql`
 
 export const PAIR_DATA = (pairAddress: string, block?: number) => {
   const queryString = `
-    ${PairFields}
+    ${PAIR_FIELDS}
     query PairData {
       pairs(${block ? `block: {number: ${block}}` : ``} where: { id: "${pairAddress}"} ) {
         ...PairFields
@@ -166,7 +97,7 @@ export const PAIR_DATA = (pairAddress: string, block?: number) => {
 }
 
 export const PAIRS_BULK = gql`
-  ${PairFields}
+  ${PAIR_FIELDS}
   query PairsBulk($allPairs: [Bytes]!) {
     pairs(where: { id_in: $allPairs }, orderBy: trackedReserveETH, orderDirection: desc) {
       ...PairFields
@@ -195,71 +126,18 @@ export const PAIRS_HISTORICAL_BULK = (block: number, pairs: string[]) => {
 }
 
 export const FILTERED_TRANSACTIONS = gql`
+  ${MINT_DETAILS}
+  ${BURN_DETAILS}
+  ${SWAP_DETAILS}
   query FilteredTransactions($allPairs: [Bytes]!) {
     mints(first: 20, where: { pair_in: $allPairs }, orderBy: timestamp, orderDirection: desc) {
-      transaction {
-        id
-        timestamp
-      }
-      pair {
-        token0 {
-          id
-          symbol
-        }
-        token1 {
-          id
-          symbol
-        }
-      }
-      to
-      liquidity
-      amount0
-      amount1
-      amountUSD
+      ...MintDetails
     }
     burns(first: 20, where: { pair_in: $allPairs }, orderBy: timestamp, orderDirection: desc) {
-      transaction {
-        id
-        timestamp
-      }
-      pair {
-        token0 {
-          id
-          symbol
-        }
-        token1 {
-          id
-          symbol
-        }
-      }
-      sender
-      liquidity
-      amount0
-      amount1
-      amountUSD
+      ...BurnDetails
     }
     swaps(first: 30, where: { pair_in: $allPairs }, orderBy: timestamp, orderDirection: desc) {
-      transaction {
-        id
-        timestamp
-      }
-      id
-      pair {
-        token0 {
-          id
-          symbol
-        }
-        token1 {
-          id
-          symbol
-        }
-      }
-      amount0In
-      amount0Out
-      amount1In
-      amount1Out
-      amountUSD
-      to
+      ...SwapDetails
     }
   }
 `
