@@ -3,7 +3,7 @@ import { gql } from 'apollo-boost'
 import { BUNDLE_ID, FACTORY_ADDRESS } from '../../constants'
 
 export const SUBGRAPH_HEALTH = gql`
-  query health {
+  query Health {
     indexingStatusForCurrentVersion(subgraphName: "whiteswapfi/whiteswap") {
       synced
       health
@@ -20,7 +20,7 @@ export const SUBGRAPH_HEALTH = gql`
 `
 
 export const GET_BLOCK = gql`
-  query blocks($timestampFrom: Int!, $timestampTo: Int!) {
+  query GetBlock($timestampFrom: Int!, $timestampTo: Int!) {
     blocks(
       first: 1
       orderBy: timestamp
@@ -35,7 +35,7 @@ export const GET_BLOCK = gql`
 `
 
 export const GET_BLOCKS = (timestamps: number[]) => {
-  let queryString = 'query blocks {'
+  let queryString = 'query GetBlocks {'
   queryString += timestamps.map(timestamp => {
     return `t${timestamp}:blocks(first: 1, orderBy: timestamp, orderDirection: desc, where: { timestamp_gt: ${timestamp}, timestamp_lt: ${
       timestamp + 600
@@ -48,7 +48,7 @@ export const GET_BLOCKS = (timestamps: number[]) => {
 }
 
 export const PRICES_BY_BLOCK = (tokenAddress: string, blocks: Block[]) => {
-  let queryString = 'query blocks {'
+  let queryString = 'query GetPriceByBlock {'
   queryString += blocks.map(
     block => `
       t${block.timestamp}:token(id:"${tokenAddress}", block: { number: ${block.number} }) {
@@ -70,7 +70,7 @@ export const PRICES_BY_BLOCK = (tokenAddress: string, blocks: Block[]) => {
 }
 
 export const SHARE_VALUE = (pairAddress: string, blocks: Block[]) => {
-  let queryString = 'query blocks {'
+  let queryString = 'query GetShareValue {'
   queryString += blocks.map(
     block => `
       t${block.timestamp}:pair(id:"${pairAddress}", block: { number: ${block.number} }) {
@@ -102,14 +102,14 @@ export const SHARE_VALUE = (pairAddress: string, blocks: Block[]) => {
 export const ETH_PRICE = (block?: number) => {
   const queryString = block
     ? `
-    query bundles {
+    query EthPrice {
       bundles(where: { id: ${BUNDLE_ID} } block: {number: ${block}}) {
         id
         ethPrice
       }
     }
   `
-    : ` query bundles {
+    : ` query EthPrice {
       bundles(where: { id: ${BUNDLE_ID} }) {
         id
         ethPrice
@@ -134,7 +134,7 @@ export const GLOBAL_CHART = gql`
 `
 
 export const GLOBAL_DATA = (block?: number) => {
-  const queryString = ` query whiteSwapFactories {
+  const queryString = ` query WhiteSwapFactories {
       whiteSwapFactories(
        ${block ? `block: { number: ${block}}` : ``}
        where: { id: "${FACTORY_ADDRESS}" }) {
@@ -152,7 +152,7 @@ export const GLOBAL_DATA = (block?: number) => {
 }
 
 export const GLOBAL_TXNS = gql`
-  query transactions {
+  query GlobalTransactions {
     transactions(first: 100, orderBy: timestamp, orderDirection: desc) {
       mints(orderBy: timestamp, orderDirection: desc) {
         transaction {

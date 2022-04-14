@@ -137,7 +137,7 @@ export async function splitQuery(callback, list, skipCount = 100) {
  */
 export async function getBlockFromTimestamp(timestamp) {
   let result = await globalApi.getBlock(timestamp, timestamp + 600)
-  return result?.data?.blocks?.[0]?.number
+  return +result?.data?.blocks?.[0]?.number
 }
 
 /**

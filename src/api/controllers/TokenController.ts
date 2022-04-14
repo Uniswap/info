@@ -19,7 +19,10 @@ class TokenController {
       case SupportedNetwork.ETHEREUM:
       case SupportedNetwork.TRON:
         return ApiService.graphqlClient.query({
-          query: TOKENS_DYNAMIC(block),
+          query: TOKENS_DYNAMIC,
+          variables: {
+            block
+          },
           fetchPolicy: 'cache-first'
         })
     }
@@ -30,7 +33,11 @@ class TokenController {
       case SupportedNetwork.ETHEREUM:
       case SupportedNetwork.TRON:
         return ApiService.graphqlClient.query({
-          query: TOKEN_DATA(tokenAddress, block),
+          query: TOKEN_DATA,
+          variables: {
+            tokenAddress,
+            block: block ? { number: block } : null
+          },
           fetchPolicy: 'cache-first'
         })
     }

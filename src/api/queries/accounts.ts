@@ -1,7 +1,8 @@
 import { gql } from 'apollo-boost'
 
+// FIXME: no swap data
 export const USER_MINTS_BUNRS_PER_PAIR = gql`
-  query events($user: Bytes!, $pair: Bytes!) {
+  query UserDataBulkPerPair($user: Bytes!, $pair: Bytes!) {
     mints(where: { to: $user, pair: $pair }) {
       amountUSD
       amount0
@@ -34,7 +35,7 @@ export const USER_MINTS_BUNRS_PER_PAIR = gql`
 `
 
 export const USER_HISTORY = gql`
-  query snapshots($user: Bytes!, $skip: Int!) {
+  query LpSnapshots($user: Bytes!, $skip: Int!) {
     liquidityPositionSnapshots(first: 1000, skip: $skip, where: { user: $user }) {
       timestamp
       reserveUSD
@@ -61,7 +62,7 @@ export const USER_HISTORY = gql`
 `
 
 export const USER_POSITIONS = gql`
-  query liquidityPositions($user: Bytes!) {
+  query LiquidityPositions($user: Bytes!) {
     liquidityPositions(where: { user: $user }) {
       pair {
         id
@@ -86,7 +87,7 @@ export const USER_POSITIONS = gql`
 `
 
 export const USER_TRANSACTIONS = gql`
-  query transactions($user: Bytes!) {
+  query Transactions($user: Bytes!) {
     mints(orderBy: timestamp, orderDirection: desc, where: { to: $user }) {
       id
       transaction {
@@ -157,7 +158,7 @@ export const USER_TRANSACTIONS = gql`
 `
 
 export const TOP_LPS_PER_PAIRS = gql`
-  query lps($pair: Bytes!) {
+  query TopLiquidityPositions($pair: Bytes!) {
     liquidityPositions(where: { pair: $pair }, orderBy: liquidityTokenBalance, orderDirection: desc, first: 10) {
       user {
         id
@@ -172,7 +173,7 @@ export const TOP_LPS_PER_PAIRS = gql`
 
 export const MINING_POSITIONS = (account: string) => {
   const queryString = `
-    query users {
+    query UserMiningPositions {
       user(id: "${account}") {
         miningPosition {
           id

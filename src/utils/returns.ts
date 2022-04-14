@@ -60,9 +60,9 @@ async function getPrincipalForUserPerPair(user: string, pairAddress: string) {
     const mintToken1 = mint.pair.token1.id
 
     // if trackign before prices were discovered (pre-launch days), hardcode stablecoins
-    if (priceOverrides.includes(mintToken0) && mint.timestamp < PRICE_DISCOVERY_START_TIMESTAMP) {
+    if (priceOverrides.includes(mintToken0) && mint.transaction.timestamp < PRICE_DISCOVERY_START_TIMESTAMP) {
       usd += parseFloat(mint.amount0) * 2
-    } else if (priceOverrides.includes(mintToken1) && mint.timestamp < PRICE_DISCOVERY_START_TIMESTAMP) {
+    } else if (priceOverrides.includes(mintToken1) && mint.transaction.timestamp < PRICE_DISCOVERY_START_TIMESTAMP) {
       usd += parseFloat(mint.amount1) * 2
     } else {
       usd += parseFloat(mint.amountUSD)
@@ -77,9 +77,9 @@ async function getPrincipalForUserPerPair(user: string, pairAddress: string) {
     const burnToken1 = burn.pair.token1.id
 
     // if trackign before prices were discovered (pre-launch days), hardcode stablecoins
-    if (priceOverrides.includes(burnToken0) && burn.timestamp < PRICE_DISCOVERY_START_TIMESTAMP) {
+    if (priceOverrides.includes(burnToken0) && burn.transaction.timestamp < PRICE_DISCOVERY_START_TIMESTAMP) {
       usd += parseFloat(burn.amount0) * 2
-    } else if (priceOverrides.includes(burnToken1) && burn.timestamp < PRICE_DISCOVERY_START_TIMESTAMP) {
+    } else if (priceOverrides.includes(burnToken1) && burn.transaction.timestamp < PRICE_DISCOVERY_START_TIMESTAMP) {
       usd += parseFloat(burn.amount1) * 2
     } else {
       usd -= parseFloat(results.data.burns[index].amountUSD)

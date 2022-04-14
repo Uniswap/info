@@ -2,7 +2,7 @@ import { Block } from 'api/types'
 import { gql } from 'apollo-boost'
 
 export const HOURLY_PAIR_RATES = (pairAddress: string, blocks: Block[]) => {
-  let queryString = 'query blocks {'
+  let queryString = 'query HourlyPairRates {'
   queryString += blocks.map(
     block => `
       t${block.timestamp}: pair(id:"${pairAddress}", block: { number: ${block.number} }) {
@@ -17,7 +17,7 @@ export const HOURLY_PAIR_RATES = (pairAddress: string, blocks: Block[]) => {
 }
 
 export const PAIR_CHART = gql`
-  query pairDayDatas($pairAddress: Bytes!, $skip: Int!) {
+  query PairChart($pairAddress: Bytes!, $skip: Int!) {
     pairDayDatas(first: 1000, skip: $skip, orderBy: date, orderDirection: asc, where: { pairAddress: $pairAddress }) {
       id
       date
@@ -36,7 +36,7 @@ export const PAIR_DAY_DATA_BULK = (pairs: string[], startTimestamp: number) => {
   })
   pairsString += ']'
   const queryString = `
-    query days {
+    query PairDayDataBulk {
       pairDayDatas(first: 1000, orderBy: date, orderDirection: asc, where: { pairAddress_in: ${pairsString}, date_gt: ${startTimestamp} }) {
         id
         pairAddress
@@ -53,7 +53,7 @@ export const PAIR_DAY_DATA_BULK = (pairs: string[], startTimestamp: number) => {
 }
 
 export const PAIR_SEARCH = gql`
-  query pairs($tokens: [Bytes]!, $id: String) {
+  query PairSearch($tokens: [Bytes]!, $id: String) {
     as0: pairs(where: { token0_in: $tokens }) {
       id
       token0 {
@@ -97,7 +97,7 @@ export const PAIR_SEARCH = gql`
 `
 
 export const ALL_PAIRS = gql`
-  query pairs($skip: Int!) {
+  query AllPairs($skip: Int!) {
     pairs(first: 500, skip: $skip, orderBy: trackedReserveETH, orderDirection: desc) {
       id
       token0 {
@@ -114,7 +114,7 @@ export const ALL_PAIRS = gql`
   }
 `
 
-const PairFields = `
+const PairFields = gql`
   fragment PairFields on Pair {
     id
     txCount
@@ -147,7 +147,7 @@ const PairFields = `
 `
 
 export const PAIRS_CURRENT = gql`
-  query pairs {
+  query CurrentPairs {
     pairs(first: 200, orderBy: trackedReserveETH, orderDirection: desc) {
       id
     }
@@ -157,7 +157,7 @@ export const PAIRS_CURRENT = gql`
 export const PAIR_DATA = (pairAddress: string, block?: number) => {
   const queryString = `
     ${PairFields}
-    query pairs {
+    query PairData {
       pairs(${block ? `block: {number: ${block}}` : ``} where: { id: "${pairAddress}"} ) {
         ...PairFields
       }
@@ -167,7 +167,7 @@ export const PAIR_DATA = (pairAddress: string, block?: number) => {
 
 export const PAIRS_BULK = gql`
   ${PairFields}
-  query pairs($allPairs: [Bytes]!) {
+  query PairsBulk($allPairs: [Bytes]!) {
     pairs(where: { id_in: $allPairs }, orderBy: trackedReserveETH, orderDirection: desc) {
       ...PairFields
     }
@@ -181,7 +181,7 @@ export const PAIRS_HISTORICAL_BULK = (block: number, pairs: string[]) => {
   })
   pairsString += ']'
   const queryString = `
-  query pairs {
+  query PairsHistoricalBulk {
     pairs(first: 200, where: {id_in: ${pairsString}}, block: {number: ${block}}, orderBy: trackedReserveETH, orderDirection: desc) {
       id
       reserveUSD
@@ -195,7 +195,7 @@ export const PAIRS_HISTORICAL_BULK = (block: number, pairs: string[]) => {
 }
 
 export const FILTERED_TRANSACTIONS = gql`
-  query ($allPairs: [Bytes]!) {
+  query FilteredTransactions($allPairs: [Bytes]!) {
     mints(first: 20, where: { pair_in: $allPairs }, orderBy: timestamp, orderDirection: desc) {
       transaction {
         id
