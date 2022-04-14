@@ -234,7 +234,7 @@ async function getUserLiquidityChart(account, startDateTimestamp, history) {
   // get all day datas where date is in this list, and pair is in pair list
   let {
     data: { pairDayDatas }
-  } = await accountApi.getUserLiquidityChart(pairs, startDateTimestamp)
+  } = await accountApi.getPairDayDataBulk(pairs, startDateTimestamp)
 
   const formattedHistory = []
 

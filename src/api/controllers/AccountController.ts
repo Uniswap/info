@@ -49,7 +49,7 @@ class AccountController implements IAccountController {
     }
   }
 
-  public getUserLiquidityChart(pairs: string[], startDateTimestamp: number) {
+  public getPairDayDataBulk(pairs: string[], startDateTimestamp: number) {
     switch (ApiService.activeNetwork) {
       case SupportedNetwork.ETHEREUM:
       case SupportedNetwork.TRON:
