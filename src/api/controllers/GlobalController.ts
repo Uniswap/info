@@ -11,6 +11,7 @@ import {
   SUBGRAPH_HEALTH
 } from 'api/queries/global'
 import { BlockHeight } from 'api/types'
+import { FACTORY_ADDRESS } from '../../constants'
 import { SupportedNetwork } from 'constants/networks'
 import IGlobalController from './GlobalController.interface'
 
@@ -20,7 +21,11 @@ class GlobalController implements IGlobalController {
       case SupportedNetwork.ETHEREUM:
       case SupportedNetwork.TRON:
         return ApiService.graphqlClient.query({
-          query: GLOBAL_DATA(block),
+          query: GLOBAL_DATA,
+          variables: {
+            block: block ? { number: block } : null,
+            factoryAddress: FACTORY_ADDRESS
+          },
           fetchPolicy: 'cache-first'
         })
     }
@@ -57,7 +62,10 @@ class GlobalController implements IGlobalController {
       case SupportedNetwork.ETHEREUM:
       case SupportedNetwork.TRON:
         return ApiService.graphqlClient.query({
-          query: ETH_PRICE(block),
+          query: ETH_PRICE,
+          variables: {
+            block: block ? { number: block } : null
+          },
           fetchPolicy: 'cache-first'
         })
     }

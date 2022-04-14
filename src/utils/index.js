@@ -160,7 +160,7 @@ export async function getBlocksFromTimestamps(timestamps, skipCount = 500) {
       if (fetchedData[t].length > 0) {
         blocks.push({
           timestamp: t.split('t')[1],
-          number: fetchedData[t][0]['number']
+          number: +fetchedData[t][0]['number']
         })
       }
     }

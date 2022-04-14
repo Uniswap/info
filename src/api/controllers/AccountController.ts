@@ -54,7 +54,11 @@ class AccountController implements IAccountController {
       case SupportedNetwork.ETHEREUM:
       case SupportedNetwork.TRON:
         return ApiService.graphqlClient.query<any>({
-          query: PAIR_DAY_DATA_BULK(pairs, startDateTimestamp)
+          query: PAIR_DAY_DATA_BULK,
+          variables: {
+            pairs,
+            startTimestamp: startDateTimestamp
+          }
         })
     }
   }
@@ -73,13 +77,16 @@ class AccountController implements IAccountController {
     }
   }
 
-  // TODO: currently disabled
+  // ! currently disabled
   public getMiningPositions(account: string) {
     switch (ApiService.activeNetwork) {
       case SupportedNetwork.ETHEREUM:
       case SupportedNetwork.TRON:
         return ApiService.graphqlClient.query<any>({
-          query: MINING_POSITIONS(account),
+          query: MINING_POSITIONS,
+          variables: {
+            account
+          },
           context: {
             client: 'stake'
           },

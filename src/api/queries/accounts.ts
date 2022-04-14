@@ -118,26 +118,23 @@ export const TOP_LPS_PER_PAIRS = gql`
   }
 `
 
-export const MINING_POSITIONS = (account: string) => {
-  const queryString = `
-    query UserMiningPositions {
-      user(id: "${account}") {
-        miningPosition {
+export const MINING_POSITIONS = gql`
+  query UserMiningPositions($account: String!) {
+    user(id: $account) {
+      miningPosition {
+        id
+        user {
           id
-          user {
-            id
-          }
-          miningPool {
-              pair {
-                id
-                token0
-                token1
-              }
-          }
-          balance
         }
+        miningPool {
+          pair {
+            id
+            token0
+            token1
+          }
+        }
+        balance
       }
     }
+  }
 `
-  return gql(queryString)
-}

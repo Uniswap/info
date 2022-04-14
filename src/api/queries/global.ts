@@ -1,7 +1,7 @@
 import { BURN_DETAILS, MINT_DETAILS, SWAP_DETAILS } from 'api/fragments'
 import { BlockHeight } from 'api/types'
 import { gql } from 'apollo-boost'
-import { BUNDLE_ID, FACTORY_ADDRESS } from '../../constants'
+import { BUNDLE_ID } from '../../constants'
 
 export const SUBGRAPH_HEALTH = gql`
   query Health {
@@ -71,7 +71,7 @@ export const PRICES_BY_BLOCK = (tokenAddress: string, blocks: BlockHeight[]) => 
 }
 
 export const SHARE_VALUE = (pairAddress: string, blocks: BlockHeight[]) => {
-  let queryString = 'query GetShareValue {'
+  let queryString = 'query blocks {'
   queryString += blocks.map(
     block => `
       t${block.timestamp}:pair(id:"${pairAddress}", block: { number: ${block.number} }) {
@@ -97,28 +97,18 @@ export const SHARE_VALUE = (pairAddress: string, blocks: BlockHeight[]) => {
     `
   )
 
+  queryString += '}'
   return gql(queryString)
 }
 
-export const ETH_PRICE = (block?: number) => {
-  const queryString = block
-    ? `
-    query EthPrice {
-      bundles(where: { id: ${BUNDLE_ID} } block: {number: ${block}}) {
-        id
-        ethPrice
-      }
+export const ETH_PRICE = gql`
+  query EthPrice($block: Block_height) {
+    bundles(block: $block, where: { id: ${BUNDLE_ID} }) {
+      id
+      ethPrice
     }
-  `
-    : ` query EthPrice {
-      bundles(where: { id: ${BUNDLE_ID} }) {
-        id
-        ethPrice
-      }
-    }
-  `
-  return gql(queryString)
-}
+  }
+`
 
 export const GLOBAL_CHART = gql`
   query whiteSwapDayDatas($startTime: Int!, $skip: Int!) {
@@ -134,23 +124,20 @@ export const GLOBAL_CHART = gql`
   }
 `
 
-export const GLOBAL_DATA = (block?: number) => {
-  const queryString = ` query WhiteSwapFactories {
-      whiteSwapFactories(
-       ${block ? `block: { number: ${block}}` : ``}
-       where: { id: "${FACTORY_ADDRESS}" }) {
-        id
-        totalVolumeUSD
-        totalVolumeETH
-        untrackedVolumeUSD
-        totalLiquidityUSD
-        totalLiquidityETH
-        txCount
-        pairCount
-      }
-    }`
-  return gql(queryString)
-}
+export const GLOBAL_DATA = gql`
+  query WhiteSwapFactories($block: Block_height, $factoryAddress: String!) {
+    whiteSwapFactories(block: $block, where: { id: $factoryAddress }) {
+      id
+      totalVolumeUSD
+      totalVolumeETH
+      untrackedVolumeUSD
+      totalLiquidityUSD
+      totalLiquidityETH
+      txCount
+      pairCount
+    }
+  }
+`
 
 export const GLOBAL_TXNS = gql`
   ${MINT_DETAILS}

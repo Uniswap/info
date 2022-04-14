@@ -30,28 +30,25 @@ export const PAIR_CHART = gql`
   }
 `
 
-export const PAIR_DAY_DATA_BULK = (pairs: string[], startTimestamp: number) => {
-  let pairsString = `[`
-  pairs.map(pair => {
-    return (pairsString += `"${pair}"`)
-  })
-  pairsString += ']'
-  const queryString = `
-    query PairDayDataBulk {
-      pairDayDatas(first: 1000, orderBy: date, orderDirection: asc, where: { pairAddress_in: ${pairsString}, date_gt: ${startTimestamp} }) {
-        id
-        pairAddress
-        date
-        dailyVolumeToken0
-        dailyVolumeToken1
-        dailyVolumeUSD
-        totalSupply
-        reserveUSD
-      }
+export const PAIR_DAY_DATA_BULK = gql`
+  query PairDayDataBulk($pairs: [String]!, $startTimestamp: Int!) {
+    pairDayDatas(
+      first: 1000
+      orderBy: date
+      orderDirection: asc
+      where: { pairAddress_in: $pairs, date_gt: $startTimestamp }
+    ) {
+      id
+      pairAddress
+      date
+      dailyVolumeToken0
+      dailyVolumeToken1
+      dailyVolumeUSD
+      totalSupply
+      reserveUSD
     }
+  }
 `
-  return gql(queryString)
-}
 
 export const PAIR_SEARCH = gql`
   ${PAIR_DETAILS}
@@ -85,16 +82,13 @@ export const PAIRS_CURRENT = gql`
   }
 `
 
-export const PAIR_DATA = (pairAddress: string, block?: number) => {
-  const queryString = `
-    ${PAIR_FIELDS}
-    query PairData {
-      pairs(${block ? `block: {number: ${block}}` : ``} where: { id: "${pairAddress}"} ) {
-        ...PairFields
-      }
-    }`
-  return gql(queryString)
-}
+export const PAIR_DATA = gql`
+  query PairData($pairAddress: String!, $block: Block_height) {
+    pairs(block: $block, where: { id: $pairAddress }) {
+      ...PairFields
+    }
+  }
+`
 
 export const PAIRS_BULK = gql`
   ${PAIR_FIELDS}
@@ -105,15 +99,9 @@ export const PAIRS_BULK = gql`
   }
 `
 
-export const PAIRS_HISTORICAL_BULK = (block: number, pairs: string[]) => {
-  let pairsString = `[`
-  pairs.map(pair => {
-    return (pairsString += `"${pair}"`)
-  })
-  pairsString += ']'
-  const queryString = `
-  query PairsHistoricalBulk {
-    pairs(first: 200, where: {id_in: ${pairsString}}, block: {number: ${block}}, orderBy: trackedReserveETH, orderDirection: desc) {
+export const PAIRS_HISTORICAL_BULK = gql`
+  query PairsHistoricalBulk($pairs: [String]!, $block: Block_height) {
+    pairs(first: 200, where: { id_in: $pairs }, block: $block, orderBy: trackedReserveETH, orderDirection: desc) {
       id
       reserveUSD
       trackedReserveETH
@@ -121,9 +109,7 @@ export const PAIRS_HISTORICAL_BULK = (block: number, pairs: string[]) => {
       untrackedVolumeUSD
     }
   }
-  `
-  return gql(queryString)
-}
+`
 
 export const FILTERED_TRANSACTIONS = gql`
   ${MINT_DETAILS}

@@ -34,7 +34,11 @@ class PairController implements IPairController {
       case SupportedNetwork.ETHEREUM:
       case SupportedNetwork.TRON:
         return ApiService.graphqlClient.query({
-          query: PAIR_DATA(pairAddress, block),
+          query: PAIR_DATA,
+          variables: {
+            pairAddress,
+            block: block ? { number: block } : null
+          },
           fetchPolicy: 'cache-first'
         })
     }
@@ -59,7 +63,11 @@ class PairController implements IPairController {
       case SupportedNetwork.ETHEREUM:
       case SupportedNetwork.TRON:
         return ApiService.graphqlClient.query({
-          query: PAIRS_HISTORICAL_BULK(block, pairs),
+          query: PAIRS_HISTORICAL_BULK,
+          variables: {
+            pairs,
+            block: block ? { number: block } : null
+          },
           fetchPolicy: 'cache-first'
         })
     }
