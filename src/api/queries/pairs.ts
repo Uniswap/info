@@ -65,15 +65,6 @@ export const PAIR_SEARCH = gql`
   }
 `
 
-export const ALL_PAIRS = gql`
-  ${PAIR_DETAILS}
-  query AllPairs($skip: Int!) {
-    pairs(first: 500, skip: $skip, orderBy: trackedReserveETH, orderDirection: desc) {
-      ...PairDetails
-    }
-  }
-`
-
 export const PAIRS_CURRENT = gql`
   query CurrentPairs {
     pairs(first: 200, orderBy: trackedReserveETH, orderDirection: desc) {

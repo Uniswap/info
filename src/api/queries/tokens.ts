@@ -1,15 +1,6 @@
 import { TOKEN_FIELDS, TOKEN_INFO_LIQUIDITY } from 'api/fragments'
 import { gql } from 'apollo-boost'
 
-export const ALL_TOKENS = gql`
-  ${TOKEN_INFO_LIQUIDITY}
-  query AllTokens($skip: Int!) {
-    tokens(first: 500, skip: $skip) {
-      ...TokenInfoLiquidity
-    }
-  }
-`
-
 export const TOKEN_SEARCH = gql`
   ${TOKEN_INFO_LIQUIDITY}
   query TokenSearch($value: String, $id: String) {

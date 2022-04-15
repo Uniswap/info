@@ -10,14 +10,12 @@ import {
 } from '../utils'
 import { useAllPairData } from './PairData'
 import { EthereumNetworkInfo, TronNetworkInfo } from 'constants/networks'
-import { globalApi, pairApi, tokenApi, accountApi } from 'api'
+import { globalApi, accountApi } from 'api'
 
 const UPDATE = 'UPDATE'
 const UPDATE_TXNS = 'UPDATE_TXNS'
 const UPDATE_CHART = 'UPDATE_CHART'
 const UPDATE_PRICE = 'UPDATE_PRICE'
-const UPDATE_ALL_PAIRS_IN_UNISWAP = 'UPDAUPDATE_ALL_PAIRS_IN_UNISWAPTE_TOP_PAIRS'
-const UPDATE_ALL_TOKENS_IN_UNISWAP = 'UPDATE_ALL_TOKENS_IN_UNISWAP'
 const UPDATE_TOP_LPS = 'UPDATE_TOP_LPS'
 
 const GlobalDataContext = createContext()
@@ -31,8 +29,6 @@ const initialGlobalNetworkState = {
   chartData: undefined,
   transactions: undefined,
   topLps: undefined,
-  allPairs: [],
-  allTokens: [],
   price: '',
   oneDayPrice: '',
   priceChange: 0
@@ -87,28 +83,6 @@ function reducer(state, { type, payload }) {
           price,
           oneDayPrice,
           priceChange
-        }
-      }
-    }
-
-    case UPDATE_ALL_PAIRS_IN_UNISWAP: {
-      const { allPairs, networkId } = payload
-      return {
-        ...state,
-        [networkId]: {
-          ...state[networkId],
-          allPairs
-        }
-      }
-    }
-
-    case UPDATE_ALL_TOKENS_IN_UNISWAP: {
-      const { allTokens, networkId } = payload
-      return {
-        ...state,
-        [networkId]: {
-          ...state[networkId],
-          allTokens
         }
       }
     }
@@ -174,26 +148,6 @@ export default function Provider({ children }) {
     })
   }, [])
 
-  const updateAllPairsInUniswap = useCallback(({ allPairs, networkId }) => {
-    dispatch({
-      type: UPDATE_ALL_PAIRS_IN_UNISWAP,
-      payload: {
-        allPairs,
-        networkId
-      }
-    })
-  }, [])
-
-  const updateAllTokensInUniswap = useCallback(({ allTokens, networkId }) => {
-    dispatch({
-      type: UPDATE_ALL_TOKENS_IN_UNISWAP,
-      payload: {
-        allTokens,
-        networkId
-      }
-    })
-  }, [])
-
   const updateTopLps = useCallback(({ topLps, networkId }) => {
     dispatch({
       type: UPDATE_TOP_LPS,
@@ -213,21 +167,10 @@ export default function Provider({ children }) {
             updateTransactions,
             updateChart,
             updatePrice,
-            updateTopLps,
-            updateAllPairsInUniswap,
-            updateAllTokensInUniswap
+            updateTopLps
           }
         ],
-        [
-          state,
-          update,
-          updateTransactions,
-          updateTopLps,
-          updateChart,
-          updatePrice,
-          updateAllPairsInUniswap,
-          updateAllTokensInUniswap
-        ]
+        [state, update, updateTransactions, updateTopLps, updateChart, updatePrice]
       )}
     >
       {children}
@@ -469,58 +412,11 @@ const getPrice = async () => {
   return [price, priceOneDay, priceChange]
 }
 
-const PAIRS_TO_FETCH = 500
-const TOKENS_TO_FETCH = 500
-
-/**
- * Loop through every pair on uniswap, used for search
- */
-async function getAllPairsOnUniswap() {
-  try {
-    let allFound = false
-    let pairs = []
-    let skipCount = 0
-    while (!allFound) {
-      let result = await pairApi.getAllPairs(skipCount)
-      skipCount = skipCount + PAIRS_TO_FETCH
-      pairs = pairs.concat(result?.data?.pairs)
-      if (result?.data?.pairs.length < PAIRS_TO_FETCH || pairs.length > PAIRS_TO_FETCH) {
-        allFound = true
-      }
-    }
-    return pairs
-  } catch (e) {
-    console.log(e)
-  }
-}
-
-/**
- * Loop through every token on uniswap, used for search
- */
-async function getAllTokensOnUniswap() {
-  try {
-    let allFound = false
-    let skipCount = 0
-    let tokens = []
-    while (!allFound) {
-      let result = await tokenApi.getAllTokens(skipCount)
-      tokens = tokens.concat(result?.data?.tokens)
-      if (result?.data?.tokens?.length < TOKENS_TO_FETCH || tokens.length > TOKENS_TO_FETCH) {
-        allFound = true
-      }
-      skipCount = skipCount += TOKENS_TO_FETCH
-    }
-    return tokens
-  } catch (e) {
-    console.log(e)
-  }
-}
-
 /**
  * Hook that fetches overview data, plus all tokens and pairs for search
  */
 export function useGlobalData() {
-  const [state, { update, updateAllPairsInUniswap, updateAllTokensInUniswap }] = useGlobalDataContext()
+  const [state, { update }] = useGlobalDataContext()
   const activeNetwork = useActiveNetworkId()
   const [price, oldPrice] = useEthPrice()
   const data = state[activeNetwork]?.globalData
@@ -529,17 +425,11 @@ export function useGlobalData() {
     async function fetchData() {
       let globalData = await getGlobalData(price, oldPrice)
       globalData && update({ data: globalData, networkId: activeNetwork })
-
-      let allPairs = await getAllPairsOnUniswap()
-      updateAllPairsInUniswap({ allPairs, networkId: activeNetwork })
-
-      let allTokens = await getAllTokensOnUniswap()
-      updateAllTokensInUniswap({ allTokens, networkId: activeNetwork })
     }
     if (!data && price && oldPrice) {
       fetchData()
     }
-  }, [price, oldPrice, update, data, updateAllPairsInUniswap, updateAllTokensInUniswap, activeNetwork])
+  }, [price, oldPrice, update, data, activeNetwork])
 
   return data || {}
 }
@@ -617,22 +507,6 @@ export function useEthPrice() {
   }, [price, updatePrice, activeNetwork])
 
   return [price, oneDayPrice]
-}
-
-export function useAllPairsInUniswap() {
-  const [state] = useGlobalDataContext()
-  const activeNetwork = useActiveNetworkId()
-  const { allPairs } = state[activeNetwork]
-
-  return allPairs
-}
-
-export function useAllTokensInUniswap() {
-  const [state] = useGlobalDataContext()
-  const activeNetwork = useActiveNetworkId()
-  const { allTokens } = state[activeNetwork]
-
-  return allTokens
 }
 
 /**

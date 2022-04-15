@@ -1,5 +1,5 @@
 import ApiService from 'api/ApiService'
-import { ALL_TOKENS, TOKENS_CURRENT, TOKENS_DYNAMIC, TOKEN_CHART, TOKEN_DATA, TOKEN_SEARCH } from 'api/queries/tokens'
+import { TOKENS_CURRENT, TOKENS_DYNAMIC, TOKEN_CHART, TOKEN_DATA, TOKEN_SEARCH } from 'api/queries/tokens'
 import { SupportedNetwork } from 'constants/networks'
 import ITokenController from './TokenController.interface'
 
@@ -52,20 +52,6 @@ class TokenController implements ITokenController {
           query: TOKEN_CHART,
           variables: {
             tokenAddr: tokenAddress,
-            skip
-          },
-          fetchPolicy: 'cache-first'
-        })
-    }
-  }
-
-  public getAllTokens(skip: number) {
-    switch (ApiService.activeNetwork) {
-      case SupportedNetwork.ETHEREUM:
-      case SupportedNetwork.TRON:
-        return ApiService.graphqlClient.query({
-          query: ALL_TOKENS,
-          variables: {
             skip
           },
           fetchPolicy: 'cache-first'

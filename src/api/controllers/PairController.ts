@@ -1,6 +1,5 @@
 import ApiService from 'api/ApiService'
 import {
-  ALL_PAIRS,
   FILTERED_TRANSACTIONS,
   HOURLY_PAIR_RATES,
   PAIRS_BULK,
@@ -94,20 +93,6 @@ class PairController implements IPairController {
       case SupportedNetwork.TRON:
         return ApiService.graphqlClient.query({
           query: PAIRS_CURRENT,
-          fetchPolicy: 'cache-first'
-        })
-    }
-  }
-
-  public getAllPairs(skip: number) {
-    switch (ApiService.activeNetwork) {
-      case SupportedNetwork.ETHEREUM:
-      case SupportedNetwork.TRON:
-        return ApiService.graphqlClient.query({
-          query: ALL_PAIRS,
-          variables: {
-            skip
-          },
           fetchPolicy: 'cache-first'
         })
     }
