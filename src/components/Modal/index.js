@@ -38,7 +38,7 @@ const StyledDialogContent = styled(({ minHeight, maxHeight, maxWidth, mobile, is
     background-color: ${({ theme }) => theme.bg6};
     box-shadow: 0 4px 8px 0 ${({ theme }) => transparentize(0.95, theme.shadow1)};
     padding: 0px;
-    width: 50vw;
+    width: 50vw; //todo namgold
     overflow-y: ${({ mobile }) => (mobile ? 'scroll' : 'hidden')};
     overflow-x: hidden;
     align-self: ${({ mobile }) => (mobile ? 'flex-end' : 'center')};

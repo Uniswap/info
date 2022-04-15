@@ -8,7 +8,7 @@ import styled from 'styled-components'
 import Link, { CustomLink } from '../Link'
 import { Divider } from '../../components'
 import DoubleTokenLogo from '../DoubleLogo'
-import { useParams, withRouter } from 'react-router-dom'
+import { withRouter } from 'react-router-dom'
 import { formattedNum, getPoolLink, shortenAddress } from '../../utils'
 import { AutoColumn } from '../Column'
 import { ButtonLight } from '../ButtonStyled'
@@ -106,7 +106,7 @@ const SORT_FIELD = {
 function PositionList({ positions }) {
   const below740 = useMedia('(max-width: 740px)')
   const below900 = useMedia('(max-width: 900px)')
-  const [networksInfo] = useNetworksInfo()
+  const [[networkInfo]] = useNetworksInfo()
 
   // pagination
   const [page, setPage] = useState(1)
@@ -133,8 +133,6 @@ function PositionList({ positions }) {
   }, [positions])
 
   const theme = useTheme()
-  const { network: currentNetworkURL } = useParams()
-  const prefixNetworkURL = currentNetworkURL ? `/${currentNetworkURL}` : ''
 
   const ListItem = ({ position }) => {
     const poolOwnership = position.liquidityTokenBalance / position.pool.totalSupply
@@ -146,11 +144,17 @@ function PositionList({ positions }) {
           {!below740 && (
             <DataText grid-area='pair' justifyContent='flex-start' alignItems='flex-start'>
               <AutoColumn gap='8px' justify='flex-start' align='flex-start'>
-                <DoubleTokenLogo size={16} a0={position.pair.token0.id} a1={position.pair.token1.id} margin={!below740} />
+                <DoubleTokenLogo
+                  size={16}
+                  a0={position.pair.token0.id}
+                  a1={position.pair.token1.id}
+                  margin={!below740}
+                  networkInfo={networkInfo}
+                />
               </AutoColumn>
               <AutoColumn gap='8px' justify='flex-end' style={{ marginLeft: '8px' }}>
-                <CustomLink to={prefixNetworkURL + '/pair/' + position.pair.id}>
-                  <TYPE.main style={{ whiteSpace: 'nowrap' }} to={prefixNetworkURL + '/pair/'}>
+                <CustomLink to={'/' + networkInfo.urlKey + '/pair/' + position.pair.id}>
+                  <TYPE.main style={{ whiteSpace: 'nowrap' }}>
                     <FormattedName
                       text={position.pair.token0.symbol + '-' + position.pair.token1.symbol}
                       maxCharacters={below740 ? 10 : 18}
@@ -168,8 +172,8 @@ function PositionList({ positions }) {
             alignItems={below740 ? 'flex-start' : 'flex-end'}
             flexDirection='column'
           >
-            <CustomLink to={prefixNetworkURL + '/pool/' + position.pool.id}>
-              <TYPE.main style={{ whiteSpace: 'nowrap' }} to={prefixNetworkURL + '/pair/'}>
+            <CustomLink to={'/' + networkInfo.urlKey + '/pool/' + position.pool.id}>
+              <TYPE.main style={{ whiteSpace: 'nowrap' }}>
                 <FormattedName
                   text={shortenAddress(position.pool.id, 3)}
                   maxCharacters={below740 ? 14 : 18}
@@ -180,11 +184,17 @@ function PositionList({ positions }) {
             {below740 && (
               <Flex marginTop='12px'>
                 <AutoColumn gap='8px' justify='flex-start' align='flex-start'>
-                  <DoubleTokenLogo size={16} a0={position.pair.token0.id} a1={position.pair.token1.id} margin={!below740} />
+                  <DoubleTokenLogo
+                    size={16}
+                    a0={position.pair.token0.id}
+                    a1={position.pair.token1.id}
+                    margin={!below740}
+                    networkInfo={networkInfo}
+                  />
                 </AutoColumn>
                 <AutoColumn gap='8px' justify='flex-end' style={{ marginLeft: '8px' }}>
-                  <CustomLink to={prefixNetworkURL + '/pair/' + position.pair.id}>
-                    <TYPE.main style={{ whiteSpace: 'nowrap' }} to={prefixNetworkURL + '/pair/'}>
+                  <CustomLink to={'/' + networkInfo.urlKey + '/pair/' + position.pair.id}>
+                    <TYPE.main style={{ whiteSpace: 'nowrap' }}>
                       <FormattedName
                         text={position.pair.token0.symbol + '-' + position.pair.token1.symbol}
                         maxCharacters={below740 ? 10 : 18}
@@ -245,14 +255,14 @@ function PositionList({ positions }) {
               <Flex justifyContent='flex-end' flexDirection={below740 ? 'column' : 'row'} sx={{ gap: '6px' }}>
                 <Link
                   external
-                  href={getPoolLink(position.pool.token0.id, networksInfo, position.pool.token1.id, false, position.pool.id)}
+                  href={getPoolLink(position.pool.token0.id, networkInfo, position.pool.token1.id, false, position.pool.id)}
                 >
                   <ButtonLight style={{ padding: '4px 6px', borderRadius: '4px' }}>+ Add</ButtonLight>
                 </Link>
                 {poolOwnership > 0 && (
                   <Link
                     external
-                    href={getPoolLink(position.pool.token0.id, networksInfo, position.pool.token1.id, true, position.pool.id)}
+                    href={getPoolLink(position.pool.token0.id, networkInfo, position.pool.token1.id, true, position.pool.id)}
                   >
                     <RemoveBtn
                       style={{
@@ -273,7 +283,7 @@ function PositionList({ positions }) {
           <Flex sx={{ gap: '8px', paddingX: '20px', marginBottom: '16px' }}>
             <Link
               external
-              href={getPoolLink(position.pool.token0.id, networksInfo, position.pool.token1.id, false, position.pool.id)}
+              href={getPoolLink(position.pool.token0.id, networkInfo, position.pool.token1.id, false, position.pool.id)}
               style={{ marginRight: '.5rem', flex: 1 }}
             >
               <ButtonLight style={{ padding: '10px', borderRadius: '4px', width: '100%' }}>+ Add</ButtonLight>
@@ -281,7 +291,7 @@ function PositionList({ positions }) {
             {poolOwnership > 0 && (
               <Link
                 external
-                href={getPoolLink(position.pool.token0.id, networksInfo, position.pool.token1.id, true, position.pool.id)}
+                href={getPoolLink(position.pool.token0.id, networkInfo, position.pool.token1.id, true, position.pool.id)}
                 style={{ flex: 1 }}
               >
                 <RemoveBtn

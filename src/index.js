@@ -11,12 +11,27 @@ import NetworkInfoContextProvider from './contexts/NetworkInfo'
 import UserContextProvider from './contexts/User'
 import App from './App'
 import ReactGA from 'react-ga'
+import { Updater as LocalStorageContextUpdater } from './contexts/LocalStorage'
+import { Updater as TokenDataContextUpdater } from './contexts/TokenData'
+import { Updater as PairDataContextUpdater } from './contexts/PairData'
+import { Updater as PoolDataContextUpdater } from './contexts/PoolData'
 
 const initGoogleAnalytics = () => {
   ReactGA.initialize('UA-207888714-1')
 }
 
 initGoogleAnalytics()
+
+function Updaters() {
+  return (
+    <>
+      <LocalStorageContextUpdater />
+      <PairDataContextUpdater />
+      <PoolDataContextUpdater />
+      <TokenDataContextUpdater />
+    </>
+  )
+}
 
 function ContextProviders({ children }) {
   return (
@@ -40,6 +55,7 @@ function ContextProviders({ children }) {
 
 ReactDOM.render(
   <ContextProviders>
+    <Updaters />
     <ThemeProvider>
       <GlobalStyle />
       <App />

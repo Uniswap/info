@@ -15,7 +15,6 @@ import { useGlobalTransactions } from '../contexts/GlobalData'
 import { useAllPairData } from '../contexts/PairData'
 import { useMedia } from 'react-use'
 import Panel from '../components/Panel'
-import { useAllTokenData } from '../contexts/TokenData'
 import { TYPE, ThemedBackground } from '../Theme'
 import { transparentize } from 'polished'
 import { CustomLink } from '../components/Link'
@@ -55,7 +54,6 @@ const WrappedPanel = styled(Panel)`
 function GlobalPage() {
   // get data for lists and totals
   const allPairs = useAllPairData()
-  const allTokens = useAllTokenData()
   const transactions = useGlobalTransactions()
   const theme = useTheme()
   const { network: currentNetworkURL } = useParams()
@@ -85,7 +83,7 @@ function GlobalPage() {
               flexDirection={below800 ? 'column-reverse' : 'row'}
             >
               <TYPE.largeHeader style={{ marginTop: below800 ? '20px' : '0' }}>Summary</TYPE.largeHeader>
-              <Search />
+              {currentNetworkURL && <Search />}
             </Flex>
             <GlobalStats />
           </AutoColumn>
@@ -104,7 +102,7 @@ function GlobalPage() {
             </RowBetween>
           </ListOptions>
           <WrappedPanel style={{ marginTop: '6px' }}>
-            <TopTokenList tokens={allTokens} />
+            <TopTokenList />
           </WrappedPanel>
           <ListOptions gap='10px' style={{ marginTop: '2rem', marginBottom: '.5rem' }}>
             <RowBetween>

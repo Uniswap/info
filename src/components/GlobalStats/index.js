@@ -8,6 +8,7 @@ import useAggregatorVolume from '../../hooks/useAggregatorVolume'
 import { ButtonEmpty } from '../ButtonStyled'
 import { Loader } from 'react-feather'
 import { useMedia } from 'react-use'
+import { aggregateGlobalData } from '../../utils/aggregateData'
 
 const Stats = styled.div`
   border: 1px solid ${({ theme }) => theme.border};
@@ -24,8 +25,11 @@ const Divider = styled.div`
 `
 
 export default function GlobalStats() {
-  const { oneDayTxns, oneDayFeeUSD, oneDayFeeChange, txnChange } = useGlobalData()
-  const oneDayFees = Number.isFinite(oneDayFeeUSD) ? formattedNum(oneDayFeeUSD, true) : ''
+  const globalDatas = useGlobalData()
+  const { oneDayTxns, oneDayFeeUSD, oneDayFeeChange, txnChange } = globalDatas[1]
+    ? aggregateGlobalData(globalDatas)
+    : globalDatas[0]
+  const oneDayFees = oneDayFeeUSD ? formattedNum(oneDayFeeUSD, true) : ''
   const theme = useTheme()
   const aggregatorVolume = useAggregatorVolume()
   const above768 = useMedia('(min-width: 768px)')

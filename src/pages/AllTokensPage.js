@@ -4,15 +4,14 @@ import 'feather-icons'
 import TopTokenList from '../components/TokenList'
 import { TYPE } from '../Theme'
 import Panel from '../components/Panel'
-import { useAllTokenData } from '../contexts/TokenData'
 import { PageWrapper, FullWrapper } from '../components'
 import { RowBetween } from '../components/Row'
 import Search from '../components/Search'
 import { useMedia } from 'react-use'
+import { useParams } from 'react-router-dom'
 
 function AllTokensPage() {
-  const allTokens = useAllTokenData()
-
+  const { network: currentNetworkURL } = useParams()
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [])
@@ -24,10 +23,10 @@ function AllTokensPage() {
       <FullWrapper>
         <RowBetween>
           <TYPE.largeHeader>Top Tokens</TYPE.largeHeader>
-          {!below600 && <Search small={true} />}
+          {currentNetworkURL && !below600 && <Search small={true} />}
         </RowBetween>
         <Panel style={{ padding: '0' }}>
-          <TopTokenList tokens={allTokens} itemMax={15} />
+          <TopTokenList itemMax={15} />
         </Panel>
       </FullWrapper>
     </PageWrapper>

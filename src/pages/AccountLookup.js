@@ -28,7 +28,6 @@ function AccountLookup() {
   const topLps = useTopLps()
 
   const below600 = useMedia('(max-width: 600px)')
-
   return (
     <PageWrapper>
       <FullWrapper>

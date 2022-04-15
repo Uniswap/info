@@ -7,6 +7,8 @@ import { RowFixed } from '../Row'
 import { OptionButton } from '../ButtonStyled'
 import { getTimeframe } from '../../utils'
 import { TYPE } from '../../Theme'
+import { aggregateChartData, aggregateGlobalData } from '../../utils/aggregateData'
+import { useNetworksInfo } from '../../contexts/NetworkInfo'
 
 const CHART_VIEW = {
   VOLUME: 'Volume',
@@ -17,15 +19,22 @@ const VOLUME_WINDOW = {
   WEEKLY: 'WEEKLY',
   DAYS: 'DAYS',
 }
+
 const GlobalChart = ({ display }) => {
   const chartView = display === 'volume' ? CHART_VIEW.VOLUME : CHART_VIEW.LIQUIDITY
 
   // time window and window size for chart
   const timeWindow = timeframeOptions.ALL_TIME
   const [volumeWindow, setVolumeWindow] = useState(VOLUME_WINDOW.DAYS)
+  const [networksInfo] = useNetworksInfo()
 
   // global historical data
-  const [dailyData, weeklyData] = useGlobalChartData()
+  const [dailyDatas, weeklyDatas] = useGlobalChartData()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const aggregatedDailyDatas = useMemo(() => aggregateChartData(dailyDatas), [JSON.stringify(dailyDatas)])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const aggregatedWeeklyDatas = useMemo(() => aggregateChartData(weeklyDatas), [JSON.stringify(weeklyDatas)])
+  const globalDatas = useGlobalData()
   const {
     totalLiquidityUSD,
     oneDayVolumeUSD,
@@ -33,29 +42,16 @@ const GlobalChart = ({ display }) => {
     liquidityChangeUSD,
     oneWeekVolume,
     weeklyVolumeChange,
-  } = useGlobalData()
+  } = globalDatas[1] ? aggregateGlobalData(globalDatas) : globalDatas[0]
 
   // based on window, get starttim
   let utcStartTime = getTimeframe(timeWindow)
 
   const chartDataFiltered = useMemo(() => {
-    let currentData = volumeWindow === VOLUME_WINDOW.DAYS ? dailyData : weeklyData
-    return (
-      currentData &&
-      Object.keys(currentData)
-        ?.map(key => {
-          let item = currentData[key]
-          if (item.date > utcStartTime) {
-            return item
-          } else {
-            return
-          }
-        })
-        .filter(item => {
-          return !!item
-        })
-    )
-  }, [dailyData, utcStartTime, volumeWindow, weeklyData])
+    let currentDatas = volumeWindow === VOLUME_WINDOW.DAYS ? aggregatedDailyDatas : aggregatedWeeklyDatas
+    return currentDatas.filter(item => item.date > utcStartTime)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(aggregatedDailyDatas), utcStartTime, volumeWindow, JSON.stringify(aggregatedWeeklyDatas)])
 
   // update the width on a window resize
   const ref = useRef()
@@ -74,33 +70,35 @@ const GlobalChart = ({ display }) => {
 
   return chartDataFiltered ? (
     <>
-      {chartDataFiltered && chartView === CHART_VIEW.LIQUIDITY && (
-        <ResponsiveContainer aspect={60 / 28} ref={ref}>
-          <TradingViewChart
-            data={dailyData}
-            base={totalLiquidityUSD}
-            baseChange={liquidityChangeUSD}
-            title='Liquidity'
-            field='totalLiquidityUSD'
-            width={width}
-            type={CHART_TYPES.AREA}
-          />
-        </ResponsiveContainer>
-      )}
-      {chartDataFiltered && chartView === CHART_VIEW.VOLUME && (
-        <ResponsiveContainer aspect={60 / 28}>
-          <TradingViewChart
-            data={chartDataFiltered}
-            base={volumeWindow === VOLUME_WINDOW.WEEKLY ? oneWeekVolume : oneDayVolumeUSD}
-            baseChange={volumeWindow === VOLUME_WINDOW.WEEKLY ? weeklyVolumeChange : volumeChangeUSD}
-            title={volumeWindow === VOLUME_WINDOW.WEEKLY ? 'Volume (7d)' : 'Volume'}
-            field={volumeWindow === VOLUME_WINDOW.WEEKLY ? 'weeklyVolumeUSD' : 'dailyVolumeUSD'}
-            width={width}
-            type={CHART_TYPES.BAR}
-            useWeekly={volumeWindow === VOLUME_WINDOW.WEEKLY}
-          />
-        </ResponsiveContainer>
-      )}
+      {chartDataFiltered &&
+        (chartView === CHART_VIEW.LIQUIDITY ? (
+          <ResponsiveContainer aspect={60 / 28} ref={ref}>
+            <TradingViewChart
+              data={aggregatedDailyDatas}
+              base={totalLiquidityUSD}
+              baseChange={liquidityChangeUSD}
+              title={(networksInfo[1] ? 'Total ' : '') + 'Liquidity'}
+              field='totalLiquidityUSD'
+              width={width}
+              type={CHART_TYPES.AREA}
+            />
+          </ResponsiveContainer>
+        ) : chartView === CHART_VIEW.VOLUME ? (
+          <ResponsiveContainer aspect={60 / 28}>
+            <TradingViewChart
+              data={chartDataFiltered}
+              base={volumeWindow === VOLUME_WINDOW.WEEKLY ? oneWeekVolume : oneDayVolumeUSD}
+              baseChange={volumeWindow === VOLUME_WINDOW.WEEKLY ? weeklyVolumeChange : volumeChangeUSD}
+              title={
+                (networksInfo[1] ? 'Total ' : '') + 'Trading Volume' + (volumeWindow === VOLUME_WINDOW.WEEKLY ? ' (7d)' : '')
+              }
+              field={volumeWindow === VOLUME_WINDOW.WEEKLY ? 'weeklyVolumeUSD' : 'dailyVolumeUSD'}
+              width={width}
+              type={CHART_TYPES.BAR}
+              useWeekly={volumeWindow === VOLUME_WINDOW.WEEKLY}
+            />
+          </ResponsiveContainer>
+        ) : null)}
       {display === 'volume' && (
         <RowFixed
           style={{
@@ -123,9 +121,7 @@ const GlobalChart = ({ display }) => {
         </RowFixed>
       )}
     </>
-  ) : (
-    ''
-  )
+  ) : null
 }
 
 export default GlobalChart

@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo, useRef } from 'react'
 import styled from 'styled-components'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 
-import { formatTime, formattedNum, getUrls } from '../../utils'
+import { formatTime, formattedNum, getEtherScanUrls } from '../../utils'
 import { useMedia } from 'react-use'
 import { useCurrentCurrency } from '../../contexts/Application'
 import { RowFixed, RowBetween } from '../Row'
@@ -11,12 +11,15 @@ import { RowFixed, RowBetween } from '../Row'
 import LocalLoader from '../LocalLoader'
 import { Box, Flex, Text } from 'rebass'
 import Link from '../Link'
+import { Link as RouterLink } from 'react-router-dom'
 import { Divider, EmptyCard } from '..'
 import DropdownSelect from '../DropdownSelect'
 import FormattedName from '../FormattedName'
 import { TYPE } from '../../Theme'
 import useTheme from '../../hooks/useTheme'
-import { useNetworksInfo } from '../../contexts/NetworkInfo'
+import { NETWORK_INFOS } from '../../constants/networks'
+import { aggregateGlobalTxns } from '../../utils/aggregateData'
+import { MouseoverTooltip } from '../Tooltip'
 
 dayjs.extend(utc)
 
@@ -44,8 +47,8 @@ const List = styled(Box)`
 const DashGrid = styled.div`
   display: grid;
   grid-gap: 1em;
-  grid-template-columns: 100px 1fr 1fr;
-  grid-template-areas: 'txn value time';
+  grid-template-columns: 1.5fr ${({ isShowNetworkColumn }) => (isShowNetworkColumn ? '75px' : '')} 1fr 1fr;
+  grid-template-areas: 'txn ${({ isShowNetworkColumn }) => (isShowNetworkColumn ? 'network' : '')} value time';
 
   > * {
     justify-content: flex-end;
@@ -55,6 +58,10 @@ const DashGrid = styled.div`
       justify-content: flex-start;
       text-align: left;
       width: 100px;
+    }
+
+    &:nth-child(2) {
+      justify-content: center;
     }
   }
 
@@ -67,8 +74,9 @@ const DashGrid = styled.div`
   }
 
   @media screen and (min-width: 780px) {
-    grid-template-columns: 1.6fr 1fr 1fr 1fr 1fr;
-    grid-template-areas: 'txn value amountToken amountOther time';
+    grid-template-columns: 2fr ${({ isShowNetworkColumn }) => (isShowNetworkColumn ? '75px' : '')} 1fr 1fr 1fr 1fr;
+    grid-template-areas: 'txn ${({ isShowNetworkColumn }) =>
+      isShowNetworkColumn ? 'network' : ''} value amountToken amountOther time';
 
     > * {
       &:first-child {
@@ -78,8 +86,9 @@ const DashGrid = styled.div`
   }
 
   @media screen and (min-width: 1080px) {
-    grid-template-columns: 1.6fr 1fr 1fr 1fr 1fr 1fr;
-    grid-template-areas: 'txn value amountToken amountOther account time';
+    grid-template-columns: 2fr ${({ isShowNetworkColumn }) => (isShowNetworkColumn ? '75px' : '')} 1fr 1fr 1fr 1fr 1fr;
+    grid-template-areas: 'txn ${({ isShowNetworkColumn }) =>
+      isShowNetworkColumn ? 'network' : ''} value amountToken amountOther account time';
   }
 `
 
@@ -94,6 +103,7 @@ const ClickableText = styled(Text)`
   color: ${({ theme }) => theme.subText};
   user-select: none;
   text-align: end;
+  white-space: nowrap
 
   &:hover {
     cursor: pointer;
@@ -135,6 +145,7 @@ const SortText = styled.button`
 
 const SORT_FIELD = {
   VALUE: 'amountUSD',
+  NETWORK: 'chainId',
   AMOUNT0: 'token0Amount',
   AMOUNT1: 'token1Amount',
   TIMESTAMP: 'timestamp',
@@ -166,9 +177,9 @@ function getTransactionType(event, symbol0, symbol1) {
 
 // @TODO rework into virtualized list
 function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
-  const [networksInfo] = useNetworksInfo()
-  const urls = useMemo(() => getUrls(networksInfo), [networksInfo])
-
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const aggregatedTransactions = useMemo(() => aggregateGlobalTxns(transactions.filter(Boolean)), [JSON.stringify(transactions)])
+  const isShowNetworkColumn = transactions?.slice(1).some(Boolean)
   // page state
   const [page, setPage] = useState(1)
   const [maxPage, setMaxPage] = useState(1)
@@ -181,17 +192,12 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
 
   const [currency] = useCurrentCurrency()
 
-  useEffect(() => {
-    setMaxPage(1) // edit this to do modular
-    setPage(1)
-  }, [transactions])
-
   // parse the txns and format for UI
   useEffect(() => {
-    if (transactions && transactions.mints && transactions.burns && transactions.swaps) {
+    if (aggregatedTransactions && aggregatedTransactions.mints && aggregatedTransactions.burns && aggregatedTransactions.swaps) {
       let newTxns = []
-      if (transactions.mints.length > 0) {
-        transactions.mints.map(mint => {
+      if (aggregatedTransactions.mints?.length > 0) {
+        aggregatedTransactions.mints.forEach(mint => {
           let newTxn = {}
           newTxn.hash = mint.transaction.id
           newTxn.timestamp = mint.transaction.timestamp
@@ -202,11 +208,12 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
           newTxn.token0Symbol = mint.pair.token0.symbol
           newTxn.token1Symbol = mint.pair.token1.symbol
           newTxn.amountUSD = mint.amountUSD
+          newTxn.chainId = mint.chainId
           return newTxns.push(newTxn)
         })
       }
-      if (transactions.burns.length > 0) {
-        transactions.burns.map(burn => {
+      if (aggregatedTransactions.burns?.length > 0) {
+        aggregatedTransactions.burns.forEach(burn => {
           let newTxn = {}
           newTxn.hash = burn.transaction.id
           newTxn.timestamp = burn.transaction.timestamp
@@ -217,11 +224,12 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
           newTxn.token0Symbol = burn.pair.token0.symbol
           newTxn.token1Symbol = burn.pair.token1.symbol
           newTxn.amountUSD = burn.amountUSD
+          newTxn.chainId = burn.chainId
           return newTxns.push(newTxn)
         })
       }
-      if (transactions.swaps.length > 0) {
-        transactions.swaps.map(swap => {
+      if (aggregatedTransactions.swaps.length > 0) {
+        aggregatedTransactions.swaps.forEach(swap => {
           const netToken0 = swap.amount0In - swap.amount0Out
           const netToken1 = swap.amount1In - swap.amount1Out
 
@@ -245,6 +253,7 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
 
           newTxn.amountUSD = swap.amountUSD
           newTxn.account = swap.origin
+          newTxn.chainId = swap.chainId
           return newTxns.push(newTxn)
         })
       }
@@ -266,7 +275,8 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
         setMaxPage(Math.floor(filtered.length / ITEMS_PER_PAGE) + extraPages)
       }
     }
-  }, [transactions, txFilter])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [aggregatedTransactions, txFilter])
 
   useEffect(() => {
     setPage(1)
@@ -276,16 +286,36 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
     filteredItems &&
     filteredItems
       .sort((a, b) => {
-        return parseFloat(a[sortedColumn]) > parseFloat(b[sortedColumn])
-          ? (sortDirection ? -1 : 1) * 1
-          : (sortDirection ? -1 : 1) * -1
+        let valueToCompareA = null
+        let valueToCompareB = null
+        if (sortedColumn === SORT_FIELD.NETWORK) {
+          valueToCompareA = NETWORK_INFOS[a.chainId].name
+          valueToCompareB = NETWORK_INFOS[b.chainId].name
+        } else {
+          valueToCompareA = parseFloat(a[sortedColumn])
+          valueToCompareB = parseFloat(b[sortedColumn])
+        }
+        if (valueToCompareA == valueToCompareB) {
+          if (a.timestamp == b.timestamp) {
+            if (a.amountUSD == b.amountUSD) {
+              return a.hash < b.hash ? 1 : -1
+            }
+            return a.amountUSD < b.amountUSD ? 1 : -1
+          }
+          return a.timestamp < b.timestamp ? 1 : -1
+        }
+        return valueToCompareA > valueToCompareB ? (sortDirection ? -1 : 1) * 1 : (sortDirection ? -1 : 1) * -1
       })
       .slice(ITEMS_PER_PAGE * (page - 1), page * ITEMS_PER_PAGE)
 
   const below1080 = useMedia('(max-width: 1080px)')
   const below780 = useMedia('(max-width: 780px)')
+  const below900 = useMedia('(max-width: 900px)')
+  const below1280 = useMedia('(max-width: 1280px)')
+  const isShowDropdown = below900 || (!below1080 && below1280)
 
   const ListItem = ({ item }) => {
+    const urls = useMemo(() => getEtherScanUrls(NETWORK_INFOS[item.chainId]), [item.chainId])
     if (item.token0Symbol === 'WETH') {
       item.token0Symbol = 'ETH'
     }
@@ -295,12 +325,21 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
     }
 
     return (
-      <DashGrid style={{ height: '56px' }}>
+      <DashGrid style={{ height: '56px' }} isShowNetworkColumn={isShowNetworkColumn}>
         <DataText area='txn' fontWeight='500'>
           <Link color={color} external href={urls.showTransaction(item.hash)}>
             {getTransactionType(item.type, item.token1Symbol, item.token0Symbol)}
           </Link>
         </DataText>
+        {isShowNetworkColumn && (
+          <DataText area='network'>
+            <RouterLink to={'/' + NETWORK_INFOS[item.chainId].urlKey}>
+              <MouseoverTooltip text={NETWORK_INFOS[item.chainId].name} width='unset'>
+                <img src={NETWORK_INFOS[item.chainId].icon} width={25} />
+              </MouseoverTooltip>
+            </RouterLink>
+          </DataText>
+        )}
         <DataText area='value'>
           {currency === 'ETH' ? 'Ξ ' + formattedNum(item.valueETH) : formattedNum(item.amountUSD, true)}
         </DataText>
@@ -316,7 +355,7 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
         )}
         {!below1080 && (
           <DataText area='account'>
-            <Link color={color} external href={`${networksInfo.ETHERSCAN_URL}/address/${item.account}`}>
+            <Link color={color} external href={urls.showAddress(item.account)}>
               {item.account && item.account.slice(0, 6) + '...' + item.account.slice(38, 42)}
             </Link>
           </DataText>
@@ -329,8 +368,8 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
   const theme = useTheme()
   return (
     <>
-      <TableHeader center={true} style={{ height: 'fit-content' }}>
-        {below780 ? (
+      <TableHeader center={true} style={{ height: 'fit-content' }} isShowNetworkColumn={isShowNetworkColumn}>
+        {isShowDropdown ? (
           <RowBetween area='txn'>
             <DropdownSelect options={TXN_TYPE} active={txFilter} setActive={setTxFilter} color={color} />
           </RowBetween>
@@ -370,7 +409,20 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
             </SortText>
           </RowFixed>
         )}
-
+        {isShowNetworkColumn && (
+          <Flex alignItems='center' justifyContent='flexStart'>
+            <ClickableText
+              color='textDim'
+              area='network'
+              onClick={e => {
+                setSortedColumn(SORT_FIELD.NETWORK)
+                setSortDirection(sortedColumn !== SORT_FIELD.NETWORK ? true : !sortDirection)
+              }}
+            >
+              Network {sortedColumn === SORT_FIELD.NETWORK ? (!sortDirection ? '↑' : '↓') : ''}
+            </ClickableText>
+          </Flex>
+        )}
         <Flex alignItems='center' justifyContent='flexStart'>
           <ClickableText
             color='textDim'

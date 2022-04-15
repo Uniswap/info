@@ -24,11 +24,11 @@ import {
   getTimestampsForChanges,
   splitQuery,
   overwriteArrayMerge,
+  memoRequest,
 } from '../utils'
 
-import { timeframeOptions, getWETH_ADDRESS } from '../constants'
-import { useExchangeClient, useLatestBlocks } from './Application'
-import { getNativeTokenSymbol, getNativeTokenWrappedName } from '../utils'
+import { timeframeOptions } from '../constants'
+import { useExchangeClients, useLatestBlocks } from './Application'
 import { useNetworksInfo } from './NetworkInfo'
 
 const UPDATE = 'UPDATE'
@@ -58,7 +58,7 @@ function reducer(state, { type, payload }) {
   switch (type) {
     case UPDATE: {
       const { poolAddress, data, chainId } = payload
-      if (!data) return merge(state, { [chainId]: { [poolAddress]: { name: 'error-pool' } } })
+      if (!data) return state
       return merge(state, { [chainId]: { [poolAddress]: data } })
     }
 
@@ -161,9 +161,15 @@ export default function Provider({ children }) {
   )
 }
 
-export async function getBulkPoolData(client, poolList, ethPrice, networksInfo) {
+export async function getBulkPoolData(client, poolList, ethPrice, networkInfo) {
   const [t1, t2, tWeek] = getTimestampsForChanges()
-  let [{ number: b1 }, { number: b2 }, { number: bWeek }] = await getBlocksFromTimestamps([t1, t2, tWeek], networksInfo)
+  let b1, b2, bWeek
+  try {
+    ;[{ number: b1 }, { number: b2 }, { number: bWeek }] = await getBlocksFromTimestamps([t1, t2, tWeek], networkInfo)
+  } catch (e) {
+    console.error('Cant get block data from ' + networkInfo.subgraphBlockUrl)
+    return
+  }
 
   try {
     let current = await client.query({
@@ -224,7 +230,7 @@ export async function getBulkPoolData(client, poolList, ethPrice, networksInfo) 
             })
             oneWeekHistory = newData.data.pools[0]
           }
-          data = parseData(data, oneDayHistory, twoDayHistory, oneWeekHistory, ethPrice, b1, networksInfo)
+          data = parseData(data, oneDayHistory, twoDayHistory, oneWeekHistory, ethPrice, b1, networkInfo)
           return data
         })
     )
@@ -235,7 +241,7 @@ export async function getBulkPoolData(client, poolList, ethPrice, networksInfo) 
   }
 }
 
-function parseData(data, oneDayData, twoDayData, oneWeekData, ethPrice, oneDayBlock, networksInfo) {
+function parseData(data, oneDayData, twoDayData, oneWeekData, ethPrice, oneDayBlock, networkInfo) {
   // get volume changes
   const [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentChange(
     data?.volumeUSD,
@@ -283,13 +289,13 @@ function parseData(data, oneDayData, twoDayData, oneWeekData, ethPrice, oneDayBl
   if (!oneWeekData && data) {
     data.oneWeekVolumeUSD = parseFloat(data.volumeUSD)
   }
-  if (data?.token0?.id === getWETH_ADDRESS(networksInfo)) {
-    data.token0.name = getNativeTokenWrappedName(networksInfo)
-    data.token0.symbol = getNativeTokenSymbol(networksInfo)
+  if (data?.token0?.id === networkInfo.wethAddress) {
+    data.token0.name = networkInfo.nativeTokenWrappedName
+    data.token0.symbol = networkInfo.nativeTokenSymbol
   }
-  if (data?.token1?.id === getWETH_ADDRESS(networksInfo)) {
-    data.token1.name = getNativeTokenWrappedName(networksInfo)
-    data.token1.symbol = getNativeTokenSymbol(networksInfo)
+  if (data?.token1?.id === networkInfo.wethAddress) {
+    data.token1.name = networkInfo.nativeTokenWrappedName
+    data.token1.symbol = networkInfo.nativeTokenSymbol
   }
 
   return data
@@ -456,43 +462,44 @@ const getHourlyRateData = async (client, poolAddress, startTime, latestBlock, fr
 }
 
 export function Updater() {
-  const exchangeSubgraphClient = useExchangeClient()
-  const [, { updateTopPools }] = usePoolDataContext()
+  const exchangeSubgraphClient = useExchangeClients()
+  const [state, { updateTopPools }] = usePoolDataContext()
   const [ethPrice] = useEthPrice()
   const [networksInfo] = useNetworksInfo()
 
   useEffect(() => {
-    let canceled = false
-    async function getData() {
+    async function getData(index) {
       // get top pools by reserves
       let {
         data: { pools },
-      } = await exchangeSubgraphClient.query({
+      } = await exchangeSubgraphClient[index].query({
         query: POOLS_CURRENT,
         fetchPolicy: 'cache-first',
       })
 
       // format as array of addresses
-      const formattedPools = pools.map(pool => {
-        return pool.id
-      })
-
+      const formattedPools = pools.map(pool => pool.id).filter(poolId => !state[networksInfo[index].chainId]?.[poolId])
+      if (!formattedPools.length) return
       // get data for every pool in list
-      let topPools = await getBulkPoolData(exchangeSubgraphClient, formattedPools, ethPrice, networksInfo)
-      !canceled && topPools && updateTopPools(topPools, networksInfo.CHAIN_ID)
+      let topPools = await getBulkPoolData(exchangeSubgraphClient[index], formattedPools, ethPrice[index], networksInfo[index])
+      topPools?.forEach(topPool => (topPool.chainId = networksInfo[index].chainId))
+      topPools && updateTopPools(topPools, networksInfo[index].chainId)
     }
-    ethPrice && getData()
-    return () => (canceled = true)
+    networksInfo.forEach((networkInfo, index) => {
+      if (ethPrice[index]) {
+        memoRequest(() => getData(index), 'UpdaterPoolData_' + networkInfo.chainId + '_' + ethPrice[index], 10000)
+      }
+    })
   }, [ethPrice, updateTopPools, exchangeSubgraphClient, networksInfo])
   return null
 }
 
 export function useHourlyRateData(poolAddress, timeWindow, frequency) {
-  const exchangeSubgraphClient = useExchangeClient()
+  const [exchangeSubgraphClient] = useExchangeClients()
   const [state, { updateHourlyData }] = usePoolDataContext()
-  const [latestBlock] = useLatestBlocks()
-  const [networksInfo] = useNetworksInfo()
-  const chartData = state?.[networksInfo.CHAIN_ID]?.[poolAddress]?.hourlyData?.[timeWindow]
+  const [[latestBlock]] = useLatestBlocks()
+  const [[networkInfo]] = useNetworksInfo()
+  const chartData = state?.[networkInfo.chainId]?.[poolAddress]?.hourlyData?.[timeWindow]
 
   useEffect(() => {
     const currentTime = dayjs.utc()
@@ -520,145 +527,100 @@ export function useHourlyRateData(poolAddress, timeWindow, frequency) {
     }
 
     async function fetch() {
-      let data = await getHourlyRateData(exchangeSubgraphClient, poolAddress, startTime, latestBlock, frequency, networksInfo)
-      updateHourlyData(poolAddress, data, timeWindow, networksInfo.CHAIN_ID)
+      let data = await getHourlyRateData(exchangeSubgraphClient, poolAddress, startTime, latestBlock, frequency, networkInfo)
+      updateHourlyData(poolAddress, data, timeWindow, networkInfo.chainId)
     }
     if (!chartData) {
       fetch()
     }
-  }, [chartData, timeWindow, poolAddress, updateHourlyData, latestBlock, frequency, exchangeSubgraphClient, networksInfo])
+  }, [chartData, timeWindow, poolAddress, updateHourlyData, latestBlock, frequency, exchangeSubgraphClient, networkInfo])
 
   return chartData
-}
-
-/**
- * @todo
- * store these updates to reduce future redundant calls
- */
-export function useDataForList(poolList) {
-  const exchangeSubgraphClient = useExchangeClient()
-  const [state] = usePoolDataContext()
-  const [ethPrice] = useEthPrice()
-
-  const [stale, setStale] = useState(false)
-  const [fetched, setFetched] = useState([])
-  const [networksInfo] = useNetworksInfo()
-
-  // reset
-  useEffect(() => {
-    if (poolList) {
-      setStale(false)
-      setFetched()
-    }
-  }, [poolList])
-
-  useEffect(() => {
-    async function fetchNewPoolData() {
-      let newFetched = []
-      let unfetched = []
-
-      poolList.map(async pool => {
-        let currentData = state?.[networksInfo.CHAIN_ID]?.[pool.id]
-        if (!currentData) {
-          unfetched.push(pool.id)
-        } else {
-          newFetched.push(currentData)
-        }
-      })
-
-      let newPoolData = await getBulkPoolData(
-        exchangeSubgraphClient,
-        unfetched.map(pool => {
-          return pool
-        }),
-        ethPrice,
-        networksInfo
-      )
-      setFetched(newFetched.concat(newPoolData ? newPoolData : []))
-    }
-    if (ethPrice && poolList && poolList.length > 0 && !fetched && !stale) {
-      setStale(true)
-      fetchNewPoolData()
-    }
-  }, [ethPrice, state, poolList, stale, fetched, exchangeSubgraphClient, networksInfo])
-
-  let formattedFetch =
-    fetched &&
-    fetched.reduce((obj, cur) => {
-      return { ...obj, [cur?.id]: cur }
-    }, {})
-
-  return formattedFetch
 }
 
 /**
  * Get all the current and 24hr changes for a pool
  */
 export function usePoolData(poolAddress) {
-  const exchangeSubgraphClient = useExchangeClient()
+  const [exchangeSubgraphClient] = useExchangeClients()
   const [state, { update }] = usePoolDataContext()
-  const [ethPrice] = useEthPrice()
-  const [networksInfo] = useNetworksInfo()
-  const poolData = state?.[networksInfo.CHAIN_ID]?.[poolAddress]
+  const [[ethPrice]] = useEthPrice()
+  const [[networkInfo]] = useNetworksInfo()
+  const [error, setError] = useState(false)
+  const poolData = state?.[networkInfo.chainId]?.[poolAddress]
+
+  useEffect(() => {
+    setError(false)
+  }, [poolAddress, networkInfo])
 
   useEffect(() => {
     async function fetchData() {
-      if (!poolData && poolAddress) {
-        let data = await getBulkPoolData(exchangeSubgraphClient, [poolAddress], ethPrice, networksInfo)
-        data && update(poolAddress, data[0], networksInfo.CHAIN_ID)
+      try {
+        let data = await getBulkPoolData(exchangeSubgraphClient, [poolAddress], ethPrice, networkInfo)
+        data?.length ? update(poolAddress, data[0], networkInfo.chainId) : setError(true)
+      } catch (e) {
+        setError(true)
       }
     }
-    if (!poolData && poolAddress && ethPrice && isAddress(poolAddress)) {
-      fetchData()
+    if (!poolData && !error) {
+      if (poolAddress && ethPrice && isAddress(poolAddress)) {
+        fetchData()
+      } else {
+        setError(true)
+      }
     }
-  }, [poolAddress, poolData, update, ethPrice, exchangeSubgraphClient, networksInfo])
+  }, [poolAddress, poolData, update, ethPrice, exchangeSubgraphClient, networkInfo, error])
 
-  return poolData || {}
+  return error ? { error: true } : poolData || {}
 }
 
 /**
  * Get most recent txns for a pool
  */
 export function usePoolTransactions(poolAddress) {
-  const exchangeSubgraphClient = useExchangeClient()
+  const [exchangeSubgraphClient] = useExchangeClients()
   const [state, { updatePoolTxns }] = usePoolDataContext()
-  const [networksInfo] = useNetworksInfo()
-  const poolTxns = state?.[networksInfo.CHAIN_ID]?.[poolAddress]?.txns
+  const [[networkInfo]] = useNetworksInfo()
+  const poolTxns = state?.[networkInfo.chainId]?.[poolAddress]?.txns
   useEffect(() => {
     async function checkForTxns() {
       if (!poolTxns) {
         let transactions = await getPoolTransactions(exchangeSubgraphClient, poolAddress)
-        updatePoolTxns(poolAddress, transactions, networksInfo.CHAIN_ID)
+        transactions.burns?.forEach(burn => (burn.chainId = networkInfo.chainId))
+        transactions.mints?.forEach(mint => (mint.chainId = networkInfo.chainId))
+        transactions.swaps?.forEach(swap => (swap.chainId = networkInfo.chainId))
+        if (transactions.burns?.length || transactions.mints?.length || transactions.swaps?.length)
+          updatePoolTxns(poolAddress, transactions, networkInfo.chainId)
       }
     }
     checkForTxns()
-  }, [poolTxns, poolAddress, updatePoolTxns, exchangeSubgraphClient])
+  }, [poolTxns, poolAddress, updatePoolTxns, exchangeSubgraphClient, networkInfo.chainId])
   return poolTxns
 }
 
 export function usePoolChartData(poolAddress) {
-  const exchangeSubgraphClient = useExchangeClient()
+  const [exchangeSubgraphClient] = useExchangeClients()
   const [state, { updateChartData }] = usePoolDataContext()
-  const [networksInfo] = useNetworksInfo()
-  const chartData = state?.[networksInfo.CHAIN_ID]?.[poolAddress]?.chartData
+  const [[networkInfo]] = useNetworksInfo()
+  const chartData = state?.[networkInfo.chainId]?.[poolAddress]?.chartData
 
   useEffect(() => {
     async function checkForChartData() {
       if (!chartData) {
         let data = await getPoolChartData(exchangeSubgraphClient, poolAddress)
-        updateChartData(poolAddress, data, networksInfo.CHAIN_ID)
+        data && updateChartData(poolAddress, data, networkInfo.chainId)
       }
     }
     checkForChartData()
-  }, [chartData, poolAddress, updateChartData, exchangeSubgraphClient])
+  }, [chartData, poolAddress, updateChartData, exchangeSubgraphClient, networkInfo.chainId])
   return chartData
 }
 
 /**
- * Get list of all pools in Uniswap
+ * Get list of all pools in Kyberswap
  */
 export function useAllPoolData() {
   const [state] = usePoolDataContext()
   const [networksInfo] = useNetworksInfo()
-  return state?.[networksInfo.CHAIN_ID] || {}
+  return networksInfo.map(networkInfo => state?.[networkInfo.chainId] || {})
 }

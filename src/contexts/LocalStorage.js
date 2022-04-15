@@ -47,7 +47,7 @@ function init() {
     [VERSION]: CURRENT_VERSION,
     [DARK_MODE]: true,
     [DISMISSED_PATHS]: {},
-    [SAVED_ACCOUNTS]: {},
+    [SAVED_ACCOUNTS]: [],
     [SAVED_TOKENS]: {},
     [SAVED_PAIRS]: {},
     [SAVED_POOLS]: {},
@@ -116,19 +116,24 @@ export function usePathDismissed(path) {
 
 export function useSavedAccounts() {
   const [state, { updateKey }] = useLocalStorageContext()
-  const savedAccounts = Object.values(state?.[SAVED_ACCOUNTS])
+  const savedAccounts =
+    state?.[SAVED_ACCOUNTS]?.filter?.(Boolean).map(acc => ({ ...acc, address: acc.address?.toLowerCase?.() })) ?? []
 
   function addAccount(address, chainId) {
-    let currentAccounts = state?.[SAVED_ACCOUNTS]
     address = address.toLowerCase()
-    currentAccounts[address] = { address, chainId }
-    updateKey(SAVED_ACCOUNTS, currentAccounts)
+    if (!savedAccounts.find(account => account.address === address && account.chainId === chainId)) {
+      savedAccounts.push({ address, chainId })
+      updateKey(SAVED_ACCOUNTS, savedAccounts)
+    }
   }
 
-  function removeAccount(address) {
-    let newAccounts = state?.[SAVED_ACCOUNTS]
-    delete newAccounts[address.toLowerCase()]
-    updateKey(SAVED_ACCOUNTS, newAccounts)
+  function removeAccount(address, chainId) {
+    address = address.toLowerCase()
+    let index = savedAccounts.findIndex(account => account.address === address && account.chainId === chainId)
+    if (index > -1) {
+      savedAccounts.splice(index, 1)
+    }
+    updateKey(SAVED_ACCOUNTS, savedAccounts)
   }
 
   return [savedAccounts, addAccount, removeAccount]

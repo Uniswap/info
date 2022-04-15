@@ -1,5 +1,5 @@
 import gql from 'graphql-tag'
-import { getFACTORY_ADDRESS, BUNDLE_ID } from '../constants'
+import { BUNDLE_ID } from '../constants'
 
 export const SUBGRAPH_BLOCK_NUMBER = () => gql`
   query block_number {
@@ -498,25 +498,21 @@ export const GLOBAL_CHART = gql`
       date
       totalVolumeUSD
       dailyVolumeUSD
-      dailyVolumeETH
       totalLiquidityUSD
-      totalLiquidityETH
     }
   }
 `
 
-export const GLOBAL_DATA = (networksInfo, block) => {
-  const queryString = ` query dmmFactories {
+export const GLOBAL_DATA = (networkInfo, block) => {
+  const queryString = `query dmmFactories {
     dmmFactories(
        ${block ? `block: { number: ${block}}` : ``}
-       where: { id: "${getFACTORY_ADDRESS(networksInfo).toLowerCase()}" }) {
+       where: { id: "${(networkInfo.factoryAddress || '0x0639542a5cd99bd5f4e85f58cb1f61d8fbe32de9').toLowerCase()}" }) {
         id
         totalVolumeUSD
         totalFeeUSD
-        totalVolumeETH
         untrackedVolumeUSD
         totalLiquidityUSD
-        totalLiquidityETH
         txCount
         pairCount
       }
@@ -887,8 +883,8 @@ export const TOKEN_CHART = gql`
       priceUSD
       totalLiquidityToken
       totalLiquidityUSD
-      totalLiquidityETH
-      dailyVolumeETH
+      # totalLiquidityETH
+      # dailyVolumeETH
       dailyVolumeToken
       dailyVolumeUSD
       # mostLiquidPairs {

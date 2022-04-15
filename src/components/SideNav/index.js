@@ -10,7 +10,7 @@ import Title from '../Title'
 import { BasicLink } from '../Link'
 import Link from '../Link'
 import NetworkModal from '../NetworkModal'
-import SwitchNetworkButton from '../SwitcNetworkButton'
+import SwitchNetworkButton from '../SwitchNetworkButton'
 import { ApplicationModal, useModalOpen, useSessionStart } from '../../contexts/Application'
 import { useDarkModeManager } from '../../contexts/LocalStorage'
 import SocialLinks from '../SocialLinks'
@@ -158,16 +158,18 @@ function SideNav() {
                   </Option>
                 </BasicLink>
 
-                <BasicLink to={prefixNetworkURL + `/accounts`}>
-                  <Option activeText={currentUrl === 'accounts' || currentUrl === 'account'}>
-                    <Wallet />
-                    <Text marginLeft='0.75rem'> Wallet Analytics</Text>
-                  </Option>
-                </BasicLink>
+                {currentNetworkURL && (
+                  <BasicLink to={prefixNetworkURL + `/accounts`}>
+                    <Option activeText={currentUrl === 'accounts' || currentUrl === 'account'}>
+                      <Wallet />
+                      <Text marginLeft='0.75rem'> Wallet Analytics</Text>
+                    </Option>
+                  </BasicLink>
+                )}
 
                 <Divider />
 
-                <Link href={addNetworkIdQueryString(networksInfo.DMM_SWAP_URL, networksInfo)} external>
+                <Link href={addNetworkIdQueryString(networksInfo[0].dmmSwapUrl, networksInfo[0])} external>
                   <Option>
                     <Repeat size={16} style={{ marginRight: '.75rem' }} />
                     Swap

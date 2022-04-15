@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import { Tooltip } from '../QuestionHelper'
+import Tooltip from '../Tooltip'
 import { darken } from 'polished'
 
 const TextWrapper = styled.div`

@@ -8,7 +8,7 @@ import { GET_BLOCK, GET_BLOCKS, SHARE_VALUE } from '../apollo/queries'
 import { Text } from 'rebass'
 import _Decimal from 'decimal.js-light'
 import toFormat from 'toformat'
-import { timeframeOptions, getWETH_ADDRESS, getKNC_ADDRESS, ChainId } from '../constants'
+import { timeframeOptions } from '../constants'
 import Numeral from 'numeral'
 import { OverflowTooltip } from '../components/Tooltip'
 
@@ -46,31 +46,29 @@ export function getTimeframe(timeWindow) {
 
 export function addNetworkIdQueryString(url, networkInfo) {
   if (url.includes('?')) {
-    return `${url}&networkId=${networkInfo.CHAIN_ID}`
+    return `${url}&networkId=${networkInfo.chainId}`
   }
 
-  return `${url}?networkId=${networkInfo.CHAIN_ID}`
+  return `${url}?networkId=${networkInfo.chainId}`
 }
 
 export function getPoolLink(token0Address, networkInfo, token1Address = null, remove = false, poolAddress = null) {
-  const nativeTokenSymbol = getNativeTokenSymbol(networkInfo)
+  const nativeTokenSymbol = networkInfo.nativeTokenSymbol
 
   if (poolAddress) {
     if (!token1Address) {
       return addNetworkIdQueryString(
-        networkInfo.DMM_SWAP_URL +
+        networkInfo.dmmSwapUrl +
           (remove ? `remove` : `add`) +
-          `/${
-            token0Address === getWETH_ADDRESS(networkInfo) ? nativeTokenSymbol : token0Address
-          }/${nativeTokenSymbol}/${poolAddress}`,
+          `/${token0Address === networkInfo.wethAddress ? nativeTokenSymbol : token0Address}/${nativeTokenSymbol}/${poolAddress}`,
         networkInfo
       )
     } else {
       return addNetworkIdQueryString(
-        networkInfo.DMM_SWAP_URL +
+        networkInfo.dmmSwapUrl +
           (remove ? `remove` : `add`) +
-          `/${token0Address === getWETH_ADDRESS(networkInfo) ? nativeTokenSymbol : token0Address}/${
-            token1Address === getWETH_ADDRESS(networkInfo) ? nativeTokenSymbol : token1Address
+          `/${token0Address === networkInfo.wethAddress ? nativeTokenSymbol : token0Address}/${
+            token1Address === networkInfo.wethAddress ? nativeTokenSymbol : token1Address
           }/${poolAddress}`,
         networkInfo
       )
@@ -79,17 +77,17 @@ export function getPoolLink(token0Address, networkInfo, token1Address = null, re
 
   if (!token1Address) {
     return addNetworkIdQueryString(
-      networkInfo.DMM_SWAP_URL +
+      networkInfo.dmmSwapUrl +
         (remove ? `remove` : `add`) +
-        `/${token0Address === getWETH_ADDRESS(networkInfo) ? nativeTokenSymbol : token0Address}/${nativeTokenSymbol}`,
+        `/${token0Address === networkInfo.wethAddress ? nativeTokenSymbol : token0Address}/${nativeTokenSymbol}`,
       networkInfo
     )
   } else {
     return addNetworkIdQueryString(
-      networkInfo.DMM_SWAP_URL +
+      networkInfo.dmmSwapUrl +
         (remove ? `remove` : `add`) +
-        `/${token0Address === getWETH_ADDRESS(networkInfo) ? nativeTokenSymbol : token0Address}/${
-          token1Address === getWETH_ADDRESS(networkInfo) ? nativeTokenSymbol : token1Address
+        `/${token0Address === networkInfo.wethAddress ? nativeTokenSymbol : token0Address}/${
+          token1Address === networkInfo.wethAddress ? nativeTokenSymbol : token1Address
         }`,
       networkInfo
     )
@@ -97,15 +95,15 @@ export function getPoolLink(token0Address, networkInfo, token1Address = null, re
 }
 
 export function getSwapLink(token0Address, networkInfo, token1Address = null) {
-  const nativeTokenSymbol = getNativeTokenSymbol(networkInfo)
+  const nativeTokenSymbol = networkInfo.nativeTokenSymbol
 
   if (!token1Address) {
-    return addNetworkIdQueryString(`${networkInfo.DMM_SWAP_URL}swap?inputCurrency=${token0Address}`, networkInfo)
+    return addNetworkIdQueryString(`${networkInfo.dmmSwapUrl}swap?inputCurrency=${token0Address}`, networkInfo)
   } else {
     return addNetworkIdQueryString(
-      `${networkInfo.DMM_SWAP_URL}swap?inputCurrency=${
-        token0Address === getWETH_ADDRESS(networkInfo) ? nativeTokenSymbol : token0Address
-      }&outputCurrency=${token1Address === getWETH_ADDRESS(networkInfo) ? nativeTokenSymbol : token1Address}`,
+      `${networkInfo.dmmSwapUrl}swap?inputCurrency=${
+        token0Address === networkInfo.wethAddress ? nativeTokenSymbol : token0Address
+      }&outputCurrency=${token1Address === networkInfo.wethAddress ? nativeTokenSymbol : token1Address}`,
       networkInfo
     )
   }
@@ -170,17 +168,12 @@ export async function splitQuery(query, localClient, vars, list, skipCount = 100
  * @dev Query speed is optimized by limiting to a 600-second period
  * @param {Int} timestamp in seconds
  */
-const cacheGetBlockFromTimestamp = {}
 export async function getBlockFromTimestamp(timestamp, networkInfo) {
-  if (parseInt(timestamp) < parseInt(networkInfo.DEFAULT_START_TIME)) {
-    timestamp = parseInt(networkInfo.DEFAULT_START_TIME)
-  }
-  let promise
-  if (cacheGetBlockFromTimestamp[networkInfo.CHAIN_ID]?.[timestamp]) {
-    promise = cacheGetBlockFromTimestamp[networkInfo.CHAIN_ID]?.[timestamp]
-  } else {
-    if (!cacheGetBlockFromTimestamp[networkInfo.CHAIN_ID]) cacheGetBlockFromTimestamp[networkInfo.CHAIN_ID] = {}
-    promise = getBlockClient(networkInfo).query({
+  const run = async () => {
+    if (parseInt(timestamp) < networkInfo.defaultStartTime) {
+      timestamp = networkInfo.defaultStartTime
+    }
+    let result = await getBlockClient(networkInfo).query({
       query: GET_BLOCK,
       variables: {
         timestampFrom: timestamp,
@@ -188,10 +181,9 @@ export async function getBlockFromTimestamp(timestamp, networkInfo) {
       },
       fetchPolicy: 'cache-first',
     })
-    cacheGetBlockFromTimestamp[networkInfo.CHAIN_ID][timestamp] = promise
+    return result?.data?.blocks?.[0]?.number
   }
-  let result = await promise
-  return result?.data?.blocks?.[0]?.number
+  return await memoRequest(run, 'getBlockFromTimestamp_' + timestamp + '_' + networkInfo.chainId, 10000)
 }
 
 /**
@@ -207,7 +199,7 @@ export async function getBlocksFromTimestamps(timestamps, networkInfo, skipCount
   }
 
   timestamps = timestamps.map(t =>
-    parseInt(t) < parseInt(networkInfo.DEFAULT_START_TIME) ? parseInt(networkInfo.DEFAULT_START_TIME) : t
+    parseInt(t) < parseInt(networkInfo.defaultStartTime) ? parseInt(networkInfo.defaultStartTime) : t
   )
 
   let fetchedData = await splitQuery(GET_BLOCKS, getBlockClient(networkInfo), [], timestamps, skipCount)
@@ -344,11 +336,11 @@ export const setThemeColor = theme => document.documentElement.style.setProperty
 
 export const Big = number => new BigNumber(number)
 
-export const getUrls = networkInfo => ({
-  showTransaction: tx => `${networkInfo.ETHERSCAN_URL}/tx/${tx}/`,
-  showAddress: address => `${networkInfo.ETHERSCAN_URL}/address/${address}/`,
-  showToken: address => `${networkInfo.ETHERSCAN_URL}/token/${address}/`,
-  showBlock: block => `${networkInfo.ETHERSCAN_URL}/block/${block}/`,
+export const getEtherScanUrls = networkInfo => ({
+  showTransaction: tx => `${networkInfo.etherscanUrl}/tx/${tx}`,
+  showAddress: address => `${networkInfo.etherscanUrl}/address/${address}`,
+  showToken: address => `${networkInfo.etherscanUrl}/token/${address}`,
+  showBlock: block => `${networkInfo.etherscanUrl}/block/${block}`,
 })
 
 export const formatTime = unix => {
@@ -552,128 +544,6 @@ export function shortenAddress(address, chars = 4) {
   return `${parsed.substring(0, chars + 2)}...${parsed.substring(42 - chars)}`
 }
 
-export function getNativeTokenSymbol(networkInfo) {
-  switch (networkInfo.CHAIN_ID) {
-    case 137:
-      return 'MATIC'
-    case 80001:
-      return 'MATIC'
-    case 56:
-      return 'BNB'
-    case 97:
-      return 'BNB'
-    case 43114:
-      return 'AVAX'
-    case 250:
-      return 'FTM'
-    case 25:
-      return 'CRO'
-    case 338:
-      return 'CRO'
-    case 106:
-      return 'VLX'
-    case ChainId.AURORA:
-      return 'ETH'
-    case ChainId.OASIS:
-      return 'ROSE'
-    default:
-      return 'ETH'
-  }
-}
-
-export function getNativeTokenWrappedName(networkInfo) {
-  switch (networkInfo.CHAIN_ID) {
-    case 137:
-      return 'Matic (Wrapped)'
-    case 80001:
-      return 'Matic (Wrapped)'
-    case 56:
-      return 'BNB (Wrapped)'
-    case 97:
-      return 'BNB (Wrapped)'
-    case 43114:
-      return 'AVAX (Wrapped)'
-    case 250:
-      return 'FTM (Wrapped)'
-    case 25:
-      return 'CRO (Wrapped)'
-    case 338:
-      return 'CRO (Wrapped)'
-    case 106:
-      return 'VLX (Wrapped)'
-    case ChainId.AURORA:
-      return 'ETH (Wrapped)'
-    case ChainId.OASIS:
-      return 'ROSE (Wrapped)'
-    default:
-      return 'Ether (Wrapped)'
-  }
-}
-
-export function getEtherscanLinkText(networkInfo) {
-  switch (networkInfo.CHAIN_ID) {
-    case 137:
-      return 'Polygonscan'
-    case 80001:
-      return 'Polygonscan'
-    case 56:
-      return 'Bscscan'
-    case 97:
-      return 'Bscscan'
-    case 43114:
-      return 'Snowtrace'
-    case 250:
-      return 'Ftmscan'
-    case 338:
-      return 'Explorer'
-    case 25:
-      return 'Explorer'
-    case 421611:
-      return 'Arbiscan'
-    case 42161:
-      return 'Arbiscan'
-    case ChainId.BTTC:
-      return 'Bttcscan'
-    case ChainId.VELAS:
-      return 'Velas EVM Explorer'
-    case ChainId.AURORA:
-      return 'Aurora Explorer'
-    case ChainId.OASIS:
-      return 'Oasis Emerald Explorer'
-    default:
-      return 'Etherscan'
-  }
-}
-
-export function getDefaultAddLiquidityUrl(networkInfo) {
-  switch (networkInfo.CHAIN_ID) {
-    case 137:
-      return `${networkInfo.DMM_SWAP_URL}pools/0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619/${getKNC_ADDRESS(networkInfo)}`
-    case 80001:
-      return `${networkInfo.DMM_SWAP_URL}pools/0x19395624C030A11f58e820C3AeFb1f5960d9742a/${getKNC_ADDRESS(networkInfo)}`
-    case 56:
-      return `${networkInfo.DMM_SWAP_URL}pools/BNB`
-    case 97:
-      return `${networkInfo.DMM_SWAP_URL}pools/BNB`
-    case 43114:
-      return `${networkInfo.DMM_SWAP_URL}pools/AVAX`
-    case 250:
-      return `${networkInfo.DMM_SWAP_URL}pools/FTM`
-    case 25:
-      return `${networkInfo.DMM_SWAP_URL}pools/CRO`
-    case 338:
-      return `${networkInfo.DMM_SWAP_URL}pools/CRO`
-    case 106:
-      return `${networkInfo.DMM_SWAP_URL}pools/VLX`
-    case ChainId.AURORA:
-      return `${networkInfo.DMM_SWAP_URL}pools/ETH`
-    case ChainId.OASIS:
-      return `${networkInfo.DMM_SWAP_URL}pools/ROSE`
-    default:
-      return `${networkInfo.DMM_SWAP_URL}pools/ETH/${getKNC_ADDRESS(networkInfo)}`
-  }
-}
-
 /**
  * Format big number of money into easy to read format
  * e.x: 299792458 => 299.8M
@@ -711,7 +581,11 @@ export const formatBigLiquidity = (num, decimals, usd = true) => {
 export const overwriteArrayMerge = (destinationArray, sourceArray, options) => sourceArray
 
 const cacheMemoRequest = {}
-export const memoRequest = async (request, key) => {
+export const memoRequest = async (request, key, cacheTimeout = 0) => {
+  const clearCache = () => {
+    cacheMemoRequest[key] = null
+  }
+
   if (cacheMemoRequest[key]) {
     return await cacheMemoRequest[key]
   }
@@ -719,10 +593,14 @@ export const memoRequest = async (request, key) => {
   let result
   try {
     result = await cacheMemoRequest[key]
-    cacheMemoRequest[key] = null
+    setTimeout(clearCache, cacheTimeout)
   } catch (e) {
-    cacheMemoRequest[key] = null
+    setTimeout(clearCache, cacheTimeout)
     throw e
   }
   return result
+}
+
+export const isAllChainLoadDone = allChainData => {
+  return allChainData && allChainData.length && allChainData.every(Boolean)
 }

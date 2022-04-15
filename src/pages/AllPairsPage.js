@@ -9,9 +9,11 @@ import { PageWrapper, FullWrapper } from '../components'
 import { RowBetween } from '../components/Row'
 import Search from '../components/Search'
 import { useMedia } from 'react-use'
+import { useParams } from 'react-router-dom'
 
 function AllPairsPage() {
   const allPairs = useAllPairData()
+  const { network: currentNetworkURL } = useParams()
 
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -24,7 +26,7 @@ function AllPairsPage() {
       <FullWrapper>
         <RowBetween>
           <TYPE.largeHeader>Top Pairs</TYPE.largeHeader>
-          {!below800 && <Search small={true} />}
+          {currentNetworkURL && !below800 && <Search small={true} />}
         </RowBetween>
         <Panel style={{ padding: '0' }}>
           <PairList pairs={allPairs} disbaleLinks={true} maxItems={15} />

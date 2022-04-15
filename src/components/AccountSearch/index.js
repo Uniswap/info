@@ -13,7 +13,10 @@ import { Divider } from '..'
 import { Flex, Text } from 'rebass'
 
 import { X } from 'react-feather'
-import { NetworksInfoEnv, useNetworksInfo } from '../../contexts/NetworkInfo'
+import { NETWORK_INFOS } from '../../constants/networks'
+import { useNetworksInfo } from '../../contexts/NetworkInfo'
+import { BasicLink } from '../Link'
+import { RowFixed } from '../Row'
 
 const Input = styled.input`
   position: relative;
@@ -36,11 +39,22 @@ const Input = styled.input`
     font-size: 12px;
   }
 `
+const Wrapper = styled.div`
+  ${({ isWrap, theme }) =>
+    isWrap
+      ? `
+  justify-content: space-between;
+  background-color: ${theme.bg4};
+  border-radius: 24px;
+  padding: 8px;
+  `
+      : ''}
+  color: ${({ theme }) => theme.text10};
+`
 
 const AccountLink = styled.span`
-  display: flex;
   cursor: pointer;
-  color: ${({ theme }) => theme.primary};
+  ${({ isSmall, theme }) => !isSmall && `color: ${theme.primary};`}
   font-size: 14px;
   font-weight: 500;
 `
@@ -60,14 +74,12 @@ const DashGrid = styled.div`
 function AccountSearch({ history, small, shortenAddress }) {
   const [accountValue, setAccountValue] = useState()
   const [savedAccounts, addAccount, removeAccount] = useSavedAccounts()
-  const [networksInfo] = useNetworksInfo()
+  const [[networkInfo]] = useNetworksInfo()
 
   function handleAccountSearch() {
     if (isAddress(accountValue.trim())) {
-      history.push('/' + networksInfo.URL_KEY + '/account/' + accountValue.trim())
-      if (!savedAccounts.find(account => account.address === accountValue.toLowerCase().trim())) {
-        addAccount(accountValue, networksInfo.CHAIN_ID)
-      }
+      history.push('/' + networkInfo.urlKey + '/account/' + accountValue.trim())
+      addAccount(accountValue.trim(), networkInfo.chainId)
     }
   }
 
@@ -109,27 +121,24 @@ function AccountSearch({ history, small, shortenAddress }) {
             savedAccounts.map(account => {
               return (
                 <DashGrid key={account.address} center={true} style={{ height: 'fit-content', padding: '1rem 0 0 0' }}>
-                  <Flex
-                    area='account'
-                    justifyContent='space-between'
-                    onClick={() =>
-                      history.push(
-                        '/' +
-                          NetworksInfoEnv.find(network => network.CHAIN_ID === account.chainId).URL_KEY +
-                          '/account/' +
-                          account.address
-                      )
-                    }
-                  >
-                    <AccountLink>
-                      {shortenAddress || small
-                        ? `${account.address?.slice(0, 6) + '...' + account.address?.slice(38, 42)}`
-                        : account.address?.slice(0, 42)}
-                    </AccountLink>
+                  <Flex area='account' justifyContent='space-between'>
+                    <Wrapper isWrap={small}>
+                      <BasicLink to={'/' + NETWORK_INFOS[account.chainId]?.urlKey + '/account/' + account.address}>
+                        <RowFixed>
+                          {small && <img src={NETWORK_INFOS[account.chainId].icon} width='16px' style={{ marginRight: '4px' }} />}
+                          <AccountLink isSmall={small}>
+                            {shortenAddress || small
+                              ? `${account.address?.slice(0, 6) + '...' + account.address?.slice(38, 42)}`
+                              : account.address?.slice(0, 42)}
+                          </AccountLink>
+                        </RowFixed>
+                      </BasicLink>
+                    </Wrapper>
+
                     <Hover
                       onClick={e => {
                         e.stopPropagation()
-                        removeAccount(account.address)
+                        removeAccount(account.address, account.chainId)
                       }}
                     >
                       <StyledIcon>

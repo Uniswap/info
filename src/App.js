@@ -23,11 +23,7 @@ import useTheme from './hooks/useTheme'
 import BottomBar from './components/BottomBar'
 import KyberSwapAnounce from './components/KyberSwapAnnounce'
 import { NetworksInfoEnv, useNetworksInfo } from './contexts/NetworkInfo'
-import { Updater as LocalStorageContextUpdater } from './contexts/LocalStorage'
-import { Updater as TokenDataContextUpdater } from './contexts/TokenData'
-import { Updater as PairDataContextUpdater } from './contexts/PairData'
-import { Updater as PoolDataContextUpdater } from './contexts/PoolData'
-import GoogleAnalyticsReporter from './components/GoogleAnalyticsReporter'
+import { ChainId } from './constants/networks'
 
 const AppWrapper = styled.div`
   position: relative;
@@ -103,29 +99,28 @@ const Marginer = styled.div`
   margin-top: 3rem;
 `
 
-function Updaters() {
-  return (
-    <>
-      <LocalStorageContextUpdater />
-      <PairDataContextUpdater />
-      <PoolDataContextUpdater />
-      <TokenDataContextUpdater />
-    </>
-  )
-}
-
 function AppLogicWrapper(props) {
   const theme = useTheme()
   const [networksInfo] = useNetworksInfo()
   const globalData = useGlobalData()
   const globalChartData = useGlobalChartData()
-  const [latestBlock, headBlock] = useLatestBlocks()
+  const [latestBlocks, headBlocks] = useLatestBlocks()
 
   const [dismissed, markAsDismissed] = useState(false)
 
   // show warning
-  const BLOCK_DIFFERENCE_THRESHOLD = networksInfo.length === 1 && networksInfo.CHAIN_ID === 137 ? 210 : 30
-  const showWarning = headBlock && latestBlock ? headBlock - latestBlock > BLOCK_DIFFERENCE_THRESHOLD : false
+  const BLOCK_DIFFERENCE_THRESHOLD = !networksInfo.slice(1).some(Boolean) && networksInfo[0].chainId === ChainId.MATIC ? 210 : 30
+  const showWarning = networksInfo
+    .map((networkInfo, i) =>
+      headBlocks[i] && latestBlocks[i]
+        ? headBlocks[i] - latestBlocks[i] > BLOCK_DIFFERENCE_THRESHOLD && {
+            networkInfo,
+            latestBlock: latestBlocks[i],
+            headBlock: headBlocks[i],
+          }
+        : false
+    )
+    .find(Boolean)
   return (
     <AppWrapper>
       {!dismissed && showWarning && (
@@ -135,7 +130,7 @@ function AppLogicWrapper(props) {
               <Text fontWeight={500} fontSize={14} color={'#ffaf01'} style={{ display: 'inline' }} mr={'8px'}>
                 Warning:
               </Text>
-              {`The data on this site has only synced to ${networksInfo.NAME} block ${latestBlock} (out of ${headBlock}). Please check back soon.`}
+              {`The data on this site has only synced to ${showWarning.networkInfo.name} block ${showWarning.latestBlock} (out of ${showWarning.headBlock}). Please check back soon.`}
             </div>
 
             <CloseButtonWrapper>
@@ -146,11 +141,11 @@ function AppLogicWrapper(props) {
           </WarningBanner>
         </WarningWrapper>
       )}
-      {latestBlock &&
-      globalData &&
-      Object.keys(globalData).length > 0 &&
-      globalChartData &&
-      Object.keys(globalChartData).length > 0 ? (
+      {latestBlocks[0] &&
+      globalData[0] &&
+      Object.keys(globalData[0]).length > 0 &&
+      globalChartData[0] &&
+      Object.keys(globalChartData[0]).length > 0 ? (
         props.children
       ) : (
         <LocalLoader fill='true' size='200px' />
@@ -166,23 +161,19 @@ function AppLogicWrapper(props) {
  */
 const LayoutWrapper = props => {
   const { network: currentNetworkURL } = useParams()
-  const [networksInfo, updateChain] = useNetworksInfo()
-  let networkInfoFromURL = NetworksInfoEnv.find(networkInfo => networkInfo.URL_KEY === currentNetworkURL)
+  const [, updateChain] = useNetworksInfo()
+  let networkInfoFromURL = NetworksInfoEnv.find(networkInfo => networkInfo.urlKey === currentNetworkURL)
 
   useEffect(() => {
     if (!currentNetworkURL) {
-      updateChain(NetworksInfoEnv[0].ENV_KEY) //default for ETH right now, will change to handle all chain later
+      updateChain('allchain')
     } else if (networkInfoFromURL) {
-      updateChain(networkInfoFromURL.ENV_KEY)
+      updateChain(networkInfoFromURL.chainId || 'allchain')
     }
   }, [currentNetworkURL, networkInfoFromURL, updateChain])
   if (currentNetworkURL && !networkInfoFromURL) return <Redirect to='/home' />
-  if (!currentNetworkURL && !networkInfoFromURL) networkInfoFromURL = NetworksInfoEnv[0] //default for ETH right now, will change to handle all chain later
-  if (networksInfo !== networkInfoFromURL) return null
   return (
     <AppLogicWrapper>
-      <GoogleAnalyticsReporter />
-      <Updaters />
       <KyberSwapAnounce />
       <ContentWrapper open={props.savedOpen}>
         <SideNav />
@@ -213,14 +204,11 @@ function App() {
             if (OVERVIEW_TOKEN_BLACKLIST.includes(match.params.tokenAddress.toLowerCase())) {
               return <Redirect to={`/${match.params.network}/home`} />
             }
-            if (isAddress(match.params.tokenAddress.toLowerCase())) {
-              return (
-                <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
-                  <TokenPage address={match.params.tokenAddress.toLowerCase()} />
-                </LayoutWrapper>
-              )
-            }
-            return <Redirect to={`/${match.params.network}/home`} />
+            return (
+              <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
+                <TokenPage address={match.params.tokenAddress.toLowerCase()} />
+              </LayoutWrapper>
+            )
           }}
         />
 
@@ -297,14 +285,15 @@ function App() {
           )}
         />
         <Route
-          path='/:network?/accounts'
+          path='/:network/accounts'
           render={() => (
             <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
               <AccountLookup />
             </LayoutWrapper>
           )}
         />
-        <Route path='/:network?/*' render={() => <RedirectToHome />} />
+        <Route path='/:network' render={() => <RedirectToHome />} />
+        <Route path='*' render={() => <RedirectToHome />} />
       </Switch>
     </BrowserRouter>
   )

@@ -11,11 +11,15 @@ import { Divider } from '..'
 
 import { formattedNum, formattedPercent } from '../../utils'
 import { useMedia } from 'react-use'
-import { useParams, withRouter } from 'react-router-dom'
+import { Link, withRouter } from 'react-router-dom'
 import { OVERVIEW_TOKEN_BLACKLIST } from '../../constants'
 import FormattedName from '../FormattedName'
 import { TYPE } from '../../Theme'
 import LocalLoader from '../LocalLoader'
+import { useAllTokenData } from '../../contexts/TokenData'
+import { NETWORK_INFOS } from '../../constants/networks'
+import { aggregateTokens } from '../../utils/aggregateData'
+import { MouseoverTooltip } from '../Tooltip'
 
 dayjs.extend(utc)
 
@@ -43,8 +47,8 @@ const List = styled(Box)`
 const DashGrid = styled.div`
   display: grid;
   grid-gap: 1em;
-  grid-template-columns: 100px 1fr 1fr;
-  grid-template-areas: 'name liq vol';
+  grid-template-columns: 1.5fr ${({ isShowNetworkColumn }) => (isShowNetworkColumn ? '75px' : '')} 1fr 1fr;
+  grid-template-areas: 'name ${({ isShowNetworkColumn }) => (isShowNetworkColumn ? 'network' : '')} liq vol';
   padding: 0;
 
   > * {
@@ -55,13 +59,17 @@ const DashGrid = styled.div`
       text-align: left;
       width: 100px;
     }
+
+    &:nth-child(2) {
+      justify-content: center;
+    }
   }
 
   @media screen and (min-width: 680px) {
     display: grid;
     grid-gap: 1em;
-    grid-template-columns: 180px 1fr 1fr 1fr 1fr;
-    grid-template-areas: 'name symbol liq price vol ';
+    grid-template-columns: 2fr ${({ isShowNetworkColumn }) => (isShowNetworkColumn ? '75px' : '')} 1fr 1fr 1fr 1fr;
+    grid-template-areas: 'name ${({ isShowNetworkColumn }) => (isShowNetworkColumn ? 'network' : '')} symbol liq price vol ';
 
     > * {
       justify-content: flex-end;
@@ -76,8 +84,9 @@ const DashGrid = styled.div`
   @media screen and (min-width: 1080px) {
     display: grid;
     grid-gap: 0.5em;
-    grid-template-columns: 1.5fr 0.6fr 1fr 1fr 1fr 1fr;
-    grid-template-areas: 'name symbol liq vol price change';
+    grid-template-columns: 2fr ${({ isShowNetworkColumn }) => (isShowNetworkColumn ? '75px' : '')} 1fr 1fr 1fr 1fr 1fr;
+    grid-template-areas: 'name ${({ isShowNetworkColumn }) =>
+      isShowNetworkColumn ? 'network' : ''} symbol liq vol price change';
   }
 `
 const TableHeader = styled(DashGrid)`
@@ -126,12 +135,18 @@ const SORT_FIELD = {
   VOL: 'oneDayVolumeUSD',
   SYMBOL: 'symbol',
   NAME: 'name',
+  NETWORK: 'network',
   PRICE: 'priceUSD',
   CHANGE: 'priceChangeUSD',
 }
 
 // @TODO rework into virtualized list
-function TopTokenList({ tokens, itemMax = 5 }) {
+function TopTokenList({ itemMax = 5 }) {
+  const tokens = useAllTokenData()
+  const isShowNetworkColumn = tokens?.slice(1).some(Boolean)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const aggregatedTokens = useMemo(() => aggregateTokens(tokens.filter(Boolean)), [JSON.stringify(tokens)])
+
   // page state
   const [page, setPage] = useState(1)
   const [maxPage, setMaxPage] = useState(1)
@@ -143,28 +158,21 @@ function TopTokenList({ tokens, itemMax = 5 }) {
   const below1080 = useMedia('(max-width: 1080px)')
   const below680 = useMedia('(max-width: 680px)')
   const below600 = useMedia('(max-width: 600px)')
-  const { network } = useParams()
-  const prefixNetworkURL = network ? `/${network}` : ''
-
-  useEffect(() => {
-    setMaxPage(1) // edit this to do modular
-    setPage(1)
-  }, [tokens])
 
   const formattedTokens = useMemo(() => {
     return (
-      tokens &&
-      Object.keys(tokens)
+      aggregatedTokens &&
+      Object.keys(aggregatedTokens)
         .filter(key => {
           return !OVERVIEW_TOKEN_BLACKLIST.includes(key)
         })
         .filter(key => {
-          return tokens[key]
+          return aggregatedTokens[key]
         })
-        .filter(key => tokens[key].name !== 'error-token')
-        .map(key => tokens[key])
+        .filter(key => aggregatedTokens[key].name !== 'error-token')
+        .map(key => aggregatedTokens[key])
     )
-  }, [tokens])
+  }, [aggregatedTokens])
 
   useEffect(() => {
     if (tokens && formattedTokens) {
@@ -181,25 +189,43 @@ function TopTokenList({ tokens, itemMax = 5 }) {
       formattedTokens &&
       formattedTokens
         .sort((a, b) => {
+          let valueToCompareA = null
+          let valueToCompareB = null
           if (sortedColumn === SORT_FIELD.SYMBOL || sortedColumn === SORT_FIELD.NAME) {
-            return a[sortedColumn] > b[sortedColumn] ? (sortDirection ? -1 : 1) * 1 : (sortDirection ? -1 : 1) * -1
+            //reverse order
+            valueToCompareB = a[sortedColumn].toLowerCase()
+            valueToCompareA = b[sortedColumn].toLowerCase()
+          } else if (sortedColumn === SORT_FIELD.NETWORK) {
+            //reverse order
+            valueToCompareB = NETWORK_INFOS[a.chainId].name
+            valueToCompareA = NETWORK_INFOS[b.chainId].name
+          } else {
+            valueToCompareA = parseFloat(a[sortedColumn])
+            valueToCompareB = parseFloat(b[sortedColumn])
           }
-          return parseFloat(a[sortedColumn]) > parseFloat(b[sortedColumn])
-            ? (sortDirection ? -1 : 1) * 1
-            : (sortDirection ? -1 : 1) * -1
+          if (valueToCompareA == valueToCompareB) {
+            if (a.totalLiquidityUSD == b.totalLiquidityUSD) {
+              return (below680 ? a.symbol : a.name).toLowerCase() > (below680 ? b.symbol : b.name).toLowerCase() ? 1 : -1
+            }
+            return a.totalLiquidityUSD < b.totalLiquidityUSD ? 1 : -1
+          }
+          return valueToCompareA > valueToCompareB ? (sortDirection ? -1 : 1) * 1 : (sortDirection ? -1 : 1) * -1
         })
         .slice(itemMax * (page - 1), page * itemMax)
     )
-  }, [formattedTokens, itemMax, page, sortDirection, sortedColumn])
+  }, [below680, formattedTokens, itemMax, page, sortDirection, sortedColumn])
 
   const ListItem = ({ item, index }) => {
     return (
-      <DashGrid style={{ height: '56px' }} focus={true}>
+      <DashGrid style={{ height: '56px' }} focus={true} isShowNetworkColumn={isShowNetworkColumn}>
         <DataText area='name' fontWeight='500'>
           <Row>
             {!below680 && <div style={{ marginRight: '1rem', width: '10px' }}>{index}</div>}
-            <TokenLogo address={item.id} />
-            <CustomLink style={{ marginLeft: '16px', whiteSpace: 'nowrap' }} to={prefixNetworkURL + '/token/' + item.id}>
+            <TokenLogo address={item.id} networkInfo={NETWORK_INFOS[item.chainId]} />
+            <CustomLink
+              style={{ marginLeft: '16px', whiteSpace: 'nowrap' }}
+              to={'/' + NETWORK_INFOS[item.chainId].urlKey + '/token/' + item.id}
+            >
               <FormattedName
                 text={below680 ? item.symbol : item.name}
                 maxCharacters={below600 ? 8 : 16}
@@ -209,6 +235,15 @@ function TopTokenList({ tokens, itemMax = 5 }) {
             </CustomLink>
           </Row>
         </DataText>
+        {isShowNetworkColumn && (
+          <DataText area='network'>
+            <Link to={'/' + NETWORK_INFOS[item.chainId].urlKey}>
+              <MouseoverTooltip text={NETWORK_INFOS[item.chainId].name} width='unset'>
+                <img src={NETWORK_INFOS[item.chainId].icon} width={25} />
+              </MouseoverTooltip>
+            </Link>
+          </DataText>
+        )}
         {!below680 && (
           <DataText area='symbol' fontWeight='500'>
             <FormattedName text={item.symbol} maxCharacters={6} />
@@ -228,7 +263,7 @@ function TopTokenList({ tokens, itemMax = 5 }) {
 
   return (
     <ListWrapper>
-      <TableHeader center={true} style={{ height: 'fit-content' }}>
+      <TableHeader center={true} style={{ height: 'fit-content' }} isShowNetworkColumn={isShowNetworkColumn}>
         <Flex alignItems='center' justifyContent='flexStart'>
           <ClickableText
             area='name'
@@ -241,6 +276,20 @@ function TopTokenList({ tokens, itemMax = 5 }) {
             {below680 ? 'Symbol' : 'Name'} {sortedColumn === SORT_FIELD.NAME ? (!sortDirection ? '↑' : '↓') : ''}
           </ClickableText>
         </Flex>
+        {isShowNetworkColumn && (
+          <Flex alignItems='center' justifyContent='center'>
+            <ClickableText
+              area='network'
+              fontWeight='500'
+              onClick={e => {
+                setSortedColumn(SORT_FIELD.NETWORK)
+                setSortDirection(sortedColumn !== SORT_FIELD.NETWORK ? true : !sortDirection)
+              }}
+            >
+              Network {sortedColumn === SORT_FIELD.NETWORK ? (!sortDirection ? '↑' : '↓') : ''}
+            </ClickableText>
+          </Flex>
+        )}
         {!below680 && (
           <Flex alignItems='center'>
             <ClickableText

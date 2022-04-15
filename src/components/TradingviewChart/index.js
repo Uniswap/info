@@ -4,7 +4,6 @@ import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { formattedNum } from '../../utils'
 import styled from 'styled-components'
-import { usePrevious } from 'react-use'
 import { Play } from 'react-feather'
 import { useDarkModeManager } from '../../contexts/LocalStorage'
 import { IconWrapper } from '..'
@@ -30,18 +29,18 @@ const TradingViewChart = ({ type = CHART_TYPES.BAR, data, base, baseChange, fiel
 
   // pointer to the chart object
   const [chartCreated, setChartCreated] = useState(false)
-  const dataPrev = usePrevious(data)
+  const [darkMode] = useDarkModeManager()
+  const theme = useTheme()
+  const textColor = darkMode ? 'white' : 'black'
 
   useEffect(() => {
-    if (data !== dataPrev && chartCreated && type === CHART_TYPES.BAR) {
-      // remove the tooltip element
-      let tooltip = document.getElementById('tooltip-id' + type)
-      let node = document.getElementById('test-id' + type)
-      node.removeChild(tooltip)
+    if (chartCreated) {
+      ref.current.innerHTML = ''
       chartCreated.resize(0, 0)
       setChartCreated()
     }
-  }, [chartCreated, data, dataPrev, type])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [base, baseChange, JSON.stringify(data), type, darkMode])
 
   // parese the data and format for tardingview consumption
   const formattedData = data?.map(entry => {
@@ -53,23 +52,6 @@ const TradingViewChart = ({ type = CHART_TYPES.BAR, data, base, baseChange, fiel
 
   // adjust the scale based on the type of chart
   const topScale = type === CHART_TYPES.AREA ? 0.32 : 0.2
-
-  const theme = useTheme()
-  const [darkMode] = useDarkModeManager()
-  const textColor = darkMode ? 'white' : 'black'
-  const previousTheme = usePrevious(darkMode)
-
-  // reset the chart if them switches
-  useEffect(() => {
-    if (chartCreated && previousTheme !== darkMode) {
-      // remove the tooltip element
-      let tooltip = document.getElementById('tooltip-id' + type)
-      let node = document.getElementById('test-id' + type)
-      node.removeChild(tooltip)
-      chartCreated.resize(0, 0)
-      setChartCreated()
-    }
-  }, [chartCreated, darkMode, previousTheme, type])
 
   // if no chart created yet, create one with options and add to DOM manually
   useEffect(() => {
@@ -142,7 +124,6 @@ const TradingViewChart = ({ type = CHART_TYPES.BAR, data, base, baseChange, fiel
 
       series.setData(formattedData)
       var toolTip = document.createElement('div')
-      toolTip.setAttribute('id', 'tooltip-id' + type)
       toolTip.className = darkMode ? 'three-line-legend-dark' : 'three-line-legend'
       ref.current.appendChild(toolTip)
       toolTip.style.display = 'block'
@@ -203,17 +184,26 @@ const TradingViewChart = ({ type = CHART_TYPES.BAR, data, base, baseChange, fiel
         }
       })
 
-      chart.timeScale().fitContent()
+      // chart.timeScale().fitContent()
+      if (formattedData.length) {
+        chart.timeScale().setVisibleRange({
+          from: new Date(Date.UTC(2022, 0, 1, 0, 0, 0, 0)).getTime() / 1000,
+          to: new Date(Date.UTC(2050, 0, 1, 0, 0, 0, 0)).getTime() / 1000,
+        })
+      }
 
       setChartCreated(chart)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     base,
     baseChange,
     chartCreated,
     darkMode,
-    data,
-    formattedData,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // JSON.stringify(data),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    JSON.stringify(formattedData),
     textColor,
     title,
     topScale,
@@ -233,7 +223,7 @@ const TradingViewChart = ({ type = CHART_TYPES.BAR, data, base, baseChange, fiel
 
   return (
     <Wrapper>
-      <div ref={ref} id={'test-id' + type} />
+      <div ref={ref} />
       <IconWrapper>
         <Play
           onClick={() => {

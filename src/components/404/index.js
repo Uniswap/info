@@ -2,6 +2,8 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 import MaintenanceImg from '../../assets/404.svg'
+import MaintenanceImgWhite from '../../assets/404white.svg'
+import { useDarkModeManager } from '../../contexts/LocalStorage'
 
 const StyledLink = styled(Link)`
   text-decoration: none;
@@ -61,31 +63,34 @@ const ButtonText = styled.span`
 `
 
 const Page404 = ({ type, currentChainName, availableChains, redirectLink }) => {
+  const [isDarkMode] = useDarkModeManager()
+
   let message, linkMessage
-  if (availableChains?.length) {
-    const availableChainElement = availableChains
-      .map(availableChain => (
-        <Link to={'/' + availableChain.URL_KEY + '/'} key={availableChain.CHAIN_ID}>
-          {availableChain.NAME}
-        </Link>
-      ))
-      .reduce((accu, elem) => (accu ? [elem] : [...accu, ', ', elem]), null) //join with comma
-    message = (
-      <>
-        This {type} is not available on {currentChainName}. This {type} is only available on these chain: {availableChainElement}
-      </>
-    )
-    linkMessage = <>Or you can go back to {type}s list</>
-  } else {
-    message = <>This {type} is not available.</>
-    linkMessage = <>You can go back to {type}s list</>
-  }
+  const availableChainElement = availableChains
+    ?.map(availableChain => (
+      <Link to={'/' + availableChain.urlKey + '/'} key={availableChain.chainId}>
+        {availableChain.name}
+      </Link>
+    ))
+    .reduce((accu, elem) => (accu ? [elem] : [...accu, ', ', elem]), null) //join with comma
+  message = (
+    <>
+      This {type}’s address is not available on {currentChainName}.
+      {availableChainElement && (
+        <>
+          <br />
+          This address is only available on {availableChains}
+        </>
+      )}
+    </>
+  )
+  linkMessage = <>You can go back to {type}s list</>
 
   return (
     <Wrapper>
       <Content>
-        <img src={MaintenanceImg} width='100%' alt='maintain' style={{ maxWidth: '456px' }} />
-        <Title>Something went wrong!</Title>
+        <img src={isDarkMode ? MaintenanceImg : MaintenanceImgWhite} width='100%' alt='maintain' style={{ maxWidth: '456px' }} />
+        <Title>This {type}’s address is not available</Title>
 
         <Message>{message}</Message>
 

@@ -51,6 +51,7 @@ const theme = (darkMode, color) => ({
   text7: darkMode ? '#c9d2d7' : '#565A69',
   text8: darkMode ? '#C3C5CB' : '#565A69',
   text9: darkMode ? '#FFFFFF' : '#000000',
+  text10: darkMode ? '#a7b6bd' : '#868787',
 
   // special case text types
   white: '#FFFFFF',
@@ -63,6 +64,7 @@ const theme = (darkMode, color) => ({
   bg5: darkMode ? '#565A69' : '#888D9B',
   bg6: darkMode ? '#243036' : '#FFFFFF',
   bg7: darkMode ? '#303e46' : '#FFFFFF',
+  bg8: darkMode ? '#3e4b51' : '#E7E7E7',
 
   //specialty colors
   modalBG: darkMode ? 'rgba(0,0,0,.425)' : 'rgba(0,0,0,0.3)',

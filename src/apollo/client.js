@@ -9,14 +9,17 @@ export const useClient = () => {
 
   const client = useMemo(
     () =>
-      new ApolloClient({
-        link: new HttpLink({
-          uri: networksInfo.SUBGRAPH_URL[0],
-        }),
-        cache: new InMemoryCache(),
-        shouldBatch: true,
-      }),
-    [networksInfo]
+      networksInfo.map(
+        networkInfo =>
+          new ApolloClient({
+            link: new HttpLink({
+              uri: networkInfo.subgraphUrls[0],
+            }),
+            cache: new InMemoryCache(),
+            shouldBatch: true,
+          })
+      ),
+    [JSON.stringify(networksInfo)]
   )
   return client
 }
@@ -32,7 +35,7 @@ export const healthClient = new ApolloClient({
 export const getBlockClient = networksInfo =>
   new ApolloClient({
     link: new HttpLink({
-      uri: networksInfo?.SUBGRAPH_BLOCK_URL,
+      uri: networksInfo?.subgraphBlockUrl,
     }),
     cache: new InMemoryCache(),
   })

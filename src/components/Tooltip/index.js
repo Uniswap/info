@@ -3,14 +3,14 @@ import styled from 'styled-components'
 import Popover from '../Popover'
 
 const TooltipContainer = styled.div`
-  width: 228px;
+  width: ${({ width }) => width || '228px'};
   padding: 0.6rem 1rem;
   line-height: 150%;
   font-weight: 400;
 `
 
 export default function Tooltip({ text, ...rest }) {
-  return <Popover content={<TooltipContainer>{text}</TooltipContainer>} {...rest} />
+  return <Popover content={<TooltipContainer {...rest}>{text}</TooltipContainer>} {...rest} />
 }
 
 export function MouseoverTooltip({ children, ...rest }) {

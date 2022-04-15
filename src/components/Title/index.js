@@ -1,11 +1,11 @@
 import React from 'react'
-import { useHistory, useParams } from 'react-router-dom'
+import { useHistory, useParams, Link } from 'react-router-dom'
 import styled from 'styled-components'
 import { useMedia } from 'react-use'
 import { Flex, Text } from 'rebass'
 import { TrendingUp, Disc, PieChart } from 'react-feather'
 
-import Link, { BasicLink } from '../Link'
+import { BasicLink } from '../Link'
 import { RowFixed } from '../Row'
 import useTheme from '../../hooks/useTheme'
 import { useDarkModeManager } from '../../contexts/LocalStorage'
@@ -58,7 +58,7 @@ export default function Title() {
     <TitleWrapper>
       <Flex alignItems='center' style={{ justifyContent: 'space-between' }}>
         <div>
-          <DMMIcon id='link' onClick={() => history.push(prefixNetworkURL + '/')}>
+          <DMMIcon id='link' to={prefixNetworkURL}>
             <img
               width={below1080 ? '110px' : '160px'}
               src={isDark ? '/logo-dark.svg' : '/logo.svg?version=v'}

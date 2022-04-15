@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react'
-import { useParams, withRouter } from 'react-router-dom'
+import React, { useEffect, useMemo, useState } from 'react'
+import { withRouter } from 'react-router-dom'
 import 'feather-icons'
 import { transparentize } from 'polished'
 import styled from 'styled-components'
@@ -30,7 +30,7 @@ import {
   formattedNum,
   formattedPercent,
   formattedTokenRatio,
-  getEtherscanLinkText,
+  getEtherScanUrls,
   getPoolLink,
   getSwapLink,
   shortenAddress,
@@ -40,6 +40,9 @@ import bookMarkOutline from '../assets/bookmark_outline.svg'
 import useTheme from '../hooks/useTheme'
 import { Flex } from 'rebass'
 import { useNetworksInfo } from '../contexts/NetworkInfo'
+import { ChainId } from '../constants/networks'
+import NotFound from '../components/404'
+import LocalLoader from '../components/LocalLoader'
 
 const DashboardWrapper = styled.div`
   width: 100%;
@@ -76,11 +79,10 @@ const TokenDetailsLayout = styled.div`
   width: 100%;
   grid-template-columns: auto auto auto auto auto;
   column-gap: 30px;
-  align-items: start;
+  justify-content: space-between;
 
   &:last-child {
     align-items: center;
-    justify-items: end;
   }
   @media screen and (max-width: 1150px) {
     grid-template-columns: 1fr;
@@ -92,7 +94,6 @@ const TokenDetailsLayout = styled.div`
 
     &:last-child {
       align-items: start;
-      justify-items: start;
     }
   }
 `
@@ -122,6 +123,7 @@ const WarningGrouping = styled.div`
 
 function PoolPage({ poolAddress, history }) {
   const {
+    error,
     token0,
     token1,
     reserve0,
@@ -142,7 +144,7 @@ function PoolPage({ poolAddress, history }) {
     token1PriceMin,
     token1PriceMax,
   } = usePoolData(poolAddress)
-  const [networksInfo] = useNetworksInfo()
+  const [[networkInfo]] = useNetworksInfo()
 
   useEffect(() => {
     document.querySelector('body').scrollTo(0, 0)
@@ -211,8 +213,8 @@ function PoolPage({ poolAddress, history }) {
 
   const [dismissed, markAsDismissed] = usePathDismissed(history.location.pathname)
 
-  // TODO: Remove this when Cronos has a token list
-  const noWarning = networksInfo.CHAIN_ID === 25
+  // TODO namgold: Remove this when Cronos has a token list
+  const noWarning = networkInfo.chainId === ChainId.CRONOS
 
   useEffect(() => {
     window.scrollTo({
@@ -224,10 +226,13 @@ function PoolPage({ poolAddress, history }) {
   const [savedPools, addPool, removePool] = useSavedPools()
 
   const listedTokens = useListedTokens()
-  const { network: currentNetworkURL } = useParams()
-  const prefixNetworkURL = currentNetworkURL ? `/${currentNetworkURL}` : ''
+  const urls = useMemo(() => getEtherScanUrls(networkInfo), [networkInfo])
 
-  return (
+  return error ? (
+    <NotFound type='pool' currentChainName={networkInfo.name} redirectLink={'/' + networkInfo.urlKey + '/pairs'} />
+  ) : !token0 ? (
+    <LocalLoader />
+  ) : (
     <PageWrapper>
       <ThemedBackground backgroundColor={transparentize(0.6, backgroundColor)} />
       <span />
@@ -243,7 +248,7 @@ function PoolPage({ poolAddress, history }) {
         <RowBetween>
           <TYPE.body>
             <AutoRow align='flex-end'>
-              <BasicLink to={prefixNetworkURL + '/pairs'}>{'Pairs '}</BasicLink>→ {token0?.symbol}-{token1?.symbol} →{' '}
+              <BasicLink to={'/' + networkInfo.urlKey + '/pairs'}>{'Pairs '}</BasicLink>→ {token0?.symbol}-{token1?.symbol} →{' '}
               {shortenAddress(poolAddress, 3)} <CopyHelper toCopy={poolAddress} />
             </AutoRow>
           </TYPE.body>
@@ -262,18 +267,21 @@ function PoolPage({ poolAddress, history }) {
               >
                 <RowFixed style={{ flexWrap: 'wrap', minWidth: '100px' }}>
                   <RowFixed>
-                    {token0 && token1 && <DoubleTokenLogo a0={token0?.id || ''} a1={token1?.id || ''} size={32} margin={true} />}{' '}
+                    {token0 && token1 && (
+                      <DoubleTokenLogo
+                        a0={token0?.id || ''}
+                        a1={token1?.id || ''}
+                        size={32}
+                        margin={true}
+                        networkInfo={networkInfo}
+                      />
+                    )}{' '}
                     <TYPE.main fontSize={below1080 ? '1.5rem' : '2rem'} style={{ margin: '0 1rem' }}>
                       {token0 && token1 ? (
                         <>
-                          <HoverSpan onClick={() => history.push(prefixNetworkURL + `/token/${token0?.id}`)}>
-                            {token0.symbol}
-                          </HoverSpan>
+                          <BasicLink to={`/${networkInfo.urlKey}/token/${token0?.id}`}>{token0.symbol}</BasicLink>
                           <span>-</span>
-                          <HoverSpan onClick={() => history.push(prefixNetworkURL + `/token/${token1?.id}`)}>
-                            {token1.symbol}
-                          </HoverSpan>{' '}
-                          Pool
+                          <BasicLink to={`/${networkInfo.urlKey}/token/${token1?.id}`}>{token1.symbol}</BasicLink> Pool
                         </>
                       ) : (
                         ''
@@ -291,7 +299,7 @@ function PoolPage({ poolAddress, history }) {
                   {!savedPools[poolAddress] && !below1080 ? (
                     <Hover
                       onClick={() =>
-                        addPool(poolAddress, token0.id, token1.id, token0.symbol, token1.symbol, networksInfo.CHAIN_ID)
+                        addPool(poolAddress, token0.id, token1.id, token0.symbol, token1.symbol, networkInfo.chainId)
                       }
                     >
                       <img src={bookMarkOutline} width={24} height={24} alt='BookMark' style={{ marginRight: '0.5rem' }} />
@@ -304,10 +312,10 @@ function PoolPage({ poolAddress, history }) {
                     <></>
                   )}
 
-                  <Link external href={getPoolLink(token0?.id, networksInfo, token1?.id, false, poolAddress)}>
+                  <Link external href={getPoolLink(token0?.id, networkInfo, token1?.id, false, poolAddress)}>
                     <ButtonOutlined style={{ padding: '11px 22px' }}>+ Add Liquidity</ButtonOutlined>
                   </Link>
-                  <Link external href={getSwapLink(token0?.id, networksInfo, token1?.id)}>
+                  <Link external href={getSwapLink(token0?.id, networkInfo, token1?.id)}>
                     <ButtonDark
                       ml={!below1080 && '.5rem'}
                       mr={below1080 && '.5rem'}
@@ -329,30 +337,34 @@ function PoolPage({ poolAddress, history }) {
                 flexWrap: 'wrap',
               }}
             >
-              <FixedPanel onClick={() => history.push(prefixNetworkURL + `/token/${token0?.id}`)}>
-                <RowFixed>
-                  <TokenLogo address={token0?.id} size={'16px'} />
-                  <TYPE.main fontSize={'16px'} lineHeight={1} fontWeight={500} ml={'4px'}>
-                    {token0 && token1
-                      ? `1 ${formattedSymbol0} = ${token0Rate} ${formattedSymbol1} ${
-                          parseFloat(token0?.derivedETH) ? '(' + token0USD + ')' : ''
-                        }`
-                      : '-'}
-                  </TYPE.main>
-                </RowFixed>
-              </FixedPanel>
-              <FixedPanel onClick={() => history.push(prefixNetworkURL + `/token/${token1?.id}`)}>
-                <RowFixed>
-                  <TokenLogo address={token1?.id} size={'16px'} />
-                  <TYPE.main fontSize={'16px'} lineHeight={1} fontWeight={500} ml={'4px'}>
-                    {token0 && token1
-                      ? `1 ${formattedSymbol1} = ${token1Rate} ${formattedSymbol0}  ${
-                          parseFloat(token1?.derivedETH) ? '(' + token1USD + ')' : ''
-                        }`
-                      : '-'}
-                  </TYPE.main>
-                </RowFixed>
-              </FixedPanel>
+              <BasicLink to={`/${networkInfo.urlKey}/token/${token0?.id}`}>
+                <FixedPanel>
+                  <RowFixed>
+                    <TokenLogo address={token0?.id} size={'16px'} networkInfo={networkInfo} />
+                    <TYPE.main fontSize={'16px'} lineHeight={1} fontWeight={500} ml={'4px'}>
+                      {token0 && token1
+                        ? `1 ${formattedSymbol0} = ${token0Rate} ${formattedSymbol1} ${
+                            parseFloat(token0?.derivedETH) ? '(' + token0USD + ')' : ''
+                          }`
+                        : '-'}
+                    </TYPE.main>
+                  </RowFixed>
+                </FixedPanel>
+              </BasicLink>
+              <BasicLink to={`/${networkInfo.urlKey}/token/${token0?.id}`}>
+                <FixedPanel>
+                  <RowFixed>
+                    <TokenLogo address={token1?.id} size={'16px'} networkInfo={networkInfo} />
+                    <TYPE.main fontSize={'16px'} lineHeight={1} fontWeight={500} ml={'4px'}>
+                      {token0 && token1
+                        ? `1 ${formattedSymbol1} = ${token1Rate} ${formattedSymbol0}  ${
+                            parseFloat(token1?.derivedETH) ? '(' + token1USD + ')' : ''
+                          }`
+                        : '-'}
+                    </TYPE.main>
+                  </RowFixed>
+                </FixedPanel>
+              </BasicLink>
             </AutoRow>
             <>
               {!below1080 && <TYPE.main fontSize={'1.125rem'}>Pool Stats</TYPE.main>}
@@ -414,9 +426,9 @@ function PoolPage({ poolAddress, history }) {
                       </TYPE.main>
                       <div />
                     </RowBetween>
-                    <Hover onClick={() => history.push(prefixNetworkURL + `/token/${token0?.id}`)} fade={true}>
+                    <BasicLink to={`/${networkInfo.urlKey}/token/${token0?.id}`}>
                       <AutoRow gap='4px'>
-                        <TokenLogo address={token0?.id} />
+                        <TokenLogo address={token0?.id} networkInfo={networkInfo} />
                         <TYPE.main fontSize={14} lineHeight={1} fontWeight={500}>
                           <RowFixed>
                             {reserve0 ? formattedNum(reserve0) : ''}{' '}
@@ -424,10 +436,10 @@ function PoolPage({ poolAddress, history }) {
                           </RowFixed>
                         </TYPE.main>
                       </AutoRow>
-                    </Hover>
-                    <Hover onClick={() => history.push(prefixNetworkURL + `/token/${token1?.id}`)} fade={true}>
+                    </BasicLink>
+                    <BasicLink to={`/${networkInfo.urlKey}/token/${token1?.id}`}>
                       <AutoRow gap='4px'>
-                        <TokenLogo address={token1?.id} />
+                        <TokenLogo address={token1?.id} networkInfo={networkInfo} />
                         <TYPE.main fontSize={14} lineHeight={1} fontWeight={500}>
                           <RowFixed>
                             {reserve1 ? formattedNum(reserve1) : ''}{' '}
@@ -435,7 +447,7 @@ function PoolPage({ poolAddress, history }) {
                           </RowFixed>
                         </TYPE.main>
                       </AutoRow>
-                    </Hover>
+                    </BasicLink>
                   </AutoColumn>
                 </Panel>
                 <Panel style={{ height: '100%' }}>
@@ -561,7 +573,7 @@ function PoolPage({ poolAddress, history }) {
                   padding: 0,
                 }}
               >
-                {transactions ? <TxnList transactions={transactions} /> : <Loader />}
+                {transactions ? <TxnList transactions={[transactions]} /> : <Loader />}
               </Panel>
               <RowBetween style={{ marginTop: '3rem' }}>
                 <TYPE.main fontSize={'1.125rem'}>Pool Information</TYPE.main>{' '}
@@ -598,7 +610,7 @@ function PoolPage({ poolAddress, history }) {
                     </AutoRow>
                   </Column>
                   <Column>
-                    <TYPE.main color={theme.subText}>
+                    <TYPE.main color={theme.subText} fontSize='12px'>
                       <RowFixed>
                         <FormattedName style={{ color: theme.subText }} text={token0?.symbol ?? ''} maxCharacters={8} />{' '}
                         <span style={{ marginLeft: '4px' }}>ADDRESS</span>
@@ -612,7 +624,7 @@ function PoolPage({ poolAddress, history }) {
                     </AutoRow>
                   </Column>
                   <Column>
-                    <TYPE.main color={theme.subText}>
+                    <TYPE.main color={theme.subText} fontSize='12px'>
                       <RowFixed>
                         <FormattedName style={{ color: theme.subText }} text={token1?.symbol ?? ''} maxCharacters={8} />{' '}
                         <span style={{ marginLeft: '4px' }}>ADDRESS</span>
@@ -625,9 +637,9 @@ function PoolPage({ poolAddress, history }) {
                       <CopyHelper toCopy={token1?.id} />
                     </AutoRow>
                   </Column>
-                  <Link external href={`${networksInfo.ETHERSCAN_URL}/address/${poolAddress}`}>
+                  <Link external href={urls.showAddress(poolAddress)}>
                     <ButtonDark color={backgroundColor} style={{ padding: '11px 22px' }}>
-                      {`View on ${getEtherscanLinkText(networksInfo)}`} ↗
+                      View on {networkInfo.etherscanLinkText} ↗
                     </ButtonDark>
                   </Link>
                 </TokenDetailsLayout>

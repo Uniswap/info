@@ -1,6 +1,6 @@
 import React, { useRef } from 'react'
 import styled from 'styled-components'
-import SwitchNetworkButton from './SwitcNetworkButton'
+import SwitchNetworkButton from './SwitchNetworkButton'
 import { useSessionStart } from '../contexts/Application'
 import { Flex, Text } from 'rebass'
 import useTheme from '../hooks/useTheme'
@@ -100,14 +100,18 @@ function BottomBar() {
 
       {menuModalOpen && (
         <MenuFlyout>
-          <BasicLink to={prefixNetworkURL + '/accounts'} onClick={() => toggleMenuModal()}>
-            <Flex color={theme.subText} alignItems='center'>
-              <Wallet />
-              <Text marginLeft='8px'> Wallet Analytics</Text>
-            </Flex>
-          </BasicLink>
-          <Divider />
-          <Link href={networksInfo.DMM_SWAP_URL} external onClick={() => toggleMenuModal()}>
+          {currentNetworkURL && (
+            <>
+              <BasicLink to={prefixNetworkURL + '/accounts'} onClick={() => toggleMenuModal()}>
+                <Flex color={theme.subText} alignItems='center'>
+                  <Wallet />
+                  <Text marginLeft='8px'> Wallet Analytics</Text>
+                </Flex>
+              </BasicLink>
+              <Divider />
+            </>
+          )}
+          <Link href={networksInfo[0].dmmSwapUrl} external onClick={() => toggleMenuModal()}>
             <Flex color={theme.subText} alignItems='center'>
               <Repeat size={16} />
               <Text marginLeft='8px'>Swap</Text>
@@ -115,7 +119,6 @@ function BottomBar() {
           </Link>
           <Divider />
           <ThemeToggle />
-
           <div>
             <SocialLinks />
             <Text marginTop='12px' fontSize='12px'>

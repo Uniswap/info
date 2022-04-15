@@ -1,7 +1,6 @@
 import React, { useRef } from 'react'
 import styled from 'styled-components'
 
-import { NETWORK_ICON } from '../../constants/networks'
 import { ApplicationModal, useModalOpen, useToggleNetworkModal } from '../../contexts/Application'
 import Modal from '../Modal'
 import ModalHeader from '../ModalHeader'
@@ -9,12 +8,13 @@ import { ButtonEmpty } from '../ButtonStyled'
 import { useOnClickOutside } from '../../hooks'
 import { NetworksInfoEnv, useNetworksInfo } from '../../contexts/NetworkInfo'
 import { Link, useHistory, useParams } from 'react-router-dom'
+import Kyber from '../Icons/Kyber'
 
 const ModalContentWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  padding: 28px 36px 60px 36px;
+  padding: 30px 22px 28px 24px;
   width: 100%;
   background-color: ${({ theme }) => theme.bg6};
 `
@@ -29,7 +29,7 @@ const NetworkList = styled.div`
   width: 100%;
   display: grid;
   grid-gap: 1rem;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, auto);
   justify-content: space-between;
 
   ${({ theme }) => theme.mediaWidth.upToExtraSmall`
@@ -51,7 +51,7 @@ const ListItem = styled.div`
 const NetworkLabel = styled.span`
   font-size: 16px;
   font-weight: 600;
-  color: ${({ theme }) => theme.text};
+  color: ${({ theme, selected }) => (selected ? theme.textReverse : theme.text)};
 `
 
 const SelectNetworkButton = styled(ButtonEmpty)`
@@ -90,24 +90,25 @@ export default function NetworkModal() {
   const { network: currentNetworkURL } = useParams()
 
   return (
-    <Modal isOpen={networkModalOpen} onDismiss={toggleNetworkModal}>
+    <Modal isOpen={networkModalOpen} onDismiss={toggleNetworkModal} maxWidth='624px'>
       <ModalContentWrapper ref={node}>
         <ModalHeader onClose={toggleNetworkModal} title='Select a Network' />
 
-        <InstructionText>You are currently on {networksInfo.NAME} Analytics page. Switch network?</InstructionText>
-
         <NetworkList>
-          {NetworksInfoEnv.map((network, index) => {
-            if (networksInfo.ENV_KEY === network.ENV_KEY) {
+          {[{ name: 'All Chains', icon: Kyber }, ...NetworksInfoEnv].map((network, index) => {
+            if (
+              (networksInfo[1] && network.name == 'All Chains') ||
+              (!networksInfo[1] && networksInfo[0].chainId === network.chainId)
+            ) {
               return (
-                <SelectNetworkButton key={index} padding='0'>
+                <SelectNetworkButton key={network.name} padding='0'>
                   <ListItem selected>
-                    <img
-                      src={NETWORK_ICON[network.CHAIN_ID]}
-                      alt='Switch Network'
-                      style={{ width: '2rem', marginRight: '1rem' }}
-                    />
-                    <NetworkLabel>{network.NAME}</NetworkLabel>
+                    {typeof network.icon == 'string' ? (
+                      <img src={network.icon} alt='Logo' style={{ width: '2rem', marginRight: '1rem' }} />
+                    ) : (
+                      <network.icon color='black' width='2rem' height='2rem' style={{ marginRight: '1rem' }} />
+                    )}
+                    <NetworkLabel selected>{network.name}</NetworkLabel>
                   </ListItem>
                 </SelectNetworkButton>
               )
@@ -119,8 +120,8 @@ export default function NetworkModal() {
             // Temporary solution for switch chain from token/pair/... detail page
             // Currently we redirect to new chain with current address
             // But that will causing 404 because each token on each chain has different address
-            // E.g: Token Tether USDT on BSC has address: 0x000 and on Fantom: 0x111
-            // When change from bsc to Fantom, we redirect to /fantom/0x000 and that will causing 404
+            // E.g: Token Tether USDT on BSC has address: 0x000 and on Fantom: 0x111, correct addresses are /bsc/0x000 and /fantom/0x111
+            // When changing network from BSC to Fantom, we redirect from /bsc/0x000 to /fantom/0x000 and that will causing 404
             // So we have temporary solution that always redirect to token/pair/... list when we are current at token/pair/... detail
             // TODO: Find current token/pair's new address on new chain. If it's not existing, redirect to token/pair/... list
             switch (currentUrl.split('/')[0]) {
@@ -137,9 +138,9 @@ export default function NetworkModal() {
                 currentUrl = 'accounts'
                 break
             }
-            const linkTo = `/${network.URL_KEY}/` + currentUrl
+            const linkTo = (network.urlKey ? `/${network.urlKey}` : '') + '/' + currentUrl
             return (
-              <Link to={linkTo} key={index}>
+              <Link to={linkTo} key={network.name}>
                 <SelectNetworkButton
                   padding='0'
                   onClick={() => {
@@ -147,12 +148,12 @@ export default function NetworkModal() {
                   }}
                 >
                   <ListItem>
-                    <img
-                      src={NETWORK_ICON[network.CHAIN_ID]}
-                      alt='Switch Network'
-                      style={{ width: '2rem', marginRight: '1rem' }}
-                    />
-                    <NetworkLabel>{network.NAME}</NetworkLabel>
+                    {typeof network.icon == 'string' ? (
+                      <img src={network.icon} alt='Logo' style={{ width: '2rem', marginRight: '1rem' }} />
+                    ) : (
+                      <network.icon width='2rem' height='2rem' style={{ marginRight: '1rem' }} />
+                    )}
+                    <NetworkLabel>{network.name}</NetworkLabel>
                   </ListItem>
                 </SelectNetworkButton>
               </Link>

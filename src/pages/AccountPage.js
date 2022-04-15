@@ -20,12 +20,11 @@ import Search from '../components/Search'
 import { TYPE } from '../Theme'
 import { useUserTransactions, useUserPositions } from '../contexts/User'
 import { useSavedAccounts } from '../contexts/LocalStorage'
-import { formattedNum, getEtherscanLinkText } from '../utils'
+import { formattedNum, getEtherScanUrls } from '../utils'
 import { useOnClickOutside } from '../hooks'
 import useTheme from '../hooks/useTheme'
 import { Flex, Text } from 'rebass'
 import { useNetworksInfo } from '../contexts/NetworkInfo'
-import { useParams } from 'react-router-dom'
 
 const AccountWrapper = styled.div`
   padding: 6px 16px 6px 0;
@@ -95,15 +94,13 @@ const Warning = styled.div`
 `
 
 function AccountPage({ account }) {
-  const [networksInfo] = useNetworksInfo()
+  const [[networkInfo]] = useNetworksInfo()
   // get data for this account
   const transactions = useUserTransactions(account)
   const positions = useUserPositions(account)
 
   // get data for user stats
   const transactionCount = transactions?.swaps?.length + transactions?.burns?.length + transactions?.mints?.length
-  const { network: currentNetworkURL } = useParams()
-  const prefixNetworkURL = currentNetworkURL ? `/${currentNetworkURL}` : ''
 
   // get derived totals
   let totalSwappedUSD = useMemo(() => {
@@ -138,7 +135,7 @@ function AccountPage({ account }) {
   useOnClickOutside(node, () => setShowDropdown(false))
   const [activePosition, setActivePosition] = useState()
 
-  const dynamicPositions = activePosition ? [activePosition] : positions
+  const dynamicPositions = useMemo(() => (activePosition ? [activePosition] : positions), [activePosition, positions])
 
   // const aggregateFees = dynamicPositions?.reduce(function (total, position) {
   //   return total + position.fees.sum
@@ -149,8 +146,7 @@ function AccountPage({ account }) {
       ? dynamicPositions.reduce((total, position) => {
           return (
             total +
-            ((parseFloat(position?.liquidityTokenBalance) / parseFloat(position?.pool?.totalSupply)) *
-              position?.pool?.reserveUSD || 0)
+            (parseFloat(position?.liquidityTokenBalance) / parseFloat(position?.pool?.totalSupply)) * position?.pool?.reserveUSD
           )
         }, 0)
       : null
@@ -167,18 +163,19 @@ function AccountPage({ account }) {
 
   // adding/removing account from saved accounts
   const [savedAccounts, addAccount, removeAccount] = useSavedAccounts()
-  const isBookmarked = !!savedAccounts.find(savedAccount => savedAccount.address == account)
+  const isBookmarked = savedAccounts.some(savedAccount => savedAccount.address === account)
   const handleBookmarkClick = useCallback(() => {
-    ;(isBookmarked ? removeAccount : addAccount)(account, networksInfo.CHAIN_ID)
-  }, [isBookmarked, removeAccount, addAccount, account, networksInfo.CHAIN_ID])
+    ;(isBookmarked ? removeAccount : addAccount)(account, networkInfo.chainId)
+  }, [isBookmarked, removeAccount, addAccount, account, networkInfo.chainId])
+  const urls = useMemo(() => getEtherScanUrls(networkInfo), [networkInfo])
 
   return (
     <PageWrapper>
       <ContentWrapper>
         <RowBetween>
           <TYPE.body>
-            <BasicLink to={prefixNetworkURL + '/accounts'}>{'Accounts '}</BasicLink>→{' '}
-            <Link lineHeight={'145.23%'} href={`${networksInfo.ETHERSCAN_URL}/address/${account}`} target='_blank'>
+            <BasicLink to={'/' + networkInfo.urlKey + '/accounts'}>{'Accounts '}</BasicLink>→{' '}
+            <Link lineHeight={'145.23%'} href={urls.showAddress(account)} target='_blank'>
               {account?.slice(0, 42)}
             </Link>
           </TYPE.body>
@@ -202,9 +199,9 @@ function AccountPage({ account }) {
                   />
                 </StyledIcon>
               )}
-              <Link lineHeight={'145.23%'} href={`${networksInfo.ETHERSCAN_URL}/address/${account}`} target='_blank'>
+              <Link lineHeight={'145.23%'} href={urls.showAddress(account)} target='_blank'>
                 <ButtonDark>
-                  <Text fontSize={14}>{`View on ${getEtherscanLinkText(networksInfo)}`}↗</Text>
+                  <Text fontSize={14}>View on {networkInfo.etherscanLinkText}↗</Text>
                 </ButtonDark>
               </Link>
             </AccountWrapper>
@@ -230,7 +227,12 @@ function AccountPage({ account }) {
                 )}
                 {activePosition && (
                   <RowFixed>
-                    <DoubleTokenLogo a0={activePosition.pair.token0.id} a1={activePosition.pair.token1.id} size={16} />
+                    <DoubleTokenLogo
+                      a0={activePosition.pair.token0.id}
+                      a1={activePosition.pair.token1.id}
+                      size={16}
+                      networkInfo={networkInfo}
+                    />
                     <TYPE.body ml={'16px'}>
                       {activePosition.pair.token0.symbol}-{activePosition.pair.token1.symbol} Position
                     </TYPE.body>
@@ -256,7 +258,7 @@ function AccountPage({ account }) {
                             }}
                             key={i}
                           >
-                            <DoubleTokenLogo a0={p.pair.token0.id} a1={p.pair.token1.id} size={16} />
+                            <DoubleTokenLogo a0={p.pair.token0.id} a1={p.pair.token1.id} size={16} networkInfo={networkInfo} />
                             <TYPE.body ml={'16px'}>
                               {p.pair.token0.symbol}-{p.pair.token1.symbol} Position
                             </TYPE.body>
@@ -343,7 +345,7 @@ function AccountPage({ account }) {
               padding: 0,
             }}
           >
-            <TxnList transactions={transactions} />
+            <TxnList transactions={[transactions]} />
           </Panel>
           <TYPE.main fontSize={'1.125rem'} style={{ marginTop: '3rem' }}>
             Wallet Statistics

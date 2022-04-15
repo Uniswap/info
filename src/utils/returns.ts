@@ -4,7 +4,7 @@ import { NormalizedCacheObject } from 'apollo-cache-inmemory'
 import { USER_MINTS_BUNRS_PER_PAIR } from '../apollo/queries'
 import dayjs from 'dayjs'
 import { getShareValueOverTime } from '.'
-import { getWETH_ADDRESS } from '../constants'
+import { NETWORK_INFO } from '../constants/networks'
 
 export const priceOverrides = [
   '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', // USDC
@@ -33,7 +33,7 @@ interface Position {
 
 const PRICE_DISCOVERY_START_TIMESTAMP = 1589747086
 
-function formatPricesForEarlyTimestamps(position, networkInfo): Position {
+function formatPricesForEarlyTimestamps(position, networkInfo: NETWORK_INFO): Position {
   if (position.timestamp < PRICE_DISCOVERY_START_TIMESTAMP) {
     if (priceOverrides.includes(position?.pair?.token0.id)) {
       position.token0PriceUSD = 1
@@ -42,10 +42,10 @@ function formatPricesForEarlyTimestamps(position, networkInfo): Position {
       position.token1PriceUSD = 1
     }
     // WETH price
-    if (position.pair?.token0.id === getWETH_ADDRESS(networkInfo)) {
+    if (position.pair?.token0.id === networkInfo.wethAddress) {
       position.token0PriceUSD = 203
     }
-    if (position.pair?.token1.id === getWETH_ADDRESS(networkInfo)) {
+    if (position.pair?.token1.id === networkInfo.wethAddress) {
       position.token1PriceUSD = 203
     }
   }
@@ -107,7 +107,11 @@ async function getPrincipalForUserPerPair(client: ApolloClient<NormalizedCacheOb
  * @param positionT0 // users liquidity info and token rates at beginning of window
  * @param positionT1 // '' at the end of the window
  */
-export function getMetricsForPositionWindow(positionT0: Position, positionT1: Position, networkInfo): ReturnMetrics {
+export function getMetricsForPositionWindow(
+  positionT0: Position,
+  positionT1: Position,
+  networkInfo: NETWORK_INFO
+): ReturnMetrics {
   positionT0 = formatPricesForEarlyTimestamps(positionT0, networkInfo)
   positionT1 = formatPricesForEarlyTimestamps(positionT1, networkInfo)
 
@@ -170,7 +174,7 @@ export async function getHistoricalPairReturns(
   currentPairData,
   pairSnapshots,
   currentETHPrice,
-  networkInfo
+  networkInfo: NETWORK_INFO
 ) {
   // catch case where data not puplated yet
   if (!currentPairData.createdAtTimestamp) {
@@ -271,7 +275,7 @@ export async function getLPReturnsOnPair(
   pair,
   ethPrice: number,
   snapshots,
-  networkInfo
+  networkInfo: NETWORK_INFO
 ) {
   // initialize values
   const principal = await getPrincipalForUserPerPair(client, user, pair.id)

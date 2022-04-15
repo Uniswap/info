@@ -4,7 +4,7 @@ import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { usePairData } from './PairData'
 import { USER_TRANSACTIONS, USER_POSITIONS, USER_HISTORY, PAIR_DAY_DATA_BULK } from '../apollo/queries'
-import { useTimeframe, useStartTimestamp, useExchangeClient } from './Application'
+import { useTimeframe, useStartTimestamp, useExchangeClients } from './Application'
 import { useEthPrice } from './GlobalData'
 import { getLPReturnsOnPair, getHistoricalPairReturns } from '../utils/returns'
 import { timeframeOptions } from '../constants'
@@ -131,10 +131,10 @@ export default function Provider({ children }) {
 }
 
 export function useUserTransactions(account) {
-  const exchangeSubgraphClient = useExchangeClient()
+  const [exchangeSubgraphClient] = useExchangeClients()
   const [state, { updateTransactions }] = useUserContext()
-  const [networksInfo] = useNetworksInfo()
-  const transactions = state?.[networksInfo.CHAIN_ID]?.[account]?.[TRANSACTIONS_KEY]
+  const [[networkInfo]] = useNetworksInfo()
+  const transactions = state?.[networkInfo.chainId]?.[account]?.[TRANSACTIONS_KEY]
   useEffect(() => {
     async function fetchData(account) {
       try {
@@ -146,7 +146,10 @@ export function useUserTransactions(account) {
           fetchPolicy: 'no-cache',
         })
         if (result?.data) {
-          updateTransactions(account, result?.data, networksInfo.CHAIN_ID)
+          result.data.burns?.forEach?.(transaction => (transaction.chainId = networkInfo.chainId))
+          result.data.mints?.forEach?.(transaction => (transaction.chainId = networkInfo.chainId))
+          result.data.swaps?.forEach?.(transaction => (transaction.chainId = networkInfo.chainId))
+          updateTransactions(account, result?.data, networkInfo.chainId)
         }
       } catch (e) {
         console.log(e)
@@ -155,7 +158,7 @@ export function useUserTransactions(account) {
     if (!transactions && account) {
       fetchData(account)
     }
-  }, [account, transactions, updateTransactions, exchangeSubgraphClient, networksInfo.CHAIN_ID])
+  }, [account, transactions, updateTransactions, exchangeSubgraphClient, networkInfo.chainId])
 
   return transactions || {}
 }
@@ -166,10 +169,10 @@ export function useUserTransactions(account) {
  * @param {*} account
  */
 export function useUserSnapshots(account) {
-  const exchangeSubgraphClient = useExchangeClient()
+  const [exchangeSubgraphClient] = useExchangeClients()
   const [state, { updateUserSnapshots }] = useUserContext()
-  const [networksInfo] = useNetworksInfo()
-  const snapshots = state?.[networksInfo.CHAIN_ID]?.[account]?.[USER_SNAPSHOTS]
+  const [[networkInfo]] = useNetworksInfo()
+  const snapshots = state?.[networkInfo.chainId]?.[account]?.[USER_SNAPSHOTS]
 
   useEffect(() => {
     async function fetchData() {
@@ -196,7 +199,7 @@ export function useUserSnapshots(account) {
           }
         }
         if (allResults) {
-          updateUserSnapshots(account, allResults, networksInfo.CHAIN_ID)
+          updateUserSnapshots(account, allResults, networkInfo.chainId)
         }
       } catch (e) {
         console.log(e)
@@ -205,7 +208,7 @@ export function useUserSnapshots(account) {
     if (!snapshots && account) {
       fetchData()
     }
-  }, [account, snapshots, updateUserSnapshots, exchangeSubgraphClient, networksInfo.CHAIN_ID])
+  }, [account, snapshots, updateUserSnapshots, exchangeSubgraphClient, networkInfo.chainId])
 
   return snapshots
 }
@@ -217,10 +220,10 @@ export function useUserSnapshots(account) {
  * @param {*} account
  */
 export function useUserPositionChart(position, account) {
-  const exchangeSubgraphClient = useExchangeClient()
+  const [exchangeSubgraphClient] = useExchangeClients()
   const pairAddress = position?.pair?.id
   const [state, { updateUserPairReturns }] = useUserContext()
-  const [networksInfo] = useNetworksInfo()
+  const [[networkInfo]] = useNetworksInfo()
 
   // get oldest date of data to fetch
   const startDateTimestamp = useStartTimestamp()
@@ -239,7 +242,7 @@ export function useUserPositionChart(position, account) {
   const [currentETHPrice] = useEthPrice()
 
   // formatetd array to return for chart data
-  const formattedHistory = state?.[networksInfo.CHAIN_ID]?.[account]?.[USER_PAIR_RETURNS_KEY]?.[pairAddress]
+  const formattedHistory = state?.[networkInfo.chainId]?.[account]?.[USER_PAIR_RETURNS_KEY]?.[pairAddress]
 
   useEffect(() => {
     async function fetchData() {
@@ -249,9 +252,9 @@ export function useUserPositionChart(position, account) {
         currentPairData,
         pairSnapshots,
         currentETHPrice,
-        networksInfo
+        networkInfo
       )
-      updateUserPairReturns(account, pairAddress, fetchedData, networksInfo.CHAIN_ID)
+      updateUserPairReturns(account, pairAddress, fetchedData, networkInfo.chainId)
     }
     if (
       account &&
@@ -276,8 +279,8 @@ export function useUserPositionChart(position, account) {
     updateUserPairReturns,
     position.pair.id,
     exchangeSubgraphClient,
-    networksInfo,
-    networksInfo.CHAIN_ID,
+    networkInfo,
+    networkInfo.chainId,
   ])
 
   return formattedHistory
@@ -289,7 +292,7 @@ export function useUserPositionChart(position, account) {
  * and usd liquidity value.
  */
 export function useUserLiquidityChart(account) {
-  const exchangeSubgraphClient = useExchangeClient()
+  const [exchangeSubgraphClient] = useExchangeClients()
   const history = useUserSnapshots(account)
   // formatetd array to return for chart data
   const [formattedHistory, setFormattedHistory] = useState()
@@ -427,13 +430,13 @@ export function useUserLiquidityChart(account) {
 }
 
 export function useUserPositions(account) {
-  const exchangeSubgraphClient = useExchangeClient()
+  const [exchangeSubgraphClient] = useExchangeClients()
   const [state, { updatePositions }] = useUserContext()
-  const [networksInfo] = useNetworksInfo()
-  const positions = state?.[networksInfo.CHAIN_ID]?.[account]?.[POSITIONS_KEY]
+  const [[networkInfo]] = useNetworksInfo()
+  const positions = state?.[networkInfo.chainId]?.[account]?.[POSITIONS_KEY]
 
   const snapshots = useUserSnapshots(account)
-  const [ethPrice] = useEthPrice()
+  const [[ethPrice]] = useEthPrice()
 
   useEffect(() => {
     async function fetchData(account) {
@@ -454,7 +457,7 @@ export function useUserPositions(account) {
                 positionData.pair,
                 ethPrice,
                 snapshots,
-                networksInfo
+                networkInfo
               )
               return {
                 ...positionData,
@@ -462,7 +465,7 @@ export function useUserPositions(account) {
               }
             })
           )
-          updatePositions(account, formattedPositions, networksInfo.CHAIN_ID)
+          updatePositions(account, formattedPositions, networkInfo.chainId)
         }
       } catch (e) {
         console.log(e)
@@ -471,7 +474,7 @@ export function useUserPositions(account) {
     if (!positions && account && ethPrice && snapshots) {
       fetchData(account)
     }
-  }, [account, positions, updatePositions, ethPrice, snapshots, exchangeSubgraphClient, networksInfo])
+  }, [account, positions, updatePositions, ethPrice, snapshots, exchangeSubgraphClient, networkInfo])
 
   return positions
 }

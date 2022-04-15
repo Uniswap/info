@@ -8,12 +8,14 @@ import styled from 'styled-components'
 
 import { CustomLink } from '../Link'
 import { Divider } from '..'
-import { useParams, withRouter } from 'react-router-dom'
+import { Link, withRouter } from 'react-router-dom'
 import { formattedNum, shortenAddress } from '../../utils'
 import { TYPE } from '../../Theme'
 import DoubleTokenLogo from '../DoubleLogo'
 import { RowFixed } from '../Row'
 import useTheme from '../../hooks/useTheme'
+import { NETWORK_INFOS } from '../../constants/networks'
+import { aggregateLps } from '../../utils/aggregateData'
 
 dayjs.extend(utc)
 
@@ -41,8 +43,8 @@ const List = styled(Box)`
 const DashGrid = styled.div`
   display: grid;
   grid-gap: 1em;
-  grid-template-columns: 10px 1.5fr 1fr 1fr 1fr;
-  grid-template-areas: 'number name pair pool value';
+  grid-template-columns: 10px 1.5fr ${({ isShowNetworkColumn }) => (isShowNetworkColumn ? '75px' : '')} 1fr 1fr 1fr;
+  grid-template-areas: 'number name ${({ isShowNetworkColumn }) => (isShowNetworkColumn ? 'network' : '')} pair pool value';
   padding: 0;
 
   > * {
@@ -50,13 +52,13 @@ const DashGrid = styled.div`
   }
 
   @media screen and (max-width: 1024px) {
-    grid-template-columns: 1.5fr 1fr 1fr 1fr;
-    grid-template-areas: 'name pair pool value';
+    grid-template-columns: 1.5fr ${({ isShowNetworkColumn }) => (isShowNetworkColumn ? '75px' : '')} 1fr 1fr 1fr;
+    grid-template-areas: 'name ${({ isShowNetworkColumn }) => (isShowNetworkColumn ? 'network' : '')} pair pool value';
   }
 
   @media screen and (max-width: 600px) {
-    grid-template-columns: 1fr 1fr 1fr;
-    grid-template-areas: 'name pool value';
+    grid-template-columns: 1fr ${({ isShowNetworkColumn }) => (isShowNetworkColumn ? '75px' : '')} 1fr 1fr;
+    grid-template-areas: 'name ${({ isShowNetworkColumn }) => (isShowNetworkColumn ? 'network' : '')} pool value';
   }
 `
 
@@ -83,6 +85,8 @@ const DataText = styled(Flex)`
 `
 
 function LPList({ lps, disbaleLinks, maxItems = 10 }) {
+  const isShowNetworkColumn = lps?.slice(1).some(Boolean)
+  const aggregatedLps = aggregateLps(lps)
   const below600 = useMedia('(max-width: 600px)')
   const below800 = useMedia('(max-width: 800px)')
   const below1024 = useMedia('(max-width: 1024px)')
@@ -91,27 +95,27 @@ function LPList({ lps, disbaleLinks, maxItems = 10 }) {
   const [page, setPage] = useState(1)
   const [maxPage, setMaxPage] = useState(1)
   const ITEMS_PER_PAGE = maxItems
-  const { network: currentNetworkURL } = useParams()
-  const prefixNetworkURL = currentNetworkURL ? `/${currentNetworkURL}` : ''
 
   useEffect(() => {
     setMaxPage(1) // edit this to do modular
     setPage(1)
-  }, [lps])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(aggregatedLps)])
 
   useEffect(() => {
-    if (lps) {
+    if (aggregatedLps) {
       let extraPages = 1
-      if (Object.keys(lps).length % ITEMS_PER_PAGE === 0) {
+      if (Object.keys(aggregatedLps).length % ITEMS_PER_PAGE === 0) {
         extraPages = 0
       }
-      setMaxPage(Math.floor(Object.keys(lps).length / ITEMS_PER_PAGE) + extraPages)
+      setMaxPage(Math.floor(Object.keys(aggregatedLps).length / ITEMS_PER_PAGE) + extraPages)
     }
-  }, [ITEMS_PER_PAGE, lps])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ITEMS_PER_PAGE, JSON.stringify(aggregatedLps)])
 
   const ListItem = ({ lp, index }) => {
     return (
-      <DashGrid style={{ height: '56px' }} disbaleLinks={disbaleLinks} focus={true}>
+      <DashGrid style={{ height: '56px' }} disbaleLinks={disbaleLinks} focus={true} isShowNetworkColumn={isShowNetworkColumn}>
         {!below1024 && (
           <DataText area='number' fontWeight='500'>
             {index}
@@ -125,11 +129,18 @@ function LPList({ lps, disbaleLinks, maxItems = 10 }) {
               textOverflow: 'ellipsis',
               overflow: 'hidden',
             }}
-            to={prefixNetworkURL + '/account/' + lp.user.id}
+            to={'/' + NETWORK_INFOS[lp.chainId].urlKey + '/account/' + lp.user.id}
           >
             {below800 ? lp.user.id.slice(0, 5) + '...' + lp.user.id.slice(39, 42) : lp.user.id}
           </CustomLink>
         </DataText>
+        {isShowNetworkColumn && (
+          <DataText area='network'>
+            <Link to={'/' + NETWORK_INFOS[lp.chainId].urlKey}>
+              <img src={NETWORK_INFOS[lp.chainId].icon} width={25} />
+            </Link>
+          </DataText>
+        )}
 
         {/* {!below1080 && (
           <DataText area="type" justifyContent="flex-end">
@@ -139,9 +150,17 @@ function LPList({ lps, disbaleLinks, maxItems = 10 }) {
 
         {!below600 && (
           <DataText>
-            <CustomLink area='pair' to={prefixNetworkURL + '/pair/' + lp.pairAddress}>
+            <CustomLink area='pair' to={'/' + NETWORK_INFOS[lp.chainId].urlKey + '/pair/' + lp.pairAddress}>
               <RowFixed>
-                {!below600 && <DoubleTokenLogo a0={lp.token0} a1={lp.token1} size={16} margin={true} />}
+                {!below600 && (
+                  <DoubleTokenLogo
+                    a0={lp.token0}
+                    a1={lp.token1}
+                    size={16}
+                    margin={true}
+                    networkInfo={NETWORK_INFOS[lp.chainId]}
+                  />
+                )}
                 {lp.pairName}
               </RowFixed>
             </CustomLink>
@@ -149,7 +168,7 @@ function LPList({ lps, disbaleLinks, maxItems = 10 }) {
         )}
 
         <DataText>
-          <CustomLink area='pool' to={prefixNetworkURL + '/pool/' + lp.poolAddress}>
+          <CustomLink area='pool' to={'/' + NETWORK_INFOS[lp.chainId].urlKey + '/pool/' + lp.poolAddress}>
             <RowFixed>{shortenAddress(lp.poolAddress, 3)}</RowFixed>
           </CustomLink>
         </DataText>
@@ -160,8 +179,8 @@ function LPList({ lps, disbaleLinks, maxItems = 10 }) {
   }
 
   const lpList =
-    lps &&
-    lps.slice(ITEMS_PER_PAGE * (page - 1), page * ITEMS_PER_PAGE).map((lp, index) => {
+    aggregatedLps &&
+    aggregatedLps.slice(ITEMS_PER_PAGE * (page - 1), page * ITEMS_PER_PAGE).map((lp, index) => {
       return (
         <div key={index}>
           <ListItem key={index} index={(page - 1) * 10 + index + 1} lp={lp} />
@@ -174,7 +193,12 @@ function LPList({ lps, disbaleLinks, maxItems = 10 }) {
 
   return (
     <ListWrapper>
-      <TableHeader center={true} disbaleLinks={disbaleLinks} style={{ height: 'fit-content' }}>
+      <TableHeader
+        center={true}
+        disbaleLinks={disbaleLinks}
+        style={{ height: 'fit-content' }}
+        isShowNetworkColumn={isShowNetworkColumn}
+      >
         {!below1024 && (
           <Flex alignItems='center' justifyContent='flex-start'>
             <TYPE.main area='number'>#</TYPE.main>
@@ -185,6 +209,13 @@ function LPList({ lps, disbaleLinks, maxItems = 10 }) {
             ACCOUNT
           </TYPE.main>
         </Flex>
+        {isShowNetworkColumn && (
+          <Flex alignItems='center'>
+            <TYPE.main area='name' color={theme.subText} fontSize='12px'>
+              NETWORK
+            </TYPE.main>
+          </Flex>
+        )}
         {/* {!below1080 && (
           <Flex alignItems="center" justifyContent="flexEnd">
             <TYPE.main area="type">Type</TYPE.main>

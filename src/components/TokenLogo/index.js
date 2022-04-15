@@ -1,29 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
 
-import { ROPSTEN_TOKEN_LOGOS_MAPPING, getWETH_ADDRESS, ChainId } from '../../constants'
-import ETHEREUM_TOKEN_LIST from '../../constants/tokenLists/ethereum.tokenlist'
-import POLYGON_TOKEN_LIST from '../../constants/tokenLists/polygon.tokenlist'
-import BSC_TOKEN_LIST from '../../constants/tokenLists/bsc.tokenlist'
-import AVALANCHE_TOKEN_LIST from '../../constants/tokenLists/avalanche.tokenlist'
-import FANTOM_TOKEN_LIST from '../../constants/tokenLists/fantom.tokenlist'
-import CRONOS_TOKEN_LIST from '../../constants/tokenLists/cronos.tokenlist'
-import ARBITRUM_TOKEN_LIST from '../../constants/tokenLists/arbitrum.tokenlist'
-import BTTC_TOKEN_LIST from '../../constants/tokenLists/bttc.tokenlist'
-import VELAS_TOKEN_LIST from '../../constants/tokenLists/velas.tokenlist'
-import AURORA_TOKEN_LIST from '../../constants/tokenLists/aurora.tokenlist'
-import OASIS_TOKEN_LIST from '../../constants/tokenLists/oasis.tokenlist'
+import { ROPSTEN_TOKEN_LOGOS_MAPPING } from '../../constants'
 import { isAddress } from '../../utils/index.js'
 import PlaceHolder from '../../assets/placeholder.png'
-import EthereumLogo from '../../assets/eth.png'
-import PolygonLogo from '../../assets/polygon.png'
-import BnbLogo from '../../assets/bnb.png'
-import AvaxLogo from '../../assets/avax.png'
-import FantomLogo from '../../assets/networks/fantom-network.png'
-import CronosLogo from '../../assets/cronos.svg'
-import VelasLogo from '../../assets/velas.png'
-import AuroraLogo from '../../assets/aurora.svg'
-import OasisLogo from '../../assets/oasis.svg'
 import { getMaticTokenLogoURL } from '../../utils/maticTokenMapping'
 import { getMumbaiTokenLogoURL } from '../../utils/mumbaiTokenMapping'
 import { getBscTestnetTokenLogoURL } from '../../utils/bscTestnetTokenMapping'
@@ -31,7 +11,7 @@ import { getBscTokenLogoURL } from '../../utils/bscTokenMapping'
 import { getAvaxTokenLogoURL } from '../../utils/avaxTokenMapping'
 import { getFantomTokenLogoURL } from '../../utils/fantomTokenMapping'
 import { getCronosTokenLogoURL } from '../../utils/cronosTokenMapping'
-import { useNetworksInfo } from '../../contexts/NetworkInfo'
+import { ChainId } from '../../constants/networks'
 
 const BAD_IMAGES = {}
 
@@ -59,184 +39,6 @@ const StyledNativeTokenLogo = styled.div`
   }
 `
 
-export function getNativeTokenLogo({ size = '24px', chainId, ...rest }) {
-  switch (chainId) {
-    case 137:
-      return (
-        <StyledNativeTokenLogo size={size} {...rest}>
-          <img
-            src={PolygonLogo}
-            style={{
-              boxShadow: '0px 6px 10px rgba(0, 0, 0, 0.075)',
-              borderRadius: '24px',
-            }}
-            alt=''
-          />
-        </StyledNativeTokenLogo>
-      )
-    case 80001:
-      return (
-        <StyledNativeTokenLogo size={size} {...rest}>
-          <img
-            src={PolygonLogo}
-            style={{
-              boxShadow: '0px 6px 10px rgba(0, 0, 0, 0.075)',
-              borderRadius: '24px',
-            }}
-            alt=''
-          />
-        </StyledNativeTokenLogo>
-      )
-
-    case 97:
-      return (
-        <StyledNativeTokenLogo size={size} {...rest}>
-          <img
-            src={BnbLogo}
-            style={{
-              boxShadow: '0px 6px 10px rgba(0, 0, 0, 0.075)',
-              borderRadius: '24px',
-            }}
-            alt=''
-          />
-        </StyledNativeTokenLogo>
-      )
-
-    case 56:
-      return (
-        <StyledNativeTokenLogo size={size} {...rest}>
-          <img
-            src={BnbLogo}
-            style={{
-              boxShadow: '0px 6px 10px rgba(0, 0, 0, 0.075)',
-              borderRadius: '24px',
-            }}
-            alt=''
-          />
-        </StyledNativeTokenLogo>
-      )
-    case 43113:
-      return (
-        <StyledNativeTokenLogo size={size} {...rest}>
-          <img
-            src={AvaxLogo}
-            style={{
-              boxShadow: '0px 6px 10px rgba(0, 0, 0, 0.075)',
-              borderRadius: '24px',
-            }}
-            alt=''
-          />
-        </StyledNativeTokenLogo>
-      )
-
-    case 43114:
-      return (
-        <StyledNativeTokenLogo size={size} {...rest}>
-          <img
-            src={AvaxLogo}
-            style={{
-              boxShadow: '0px 6px 10px rgba(0, 0, 0, 0.075)',
-              borderRadius: '24px',
-            }}
-            alt=''
-          />
-        </StyledNativeTokenLogo>
-      )
-
-    case 250:
-      return (
-        <StyledNativeTokenLogo size={size} {...rest}>
-          <img
-            src={FantomLogo}
-            style={{
-              boxShadow: '0px 6px 10px rgba(0, 0, 0, 0.075)',
-              borderRadius: '24px',
-            }}
-            alt=''
-          />
-        </StyledNativeTokenLogo>
-      )
-    case 338:
-      return (
-        <StyledNativeTokenLogo size={size} {...rest}>
-          <img
-            src={CronosLogo}
-            style={{
-              boxShadow: '0px 6px 10px rgba(0, 0, 0, 0.075)',
-              borderRadius: '24px',
-            }}
-            alt=''
-          />
-        </StyledNativeTokenLogo>
-      )
-    case 25:
-      return (
-        <StyledNativeTokenLogo size={size} {...rest}>
-          <img
-            src={CronosLogo}
-            style={{
-              boxShadow: '0px 6px 10px rgba(0, 0, 0, 0.075)',
-              borderRadius: '24px',
-            }}
-            alt=''
-          />
-        </StyledNativeTokenLogo>
-      )
-    case 106:
-      return (
-        <StyledNativeTokenLogo size={size} {...rest}>
-          <img
-            src={VelasLogo}
-            style={{
-              boxShadow: '0px 6px 10px rgba(0, 0, 0, 0.075)',
-              borderRadius: '24px',
-            }}
-            alt=''
-          />
-        </StyledNativeTokenLogo>
-      )
-    case ChainId.AURORA:
-      return (
-        <StyledNativeTokenLogo size={size} {...rest}>
-          <img
-            src={AuroraLogo}
-            style={{
-              boxShadow: '0px 6px 10px rgba(0, 0, 0, 0.075)',
-              borderRadius: '24px',
-            }}
-            alt=''
-          />
-        </StyledNativeTokenLogo>
-      )
-    case ChainId.OASIS:
-      return (
-        <StyledNativeTokenLogo size={size} {...rest}>
-          <img
-            src={OasisLogo}
-            style={{
-              boxShadow: '0px 6px 10px rgba(0, 0, 0, 0.075)',
-              borderRadius: '24px',
-            }}
-            alt=''
-          />
-        </StyledNativeTokenLogo>
-      )
-    default:
-      return (
-        <StyledNativeTokenLogo size={size} {...rest}>
-          <img
-            src={EthereumLogo}
-            style={{
-              boxShadow: '0px 6px 10px rgba(0, 0, 0, 0.075)',
-              borderRadius: '24px',
-            }}
-            alt=''
-          />
-        </StyledNativeTokenLogo>
-      )
-  }
-}
-
 export function getCustomLogo({ address, chainId, src, size, setError, ...rest }) {
   return (
     <Inline>
@@ -255,15 +57,17 @@ export function getCustomLogo({ address, chainId, src, size, setError, ...rest }
   )
 }
 
-export default function TokenLogo({ address, header = false, size = '24px', ...rest }) {
+//todo: dò reference TokenLogo networkInfo
+export default function TokenLogo({ address, networkInfo, header = false, size = '24px', ...rest }) {
   const [error, setError] = useState(false)
-  const [networksInfo] = useNetworksInfo()
 
   useEffect(() => {
     setError(false)
-  }, [address, networksInfo])
+  }, [address, networkInfo])
 
-  if (error || BAD_IMAGES[networksInfo.CHAIN_ID]?.[address]) {
+  if (!networkInfo) return null
+
+  if (error || BAD_IMAGES[networkInfo.chainId]?.[address]) {
     return (
       <Inline>
         <Image {...rest} alt={''} src={PlaceHolder} size={size} />
@@ -271,150 +75,79 @@ export default function TokenLogo({ address, header = false, size = '24px', ...r
     )
   }
 
-  if (address?.toLowerCase() === getWETH_ADDRESS(networksInfo)) {
-    return getNativeTokenLogo({ size, chainId: networksInfo.CHAIN_ID, ...rest })
+  if (address?.toLowerCase() === networkInfo.wethAddress) {
+    return (
+      <StyledNativeTokenLogo size={size} {...rest}>
+        <img
+          src={networkInfo.nativeTokenLogo}
+          style={{
+            boxShadow: '0px 6px 10px rgba(0, 0, 0, 0.075)',
+            borderRadius: '24px',
+          }}
+          alt=''
+        />
+      </StyledNativeTokenLogo>
+    )
   }
 
   const formattedAddress = isAddress(address)
   let path
 
-  switch (networksInfo.CHAIN_ID) {
-    case 3:
+  if (formattedAddress && networkInfo.tokenLists[formattedAddress]) {
+    return getCustomLogo({
+      address,
+      chainId: networkInfo.chainId,
+      src: networkInfo.tokenLists[formattedAddress].logoURI,
+      size,
+      setError,
+      ...rest,
+    })
+  }
+
+  switch (networkInfo.chainId) {
+    case ChainId.ROPSTEN:
       if (ROPSTEN_TOKEN_LOGOS_MAPPING[address?.toLowerCase()]) {
         address = ROPSTEN_TOKEN_LOGOS_MAPPING[address?.toLowerCase()]
       }
-
       path = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${formattedAddress}/logo.png`
       break
-    case 137:
-      if (formattedAddress && POLYGON_TOKEN_LIST[formattedAddress]) {
-        return getCustomLogo({
-          address,
-          chainId: networksInfo.CHAIN_ID,
-          src: POLYGON_TOKEN_LIST[formattedAddress].logoURI,
-          size,
-          setError,
-          ...rest,
-        })
-      }
-
+    case ChainId.MATIC:
       path = getMaticTokenLogoURL(address)
       break
-    case 80001:
+    case ChainId.MUMBAI:
       path = getMumbaiTokenLogoURL(address)
       break
-    case 97:
+    case ChainId.BSCTESTNET:
       path = getBscTestnetTokenLogoURL(address)
       break
-    case 56:
-      if (formattedAddress && BSC_TOKEN_LIST[formattedAddress]) {
-        return getCustomLogo({
-          address,
-          chainId: networksInfo.CHAIN_ID,
-          src: BSC_TOKEN_LIST[formattedAddress].logoURI,
-          size,
-          setError,
-          ...rest,
-        })
-      }
+    case ChainId.BSCMAINNET:
       path = getBscTokenLogoURL(address)
       break
 
-    case 43114:
-      if (formattedAddress && AVALANCHE_TOKEN_LIST[formattedAddress]) {
-        return getCustomLogo({
-          address,
-          chainId: networksInfo.CHAIN_ID,
-          src: AVALANCHE_TOKEN_LIST[formattedAddress].logoURI,
-          size,
-          setError,
-          ...rest,
-        })
-      }
+    case ChainId.AVAXMAINNET:
       path = getAvaxTokenLogoURL(address)
       break
 
-    case 250:
-      if (formattedAddress && FANTOM_TOKEN_LIST[formattedAddress]) {
-        return getCustomLogo({
-          address,
-          chainId: networksInfo.CHAIN_ID,
-          src: FANTOM_TOKEN_LIST[formattedAddress].logoURI,
-          size,
-          setError,
-          ...rest,
-        })
-      }
+    case ChainId.FANTOM:
       path = getFantomTokenLogoURL(address)
       break
 
-    case 25:
-      if (formattedAddress && CRONOS_TOKEN_LIST[formattedAddress]) {
-        return getCustomLogo({
-          address,
-          chainId: networksInfo.CHAIN_ID,
-          src: CRONOS_TOKEN_LIST[formattedAddress].logoURI,
-          size,
-          setError,
-          ...rest,
-        })
-      }
+    case ChainId.CRONOS:
       path = getCronosTokenLogoURL(address)
       break
 
     case ChainId.ARBITRUM:
-      if (formattedAddress && ARBITRUM_TOKEN_LIST[formattedAddress]) {
-        return getCustomLogo({ address, src: ARBITRUM_TOKEN_LIST[formattedAddress].logoURI, size, setError, ...rest })
-      }
       path = `https://raw.githubusercontent.com/Uniswap/assets/master/blockchains/arbitrum/assets/${isAddress(address)}/logo.png`
       break
 
-    case ChainId.VELAS:
-      if (formattedAddress && VELAS_TOKEN_LIST[formattedAddress]) {
-        return getCustomLogo({ address, src: VELAS_TOKEN_LIST[formattedAddress].logoURI, size, setError, ...rest })
-      }
-      path = 'error'
-      break
-
-    case ChainId.AURORA:
-      if (formattedAddress && AURORA_TOKEN_LIST[formattedAddress.toLowerCase()]) {
-        return getCustomLogo({
-          address,
-          src: AURORA_TOKEN_LIST[formattedAddress.toLowerCase()].logoURI,
-          size,
-          setError,
-          ...rest,
-        })
-      }
-      path = 'error'
-      break
-
     case ChainId.BTTC:
-      if (formattedAddress && BTTC_TOKEN_LIST[formattedAddress]) {
-        return getCustomLogo({ address, src: BTTC_TOKEN_LIST[formattedAddress].logoURI, size, setError, ...rest })
-      }
-      path = 'error'
-      break
-
+    case ChainId.VELAS:
+    case ChainId.AURORA:
     case ChainId.OASIS:
-      if (formattedAddress && OASIS_TOKEN_LIST[formattedAddress]) {
-        return getCustomLogo({ address, src: OASIS_TOKEN_LIST[formattedAddress].logoURI, size, setError, ...rest })
-      }
       path = 'error'
       break
 
     default:
-      if (formattedAddress && ETHEREUM_TOKEN_LIST[formattedAddress]?.logoURI) {
-        return getCustomLogo({
-          address,
-          chainId: networksInfo.CHAIN_ID,
-          src: ETHEREUM_TOKEN_LIST[formattedAddress].logoURI,
-          size,
-          setError,
-          ...rest,
-        })
-      }
-
       // hard coded fixes for trust wallet api issues
       if (address?.toLowerCase() === '0x5e74c9036fb86bd7ecdcb084a0673efc32ea31cb') {
         address = '0x42456d7084eacf4083f1140d3229471bba2949a8'
@@ -427,21 +160,5 @@ export default function TokenLogo({ address, header = false, size = '24px', ...r
       path = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${formattedAddress}/logo.png`
       break
   }
-
-  return (
-    <Inline>
-      <Image
-        {...rest}
-        alt={''}
-        src={path}
-        srcSet=''
-        size={size}
-        onError={event => {
-          BAD_IMAGES[networksInfo.CHAIN_ID] = { ...BAD_IMAGES[networksInfo.CHAIN_ID], [address]: true }
-          setError(true)
-          event.preventDefault()
-        }}
-      />
-    </Inline>
-  )
+  return getCustomLogo({ address, chainId: networkInfo.chainId, src: path, size, setError, ...rest })
 }

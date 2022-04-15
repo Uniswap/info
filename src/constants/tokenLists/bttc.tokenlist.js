@@ -51,7 +51,7 @@ const BTTC_TOKEN_ARRAY = [
   },
   {
     chainId: 199,
-    address: '0xedf53026aea60f8f75fca25f8830b7e2d6200662',
+    address: '0xEdf53026aeA60f8F75FcA25f8830b7e2d6200662',
     symbol: 'TRX',
     decimals: 6,
     name: 'TRON',
@@ -79,6 +79,14 @@ const BTTC_TOKEN_ARRAY = [
     symbol: 'USDT_t',
     decimals: 6,
     name: 'Tether USD_TRON',
+    logoURI: 'https://coin.top/production/logo/usdtlogo.png',
+  },
+  {
+    chainId: 199,
+    address: '0xE887512ab8BC60BcC9224e1c3b5Be68E26048B8B',
+    symbol: 'USDT_e',
+    name: 'Tether USD_Ethereum',
+    decimals: 6,
     logoURI: 'https://coin.top/production/logo/usdtlogo.png',
   },
   {

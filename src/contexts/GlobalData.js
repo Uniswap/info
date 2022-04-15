@@ -1,19 +1,28 @@
-import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect, useState, useRef } from 'react'
+import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect, useState } from 'react'
 import dayjs from 'dayjs'
+import merge from 'deepmerge'
 import utc from 'dayjs/plugin/utc'
-import { useTimeframe, useExchangeClient } from './Application'
-import { getPercentChange, getBlockFromTimestamp, getBlocksFromTimestamps, get2DayPercentChange, getTimeframe } from '../utils'
+import { useTimeframe, useExchangeClients } from './Application'
+import {
+  getPercentChange,
+  getBlockFromTimestamp,
+  getBlocksFromTimestamps,
+  getTimeframe,
+  memoRequest,
+  overwriteArrayMerge,
+} from '../utils'
 import { GLOBAL_DATA, GLOBAL_TXNS, GLOBAL_CHART, ETH_PRICE, ALL_PAIRS, ALL_TOKENS, TOP_LPS_PER_POOLS } from '../apollo/queries'
 import weekOfYear from 'dayjs/plugin/weekOfYear'
 import { useAllPoolData } from './PoolData'
-import { useNetworksInfo as useNetworkInfo } from './NetworkInfo'
+import { useNetworksInfo } from './NetworkInfo'
+import { calculateValuesOnGlobalData } from '../utils/aggregateData'
 const UPDATE = 'UPDATE'
 const UPDATE_TXNS = 'UPDATE_TXNS'
 const UPDATE_CHART = 'UPDATE_CHART'
 const UPDATE_ETH_PRICE = 'UPDATE_ETH_PRICE'
 const ETH_PRICE_KEY = 'ETH_PRICE_KEY'
-const UPDATE_ALL_PAIRS_IN_UNISWAP = 'UPDAUPDATE_ALL_PAIRS_IN_UNISWAPTE_TOP_PAIRS'
-const UPDATE_ALL_TOKENS_IN_UNISWAP = 'UPDATE_ALL_TOKENS_IN_UNISWAP'
+const UPDATE_ALL_PAIRS_IN_KYBERSWAP = 'UPDATE_ALL_PAIRS_IN_KYBERSWAP'
+const UPDATE_ALL_TOKENS_IN_KYBERSWAP = 'UPDATE_ALL_TOKENS_IN_KYBERSWAP'
 const UPDATE_TOP_LPS = 'UPDATE_TOP_LPS'
 
 // format dayjs with the libraries that we need
@@ -29,59 +38,35 @@ function useGlobalDataContext() {
 function reducer(state, { type, payload }) {
   switch (type) {
     case UPDATE: {
-      const { data } = payload
-      return {
-        ...state,
-        globalData: data,
-      }
+      const { data, chainId } = payload
+      return merge(state, { [chainId]: { globalData: data } })
     }
     case UPDATE_TXNS: {
-      const { transactions } = payload
-      return {
-        ...state,
-        transactions,
-      }
+      const { transactions, chainId } = payload
+      return merge(state, { [chainId]: { transactions } })
     }
     case UPDATE_CHART: {
-      const { daily, weekly } = payload
-      return {
-        ...state,
-        chartData: {
-          daily,
-          weekly,
-        },
-      }
+      const { daily, weekly, chainId } = payload
+      return merge(state, { [chainId]: { chartData: { daily, weekly } } })
     }
     case UPDATE_ETH_PRICE: {
       const { chainId, ethPrice, oneDayPrice } = payload
-      return {
-        [ETH_PRICE_KEY]: { [chainId]: ethPrice },
-        oneDayPrice: { [chainId]: oneDayPrice },
-      }
+      return merge(state, { [chainId]: { [ETH_PRICE_KEY]: ethPrice, oneDayPrice: oneDayPrice } })
     }
 
-    case UPDATE_ALL_PAIRS_IN_UNISWAP: {
-      const { allPairs } = payload
-      return {
-        ...state,
-        allPairs,
-      }
+    case UPDATE_ALL_PAIRS_IN_KYBERSWAP: {
+      const { allPairs, chainId } = payload
+      return merge(state, { [chainId]: { allPairs } }, { arrayMerge: overwriteArrayMerge })
     }
 
-    case UPDATE_ALL_TOKENS_IN_UNISWAP: {
-      const { allTokens } = payload
-      return {
-        ...state,
-        allTokens,
-      }
+    case UPDATE_ALL_TOKENS_IN_KYBERSWAP: {
+      const { allTokens, chainId } = payload
+      return merge(state, { [chainId]: { allTokens } }, { arrayMerge: overwriteArrayMerge })
     }
 
     case UPDATE_TOP_LPS: {
-      const { topLps } = payload
-      return {
-        ...state,
-        topLps,
-      }
+      const { topLps, chainId } = payload
+      return merge(state, { [chainId]: { topLps } }, { arrayMerge: overwriteArrayMerge })
     }
     default: {
       throw Error(`Unexpected action type in DataContext reducer: '${type}'.`)
@@ -91,30 +76,33 @@ function reducer(state, { type, payload }) {
 
 export default function Provider({ children }) {
   const [state, dispatch] = useReducer(reducer, {})
-  const update = useCallback(data => {
+  const update = useCallback((data, chainId) => {
     dispatch({
       type: UPDATE,
       payload: {
         data,
+        chainId,
       },
     })
   }, [])
 
-  const updateTransactions = useCallback(transactions => {
+  const updateTransactions = useCallback((transactions, chainId) => {
     dispatch({
       type: UPDATE_TXNS,
       payload: {
         transactions,
+        chainId,
       },
     })
   }, [])
 
-  const updateChart = useCallback((daily, weekly) => {
+  const updateChart = useCallback((daily, weekly, chainId) => {
     dispatch({
       type: UPDATE_CHART,
       payload: {
         daily,
         weekly,
+        chainId,
       },
     })
   }, [])
@@ -130,29 +118,32 @@ export default function Provider({ children }) {
     })
   }, [])
 
-  const updateAllPairsInUniswap = useCallback(allPairs => {
+  const updateAllPairsInKyberswap = useCallback((allPairs, chainId) => {
     dispatch({
-      type: UPDATE_ALL_PAIRS_IN_UNISWAP,
+      type: UPDATE_ALL_PAIRS_IN_KYBERSWAP,
       payload: {
         allPairs,
+        chainId,
       },
     })
   }, [])
 
-  const updateAllTokensInUniswap = useCallback(allTokens => {
+  const updateAllTokensInKyberswap = useCallback((allTokens, chainId) => {
     dispatch({
-      type: UPDATE_ALL_TOKENS_IN_UNISWAP,
+      type: UPDATE_ALL_TOKENS_IN_KYBERSWAP,
       payload: {
         allTokens,
+        chainId,
       },
     })
   }, [])
 
-  const updateTopLps = useCallback(topLps => {
+  const updateTopLps = useCallback((topLps, chainId) => {
     dispatch({
       type: UPDATE_TOP_LPS,
       payload: {
         topLps,
+        chainId,
       },
     })
   }, [])
@@ -167,8 +158,8 @@ export default function Provider({ children }) {
             updateChart,
             updateEthPrice,
             updateTopLps,
-            updateAllPairsInUniswap,
-            updateAllTokensInUniswap,
+            updateAllPairsInKyberswap,
+            updateAllTokensInKyberswap,
           },
         ],
         [
@@ -178,8 +169,8 @@ export default function Provider({ children }) {
           updateTopLps,
           updateChart,
           updateEthPrice,
-          updateAllPairsInUniswap,
-          updateAllTokensInUniswap,
+          updateAllPairsInKyberswap,
+          updateAllTokensInKyberswap,
         ]
       )}
     >
@@ -195,7 +186,7 @@ export default function Provider({ children }) {
  * @param {*} ethPrice
  * @param {*} oldEthPrice
  */
-async function getGlobalData(client, ethPrice, oldEthPrice, networksInfo) {
+async function getGlobalData(client, networksInfo) {
   // data for each day , historic data used for % changes
   let data = {}
   let oneDayData = {}
@@ -220,7 +211,7 @@ async function getGlobalData(client, ethPrice, oldEthPrice, networksInfo) {
       query: GLOBAL_DATA(networksInfo),
       fetchPolicy: 'cache-first',
     })
-    data = result.data.dmmFactories[0]
+    data = result.data.dmmFactories[0] || {}
 
     // fetch the historical data
     let oneDayResult = await client.query({
@@ -228,69 +219,27 @@ async function getGlobalData(client, ethPrice, oldEthPrice, networksInfo) {
       fetchPolicy: 'cache-first',
     })
 
-    oneDayData = oneDayResult.data.dmmFactories[0]
+    data.oneDayData = { ...oneDayResult.data.dmmFactories[0] } //preventing fetchPolicy: 'cache-first' returning same object causing circular object
 
     let twoDayResult = await client.query({
       query: GLOBAL_DATA(networksInfo, twoDayBlock?.number),
       fetchPolicy: 'cache-first',
     })
-    twoDayData = twoDayResult.data.dmmFactories[0]
+    data.twoDayData = { ...twoDayResult.data.dmmFactories[0] } //preventing fetchPolicy: 'cache-first' returning same object causing circular object
 
     let oneWeekResult = await client.query({
       query: GLOBAL_DATA(networksInfo, oneWeekBlock?.number),
       fetchPolicy: 'cache-first',
     })
-    const oneWeekData = oneWeekResult.data.dmmFactories[0]
+    data.oneWeekData = { ...oneWeekResult.data.dmmFactories[0] } //preventing fetchPolicy: 'cache-first' returning same object causing circular object
 
     let twoWeekResult = await client.query({
       query: GLOBAL_DATA(networksInfo, twoWeekBlock?.number),
       fetchPolicy: 'cache-first',
     })
-    const twoWeekData = twoWeekResult.data.dmmFactories[0]
+    data.twoWeekData = { ...twoWeekResult.data.dmmFactories[0] } //preventing fetchPolicy: 'cache-first' returning same object causing circular object
 
-    if (data) {
-      let [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentChange(
-        data ? data.totalVolumeUSD : 0,
-        oneDayData && oneDayData.totalVolumeUSD ? oneDayData.totalVolumeUSD : 0,
-        twoDayData && twoDayData.totalVolumeUSD ? twoDayData.totalVolumeUSD : 0
-      )
-
-      let [oneDayFeeUSD, oneDayFeeChange] = get2DayPercentChange(
-        data ? data.totalFeeUSD : 0,
-        oneDayData && oneDayData.totalFeeUSD ? oneDayData.totalFeeUSD : 0,
-        twoDayData && twoDayData.totalFeeUSD ? twoDayData.totalFeeUSD : 0
-      )
-
-      const [oneDayTxns, txnChange] = get2DayPercentChange(
-        data ? data.txCount : 0,
-        oneDayData && oneDayData.txCount ? oneDayData.txCount : 0,
-        twoDayData && twoDayData.txCount ? twoDayData.txCount : 0
-      )
-
-      data.totalLiquidityUSD = data.totalLiquidityETH * ethPrice
-      const liquidityChangeUSD = getPercentChange(
-        data && ethPrice ? data.totalLiquidityETH * ethPrice : 0,
-        oneDayData && oldEthPrice ? oneDayData.totalLiquidityETH * oldEthPrice : 0
-      )
-
-      data.oneDayVolumeUSD = oneDayVolumeUSD
-      data.volumeChangeUSD = volumeChangeUSD
-      data.oneDayFeeUSD = oneDayFeeUSD
-      data.oneDayFeeChange = oneDayFeeChange
-      data.liquidityChangeUSD = liquidityChangeUSD
-      data.oneDayTxns = oneDayTxns
-      data.txnChange = txnChange
-    }
-
-    if (data && oneWeekData && twoWeekData) {
-      const [oneWeekVolume, weeklyVolumeChange] = get2DayPercentChange(
-        data ? data.totalVolumeUSD : 0,
-        oneWeekData ? oneWeekData.totalVolumeUSD : 0,
-        twoWeekData ? twoWeekData.totalVolumeUSD : 0
-      )
-      data.oneWeekVolume = oneWeekVolume
-      data.weeklyVolumeChange = weeklyVolumeChange
-    }
+    calculateValuesOnGlobalData(data)
   } catch (e) {
     console.log(e)
   }
@@ -350,6 +299,7 @@ const getChartData = async (client, oldestDateToFetch) => {
         let currentDayIndex = (nextDay / oneDay).toFixed(0)
         if (!dayIndexSet.has(currentDayIndex)) {
           data.push({
+            id: nextDay / 86400 + '',
             date: nextDay,
             dailyVolumeUSD: 0,
             totalLiquidityUSD: latestLiquidityUSD,
@@ -426,47 +376,50 @@ const getGlobalTransactions = async client => {
 /**
  * Gets the current price  of ETH, 24 hour price, and % change between them
  */
-const getEthPrice = async (client, networksInfo) => {
-  if (!client) {
-    return [0, 0, 0]
+const getEthPrice = async (client, networkInfo) => {
+  const run = async () => {
+    if (!client) {
+      return [0, 0, 0]
+    }
+
+    const utcCurrentTime = dayjs()
+    const utcOneDayBack = utcCurrentTime.subtract(1, 'day').startOf('minute').unix()
+
+    let ethPrice = 0
+    let ethPriceOneDay = 0
+    let priceChangeETH = 0
+
+    try {
+      let oneDayBlock = await getBlockFromTimestamp(utcOneDayBack, networkInfo)
+      let result = await client.query({
+        query: ETH_PRICE(),
+        fetchPolicy: 'cache-first',
+      })
+      let resultOneDay = await client.query({
+        query: ETH_PRICE(oneDayBlock),
+        fetchPolicy: 'cache-first',
+      })
+      const currentPrice = result?.data?.bundles[0]?.ethPrice
+      const oneDayBackPrice = resultOneDay?.data?.bundles[0]?.ethPrice
+      priceChangeETH = getPercentChange(currentPrice, oneDayBackPrice)
+      ethPrice = currentPrice || 0
+      ethPriceOneDay = oneDayBackPrice || currentPrice
+    } catch (e) {
+      console.log(e)
+    }
+
+    return [ethPrice, ethPriceOneDay, priceChangeETH]
   }
-
-  const utcCurrentTime = dayjs()
-  const utcOneDayBack = utcCurrentTime.subtract(1, 'day').startOf('minute').unix()
-
-  let ethPrice = 0
-  let ethPriceOneDay = 0
-  let priceChangeETH = 0
-
-  try {
-    let oneDayBlock = await getBlockFromTimestamp(utcOneDayBack, networksInfo)
-    let result = await client.query({
-      query: ETH_PRICE(),
-      fetchPolicy: 'cache-first',
-    })
-    let resultOneDay = await client.query({
-      query: ETH_PRICE(oneDayBlock),
-      fetchPolicy: 'cache-first',
-    })
-    const currentPrice = result?.data?.bundles[0]?.ethPrice
-    const oneDayBackPrice = resultOneDay?.data?.bundles[0]?.ethPrice
-    priceChangeETH = getPercentChange(currentPrice, oneDayBackPrice)
-    ethPrice = currentPrice || 0
-    ethPriceOneDay = oneDayBackPrice || currentPrice
-  } catch (e) {
-    console.log(e)
-  }
-
-  return [ethPrice, ethPriceOneDay, priceChangeETH]
+  return await memoRequest(run, 'getEthPrice' + networkInfo.chainId, 10000)
 }
 
 const PAIRS_TO_FETCH = 500
 const TOKENS_TO_FETCH = 500
 
 /**
- * Loop through every pair on uniswap, used for search
+ * Loop through every pair on kyberswap, used for search
  */
-async function getAllPairsOnUniswap(client) {
+async function getAllPairsOnKyberswap(client) {
   try {
     let allFound = false
     let pairs = []
@@ -492,9 +445,9 @@ async function getAllPairsOnUniswap(client) {
 }
 
 /**
- * Loop through every token on uniswap, used for search
+ * Loop through every token on kyberswap, used for search
  */
-async function getAllTokensOnUniswap(client) {
+async function getAllTokensOnKyberswap(client) {
   try {
     let allFound = false
     let skipCount = 0
@@ -523,61 +476,53 @@ async function getAllTokensOnUniswap(client) {
  * Hook that fetches overview data, plus all tokens and pairs for search
  */
 export function useGlobalData() {
-  const exchangeSubgraphClient = useExchangeClient()
-  const [state, { update, updateAllPairsInUniswap, updateAllTokensInUniswap }] = useGlobalDataContext()
+  const exchangeSubgraphClient = useExchangeClients()
+  const [state, { update, updateAllPairsInKyberswap, updateAllTokensInKyberswap }] = useGlobalDataContext()
   const [ethPrice, oldEthPrice] = useEthPrice()
-  const [networksInfo] = useNetworkInfo()
-
-  const data = state?.globalData
-  const mounted = useRef()
+  const [networksInfo] = useNetworksInfo()
+  const data = networksInfo.map(networkInfo => state?.[networkInfo.chainId]?.globalData)
 
   useEffect(() => {
-    if (!mounted.current) {
-      mounted.current = true
-    } else {
-      update()
-      updateAllPairsInUniswap()
-      updateAllTokensInUniswap()
-    }
-  }, [exchangeSubgraphClient, update, updateAllPairsInUniswap, updateAllTokensInUniswap])
+    async function fetchData(index) {
+      let globalData = await getGlobalData(exchangeSubgraphClient[index], networksInfo[index])
+      globalData && update(globalData, networksInfo[index].chainId)
 
-  useEffect(() => {
-    async function fetchData() {
-      let globalData = await getGlobalData(exchangeSubgraphClient, ethPrice, oldEthPrice, networksInfo)
-      globalData && update(globalData)
+      let allPairs = await getAllPairsOnKyberswap(exchangeSubgraphClient[index])
+      allPairs?.forEach(allPair => (allPair.chainId = networksInfo[index].chainId))
+      updateAllPairsInKyberswap(allPairs, networksInfo[index].chainId)
 
-      let allPairs = await getAllPairsOnUniswap(exchangeSubgraphClient)
-      updateAllPairsInUniswap(allPairs)
-
-      let allTokens = await getAllTokensOnUniswap(exchangeSubgraphClient)
-      updateAllTokensInUniswap(allTokens)
+      let allTokens = await getAllTokensOnKyberswap(exchangeSubgraphClient[index])
+      allTokens?.forEach(allToken => (allToken.chainId = networksInfo[index].chainId))
+      updateAllTokensInKyberswap(allTokens, networksInfo[index].chainId)
     }
 
-    if (!data && ethPrice && oldEthPrice) {
-      fetchData()
-    }
+    networksInfo.forEach((networkInfo, index) => {
+      if (!data[index] && ethPrice[index] && oldEthPrice[index]) {
+        memoRequest(() => fetchData(index), 'useGlobalData' + networkInfo.chainId, 10000)
+      }
+    })
   }, [
     ethPrice,
     oldEthPrice,
     update,
     data,
-    updateAllPairsInUniswap,
-    updateAllTokensInUniswap,
+    updateAllPairsInKyberswap,
+    updateAllTokensInKyberswap,
     exchangeSubgraphClient,
     networksInfo,
   ])
 
-  return data || {}
+  return data || []
 }
 
 export function useGlobalChartData() {
-  const exchangeSubgraphClient = useExchangeClient()
+  const exchangeSubgraphClient = useExchangeClients()
   const [state, { updateChart }] = useGlobalDataContext()
-  const [oldestDateFetch, setOldestDateFetched] = useState()
+  const [oldestDateFetch, setOldestDateFetched] = useState([])
   const [activeWindow] = useTimeframe()
-
-  const chartDataDaily = state?.chartData?.daily
-  const chartDataWeekly = state?.chartData?.weekly
+  const [networksInfo] = useNetworksInfo()
+  const chartDataDaily = networksInfo.map(networkInfo => state?.[networkInfo.chainId]?.chartData?.daily)
+  const chartDataWeekly = networksInfo.map(networkInfo => state?.[networkInfo.chainId]?.chartData?.weekly)
 
   /**
    * Keep track of oldest date fetched. Used to
@@ -585,92 +530,99 @@ export function useGlobalChartData() {
    * (dont fetch year long stuff unless year option selected)
    */
   useEffect(() => {
-    // based on window, get starttime
-    let startTime = getTimeframe(activeWindow)
+    networksInfo.forEach((networkInfo, index) => {
+      // based on window, get starttime
+      let startTime = getTimeframe(activeWindow[index])
 
-    if ((activeWindow && startTime < oldestDateFetch) || !oldestDateFetch) {
-      setOldestDateFetched(startTime)
-    }
-  }, [activeWindow, oldestDateFetch])
+      if ((activeWindow[index] && startTime < oldestDateFetch[index]) || !oldestDateFetch[index]) {
+        setOldestDateFetched(oldestDateFetch => ((oldestDateFetch[index] = startTime), oldestDateFetch))
+      }
+    })
+  }, [activeWindow, networksInfo, oldestDateFetch])
 
   /**
    * Fetch data if none fetched or older data is needed
    */
   useEffect(() => {
-    async function fetchData() {
+    async function fetchData(index) {
       // historical stuff for chart
-      let [newChartData, newWeeklyData] = await getChartData(exchangeSubgraphClient, oldestDateFetch)
-      updateChart(newChartData, newWeeklyData)
+      let [newChartData, newWeeklyData] = await getChartData(exchangeSubgraphClient[index], oldestDateFetch[index])
+      updateChart(newChartData, newWeeklyData, networksInfo[index].chainId)
     }
-    if (oldestDateFetch && !(chartDataDaily && chartDataWeekly)) {
-      fetchData()
-    }
-  }, [chartDataDaily, chartDataWeekly, oldestDateFetch, updateChart, exchangeSubgraphClient])
+    networksInfo.forEach((networkInfo, index) => {
+      if (oldestDateFetch[index] && !(chartDataDaily[index] && chartDataWeekly[index])) {
+        memoRequest(() => fetchData(index), 'useGlobalChartData' + networkInfo.chainId, 10000)
+      }
+    })
+  }, [chartDataDaily, chartDataWeekly, oldestDateFetch, updateChart, exchangeSubgraphClient, networksInfo])
 
   return [chartDataDaily, chartDataWeekly]
 }
 
 export function useGlobalTransactions() {
-  const exchangeSubgraphClient = useExchangeClient()
+  const exchangeSubgraphClient = useExchangeClients()
   const [state, { updateTransactions }] = useGlobalDataContext()
-  const transactions = state?.transactions
+  const [networksInfo] = useNetworksInfo()
+  const transactions = networksInfo.map(networkInfo => state?.[networkInfo.chainId]?.transactions)
+
+  // useEffect(() => {
+  //   updateTransactions()
+  // }, [exchangeSubgraphClient, updateTransactions])
 
   useEffect(() => {
-    updateTransactions()
-  }, [exchangeSubgraphClient, updateTransactions])
-
-  useEffect(() => {
-    async function fetchData() {
-      if (!transactions) {
-        let txns = await getGlobalTransactions(exchangeSubgraphClient)
-        updateTransactions(txns)
-      }
+    async function fetchData(index) {
+      let transactions = await getGlobalTransactions(exchangeSubgraphClient[index])
+      transactions.burns?.forEach(burn => (burn.chainId = networksInfo[index].chainId))
+      transactions.mints?.forEach(mint => (mint.chainId = networksInfo[index].chainId))
+      transactions.swaps?.forEach(swap => (swap.chainId = networksInfo[index].chainId))
+      updateTransactions(transactions, networksInfo[index].chainId)
     }
-    fetchData()
-  }, [updateTransactions, transactions, exchangeSubgraphClient])
+    networksInfo.forEach((networkInfo, index) => {
+      if (!transactions[index]) {
+        memoRequest(() => fetchData(index), 'useGlobalTransactions' + networkInfo.chainId, 10000)
+      }
+    })
+  }, [updateTransactions, exchangeSubgraphClient, networksInfo, transactions])
   return transactions
 }
 
-export function useEthPrice(networkInfoParams) {
-  const exchangeSubgraphClient = useExchangeClient()
+export function useEthPrice() {
+  const [networksInfo] = useNetworksInfo()
+  const exchangeSubgraphClient = useExchangeClients()
   const [state, { updateEthPrice }] = useGlobalDataContext()
-  const [currentNetworkInfo] = useNetworkInfo()
-  const networkInfo = networkInfoParams || currentNetworkInfo
-  const ethPrice = state?.[ETH_PRICE_KEY]?.[networkInfo.CHAIN_ID]
-  const ethPriceOld = state?.oneDayPrice?.[networkInfo.CHAIN_ID]
-  const mounted = useRef()
+  const ethPrice = networksInfo.map(networkInfo => state?.[networkInfo.chainId]?.[ETH_PRICE_KEY])
+  const ethPriceOld = networksInfo.map(networkInfo => state?.[networkInfo.chainId]?.oneDayPrice)
 
   useEffect(() => {
-    if (!mounted.current) {
-      mounted.current = true
-    } else {
-      updateEthPrice(networkInfo.CHAIN_ID)
+    let timeoutToken
+    async function checkForEthPrice(index) {
+      let [newPrice, oneDayPrice, priceChange] = await getEthPrice(exchangeSubgraphClient[index], networksInfo[index])
+      updateEthPrice(networksInfo[index].chainId, newPrice, oneDayPrice, priceChange)
+      timeoutToken = setTimeout(() => updateEthPrice(networksInfo[index].chainId, 0, 0, 0), 30000)
     }
-  }, [networkInfo, updateEthPrice])
-
-  useEffect(() => {
-    async function checkForEthPrice() {
-      if (!ethPrice) {
-        let [newPrice, oneDayPrice, priceChange] = await getEthPrice(exchangeSubgraphClient, networkInfo)
-        updateEthPrice(networkInfo.CHAIN_ID, newPrice, oneDayPrice, priceChange)
+    networksInfo.forEach((networkInfo, index) => {
+      if (!ethPrice[index]) {
+        memoRequest(() => checkForEthPrice(index), 'useEthPrice' + networkInfo.chainId, 10000)
       }
-    }
-    checkForEthPrice()
-  }, [ethPrice, updateEthPrice, exchangeSubgraphClient, networkInfo])
+    })
+    return () => timeoutToken && clearTimeout(timeoutToken)
+  }, [ethPrice, updateEthPrice, exchangeSubgraphClient, networksInfo])
 
   return [ethPrice, ethPriceOld]
 }
 
-export function useAllPairsInUniswap() {
+export function useAllPairsInKyberswap() {
   const [state] = useGlobalDataContext()
-  let allPairs = state?.allPairs
+  const [[networkInfo]] = useNetworksInfo()
+  const allPairs = state?.[networkInfo.chainId]?.allPairs
 
   return allPairs || []
 }
 
-export function useAllTokensInUniswap() {
+export function useAllTokensInKyberswap() {
   const [state] = useGlobalDataContext()
-  let allTokens = state?.allTokens
+  const [[networkInfo]] = useNetworksInfo()
+  const allTokens = state?.[networkInfo.chainId]?.allTokens
 
   return allTokens || []
 }
@@ -680,17 +632,17 @@ export function useAllTokensInUniswap() {
  * @TODO Not a perfect lookup needs improvement
  */
 export function useTopLps() {
-  const exchangeSubgraphClient = useExchangeClient()
+  const exchangeSubgraphClient = useExchangeClients()
   const [state, { updateTopLps }] = useGlobalDataContext()
-  let topLps = state?.topLps
-
   const allPools = useAllPoolData()
+  const [networksInfo] = useNetworksInfo()
+  const topLps = networksInfo.map(networkInfo => state?.[networkInfo.chainId]?.topLps)
 
   useEffect(() => {
-    async function fetchData() {
+    async function fetchData(index) {
       // get top 20 by reserves
-      let topPools = Object.keys(allPools)
-        ?.sort((a, b) => parseFloat(allPools[a].reserveUSD > allPools[b].reserveUSD ? -1 : 1))
+      let topPools = Object.keys(allPools[index])
+        ?.sort((a, b) => parseFloat(allPools[index][a].reserveUSD > allPools[index][b].reserveUSD ? -1 : 1))
         ?.slice(0, 99)
         .map(pool => pool)
 
@@ -698,7 +650,7 @@ export function useTopLps() {
         topPools.map(async pool => {
           // for each one, fetch top LPs
           try {
-            const { data: results } = await exchangeSubgraphClient.query({
+            const { data: results } = await exchangeSubgraphClient[index].query({
               query: TOP_LPS_PER_POOLS,
               variables: {
                 pool: pool.toString(),
@@ -715,11 +667,11 @@ export function useTopLps() {
       // get the top lps from the results formatted
       const topLps = []
       topLpLists
-        .filter(i => !!i) // check for ones not fetched correctly
-        .map(list => {
-          return list.map(entry => {
-            const poolData = allPools[entry.pool.id]
-            return topLps.push({
+        .filter(Boolean) // check for ones not fetched correctly
+        .forEach(list => {
+          list.forEach(entry => {
+            const poolData = allPools[index][entry.pool.id]
+            topLps.push({
               user: entry.user,
               pairName: poolData.token0.symbol + '-' + poolData.token1.symbol,
               pairAddress: entry.pair.id,
@@ -727,18 +679,20 @@ export function useTopLps() {
               token0: poolData.token0.id,
               token1: poolData.token1.id,
               usd: (parseFloat(entry.liquidityTokenBalance) / parseFloat(poolData.totalSupply)) * parseFloat(poolData.reserveUSD),
+              chainId: networksInfo[index].chainId,
             })
           })
         })
 
       const sorted = topLps.sort((a, b) => (a.usd > b.usd ? -1 : 1))
       const shorter = sorted.splice(0, 100)
-      updateTopLps(shorter)
+      updateTopLps(shorter, networksInfo[index].chainId)
     }
-
-    if (!topLps && allPools && Object.keys(allPools).length > 0) {
-      fetchData()
-    }
+    networksInfo.forEach((networkInfo, index) => {
+      if (!topLps[index] && allPools[index] && Object.keys(allPools[index]).length > 0) {
+        memoRequest(() => fetchData(index), 'useTopLps' + networkInfo.chainId, 10000)
+      }
+    })
   })
 
   return topLps
