@@ -470,3 +470,7 @@ export function getCurrentNetwork() {
     return TronNetworkInfo
   }
 }
+
+export function escapeRegExp(string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') // $& means the whole matched string
+}
