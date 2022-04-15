@@ -33,19 +33,10 @@ export const TOKEN_CHART = gql`
   }
 `
 // ! need mapped
-export const TOKENS_CURRENT = gql`
+export const GET_TOKENS = gql`
   ${TOKEN_FIELDS}
-  query CurrentToken {
-    tokens(first: 200, orderBy: tradeVolumeUSD, orderDirection: desc) {
-      ...TokenFields
-    }
-  }
-`
-// ! need mapped
-export const TOKENS_DYNAMIC = gql`
-  ${TOKEN_FIELDS}
-  query DynamicToken($block: Int!) {
-    tokens(block: { number: $block }, first: 200, orderBy: tradeVolumeUSD, orderDirection: desc) {
+  query Tokens($block: Block_height) {
+    tokens(block: $block, first: 200, orderBy: tradeVolumeUSD, orderDirection: desc) {
       ...TokenFields
     }
   }

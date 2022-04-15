@@ -214,9 +214,9 @@ const getTopTokens = async (price, priceOld) => {
   let twoDayBlock = await getBlockFromTimestamp(utcTwoDaysBack)
 
   try {
-    let current = await tokenApi.getCurrentTokens()
-    let oneDayResult = await tokenApi.getDynamicTokens(oneDayBlock)
-    let twoDayResult = await tokenApi.getDynamicTokens(twoDayBlock)
+    let current = await tokenApi.getTokens()
+    let oneDayResult = await tokenApi.getTokens(oneDayBlock)
+    let twoDayResult = await tokenApi.getTokens(twoDayBlock)
 
     let oneDayData = oneDayResult?.data?.tokens.reduce((obj, cur) => {
       return { ...obj, [cur.id]: cur }

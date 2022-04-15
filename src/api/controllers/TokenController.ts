@@ -1,28 +1,17 @@
 import ApiService from 'api/ApiService'
-import { TOKENS_CURRENT, TOKENS_DYNAMIC, TOKEN_CHART, TOKEN_DATA, TOKEN_SEARCH } from 'api/queries/tokens'
+import { GET_TOKENS, TOKEN_CHART, TOKEN_DATA, TOKEN_SEARCH } from 'api/queries/tokens'
 import { SupportedNetwork } from 'constants/networks'
 import ITokenController from './TokenController.interface'
 
 class TokenController implements ITokenController {
-  public getCurrentTokens() {
+  public getTokens(block?: number) {
     switch (ApiService.activeNetwork) {
       case SupportedNetwork.ETHEREUM:
       case SupportedNetwork.TRON:
         return ApiService.graphqlClient.query({
-          query: TOKENS_CURRENT,
-          fetchPolicy: 'cache-first'
-        })
-    }
-  }
-
-  public getDynamicTokens(block: number) {
-    switch (ApiService.activeNetwork) {
-      case SupportedNetwork.ETHEREUM:
-      case SupportedNetwork.TRON:
-        return ApiService.graphqlClient.query({
-          query: TOKENS_DYNAMIC,
+          query: GET_TOKENS,
           variables: {
-            block
+            block: block ? { number: block } : null
           },
           fetchPolicy: 'cache-first'
         })
