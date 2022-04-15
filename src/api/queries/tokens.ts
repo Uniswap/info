@@ -25,6 +25,7 @@ export const TOKEN_SEARCH = gql`
   }
 `
 
+// ! need mapped
 export const TOKEN_CHART = gql`
   query TokenChart($tokenAddr: String!, $skip: Int!) {
     tokenDayDatas(first: 1000, skip: $skip, orderBy: date, orderDirection: asc, where: { token: $tokenAddr }) {
@@ -40,7 +41,7 @@ export const TOKEN_CHART = gql`
     }
   }
 `
-
+// ! need mapped
 export const TOKENS_CURRENT = gql`
   ${TOKEN_FIELDS}
   query CurrentToken {
@@ -49,7 +50,7 @@ export const TOKENS_CURRENT = gql`
     }
   }
 `
-
+// ! need mapped
 export const TOKENS_DYNAMIC = gql`
   ${TOKEN_FIELDS}
   query DynamicToken($block: Int!) {
@@ -58,7 +59,7 @@ export const TOKENS_DYNAMIC = gql`
     }
   }
 `
-
+// ! need mapped
 export const TOKEN_DATA = gql`
   ${TOKEN_FIELDS}
   query TokenData($tokenAddress: String!, $block: Int) {
