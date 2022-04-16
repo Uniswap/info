@@ -59,6 +59,14 @@ const POLYGON_TOKEN_LIST = {
     logoURI:
       'https://raw.githubusercontent.com/stevepegaxy/assets/master/blockchains/polygon/assets/0xcC1B9517460D8aE86fe576f614d091fCa65a28Fc/logo.png',
   },
+  '0xFbBd93fC3BE8B048c007666AF4846e4A36BACC95': {
+    chainId: 137,
+    address: '0xFbBd93fC3BE8B048c007666AF4846e4A36BACC95',
+    symbol: 'RIKEN',
+    name: 'RIKEN',
+    decimals: 18,
+    logoURI: 'https://i.imgur.com/o914JpY.jpg',
+  },
 }
 
 export default POLYGON_TOKEN_LIST
