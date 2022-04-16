@@ -351,7 +351,7 @@ function PoolPage({ poolAddress, history }) {
                   </RowFixed>
                 </FixedPanel>
               </BasicLink>
-              <BasicLink to={`/${networkInfo.urlKey}/token/${token0?.id}`}>
+              <BasicLink to={`/${networkInfo.urlKey}/token/${token1?.id}`}>
                 <FixedPanel>
                   <RowFixed>
                     <TokenLogo address={token1?.id} size={'16px'} networkInfo={networkInfo} />
