@@ -3,7 +3,7 @@ import { AutoColumn } from '../Column'
 import Title from '../Title'
 import { BasicLink } from '../Link'
 import { useMedia } from 'react-use'
-import { transparentize } from 'polished'
+import { darken } from 'polished'
 import { TYPE } from '../../Theme'
 import { useFormatPath } from 'hooks'
 import { useLocation } from 'react-router-dom'
@@ -13,10 +13,11 @@ import { useSessionStart } from 'state/features/application/hooks'
 import { useDarkModeManager } from 'state/features/user/hooks'
 import Toggle from '../Toggle'
 import { useTranslation } from 'react-i18next'
+import NetworkSwitcher from 'components/NetworkSwitcher'
 
 const Wrapper = styled.div`
   height: ${({ isMobile }) => (isMobile ? 'initial' : '100vh')};
-  background-color: ${({ theme }) => transparentize(0.4, theme.bg1)};
+  background-color: ${({ theme }) => darken(0.05, theme.bg1)};
   color: ${({ theme }) => theme.text1};
   position: sticky;
   top: 0px;
@@ -153,6 +154,7 @@ function SideNav() {
         <DesktopWrapper>
           <AutoColumn gap="1rem">
             <Title />
+            <NetworkSwitcher />
             {!below1080 && (
               <AutoColumn style={{ marginTop: '5.25rem' }}>
                 <BasicLink to={formatPath('/')}>
