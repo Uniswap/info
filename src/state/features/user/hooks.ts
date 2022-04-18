@@ -11,11 +11,11 @@ import {
 } from './slice'
 import { useActiveNetworkId } from '../application/hooks'
 
-export function useDarkModeManager() {
+export function useDarkModeManager(): [boolean, () => void] {
   const dispatch = useAppDispatch()
   const isDarkMode = useAppSelector(state => state.user.darkMode)
-  const toggleDarkMode = (value: boolean) => {
-    dispatch(setDarkMode(value === false || value === true ? value : !isDarkMode))
+  const toggleDarkMode = () => {
+    dispatch(setDarkMode(!isDarkMode))
   }
   return [isDarkMode, toggleDarkMode]
 }
