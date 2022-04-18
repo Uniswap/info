@@ -554,11 +554,14 @@ export function usePoolData(poolAddress) {
   }, [poolAddress, networkInfo])
 
   useEffect(() => {
+    let cancelled = false
     async function fetchData() {
       try {
         let data = await getBulkPoolData(exchangeSubgraphClient, [poolAddress], ethPrice, networkInfo)
+        if (cancelled) return
         data?.length ? update(poolAddress, data[0], networkInfo.chainId) : setError(true)
       } catch (e) {
+        if (cancelled) return
         setError(true)
       }
     }
@@ -569,6 +572,7 @@ export function usePoolData(poolAddress) {
         setError(true)
       }
     }
+    return () => (cancelled = true)
   }, [poolAddress, poolData, update, ethPrice, exchangeSubgraphClient, networkInfo, error])
 
   return error ? { error: true } : poolData || {}

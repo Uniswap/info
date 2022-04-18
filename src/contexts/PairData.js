@@ -624,12 +624,15 @@ export function usePairData(pairAddress) {
   }, [pairAddress, networkInfo])
 
   useEffect(() => {
+    let cancelled = false
     async function fetchData() {
       try {
         let data = await getBulkPairData(exchangeSubgraphClient, [pairAddress], ethPrice, networkInfo)
+        if (cancelled) return
         if (data) update(pairAddress, data[0], networkInfo.chainId)
         else setError(true)
       } catch (e) {
+        if (cancelled) return
         setError(true)
       }
     }
@@ -643,6 +646,7 @@ export function usePairData(pairAddress) {
         setError(true)
       }
     }
+    return () => (cancelled = true)
   }, [pairAddress, pairData, update, ethPrice, exchangeSubgraphClient, networkInfo, error])
 
   return error ? { error: true } : pairData || {}

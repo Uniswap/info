@@ -618,6 +618,7 @@ export function useTokenData(tokenAddress) {
   }, [tokenAddress, networkInfo])
 
   useEffect(() => {
+    let cancelled = false
     if (!tokenData && !error) {
       if (!isAddress(tokenAddress)) setError(true)
       else if (ethPrice && ethPriceOld) {
@@ -625,15 +626,20 @@ export function useTokenData(tokenAddress) {
           () =>
             getTokenData(exchangeSubgraphClient, tokenAddress, ethPrice, ethPriceOld, networkInfo)
               .then(data => {
+                if (cancelled) return
                 if (data) update(tokenAddress, data, networkInfo.chainId)
                 else setError(true)
               })
-              .catch(e => setError(true)),
+              .catch(e => {
+                if (cancelled) return
+                setError(true)
+              }),
           'useTokenData_' + networkInfo.chainId + '_' + ethPrice,
           10000
         )
       }
     }
+    return () => (cancelled = true)
   }, [ethPrice, ethPriceOld, tokenAddress, tokenData, update, exchangeSubgraphClient, networkInfo, error])
 
   return error ? { error: true } : tokenData || {}
