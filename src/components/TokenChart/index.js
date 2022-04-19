@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import styled from 'styled-components/macro'
 import { Area, XAxis, YAxis, ResponsiveContainer, Tooltip, AreaChart, BarChart, Bar } from 'recharts'
 import { AutoRow, RowBetween, RowFixed } from '../Row'
@@ -13,7 +13,7 @@ import CandleStickChart from '../CandleChart'
 import LocalLoader from '../LocalLoader'
 import { AutoColumn } from '../Column'
 import { Activity } from 'react-feather'
-import { useDarkModeManager } from '../../contexts/LocalStorage'
+import { useDarkModeManager } from 'state/features/user/hooks'
 import { useTranslation } from 'react-i18next'
 
 const ChartWrapper = styled.div`
@@ -33,18 +33,17 @@ const CHART_VIEW = {
   VOLUME: 'Volume',
   LIQUIDITY: 'Liquidity',
   PRICE: 'Price',
-  LINE_PRICE: 'Price (Line)',
+  LINE_PRICE: 'Price (Line)'
 }
 
 const DATA_FREQUENCY = {
   DAY: 'DAY',
   HOUR: 'HOUR',
-  LINE: 'LINE',
+  LINE: 'LINE'
 }
 
 const TokenChart = ({ address, color, base }) => {
   const { t } = useTranslation()
-  
   // settings for the window and candle width
   const [chartFilter, setChartFilter] = useState(CHART_VIEW.PRICE)
   const [frequency, setFrequency] = useState(DATA_FREQUENCY.HOUR)
@@ -110,10 +109,10 @@ const TokenChart = ({ address, color, base }) => {
   const below600 = useMedia('(max-width: 600px)')
 
   let utcStartTime = getTimeframe(timeWindow)
-  const domain = [(dataMin) => (dataMin > utcStartTime ? dataMin : utcStartTime), 'dataMax']
+  const domain = [dataMin => (dataMin > utcStartTime ? dataMin : utcStartTime), 'dataMax']
   const aspect = below1080 ? 60 / 32 : below600 ? 60 / 42 : 60 / 22
 
-  chartData = chartData?.filter((entry) => entry.date >= utcStartTime)
+  chartData = chartData?.filter(entry => entry.date >= utcStartTime)
 
   // update the width on a window resize
   const ref = useRef()
@@ -236,7 +235,7 @@ const TokenChart = ({ address, color, base }) => {
               interval="preserveEnd"
               tickMargin={16}
               minTickGap={120}
-              tickFormatter={(tick) => toNiceDate(tick)}
+              tickFormatter={tick => toNiceDate(tick)}
               dataKey="date"
               tick={{ fill: textColor }}
               type={'number'}
@@ -245,7 +244,7 @@ const TokenChart = ({ address, color, base }) => {
             <YAxis
               type="number"
               orientation="right"
-              tickFormatter={(tick) => '$' + toK(tick)}
+              tickFormatter={tick => '$' + toK(tick)}
               axisLine={false}
               tickLine={false}
               interval="preserveEnd"
@@ -255,9 +254,9 @@ const TokenChart = ({ address, color, base }) => {
             />
             <Tooltip
               cursor={true}
-              formatter={(val) => formattedNum(val, true)}
-              labelFormatter={(label) => toNiceDateYear(label)}
-              labelStyle={{ 
+              formatter={val => formattedNum(val, true)}
+              labelFormatter={label => toNiceDateYear(label)}
+              labelStyle={{
                 paddingTop: 4
               }}
               contentStyle={{
@@ -299,7 +298,7 @@ const TokenChart = ({ address, color, base }) => {
                 interval="preserveEnd"
                 tickMargin={16}
                 minTickGap={120}
-                tickFormatter={(tick) => toNiceDate(tick)}
+                tickFormatter={tick => toNiceDate(tick)}
                 dataKey="date"
                 tick={{ fill: 'textColor' }}
                 type={'number'}
@@ -308,7 +307,7 @@ const TokenChart = ({ address, color, base }) => {
               <YAxis
                 type="number"
                 orientation="right"
-                tickFormatter={(tick) => '$' + toK(tick)}
+                tickFormatter={tick => '$' + toK(tick)}
                 axisLine={false}
                 tickLine={false}
                 interval="preserveEnd"
@@ -318,8 +317,8 @@ const TokenChart = ({ address, color, base }) => {
               />
               <Tooltip
                 cursor={true}
-                formatter={(val) => formattedNum(val, true)}
-                labelFormatter={(label) => toNiceDateYear(label)}
+                formatter={val => formattedNum(val, true)}
+                labelFormatter={label => toNiceDateYear(label)}
                 labelStyle={{ paddingTop: 4 }}
                 contentStyle={{
                   padding: '10px 14px',
@@ -360,7 +359,7 @@ const TokenChart = ({ address, color, base }) => {
               interval="preserveEnd"
               minTickGap={80}
               tickMargin={14}
-              tickFormatter={(tick) => toNiceDate(tick)}
+              tickFormatter={tick => toNiceDate(tick)}
               dataKey="date"
               tick={{ fill: textColor }}
               type={'number'}
@@ -370,7 +369,7 @@ const TokenChart = ({ address, color, base }) => {
               type="number"
               axisLine={false}
               tickMargin={30}
-              tickFormatter={(tick) => '$' + toK(tick)}
+              tickFormatter={tick => '$' + toK(tick)}
               tickLine={false}
               orientation="right"
               interval="preserveEnd"
@@ -380,14 +379,14 @@ const TokenChart = ({ address, color, base }) => {
             />
             <Tooltip
               cursor={{ fill: color, opacity: 0.1 }}
-              formatter={(val) => formattedNum(val, true)}
-              labelFormatter={(label) => toNiceDateYear(label)}
+              formatter={val => formattedNum(val, true)}
+              labelFormatter={label => toNiceDateYear(label)}
               labelStyle={{ paddingTop: 4 }}
               contentStyle={{
                 padding: '10px 14px',
                 borderRadius: 10,
                 borderColor: color,
-                color: 'black',
+                color: 'black'
               }}
               wrapperStyle={{ top: -70, left: -10 }}
             />

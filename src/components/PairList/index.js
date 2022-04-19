@@ -1,14 +1,12 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useMedia } from 'react-use'
-import dayjs from 'dayjs'
 import LocalLoader from '../LocalLoader'
-import utc from 'dayjs/plugin/utc'
 import { Box, Flex, Text } from 'rebass'
 import styled from 'styled-components/macro'
+import { useFormatPath } from 'hooks'
 
 import { CustomLink } from '../Link'
 import { Divider } from '../../components'
-import { withRouter } from 'react-router-dom'
 import { formattedNum, formattedPercent } from '../../utils'
 import DoubleTokenLogo from '../DoubleLogo'
 import FormattedName from '../FormattedName'
@@ -18,8 +16,6 @@ import { transparentize } from 'polished'
 import Panel from '../Panel'
 import { useTranslation } from 'react-i18next'
 
-dayjs.extend(utc)
-
 const PageButtons = styled.div`
   width: 100%;
   display: flex;
@@ -27,13 +23,13 @@ const PageButtons = styled.div`
   margin-top: 2em;
 
   @media screen and (max-width: 440px) {
-    margin-top: .75rem;
+    margin-top: 0.75rem;
   }
 `
 
 const Arrow = styled.div`
   color: ${({ theme }) => theme.primary1};
-  opacity: ${(props) => (props.faded ? 0.3 : 1)};
+  opacity: ${props => (props.faded ? 0.3 : 1)};
   padding: 0 20px;
   user-select: none;
   :hover {
@@ -62,10 +58,10 @@ const DashGrid = styled.div`
       width: 20px;
     }
   }
-  
+
   @media screen and (min-width: 740px) {
     padding: 0 1.125rem;
-    grid-template-columns: 1.5fr 1fr 1fr};
+    grid-template-columns: 1.5fr 1fr 1fr;
     grid-template-areas: ' name liq vol';
   }
 
@@ -81,8 +77,6 @@ const DashGrid = styled.div`
   }
 `
 
-const ListWrapper = styled.div``
-
 const ClickableText = styled(Text)`
   color: ${({ theme }) => transparentize(0.3, theme.text6)};
   user-select: none;
@@ -93,7 +87,9 @@ const ClickableText = styled(Text)`
   display: flex;
   justify-content: flex-end;
 
-  ${({ active = true, theme }) => active && `
+  ${({ active = true }) =>
+    active &&
+    `
     &:hover {
       opacity: 0.6;
     }
@@ -139,19 +135,20 @@ const SORT_FIELD = {
   VOL: 1,
   VOL_7DAYS: 3,
   FEES: 4,
-  APY: 5,
+  APY: 5
 }
 
 const FIELD_TO_VALUE = {
   [SORT_FIELD.LIQ]: 'trackedReserveUSD', // sort with tracked volume only
   [SORT_FIELD.VOL]: 'oneDayVolumeUSD',
   [SORT_FIELD.VOL_7DAYS]: 'oneWeekVolumeUSD',
-  [SORT_FIELD.FEES]: 'oneDayVolumeUSD',
+  [SORT_FIELD.FEES]: 'oneDayVolumeUSD'
 }
 
-function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
+function PairList({ pairs, disbaleLinks, maxItems = 10 }) {
   const { t } = useTranslation()
-  
+  const formatPath = useFormatPath()
+
   const below440 = useMedia('(max-width: 440px)')
   const below600 = useMedia('(max-width: 600px)')
   const below740 = useMedia('(max-width: 740px)')
@@ -193,22 +190,21 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
         <DashGrid style={{ padding: below440 ? '.75rem' : '.875rem 2rem' }} disbaleLinks={disbaleLinks} focus={true}>
           <DataText area="name" fontWeight="500">
             {!below600 && <div style={{ marginRight: '20px', width: '10px' }}>{index}</div>}
-            {!below440 && <DoubleTokenLogo
-              size={below600 ? 16 : 20}
-              a0={pairData.token0.id}
-              a1={pairData.token1.id}
-              margin={!below740}
-            />}
-            <Link 
-              to={'/pair/' + pairAddress}
-              style={{ marginLeft: below440 && 0 }}
-            >
+            {!below440 && (
+              <DoubleTokenLogo
+                size={below600 ? 16 : 20}
+                a0={pairData.token0.id}
+                a1={pairData.token1.id}
+                margin={!below740}
+              />
+            )}
+            <Link to={formatPath(`/pairs/${pairAddress}`)} style={{ marginLeft: below440 && 0 }}>
               <FormattedName
                 text={pairData.token0.symbol + '-' + pairData.token1.symbol}
                 maxCharacters={below600 ? 8 : 16}
                 adjustSize={true}
                 link={true}
-                fontSize={ below440 ? 10 : 14 }
+                fontSize={below440 ? 10 : 14}
               />
             </Link>
           </DataText>
@@ -252,10 +248,10 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
       })
 
   return (
-    <ListWrapper>
+    <div>
       <Panel
         style={{
-          marginTop: below440 ? '.75rem' : '1.5rem', 
+          marginTop: below440 ? '.75rem' : '1.5rem',
           padding: 0
         }}
       >
@@ -265,15 +261,14 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
           style={{ height: 'fit-content', padding: below440 ? '.75rem' : '1rem 2rem', borderTop: 'none' }}
         >
           <Flex alignItems="center" justifyContent="flexStart">
-            <ClickableText 
-              active={false}
-              style={{ justifyContent: 'flex-start' }}
-            >{t('name')}</ClickableText>
+            <ClickableText active={false} style={{ justifyContent: 'flex-start' }}>
+              {t('name')}
+            </ClickableText>
           </Flex>
           <Flex alignItems="center" justifyContent="flexEnd">
             <ClickableText
               area="liq"
-              onClick={(e) => {
+              onClick={() => {
                 setSortedColumn(SORT_FIELD.LIQ)
                 setSortDirection(sortedColumn !== SORT_FIELD.LIQ ? true : !sortDirection)
               }}
@@ -284,7 +279,7 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
           <Flex alignItems="center">
             <ClickableText
               area="vol"
-              onClick={(e) => {
+              onClick={() => {
                 setSortedColumn(SORT_FIELD.VOL)
                 setSortDirection(sortedColumn !== SORT_FIELD.VOL ? true : !sortDirection)
               }}
@@ -297,12 +292,12 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
             <Flex alignItems="center" justifyContent="flexEnd">
               <ClickableText
                 area="volWeek"
-                onClick={(e) => {
+                onClick={() => {
                   setSortedColumn(SORT_FIELD.VOL_7DAYS)
                   setSortDirection(sortedColumn !== SORT_FIELD.VOL_7DAYS ? true : !sortDirection)
                 }}
               >
-                {('volume')} (7d) {sortedColumn === SORT_FIELD.VOL_7DAYS ? (!sortDirection ? '↑' : '↓') : ''}
+                {'volume'} (7d) {sortedColumn === SORT_FIELD.VOL_7DAYS ? (!sortDirection ? '↑' : '↓') : ''}
               </ClickableText>
             </Flex>
           )}
@@ -310,7 +305,7 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
             <Flex alignItems="center" justifyContent="flexEnd">
               <ClickableText
                 area="fees"
-                onClick={(e) => {
+                onClick={() => {
                   setSortedColumn(SORT_FIELD.FEES)
                   setSortDirection(sortedColumn !== SORT_FIELD.FEES ? true : !sortDirection)
                 }}
@@ -323,12 +318,15 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
             <Flex alignItems="center" justifyContent="flexEnd">
               <ClickableText
                 area="apy"
-                onClick={(e) => {
+                onClick={() => {
                   setSortedColumn(SORT_FIELD.APY)
                   setSortDirection(sortedColumn !== SORT_FIELD.APY ? true : !sortDirection)
                 }}
               >
-                {`1y ${t('fees')} / ${t('liquidity')} ${sortedColumn === SORT_FIELD.APY ? (!sortDirection ? '↑' : '↓') : ''}`}{sortedColumn === SORT_FIELD.APY ? (!sortDirection ? '↑' : '↓') : ''}
+                {`1y ${t('fees')} / ${t('liquidity')} ${
+                  sortedColumn === SORT_FIELD.APY ? (!sortDirection ? '↑' : '↓') : ''
+                }`}
+                {sortedColumn === SORT_FIELD.APY ? (!sortDirection ? '↑' : '↓') : ''}
               </ClickableText>
               <QuestionHelper text={t('basedOn24hrVolume')} />
             </Flex>
@@ -339,7 +337,7 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
       </Panel>
       <PageButtons>
         <div
-          onClick={(e) => {
+          onClick={() => {
             setPage(page === 1 ? page : page - 1)
           }}
         >
@@ -347,15 +345,15 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
         </div>
         <TYPE.body>{`${t('page')} ${page} ${t('of')} ${maxPage}`}</TYPE.body>
         <div
-          onClick={(e) => {
+          onClick={() => {
             setPage(page === maxPage ? page : page + 1)
           }}
         >
           <Arrow faded={page === maxPage ? true : false}>→</Arrow>
         </div>
       </PageButtons>
-    </ListWrapper>
+    </div>
   )
 }
 
-export default withRouter(PairList)
+export default PairList

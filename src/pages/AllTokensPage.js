@@ -1,6 +1,4 @@
-import React, { useEffect } from 'react'
-import 'feather-icons'
-
+import { useEffect } from 'react'
 import TopTokenList from '../components/TokenList'
 import { TYPE } from '../Theme'
 import { useAllTokenData } from '../contexts/TokenData'
@@ -13,7 +11,6 @@ import { useTranslation } from 'react-i18next'
 
 function AllTokensPage() {
   const { t } = useTranslation()
-  
   const allTokens = useAllTokenData()
 
   useEffect(() => {

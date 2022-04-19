@@ -1,19 +1,16 @@
-import React, { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { createChart } from 'lightweight-charts'
 import dayjs from 'dayjs'
-import utc from 'dayjs/plugin/utc'
 import { formattedNum } from '../../utils'
 import styled from 'styled-components/macro'
 import { usePrevious } from 'react-use'
 import { Play } from 'react-feather'
-import { useDarkModeManager } from '../../contexts/LocalStorage'
+import { useDarkModeManager } from 'state/features/user/hooks'
 import { IconWrapper } from '..'
-
-dayjs.extend(utc)
 
 export const CHART_TYPES = {
   BAR: 'BAR',
-  AREA: 'AREA',
+  AREA: 'AREA'
 }
 
 const Wrapper = styled.div`
@@ -31,7 +28,7 @@ const TradingViewChart = ({
   field,
   title,
   width,
-  useWeekly = false,
+  useWeekly = false
 }) => {
   // reference for DOM element to create with chart
   const ref = useRef()
@@ -52,10 +49,10 @@ const TradingViewChart = ({
   }, [chartCreated, data, dataPrev, type])
 
   // parese the data and format for tardingview consumption
-  const formattedData = data?.map((entry) => {
+  const formattedData = data?.map(entry => {
     return {
       time: dayjs.unix(entry.date).utc().format('YYYY-MM-DD'),
-      value: parseFloat(entry[field]),
+      value: parseFloat(entry[field])
     }
   })
 
@@ -86,44 +83,44 @@ const TradingViewChart = ({
         height: HEIGHT,
         layout: {
           backgroundColor: 'transparent',
-          textColor: textColor,
+          textColor: textColor
         },
         rightPriceScale: {
           scaleMargins: {
             top: topScale,
-            bottom: 0,
+            bottom: 0
           },
-          borderVisible: false,
+          borderVisible: false
         },
         timeScale: {
-          borderVisible: false,
+          borderVisible: false
         },
         grid: {
           horzLines: {
             color: 'rgba(197, 203, 206, 0.5)',
-            visible: false,
+            visible: false
           },
           vertLines: {
             color: 'rgba(197, 203, 206, 0.5)',
-            visible: false,
-          },
+            visible: false
+          }
         },
         crosshair: {
           horzLine: {
             visible: false,
-            labelVisible: false,
+            labelVisible: false
           },
           vertLine: {
             visible: true,
             style: 0,
             width: 2,
             color: 'rgba(32, 38, 46, 0.1)',
-            labelVisible: false,
-          },
+            labelVisible: false
+          }
         },
         localization: {
-          priceFormatter: (val) => formattedNum(val, true),
-        },
+          priceFormatter: val => formattedNum(val, true)
+        }
       })
 
       var series =
@@ -131,20 +128,20 @@ const TradingViewChart = ({
           ? chart.addHistogramSeries({
               color: '#2E69BB',
               priceFormat: {
-                type: 'volume',
+                type: 'volume'
               },
               scaleMargins: {
                 top: 0.32,
-                bottom: 0,
+                bottom: 0
               },
               lineColor: '#2E69BB',
-              lineWidth: 1,
+              lineWidth: 1
             })
           : chart.addAreaSeries({
               topColor: '#2E69BB',
               bottomColor: 'rgba(255, 255, 255, 0)',
               lineColor: '#2E69BB',
-              lineWidth: 1,
+              lineWidth: 1
             })
 
       series.setData(formattedData)
@@ -164,7 +161,7 @@ const TradingViewChart = ({
       let color = percentChange >= 0 ? 'green' : 'red'
 
       // get the title of the chart
-      function setLastBarText() {
+      const setLastBarText = () => {
         toolTip.innerHTML =
           `<div style="font-size: 16px; margin: 4px 0px; color: ${textColor};">${title} ${
             type === CHART_TYPES.BAR && !useWeekly ? '(24hr)' : ''
@@ -226,7 +223,7 @@ const TradingViewChart = ({
     topScale,
     type,
     useWeekly,
-    width,
+    width
   ])
 
   // responsiveness

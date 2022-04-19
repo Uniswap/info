@@ -1,6 +1,4 @@
-import React, { useEffect } from 'react'
-import 'feather-icons'
-import { withRouter } from 'react-router-dom'
+import { useEffect } from 'react'
 import { DashboardWrapper, TYPE } from '../Theme'
 import { PageWrapper, FullWrapper } from '../components'
 import LPList from '../components/LPList'
@@ -51,10 +49,10 @@ function AccountLookup() {
             {t('topLiquidityPositions')}
           </TYPE.main>
           {topLps && topLps.length > 0 ? <LPList lps={topLps} maxItems={200} /> : <LocalLoader />}
-        </DashboardWrapper>      
+        </DashboardWrapper>
       </FullWrapper>
     </PageWrapper>
   )
 }
 
-export default withRouter(AccountLookup)
+export default AccountLookup

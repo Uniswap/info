@@ -1,18 +1,19 @@
-import { useState, useCallback, useEffect, useRef } from 'react'
+import { useState, useCallback, useEffect, useRef, RefObject } from 'react'
 import { shade } from 'polished'
 import Vibrant from 'node-vibrant'
 import { hex } from 'wcag-contrast'
-import { isAddress } from '../utils'
+import { isAddress, networkPrefix } from '../utils'
 import copy from 'copy-to-clipboard'
+import { useAppSelector } from 'state/hooks'
 
-export function useColor(tokenAddress, token) {
+export function useColor(tokenAddress: string, token: string) {
   const [color, setColor] = useState('#2172E5')
   if (tokenAddress) {
     const path = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${isAddress(
       tokenAddress
     )}/logo.png`
     if (path) {
-      Vibrant.from(path).getPalette((err, palette) => {
+      Vibrant.from(path).getPalette((_err, palette) => {
         if (palette && palette.Vibrant) {
           let detectedHex = palette.Vibrant.hex
           let AAscore = hex(detectedHex, '#FFF')
@@ -35,7 +36,7 @@ export function useColor(tokenAddress, token) {
 export function useCopyClipboard(timeout = 500) {
   const [isCopied, setIsCopied] = useState(false)
 
-  const staticCopy = useCallback((text) => {
+  const staticCopy = useCallback(text => {
     const didCopy = copy(text)
     setIsCopied(didCopy)
   }, [])
@@ -50,13 +51,14 @@ export function useCopyClipboard(timeout = 500) {
         clearTimeout(hide)
       }
     }
+    return
   }, [isCopied, setIsCopied, timeout])
 
   return [isCopied, staticCopy]
 }
 
-export const useOutsideClick = (ref, ref2, callback) => {
-  const handleClick = (e) => {
+export const useOutsideClick = (ref: RefObject<any>, ref2: RefObject<any>, callback: (value: boolean) => void) => {
+  const handleClick = (e: MouseEvent) => {
     if (ref.current && ref.current && !ref2.current) {
       callback(true)
     } else if (ref.current && !ref.current.contains(e.target) && ref2.current && !ref2.current.contains(e.target)) {
@@ -95,4 +97,13 @@ export default function useInterval(callback: () => void, delay: null | number) 
     }
     return
   }, [delay])
+}
+
+export function useFormatPath() {
+  const activeNetwork = useAppSelector(state => state.application.activeNetwork)
+
+  return useCallback((url?: string) => {
+    const path = networkPrefix(activeNetwork)
+    return url ? `${path}${url}` : path
+  }, [])
 }

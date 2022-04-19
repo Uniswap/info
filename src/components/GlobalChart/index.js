@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useRef } from 'react'
+import { useState, useMemo, useEffect, useRef } from 'react'
 import { timeframeOptions } from '../../constants'
 import { useGlobalChartData, useGlobalData } from '../../contexts/GlobalData'
 import { useMedia } from 'react-use'
@@ -13,16 +13,15 @@ import { useTranslation } from 'react-i18next'
 
 const CHART_VIEW = {
   VOLUME: 'Volume',
-  LIQUIDITY: 'Liquidity',
+  LIQUIDITY: 'Liquidity'
 }
 
 const VOLUME_WINDOW = {
   WEEKLY: 'WEEKLY',
-  DAYS: 'DAYS',
+  DAYS: 'DAYS'
 }
 const GlobalChart = ({ display }) => {
   const { t } = useTranslation()
-  
   // chart options
   const [chartView, setChartView] = useState(display === 'volume' ? CHART_VIEW.VOLUME : CHART_VIEW.LIQUIDITY)
 
@@ -32,14 +31,8 @@ const GlobalChart = ({ display }) => {
 
   // global historical data
   const [dailyData, weeklyData] = useGlobalChartData()
-  const {
-    totalLiquidityUSD,
-    oneDayVolumeUSD,
-    volumeChangeUSD,
-    liquidityChangeUSD,
-    oneWeekVolume,
-    weeklyVolumeChange,
-  } = useGlobalData()
+  const { totalLiquidityUSD, oneDayVolumeUSD, volumeChangeUSD, liquidityChangeUSD, oneWeekVolume, weeklyVolumeChange } =
+    useGlobalData()
 
   // based on window, get starttim
   let utcStartTime = getTimeframe(timeWindow)
@@ -49,7 +42,7 @@ const GlobalChart = ({ display }) => {
     return (
       currentData &&
       Object.keys(currentData)
-        ?.map((key) => {
+        ?.map(key => {
           let item = currentData[key]
           if (item.date > utcStartTime) {
             return item
@@ -57,7 +50,7 @@ const GlobalChart = ({ display }) => {
             return
           }
         })
-        .filter((item) => {
+        .filter(item => {
           return !!item
         })
     )
@@ -82,7 +75,7 @@ const GlobalChart = ({ display }) => {
   return chartDataFiltered ? (
     <>
       {below800 && (
-        <DropdownSelect options={CHART_VIEW} active={chartView} setActive={setChartView} color={'#2E69BB'}/>
+        <DropdownSelect options={CHART_VIEW} active={chartView} setActive={setChartView} color={'#2E69BB'} />
       )}
       {chartDataFiltered && chartView === CHART_VIEW.LIQUIDITY && (
         <Panel>

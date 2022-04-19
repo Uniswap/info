@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import styled from 'styled-components/macro'
 import { Area, XAxis, YAxis, ResponsiveContainer, Tooltip, AreaChart } from 'recharts'
 import { AutoRow, RowBetween } from '../Row'
@@ -10,7 +10,7 @@ import { timeframeOptions } from '../../constants'
 import DropdownSelect from '../DropdownSelect'
 import { useUserLiquidityChart } from '../../contexts/User'
 import LocalLoader from '../LocalLoader'
-import { useDarkModeManager } from '../../contexts/LocalStorage'
+import { useDarkModeManager } from 'state/features/user/hooks'
 import { TYPE } from '../../Theme'
 import { useTranslation } from 'react-i18next'
 
@@ -36,7 +36,7 @@ const UserChart = ({ account }) => {
   const [timeWindow, setTimeWindow] = useState(timeframeOptions.ALL_TIME)
   let utcStartTime = getTimeframe(timeWindow)
 
-  const domain = [(dataMin) => (dataMin > utcStartTime ? dataMin : utcStartTime), 'dataMax']
+  const domain = [dataMin => (dataMin > utcStartTime ? dataMin : utcStartTime), 'dataMax']
 
   const aspect = above1600 ? 60 / 12 : below600 ? 60 / 42 : 60 / 16
 
@@ -89,7 +89,7 @@ const UserChart = ({ account }) => {
               interval="preserveEnd"
               tickMargin={16}
               minTickGap={0}
-              tickFormatter={(tick) => toNiceDate(tick)}
+              tickFormatter={tick => toNiceDate(tick)}
               dataKey="date"
               tick={{ fill: textColor }}
               type={'number'}
@@ -98,7 +98,7 @@ const UserChart = ({ account }) => {
             <YAxis
               type="number"
               orientation="right"
-              tickFormatter={(tick) => '$' + toK(tick)}
+              tickFormatter={tick => '$' + toK(tick)}
               axisLine={false}
               tickLine={false}
               interval="preserveEnd"
@@ -108,14 +108,14 @@ const UserChart = ({ account }) => {
             />
             <Tooltip
               cursor={true}
-              formatter={(val) => formattedNum(val, true)}
-              labelFormatter={(label) => toNiceDateYear(label)}
+              formatter={val => formattedNum(val, true)}
+              labelFormatter={label => toNiceDateYear(label)}
               labelStyle={{ paddingTop: 4 }}
               contentStyle={{
                 padding: '10px 14px',
                 borderRadius: 10,
                 borderColor: '#C9A02F',
-                color: 'black',
+                color: 'black'
               }}
               wrapperStyle={{ top: -70, left: -10 }}
             />

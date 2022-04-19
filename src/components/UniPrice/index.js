@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import { useMemo } from 'react'
 import styled from 'styled-components/macro'
 import Panel from '../Panel'
 import { AutoColumn } from '../Column'

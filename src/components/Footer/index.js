@@ -1,4 +1,3 @@
-import React from 'react'
 import { Flex } from 'rebass'
 
 import Link from '../Link'
@@ -6,7 +5,7 @@ import Link from '../Link'
 const links = [
   { url: 'https://ws.exchange/about', text: 'About' },
   { url: 'https://docs.ws.exchange/', text: 'Docs' },
-  { url: 'https://github.com/WhiteSwap/whiteswap-info', text: 'Code' },
+  { url: 'https://github.com/WhiteSwap/whiteswap-info', text: 'Code' }
 ]
 
 const FooterLink = ({ children, ...rest }) => (

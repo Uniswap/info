@@ -1,17 +1,19 @@
-import React, { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import styled from 'styled-components/macro'
 import { useUserTransactions, useUserPositions } from '../contexts/User'
 import TxnList from '../components/TxnList'
+import { useParams, Navigate } from 'react-router-dom'
 import Panel from '../components/Panel'
-import { formattedNum } from '../utils'
+import { formattedNum, isAddress } from '../utils'
 import Row, { AutoRow, RowFixed, RowBetween } from '../components/Row'
 import { AutoColumn } from '../components/Column'
 import UserChart from '../components/UserChart'
 import PairReturnsChart from '../components/PairReturnsChart'
 import PositionList from '../components/PositionList'
+import { useFormatPath } from 'hooks'
 // import MiningPositionList from '../components/MiningPositionList'
 import { DashboardWrapper, TYPE } from '../Theme'
-import { ButtonDropdown, ButtonLight } from '../components/ButtonStyled'
+import { ButtonDropdown } from '../components/ButtonStyled'
 import { PageWrapper, ContentWrapper, StyledIcon } from '../components'
 import DoubleTokenLogo from '../components/DoubleLogo'
 import { Bookmark, Activity } from 'react-feather'
@@ -75,15 +77,21 @@ const Warning = styled.div`
   width: calc(100% - 2rem);
 `
 
-function AccountPage({ account }) {
+function AccountPage() {
   const { t } = useTranslation()
+  const formatPath = useFormatPath()
+
+  const { accountAddress } = useParams()
+  if (!isAddress(accountAddress.toLowerCase())) {
+    return <Navigate to={formatPath('/')} />
+  }
 
   const below600 = useMedia('(max-width: 600px)')
   const below440 = useMedia('(max-width: 440px)')
 
   // get data for this account
-  const transactions = useUserTransactions(account)
-  const positions = useUserPositions(account)
+  const transactions = useUserTransactions(accountAddress)
+  const positions = useUserPositions(accountAddress)
   // const miningPositions = useMiningPositions(account)
 
   // get data for user stats
@@ -139,7 +147,7 @@ function AccountPage({ account }) {
   useEffect(() => {
     window.scrollTo({
       behavior: 'smooth',
-      top: 0,
+      top: 0
     })
   }, [])
 
@@ -148,10 +156,9 @@ function AccountPage({ account }) {
       <ContentWrapper>
         <RowBetween>
           <TYPE.body>
-            <BasicLink to="/accounts">{`${t('accounts')} `}</BasicLink>→
-            <Link lineHeight={'145.23%'} href={'https://etherscan.io/address/' + account} target="_blank">
-              
-              {account?.slice(0, 42)}
+            <BasicLink to={formatPath('/accounts')}>{`${t('accounts')} `}</BasicLink>→
+            <Link lineHeight={'145.23%'} href={'https://etherscan.io/address/' + accountAddress} target="_blank">
+              {accountAddress?.slice(0, 42)}
             </Link>
           </TYPE.body>
           {!below600 && <Search small={true} />}
@@ -159,8 +166,10 @@ function AccountPage({ account }) {
         <Header>
           <RowBetween>
             <span>
-              <TYPE.header fontSize={24}>{account?.slice(0, 6) + '...' + account?.slice(38, 42)}</TYPE.header>
-              <Link lineHeight={'145.23%'} href={'https://etherscan.io/address/' + account} target="_blank">
+              <TYPE.header fontSize={24}>
+                {accountAddress?.slice(0, 6) + '...' + accountAddress?.slice(38, 42)}
+              </TYPE.header>
+              <Link lineHeight={'145.23%'} href={'https://etherscan.io/address/' + accountAddress} target="_blank">
                 <TYPE.main fontSize={14}>{t('viewOnEtherscan')}</TYPE.main>
               </Link>
             </span>
@@ -244,7 +253,9 @@ function AccountPage({ account }) {
             <AutoRow gap="1.5rem">
               <AutoColumn gap="10px">
                 <RowBetween>
-                  <TYPE.light fontSize={below440 ? 12 : 14} fontWeight={500}>{t('liquidityIncludingFees')}</TYPE.light>
+                  <TYPE.light fontSize={below440 ? 12 : 14} fontWeight={500}>
+                    {t('liquidityIncludingFees')}
+                  </TYPE.light>
                   <div />
                 </RowBetween>
                 <RowFixed>
@@ -259,11 +270,13 @@ function AccountPage({ account }) {
               </AutoColumn>
               <AutoColumn gap="10px">
                 <RowBetween>
-                  <TYPE.light fontSize={below440 ? 12 : 14} fontWeight={500}>{t('feesEarnedCumulative')}</TYPE.light>
+                  <TYPE.light fontSize={below440 ? 12 : 14} fontWeight={500}>
+                    {t('feesEarnedCumulative')}
+                  </TYPE.light>
                   <div />
                 </RowBetween>
                 <RowFixed align="flex-end">
-                  <TYPE.header  fontSize={below440 ? 18 : 24} lineHeight={1} color={aggregateFees && 'green'}>
+                  <TYPE.header fontSize={below440 ? 18 : 24} lineHeight={1} color={aggregateFees && 'green'}>
                     {aggregateFees ? formattedNum(aggregateFees, true, true) : '-'}
                   </TYPE.header>
                 </RowFixed>
@@ -274,9 +287,9 @@ function AccountPage({ account }) {
         {!hideLPContent && (
           <DashboardWrapper>
             {activePosition ? (
-              <PairReturnsChart account={account} position={activePosition} />
+              <PairReturnsChart account={accountAddress} position={activePosition} />
             ) : (
-              <UserChart account={account} position={activePosition} />
+              <UserChart account={accountAddress} position={activePosition} />
             )}
           </DashboardWrapper>
         )}
@@ -302,7 +315,7 @@ function AccountPage({ account }) {
                 <AutoColumn gap="8px" justify="flex-start">
                   <TYPE.main>No Staked Liquidity.</TYPE.main>
                   <AutoRow gap="8px" justify="flex-start">
-                    <ButtonLight 
+                    <ButtonLight
                       style={{ padding: '.5rem 1rem', borderRadius: '.625rem' }}
                       onClick={() => window.open('https://ws.exchange/', '_blank')}
                     >
@@ -310,7 +323,7 @@ function AccountPage({ account }) {
                     </ButtonLight>
                   </AutoRow>
                 </AutoColumn>
-              </Panel> 
+              </Panel>
             )}
         </DashboardWrapper> */}
 
@@ -327,10 +340,10 @@ function AccountPage({ account }) {
           </TYPE.main>
           <Panel
             style={{
-              marginTop: below440 ? '.75rem' : '1.5rem',
+              marginTop: below440 ? '.75rem' : '1.5rem'
             }}
           >
-            {below440 && 
+            {below440 && (
               <AutoColumn gap=".75rem">
                 <AutoColumn gap="8px">
                   <TYPE.header fontSize={24}>{totalSwappedUSD ? formattedNum(totalSwappedUSD, true) : '-'}</TYPE.header>
@@ -347,8 +360,8 @@ function AccountPage({ account }) {
                   <TYPE.main>{t('totalTransactions')}</TYPE.main>
                 </AutoColumn>
               </AutoColumn>
-            }
-            {!below440 && 
+            )}
+            {!below440 && (
               <AutoRow gap="20px">
                 <AutoColumn gap="8px">
                   <TYPE.header fontSize={24}>{totalSwappedUSD ? formattedNum(totalSwappedUSD, true) : '-'}</TYPE.header>
@@ -365,7 +378,7 @@ function AccountPage({ account }) {
                   <TYPE.main>{t('totalTransactions')}</TYPE.main>
                 </AutoColumn>
               </AutoRow>
-            }
+            )}
           </Panel>
         </DashboardWrapper>
       </ContentWrapper>

@@ -1,21 +1,19 @@
-import React from 'react'
 import { BigNumber } from 'bignumber.js'
 import dayjs from 'dayjs'
 import { ethers } from 'ethers'
-import utc from 'dayjs/plugin/utc'
-import { client, blockClient } from '../apollo/client'
-import { GET_BLOCK, GET_BLOCKS, SHARE_VALUE } from '../apollo/queries'
 import { Text } from 'rebass'
 import _Decimal from 'decimal.js-light'
 import toFormat from 'toformat'
 import { timeframeOptions } from '../constants'
+import { SUPPORTED_NETWORK_VERSIONS } from '../constants/networks'
 import Numeral from 'numeral'
+import { globalApi } from 'api'
+import { TronNetworkInfo } from 'constants/networks'
 
 // format libraries
 const Decimal = toFormat(_Decimal)
 
 BigNumber.set({ EXPONENTIAL_AT: 50 })
-dayjs.extend(utc)
 
 export function getTimeframe(timeWindow) {
   const utcEndTime = dayjs.utc()
@@ -83,12 +81,12 @@ export function localNumber(val) {
   return Numeral(val).format('0,0')
 }
 
-export const toNiceDate = (date) => {
+export const toNiceDate = date => {
   let x = dayjs.utc(dayjs.unix(date)).format('MMM DD')
   return x
 }
 
-export const toWeeklyDate = (date) => {
+export const toWeeklyDate = date => {
   const formatted = dayjs.utc(dayjs.unix(date))
   date = new Date(formatted)
   const day = new Date(formatted).getDay()
@@ -106,7 +104,7 @@ export function getTimestampsForChanges() {
   return [t1, t2, tWeek]
 }
 
-export async function splitQuery(query, localClient, vars, list, skipCount = 100) {
+export async function splitQuery(callback, list, skipCount = 100) {
   let fetchedData = {}
   let allFound = false
   let skip = 0
@@ -117,13 +115,10 @@ export async function splitQuery(query, localClient, vars, list, skipCount = 100
       end = skip + skipCount
     }
     let sliced = list.slice(skip, end)
-    let result = await localClient.query({
-      query: query(...vars, sliced),
-      fetchPolicy: 'cache-first',
-    })
+    let result = await callback(sliced)
     fetchedData = {
       ...fetchedData,
-      ...result.data,
+      ...result.data
     }
     if (Object.keys(result.data).length < skipCount || skip + skipCount > list.length) {
       allFound = true
@@ -141,15 +136,8 @@ export async function splitQuery(query, localClient, vars, list, skipCount = 100
  * @param {Int} timestamp in seconds
  */
 export async function getBlockFromTimestamp(timestamp) {
-  let result = await blockClient.query({
-    query: GET_BLOCK,
-    variables: {
-      timestampFrom: timestamp,
-      timestampTo: timestamp + 600,
-    },
-    fetchPolicy: 'cache-first',
-  })
-  return result?.data?.blocks?.[0]?.number
+  let result = await globalApi.getBlock(timestamp, timestamp + 600)
+  return +result?.data?.blocks?.[0]?.number
 }
 
 /**
@@ -164,7 +152,7 @@ export async function getBlocksFromTimestamps(timestamps, skipCount = 500) {
     return []
   }
 
-  let fetchedData = await splitQuery(GET_BLOCKS, blockClient, [], timestamps, skipCount)
+  let fetchedData = await splitQuery(params => globalApi.getBlocks(params), timestamps, skipCount)
 
   let blocks = []
   if (fetchedData) {
@@ -172,7 +160,7 @@ export async function getBlocksFromTimestamps(timestamps, skipCount = 500) {
       if (fetchedData[t].length > 0) {
         blocks.push({
           timestamp: t.split('t')[1],
-          number: fetchedData[t][0]['number'],
+          number: +fetchedData[t][0]['number']
         })
       }
     }
@@ -185,10 +173,7 @@ export async function getLiquidityTokenBalanceOvertime(account, timestamps) {
   const blocks = await getBlocksFromTimestamps(timestamps)
 
   // get historical share values with time travel queries
-  let result = await client.query({
-    query: SHARE_VALUE(account, blocks),
-    fetchPolicy: 'cache-first',
-  })
+  let result = await globalApi.getShareValue(account, blocks)
 
   let values = []
   for (var row in result?.data) {
@@ -196,7 +181,7 @@ export async function getLiquidityTokenBalanceOvertime(account, timestamps) {
     if (timestamp) {
       values.push({
         timestamp,
-        balance: 0,
+        balance: 0
       })
     }
   }
@@ -219,10 +204,7 @@ export async function getShareValueOverTime(pairAddress, timestamps) {
   const blocks = await getBlocksFromTimestamps(timestamps)
 
   // get historical share values with time travel queries
-  let result = await client.query({
-    query: SHARE_VALUE(pairAddress, blocks),
-    fetchPolicy: 'cache-first',
-  })
+  let result = await globalApi.getShareValue(pairAddress, blocks)
 
   let values = []
   for (var row in result?.data) {
@@ -241,7 +223,7 @@ export async function getShareValueOverTime(pairAddress, timestamps) {
         roiUsd: values && values[0] ? sharePriceUsd / values[0]['sharePriceUsd'] : 1,
         ethPrice: 0,
         token0PriceUSD: 0,
-        token1PriceUSD: 0,
+        token1PriceUSD: 0
       })
     }
   }
@@ -276,9 +258,9 @@ export function getTimestampRange(timestamp_from, period_length, periods) {
   return timestamps
 }
 
-export const toNiceDateYear = (date) => dayjs.utc(dayjs.unix(date)).format('MMMM DD, YYYY')
+export const toNiceDateYear = date => dayjs.utc(dayjs.unix(date)).format('MMMM DD, YYYY')
 
-export const isAddress = (value) => {
+export const isAddress = value => {
   try {
     return ethers.utils.getAddress(value.toLowerCase())
   } catch {
@@ -286,22 +268,22 @@ export const isAddress = (value) => {
   }
 }
 
-export const toK = (num) => {
+export const toK = num => {
   return Numeral(num).format('0.[00]a')
 }
 
-export const setThemeColor = (theme) => document.documentElement.style.setProperty('--c-token', theme || '#333333')
+export const setThemeColor = theme => document.documentElement.style.setProperty('--c-token', theme || '#333333')
 
-export const Big = (number) => new BigNumber(number)
+export const Big = number => new BigNumber(number)
 
 export const urls = {
-  showTransaction: (tx) => `https://etherscan.io/tx/${tx}/`,
-  showAddress: (address) => `https://www.etherscan.io/address/${address}/`,
-  showToken: (address) => `https://www.etherscan.io/token/${address}/`,
-  showBlock: (block) => `https://etherscan.io/block/${block}/`,
+  showTransaction: tx => `https://etherscan.io/tx/${tx}/`,
+  showAddress: address => `https://www.etherscan.io/address/${address}/`,
+  showToken: address => `https://www.etherscan.io/token/${address}/`,
+  showBlock: block => `https://etherscan.io/block/${block}/`
 }
 
-export const formatTime = (unix) => {
+export const formatTime = unix => {
   const now = dayjs()
   const timestamp = dayjs.unix(unix)
 
@@ -321,7 +303,7 @@ export const formatTime = (unix) => {
   }
 }
 
-export const formatNumber = (num) => {
+export const formatNumber = num => {
   return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
 }
 
@@ -329,7 +311,7 @@ export const formatNumber = (num) => {
 var priceFormatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
   currency: 'USD',
-  minimumFractionDigits: 2,
+  minimumFractionDigits: 2
 })
 
 export const toSignificant = (number, significantDigits) => {
@@ -338,6 +320,7 @@ export const toSignificant = (number, significantDigits) => {
   return updated.toFormat(updated.decimalPlaces(), { groupSeparator: '' })
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const formattedNum = (number, usd = false, acceptNegatives = false) => {
   if (isNaN(number) || number === '' || number === undefined) {
     return usd ? '$0' : 0
@@ -388,7 +371,7 @@ export function rawPercent(percentRaw) {
   return percent.toFixed(0) + '%'
 }
 
-export function formattedPercent(percent, useBrackets = false) {
+export function formattedPercent(percent) {
   percent = parseFloat(percent)
   if (!percent || percent === 0) {
     return <Text fontWeight={500}>0%</Text>
@@ -471,4 +454,23 @@ export function isEquivalent(a, b) {
     }
   }
   return true
+}
+
+export function networkPrefix(activeNetwork) {
+  const prefix = '/' + activeNetwork.route.toLocaleLowerCase()
+  return prefix
+}
+
+export function getCurrentNetwork() {
+  const locationNetworkId = location.pathname.split('/')[1]
+  const newNetworkInfo = SUPPORTED_NETWORK_VERSIONS.find(n => locationNetworkId === n.route.toLowerCase())
+  if (newNetworkInfo) {
+    return newNetworkInfo
+  } else {
+    return TronNetworkInfo
+  }
+}
+
+export function escapeRegExp(string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') // $& means the whole matched string
 }

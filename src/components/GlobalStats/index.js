@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import styled from 'styled-components/macro'
 import { RowFixed, RowBetween } from '../Row'
 import { useMedia } from 'react-use'
@@ -17,7 +17,6 @@ const Header = styled.div`
 
 export default function GlobalStats() {
   const { t } = useTranslation()
-  
   const below1295 = useMedia('(max-width: 1295px)')
   const below1180 = useMedia('(max-width: 1180px)')
   const below1024 = useMedia('(max-width: 1024px)')
@@ -33,55 +32,45 @@ export default function GlobalStats() {
 
   return (
     <Header>
-      {!below400 && <RowBetween style={{ padding: below816 ? '0.5rem' : '.5rem' }}>
-        <RowFixed>
-          {!below400 && (
-            <TYPE.light
-              fontSize={14}
-              fontWeight={700}
-              mr={'1rem'}
-              onMouseEnter={() => {
-                setShowPriceCard(true)
-              }}
-              onMouseLeave={() => {
-                setShowPriceCard(false)
-              }}
-              style={{ position: 'relative' }}
-            >
-              ETH {t('price')}: {formattedEthPrice}
-              {showPriceCard && <UniPrice />}
-            </TYPE.light>
-          )}
+      {!below400 && (
+        <RowBetween style={{ padding: below816 ? '0.5rem' : '.5rem' }}>
+          <RowFixed>
+            {!below400 && (
+              <TYPE.light
+                fontSize={14}
+                fontWeight={700}
+                mr={'1rem'}
+                onMouseEnter={() => {
+                  setShowPriceCard(true)
+                }}
+                onMouseLeave={() => {
+                  setShowPriceCard(false)
+                }}
+                style={{ position: 'relative' }}
+              >
+                ETH {t('price')}: {formattedEthPrice}
+                {showPriceCard && <UniPrice />}
+              </TYPE.light>
+            )}
 
-          {!below1180 && (
-            <TYPE.light 
-              fontSize={14}
-              fontWeight={700}
-              mr={'1rem'}
-            >
-              {t('transactions')} (24H): {localNumber(oneDayTxns)}
-            </TYPE.light>
-          )}
-          {!below1024 && (
-            <TYPE.light 
-              fontSize={14}
-              fontWeight={700}
-              mr={'1rem'}
-            >
-              {t('pairs')}: {localNumber(pairCount)}
-            </TYPE.light>
-          )}
-          {!below1295 && (
-            <TYPE.light 
-              fontSize={14}
-              fontWeight={700}
-              mr={'1rem'}
-            >
-              {t('fees24hrs')}: {oneDayFees}&nbsp;
-            </TYPE.light>
-          )}
-        </RowFixed>
-      </RowBetween>}
+            {!below1180 && (
+              <TYPE.light fontSize={14} fontWeight={700} mr={'1rem'}>
+                {t('transactions')} (24H): {localNumber(oneDayTxns)}
+              </TYPE.light>
+            )}
+            {!below1024 && (
+              <TYPE.light fontSize={14} fontWeight={700} mr={'1rem'}>
+                {t('pairs')}: {localNumber(pairCount)}
+              </TYPE.light>
+            )}
+            {!below1295 && (
+              <TYPE.light fontSize={14} fontWeight={700} mr={'1rem'}>
+                {t('fees24hrs')}: {oneDayFees}&nbsp;
+              </TYPE.light>
+            )}
+          </RowFixed>
+        </RowBetween>
+      )}
     </Header>
   )
 }

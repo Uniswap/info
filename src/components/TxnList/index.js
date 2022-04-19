@@ -1,11 +1,9 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import styled from 'styled-components/macro'
-import dayjs from 'dayjs'
-import utc from 'dayjs/plugin/utc'
 
 import { formatTime, formattedNum, urls } from '../../utils'
 import { useMedia } from 'react-use'
-import { useCurrentCurrency } from '../../contexts/Application'
+import { useCurrentCurrency } from 'state/features/application/hooks'
 import { RowFixed, RowBetween } from '../Row'
 
 import LocalLoader from '../LocalLoader'
@@ -19,8 +17,6 @@ import { transparentize } from 'polished'
 import Panel from '../Panel'
 import { useTranslation } from 'react-i18next'
 
-dayjs.extend(utc)
-
 const PageButtons = styled.div`
   width: 100%;
   display: flex;
@@ -28,13 +24,13 @@ const PageButtons = styled.div`
   margin-top: 2em;
 
   @media screen and (max-width: 440px) {
-    margin-top: .75rem;
+    margin-top: 0.75rem;
   }
 `
 
 const Arrow = styled.div`
-  color: #6681A7;
-  opacity: ${(props) => (props.faded ? 0.3 : 1)};
+  color: #6681a7;
+  opacity: ${props => (props.faded ? 0.3 : 1)};
   padding: 0 20px;
   user-select: none;
   :hover {
@@ -92,7 +88,7 @@ const DashGrid = styled.div`
   }
 
   @media screen and (max-width: 440px) {
-    padding: .75rem;
+    padding: 0.75rem;
   }
 `
 
@@ -142,7 +138,7 @@ const DataText = styled(Flex)`
 
 const SortText = styled.button`
   cursor: pointer;
-  font-weight: ${({ active, theme }) => (active ? 500 : 400)};
+  font-weight: ${({ active }) => (active ? 500 : 400)};
   margin-right: 0.75rem !important;
   border: none;
   background-color: transparent;
@@ -164,14 +160,14 @@ const SORT_FIELD = {
   VALUE: 'amountUSD',
   AMOUNT0: 'token0Amount',
   AMOUNT1: 'token1Amount',
-  TIMESTAMP: 'timestamp',
+  TIMESTAMP: 'timestamp'
 }
 
 const TXN_TYPE = {
   ALL: 'All',
   SWAP: 'Swaps',
   ADD: 'Adds',
-  REMOVE: 'Removes',
+  REMOVE: 'Removes'
 }
 
 const ITEMS_PER_PAGE = 10
@@ -217,7 +213,7 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
     if (transactions && transactions.mints && transactions.burns && transactions.swaps) {
       let newTxns = []
       if (transactions.mints.length > 0) {
-        transactions.mints.map((mint) => {
+        transactions.mints.map(mint => {
           let newTxn = {}
           newTxn.hash = mint.transaction.id
           newTxn.timestamp = mint.transaction.timestamp
@@ -232,7 +228,7 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
         })
       }
       if (transactions.burns.length > 0) {
-        transactions.burns.map((burn) => {
+        transactions.burns.map(burn => {
           let newTxn = {}
           newTxn.hash = burn.transaction.id
           newTxn.timestamp = burn.transaction.timestamp
@@ -247,7 +243,7 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
         })
       }
       if (transactions.swaps.length > 0) {
-        transactions.swaps.map((swap) => {
+        transactions.swaps.map(swap => {
           const netToken0 = swap.amount0In - swap.amount0Out
           const netToken1 = swap.amount1In - swap.amount1Out
 
@@ -275,7 +271,7 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
         })
       }
 
-      const filtered = newTxns.filter((item) => {
+      const filtered = newTxns.filter(item => {
         if (txFilter !== TXN_TYPE.ALL) {
           return item.type === txFilter
         }
@@ -359,7 +355,7 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
     <>
       <Panel
         style={{
-          marginTop: below440 ? '.75rem' : '1.5rem', 
+          marginTop: below440 ? '.75rem' : '1.5rem',
           padding: 0
         }}
       >
@@ -409,7 +405,7 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
             <ClickableText
               color="textDim"
               area="value"
-              onClick={(e) => {
+              onClick={() => {
                 setSortedColumn(SORT_FIELD.VALUE)
                 setSortDirection(sortedColumn !== SORT_FIELD.VALUE ? true : !sortDirection)
               }}
@@ -487,7 +483,7 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
       </Panel>
       <PageButtons>
         <div
-          onClick={(e) => {
+          onClick={() => {
             setPage(page === 1 ? page : page - 1)
           }}
         >
@@ -495,7 +491,7 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
         </div>
         <TYPE.body>{`${t('page')} ${page} ${t('of')} ${maxPage}`}</TYPE.body>
         <div
-          onClick={(e) => {
+          onClick={() => {
             setPage(page === maxPage ? page : page + 1)
           }}
         >

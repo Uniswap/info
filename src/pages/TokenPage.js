@@ -1,6 +1,5 @@
-import React, { useState } from 'react'
-import 'feather-icons'
-import { withRouter } from 'react-router-dom'
+import { useState } from 'react'
+import { useLocation, useParams, Navigate } from 'react-router-dom'
 import { Text } from 'rebass'
 import styled from 'styled-components/macro'
 import Link from '../components/Link'
@@ -17,18 +16,21 @@ import { BasicLink } from '../components/Link'
 import Search from '../components/Search'
 import { formattedNum, formattedPercent, getPoolLink, getSwapLink, localNumber } from '../utils'
 import { useTokenData, useTokenTransactions, useTokenPairs } from '../contexts/TokenData'
+import { useFormatPath } from 'hooks'
 import { TYPE } from '../Theme'
+import { OVERVIEW_TOKEN_BLACKLIST } from '../constants'
+import { isAddress } from '../utils'
 import { useColor } from '../hooks'
 import CopyHelper from '../components/Copy'
 import { useMedia } from 'react-use'
 import { useDataForList } from '../contexts/PairData'
 import { useEffect } from 'react'
 import Warning from '../components/Warning'
-import { usePathDismissed, useSavedTokens } from '../contexts/LocalStorage'
+import { usePathDismissed, useSavedTokens } from 'state/features/user/hooks'
 import { Hover, PageWrapper, ContentWrapper, StyledIcon } from '../components'
 import { PlusCircle, Bookmark } from 'react-feather'
 import FormattedName from '../components/FormattedName'
-import { useListedTokens } from '../contexts/Application'
+import { useListedTokens } from 'state/features/application/hooks'
 import { DashboardWrapper } from '../Theme'
 import { useTranslation } from 'react-i18next'
 
@@ -85,9 +87,17 @@ const WarningGrouping = styled.div`
   pointer-events: ${({ disabled }) => disabled && 'none'};
 `
 
-function TokenPage({ address, history }) {
+function TokenPage() {
   const { t } = useTranslation()
-  
+  const formatPath = useFormatPath()
+
+  const location = useLocation()
+  const { tokenAddress } = useParams()
+
+  if (OVERVIEW_TOKEN_BLACKLIST.includes(tokenAddress.toLowerCase()) || !isAddress(tokenAddress.toLowerCase())) {
+    return <Navigate to={formatPath('/')} />
+  }
+
   const {
     id,
     name,
@@ -101,8 +111,8 @@ function TokenPage({ address, history }) {
     priceChangeUSD,
     liquidityChangeUSD,
     oneDayTxns,
-    txnChange,
-  } = useTokenData(address)
+    txnChange
+  } = useTokenData(tokenAddress)
 
   useEffect(() => {
     document.querySelector('body').scrollTo(0, 0)
@@ -111,13 +121,13 @@ function TokenPage({ address, history }) {
   // detect color from token
   const backgroundColor = useColor(id, symbol)
 
-  const allPairs = useTokenPairs(address)
+  const allPairs = useTokenPairs(tokenAddress)
 
   // pairs to show in pair list
   const fetchedPairsList = useDataForList(allPairs)
 
   // all transactions with this token
-  const transactions = useTokenTransactions(address)
+  const transactions = useTokenTransactions(tokenAddress)
 
   // price
   const price = priceUSD ? formattedNum(priceUSD, true) : ''
@@ -157,14 +167,14 @@ function TokenPage({ address, history }) {
   const LENGTH = below1080 ? 10 : 16
   const formattedSymbol = symbol?.length > LENGTH ? symbol.slice(0, LENGTH) + '...' : symbol
 
-  const [dismissed, markAsDismissed] = usePathDismissed(history.location.pathname)
+  const [dismissed, markAsDismissed] = usePathDismissed(location.pathname)
   const [savedTokens, addToken] = useSavedTokens()
   const listedTokens = useListedTokens()
 
   useEffect(() => {
     window.scrollTo({
       behavior: 'smooth',
-      top: 0,
+      top: 0
     })
   }, [])
 
@@ -172,44 +182,47 @@ function TokenPage({ address, history }) {
     <PageWrapper>
       <Warning
         type={'token'}
-        show={!dismissed && listedTokens && !listedTokens.includes(address)}
+        show={!dismissed && listedTokens.length > 0 && !listedTokens.includes(tokenAddress)}
         setShow={markAsDismissed}
-        address={address}
+        address={tokenAddress}
       />
       <ContentWrapper>
         <RowBetween style={{ flexWrap: 'wrap', alingItems: 'start' }}>
           <AutoRow align="flex-end" style={{ width: 'fit-content' }}>
             <TYPE.body>
-              <BasicLink to="/tokens">{`${t('tokens')} `}</BasicLink>→ {symbol}
+              <BasicLink to={formatPath(`/tokens`)}>{`${t('tokens')} `}</BasicLink>→ {symbol}
               {'  '}
             </TYPE.body>
             <Link
               style={{ width: 'fit-content' }}
               color={backgroundColor}
               external
-              href={'https://etherscan.io/address/' + address}
+              href={'https://etherscan.io/address/' + tokenAddress}
             >
               <Text style={{ marginLeft: '.15rem' }} fontSize={'14px'} fontWeight={400}>
-                ({address.slice(0, 8) + '...' + address.slice(36, 42)})
+                ({tokenAddress.slice(0, 8) + '...' + tokenAddress.slice(36, 42)})
               </Text>
             </Link>
           </AutoRow>
           {!below600 && <Search small={true} />}
         </RowBetween>
 
-        <WarningGrouping disabled={!dismissed && listedTokens && !listedTokens.includes(address)}>
+        <WarningGrouping disabled={!dismissed && listedTokens && !listedTokens.includes(tokenAddress)}>
           <DashboardWrapper style={{ marginTop: below1080 ? '0' : '1rem' }}>
             <RowFixed
               style={{
                 flexWrap: 'wrap',
                 marginBottom: '2rem',
-                alignItems: 'flex-start',
+                alignItems: 'flex-start'
               }}
             >
               <RowFixed style={{ flexWrap: 'wrap' }}>
                 <RowFixed style={{ alignItems: 'baseline' }}>
-                  <TokenLogo address={address} size={below440 ? '22px' : '32px'} style={{ alignSelf: 'center' }} />
-                    <TYPE.main fontSize={!below1080 ? '2.5rem' : below440 ? '1.25rem' : '1.5rem'} style={{ margin: '0 1rem' }}>
+                  <TokenLogo address={tokenAddress} size={below440 ? '22px' : '32px'} style={{ alignSelf: 'center' }} />
+                  <TYPE.main
+                    fontSize={!below1080 ? '2.5rem' : below440 ? '1.25rem' : '1.5rem'}
+                    style={{ margin: '0 1rem' }}
+                  >
                     <RowFixed gap="6px">
                       <FormattedName text={name ? name + ' ' : ''} maxCharacters={16} style={{ marginRight: '6px' }} />{' '}
                       {formattedSymbol ? `(${formattedSymbol})` : ''}
@@ -227,8 +240,8 @@ function TokenPage({ address, history }) {
               </RowFixed>
               <span>
                 <RowFixed ml={below500 ? '0' : '2.5rem'} mt={below500 ? '1rem' : '0'}>
-                  {!!!savedTokens[address] && !below800 ? (
-                    <Hover onClick={() => addToken(address, symbol)}>
+                  {!savedTokens[tokenAddress] && !below800 ? (
+                    <Hover onClick={() => addToken(tokenAddress, symbol)}>
                       <StyledIcon>
                         <PlusCircle style={{ marginRight: '0.5rem' }} />
                       </StyledIcon>
@@ -240,10 +253,10 @@ function TokenPage({ address, history }) {
                   ) : (
                     <></>
                   )}
-                  <Link href={getPoolLink(address)} target="_blank">
+                  <Link href={getPoolLink(tokenAddress)} target="_blank">
                     <ButtonLight color={backgroundColor}>{t('addLiquidity')}</ButtonLight>
                   </Link>
-                  <Link href={getSwapLink(address)} target="_blank">
+                  <Link href={getSwapLink(tokenAddress)} target="_blank">
                     <ButtonDark ml={'.5rem'} color={backgroundColor}>
                       {t('trade')}
                     </ButtonDark>
@@ -273,7 +286,9 @@ function TokenPage({ address, history }) {
               <Panel>
                 <AutoColumn gap="20px">
                   <RowBetween>
-                    <TYPE.light fontSize={14} fontWeight={500}>{t('totalLiquidity')}</TYPE.light>
+                    <TYPE.light fontSize={14} fontWeight={500}>
+                      {t('totalLiquidity')}
+                    </TYPE.light>
                     <div />
                   </RowBetween>
                   <RowBetween align="flex-end">
@@ -287,7 +302,9 @@ function TokenPage({ address, history }) {
               <Panel>
                 <AutoColumn gap="20px">
                   <RowBetween>
-                    <TYPE.light fontSize={14} fontWeight={500}>{t('volume24hrs')} {usingUtVolume && `(${t('untracked')})`}</TYPE.light>
+                    <TYPE.light fontSize={14} fontWeight={500}>
+                      {t('volume24hrs')} {usingUtVolume && `(${t('untracked')})`}
+                    </TYPE.light>
                     <div />
                   </RowBetween>
                   <RowBetween align="flex-end">
@@ -302,7 +319,9 @@ function TokenPage({ address, history }) {
               <Panel>
                 <AutoColumn gap="20px">
                   <RowBetween>
-                    <TYPE.light fontSize={14} fontWeight={500}>{t('transactions')} (24hrs)</TYPE.light>
+                    <TYPE.light fontSize={14} fontWeight={500}>
+                      {t('transactions')} (24hrs)
+                    </TYPE.light>
                     <div />
                   </RowBetween>
                   <RowBetween align="flex-end">
@@ -316,10 +335,10 @@ function TokenPage({ address, history }) {
               <Panel
                 style={{
                   gridColumn: !below1080 ? '2/4' : below1024 ? '1/4' : '2/-1',
-                  gridRow: below1080 ? '' : '1/4',
+                  gridRow: below1080 ? '' : '1/4'
                 }}
               >
-                <TokenChart address={address} color={backgroundColor} base={priceUSD} />
+                <TokenChart address={tokenAddress} color={backgroundColor} base={priceUSD} />
               </Panel>
             </PanelWrapper>
           </DashboardWrapper>
@@ -328,23 +347,27 @@ function TokenPage({ address, history }) {
             <TYPE.main fontSize={22} fontWeight={500}>
               {t('topPairs')}
             </TYPE.main>
-            {address && fetchedPairsList ? (
-              <PairList color={backgroundColor} address={address} pairs={fetchedPairsList} />
+            {tokenAddress && fetchedPairsList ? (
+              <PairList color={backgroundColor} address={tokenAddress} pairs={fetchedPairsList} />
             ) : (
               <Loader />
             )}
           </DashboardWrapper>
 
           <DashboardWrapper style={{ marginTop: '1.5rem' }}>
-            <TYPE.main fontSize={22} fontWeight={500}>{t('transactions')}</TYPE.main>
+            <TYPE.main fontSize={22} fontWeight={500}>
+              {t('transactions')}
+            </TYPE.main>
             {transactions ? <TxnList color={backgroundColor} transactions={transactions} /> : <Loader />}
           </DashboardWrapper>
           <DashboardWrapper style={{ marginTop: '1.5rem' }}>
-            <TYPE.main fontSize={22} fontWeight={500}>Token Information</TYPE.main>
+            <TYPE.main fontSize={22} fontWeight={500}>
+              Token Information
+            </TYPE.main>
             <Panel
               rounded
               style={{
-                marginTop: below440 ? '.75rem' : '1.5rem',
+                marginTop: below440 ? '.75rem' : '1.5rem'
               }}
               p={20}
             >
@@ -365,13 +388,13 @@ function TokenPage({ address, history }) {
                   <TYPE.light>{t('address')}</TYPE.light>
                   <RowBetween style={{ marginTop: '-5px' }}>
                     <TYPE.main style={{ marginTop: '.5rem' }} fontWeight="500">
-                      {address.slice(0, 8) + '...' + address.slice(36, 42)}
+                      {tokenAddress.slice(0, 8) + '...' + tokenAddress.slice(36, 42)}
                     </TYPE.main>
-                    <CopyHelper toCopy={address}/>
+                    <CopyHelper toCopy={tokenAddress} />
                   </RowBetween>
                 </Column>
                 <ButtonLight color={backgroundColor}>
-                  <Link color={backgroundColor} external href={'https://etherscan.io/address/' + address}>
+                  <Link color={backgroundColor} external href={'https://etherscan.io/address/' + tokenAddress}>
                     {t('viewOnEtherscan')} ↗
                   </Link>
                 </ButtonLight>
@@ -384,4 +407,4 @@ function TokenPage({ address, history }) {
   )
 }
 
-export default withRouter(TokenPage)
+export default TokenPage

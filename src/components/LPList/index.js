@@ -1,14 +1,12 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useMedia } from 'react-use'
-import dayjs from 'dayjs'
 import LocalLoader from '../LocalLoader'
-import utc from 'dayjs/plugin/utc'
 import { Box, Flex, Text } from 'rebass'
 import styled from 'styled-components/macro'
+import { useFormatPath } from 'hooks'
 
 import { CustomLink } from '../Link'
 import { Divider } from '..'
-import { withRouter } from 'react-router-dom'
 import { formattedNum } from '../../utils'
 import { TYPE } from '../../Theme'
 import DoubleTokenLogo from '../DoubleLogo'
@@ -17,8 +15,6 @@ import Panel from '../Panel'
 import { transparentize } from 'polished'
 import { useTranslation } from 'react-i18next'
 
-dayjs.extend(utc)
-
 const PageButtons = styled.div`
   width: 100%;
   display: flex;
@@ -26,13 +22,13 @@ const PageButtons = styled.div`
   margin-top: 2em;
 
   @media screen and (max-width: 440px) {
-    margin-top: .75rem;
+    margin-top: 0.75rem;
   }
 `
 
 const Arrow = styled.div`
   color: ${({ theme }) => theme.primary1};
-  opacity: ${(props) => (props.faded ? 0.3 : 1)};
+  opacity: ${props => (props.faded ? 0.3 : 1)};
   padding: 0 20px;
   user-select: none;
   :hover {
@@ -79,7 +75,7 @@ const DashGrid = styled.div`
   }
 
   @media screen and (max-width: 440px) {
-    padding: .75rem;
+    padding: 0.75rem;
   }
 `
 
@@ -101,6 +97,7 @@ const DataText = styled(Flex)`
 
 function LPList({ lps, disbaleLinks, maxItems = 10 }) {
   const { t } = useTranslation()
+  const formatPath = useFormatPath()
   const below440 = useMedia('(max-width: 440px)')
   const below600 = useMedia('(max-width: 600px)')
   const below800 = useMedia('(max-width: 800px)')
@@ -134,8 +131,10 @@ function LPList({ lps, disbaleLinks, maxItems = 10 }) {
           </DataText>
         )}
         <DataText area="name" fontWeight="500" justifyContent="flex-start">
-          <CustomLink style={{ whiteSpace: 'nowrap' }} to={'/account/' + lp.user.id}>
-            {below800 ? lp.user.id.slice(0, 4) + '...' + (below440 ? lp.user.id.slice(39, 42) : lp.user.id.slice(38, 42)) : lp.user.id}
+          <CustomLink style={{ whiteSpace: 'nowrap' }} to={formatPath(`/accounts/${lp.user.id}`)}>
+            {below800
+              ? lp.user.id.slice(0, 4) + '...' + (below440 ? lp.user.id.slice(39, 42) : lp.user.id.slice(38, 42))
+              : lp.user.id}
           </CustomLink>
         </DataText>
 
@@ -146,7 +145,7 @@ function LPList({ lps, disbaleLinks, maxItems = 10 }) {
         )} */}
 
         <DataText>
-          <CustomLink area="pair" to={'/pair/' + lp.pairAddress}>
+          <CustomLink area="pair" to={formatPath(`/pairs/${lp.pairAddress}`)}>
             <RowFixed style={{ textAlign: 'right' }}>
               {!below600 && <DoubleTokenLogo a0={lp.token0} a1={lp.token1} size={16} margin={true} />}
               {lp.pairName}
@@ -173,13 +172,13 @@ function LPList({ lps, disbaleLinks, maxItems = 10 }) {
     <ListWrapper>
       <Panel
         style={{
-          marginTop: below440 ? '.75rem' : '1.5rem', 
+          marginTop: below440 ? '.75rem' : '1.5rem',
           padding: 0
         }}
       >
-        <DashGrid 
-          center={true} 
-          disbaleLinks={disbaleLinks} 
+        <DashGrid
+          center={true}
+          disbaleLinks={disbaleLinks}
           style={{ height: 'fit-content', padding: below440 ? '.75rem' : '1rem 2rem', borderTop: 'none' }}
         >
           {!below600 && (
@@ -218,4 +217,4 @@ function LPList({ lps, disbaleLinks, maxItems = 10 }) {
   )
 }
 
-export default withRouter(LPList)
+export default LPList

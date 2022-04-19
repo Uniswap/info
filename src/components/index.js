@@ -1,4 +1,3 @@
-import React from 'react'
 import styled from 'styled-components/macro'
 import { Text, Box } from 'rebass'
 
@@ -128,7 +127,7 @@ export const ContentWrapper = styled.div`
   margin: 0 auto;
   padding: 0 2rem;
   box-sizing: border-box;
-  
+
   @media screen and (max-width: 1180px) {
     grid-template-columns: 1fr;
     padding: 0 1rem;

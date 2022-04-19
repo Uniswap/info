@@ -1,15 +1,15 @@
-import React, { useState } from 'react'
-import 'feather-icons'
-import { withRouter } from 'react-router-dom'
+import { useState } from 'react'
+import { useNavigate, Link } from 'react-router-dom'
 import styled from 'styled-components/macro'
 import { ButtonLight, ButtonFaded } from '../ButtonStyled'
 import { AutoRow, RowBetween } from '../Row'
 import { isAddress } from '../../utils'
-import { useSavedAccounts } from '../../contexts/LocalStorage'
+import { useSavedAccounts } from 'state/features/user/hooks'
 import { AutoColumn } from '../Column'
 import { TYPE } from '../../Theme'
 import { Hover, StyledIcon } from '..'
 import Panel from '../Panel'
+import { useFormatPath } from 'hooks'
 import { Divider } from '..'
 import { Flex } from 'rebass'
 
@@ -35,7 +35,7 @@ const Input = styled.input`
   background: none;
   border: none;
   outline: none;
-  padding: .875rem 1rem;
+  padding: 0.875rem 1rem;
   border-radius: 12px;
   color: ${({ theme }) => theme.text1};
   background-color: ${({ theme }) => theme.bg1};
@@ -57,7 +57,6 @@ const Input = styled.input`
 
 const AccountLink = styled.span`
   display: flex;
-  cursor: pointer;
   color: ${({ theme }) => theme.link};
   font-size: 14px;
   font-weight: 500;
@@ -75,15 +74,17 @@ const DashGrid = styled.div`
   }
 `
 
-function AccountSearch({ history, small }) {
+function AccountSearch({ small }) {
   const { t } = useTranslation()
+  const formatPath = useFormatPath()
+  const navigate = useNavigate()
   const [accountValue, setAccountValue] = useState()
   const [savedAccounts, addAccount, removeAccount] = useSavedAccounts()
   const below440 = useMedia('(max-width: 440px)')
 
   function handleAccountSearch() {
     if (isAddress(accountValue)) {
-      history.push('/account/' + accountValue)
+      navigate(formatPath(`/accounts/${accountValue}`))
       if (!savedAccounts.includes(accountValue)) {
         addAccount(accountValue)
       }
@@ -98,15 +99,12 @@ function AccountSearch({ history, small }) {
             <Input
               style={below440 ? { marginRight: '0px' } : {}}
               placeholder="0x..."
-              onChange={(e) => {
+              onChange={e => {
                 setAccountValue(e.target.value)
               }}
             />
           </Wrapper>
-          <ButtonLight 
-            style={below440 ? { width: '100%', marginTop: '1rem' } : {}}
-            onClick={handleAccountSearch}
-          >
+          <ButtonLight style={below440 ? { width: '100%', marginTop: '1rem' } : {}} onClick={handleAccountSearch}>
             {t('loadAccountDetails')}
           </ButtonLight>
         </AutoRow>
@@ -120,15 +118,13 @@ function AccountSearch({ history, small }) {
             </DashGrid>
             <Divider />
             {savedAccounts?.length > 0 ? (
-              savedAccounts.map((account) => {
+              savedAccounts.map(account => {
                 return (
                   <DashGrid key={account} center={true} style={{ height: 'fit-content', padding: '1rem 0 0 0' }}>
-                    <Flex
-                      area="account"
-                      justifyContent="space-between"
-                      onClick={() => history.push('/account/' + account)}
-                    >
-                      <AccountLink>{account?.slice(0, 42)}</AccountLink>
+                    <Flex area="account" justifyContent="space-between">
+                      <AccountLink as={Link} to={formatPath(`/accounts/${account}`)}>
+                        {account?.slice(0, 42)}
+                      </AccountLink>
                       <Hover onClick={() => removeAccount(account)}>
                         <StyledIcon>
                           <X size={16} />
@@ -148,10 +144,10 @@ function AccountSearch({ history, small }) {
           <>
             <TYPE.main>{t('accounts')}</TYPE.main>
             {savedAccounts?.length > 0 ? (
-              savedAccounts.map((account) => {
+              savedAccounts.map(account => {
                 return (
                   <RowBetween key={account}>
-                    <ButtonFaded onClick={() => history.push('/account/' + account)}>
+                    <ButtonFaded as={Link} to={formatPath(`/accounts/${account}`)}>
                       {small ? (
                         <TYPE.header>{account?.slice(0, 6) + '...' + account?.slice(38, 42)}</TYPE.header>
                       ) : (
@@ -176,4 +172,4 @@ function AccountSearch({ history, small }) {
   )
 }
 
-export default withRouter(AccountSearch)
+export default AccountSearch

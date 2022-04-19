@@ -1,23 +1,22 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import styled from 'styled-components/macro'
-import { ApolloProvider } from 'react-apollo'
-import { client } from './apollo/client'
-import { Route, Switch, BrowserRouter, Redirect } from 'react-router-dom'
+import { Route, Routes, Navigate } from 'react-router-dom'
 import GlobalPage from './pages/GlobalPage'
 import TokenPage from './pages/TokenPage'
 import PairPage from './pages/PairPage'
 import { useGlobalData, useGlobalChartData } from './contexts/GlobalData'
-import { isAddress } from './utils'
+import { usePairUpdater } from 'contexts/PairData'
+import { useTokenUpdater } from 'contexts/TokenData'
 import AccountPage from './pages/AccountPage'
 import AllTokensPage from './pages/AllTokensPage'
 import AllPairsPage from './pages/AllPairsPage'
 import PinnedData from './components/PinnedData'
+import { useFormatPath } from './hooks'
 
 import SideNav from './components/SideNav'
 import AccountLookup from './pages/AccountLookup'
-import { OVERVIEW_TOKEN_BLACKLIST, PAIR_BLACKLIST } from './constants'
 import LocalLoader from './components/LocalLoader'
-import { useLatestBlocks } from './contexts/Application'
+import { useLatestBlocks } from 'state/features/application/hooks'
 
 const AppWrapper = styled.div`
   position: relative;
@@ -75,23 +74,6 @@ const WarningBanner = styled.div`
   font-weight: 500;
 `
 
-/**
- * Wrap the component with the header and sidebar pinned tab
- */
-const LayoutWrapper = ({ children, savedOpen, setSavedOpen }) => {
-  return (
-    <>
-      <ContentWrapper open={savedOpen}>
-        <SideNav />
-        <Center id="center">{children}</Center>
-        <Right open={savedOpen}>
-          <PinnedData open={savedOpen} setSavedOpen={setSavedOpen} />
-        </Right>
-      </ContentWrapper>
-    </>
-  )
-}
-
 const BLOCK_DIFFERENCE_THRESHOLD = 30
 
 function App() {
@@ -100,114 +82,49 @@ function App() {
   const globalData = useGlobalData()
   const globalChartData = useGlobalChartData()
   const [latestBlock, headBlock] = useLatestBlocks()
-
+  const formatPath = useFormatPath()
   // show warning
   const showWarning = headBlock && latestBlock ? headBlock - latestBlock > BLOCK_DIFFERENCE_THRESHOLD : false
 
+  usePairUpdater()
+  useTokenUpdater()
+
   return (
-    <ApolloProvider client={client}>
-      <AppWrapper>
-        {showWarning && (
-          <WarningWrapper>
-            <WarningBanner>
-              {`Warning: The data on this site has only synced to Ethereum block ${latestBlock} (out of ${headBlock}). Please check back soon.`}
-            </WarningBanner>
-          </WarningWrapper>
-        )}
-        {latestBlock &&
-        globalData &&
-        Object.keys(globalData).length > 0 &&
-        globalChartData &&
-        Object.keys(globalChartData).length > 0 ? (
-          <BrowserRouter>
-            <Switch>
-              <Route
-                exacts
-                strict
-                path="/token/:tokenAddress"
-                render={({ match }) => {
-                  if (OVERVIEW_TOKEN_BLACKLIST.includes(match.params.tokenAddress.toLowerCase())) {
-                    return <Redirect to="/home" />
-                  }
-                  if (isAddress(match.params.tokenAddress.toLowerCase())) {
-                    return (
-                      <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
-                        <TokenPage address={match.params.tokenAddress.toLowerCase()} />
-                      </LayoutWrapper>
-                    )
-                  } else {
-                    return <Redirect to="/home" />
-                  }
-                }}
-              />
-              <Route
-                exacts
-                strict
-                path="/pair/:pairAddress"
-                render={({ match }) => {
-                  if (PAIR_BLACKLIST.includes(match.params.pairAddress.toLowerCase())) {
-                    return <Redirect to="/home" />
-                  }
-                  if (isAddress(match.params.pairAddress.toLowerCase())) {
-                    return (
-                      <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
-                        <PairPage pairAddress={match.params.pairAddress.toLowerCase()} />
-                      </LayoutWrapper>
-                    )
-                  } else {
-                    return <Redirect to="/home" />
-                  }
-                }}
-              />
-              <Route
-                exacts
-                strict
-                path="/account/:accountAddress"
-                render={({ match }) => {
-                  if (isAddress(match.params.accountAddress.toLowerCase())) {
-                    return (
-                      <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
-                        <AccountPage account={match.params.accountAddress.toLowerCase()} />
-                      </LayoutWrapper>
-                    )
-                  } else {
-                    return <Redirect to="/home" />
-                  }
-                }}
-              />
-
-              <Route path="/home">
-                <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
-                  <GlobalPage />
-                </LayoutWrapper>
-              </Route>
-
-              <Route path="/tokens">
-                <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
-                  <AllTokensPage />
-                </LayoutWrapper>
-              </Route>
-
-              <Route path="/pairs">
-                <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
-                  <AllPairsPage />
-                </LayoutWrapper>
-              </Route>
-
-              <Route path="/accounts">
-                <LayoutWrapper savedOpen={savedOpen} setSavedOpen={setSavedOpen}>
-                  <AccountLookup />
-                </LayoutWrapper>
-              </Route>
-
-              <Redirect to="/home" />
-            </Switch>
-          </BrowserRouter>
-        ) : (
-          <LocalLoader fill="true" />
-        )}
-      </AppWrapper>
-    </ApolloProvider>
+    <AppWrapper>
+      {showWarning && (
+        <WarningWrapper>
+          <WarningBanner>
+            {`Warning: The data on this site has only synced to Ethereum block ${latestBlock} (out of ${headBlock}). Please check back soon.`}
+          </WarningBanner>
+        </WarningWrapper>
+      )}
+      {latestBlock &&
+      globalData &&
+      Object.keys(globalData).length > 0 &&
+      globalChartData &&
+      Object.keys(globalChartData).length > 0 ? (
+        <ContentWrapper open={savedOpen}>
+          <SideNav />
+          <Center id="center">
+            <Routes>
+              <Route path="/:networkID" element={<GlobalPage />} />
+              <Route path="/:networkID/tokens" element={<AllTokensPage />} />
+              <Route path="/:networkID/tokens/:tokenAddress" element={<TokenPage />} />
+              <Route path="/:networkID/pairs" element={<AllPairsPage />} />
+              <Route path="/:networkID/pairs/:pairAddress" element={<PairPage />} />
+              <Route path="/:networkID/accounts" element={<AccountLookup />} />
+              <Route path="/:networkID/accounts/:accountAddress" element={<AccountPage />} />
+              <Route path="*" element={<Navigate to={formatPath('/')} replace />} />
+            </Routes>
+          </Center>
+          <Right open={savedOpen}>
+            <PinnedData open={savedOpen} setSavedOpen={setSavedOpen} />
+          </Right>
+        </ContentWrapper>
+      ) : (
+        <LocalLoader fill="true" />
+      )}
+    </AppWrapper>
   )
 }
 

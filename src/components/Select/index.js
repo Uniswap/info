@@ -1,4 +1,3 @@
-import React from 'react'
 import styled from 'styled-components/macro'
 import PropTypes from 'prop-types'
 import { default as ReactSelect } from 'react-select'
@@ -72,7 +71,7 @@ const Select = ({ options, onChange, setCapEth, capEth, tokenSelect = false, pla
       options={options}
       value={placeholder}
       filterOption={customFilter}
-      getOptionLabel={(option) => (
+      getOptionLabel={option => (
         <MenuLabel>
           <LogoBox>{option.logo}</LogoBox>
           <LabelBox>{option.label}</LabelBox>
@@ -103,7 +102,7 @@ const Select = ({ options, onChange, setCapEth, capEth, tokenSelect = false, pla
               {children}
             </CustomMenu>
           )
-        },
+        }
       }}
     />
   ) : (
@@ -120,7 +119,7 @@ const Select = ({ options, onChange, setCapEth, capEth, tokenSelect = false, pla
 
 Select.propTypes = {
   options: PropTypes.array.isRequired,
-  onChange: PropTypes.func,
+  onChange: PropTypes.func
 }
 
 export default Select

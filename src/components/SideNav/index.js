@@ -1,4 +1,3 @@
-import React from 'react'
 import styled from 'styled-components/macro'
 import { AutoColumn } from '../Column'
 import Title from '../Title'
@@ -6,11 +5,12 @@ import { BasicLink } from '../Link'
 import { useMedia } from 'react-use'
 import { transparentize } from 'polished'
 import { TYPE } from '../../Theme'
-import { withRouter } from 'react-router-dom'
+import { useFormatPath } from 'hooks'
+import { useLocation } from 'react-router-dom'
 import { TrendingUp, List, PieChart, Disc } from 'react-feather'
 import Link from '../Link'
-import { useSessionStart } from '../../contexts/Application'
-import { useDarkModeManager } from '../../contexts/LocalStorage'
+import { useSessionStart } from 'state/features/application/hooks'
+import { useDarkModeManager } from 'state/features/user/hooks'
 import Toggle from '../Toggle'
 import { useTranslation } from 'react-i18next'
 
@@ -41,7 +41,7 @@ const Option = styled.div`
   opacity: ${({ activeText }) => (activeText ? 1 : 0.6)};
   color: ${({ activeText, theme }) => (activeText ? theme.blueGrey : theme.text1)};
   display: flex;
-  padding: .5rem 1.5rem;
+  padding: 0.5rem 1.5rem;
   position: relative;
   align-items: center;
   width: 100%;
@@ -50,7 +50,9 @@ const Option = styled.div`
     opacity: 1;
   }
 
-  ${({ activeText, theme }) => activeText && `
+  ${({ activeText, theme }) =>
+    activeText &&
+    `
     background: rgba(102, 129, 167, 0.1);
     font-weight: 700;
 
@@ -133,8 +135,10 @@ const PollingDot = styled.div`
   background-color: ${({ theme }) => theme.green1};
 `
 
-function SideNav({ history }) {
+function SideNav() {
   const { t } = useTranslation()
+  const formatPath = useFormatPath()
+  const location = useLocation()
 
   const below1080 = useMedia('(max-width: 1080px)')
   const below1180 = useMedia('(max-width: 1180px)')
@@ -151,19 +155,18 @@ function SideNav({ history }) {
             <Title />
             {!below1080 && (
               <AutoColumn style={{ marginTop: '5.25rem' }}>
-                <BasicLink to="/home">
-                  <Option activeText={history.location.pathname === '/home' ?? undefined}>
+                <BasicLink to={formatPath('/')}>
+                  <Option activeText={location.pathname === '/' ?? undefined}>
                     <StyledNavButton>
                       <TrendingUp size={20} />
                     </StyledNavButton>
                     {t('sideNav.overview')}
                   </Option>
                 </BasicLink>
-                <BasicLink to="/tokens">
+                <BasicLink to={formatPath('/tokens')}>
                   <Option
                     activeText={
-                      (history.location.pathname.split('/')[1] === 'tokens' ||
-                        history.location.pathname.split('/')[1] === 'token') ??
+                      (location.pathname.split('/')[1] === 'tokens' || location.pathname.split('/')[1] === 'token') ??
                       undefined
                     }
                   >
@@ -173,11 +176,10 @@ function SideNav({ history }) {
                     {t('sideNav.tokens')}
                   </Option>
                 </BasicLink>
-                <BasicLink to="/pairs">
+                <BasicLink to={formatPath('/pairs')}>
                   <Option
                     activeText={
-                      (history.location.pathname.split('/')[1] === 'pairs' ||
-                        history.location.pathname.split('/')[1] === 'pair') ??
+                      (location.pathname.split('/')[1] === 'pairs' || location.pathname.split('/')[1] === 'pair') ??
                       undefined
                     }
                   >
@@ -188,11 +190,11 @@ function SideNav({ history }) {
                   </Option>
                 </BasicLink>
 
-                <BasicLink to="/accounts">
+                <BasicLink to={formatPath('/accounts')}>
                   <Option
                     activeText={
-                      (history.location.pathname.split('/')[1] === 'accounts' ||
-                        history.location.pathname.split('/')[1] === 'account') ??
+                      (location.pathname.split('/')[1] === 'accounts' ||
+                        location.pathname.split('/')[1] === 'account') ??
                       undefined
                     }
                   >
@@ -243,7 +245,8 @@ function SideNav({ history }) {
               <PollingDot />
               <a href="/" style={{ color: 'activeColor' }}>
                 <TYPE.small>
-                  {`${t('updated')} ${!!seconds ? seconds + 's' : '-'} ${t('ago')}`}<br />
+                  {`${t('updated')} ${seconds ? seconds + 's' : '-'} ${t('ago')}`}
+                  <br />
                 </TYPE.small>
               </a>
             </Polling>
@@ -258,4 +261,4 @@ function SideNav({ history }) {
   )
 }
 
-export default withRouter(SideNav)
+export default SideNav

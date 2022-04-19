@@ -1,6 +1,5 @@
-import React from 'react'
 import styled, { css, keyframes } from 'styled-components/macro'
-import { useDarkModeManager } from '../../contexts/LocalStorage'
+import { useDarkModeManager } from 'state/features/user/hooks'
 
 const pulse = keyframes`
   0% { transform: scale(1); }
@@ -16,7 +15,7 @@ const Wrapper = styled.div`
   height: 100%;
   width: 100%;
 
-  ${(props) =>
+  ${props =>
     props.fill && !props.height
       ? css`
           height: 100vh;
@@ -35,11 +34,12 @@ const AnimatedImg = styled.div`
 
 const LocalLoader = ({ fill }) => {
   const [darkMode] = useDarkModeManager()
-
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const src = require(darkMode ? 'assets/logo_white.svg' : 'assets/logo.svg').default
   return (
     <Wrapper fill={fill}>
       <AnimatedImg>
-        <img src={require(darkMode ? '../../assets/logo_white.svg' : '../../assets/logo.svg')} alt="loading-icon" />
+        <img src={src} alt="loading-icon" />
       </AnimatedImg>
     </Wrapper>
   )
