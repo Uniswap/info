@@ -54,7 +54,7 @@ const Address = ({ address, token, ...rest }) => (
 export const Hover = styled.div`
   :hover {
     cursor: pointer;
-    opacity: ${({ fade }) => fade && '0.7'};
+    opacity: ${({ $fade }) => $fade && '0.7'};
   }
 `
 

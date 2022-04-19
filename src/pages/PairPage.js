@@ -402,7 +402,7 @@ function PairPage() {
                       </TYPE.light>
                       <div />
                     </RowBetween>
-                    <Hover as={RouterLink} to={formatPath(`/tokens/${token0?.id}`)} fade={true}>
+                    <Hover as={RouterLink} to={formatPath(`/tokens/${token0?.id}`)} $fade>
                       <AutoRow gap="4px">
                         <TokenLogo address={token0?.id} />
                         <TYPE.main fontSize={20} lineHeight={1} fontWeight={500}>
@@ -413,7 +413,7 @@ function PairPage() {
                         </TYPE.main>
                       </AutoRow>
                     </Hover>
-                    <Hover as={RouterLink} to={formatPath(`/tokens/${token1?.id}`)} fade={true}>
+                    <Hover as={RouterLink} to={formatPath(`/tokens/${token1?.id}`)} $fade>
                       <AutoRow gap="4px">
                         <TokenLogo address={token1?.id} />
                         <TYPE.main fontSize={20} lineHeight={1} fontWeight={500}>
