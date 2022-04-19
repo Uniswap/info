@@ -18,6 +18,7 @@ export const CurrentNetwork = styled.div<{ bgColor?: string }>`
   border-radius: 0.5rem;
   color: ${({ theme }) => theme.text2};
   cursor: pointer;
+  min-width: 203px;
 
   :hover {
     opacity: 0.9;
@@ -29,6 +30,18 @@ export const CurrentNetwork = styled.div<{ bgColor?: string }>`
     height: 0.5rem;
     border-radius: 50%;
     background-color: ${({ theme }) => theme.green1};
+
+    @media screen and (max-width: 600px) {
+      content: unset;
+    }
+  }
+
+  @media screen and (max-width: 600px) {
+    grid-template-columns: 2rem;
+    padding: 0;
+    background-color: unset;
+    min-width: auto;
+    margin: 0;
   }
 `
 
@@ -44,6 +57,17 @@ export const NetworkList = styled.ul`
   width: 100%;
   margin: 0;
   padding: 0;
+
+  @media screen and (max-width: 1080px) {
+    border-radius: 0 0 0.5rem 0.5rem;
+    transform: translate(0, 1rem);
+  }
+
+  @media screen and (max-width: 600px) {
+    border-radius: 0 0 0.5rem 0.5rem;
+    transform: translate(calc(-100% + 2.5rem), 1rem);
+    width: 200px;
+  }
 `
 
 export const NetworkListItem = styled.li<{ isBeta?: boolean }>`
@@ -80,4 +104,10 @@ export const NetworkListItem = styled.li<{ isBeta?: boolean }>`
 export const NetworkLogo = styled.img`
   width: 100%;
   border-radius: 50%;
+`
+
+export const NetworkName = styled.span`
+  @media screen and (max-width: 600px) {
+    display: none;
+  }
 `

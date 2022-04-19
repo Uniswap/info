@@ -12,13 +12,14 @@ export const Wrapper = styled.div<{ isMobile: boolean }>`
   border-right: 1px solid ${({ theme }) => theme.mercuryGray};
   color: ${({ theme }) => theme.bg2};
 
+  @media screen and (max-width: 1080px) {
+    border-bottom: 1px solid ${({ theme }) => theme.mercuryGray};
+    padding: 1rem;
+  }
+
   @media screen and (max-width: 800px) {
     grid-template-columns: 1fr;
     position: relative;
-  }
-
-  @media screen and (max-width: 600px) {
-    padding: 1rem;
   }
 `
 
@@ -78,9 +79,11 @@ export const DesktopWrapper = styled.div`
 `
 
 export const MobileWrapper = styled.div`
-  display: flex;
+  display: grid;
   justify-content: space-between;
   align-items: center;
+  grid-template-columns: 1fr min-content min-content;
+  gap: 1rem;
 `
 
 export const HeaderText = styled.div`

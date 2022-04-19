@@ -9,7 +9,7 @@ import {
   addToken,
   removeToken
 } from './slice'
-import { useActiveNetworkId } from '../application/hooks'
+import { useActiveNetworkId } from 'state/features/application/hooks'
 
 export function useDarkModeManager(): [boolean, () => void] {
   const dispatch = useAppDispatch()

@@ -1,15 +1,15 @@
-import { AutoColumn } from '../Column'
-import Title from '../Title'
-import { BasicLink } from '../Link'
+import { AutoColumn } from 'components/Column'
+import Title from 'components/Title'
+import { BasicLink } from 'components/Link'
 import { useMedia } from 'react-use'
-import { TYPE } from '../../Theme'
+import { TYPE } from 'Theme'
 import { useFormatPath } from 'hooks'
 import { useLocation } from 'react-router-dom'
 import { TrendingUp, List, PieChart, Disc } from 'react-feather'
-import Link from '../Link'
+import Link from 'components/Link'
 import { useSessionStart } from 'state/features/application/hooks'
 import { useDarkModeManager } from 'state/features/user/hooks'
-import Toggle from '../Toggle'
+import Toggle from 'components/Toggle'
 import { useTranslation } from 'react-i18next'
 import NetworkSwitcher from 'components/NetworkSwitcher'
 import {
@@ -22,18 +22,16 @@ import {
   Wrapper,
   Option
 } from './styled'
+import MobileMenu from './MobileMenu'
 
 function SideNav() {
   const { t } = useTranslation()
-  const formatPath = useFormatPath()
-  const location = useLocation()
-
   const below1080 = useMedia('(max-width: 1080px)')
   const below1180 = useMedia('(max-width: 1180px)')
-
-  const seconds = useSessionStart()
-
   const [isDark, toggleDarkMode] = useDarkModeManager()
+  const formatPath = useFormatPath()
+  const location = useLocation()
+  const seconds = useSessionStart()
 
   return (
     <Wrapper isMobile={below1080}>
@@ -139,6 +137,8 @@ function SideNav() {
       ) : (
         <MobileWrapper>
           <Title />
+          <NetworkSwitcher />
+          <MobileMenu />
         </MobileWrapper>
       )}
     </Wrapper>

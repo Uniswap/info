@@ -3,7 +3,14 @@ import { useCallback, useRef, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { useActiveNetwork } from 'state/features/application/hooks'
 import { updateActiveNetwork } from 'state/features/application/slice'
-import { NetworkSwitcherContainer, CurrentNetwork, NetworkList, NetworkListItem, NetworkLogo } from './styled'
+import {
+  NetworkSwitcherContainer,
+  CurrentNetwork,
+  NetworkList,
+  NetworkListItem,
+  NetworkLogo,
+  NetworkName
+} from './styled'
 import { useLocation } from 'react-use'
 import { useNavigate } from 'react-router-dom'
 import { useOnClickOutside } from 'hooks/useOnClickOutSide'
@@ -32,7 +39,7 @@ const NetworkSwitcher = () => {
     <NetworkSwitcherContainer>
       <CurrentNetwork onClick={() => setIsOpen(!isOpen)}>
         <NetworkLogo src={activeNetwork.imageURL} alt={activeNetwork.name} />
-        <span>{activeNetwork.name}</span>
+        <NetworkName>{activeNetwork.name}</NetworkName>
       </CurrentNetwork>
       {isOpen ? (
         <NetworkList ref={node}>
