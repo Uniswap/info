@@ -438,7 +438,7 @@ const getHourlyRateData = async (pairAddress, startTime, latestBlock) => {
   }
 }
 
-export function Updater() {
+export function usePairUpdater() {
   const [, { updateTopPairs }] = usePairDataContext()
   const activeNetwork = useActiveNetworkId()
   const [price] = useEthPrice()
@@ -461,7 +461,6 @@ export function Updater() {
     }
     price && getData()
   }, [price, updateTopPairs, activeNetwork])
-  return null
 }
 
 export function useHourlyRateData(pairAddress, timeWindow) {

@@ -5,6 +5,8 @@ import GlobalPage from './pages/GlobalPage'
 import TokenPage from './pages/TokenPage'
 import PairPage from './pages/PairPage'
 import { useGlobalData, useGlobalChartData } from './contexts/GlobalData'
+import { usePairUpdater } from 'contexts/PairData'
+import { useTokenUpdater } from 'contexts/TokenData'
 import AccountPage from './pages/AccountPage'
 import AllTokensPage from './pages/AllTokensPage'
 import AllPairsPage from './pages/AllPairsPage'
@@ -83,6 +85,9 @@ function App() {
   const formatPath = useFormatPath()
   // show warning
   const showWarning = headBlock && latestBlock ? headBlock - latestBlock > BLOCK_DIFFERENCE_THRESHOLD : false
+
+  usePairUpdater()
+  useTokenUpdater()
 
   return (
     <AppWrapper>

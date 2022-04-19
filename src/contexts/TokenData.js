@@ -575,7 +575,7 @@ const getTokenChartData = async tokenAddress => {
   return data
 }
 
-export function Updater() {
+export function useTokenUpdater() {
   const [, { updateTopTokens }] = useTokenDataContext()
   const activeNetwork = useActiveNetworkId()
   const [price, priceOld] = useEthPrice()
@@ -588,7 +588,6 @@ export function Updater() {
     }
     price && priceOld && fetchData()
   }, [price, priceOld, updateTopTokens, activeNetwork])
-  return null
 }
 
 export function useTokenData(tokenAddress) {

@@ -5,9 +5,9 @@ import ReactGA from 'react-ga'
 import { isMobile } from 'react-device-detect'
 import { ApolloProvider } from '@apollo/react-hooks'
 import ThemeProvider, { GlobalStyle } from './Theme'
-import TokenDataContextProvider, { Updater as TokenDataContextUpdater } from './contexts/TokenData'
+import TokenDataContextProvider from './contexts/TokenData'
 import GlobalDataContextProvider from './contexts/GlobalData'
-import PairDataContextProvider, { Updater as PairDataContextUpdater } from './contexts/PairData'
+import PairDataContextProvider from './contexts/PairData'
 import UserContextProvider from './contexts/User'
 import { PersistGate } from 'redux-persist/integration/react'
 import dayjs from 'dayjs'
@@ -48,30 +48,18 @@ function ContextProviders({ children }) {
   )
 }
 
-function Updaters() {
-  return (
-    <>
-      <PairDataContextUpdater />
-      <TokenDataContextUpdater />
-    </>
-  )
-}
-
 ReactDOM.render(
   <StrictMode>
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
         <ContextProviders>
-          <Updaters />
           <ThemeProvider>
-            <>
+            <ApolloProvider client={ApiService.graphqlClient}>
               <GlobalStyle />
-              <ApolloProvider client={ApiService.graphqlClient}>
-                <BrowserRouter>
-                  <App />
-                </BrowserRouter>
-              </ApolloProvider>
-            </>
+              <BrowserRouter>
+                <App />
+              </BrowserRouter>
+            </ApolloProvider>
           </ThemeProvider>
         </ContextProviders>
       </PersistGate>
