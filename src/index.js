@@ -6,7 +6,6 @@ import { isMobile } from 'react-device-detect'
 import { ApolloProvider } from '@apollo/react-hooks'
 import ThemeProvider, { GlobalStyle } from './Theme'
 import TokenDataContextProvider from './contexts/TokenData'
-import UserContextProvider from './contexts/User'
 import { PersistGate } from 'redux-persist/integration/react'
 import dayjs from 'dayjs'
 import weekOfYear from 'dayjs/plugin/weekOfYear'
@@ -35,11 +34,7 @@ if (typeof GOOGLE_ANALYTICS_ID === 'string' && GOOGLE_ANALYTICS_ID !== '') {
 }
 
 function ContextProviders({ children }) {
-  return (
-    <TokenDataContextProvider>
-      <UserContextProvider>{children}</UserContextProvider>
-    </TokenDataContextProvider>
-  )
+  return <TokenDataContextProvider>{children}</TokenDataContextProvider>
 }
 
 ReactDOM.render(

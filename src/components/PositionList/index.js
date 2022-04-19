@@ -288,7 +288,7 @@ function PositionList({ positions }) {
 
   const positionsSorted =
     positions &&
-    positions
+    [...positions]
 
       .sort((p0, p1) => {
         if (sortedColumn === SORT_FIELD.PRINCIPAL) {

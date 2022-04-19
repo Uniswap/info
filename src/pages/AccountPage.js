@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react'
 import styled from 'styled-components/macro'
-import { useUserTransactions, useUserPositions } from '../contexts/User'
+import { useUserTransactions, useUserPositions } from 'state/features/account/hooks'
 import TxnList from '../components/TxnList'
 import { useParams, Navigate } from 'react-router-dom'
 import Panel from '../components/Panel'
