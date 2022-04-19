@@ -76,6 +76,10 @@ export function useActiveNetworkId() {
   return useAppSelector(state => state.application.activeNetwork.id)
 }
 
+export function useActiveNetwork() {
+  return useAppSelector(state => state.application.activeNetwork)
+}
+
 export function useUpdateActiveNetwork() {
   const dispatch = useAppDispatch()
   const networkId = useActiveNetworkId()
