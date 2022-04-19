@@ -1,4 +1,4 @@
-import { useAllPairData } from 'contexts/PairData'
+import { useAllPairData } from 'state/features/pairs/hooks'
 import { getGlobalData, getChartData, getGlobalTransactions, getPrice, getTopLps } from 'data/ethereum/global'
 import { useState, useEffect } from 'react'
 import { useAppDispatch, useAppSelector } from 'state/hooks'

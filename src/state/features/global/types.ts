@@ -53,42 +53,6 @@ export interface Transaction {
   timestamp: string
 }
 
-export interface TransactionData {
-  pair: Pair
-  transaction: Transaction
-}
-
-export interface BurnTransaction extends TransactionData {
-  amount0: string
-  amount1: string
-  amountUSD: string
-  liquidity: string
-  sender: string
-}
-
-export interface MintTransaction extends TransactionData {
-  amount0: string
-  amount1: string
-  amountUSD: string
-  liquidity: string
-  to: string
-}
-
-export interface SwapTransactions extends TransactionData {
-  amount0In: string
-  amount0Out: string
-  amount1In: string
-  amount1Out: string
-  amountUSD: string
-  to: string
-}
-
-export interface Transactions {
-  burns: BurnTransaction[]
-  mints: MintTransaction[]
-  swaps: SwapTransactions[]
-}
-
 export type LiquidityPositionUser = {
   id: string
 }

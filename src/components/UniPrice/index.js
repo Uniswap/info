@@ -4,7 +4,7 @@ import Panel from '../Panel'
 import { AutoColumn } from '../Column'
 import { RowFixed } from '../Row'
 import { TYPE } from '../../Theme'
-import { usePairData } from '../../contexts/PairData'
+import { usePairData } from 'state/features/pairs/hooks'
 import { formattedNum } from '../../utils'
 
 const PriceCard = styled(Panel)`

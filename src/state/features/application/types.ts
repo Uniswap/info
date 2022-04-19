@@ -4,8 +4,8 @@ export interface ApplicationState {
   currency: string
   timeKey: string
   sessionStart: number
-  latestBlock: string
-  headBlock: string
+  latestBlock: number
+  headBlock: number
   supportedTokens: {
     [SupportedNetwork.ETHEREUM]: Array<string>
     [SupportedNetwork.TRON]: Array<string>

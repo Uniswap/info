@@ -12,7 +12,7 @@ import GlobalStats from '../components/GlobalStats'
 
 import { useGlobalData, useGlobalTransactions } from 'state/features/global/hooks'
 import { useFormatPath } from 'hooks'
-import { useAllPairData } from '../contexts/PairData'
+import { useAllPairData } from 'state/features/pairs/hooks'
 import { useMedia } from 'react-use'
 import Panel from '../components/Panel'
 import { useAllTokenData } from '../contexts/TokenData'
