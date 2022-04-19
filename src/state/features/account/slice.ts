@@ -5,12 +5,19 @@ import {
   UpdatePositionsPayload,
   UpdateTransactionsPayload,
   UpdatePositionHistoryPayload,
-  UpdatePairReturnsPayload
+  UpdatePairReturnsPayload,
+  AccountNetworkState,
+  UpdateTopLiquidityPositionsPayload
 } from './types'
 
+const initialNetworkAccountState: AccountNetworkState = {
+  topLiquidityPositions: undefined,
+  byAddress: {}
+}
+
 const initialState: AccountState = {
-  [SupportedNetwork.ETHEREUM]: {},
-  [SupportedNetwork.TRON]: {}
+  [SupportedNetwork.ETHEREUM]: initialNetworkAccountState,
+  [SupportedNetwork.TRON]: initialNetworkAccountState
 }
 
 export const accountSlice = createSlice({
@@ -21,30 +28,41 @@ export const accountSlice = createSlice({
       state,
       { payload: { networkId, transactions, account } }: PayloadAction<UpdateTransactionsPayload>
     ) => {
-      state[networkId][account] = { ...state[networkId][account], transactions }
+      state[networkId].byAddress[account] = { ...state[networkId].byAddress[account], transactions }
     },
     updatePositions: (state, { payload: { networkId, account, positions } }: PayloadAction<UpdatePositionsPayload>) => {
-      state[networkId][account] = { ...state[networkId][account], positions }
+      state[networkId].byAddress[account] = { ...state[networkId].byAddress[account], positions }
     },
     updatePositionHistory: (
       state,
       { payload: { networkId, account, historyData } }: PayloadAction<UpdatePositionHistoryPayload>
     ) => {
-      state[networkId][account] = { ...state[networkId][account], liquiditySnapshots: historyData }
+      state[networkId].byAddress[account] = { ...state[networkId].byAddress[account], liquiditySnapshots: historyData }
     },
     updatePairReturns: (
       state,
       { payload: { networkId, account, pairAddress, data } }: PayloadAction<UpdatePairReturnsPayload>
     ) => {
-      state[networkId][account] = {
-        ...state[networkId][account],
-        pairReturns: { ...state[networkId][account]?.pairReturns, [pairAddress]: data }
+      state[networkId].byAddress[account] = {
+        ...state[networkId].byAddress[account],
+        pairReturns: { ...state[networkId].byAddress[account]?.pairReturns, [pairAddress]: data }
       }
-      state[networkId][account].pairReturns[pairAddress] = data
+    },
+    updateTopLiquidityPositions: (
+      state,
+      { payload: { networkId, liquidityPositions } }: PayloadAction<UpdateTopLiquidityPositionsPayload>
+    ) => {
+      state[networkId].topLiquidityPositions = liquidityPositions
     }
   }
 })
 
-export const { updateTransactions, updatePositions, updatePositionHistory, updatePairReturns } = accountSlice.actions
+export const {
+  updateTransactions,
+  updatePositions,
+  updatePositionHistory,
+  updatePairReturns,
+  updateTopLiquidityPositions
+} = accountSlice.actions
 
 export default accountSlice.reducer

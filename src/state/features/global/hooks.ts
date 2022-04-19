@@ -1,10 +1,9 @@
-import { useAllPairData } from 'state/features/pairs/hooks'
-import { getGlobalData, getChartData, getGlobalTransactions, getPrice, getTopLps } from 'data/ethereum/global'
+import { getGlobalData, getChartData, getGlobalTransactions, getPrice } from 'data/ethereum/global'
 import { useState, useEffect } from 'react'
 import { useAppDispatch, useAppSelector } from 'state/hooks'
 import { getTimeframe } from 'utils'
 import { useActiveNetworkId, useTimeframe } from '../application/hooks'
-import { updateChart, updateGlobalData, updatePrice, updateTopLps, updateTransactions } from './slice'
+import { updateChart, updateGlobalData, updatePrice, updateTransactions } from './slice'
 
 /**
  * Hook that fetches overview data, plus all tokens and pairs for search
@@ -102,25 +101,4 @@ export function useEthPrice() {
   }, [price, activeNetwork])
 
   return [price, oneDayPrice]
-}
-
-export function useTopLps() {
-  const dispatch = useAppDispatch()
-  const activeNetwork = useActiveNetworkId()
-  const topLps = useAppSelector(state => state.global[activeNetwork].topLps)
-
-  const allPairs = useAllPairData()
-
-  useEffect(() => {
-    async function fetchData() {
-      const response = await getTopLps(allPairs)
-      dispatch(updateTopLps({ topLps: response, networkId: activeNetwork }))
-    }
-
-    if (!topLps && allPairs && Object.keys(allPairs).length > 0) {
-      fetchData()
-    }
-  })
-
-  return topLps
 }

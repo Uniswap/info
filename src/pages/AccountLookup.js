@@ -4,7 +4,7 @@ import { PageWrapper, FullWrapper } from '../components'
 import LPList from '../components/LPList'
 import styled from 'styled-components/macro'
 import AccountSearch from '../components/AccountSearch'
-import { useTopLps } from 'state/features/global/hooks'
+import { useTopLiquidityPositions } from 'state/features/account/hooks'
 import LocalLoader from '../components/LocalLoader'
 import { RowBetween } from '../components/Row'
 import { useMedia } from 'react-use'
@@ -27,7 +27,7 @@ function AccountLookup() {
     window.scrollTo(0, 0)
   }, [])
 
-  const topLps = useTopLps()
+  const topLps = useTopLiquidityPositions()
 
   const below600 = useMedia('(max-width: 600px)')
 

@@ -70,7 +70,6 @@ export interface GlobalNetworkState {
   globalData?: GlobalData
   chartData?: ChardData
   transactions?: Transactions
-  topLps?: Array<LiquidityPosition>
   price: number
   oneDayPrice: number
   priceChange: number
@@ -95,8 +94,4 @@ export type UpdatePricePayload = ParamsWithNetwork<{
   price: number
   oneDayPrice: number
   priceChange: number
-}>
-
-export type UpdateTopLpsPayload = ParamsWithNetwork<{
-  topLps: Array<LiquidityPosition>
 }>

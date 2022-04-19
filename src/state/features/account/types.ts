@@ -75,7 +75,12 @@ export interface Account {
   pairReturns: PairReturns
 }
 
-export type AccountState = Record<SupportedNetwork, Record<string, Account>>
+export type AccountNetworkState = {
+  topLiquidityPositions?: Array<LiquidityPosition>
+  byAddress: Record<string, Account>
+}
+
+export type AccountState = Record<SupportedNetwork, AccountNetworkState>
 
 export type UpdateTransactionsPayload = ParamsWithNetwork<{
   account: string
@@ -102,3 +107,20 @@ export type LiquidityChart = {
   date: number
   valueUSD: number
 }
+
+export type LiquidityPositionUser = {
+  id: string
+}
+
+export interface LiquidityPosition {
+  pairAddress: string
+  pairName: string
+  token0: string
+  token1: string
+  usd: number
+  user: LiquidityPositionUser
+}
+
+export type UpdateTopLiquidityPositionsPayload = ParamsWithNetwork<{
+  liquidityPositions: Array<LiquidityPosition>
+}>

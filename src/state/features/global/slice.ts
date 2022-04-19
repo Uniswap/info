@@ -6,7 +6,6 @@ import {
   UpdateChartPayload,
   UpdateGlobalDataPayload,
   UpdatePricePayload,
-  UpdateTopLpsPayload,
   UpdateTransactionsPayload
 } from './types'
 
@@ -14,7 +13,6 @@ const initialGlobalNetworkState: GlobalNetworkState = {
   globalData: undefined,
   chartData: undefined,
   transactions: undefined,
-  topLps: undefined,
   price: 0,
   oneDayPrice: 0,
   priceChange: 0
@@ -48,13 +46,10 @@ export const globalSlice = createSlice({
       state[networkId].price = price
       state[networkId].oneDayPrice = oneDayPrice
       state[networkId].priceChange = priceChange
-    },
-    updateTopLps: (state, { payload: { networkId, topLps } }: PayloadAction<UpdateTopLpsPayload>) => {
-      state[networkId].topLps = topLps
     }
   }
 })
 
-export const { updateGlobalData, updateTransactions, updateChart, updatePrice, updateTopLps } = globalSlice.actions
+export const { updateGlobalData, updateTransactions, updateChart, updatePrice } = globalSlice.actions
 
 export default globalSlice.reducer

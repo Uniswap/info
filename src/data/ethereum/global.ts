@@ -1,6 +1,5 @@
-import { accountApi, globalApi } from 'api'
+import { globalApi } from 'api'
 import dayjs from 'dayjs'
-import { LiquidityPosition } from 'state/features/global/types'
 import { getBlocksFromTimestamps, get2DayPercentChange, getPercentChange, getBlockFromTimestamp } from 'utils'
 
 /**
@@ -235,51 +234,4 @@ export const getPrice = async () => {
   }
 
   return [price, priceOneDay, priceChange]
-}
-
-/**
- * Get the top liquidity positions based on USD size
- * @TODO Not a perfect lookup needs improvement
- */
-export const getTopLps = async (allPairs: any) => {
-  // get top 20 by reserves
-  const topPairs = Object.keys(allPairs)
-    ?.sort((a, b) => (allPairs[a].reserveUSD > allPairs[b].reserveUSD ? -1 : 1))
-    ?.slice(0, 99)
-    .map(pair => pair)
-
-  const topLpLists = await Promise.all(
-    topPairs.map(async pair => {
-      // for each one, fetch top LPs
-      const { data: results } = await accountApi.getTopLiquidityPools(pair.toString())
-      if (results) {
-        return results.liquidityPositions
-      }
-      return []
-    })
-  )
-
-  // get the top lps from the results formatted
-  const topLps: LiquidityPosition[] = []
-  topLpLists
-    .filter(i => !!i) // check for ones not fetched correctly
-    .map(list => {
-      return list.map(entry => {
-        const pairData = allPairs[entry.pair.id]
-        return topLps.push({
-          user: entry.user,
-          pairName: pairData.token0.symbol + '-' + pairData.token1.symbol,
-          pairAddress: entry.pair.id,
-          token0: pairData.token0.id,
-          token1: pairData.token1.id,
-          usd:
-            (parseFloat(entry.liquidityTokenBalance) / parseFloat(pairData.totalSupply)) *
-            parseFloat(pairData.reserveUSD)
-        })
-      })
-    })
-
-  const sorted = topLps.sort((a, b) => (a.usd > b.usd ? -1 : 1))
-  const shorter = sorted.splice(0, 100)
-  return shorter
 }
