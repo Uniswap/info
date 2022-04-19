@@ -1,6 +1,7 @@
 import { pairApi } from 'api'
 import { BlockHeight } from 'api/types'
 import dayjs from 'dayjs'
+import { Pair } from 'state/features/pairs/types'
 import {
   getTimestampsForChanges,
   getBlocksFromTimestamps,
@@ -9,6 +10,20 @@ import {
   splitQuery
 } from 'utils'
 import { updateNameData } from 'utils/data'
+
+export async function getPairList(price: number) {
+  const {
+    data: { pairs }
+  } = await pairApi.getCurrentPairs()
+
+  // format as array of addresses
+  const formattedPairs = pairs.map((pair: Pair) => {
+    return pair.id
+  })
+
+  // get data for every pair in list
+  return getBulkPairData(formattedPairs, price)
+}
 
 export async function getBulkPairData(pairList: string[], price: number) {
   const [t1, t2, tWeek] = getTimestampsForChanges()

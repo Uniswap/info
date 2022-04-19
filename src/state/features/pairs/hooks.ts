@@ -1,6 +1,11 @@
-import { pairApi } from 'api'
 import { timeframeOptions } from '../../../constants'
-import { getBulkPairData, getHourlyRateData, getPairTransactions, getPairChartData } from 'data/ethereum/pairs'
+import {
+  getBulkPairData,
+  getHourlyRateData,
+  getPairTransactions,
+  getPairChartData,
+  getPairList
+} from 'data/ethereum/pairs'
 import dayjs from 'dayjs'
 import { isAddress } from 'ethers/lib/utils'
 import { useEffect, useState } from 'react'
@@ -17,18 +22,7 @@ export function usePairUpdater() {
 
   useEffect(() => {
     async function getData() {
-      // get top pairs by reserves
-      const {
-        data: { pairs }
-      } = await pairApi.getCurrentPairs()
-
-      // format as array of addresses
-      const formattedPairs = pairs.map((pair: Pair) => {
-        return pair.id
-      })
-
-      // get data for every pair in list
-      const topPairs = await getBulkPairData(formattedPairs, price)
+      const topPairs = await getPairList(price)
       topPairs && dispatch(updateTopPairs({ topPairs, networkId: activeNetwork }))
     }
     price && getData()
