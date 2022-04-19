@@ -11,7 +11,6 @@ import { useTranslation } from 'react-i18next'
 
 function AllTokensPage() {
   const { t } = useTranslation()
-
   const allTokens = useAllTokenData()
 
   useEffect(() => {

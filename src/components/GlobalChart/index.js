@@ -22,7 +22,6 @@ const VOLUME_WINDOW = {
 }
 const GlobalChart = ({ display }) => {
   const { t } = useTranslation()
-
   // chart options
   const [chartView, setChartView] = useState(display === 'volume' ? CHART_VIEW.VOLUME : CHART_VIEW.LIQUIDITY)
 

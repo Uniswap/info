@@ -15,7 +15,6 @@ const ChartWrapper = styled.div`
 
 const Chart = ({ data, chartOption, currencyUnit, symbol }) => {
   const { t } = useTranslation()
-
   const [chartData, setChartData] = useState([])
   useEffect(() => {
     setChartData([])

@@ -17,7 +17,6 @@ const Header = styled.div`
 
 export default function GlobalStats() {
   const { t } = useTranslation()
-
   const below1295 = useMedia('(max-width: 1295px)')
   const below1180 = useMedia('(max-width: 1180px)')
   const below1024 = useMedia('(max-width: 1024px)')

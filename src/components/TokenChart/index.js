@@ -44,7 +44,6 @@ const DATA_FREQUENCY = {
 
 const TokenChart = ({ address, color, base }) => {
   const { t } = useTranslation()
-
   // settings for the window and candle width
   const [chartFilter, setChartFilter] = useState(CHART_VIEW.PRICE)
   const [frequency, setFrequency] = useState(DATA_FREQUENCY.HOUR)
