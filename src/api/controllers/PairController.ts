@@ -7,6 +7,7 @@ import {
   PAIRS_HISTORICAL_BULK,
   PAIR_CHART,
   PAIR_DATA,
+  PAIR_DAY_DATA_BULK,
   PAIR_SEARCH
 } from 'api/queries/pairs'
 import { BlockHeight } from 'api/types'
@@ -14,7 +15,7 @@ import { SupportedNetwork } from 'constants/networks'
 import { IPairController } from './PairController.interface'
 
 class PairController implements IPairController {
-  public getFilteredTransactions(allPairs: string) {
+  public getFilteredTransactions(allPairs: string[]) {
     switch (ApiService.activeNetwork) {
       case SupportedNetwork.ETHEREUM:
       case SupportedNetwork.TRON:
@@ -118,6 +119,20 @@ class PairController implements IPairController {
           variables: {
             tokens,
             id
+          }
+        })
+    }
+  }
+
+  public getPairDayDataBulk(pairs: string[], startDateTimestamp: number) {
+    switch (ApiService.activeNetwork) {
+      case SupportedNetwork.ETHEREUM:
+      case SupportedNetwork.TRON:
+        return ApiService.graphqlClient.query<any>({
+          query: PAIR_DAY_DATA_BULK,
+          variables: {
+            pairs,
+            startTimestamp: startDateTimestamp
           }
         })
     }

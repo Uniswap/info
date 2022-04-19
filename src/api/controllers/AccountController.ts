@@ -1,13 +1,11 @@
 import ApiService from 'api/ApiService'
 import {
-  MINING_POSITIONS,
   TOP_LPS_PER_PAIRS,
-  USER_HISTORY,
-  USER_MINTS_BUNRS_PER_PAIR,
-  USER_POSITIONS,
+  USER_LIQUIDITY_POSITION_SNAPSHOTS,
+  USER_MINTS_BURNS_PER_PAIR,
+  USER_LIQUIDITY_POSITIONS,
   USER_TRANSACTIONS
 } from 'api/queries/accounts'
-import { PAIR_DAY_DATA_BULK } from 'api/queries/pairs'
 import {
   TopLiquidityPoolsData,
   TopLiquidityPoolsParams,
@@ -34,12 +32,12 @@ class AccountController implements IAccountController {
     }
   }
 
-  public getUserHistory(account: string, skip: number) {
+  public getUserLiquidityPositionSnapshots(account: string, skip: number) {
     switch (ApiService.activeNetwork) {
       case SupportedNetwork.ETHEREUM:
       case SupportedNetwork.TRON:
         return ApiService.graphqlClient.query<any, UserHistoryParams>({
-          query: USER_HISTORY,
+          query: USER_LIQUIDITY_POSITION_SNAPSHOTS,
           variables: {
             skip: skip,
             user: account
@@ -49,46 +47,14 @@ class AccountController implements IAccountController {
     }
   }
 
-  public getPairDayDataBulk(pairs: string[], startDateTimestamp: number) {
-    switch (ApiService.activeNetwork) {
-      case SupportedNetwork.ETHEREUM:
-      case SupportedNetwork.TRON:
-        return ApiService.graphqlClient.query<any>({
-          query: PAIR_DAY_DATA_BULK,
-          variables: {
-            pairs,
-            startTimestamp: startDateTimestamp
-          }
-        })
-    }
-  }
-
-  public getUserPositions(account: string) {
+  public getUserLiquidityPositions(account: string) {
     switch (ApiService.activeNetwork) {
       case SupportedNetwork.ETHEREUM:
       case SupportedNetwork.TRON:
         return ApiService.graphqlClient.query<UserPositionData, UserParams>({
-          query: USER_POSITIONS,
+          query: USER_LIQUIDITY_POSITIONS,
           variables: {
             user: account
-          },
-          fetchPolicy: 'no-cache'
-        })
-    }
-  }
-
-  // ! currently disabled
-  public getMiningPositions(account: string) {
-    switch (ApiService.activeNetwork) {
-      case SupportedNetwork.ETHEREUM:
-      case SupportedNetwork.TRON:
-        return ApiService.graphqlClient.query<any>({
-          query: MINING_POSITIONS,
-          variables: {
-            account
-          },
-          context: {
-            client: 'stake'
           },
           fetchPolicy: 'no-cache'
         })
@@ -114,7 +80,7 @@ class AccountController implements IAccountController {
       case SupportedNetwork.ETHEREUM:
       case SupportedNetwork.TRON:
         return ApiService.graphqlClient.query<any, UserMintsBurnsParams>({
-          query: USER_MINTS_BUNRS_PER_PAIR,
+          query: USER_MINTS_BURNS_PER_PAIR,
           variables: {
             user,
             pair

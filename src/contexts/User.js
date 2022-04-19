@@ -6,7 +6,7 @@ import dayjs from 'dayjs'
 import { useEthPrice } from './GlobalData'
 import { getLPReturnsOnPair, getHistoricalPairReturns } from '../utils/returns'
 import { timeframeOptions } from '../constants'
-import { accountApi } from 'api'
+import { accountApi, pairApi } from 'api'
 
 const UPDATE_TRANSACTIONS = 'UPDATE_TRANSACTIONS'
 const UPDATE_POSITIONS = 'UPDATE_POSITIONS '
@@ -193,7 +193,7 @@ async function getUserHistory(account) {
     let allResults = []
     let found = false
     while (!found) {
-      let result = await accountApi.getUserHistory(account, skip)
+      let result = await accountApi.getUserLiquidityPositionSnapshots(account, skip)
       allResults = allResults.concat(result.data.liquidityPositionSnapshots)
       if (result.data.liquidityPositionSnapshots.length < 1000) {
         found = true
@@ -234,7 +234,7 @@ async function getUserLiquidityChart(account, startDateTimestamp, history) {
   // get all day datas where date is in this list, and pair is in pair list
   let {
     data: { pairDayDatas }
-  } = await accountApi.getPairDayDataBulk(pairs, startDateTimestamp)
+  } = await pairApi.getPairDayDataBulk(pairs, startDateTimestamp)
 
   const formattedHistory = []
 
@@ -303,7 +303,7 @@ async function getUserLiquidityChart(account, startDateTimestamp, history) {
 
 async function getUserPositions(account, price, snapshots) {
   try {
-    let result = await accountApi.getUserPositions(account)
+    let result = await accountApi.getUserLiquidityPositions(account)
     if (result?.data?.liquidityPositions) {
       let formattedPositions = await Promise.all(
         result?.data?.liquidityPositions.map(async positionData => {
@@ -316,24 +316,6 @@ async function getUserPositions(account, price, snapshots) {
       )
       return formattedPositions
     }
-  } catch (e) {
-    console.log(e)
-  }
-}
-
-async function getMiningPositions(account, allPairData) {
-  try {
-    let miningPositionData = []
-    let result = await accountApi.getMiningPositions(account)
-    if (!result?.data?.user?.miningPosition) {
-      return
-    }
-    miningPositionData = result.data.user.miningPosition
-    for (const miningPosition of miningPositionData) {
-      const pairAddress = miningPosition.miningPool.pair.id
-      miningPosition.pairData = allPairData[pairAddress]
-    }
-    return miningPositionData
   } catch (e) {
     console.log(e)
   }
@@ -521,25 +503,4 @@ export function useUserPositions(account) {
   }, [account, positions, updatePositions, price, snapshots, activeNetwork])
 
   return positions
-}
-
-export function useMiningPositions(account) {
-  const [state, { updateMiningPositions }] = useUserContext()
-  const allPairData = useAllPairData()
-  const activeNetwork = useActiveNetworkId()
-  const miningPositions = state[activeNetwork]?.[account]?.[MINING_POSITIONS_KEY]
-
-  const snapshots = useUserSnapshots(account)
-
-  useEffect(() => {
-    async function fetchData(account) {
-      const miningPositionData = await getMiningPositions(account, allPairData)
-      updateMiningPositions(account, miningPositionData)
-    }
-
-    if (!miningPositions && account && snapshots) {
-      fetchData(account)
-    }
-  }, [account, miningPositions, updateMiningPositions, snapshots, allPairData, activeNetwork])
-  return miningPositions
 }

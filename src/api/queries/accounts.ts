@@ -1,9 +1,8 @@
 import { BURN_DETAILS, MINT_DETAILS, SWAP_DETAILS } from 'api/fragments'
 import { gql } from 'apollo-boost'
 
-// FIXME: no swap data
-export const USER_MINTS_BUNRS_PER_PAIR = gql`
-  query UserDataBulkPerPair($user: Bytes!, $pair: Bytes!) {
+export const USER_MINTS_BURNS_PER_PAIR = gql`
+  query UserMintsBurnsPerPair($user: Bytes!, $pair: Bytes!) {
     mints(where: { to: $user, pair: $pair }) {
       amountUSD
       amount0
@@ -35,7 +34,7 @@ export const USER_MINTS_BUNRS_PER_PAIR = gql`
   }
 `
 
-export const USER_HISTORY = gql`
+export const USER_LIQUIDITY_POSITION_SNAPSHOTS = gql`
   query LpSnapshots($user: Bytes!, $skip: Int!) {
     liquidityPositionSnapshots(first: 1000, skip: $skip, where: { user: $user }) {
       timestamp
@@ -62,7 +61,7 @@ export const USER_HISTORY = gql`
   }
 `
 // ! need mapped
-export const USER_POSITIONS = gql`
+export const USER_LIQUIDITY_POSITIONS = gql`
   query LiquidityPositions($user: Bytes!) {
     liquidityPositions(where: { user: $user }) {
       pair {
@@ -114,27 +113,6 @@ export const TOP_LPS_PER_PAIRS = gql`
         id
       }
       liquidityTokenBalance
-    }
-  }
-`
-
-export const MINING_POSITIONS = gql`
-  query UserMiningPositions($account: String!) {
-    user(id: $account) {
-      miningPosition {
-        id
-        user {
-          id
-        }
-        miningPool {
-          pair {
-            id
-            token0
-            token1
-          }
-        }
-        balance
-      }
     }
   }
 `
