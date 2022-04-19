@@ -1,5 +1,5 @@
 import { createContext, useContext, useReducer, useMemo, useCallback, useEffect, useState } from 'react'
-import { useAllPairData, usePairData } from './PairData'
+import { usePairData } from './PairData'
 import { EthereumNetworkInfo, TronNetworkInfo } from '../constants/networks'
 import { useTimeframe, useStartTimestamp, useActiveNetworkId } from 'state/features/application/hooks'
 import dayjs from 'dayjs'
