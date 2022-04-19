@@ -10,7 +10,7 @@ import GlobalChart from '../components/GlobalChart'
 import Search from '../components/Search'
 import GlobalStats from '../components/GlobalStats'
 
-import { useGlobalData, useGlobalTransactions } from '../contexts/GlobalData'
+import { useGlobalData, useGlobalTransactions } from 'state/features/global/hooks'
 import { useFormatPath } from 'hooks'
 import { useAllPairData } from '../contexts/PairData'
 import { useMedia } from 'react-use'

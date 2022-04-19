@@ -1,7 +1,7 @@
 import { createContext, useContext, useReducer, useMemo, useCallback, useEffect, useState } from 'react'
 import { EthereumNetworkInfo, TronNetworkInfo } from '../constants/networks'
 
-import { useEthPrice } from './GlobalData'
+import { useEthPrice } from 'state/features/global/hooks'
 import { useActiveNetworkId, useLatestBlocks } from 'state/features/application/hooks'
 
 import dayjs from 'dayjs'
@@ -290,6 +290,7 @@ function parseData(data, oneDayData, twoDayData, oneWeekData, price, oneDayBlock
   return data
 }
 
+// TODO: can be improved using useQuery
 const getPairTransactions = async pairAddress => {
   const transactions = {}
 

@@ -3,7 +3,7 @@ import { EthereumNetworkInfo, TronNetworkInfo } from '../constants/networks'
 
 import { tokenApi, pairApi, globalApi } from 'api'
 
-import { useEthPrice } from './GlobalData'
+import { useEthPrice } from 'state/features/global/hooks'
 import { useActiveNetworkId, useLatestBlocks } from 'state/features/application/hooks'
 
 import dayjs from 'dayjs'
@@ -414,6 +414,7 @@ const getTokenData = async (address, price, priceOld) => {
   return data
 }
 
+// TODO: can be improved by useQuery
 const getTokenTransactions = async allPairsFormatted => {
   const transactions = {}
   try {
