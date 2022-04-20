@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import 'feather-icons'
-import { useParams, withRouter } from 'react-router-dom'
+import { withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 import { ButtonDark } from '../ButtonStyled'
 import { isAddress } from '../../utils'
@@ -13,7 +13,7 @@ import { Divider } from '..'
 import { Flex, Text } from 'rebass'
 
 import { X } from 'react-feather'
-import { NETWORK_INFOS } from '../../constants/networks'
+import { NETWORKS_INFO } from '../../constants/networks'
 import { useNetworksInfo } from '../../contexts/NetworkInfo'
 import { BasicLink } from '../Link'
 import { RowFixed } from '../Row'
@@ -123,9 +123,9 @@ function AccountSearch({ history, small, shortenAddress }) {
                 <DashGrid key={account.address} center={true} style={{ height: 'fit-content', padding: '1rem 0 0 0' }}>
                   <Flex area='account' justifyContent='space-between'>
                     <Wrapper isWrap={small}>
-                      <BasicLink to={'/' + NETWORK_INFOS[account.chainId]?.urlKey + '/account/' + account.address}>
+                      <BasicLink to={'/' + NETWORKS_INFO[account.chainId]?.urlKey + '/account/' + account.address}>
                         <RowFixed>
-                          {small && <img src={NETWORK_INFOS[account.chainId].icon} width='16px' style={{ marginRight: '4px' }} />}
+                          {small && <img src={NETWORKS_INFO[account.chainId].icon} width='16px' style={{ marginRight: '4px' }} />}
                           <AccountLink isSmall={small}>
                             {shortenAddress || small
                               ? `${account.address?.slice(0, 6) + '...' + account.address?.slice(38, 42)}`

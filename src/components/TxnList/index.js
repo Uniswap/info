@@ -17,7 +17,7 @@ import DropdownSelect from '../DropdownSelect'
 import FormattedName from '../FormattedName'
 import { TYPE } from '../../Theme'
 import useTheme from '../../hooks/useTheme'
-import { NETWORK_INFOS } from '../../constants/networks'
+import { NETWORKS_INFO } from '../../constants/networks'
 import { aggregateGlobalTxns } from '../../utils/aggregateData'
 import { MouseoverTooltip } from '../Tooltip'
 
@@ -289,8 +289,8 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
         let valueToCompareA = null
         let valueToCompareB = null
         if (sortedColumn === SORT_FIELD.NETWORK) {
-          valueToCompareA = NETWORK_INFOS[a.chainId].name
-          valueToCompareB = NETWORK_INFOS[b.chainId].name
+          valueToCompareA = NETWORKS_INFO[a.chainId].name
+          valueToCompareB = NETWORKS_INFO[b.chainId].name
         } else {
           valueToCompareA = parseFloat(a[sortedColumn])
           valueToCompareB = parseFloat(b[sortedColumn])
@@ -315,7 +315,7 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
   const isShowDropdown = below900 || (!below1080 && below1280)
 
   const ListItem = ({ item }) => {
-    const urls = useMemo(() => getEtherScanUrls(NETWORK_INFOS[item.chainId]), [item.chainId])
+    const urls = useMemo(() => getEtherScanUrls(NETWORKS_INFO[item.chainId]), [item.chainId])
     if (item.token0Symbol === 'WETH') {
       item.token0Symbol = 'ETH'
     }
@@ -333,9 +333,9 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
         </DataText>
         {isShowNetworkColumn && (
           <DataText area='network'>
-            <RouterLink to={'/' + NETWORK_INFOS[item.chainId].urlKey}>
-              <MouseoverTooltip text={NETWORK_INFOS[item.chainId].name} width='unset'>
-                <img src={NETWORK_INFOS[item.chainId].icon} width={25} />
+            <RouterLink to={'/' + NETWORKS_INFO[item.chainId].urlKey}>
+              <MouseoverTooltip text={NETWORKS_INFO[item.chainId].name} width='unset'>
+                <img src={NETWORKS_INFO[item.chainId].icon} width={25} />
               </MouseoverTooltip>
             </RouterLink>
           </DataText>

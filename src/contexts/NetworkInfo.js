@@ -1,9 +1,9 @@
 import React, { createContext, useContext, useReducer, useMemo, useCallback } from 'react'
-import { NETWORK_INFOS } from '../constants/networks'
+import { NETWORKS_INFO } from '../constants/networks'
 const UPDATE_CHAIN = 'UPDATE_CHAIN'
 
 export const NetworksInfoEnv = process.env.REACT_APP_SUPPORT_CHAINS_ID.split(',').map(
-  supportChainId => NETWORK_INFOS[supportChainId]
+  supportChainId => NETWORKS_INFO[supportChainId]
 )
 const INITIAL_STATE = {
   networksInfo: [NetworksInfoEnv[0]],

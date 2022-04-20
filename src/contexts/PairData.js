@@ -703,7 +703,6 @@ export function usePairChartData(pairAddress) {
  * Get list of all pairs in Kyberswap
  */
 export function useAllPairData() {
-  //todo namgold: dò lại
   const [state] = usePairDataContext()
   const [networksInfo] = useNetworksInfo()
   return networksInfo.map(networkInfo => state?.[networkInfo?.chainId] || {})

@@ -82,7 +82,7 @@ export type NETWORK_INFO = {
   }
 }
 
-export const NETWORK_INFOS: { [key in ChainId]: NETWORK_INFO } = {
+export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
   [ChainId.MAINNET]: {
     chainId: ChainId.MAINNET,
     icon: Mainnet,

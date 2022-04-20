@@ -16,7 +16,7 @@ import { OVERVIEW_TOKEN_BLACKLIST, PAIR_BLACKLIST } from '../../constants'
 import { PAIR_SEARCH, TOKEN_SEARCH } from '../../apollo/queries'
 import FormattedName from '../FormattedName'
 import { TYPE } from '../../Theme'
-import { NETWORK_INFOS } from '../../constants/networks'
+import { NETWORKS_INFO } from '../../constants/networks'
 
 const Container = styled.div`
   height: 48px;
@@ -436,22 +436,22 @@ export const Search = ({ small = false }) => {
           )}
           {filteredPairList &&
             filteredPairList.slice(0, pairsShown).map(pair => {
-              if (pair?.token0?.id === NETWORK_INFOS[pair.chainId].wethAddress) {
-                pair.token0.name = NETWORK_INFOS[pair.chainId].nativeTokenWrappedName
-                pair.token0.symbol = NETWORK_INFOS[pair.chainId].nativeTokenSymbol
+              if (pair?.token0?.id === NETWORKS_INFO[pair.chainId].wethAddress) {
+                pair.token0.name = NETWORKS_INFO[pair.chainId].nativeTokenWrappedName
+                pair.token0.symbol = NETWORKS_INFO[pair.chainId].nativeTokenSymbol
               }
-              if (pair?.token1.id === NETWORK_INFOS[pair.chainId].wethAddress) {
-                pair.token1.name = NETWORK_INFOS[pair.chainId].nativeTokenWrappedName
-                pair.token1.symbol = NETWORK_INFOS[pair.chainId].nativeTokenSymbol
+              if (pair?.token1.id === NETWORKS_INFO[pair.chainId].wethAddress) {
+                pair.token1.name = NETWORKS_INFO[pair.chainId].nativeTokenWrappedName
+                pair.token1.symbol = NETWORKS_INFO[pair.chainId].nativeTokenSymbol
               }
               return (
-                <BasicLink to={'/' + NETWORK_INFOS[pair.chainId].urlKey + '/pair/' + pair.id} key={pair.id} onClick={onDismiss}>
+                <BasicLink to={'/' + NETWORKS_INFO[pair.chainId].urlKey + '/pair/' + pair.id} key={pair.id} onClick={onDismiss}>
                   <MenuItem>
                     <DoubleTokenLogo
                       a0={pair?.token0?.id}
                       a1={pair?.token1?.id}
                       margin={true}
-                      networkInfo={NETWORK_INFOS[pair.chainId]}
+                      networkInfo={NETWORKS_INFO[pair.chainId]}
                     />
                     <TYPE.body style={{ marginLeft: '10px' }}>{pair.token0.symbol + '-' + pair.token1.symbol} Pair</TYPE.body>
                   </MenuItem>
@@ -479,10 +479,10 @@ export const Search = ({ small = false }) => {
           )}
           {filteredTokenList.slice(0, tokensShown).map(token => {
             return (
-              <BasicLink to={'/' + NETWORK_INFOS[token.chainId].urlKey + '/token/' + token.id} key={token.id} onClick={onDismiss}>
+              <BasicLink to={'/' + NETWORKS_INFO[token.chainId].urlKey + '/token/' + token.id} key={token.id} onClick={onDismiss}>
                 <MenuItem>
                   <RowFixed>
-                    <TokenLogo address={token.id} style={{ marginRight: '10px' }} networkInfo={NETWORK_INFOS[token.chainId]} />
+                    <TokenLogo address={token.id} style={{ marginRight: '10px' }} networkInfo={NETWORKS_INFO[token.chainId]} />
                     <FormattedName text={token.name} maxCharacters={20} style={{ marginRight: '6px' }} />
                     (<FormattedName text={token.symbol} maxCharacters={6} />)
                   </RowFixed>

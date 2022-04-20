@@ -16,7 +16,7 @@ import QuestionHelper from '../QuestionHelper'
 import { TYPE } from '../../Theme'
 import { MAX_ALLOW_APY } from '../../constants'
 import useTheme from '../../hooks/useTheme'
-import { NETWORK_INFOS } from '../../constants/networks'
+import { NETWORKS_INFO } from '../../constants/networks'
 import { aggregatePairs } from '../../utils/aggregateData'
 import { MouseoverTooltip } from '../Tooltip'
 
@@ -186,11 +186,11 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 5 }) {
               a0={pairData.token0.id}
               a1={pairData.token1.id}
               margin={!below740}
-              networkInfo={NETWORK_INFOS[pairData.chainId]}
+              networkInfo={NETWORKS_INFO[pairData.chainId]}
             />
             <CustomLink
               style={{ marginLeft: '20px', whiteSpace: 'nowrap' }}
-              to={'/' + NETWORK_INFOS[pairData.chainId].urlKey + '/pair/' + pairAddress}
+              to={'/' + NETWORKS_INFO[pairData.chainId].urlKey + '/pair/' + pairAddress}
               color={color}
             >
               <FormattedName text={showData.name} maxCharacters={below600 ? 8 : 16} adjustSize={true} link={true} />
@@ -198,9 +198,9 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 5 }) {
           </DataText>
           {isShowNetworkColumn && (
             <DataText area='network'>
-              <Link to={'/' + NETWORK_INFOS[pairData.chainId].urlKey}>
-                <MouseoverTooltip text={NETWORK_INFOS[pairData.chainId].name} width='unset'>
-                  <img src={NETWORK_INFOS[pairData.chainId].icon} width={25} />
+              <Link to={'/' + NETWORKS_INFO[pairData.chainId].urlKey}>
+                <MouseoverTooltip text={NETWORKS_INFO[pairData.chainId].name} width='unset'>
+                  <img src={NETWORKS_INFO[pairData.chainId].icon} width={25} />
                 </MouseoverTooltip>
               </Link>
             </DataText>
@@ -234,8 +234,8 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 5 }) {
           valueToCompareB = parseFloat(MAP_SHOW_DATA(pairB)[sortedColumn])
         } else if (sortedColumn === FIELDS.NETWORK) {
           //reverse order
-          valueToCompareB = NETWORK_INFOS[pairA.chainId].name
-          valueToCompareA = NETWORK_INFOS[pairB.chainId].name
+          valueToCompareB = NETWORKS_INFO[pairA.chainId].name
+          valueToCompareA = NETWORKS_INFO[pairB.chainId].name
         }
         if (valueToCompareA == valueToCompareB) {
           if (parseFloat(MAP_SHOW_DATA(pairA)[FIELDS.LIQ]) == parseFloat(MAP_SHOW_DATA(pairB)[FIELDS.LIQ])) {

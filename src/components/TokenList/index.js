@@ -17,7 +17,7 @@ import FormattedName from '../FormattedName'
 import { TYPE } from '../../Theme'
 import LocalLoader from '../LocalLoader'
 import { useAllTokenData } from '../../contexts/TokenData'
-import { NETWORK_INFOS } from '../../constants/networks'
+import { NETWORKS_INFO } from '../../constants/networks'
 import { aggregateTokens } from '../../utils/aggregateData'
 import { MouseoverTooltip } from '../Tooltip'
 
@@ -197,8 +197,8 @@ function TopTokenList({ itemMax = 5 }) {
             valueToCompareA = b[sortedColumn].toLowerCase()
           } else if (sortedColumn === SORT_FIELD.NETWORK) {
             //reverse order
-            valueToCompareB = NETWORK_INFOS[a.chainId].name
-            valueToCompareA = NETWORK_INFOS[b.chainId].name
+            valueToCompareB = NETWORKS_INFO[a.chainId].name
+            valueToCompareA = NETWORKS_INFO[b.chainId].name
           } else {
             valueToCompareA = parseFloat(a[sortedColumn])
             valueToCompareB = parseFloat(b[sortedColumn])
@@ -221,10 +221,10 @@ function TopTokenList({ itemMax = 5 }) {
         <DataText area='name' fontWeight='500'>
           <Row>
             {!below680 && <div style={{ marginRight: '1rem', width: '10px' }}>{index}</div>}
-            <TokenLogo address={item.id} networkInfo={NETWORK_INFOS[item.chainId]} />
+            <TokenLogo address={item.id} networkInfo={NETWORKS_INFO[item.chainId]} />
             <CustomLink
               style={{ marginLeft: '16px', whiteSpace: 'nowrap' }}
-              to={'/' + NETWORK_INFOS[item.chainId].urlKey + '/token/' + item.id}
+              to={'/' + NETWORKS_INFO[item.chainId].urlKey + '/token/' + item.id}
             >
               <FormattedName
                 text={below680 ? item.symbol : item.name}
@@ -237,9 +237,9 @@ function TopTokenList({ itemMax = 5 }) {
         </DataText>
         {isShowNetworkColumn && (
           <DataText area='network'>
-            <Link to={'/' + NETWORK_INFOS[item.chainId].urlKey}>
-              <MouseoverTooltip text={NETWORK_INFOS[item.chainId].name} width='unset'>
-                <img src={NETWORK_INFOS[item.chainId].icon} width={25} />
+            <Link to={'/' + NETWORKS_INFO[item.chainId].urlKey}>
+              <MouseoverTooltip text={NETWORKS_INFO[item.chainId].name} width='unset'>
+                <img src={NETWORKS_INFO[item.chainId].icon} width={25} />
               </MouseoverTooltip>
             </Link>
           </DataText>

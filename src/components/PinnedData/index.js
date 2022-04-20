@@ -10,7 +10,7 @@ import AccountSearch from '../AccountSearch'
 import { Bookmark, ChevronRight, X } from 'react-feather'
 import FormattedName from '../FormattedName'
 import { shortenAddress } from '../../utils'
-import { NETWORK_INFOS } from '../../constants/networks'
+import { NETWORKS_INFO } from '../../constants/networks'
 
 const RightColumn = styled.div`
   position: sticky;
@@ -98,9 +98,9 @@ function PinnedData({ open, setSavedOpen }) {
                 return (
                   <RowBetween key={pair.address}>
                     <Wrapper>
-                      <Link to={'/' + NETWORK_INFOS[pair.chainId].urlKey + '/pair/' + address}>
+                      <Link to={'/' + NETWORKS_INFO[pair.chainId].urlKey + '/pair/' + address}>
                         <RowFixed>
-                          <img src={NETWORK_INFOS[pair.chainId].icon} width='16px' style={{ marginRight: '4px' }} />
+                          <img src={NETWORKS_INFO[pair.chainId].icon} width='16px' style={{ marginRight: '4px' }} />
                           <TYPE.header>
                             <FormattedName
                               text={pair.token0Symbol + '/' + pair.token1Symbol}
@@ -138,9 +138,9 @@ function PinnedData({ open, setSavedOpen }) {
                 return (
                   <RowBetween key={pool.address}>
                     <Wrapper>
-                      <Link to={'/' + NETWORK_INFOS[pool.chainId].urlKey + '/pool/' + pool.address}>
+                      <Link to={'/' + NETWORKS_INFO[pool.chainId].urlKey + '/pool/' + pool.address}>
                         <RowFixed>
-                          <img src={NETWORK_INFOS[pool.chainId].icon} width='16px' style={{ marginRight: '4px' }} />
+                          <img src={NETWORKS_INFO[pool.chainId].icon} width='16px' style={{ marginRight: '4px' }} />
                           <TYPE.header>
                             <FormattedName text={shortenAddress(pool.address, 3)} maxCharacters={12} fontSize={'12px'} />
                           </TYPE.header>
@@ -174,9 +174,9 @@ function PinnedData({ open, setSavedOpen }) {
                 return (
                   <RowBetween key={address}>
                     <Wrapper>
-                      <Link to={'/' + NETWORK_INFOS[token.chainId].urlKey + '/token/' + address}>
+                      <Link to={'/' + NETWORKS_INFO[token.chainId].urlKey + '/token/' + address}>
                         <RowFixed>
-                          <img src={NETWORK_INFOS[token.chainId].icon} width='16px' style={{ marginRight: '4px' }} />
+                          <img src={NETWORKS_INFO[token.chainId].icon} width='16px' style={{ marginRight: '4px' }} />
                           <TYPE.header ml={'6px'}>
                             <FormattedName text={token.symbol} maxCharacters={12} fontSize={'12px'} />
                           </TYPE.header>

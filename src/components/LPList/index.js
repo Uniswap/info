@@ -14,7 +14,7 @@ import { TYPE } from '../../Theme'
 import DoubleTokenLogo from '../DoubleLogo'
 import { RowFixed } from '../Row'
 import useTheme from '../../hooks/useTheme'
-import { NETWORK_INFOS } from '../../constants/networks'
+import { NETWORKS_INFO } from '../../constants/networks'
 import { aggregateLps } from '../../utils/aggregateData'
 
 dayjs.extend(utc)
@@ -129,15 +129,15 @@ function LPList({ lps, disbaleLinks, maxItems = 10 }) {
               textOverflow: 'ellipsis',
               overflow: 'hidden',
             }}
-            to={'/' + NETWORK_INFOS[lp.chainId].urlKey + '/account/' + lp.user.id}
+            to={'/' + NETWORKS_INFO[lp.chainId].urlKey + '/account/' + lp.user.id}
           >
             {below800 ? lp.user.id.slice(0, 5) + '...' + lp.user.id.slice(39, 42) : lp.user.id}
           </CustomLink>
         </DataText>
         {isShowNetworkColumn && (
           <DataText area='network'>
-            <Link to={'/' + NETWORK_INFOS[lp.chainId].urlKey}>
-              <img src={NETWORK_INFOS[lp.chainId].icon} width={25} />
+            <Link to={'/' + NETWORKS_INFO[lp.chainId].urlKey}>
+              <img src={NETWORKS_INFO[lp.chainId].icon} width={25} />
             </Link>
           </DataText>
         )}
@@ -150,7 +150,7 @@ function LPList({ lps, disbaleLinks, maxItems = 10 }) {
 
         {!below600 && (
           <DataText>
-            <CustomLink area='pair' to={'/' + NETWORK_INFOS[lp.chainId].urlKey + '/pair/' + lp.pairAddress}>
+            <CustomLink area='pair' to={'/' + NETWORKS_INFO[lp.chainId].urlKey + '/pair/' + lp.pairAddress}>
               <RowFixed>
                 {!below600 && (
                   <DoubleTokenLogo
@@ -158,7 +158,7 @@ function LPList({ lps, disbaleLinks, maxItems = 10 }) {
                     a1={lp.token1}
                     size={16}
                     margin={true}
-                    networkInfo={NETWORK_INFOS[lp.chainId]}
+                    networkInfo={NETWORKS_INFO[lp.chainId]}
                   />
                 )}
                 {lp.pairName}
@@ -168,7 +168,7 @@ function LPList({ lps, disbaleLinks, maxItems = 10 }) {
         )}
 
         <DataText>
-          <CustomLink area='pool' to={'/' + NETWORK_INFOS[lp.chainId].urlKey + '/pool/' + lp.poolAddress}>
+          <CustomLink area='pool' to={'/' + NETWORKS_INFO[lp.chainId].urlKey + '/pool/' + lp.poolAddress}>
             <RowFixed>{shortenAddress(lp.poolAddress, 3)}</RowFixed>
           </CustomLink>
         </DataText>

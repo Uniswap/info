@@ -57,7 +57,6 @@ export function getCustomLogo({ address, chainId, src, size, setError, ...rest }
   )
 }
 
-//todo: dò reference TokenLogo networkInfo
 export default function TokenLogo({ address, networkInfo, header = false, size = '24px', ...rest }) {
   const [error, setError] = useState(false)
 
