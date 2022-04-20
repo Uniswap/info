@@ -219,9 +219,9 @@ function PairList({ pairs, disbaleLinks, maxItems = 10 }) {
       return ''
     }
   }
-
   const pairList =
     pairs &&
+    Object.keys(pairs).length > 0 &&
     Object.keys(pairs)
       .sort((addressA, addressB) => {
         const pairA = pairs[addressA]

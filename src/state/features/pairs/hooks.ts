@@ -8,7 +8,7 @@ import {
 } from 'data/ethereum/pairs'
 import dayjs from 'dayjs'
 import { isAddress } from 'ethers/lib/utils'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useActiveNetworkId, useLatestBlocks } from '../application/hooks'
 import { useEthPrice } from '../global/hooks'
 import { useAppDispatch, useAppSelector } from 'state/hooks'
@@ -33,7 +33,7 @@ export function useHourlyRateData(pairAddress: string, timeWindow: string) {
   const dispatch = useAppDispatch()
   const activeNetwork = useActiveNetworkId()
   const [latestBlock] = useLatestBlocks()
-  const chartData = useAppSelector(state => state.pairs[activeNetwork]?.[pairAddress]?.hourlyData?.[timeWindow])
+  const chartData = useAppSelector(state => state.pairs[activeNetwork]?.[pairAddress]?.timeWindowData?.[timeWindow])
 
   useEffect(() => {
     const currentTime = dayjs.utc()
@@ -63,14 +63,6 @@ export function useDataForList(pairList: Pair[]) {
   const pairs = useAppSelector(state => state.pairs[activeNetwork])
   const [stale, setStale] = useState(false)
   const [fetched, setFetched] = useState<Pair[]>([])
-
-  // reset
-  useEffect(() => {
-    if (pairList) {
-      setStale(false)
-      setFetched([])
-    }
-  }, [pairList])
 
   useEffect(() => {
     async function fetchNewPairData() {
@@ -102,11 +94,7 @@ export function useDataForList(pairList: Pair[]) {
     }
   }, [price, pairs, pairList, stale, fetched, activeNetwork])
 
-  const formattedFetch =
-    fetched &&
-    fetched.reduce((obj, cur) => {
-      return { ...obj, [cur?.id]: cur }
-    }, {})
+  const formattedFetch = useMemo(() => fetched?.reduce((obj, cur) => ({ ...obj, [cur?.id]: cur }), {}), [fetched])
 
   return formattedFetch
 }

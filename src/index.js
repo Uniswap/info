@@ -5,7 +5,6 @@ import ReactGA from 'react-ga'
 import { isMobile } from 'react-device-detect'
 import { ApolloProvider } from '@apollo/react-hooks'
 import ThemeProvider, { GlobalStyle } from './Theme'
-import TokenDataContextProvider from './contexts/TokenData'
 import { PersistGate } from 'redux-persist/integration/react'
 import dayjs from 'dayjs'
 import weekOfYear from 'dayjs/plugin/weekOfYear'
@@ -33,24 +32,18 @@ if (typeof GOOGLE_ANALYTICS_ID === 'string' && GOOGLE_ANALYTICS_ID !== '') {
   ReactGA.initialize('test', { testMode: true, debug: true })
 }
 
-function ContextProviders({ children }) {
-  return <TokenDataContextProvider>{children}</TokenDataContextProvider>
-}
-
 ReactDOM.render(
   <StrictMode>
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
-        <ContextProviders>
-          <ThemeProvider>
-            <ApolloProvider client={ApiService.graphqlClient}>
-              <GlobalStyle />
-              <BrowserRouter>
-                <App />
-              </BrowserRouter>
-            </ApolloProvider>
-          </ThemeProvider>
-        </ContextProviders>
+        <ThemeProvider>
+          <ApolloProvider client={ApiService.graphqlClient}>
+            <GlobalStyle />
+            <BrowserRouter>
+              <App />
+            </BrowserRouter>
+          </ApolloProvider>
+        </ThemeProvider>
       </PersistGate>
     </Provider>
   </StrictMode>,

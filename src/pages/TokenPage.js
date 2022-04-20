@@ -15,7 +15,7 @@ import TokenChart from '../components/TokenChart'
 import { BasicLink } from '../components/Link'
 import Search from '../components/Search'
 import { formattedNum, formattedPercent, getPoolLink, getSwapLink, localNumber } from '../utils'
-import { useTokenData, useTokenTransactions, useTokenPairs } from '../contexts/TokenData'
+import { useTokenData, useTokenTransactions, useTokenPairs } from 'state/features/token/hooks'
 import { useFormatPath } from 'hooks'
 import { TYPE } from '../Theme'
 import { OVERVIEW_TOKEN_BLACKLIST } from '../constants'
@@ -114,10 +114,6 @@ function TokenPage() {
     txnChange
   } = useTokenData(tokenAddress)
 
-  useEffect(() => {
-    document.querySelector('body').scrollTo(0, 0)
-  }, [])
-
   // detect color from token
   const backgroundColor = useColor(id, symbol)
 
@@ -172,10 +168,7 @@ function TokenPage() {
   const listedTokens = useListedTokens()
 
   useEffect(() => {
-    window.scrollTo({
-      behavior: 'smooth',
-      top: 0
-    })
+    window.scrollTo(0, 0)
   }, [])
 
   return (

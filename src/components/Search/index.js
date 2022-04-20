@@ -16,7 +16,7 @@ import FormattedName from '../FormattedName'
 import { TYPE } from '../../Theme'
 import { escapeRegExp } from 'utils'
 import { useTranslation } from 'react-i18next'
-import { useAllTokenData } from 'contexts/TokenData'
+import { useAllTokenData } from 'state/features/token/hooks'
 import { useAllPairData } from 'state/features/pairs/hooks'
 
 const Container = styled.div`
@@ -204,7 +204,7 @@ export const Search = ({ small = false }) => {
   const poolForList = useMemo(() => {
     return combinedPools
       .filter(t => {
-        const regexMatches = Object.keys(t).map(key => {
+        const regexMatches = Object.keys(t || {}).map(key => {
           const isAddress = value.slice(0, 2) === '0x'
           if (key === 'address' && isAddress) {
             return t[key].match(new RegExp(escapeRegExp(value), 'i'))

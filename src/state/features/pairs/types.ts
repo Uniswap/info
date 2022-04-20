@@ -30,7 +30,7 @@ export interface Pair {
   volumeChangeUntracked: number
   volumeUSD: string
   chartData?: PairDayData[]
-  hourlyData?: Record<string, HourDataItem[][]>
+  timeWindowData?: TimeWindowData
   txns?: Transactions
 }
 

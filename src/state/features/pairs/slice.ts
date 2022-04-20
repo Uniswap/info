@@ -55,8 +55,8 @@ export const pairsSlice = createSlice({
       state,
       { payload: { networkId, address, timeWindow, hourlyData } }: PayloadAction<UpdateHourlyDataPayload>
     ) => {
-      const data = state[networkId][address]?.hourlyData
-      state[networkId][address].hourlyData = { ...data, [timeWindow]: hourlyData }
+      const data = state[networkId][address]?.timeWindowData
+      state[networkId][address].timeWindowData = { ...data, [timeWindow]: hourlyData }
     }
   }
 })

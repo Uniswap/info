@@ -44,3 +44,11 @@ interface Transactions {
   mints: MintTransaction[]
   swaps: SwapTransactions[]
 }
+
+interface TimeWindowItem {
+  close: number
+  open: number
+  timestamp: string
+}
+
+type TimeWindowData = Record<string, TimeWindowItem[][]>

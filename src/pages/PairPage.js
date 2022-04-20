@@ -132,10 +132,6 @@ function PairPage() {
     liquidityChangeUSD
   } = usePairData(pairAddress)
 
-  useEffect(() => {
-    document.querySelector('body').scrollTo(0, 0)
-  }, [])
-
   const transactions = usePairTransactions(pairAddress)
 
   // liquidity
@@ -201,10 +197,7 @@ function PairPage() {
   const [dismissed, markAsDismissed] = usePathDismissed(location.pathname)
 
   useEffect(() => {
-    window.scrollTo({
-      behavior: 'smooth',
-      top: 0
-    })
+    window.scrollTo(0, 0)
   }, [])
 
   const [savedPairs, addPair] = useSavedPairs()

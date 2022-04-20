@@ -3,6 +3,7 @@ import applicationReducer from './application/slice'
 import globalReducer from './global/slice'
 import pairsReducer from './pairs/slice'
 import accountReducer from './account/slice'
+import tokenReducer from './token/slice'
 import { combineReducers } from '@reduxjs/toolkit'
 
 const rootReducer = combineReducers({
@@ -10,7 +11,8 @@ const rootReducer = combineReducers({
   application: applicationReducer,
   global: globalReducer,
   pairs: pairsReducer,
-  account: accountReducer
+  account: accountReducer,
+  token: tokenReducer
 })
 
 export default rootReducer
