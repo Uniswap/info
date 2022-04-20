@@ -1,5 +1,5 @@
 import { darken } from 'polished'
-import styled, { css } from 'styled-components'
+import styled from 'styled-components'
 
 export const NetworkSwitcherContainer = styled.div`
   position: relative;
@@ -70,7 +70,7 @@ export const NetworkList = styled.ul`
   }
 `
 
-export const NetworkListItem = styled.li<{ isBeta?: boolean }>`
+export const NetworkListItem = styled.li`
   cursor: pointer;
   transition: 0.3s;
   padding: 0.75rem 1rem;
@@ -87,18 +87,13 @@ export const NetworkListItem = styled.li<{ isBeta?: boolean }>`
     background-color: ${({ theme }) => theme.bg1};
     opacity: 1;
   }
+`
 
-  ${({ isBeta }) =>
-    isBeta &&
-    css`
-      :after {
-        content: 'beta';
-        padding: 0.25rem 0.5rem;
-        border-radius: 0.5rem;
-        background-color: ${({ theme }) => theme.bg2};
-        color: ${({ theme }) => theme.text3};
-      }
-    `}
+export const NetworkBlurb = styled.span`
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.5rem;
+  background-color: ${({ theme }) => theme.bg2};
+  color: ${({ theme }) => theme.text3};
 `
 
 export const NetworkLogo = styled.img`

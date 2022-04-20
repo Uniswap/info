@@ -1,7 +1,6 @@
 import { NetworkInfo, SUPPORTED_NETWORK_VERSIONS } from 'constants/networks'
 import { useCallback, useRef, useState } from 'react'
 import { useDispatch } from 'react-redux'
-import { useActiveNetwork } from 'state/features/application/hooks'
 import { updateActiveNetwork } from 'state/features/application/slice'
 import {
   NetworkSwitcherContainer,
@@ -9,11 +8,13 @@ import {
   NetworkList,
   NetworkListItem,
   NetworkLogo,
-  NetworkName
+  NetworkName,
+  NetworkBlurb
 } from './styled'
 import { useLocation } from 'react-use'
 import { useNavigate } from 'react-router-dom'
 import { useOnClickOutside } from 'hooks/useOnClickOutSide'
+import { useActiveNetwork } from 'state/features/application/hooks'
 
 const NetworkSwitcher = () => {
   const activeNetwork = useActiveNetwork()
@@ -24,8 +25,7 @@ const NetworkSwitcher = () => {
 
   const handleSelect = useCallback(
     (network: NetworkInfo) => {
-      const updatedPathName = pathname?.replace(activeNetwork.route, network.route)
-      updatedPathName && navigate(updatedPathName)
+      navigate(`${network.route}/`)
       setIsOpen(false)
       dispatch(updateActiveNetwork(network))
     },
@@ -44,9 +44,10 @@ const NetworkSwitcher = () => {
       {isOpen ? (
         <NetworkList ref={node}>
           {SUPPORTED_NETWORK_VERSIONS.map(network => (
-            <NetworkListItem key={network.id} isBeta={network.route === 'trx'} onClick={() => handleSelect(network)}>
+            <NetworkListItem key={network.id} onClick={() => handleSelect(network)}>
               <NetworkLogo src={network.imageURL} alt={network.name} />
               <span>{network.name}</span>
+              {network.blurb ? <NetworkBlurb>{network.blurb}</NetworkBlurb> : undefined}
             </NetworkListItem>
           ))}
         </NetworkList>
