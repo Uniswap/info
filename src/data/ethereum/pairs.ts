@@ -1,5 +1,6 @@
 import { pairApi } from 'api'
 import { BlockHeight } from 'api/types'
+import { TOKEN_OVERRIDES } from 'constants/tokens'
 import dayjs from 'dayjs'
 import { Pair } from 'state/features/pairs/types'
 import {
@@ -9,7 +10,6 @@ import {
   getPercentChange,
   splitQuery
 } from 'utils'
-import { updateNameData } from 'utils/data'
 
 export async function getPairList(price: number) {
   const {
@@ -89,34 +89,40 @@ function parseData(data: any, oneDayData: any, twoDayData: any, oneWeekData: any
     twoDayData?.untrackedVolumeUSD ? twoDayData?.untrackedVolumeUSD : 0
   )
   const oneWeekVolumeUSD = parseFloat(oneWeekData ? data?.volumeUSD - oneWeekData?.volumeUSD : data.volumeUSD)
-
+  const parsedData = { ...data }
   // set volume properties
-  data.oneDayVolumeUSD = oneDayVolumeUSD
-  data.oneWeekVolumeUSD = oneWeekVolumeUSD
-  data.volumeChangeUSD = volumeChangeUSD
-  data.oneDayVolumeUntracked = oneDayVolumeUntracked
-  data.volumeChangeUntracked = volumeChangeUntracked
-
+  parsedData.oneDayVolumeUSD = oneDayVolumeUSD
+  parsedData.oneWeekVolumeUSD = oneWeekVolumeUSD
+  parsedData.volumeChangeUSD = volumeChangeUSD
+  parsedData.oneDayVolumeUntracked = oneDayVolumeUntracked
+  parsedData.volumeChangeUntracked = volumeChangeUntracked
+  parsedData.token0 = {
+    ...parsedData.token0,
+    name: TOKEN_OVERRIDES[data.token0.id]?.name ?? parsedData.token0.name,
+    symbol: TOKEN_OVERRIDES[data.token0.id]?.symbol ?? parsedData.token0.symbol
+  }
+  parsedData.token1 = {
+    ...parsedData.token1,
+    name: TOKEN_OVERRIDES[data.token1.id]?.name ?? parsedData.token1.name,
+    symbol: TOKEN_OVERRIDES[data.token1.id]?.symbol ?? parsedData.token1.symbol
+  }
   // set liquidity properties
   // TODO: trackedReserveETH
-  data.trackedReserveUSD = data.trackedReserveETH * price
-  data.liquidityChangeUSD = getPercentChange(data.reserveUSD, oneDayData?.reserveUSD)
+  parsedData.trackedReserveUSD = data.trackedReserveETH * price
+  parsedData.liquidityChangeUSD = getPercentChange(data.reserveUSD, oneDayData?.reserveUSD)
 
   // format if pair hasnt existed for a day or a week
   if (!oneDayData && data && data.createdAtBlockNumber > oneDayBlock) {
-    data.oneDayVolumeUSD = parseFloat(data.volumeUSD)
+    parsedData.oneDayVolumeUSD = parseFloat(data.volumeUSD)
   }
   if (!oneDayData && data) {
-    data.oneDayVolumeUSD = parseFloat(data.volumeUSD)
+    parsedData.oneDayVolumeUSD = parseFloat(data.volumeUSD)
   }
   if (!oneWeekData && data) {
-    data.oneWeekVolumeUSD = parseFloat(data.volumeUSD)
+    parsedData.oneWeekVolumeUSD = parseFloat(data.volumeUSD)
   }
 
-  // format incorrect names
-  updateNameData(data)
-
-  return data
+  return parsedData
 }
 
 // TODO: can be improved using useQuery

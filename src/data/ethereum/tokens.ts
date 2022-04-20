@@ -1,5 +1,6 @@
 import { tokenApi, pairApi, globalApi } from 'api'
 import { BlockHeight } from 'api/types'
+import { TOKEN_OVERRIDES } from 'constants/tokens'
 import dayjs from 'dayjs'
 import { Token, TokenDayData } from 'state/features/token/types'
 import {
@@ -9,7 +10,6 @@ import {
   getBlocksFromTimestamps,
   splitQuery
 } from 'utils'
-import { updateNameData } from 'utils/data'
 
 export const getTopTokens = async (price: number, priceOld: number): Promise<Token[]> => {
   const utcCurrentTime = dayjs()
@@ -36,7 +36,7 @@ export const getTopTokens = async (price: number, priceOld: number): Promise<Tok
         oneDayData &&
         twoDayData &&
         current?.data?.tokens.map(async (token: Token) => {
-          const data = token
+          const data = { ...token }
 
           // let liquidityDataThisToken = liquidityData?.[token.id]
           let oneDayHistory = oneDayData?.[token.id]
@@ -82,6 +82,8 @@ export const getTopTokens = async (price: number, priceOld: number): Promise<Tok
           data.liquidityChangeUSD = getPercentChange(currentLiquidityUSD ?? 0, oldLiquidityUSD ?? 0)
           data.oneDayTxns = oneDayTxns
           data.txnChange = txnChange
+          data.name = TOKEN_OVERRIDES[data.id]?.name ?? data.name
+          data.symbol = TOKEN_OVERRIDES[data.id]?.symbol ?? data.symbol
 
           // new tokens
           if (!oneDayHistory && data) {
@@ -89,12 +91,6 @@ export const getTopTokens = async (price: number, priceOld: number): Promise<Tok
             data.oneDayVolumeETH = +data.tradeVolume * +data.derivedETH
             data.oneDayTxns = +data.txCount
           }
-
-          // update name data for
-          updateNameData({
-            token0: data
-          })
-
           // HOTFIX for Aave
           if (data.id === '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9') {
             const aaveData = await pairApi.getPairData('0xdfc14d2af169b0d36c4eff567ada9b2e0cae044f')
@@ -195,6 +191,8 @@ export const getTokenData = async (address: string, price: number, priceOld: num
       data.liquidityChangeUSD = liquidityChangeUSD
       data.oneDayTxns = oneDayTxns
       data.txnChange = txnChange
+      data.name = TOKEN_OVERRIDES[data.id]?.name ?? data.name
+      data.symbol = TOKEN_OVERRIDES[data.id]?.symbol ?? data.symbol
 
       // new tokens
       if (!oneDayData && data) {
@@ -202,11 +200,6 @@ export const getTokenData = async (address: string, price: number, priceOld: num
         data.oneDayVolumeETH = +data.tradeVolume * +data.derivedETH
         data.oneDayTxns = +data.txCount
       }
-
-      // update name data for
-      updateNameData({
-        token0: data
-      })
 
       // HOTFIX for Aave
       if (data.id === '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9') {

@@ -109,7 +109,7 @@ export const getChartData = async (oldestDateToFetch: number) => {
     while (!allFound) {
       const result = await globalApi.getGlobalChart(oldestDateToFetch, skip)
       skip += 1000
-      data = data.concat(result.data.whiteSwapDayDatas)
+      data = result.data.whiteSwapDayDatas.map((el: any) => ({ ...el, dailyVolumeUSD: parseFloat(el.dailyVolumeUSD) }))
       if (result.data.whiteSwapDayDatas.length < 1000) {
         allFound = true
       }
@@ -120,11 +120,10 @@ export const getChartData = async (oldestDateToFetch: number) => {
       const dayIndexArray: any[] = []
       const oneDay = 24 * 60 * 60
       // for each day, parse the daily volume and format for chart array
-      data.forEach((dayData, i) => {
+      data.forEach((_dayData, i) => {
         // add the day index to the set of days
         dayIndexSet.add((data[i].date / oneDay).toFixed(0))
         dayIndexArray.push(data[i])
-        dayData.dailyVolumeUSD = parseFloat(dayData.dailyVolumeUSD)
       })
 
       // fill in empty days ( there will be no day datas if no trades made that day )
