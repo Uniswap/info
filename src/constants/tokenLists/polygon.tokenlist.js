@@ -73,7 +73,7 @@ const POLYGON_TOKEN_LIST = {
     symbol: 'RIGY',
     name: 'RIGY',
     decimals: 18,
-    logoURI: 'https://i.imgur.com/ZQWH9gg.jpg',
+    logoURI: 'https://i.imgur.com/0uZyC7M.png',
   },
 }
 
