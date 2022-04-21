@@ -1,4 +1,5 @@
 import { darken } from 'polished'
+import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 
 export const Wrapper = styled.div<{ isMobile: boolean }>`
@@ -23,11 +24,11 @@ export const Wrapper = styled.div<{ isMobile: boolean }>`
   }
 `
 
-export const Option = styled.div<{ activeText?: any }>`
+export const NavigationLink = styled(NavLink)`
   font-weight: 500;
   font-size: 1rem;
-  opacity: ${({ activeText }) => (activeText ? 1 : 0.6)};
-  color: ${({ activeText, theme }) => (activeText ? theme.blueGrey : theme.text1)};
+  opacity: 0.6;
+  color: ${({ theme }) => theme.text1};
   display: flex;
   padding: 0.5rem 1.5rem;
   position: relative;
@@ -38,30 +39,29 @@ export const Option = styled.div<{ activeText?: any }>`
     opacity: 1;
   }
 
-  ${({ activeText, theme }) =>
-    activeText &&
-    `
-  background: rgba(102, 129, 167, 0.1);
-  font-weight: 700;
+  &.active {
+    opacity: 1;
+    color: ${({ theme }) => theme.blueGrey};
+    background: rgba(102, 129, 167, 0.1);
+    font-weight: 700;
 
-  > div {
-    background: ${theme.blueGrey};
+    div {
+      background: ${({ theme }) => theme.blueGrey};
 
-    > svg {
-      stroke: ${theme.lightText1};
+      svg {
+        stroke: ${({ theme }) => theme.lightText1};
+      }
+    }
+    :before {
+      content: '';
+      position: absolute;
+      width: 0.25rem;
+      height: 100%;
+      top: 0;
+      left: 0;
+      background: ${({ theme }) => theme.blueGrey};
     }
   }
-
-  :before {
-    content: '';
-    position: absolute;
-    width: .25rem;
-    height: 100%;
-    top: 0;
-    left: 0;
-    background: ${theme.blueGrey};
-  }
-`}
 `
 
 export const StyledNavButton = styled.div`
