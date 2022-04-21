@@ -19,6 +19,7 @@ import { getSubgraphStatus } from 'data/ethereum/application'
 
 export function useLatestBlocks() {
   const dispatch = useAppDispatch()
+  const activeNetwork = useActiveNetworkId()
   const latestBlock = useAppSelector(state => state.application.latestBlock)
   const headBlock = useAppSelector(state => state.application.headBlock)
 
@@ -30,10 +31,8 @@ export function useLatestBlocks() {
         dispatch(updateHeadBlock(result.headBlock))
       }
     }
-    if (!latestBlock) {
-      fetch()
-    }
-  }, [latestBlock, updateHeadBlock, updateLatestBlock])
+    fetch()
+  }, [activeNetwork])
 
   return [latestBlock, headBlock]
 }

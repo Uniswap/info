@@ -15,6 +15,7 @@ import { useLocation } from 'react-use'
 import { useNavigate } from 'react-router-dom'
 import { useOnClickOutside } from 'hooks/useOnClickOutSide'
 import { useActiveNetwork } from 'state/features/application/hooks'
+import ApiService from 'api/ApiService'
 
 const NetworkSwitcher = () => {
   const activeNetwork = useActiveNetwork()
@@ -28,6 +29,7 @@ const NetworkSwitcher = () => {
       navigate(`${network.route}/`)
       setIsOpen(false)
       dispatch(updateActiveNetwork(network))
+      ApiService.setActiveNetwork(network.id)
     },
     [activeNetwork.route, pathname]
   )
