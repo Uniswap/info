@@ -1,28 +1,19 @@
 import { useEffect } from 'react'
-import { DashboardWrapper, TYPE } from '../Theme'
-import { PageWrapper, FullWrapper } from '../components'
-import LPList from '../components/LPList'
-import styled from 'styled-components/macro'
-import AccountSearch from '../components/AccountSearch'
+import { DashboardWrapper, TYPE } from 'Theme'
+import { PageWrapper, FullWrapper } from 'components'
+import LPList from 'components/LPList'
+import AccountSearch from 'components/AccountSearch'
 import { useTopLiquidityPositions } from 'state/features/account/hooks'
-import LocalLoader from '../components/LocalLoader'
-import { RowBetween } from '../components/Row'
+import LocalLoader from 'components/LocalLoader'
+import { RowBetween } from 'components/Row'
 import { useMedia } from 'react-use'
-import Search from '../components/Search'
+import Search from 'components/Search'
 import { useTranslation } from 'react-i18next'
-
-const AccountWrapper = styled.div`
-  margin-top: 2rem;
-
-  @media screen and (max-width: 600px) {
-    width: 100%;
-  }
-`
+import { AccountWrapper } from './styled'
 
 function AccountLookup() {
   const { t } = useTranslation()
 
-  // scroll to top
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [])

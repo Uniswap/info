@@ -1,21 +1,22 @@
 import { useState, useEffect } from 'react'
 import { useMedia } from 'react-use'
-import LocalLoader from '../LocalLoader'
+import LocalLoader from 'components/LocalLoader'
 import { Box, Flex, Text } from 'rebass'
 import styled from 'styled-components/macro'
 import { useFormatPath } from 'hooks'
-import Link, { CustomLink } from '../Link'
-import { Divider } from '..'
-import DoubleTokenLogo from '../DoubleLogo'
-import { formattedNum, getUniswapAppLink } from '../../utils'
-import { AutoColumn } from '../Column'
-import { RowFixed } from '../Row'
-import { ButtonLight } from '../ButtonStyled'
-import { TYPE } from '../../Theme'
-import FormattedName from '../FormattedName'
-import Panel from '../Panel'
+import Link, { CustomLink } from 'components/Link'
+import { Divider } from 'components'
+import DoubleTokenLogo from 'components/DoubleLogo'
+import { formattedNum, getWhiteSwapAppLink } from '../../utils'
+import { AutoColumn } from 'components/Column'
+import { RowFixed } from 'components/Row'
+import { ButtonLight } from 'components/ButtonStyled'
+import { TYPE } from 'Theme'
+import FormattedName from 'components/FormattedName'
+import Panel from 'components/Panel'
 import { transparentize } from 'polished'
 import { useTranslation } from 'react-i18next'
+import { useActiveNetworkId } from 'state/features/application/hooks'
 
 const PageButtons = styled.div`
   width: 100%;
@@ -123,6 +124,7 @@ const SORT_FIELD = {
 function MiningPositionList({ miningPositions }) {
   const { t } = useTranslation()
   const formatPath = useFormatPath()
+  const activeNetworkId = useActiveNetworkId()
 
   // const below500 = useMedia('(max-width: 500px)')
   const below440 = useMedia('(max-width: 440px)')
@@ -177,11 +179,15 @@ function MiningPositionList({ miningPositions }) {
               </TYPE.main>
             </CustomLink>
             <RowFixed gap="8px" justify="flex-start">
-              <Link external href={getUniswapAppLink(firstPairAddress)} style={{ marginRight: '.5rem' }}>
+              <Link
+                external
+                href={getWhiteSwapAppLink(activeNetworkId, firstPairAddress)}
+                style={{ marginRight: '.5rem' }}
+              >
                 <ButtonLight style={{ padding: '4px 6px', borderRadius: '4px' }}>Stake More</ButtonLight>
               </Link>
               {pairPercentage > 0 && (
-                <Link external href={getUniswapAppLink(firstPairAddress)}>
+                <Link external href={getWhiteSwapAppLink(activeNetworkId, firstPairAddress)}>
                   <ButtonLight style={{ padding: '4px 6px', borderRadius: '4px' }}>Withdraw</ButtonLight>
                 </Link>
               )}

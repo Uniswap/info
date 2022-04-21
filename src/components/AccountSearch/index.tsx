@@ -1,89 +1,34 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import styled from 'styled-components/macro'
-import { ButtonLight, ButtonFaded } from '../ButtonStyled'
-import { AutoRow, RowBetween } from '../Row'
-import { isAddress } from '../../utils'
+import { ButtonLight, ButtonFaded } from 'components/ButtonStyled'
+import { AutoRow, RowBetween } from 'components/Row'
+import { isAddress } from 'utils'
 import { useSavedAccounts } from 'state/features/user/hooks'
-import { AutoColumn } from '../Column'
-import { TYPE } from '../../Theme'
-import { Hover, StyledIcon } from '..'
-import Panel from '../Panel'
+import { AutoColumn } from 'components/Column'
+import { TYPE } from 'Theme'
+import { Hover, StyledIcon, Divider } from 'components'
+import Panel from 'components/Panel'
 import { useFormatPath } from 'hooks'
-import { Divider } from '..'
 import { Flex } from 'rebass'
-
 import { X } from 'react-feather'
 import { useMedia } from 'react-use'
 import { useTranslation } from 'react-i18next'
+import { AccountLink, DashGrid, Input, Wrapper } from './styled'
 
-const Wrapper = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: flex-end;
-  width: 100%;
-  border-radius: 12px;
-`
+type Props = {
+  small?: boolean
+}
 
-const Input = styled.input`
-  position: relative;
-  display: flex;
-  align-items: center;
-  width: 100%;
-  white-space: nowrap;
-  background: none;
-  border: none;
-  outline: none;
-  padding: 0.875rem 1rem;
-  border-radius: 12px;
-  color: ${({ theme }) => theme.text1};
-  background-color: ${({ theme }) => theme.bg1};
-  font-size: 16px;
-  margin-right: 1rem;
-  border: 1px solid ${({ theme }) => theme.bg3};
-
-  ::placeholder {
-    color: ${({ theme }) => theme.text3};
-    font-size: 14px;
-  }
-
-  @media screen and (max-width: 640px) {
-    ::placeholder {
-      font-size: 1rem;
-    }
-  }
-`
-
-const AccountLink = styled.span`
-  display: flex;
-  color: ${({ theme }) => theme.link};
-  font-size: 14px;
-  font-weight: 500;
-`
-
-const DashGrid = styled.div`
-  display: grid;
-  grid-gap: 1em;
-  grid-template-columns: 1fr;
-  grid-template-areas: 'account';
-  padding: 0 4px;
-
-  > * {
-    justify-content: flex-end;
-  }
-`
-
-function AccountSearch({ small }) {
+function AccountSearch({ small }: Props) {
   const { t } = useTranslation()
   const formatPath = useFormatPath()
   const navigate = useNavigate()
-  const [accountValue, setAccountValue] = useState()
+  const [accountValue, setAccountValue] = useState<string | undefined>()
   const [savedAccounts, addAccount, removeAccount] = useSavedAccounts()
   const below440 = useMedia('(max-width: 440px)')
 
   function handleAccountSearch() {
-    if (isAddress(accountValue)) {
+    if (accountValue && isAddress(accountValue)) {
       navigate(formatPath(`/accounts/${accountValue}`))
       if (!savedAccounts.includes(accountValue)) {
         addAccount(accountValue)
@@ -99,7 +44,7 @@ function AccountSearch({ small }) {
             <Input
               style={below440 ? { marginRight: '0px' } : {}}
               placeholder="0x..."
-              onChange={e => {
+              onChange={(e: any) => {
                 setAccountValue(e.target.value)
               }}
             />
@@ -113,15 +58,15 @@ function AccountSearch({ small }) {
       <AutoColumn gap={'12px'}>
         {!small && (
           <Panel>
-            <DashGrid center={true} style={{ height: 'fit-content', padding: '0 0 1rem 0' }}>
+            <DashGrid>
               <TYPE.main area="account">{t('savedAccounts')}</TYPE.main>
             </DashGrid>
             <Divider />
             {savedAccounts?.length > 0 ? (
               savedAccounts.map(account => {
                 return (
-                  <DashGrid key={account} center={true} style={{ height: 'fit-content', padding: '1rem 0 0 0' }}>
-                    <Flex area="account" justifyContent="space-between">
+                  <DashGrid key={account} padding="1rem 0 0 0">
+                    <Flex justifyContent="space-between">
                       <AccountLink as={Link} to={formatPath(`/accounts/${account}`)}>
                         {account?.slice(0, 42)}
                       </AccountLink>
