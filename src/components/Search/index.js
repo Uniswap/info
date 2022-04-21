@@ -15,10 +15,9 @@ import { transparentize } from 'polished'
 import FormattedName from '../FormattedName'
 import { TYPE } from '../../Theme'
 import { escapeRegExp } from 'utils'
-import { updateNameData } from '../../utils/data'
 import { useTranslation } from 'react-i18next'
-import { useAllTokenData } from 'contexts/TokenData'
-import { useAllPairData } from 'contexts/PairData'
+import { useAllTokenData } from 'state/features/token/hooks'
+import { useAllPairData } from 'state/features/pairs/hooks'
 
 const Container = styled.div`
   height: 48px;
@@ -205,7 +204,7 @@ export const Search = ({ small = false }) => {
   const poolForList = useMemo(() => {
     return combinedPools
       .filter(t => {
-        const regexMatches = Object.keys(t).map(key => {
+        const regexMatches = Object.keys(t || {}).map(key => {
           const isAddress = value.slice(0, 2) === '0x'
           if (key === 'address' && isAddress) {
             return t[key].match(new RegExp(escapeRegExp(value), 'i'))
@@ -315,7 +314,6 @@ export const Search = ({ small = false }) => {
           ) : (
             poolForList.slice(0, pairsShown).map(pair => {
               //format incorrect names
-              updateNameData(pair)
               return (
                 <BasicLink to={formatPath(`/pairs/${pair.id}`)} key={pair.id} onClick={onDismiss}>
                   <MenuItem>

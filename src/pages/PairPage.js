@@ -15,14 +15,14 @@ import { PAIR_BLACKLIST } from '../constants'
 import { BasicLink } from '../components/Link'
 import Search from '../components/Search'
 import { formattedNum, formattedPercent, getPoolLink, getSwapLink } from '../utils'
-import { usePairData, usePairTransactions } from '../contexts/PairData'
+import { usePairData, usePairTransactions } from 'state/features/pairs/hooks'
 import { DashboardWrapper, TYPE } from '../Theme'
 import CopyHelper from '../components/Copy'
 import { useMedia } from 'react-use'
 import DoubleTokenLogo from '../components/DoubleLogo'
 import TokenLogo from '../components/TokenLogo'
 import { Hover } from '../components'
-import { useEthPrice } from '../contexts/GlobalData'
+import { useEthPrice } from 'state/features/global/hooks'
 import Warning from '../components/Warning'
 import { usePathDismissed, useSavedPairs } from 'state/features/user/hooks'
 import { useFormatPath } from 'hooks'
@@ -132,10 +132,6 @@ function PairPage() {
     liquidityChangeUSD
   } = usePairData(pairAddress)
 
-  useEffect(() => {
-    document.querySelector('body').scrollTo(0, 0)
-  }, [])
-
   const transactions = usePairTransactions(pairAddress)
 
   // liquidity
@@ -201,10 +197,7 @@ function PairPage() {
   const [dismissed, markAsDismissed] = usePathDismissed(location.pathname)
 
   useEffect(() => {
-    window.scrollTo({
-      behavior: 'smooth',
-      top: 0
-    })
+    window.scrollTo(0, 0)
   }, [])
 
   const [savedPairs, addPair] = useSavedPairs()
@@ -402,7 +395,7 @@ function PairPage() {
                       </TYPE.light>
                       <div />
                     </RowBetween>
-                    <Hover as={RouterLink} to={formatPath(`/tokens/${token0?.id}`)} fade={true}>
+                    <Hover as={RouterLink} to={formatPath(`/tokens/${token0?.id}`)} $fade>
                       <AutoRow gap="4px">
                         <TokenLogo address={token0?.id} />
                         <TYPE.main fontSize={20} lineHeight={1} fontWeight={500}>
@@ -413,7 +406,7 @@ function PairPage() {
                         </TYPE.main>
                       </AutoRow>
                     </Hover>
-                    <Hover as={RouterLink} to={formatPath(`/tokens/${token1?.id}`)} fade={true}>
+                    <Hover as={RouterLink} to={formatPath(`/tokens/${token1?.id}`)} $fade>
                       <AutoRow gap="4px">
                         <TokenLogo address={token1?.id} />
                         <TYPE.main fontSize={20} lineHeight={1} fontWeight={500}>

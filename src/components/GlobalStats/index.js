@@ -2,7 +2,7 @@ import { useState } from 'react'
 import styled from 'styled-components/macro'
 import { RowFixed, RowBetween } from '../Row'
 import { useMedia } from 'react-use'
-import { useGlobalData, useEthPrice } from '../../contexts/GlobalData'
+import { useGlobalData, useEthPrice } from 'state/features/global/hooks'
 import { formattedNum, localNumber } from '../../utils'
 
 import UniPrice from '../UniPrice'

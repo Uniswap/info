@@ -7,7 +7,7 @@ import { toK, toNiceDate, toNiceDateYear, formattedNum, getTimeframe } from '../
 import { OptionButton } from '../ButtonStyled'
 import { useMedia, usePrevious } from 'react-use'
 import { timeframeOptions } from '../../constants'
-import { useTokenChartData, useTokenPriceData } from '../../contexts/TokenData'
+import { useTokenChartData, useTokenPriceData } from 'state/features/token/hooks'
 import DropdownSelect from '../DropdownSelect'
 import CandleStickChart from '../CandleChart'
 import LocalLoader from '../LocalLoader'

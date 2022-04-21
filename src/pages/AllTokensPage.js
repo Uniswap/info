@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import TopTokenList from '../components/TokenList'
 import { TYPE } from '../Theme'
-import { useAllTokenData } from '../contexts/TokenData'
+import { useAllTokenData } from 'state/features/token/hooks'
 import { PageWrapper, FullWrapper } from '../components'
 import { RowBetween } from '../components/Row'
 import Search from '../components/Search'

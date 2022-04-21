@@ -5,7 +5,7 @@ import { RowBetween, AutoRow } from '../Row'
 
 import { toK, toNiceDate, toNiceDateYear, formattedNum, getTimeframe } from '../../utils'
 import { OptionButton } from '../ButtonStyled'
-import { usePairChartData, useHourlyRateData, usePairData } from '../../contexts/PairData'
+import { usePairChartData, useHourlyRateData, usePairData } from 'state/features/pairs/hooks'
 import { timeframeOptions } from '../../constants'
 import { useMedia } from 'react-use'
 import { EmptyCard } from '..'

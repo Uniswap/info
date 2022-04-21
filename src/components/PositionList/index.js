@@ -9,7 +9,7 @@ import { Divider } from '../../components'
 import DoubleTokenLogo from '../DoubleLogo'
 import { formattedNum, getPoolLink } from '../../utils'
 import { AutoColumn } from '../Column'
-import { useEthPrice } from '../../contexts/GlobalData'
+import { useEthPrice } from 'state/features/global/hooks'
 import { RowFixed } from '../Row'
 import { ButtonLight } from '../ButtonStyled'
 import { TYPE } from '../../Theme'
@@ -288,7 +288,7 @@ function PositionList({ positions }) {
 
   const positionsSorted =
     positions &&
-    positions
+    [...positions]
 
       .sort((p0, p1) => {
         if (sortedColumn === SORT_FIELD.PRINCIPAL) {

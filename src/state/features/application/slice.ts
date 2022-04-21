@@ -8,8 +8,8 @@ const initialState: ApplicationState = {
   currency: 'USD',
   timeKey: timeframeOptions.ALL_TIME,
   sessionStart: 0,
-  latestBlock: '',
-  headBlock: '',
+  latestBlock: 0,
+  headBlock: 0,
   supportedTokens: {
     [SupportedNetwork.ETHEREUM]: [],
     [SupportedNetwork.TRON]: []
@@ -30,10 +30,10 @@ export const applicationSlice = createSlice({
     updateSessionStart: (state, action: PayloadAction<number>) => {
       state.sessionStart = action.payload
     },
-    updateLatestBlock: (state, action: PayloadAction<string>) => {
+    updateLatestBlock: (state, action: PayloadAction<number>) => {
       state.latestBlock = action.payload
     },
-    updateHeadBlock: (state, action: PayloadAction<string>) => {
+    updateHeadBlock: (state, action: PayloadAction<number>) => {
       state.headBlock = action.payload
     },
     updateSupportedTokens: (state, action: PayloadAction<Array<string>>) => {

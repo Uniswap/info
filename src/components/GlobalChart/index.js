@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useRef } from 'react'
 import { timeframeOptions } from '../../constants'
-import { useGlobalChartData, useGlobalData } from '../../contexts/GlobalData'
+import { useGlobalChartData, useGlobalData } from 'state/features/global/hooks'
 import { useMedia } from 'react-use'
 import DropdownSelect from '../DropdownSelect'
 import TradingViewChart, { CHART_TYPES } from '../TradingviewChart'

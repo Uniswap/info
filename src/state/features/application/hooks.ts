@@ -15,22 +15,11 @@ import {
 import { DEFAULT_LIST_OF_LISTS } from 'constants/lists'
 import getTokenList from 'utils/tokenLists'
 import ApiService from 'api/ApiService'
-import { globalApi } from 'api'
-
-async function getSubgraphStatus() {
-  try {
-    const res = await globalApi.getHealthStatus()
-    const syncedBlock = res.data.indexingStatusForCurrentVersion.chains[0].latestBlock.number
-    const headBlock = res.data.indexingStatusForCurrentVersion.chains[0].chainHeadBlock.number
-    return { syncedBlock, headBlock }
-  } catch (e) {
-    console.log(e)
-    return
-  }
-}
+import { getSubgraphStatus } from 'data/ethereum/application'
 
 export function useLatestBlocks() {
   const dispatch = useAppDispatch()
+  const activeNetwork = useActiveNetworkId()
   const latestBlock = useAppSelector(state => state.application.latestBlock)
   const headBlock = useAppSelector(state => state.application.headBlock)
 
@@ -42,10 +31,8 @@ export function useLatestBlocks() {
         dispatch(updateHeadBlock(result.headBlock))
       }
     }
-    if (!latestBlock) {
-      fetch()
-    }
-  }, [latestBlock, updateHeadBlock, updateLatestBlock])
+    fetch()
+  }, [activeNetwork])
 
   return [latestBlock, headBlock]
 }

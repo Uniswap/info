@@ -1,10 +1,8 @@
 import { AutoColumn } from 'components/Column'
 import Title from 'components/Title'
-import { BasicLink } from 'components/Link'
 import { useMedia } from 'react-use'
 import { TYPE } from 'Theme'
 import { useFormatPath } from 'hooks'
-import { useLocation } from 'react-router-dom'
 import { TrendingUp, List, PieChart, Disc } from 'react-feather'
 import Link from 'components/Link'
 import { useSessionStart } from 'state/features/application/hooks'
@@ -20,7 +18,7 @@ import {
   PollingDot,
   StyledNavButton,
   Wrapper,
-  Option
+  NavigationLink
 } from './styled'
 import MobileMenu from './MobileMenu'
 
@@ -30,7 +28,6 @@ function SideNav() {
   const below1180 = useMedia('(max-width: 1180px)')
   const [isDark, toggleDarkMode] = useDarkModeManager()
   const formatPath = useFormatPath()
-  const location = useLocation()
   const seconds = useSessionStart()
 
   return (
@@ -42,55 +39,30 @@ function SideNav() {
             <NetworkSwitcher />
             {!below1080 && (
               <AutoColumn style={{ marginTop: '5.25rem' }}>
-                <BasicLink to={formatPath('/')}>
-                  <Option activeText={location.pathname === '/' ?? undefined}>
-                    <StyledNavButton>
-                      <TrendingUp size={20} />
-                    </StyledNavButton>
-                    {t('sideNav.overview')}
-                  </Option>
-                </BasicLink>
-                <BasicLink to={formatPath('/tokens')}>
-                  <Option
-                    activeText={
-                      (location.pathname.split('/')[1] === 'tokens' || location.pathname.split('/')[1] === 'token') ??
-                      undefined
-                    }
-                  >
-                    <StyledNavButton>
-                      <Disc size={20} />
-                    </StyledNavButton>
-                    {t('sideNav.tokens')}
-                  </Option>
-                </BasicLink>
-                <BasicLink to={formatPath('/pairs')}>
-                  <Option
-                    activeText={
-                      (location.pathname.split('/')[1] === 'pairs' || location.pathname.split('/')[1] === 'pair') ??
-                      undefined
-                    }
-                  >
-                    <StyledNavButton>
-                      <PieChart size={20} />
-                    </StyledNavButton>
-                    {t('sideNav.pairs')}
-                  </Option>
-                </BasicLink>
-
-                <BasicLink to={formatPath('/accounts')}>
-                  <Option
-                    activeText={
-                      (location.pathname.split('/')[1] === 'accounts' ||
-                        location.pathname.split('/')[1] === 'account') ??
-                      undefined
-                    }
-                  >
-                    <StyledNavButton>
-                      <List size={20} />
-                    </StyledNavButton>
-                    {t('sideNav.accounts')}
-                  </Option>
-                </BasicLink>
+                <NavigationLink to={formatPath('/')}>
+                  <StyledNavButton>
+                    <TrendingUp size={20} />
+                  </StyledNavButton>
+                  {t('sideNav.overview')}
+                </NavigationLink>
+                <NavigationLink to={formatPath('/tokens')}>
+                  <StyledNavButton>
+                    <Disc size={20} />
+                  </StyledNavButton>
+                  {t('sideNav.tokens')}
+                </NavigationLink>
+                <NavigationLink to={formatPath('/pairs')}>
+                  <StyledNavButton>
+                    <PieChart size={20} />
+                  </StyledNavButton>
+                  {t('sideNav.pairs')}
+                </NavigationLink>
+                <NavigationLink to={formatPath('/accounts')}>
+                  <StyledNavButton>
+                    <List size={20} />
+                  </StyledNavButton>
+                  {t('sideNav.accounts')}
+                </NavigationLink>
               </AutoColumn>
             )}
           </AutoColumn>

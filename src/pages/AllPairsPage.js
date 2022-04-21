@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { TYPE } from '../Theme'
-import { useAllPairData } from '../contexts/PairData'
+import { useAllPairData } from 'state/features/pairs/hooks'
 import PairList from '../components/PairList'
 import { PageWrapper, FullWrapper } from '../components'
 import { RowBetween } from '../components/Row'

@@ -18,7 +18,7 @@ class TokenController implements ITokenController {
     }
   }
 
-  public getTokenData(tokenAddress: string, block: number) {
+  public getTokenData(tokenAddress: string, block?: number) {
     switch (ApiService.activeNetwork) {
       case SupportedNetwork.ETHEREUM:
       case SupportedNetwork.TRON:
