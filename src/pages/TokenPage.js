@@ -121,7 +121,6 @@ function TokenPage() {
 
   // pairs to show in pair list
   const fetchedPairsList = useDataForList(allPairs)
-
   // all transactions with this token
   const transactions = useTokenTransactions(tokenAddress)
 

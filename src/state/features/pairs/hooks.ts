@@ -8,7 +8,7 @@ import {
 } from 'data/ethereum/pairs'
 import dayjs from 'dayjs'
 import { isAddress } from 'ethers/lib/utils'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useActiveNetworkId, useLatestBlocks } from '../application/hooks'
 import { useEthPrice } from '../global/hooks'
 import { useAppDispatch, useAppSelector } from 'state/hooks'
@@ -61,8 +61,7 @@ export function useDataForList(pairList: Pair[]) {
   const [price] = useEthPrice()
   const activeNetwork = useActiveNetworkId()
   const pairs = useAppSelector(state => state.pairs[activeNetwork])
-  const [stale, setStale] = useState(false)
-  const [fetched, setFetched] = useState<Pair[]>([])
+  const [pairsData, setPairsData] = useState<Record<string, Pair[]>>({})
 
   useEffect(() => {
     async function fetchNewPairData() {
@@ -79,24 +78,21 @@ export function useDataForList(pairList: Pair[]) {
       })
 
       const newPairData: Pair[] | undefined = await getBulkPairData(
-        unfetched.map(pair => {
-          return pair
-        }),
+        unfetched.map(pair => pair),
         price
       )
       if (newPairData) {
-        setFetched(newFetched.concat(newPairData))
+        const response = newFetched.concat(newPairData)
+        const newFetchedPairs = response?.reduce((obj, cur) => ({ ...obj, [cur?.id]: cur }), {})
+        setPairsData(newFetchedPairs)
       }
     }
-    if (price && pairList && pairList.length > 0 && !fetched && !stale) {
-      setStale(true)
+    if (price && pairList && pairList.length > 0) {
       fetchNewPairData()
     }
-  }, [price, pairs, pairList, stale, fetched, activeNetwork])
+  }, [price, pairs, pairList, activeNetwork])
 
-  const formattedFetch = useMemo(() => fetched?.reduce((obj, cur) => ({ ...obj, [cur?.id]: cur }), {}), [fetched])
-
-  return formattedFetch
+  return pairsData
 }
 
 /**
