@@ -1,35 +1,36 @@
 import { useEffect, useState } from 'react'
 import { useLocation, useParams, Navigate, Link as RouterLink } from 'react-router-dom'
 import styled from 'styled-components/macro'
-import Panel from '../components/Panel'
-import { PageWrapper, ContentWrapperLarge, StyledIcon } from '../components/index'
-import { AutoRow, RowBetween, RowFixed } from '../components/Row'
-import Column, { AutoColumn } from '../components/Column'
-import { ButtonLight, ButtonDark } from '../components/ButtonStyled'
-import PairChart from '../components/PairChart'
-import Link from '../components/Link'
-import TxnList from '../components/TxnList'
-import { isAddress } from '../utils'
-import Loader from '../components/LocalLoader'
-import { PAIR_BLACKLIST } from '../constants'
-import { BasicLink } from '../components/Link'
-import Search from '../components/Search'
-import { formattedNum, formattedPercent, getPoolLink, getSwapLink } from '../utils'
+import Panel from 'components/Panel'
+import { PageWrapper, ContentWrapperLarge, StyledIcon } from 'components/index'
+import { AutoRow, RowBetween, RowFixed } from 'components/Row'
+import Column, { AutoColumn } from 'components/Column'
+import { ButtonLight, ButtonDark } from 'components/ButtonStyled'
+import PairChart from 'components/PairChart'
+import Link from 'components/Link'
+import TxnList from 'components/TxnList'
+import { isAddress } from 'utils'
+import Loader from 'components/LocalLoader'
+import { PAIR_BLACKLIST } from 'constants/index'
+import { BasicLink } from 'components/Link'
+import Search from 'components/Search'
+import { formattedNum, formattedPercent, getPoolLink, getSwapLink } from 'utils'
 import { usePairData, usePairTransactions } from 'state/features/pairs/hooks'
-import { DashboardWrapper, TYPE } from '../Theme'
-import CopyHelper from '../components/Copy'
+import { DashboardWrapper, TYPE } from 'Theme'
+import CopyHelper from 'components/Copy'
 import { useMedia } from 'react-use'
-import DoubleTokenLogo from '../components/DoubleLogo'
-import TokenLogo from '../components/TokenLogo'
-import { Hover } from '../components'
+import DoubleTokenLogo from 'components/DoubleLogo'
+import TokenLogo from 'components/TokenLogo'
+import { Hover } from 'components'
 import { useEthPrice } from 'state/features/global/hooks'
-import Warning from '../components/Warning'
+import Warning from 'components/Warning'
 import { usePathDismissed, useSavedPairs } from 'state/features/user/hooks'
 import { useFormatPath } from 'hooks'
 import { Bookmark, PlusCircle } from 'react-feather'
-import FormattedName from '../components/FormattedName'
+import FormattedName from 'components/FormattedName'
 import { useListedTokens } from 'state/features/application/hooks'
 import { useTranslation } from 'react-i18next'
+import { useActiveNetworkId } from 'state/features/application/hooks'
 
 const PanelWrapper = styled.div`
   grid-template-columns: repeat(3, 1fr);
@@ -113,6 +114,7 @@ function PairPage() {
   const formatPath = useFormatPath()
   const { pairAddress } = useParams()
   const location = useLocation()
+  const activeNetworkId = useActiveNetworkId()
 
   if (PAIR_BLACKLIST.includes(pairAddress.toLowerCase()) || !isAddress(pairAddress.toLowerCase())) {
     return <Navigate to={formatPath('/')} />
@@ -283,10 +285,10 @@ function PairPage() {
                     <></>
                   )}
 
-                  <Link external href={getPoolLink(token0?.id, token1?.id)}>
+                  <Link external href={getPoolLink(activeNetworkId, token0?.id, token1?.id)}>
                     <ButtonLight>{t('addLiquidity')}</ButtonLight>
                   </Link>
-                  <Link external href={getSwapLink(token0?.id, token1?.id)}>
+                  <Link external href={getSwapLink(activeNetworkId, token0?.id, token1?.id)}>
                     <ButtonDark ml={!below1080 && '.5rem'} mr={below1080 && '.5rem'}>
                       {t('trade')}
                     </ButtonDark>

@@ -1,88 +1,34 @@
 import { useState, useMemo, useEffect } from 'react'
-import styled from 'styled-components/macro'
 import { useUserTransactions, useUserPositions } from 'state/features/account/hooks'
-import TxnList from '../components/TxnList'
+import TxnList from 'components/TxnList'
 import { useParams, Navigate } from 'react-router-dom'
-import Panel from '../components/Panel'
-import { formattedNum, isAddress } from '../utils'
-import Row, { AutoRow, RowFixed, RowBetween } from '../components/Row'
-import { AutoColumn } from '../components/Column'
-import UserChart from '../components/UserChart'
-import PairReturnsChart from '../components/PairReturnsChart'
-import PositionList from '../components/PositionList'
+import Panel from 'components/Panel'
+import { formattedNum, isAddress } from 'utils'
+import { AutoRow, RowFixed, RowBetween } from 'components/Row'
+import { AutoColumn } from 'components/Column'
+import UserChart from 'components/UserChart'
+import PairReturnsChart from 'components/PairReturnsChart'
+import PositionList from 'components/PositionList'
 import { useFormatPath } from 'hooks'
-// import MiningPositionList from '../components/MiningPositionList'
-import { DashboardWrapper, TYPE } from '../Theme'
-import { ButtonDropdown } from '../components/ButtonStyled'
-import { PageWrapper, ContentWrapper, StyledIcon } from '../components'
-import DoubleTokenLogo from '../components/DoubleLogo'
+import { DashboardWrapper, TYPE } from 'Theme'
+import { ButtonDropdown } from 'components/ButtonStyled'
+import { PageWrapper, ContentWrapper, StyledIcon } from 'components'
+import DoubleTokenLogo from 'components/DoubleLogo'
 import { Bookmark, Activity } from 'react-feather'
-import Link from '../components/Link'
-import { FEE_WARNING_TOKENS } from '../constants'
-import { BasicLink } from '../components/Link'
+import Link from 'components/Link'
+import { FEE_WARNING_TOKENS } from 'constants/index'
+import { BasicLink } from 'components/Link'
 import { useMedia } from 'react-use'
-import Search from '../components/Search'
+import Search from 'components/Search'
 import { useTranslation } from 'react-i18next'
-
-const AccountWrapper = styled.div`
-  background-color: rgba(255, 255, 255, 0.2);
-  padding: 6px 16px;
-  border-radius: 100px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`
-
-const Header = styled.div``
-
-const DropdownWrapper = styled.div`
-  position: relative;
-  margin-bottom: 1rem;
-  border: 1px solid #edeef2;
-  border-radius: 12px;
-`
-
-const Flyout = styled.div`
-  position: absolute;
-  top: 38px;
-  left: -1px;
-  width: 100%;
-  background-color: ${({ theme }) => theme.bg1};
-  z-index: 999;
-  border-bottom-right-radius: 10px;
-  border-bottom-left-radius: 10px;
-  padding-top: 4px;
-  border: 1px solid #edeef2;
-  border-top: none;
-`
-
-const MenuRow = styled(Row)`
-  width: 100%;
-  padding: 12px 0;
-  padding-left: 12px;
-
-  :hover {
-    cursor: pointer;
-    background-color: ${({ theme }) => theme.bg2};
-  }
-`
-
-const Warning = styled.div`
-  background-color: ${({ theme }) => theme.bg2};
-  color: ${({ theme }) => theme.text1};
-  padding: 1rem;
-  font-weight: 600;
-  border-radius: 10px;
-  margin-bottom: 1rem;
-  width: calc(100% - 2rem);
-`
+import { AccountWrapper, DropdownWrapper, Flyout, Header, MenuRow, Warning } from './styled'
 
 function AccountPage() {
   const { t } = useTranslation()
   const formatPath = useFormatPath()
 
   const { accountAddress } = useParams()
-  if (!isAddress(accountAddress.toLowerCase())) {
+  if (!isAddress(accountAddress?.toLowerCase())) {
     return <Navigate to={formatPath('/')} />
   }
 
@@ -92,13 +38,13 @@ function AccountPage() {
   // get data for this account
   const transactions = useUserTransactions(accountAddress)
   const positions = useUserPositions(accountAddress)
-  // const miningPositions = useMiningPositions(account)
 
   // get data for user stats
   const transactionCount = transactions?.swaps?.length + transactions?.burns?.length + transactions?.mints?.length
 
   // get derived totals
-  let totalSwappedUSD = useMemo(() => {
+  const totalSwappedUSD = useMemo(() => {
+    console.log(transactions)
     return transactions?.swaps
       ? transactions?.swaps.reduce((total, swap) => {
           return total + parseFloat(swap.amountUSD)
@@ -231,7 +177,7 @@ function AccountPage() {
                   {activePosition && (
                     <MenuRow
                       onClick={() => {
-                        setActivePosition()
+                        setActivePosition(undefined)
                         setShowDropdown(false)
                       }}
                     >
@@ -289,7 +235,7 @@ function AccountPage() {
             {activePosition ? (
               <PairReturnsChart account={accountAddress} position={activePosition} />
             ) : (
-              <UserChart account={accountAddress} position={activePosition} />
+              <UserChart account={accountAddress} />
             )}
           </DashboardWrapper>
         )}
@@ -300,32 +246,6 @@ function AccountPage() {
           </TYPE.main>
           <PositionList positions={positions} />
         </DashboardWrapper>
-
-        {/* <DashboardWrapper>
-          <TYPE.main fontSize={22} fontWeight={500}>
-            Liquidity Mining Pools
-          </TYPE.main>
-            {miningPositions && <MiningPositionList miningPositions={miningPositions} />}
-            {!miningPositions && (
-              <Panel
-                style={{
-                  marginTop: below440 ? '.75rem' : '1.5rem',
-                }}
-              >
-                <AutoColumn gap="8px" justify="flex-start">
-                  <TYPE.main>No Staked Liquidity.</TYPE.main>
-                  <AutoRow gap="8px" justify="flex-start">
-                    <ButtonLight
-                      style={{ padding: '.5rem 1rem', borderRadius: '.625rem' }}
-                      onClick={() => window.open('https://ws.exchange/', '_blank')}
-                    >
-                      Learn More
-                    </ButtonLight>
-                  </AutoRow>
-                </AutoColumn>
-              </Panel>
-            )}
-        </DashboardWrapper> */}
 
         <DashboardWrapper>
           <TYPE.main fontSize={22} fontWeight={500}>

@@ -1,38 +1,35 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useLocation, useParams, Navigate } from 'react-router-dom'
 import { Text } from 'rebass'
 import styled from 'styled-components/macro'
-import Link from '../components/Link'
-import Panel from '../components/Panel'
-import TokenLogo from '../components/TokenLogo'
-import PairList from '../components/PairList'
-import Loader from '../components/LocalLoader'
-import { AutoRow, RowBetween, RowFixed } from '../components/Row'
-import Column, { AutoColumn } from '../components/Column'
-import { ButtonLight, ButtonDark } from '../components/ButtonStyled'
-import TxnList from '../components/TxnList'
-import TokenChart from '../components/TokenChart'
-import { BasicLink } from '../components/Link'
-import Search from '../components/Search'
-import { formattedNum, formattedPercent, getPoolLink, getSwapLink, localNumber } from '../utils'
+import Link from 'components/Link'
+import Panel from 'components/Panel'
+import TokenLogo from 'components/TokenLogo'
+import PairList from 'components/PairList'
+import Loader from 'components/LocalLoader'
+import { AutoRow, RowBetween, RowFixed } from 'components/Row'
+import Column, { AutoColumn } from 'components/Column'
+import { ButtonLight, ButtonDark } from 'components/ButtonStyled'
+import TxnList from 'components/TxnList'
+import TokenChart from 'components/TokenChart'
+import { BasicLink } from 'components/Link'
+import Search from 'components/Search'
+import { formattedNum, formattedPercent, getPoolLink, getSwapLink, localNumber, isAddress } from 'utils'
 import { useTokenData, useTokenTransactions, useTokenPairs } from 'state/features/token/hooks'
-import { useFormatPath } from 'hooks'
-import { TYPE } from '../Theme'
-import { OVERVIEW_TOKEN_BLACKLIST } from '../constants'
-import { isAddress } from '../utils'
-import { useColor } from '../hooks'
-import CopyHelper from '../components/Copy'
+import { useFormatPath, useColor } from 'hooks'
+import { OVERVIEW_TOKEN_BLACKLIST } from 'constants/index'
+import CopyHelper from 'components/Copy'
 import { useMedia } from 'react-use'
 import { useDataForList } from 'state/features/pairs/hooks'
-import { useEffect } from 'react'
-import Warning from '../components/Warning'
+import Warning from 'components/Warning'
 import { usePathDismissed, useSavedTokens } from 'state/features/user/hooks'
 import { Hover, PageWrapper, ContentWrapper, StyledIcon } from '../components'
 import { PlusCircle, Bookmark } from 'react-feather'
-import FormattedName from '../components/FormattedName'
+import FormattedName from 'components/FormattedName'
 import { useListedTokens } from 'state/features/application/hooks'
-import { DashboardWrapper } from '../Theme'
+import { TYPE, DashboardWrapper } from 'Theme'
 import { useTranslation } from 'react-i18next'
+import { useActiveNetworkId } from 'state/features/application/hooks'
 
 const PanelWrapper = styled.div`
   grid-template-columns: repeat(3, 1fr);
@@ -93,6 +90,7 @@ function TokenPage() {
 
   const location = useLocation()
   const { tokenAddress } = useParams()
+  const activeNetworkId = useActiveNetworkId()
 
   if (OVERVIEW_TOKEN_BLACKLIST.includes(tokenAddress.toLowerCase()) || !isAddress(tokenAddress.toLowerCase())) {
     return <Navigate to={formatPath('/')} />
@@ -245,7 +243,7 @@ function TokenPage() {
                   ) : (
                     <></>
                   )}
-                  <Link href={getPoolLink(tokenAddress)} target="_blank">
+                  <Link href={getPoolLink(activeNetworkId, tokenAddress)} target="_blank">
                     <ButtonLight color={backgroundColor}>{t('addLiquidity')}</ButtonLight>
                   </Link>
                   <Link href={getSwapLink(tokenAddress)} target="_blank">

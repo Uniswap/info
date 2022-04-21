@@ -4,7 +4,7 @@ const Attribution = () => (
       Github
     </a>{' '}
     |{' '}
-    <a href="https://ws.exchange" rel="noopener noreferrer" target="_blank">
+    <a href="https://app.ws.exchange" rel="noopener noreferrer" target="_blank">
       WhiteSwap
     </a>{' '}
     |{' '}

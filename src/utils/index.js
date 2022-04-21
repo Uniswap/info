@@ -1,14 +1,14 @@
 import { BigNumber } from 'bignumber.js'
 import dayjs from 'dayjs'
 import { ethers } from 'ethers'
-import { Text } from 'rebass'
 import _Decimal from 'decimal.js-light'
 import toFormat from 'toformat'
-import { timeframeOptions } from '../constants'
-import { SUPPORTED_NETWORK_VERSIONS } from '../constants/networks'
+import { timeframeOptions } from 'constants/index'
+import { SUPPORTED_NETWORK_VERSIONS } from 'constants/networks'
 import Numeral from 'numeral'
 import { globalApi } from 'api'
 import { TronNetworkInfo } from 'constants/networks'
+import { Text } from 'rebass'
 
 // format libraries
 const Decimal = toFormat(_Decimal)
@@ -36,45 +36,62 @@ export function getTimeframe(timeWindow) {
   return utcStartTime
 }
 
-export function getPoolLink(token0Address, token1Address = null, remove = false) {
-  if (!token1Address) {
-    return (
-      `https://ws.exchange/` +
-      (remove ? `remove` : `add`) +
-      `/${token0Address === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' ? 'ETH' : token0Address}/${'ETH'}`
-    )
-  } else {
-    return (
-      `https://ws.exchange/` +
-      (remove ? `remove` : `add`) +
-      `/${token0Address === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' ? 'ETH' : token0Address}/${
-        token1Address === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' ? 'ETH' : token1Address
-      }`
-    )
+function parseAddress0ForRoute(token0Address) {
+  switch (token0Address) {
+    case '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2':
+      return 'ETH'
+
+    case 'TNUC9Qb1rRpS5CbWLmNMxXBjyFoydXjWFR':
+      return 'TRX'
+
+    default:
+      return token0Address
   }
 }
 
-export function getSwapLink(token0Address, token1Address = null) {
-  if (!token1Address) {
-    return `https://ws.exchange/swap?inputCurrency=${token0Address}`
-  } else {
-    return `https://ws.exchange/swap?inputCurrency=${
-      token0Address === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' ? 'ETH' : token0Address
-    }&outputCurrency=${token1Address === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' ? 'ETH' : token1Address}`
+function parseAddress1ForRoute(network, token1Address) {
+  switch (token1Address) {
+    case null:
+      return network.toUpperCase()
+
+    case '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2':
+      return 'ETH'
+
+    case 'TNUC9Qb1rRpS5CbWLmNMxXBjyFoydXjWFR':
+      return 'TRX'
+
+    default:
+      return token1Address
   }
 }
 
-export function getMiningPoolLink(token0Address) {
-  return `https://ws.exchange/stake/ETH/${token0Address}`
+export function getPoolLink(network, token0Address, token1Address = null, remove = false) {
+  const poolPage = remove ? 'remove' : 'add'
+  const updatedAddress0 = parseAddress0ForRoute(token0Address)
+  const updatedAddress1 = parseAddress1ForRoute(token1Address)
+  return `https://app.ws.exchange/${network}/${poolPage}/${updatedAddress0}/${updatedAddress1}`
 }
 
-export function getUniswapAppLink(linkVariable) {
-  let baseUniswapUrl = 'https://ws.exchange/stake'
+export function getSwapLink(network, token0Address, token1Address = null) {
+  const updatedAddress0 = parseAddress0ForRoute(token0Address)
+  if (!token1Address) {
+    return `https://app.ws.exchange/${network}/swap?inputCurrency=${updatedAddress0}`
+  }
+  const updatedAddress1 = parseAddress1ForRoute(token1Address)
+  return `https://app.ws.exchange/${network}/swap?inputCurrency=${updatedAddress0}&outputCurrency=${updatedAddress1}`
+}
+
+export function getMiningPoolLink(network, token0Address) {
+  return `https://app.ws.exchange/${network}/stake/${network.toUpperCase()}/${token0Address}`
+}
+
+export function getWhiteSwapAppLink(network, linkVariable) {
+  let baseWhiteSwapUrl = `https://app.ws.exchange/${network}/stake`
   if (!linkVariable) {
-    return baseUniswapUrl
+    return baseWhiteSwapUrl
   }
 
-  return `${baseUniswapUrl}/ETH/${linkVariable}`
+  return `${baseWhiteSwapUrl}/${network.toUpperCase()}/${linkVariable}`
 }
 
 export function localNumber(val) {
@@ -372,12 +389,12 @@ export function rawPercent(percentRaw) {
 }
 
 export function formattedPercent(percent) {
-  percent = parseFloat(percent)
+  const parsedPercent = parseFloat(percent)
   if (!percent || percent === 0) {
     return <Text fontWeight={500}>0%</Text>
   }
 
-  if (percent < 0.0001 && percent > 0) {
+  if (parsedPercent < 0.0001 && parsedPercent > 0) {
     return (
       <Text fontWeight={500} color="#54B45D">
         {'< 0.0001%'}
@@ -385,7 +402,7 @@ export function formattedPercent(percent) {
     )
   }
 
-  if (percent < 0 && percent > -0.0001) {
+  if (parsedPercent < 0 && parsedPercent > -0.0001) {
     return (
       <Text fontWeight={500} color="#C73846">
         {'< 0.0001%'}
@@ -393,7 +410,7 @@ export function formattedPercent(percent) {
     )
   }
 
-  let fixedPercent = percent.toFixed(2)
+  let fixedPercent = parsedPercent.toFixed(2)
   if (fixedPercent === '0.00') {
     return '0%'
   }

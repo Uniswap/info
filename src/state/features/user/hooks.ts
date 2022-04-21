@@ -32,7 +32,7 @@ export function usePathDismissed(path: string) {
   return [dismissedPaths?.[path], markDismissedPath]
 }
 
-export function useSavedAccounts() {
+export function useSavedAccounts(): [string[], (account: string) => void, (account: string) => void] {
   const activeNetwork = useActiveNetworkId()
   const dispatch = useAppDispatch()
   const savedAccounts = useAppSelector(state => state.user[activeNetwork].savedAccounts)

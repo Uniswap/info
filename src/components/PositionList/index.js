@@ -1,22 +1,23 @@
 import { useState, useEffect } from 'react'
 import { useMedia } from 'react-use'
-import LocalLoader from '../LocalLoader'
+import LocalLoader from 'components/LocalLoader'
 import { Box, Flex, Text } from 'rebass'
 import styled from 'styled-components/macro'
-import Link, { CustomLink as RouterLink } from '../Link'
+import Link, { CustomLink as RouterLink } from 'components/Link'
 import { useFormatPath } from 'hooks'
-import { Divider } from '../../components'
-import DoubleTokenLogo from '../DoubleLogo'
-import { formattedNum, getPoolLink } from '../../utils'
-import { AutoColumn } from '../Column'
+import { Divider } from 'components'
+import DoubleTokenLogo from 'components/DoubleLogo'
+import { formattedNum, getPoolLink } from 'utils'
+import { AutoColumn } from 'components/Column'
 import { useEthPrice } from 'state/features/global/hooks'
-import { RowFixed } from '../Row'
-import { ButtonLight } from '../ButtonStyled'
-import { TYPE } from '../../Theme'
-import FormattedName from '../FormattedName'
+import { RowFixed } from 'components/Row'
+import { ButtonLight } from 'components/ButtonStyled'
+import { TYPE } from 'Theme'
+import FormattedName from 'components/FormattedName'
 import { transparentize } from 'polished'
-import Panel from '../Panel'
+import Panel from 'components/Panel'
 import { useTranslation } from 'react-i18next'
+import { useActiveNetworkId } from 'state/features/application/hooks'
 
 const PageButtons = styled.div`
   width: 100%;
@@ -145,6 +146,7 @@ const SORT_FIELD = {
 function PositionList({ positions }) {
   const { t } = useTranslation()
   const formatPath = useFormatPath()
+  const activeNetworkId = useActiveNetworkId()
 
   const below440 = useMedia('(max-width: 440px)')
   const below500 = useMedia('(max-width: 500px)')
@@ -195,13 +197,16 @@ function PositionList({ positions }) {
             <ButtonsContainer gap="8px" justify="flex-start">
               <Link
                 external
-                href={getPoolLink(position.pair.token0.id, position.pair.token1.id)}
+                href={getPoolLink(activeNetworkId, position.pair.token0.id, position.pair.token1.id)}
                 style={{ marginRight: '.5rem' }}
               >
                 <ButtonLight style={{ padding: '.5rem 1rem', borderRadius: '.625rem' }}>{t('add')}</ButtonLight>
               </Link>
               {poolOwnership > 0 && (
-                <Link external href={getPoolLink(position.pair.token0.id, position.pair.token1.id, true)}>
+                <Link
+                  external
+                  href={getPoolLink(activeNetworkId, position.pair.token0.id, position.pair.token1.id, true)}
+                >
                   <ButtonLight style={{ padding: '.5rem 1rem', borderRadius: '.625rem' }}>{t('remove')}</ButtonLight>
                 </Link>
               )}
