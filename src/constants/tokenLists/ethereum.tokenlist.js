@@ -143,6 +143,14 @@ const ETHEREUM_TOKEN_LIST = {
     decimals: 18,
     logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/18876.png',
   },
+  '0x7C5A0CE9267ED19B22F8cae653F198e3E8daf098': {
+    chainId: 1,
+    address: '0x7C5A0CE9267ED19B22F8cae653F198e3E8daf098',
+    symbol: 'SAN',
+    name: 'Santiment Network Token',
+    decimals: 18,
+    logoURI: 'https://i.imgur.com/OH663J3.jpg',
+  },
 }
 
 export default ETHEREUM_TOKEN_LIST

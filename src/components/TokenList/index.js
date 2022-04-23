@@ -360,8 +360,8 @@ function TopTokenList({ itemMax = 5 }) {
         <List p={0}>
           {filteredList.map((item, index) => {
             return (
-              <div key={index} style={{ padding: '0 20px' }}>
-                <ListItem key={index} index={(page - 1) * itemMax + index + 1} item={item} />
+              <div key={item.id} style={{ padding: '0 20px' }}>
+                <ListItem index={(page - 1) * itemMax + index + 1} item={item} />
                 <Divider />
               </div>
             )

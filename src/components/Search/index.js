@@ -17,6 +17,7 @@ import { PAIR_SEARCH, TOKEN_SEARCH } from '../../apollo/queries'
 import FormattedName from '../FormattedName'
 import { TYPE } from '../../Theme'
 import { NETWORKS_INFO } from '../../constants/networks'
+import { useNetworksInfo } from '../../contexts/NetworkInfo'
 
 const Container = styled.div`
   height: 48px;
@@ -132,6 +133,7 @@ const Blue = styled.span`
 export const Search = ({ small = false }) => {
   // TODO: support search on all chain
   const [exchangeSubgraphClient] = useExchangeClients()
+  const [[networkInfo]] = useNetworksInfo()
   let allTokens = useAllTokensInKyberswap()
   const [allTokenData] = useAllTokenData()
 
@@ -177,8 +179,16 @@ export const Search = ({ small = false }) => {
               id: value,
             },
           })
-          setSearchedPairs(pairs.data.as0.concat(pairs.data.as1).concat(pairs.data.asAddress))
-          let foundTokens = tokens.data.asSymbol.concat(tokens.data.asAddress).concat(tokens.data.asName)
+          setSearchedPairs(
+            pairs.data.as0
+              .concat(pairs.data.as1)
+              .concat(pairs.data.asAddress)
+              .map(item => ({ ...item, chainId: networkInfo.chainId }))
+          )
+          let foundTokens = tokens.data.asSymbol
+            .concat(tokens.data.asAddress)
+            .concat(tokens.data.asName)
+            .map(item => ({ ...item, chainId: networkInfo.chainId }))
           setSearchedTokens(foundTokens)
         }
       } catch (e) {
