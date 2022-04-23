@@ -135,13 +135,21 @@ const ETHEREUM_TOKEN_LIST = {
     decimals: 18,
     logoURI: 'https://i.imgur.com/zhZo9Bx.jpg',
   },
-  '0x4d224452801aced8b2f0aebe155379bb5d594381': {
+  '0x4d224452801ACEd8B2F0aebE155379bb5D594381': {
     chainId: 1,
-    address: '0x4d224452801aced8b2f0aebe155379bb5d594381',
+    address: '0x4d224452801ACEd8B2F0aebE155379bb5D594381',
     symbol: 'APE',
     name: 'ApeCoin',
     decimals: 18,
     logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/18876.png',
+  },
+  '0xB620Be8a1949AA9532e6a3510132864EF9Bc3F82': {
+    chainId: 1,
+    address: '0xB620Be8a1949AA9532e6a3510132864EF9Bc3F82',
+    symbol: 'LFT',
+    name: 'Lend Flare Dao Token',
+    decimals: 18,
+    logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/19189.png',
   },
   '0x7C5A0CE9267ED19B22F8cae653F198e3E8daf098': {
     chainId: 1,
