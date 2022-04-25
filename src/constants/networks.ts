@@ -10,18 +10,6 @@ import Velas from '../assets/networks/velas-network.png'
 import Aurora from '../assets/networks/aurora-network.svg'
 import Oasis from '../assets/networks/oasis-network.svg'
 
-import ETHEREUM_TOKEN_LIST from './tokenLists/ethereum.tokenlist'
-import BSC_TOKEN_LIST from './tokenLists/bsc.tokenlist'
-import POLYGON_TOKEN_LIST from './tokenLists/polygon.tokenlist'
-import AVALANCHE_TOKEN_LIST from './tokenLists/avalanche.tokenlist'
-import FANTOM_TOKEN_LIST from './tokenLists/fantom.tokenlist'
-import CRONOS_TOKEN_LIST from './tokenLists/cronos.tokenlist'
-import ARBITRUM_TOKEN_LIST from './tokenLists/arbitrum.tokenlist'
-import BTTC_TOKEN_LIST from './tokenLists/bttc.tokenlist'
-import VELAS_TOKEN_LIST from './tokenLists/velas.tokenlist'
-import AURORA_TOKEN_LIST from './tokenLists/aurora.tokenlist'
-import OASIS_TOKEN_LIST from './tokenLists/oasis.tokenlist'
-
 import EthereumLogo from '../assets/eth.png'
 import MaticLogo from '../assets/polygon.png'
 import BnbLogo from '../assets/bnb.png'
@@ -71,15 +59,7 @@ export type NETWORK_INFO = {
   nativeTokenWrappedName: string
   nativeTokenLogo: string
   etherscanLinkText: string
-  tokenLists: {
-    [key: string]: {
-      address: string
-      symbol: string
-      name: string
-      decimals: number
-      logoURI?: string
-    }
-  }
+  tokensListUrl: string
 }
 
 export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
@@ -101,7 +81,7 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     nativeTokenWrappedName: 'Ether (Wrapped)',
     nativeTokenLogo: EthereumLogo,
     etherscanLinkText: 'Etherscan',
-    tokenLists: ETHEREUM_TOKEN_LIST,
+    tokensListUrl: 'https://raw.githubusercontent.com/KyberNetwork/ks-assets/main/tokenLists/ethereum.tokenlist.json',
   },
   [ChainId.ROPSTEN]: {
     chainId: ChainId.ROPSTEN,
@@ -121,7 +101,7 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     nativeTokenWrappedName: 'Ether (Wrapped)',
     nativeTokenLogo: EthereumLogo,
     etherscanLinkText: 'Etherscan',
-    tokenLists: ETHEREUM_TOKEN_LIST,
+    tokensListUrl: 'https://raw.githubusercontent.com/KyberNetwork/ks-assets/main/tokenLists/ropsten.tokenlist.json',
   },
   [ChainId.MATIC]: {
     chainId: ChainId.MATIC,
@@ -144,7 +124,7 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     nativeTokenWrappedName: 'Matic (Wrapped)',
     nativeTokenLogo: MaticLogo,
     etherscanLinkText: 'Polygonscan',
-    tokenLists: POLYGON_TOKEN_LIST,
+    tokensListUrl: 'https://raw.githubusercontent.com/KyberNetwork/ks-assets/main/tokenLists/matic.tokenlist.json',
   },
   [ChainId.MUMBAI]: {
     chainId: ChainId.MUMBAI,
@@ -164,7 +144,7 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     nativeTokenWrappedName: 'Matic (Wrapped)',
     nativeTokenLogo: MaticLogo,
     etherscanLinkText: 'Polygonscan',
-    tokenLists: POLYGON_TOKEN_LIST,
+    tokensListUrl: 'https://raw.githubusercontent.com/KyberNetwork/ks-assets/main/tokenLists/mumbai.tokenlist.json',
   },
   [ChainId.BSCMAINNET]: {
     chainId: ChainId.BSCMAINNET,
@@ -187,7 +167,7 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     nativeTokenWrappedName: 'BNB (Wrapped)',
     nativeTokenLogo: BnbLogo,
     etherscanLinkText: 'Bscscan',
-    tokenLists: BSC_TOKEN_LIST,
+    tokensListUrl: 'https://raw.githubusercontent.com/KyberNetwork/ks-assets/main/tokenLists/bsc.mainnet.tokenlist.json',
   },
   [ChainId.BSCTESTNET]: {
     chainId: ChainId.BSCTESTNET,
@@ -207,7 +187,7 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     nativeTokenWrappedName: 'BNB (Wrapped)',
     nativeTokenLogo: BnbLogo,
     etherscanLinkText: 'Bscscan',
-    tokenLists: BSC_TOKEN_LIST,
+    tokensListUrl: 'https://raw.githubusercontent.com/KyberNetwork/ks-assets/main/tokenLists/bsc.testnet.tokenlist.json',
   },
   [ChainId.AVAXMAINNET]: {
     chainId: ChainId.AVAXMAINNET,
@@ -230,7 +210,7 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     nativeTokenWrappedName: 'AVAX (Wrapped)',
     nativeTokenLogo: AvaxLogo,
     etherscanLinkText: 'Snowtrace',
-    tokenLists: AVALANCHE_TOKEN_LIST,
+    tokensListUrl: 'https://raw.githubusercontent.com/KyberNetwork/ks-assets/main/tokenLists/avax.mainnet.tokenlist.json',
   },
   [ChainId.AVAXTESTNET]: {
     //todo: check this
@@ -251,7 +231,7 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     nativeTokenWrappedName: 'AVAX (Wrapped)',
     nativeTokenLogo: AvaxLogo,
     etherscanLinkText: 'Snowtrace',
-    tokenLists: AVALANCHE_TOKEN_LIST,
+    tokensListUrl: 'https://raw.githubusercontent.com/KyberNetwork/ks-assets/main/tokenLists/avax.testnet.tokenlist.json',
   },
   [ChainId.FANTOM]: {
     chainId: ChainId.FANTOM,
@@ -271,7 +251,7 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     nativeTokenWrappedName: 'FTM (Wrapped)',
     nativeTokenLogo: FantomLogo,
     etherscanLinkText: 'Ftmscan',
-    tokenLists: FANTOM_TOKEN_LIST,
+    tokensListUrl: 'https://raw.githubusercontent.com/KyberNetwork/ks-assets/main/tokenLists/fantom.mainnet.tokenlist.json',
   },
   [ChainId.CRONOS]: {
     chainId: ChainId.CRONOS,
@@ -291,7 +271,7 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     nativeTokenWrappedName: 'CRO (Wrapped)',
     nativeTokenLogo: CronosLogo,
     etherscanLinkText: 'Explorer',
-    tokenLists: CRONOS_TOKEN_LIST,
+    tokensListUrl: 'https://raw.githubusercontent.com/KyberNetwork/ks-assets/main/tokenLists/cronos.tokenlist.json',
   },
   [ChainId.CRONOSTESTNET]: {
     chainId: ChainId.CRONOSTESTNET,
@@ -311,7 +291,7 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     nativeTokenWrappedName: 'CRO (Wrapped)',
     nativeTokenLogo: CronosLogo,
     etherscanLinkText: 'Explorer',
-    tokenLists: CRONOS_TOKEN_LIST,
+    tokensListUrl: 'https://raw.githubusercontent.com/KyberNetwork/ks-assets/main/tokenLists/cronos.testnet.tokenlist.json',
   },
   [ChainId.ARBITRUM]: {
     chainId: ChainId.ARBITRUM,
@@ -331,7 +311,7 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     nativeTokenWrappedName: 'Ether (Wrapped)',
     nativeTokenLogo: EthereumLogo,
     etherscanLinkText: 'Arbiscan',
-    tokenLists: ARBITRUM_TOKEN_LIST,
+    tokensListUrl: 'https://raw.githubusercontent.com/KyberNetwork/ks-assets/main/tokenLists/arbitrum.tokenlist.json',
   },
   [ChainId.ARBITRUM_TESTNET]: {
     chainId: ChainId.ARBITRUM_TESTNET,
@@ -351,7 +331,7 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     nativeTokenWrappedName: 'Ether (Wrapped)',
     nativeTokenLogo: EthereumLogo,
     etherscanLinkText: 'Arbiscan',
-    tokenLists: ARBITRUM_TOKEN_LIST,
+    tokensListUrl: 'https://raw.githubusercontent.com/KyberNetwork/ks-assets/main/tokenLists/arbitrum.testnet.tokenlist.json',
   },
   [ChainId.BTTC]: {
     chainId: ChainId.BTTC,
@@ -371,7 +351,7 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     nativeTokenWrappedName: 'BTT (Wrapped)',
     nativeTokenLogo: BTTCLogo,
     etherscanLinkText: 'Bttcscan',
-    tokenLists: BTTC_TOKEN_LIST,
+    tokensListUrl: 'https://raw.githubusercontent.com/KyberNetwork/ks-assets/main/tokenLists/bttc.tokenlist.json',
   },
   [ChainId.VELAS]: {
     chainId: ChainId.VELAS,
@@ -391,7 +371,7 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     nativeTokenWrappedName: 'VLX (Wrapped)',
     nativeTokenLogo: VelasLogo,
     etherscanLinkText: 'Velas EVM Explorer',
-    tokenLists: VELAS_TOKEN_LIST,
+    tokensListUrl: 'https://raw.githubusercontent.com/KyberNetwork/ks-assets/main/tokenLists/velas.tokenlist.json',
   },
   [ChainId.AURORA]: {
     chainId: ChainId.AURORA,
@@ -411,7 +391,7 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     nativeTokenWrappedName: 'ETH (Wrapped)',
     nativeTokenLogo: AuroraLogo,
     etherscanLinkText: 'Aurora Explorer',
-    tokenLists: AURORA_TOKEN_LIST,
+    tokensListUrl: 'https://raw.githubusercontent.com/KyberNetwork/ks-assets/main/tokenLists/aurora.tokenlist.json',
   },
   [ChainId.OASIS]: {
     chainId: ChainId.OASIS,
@@ -431,6 +411,6 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     nativeTokenWrappedName: 'ROSE (Wrapped)',
     nativeTokenLogo: OasisLogo,
     etherscanLinkText: 'Oasis Emerald Explorer',
-    tokenLists: OASIS_TOKEN_LIST,
+    tokensListUrl: 'https://raw.githubusercontent.com/KyberNetwork/ks-assets/main/tokenLists/oasis.tokenlist.json',
   },
 }

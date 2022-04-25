@@ -6,7 +6,7 @@ import utc from 'dayjs/plugin/utc'
 import getTokenList from '../utils/tokenLists'
 import { healthClient, useClient } from '../apollo/client'
 import { SUBGRAPH_HEALTH, SUBGRAPH_BLOCK_NUMBER } from '../apollo/queries'
-import { useNetworksInfo } from './NetworkInfo'
+import { useNetworksInfo, useTokensList } from './NetworkInfo'
 import { ApolloClient } from 'apollo-client'
 import { InMemoryCache } from 'apollo-cache-inmemory'
 import { HttpLink } from 'apollo-link-http'
@@ -353,6 +353,7 @@ export function useSessionStart() {
 export function useListedTokens() {
   const [state, { updateSupportedTokens }] = useApplicationContext()
   const [[networkInfo]] = useNetworksInfo()
+  const tokensList = useTokensList()
   const supportedTokens = state?.[SUPPORTED_TOKENS]?.[networkInfo.chainId]
 
   useEffect(() => {
@@ -364,7 +365,7 @@ export function useListedTokens() {
       }, Promise.resolve([]))
       let formatted = allFetched?.map(t => t.address.toLowerCase())
       formatted.push((networkInfo.kncAddress || '0xdeFA4e8a7bcBA345F687a2f1456F5Edd9CE97202').toLowerCase())
-      formatted = formatted.concat(Object.keys(networkInfo.tokenLists).map(item => item.toLowerCase()))
+      formatted = formatted.concat(Object.keys(tokensList[networkInfo.chainId]).map(item => item.toLowerCase()))
       updateSupportedTokens(formatted, networkInfo.chainId)
     }
     if (!supportedTokens) {
