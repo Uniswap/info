@@ -64,7 +64,8 @@ export default function TokenLogo({ address, networkInfo, header = false, size =
 
   useEffect(() => {
     setError(false)
-  }, [address, networkInfo])
+    BAD_IMAGES[networkInfo.chainId] && (BAD_IMAGES[networkInfo.chainId][address] = false)
+  }, [address, networkInfo, tokensList])
 
   if (!networkInfo) return null
 
