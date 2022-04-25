@@ -25,7 +25,6 @@ const Inline = styled.div`
 const Image = styled.img`
   width: ${({ size }) => size};
   height: ${({ size }) => size};
-  background-color: white;
   border-radius: 50%;
 `
 
@@ -85,7 +84,6 @@ export default function TokenLogo({ address, networkInfo, header = false, size =
           style={{
             boxShadow: '0px 6px 10px rgba(0, 0, 0, 0.075)',
             borderRadius: '24px',
-            backgroundColor: 'white',
           }}
           alt=''
         />

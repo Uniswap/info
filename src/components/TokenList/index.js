@@ -20,6 +20,7 @@ import { useAllTokenData } from '../../contexts/TokenData'
 import { NETWORKS_INFO } from '../../constants/networks'
 import { aggregateTokens } from '../../utils/aggregateData'
 import { MouseoverTooltip } from '../Tooltip'
+import { NetworksInfoEnv } from '../../contexts/NetworkInfo'
 
 dayjs.extend(utc)
 
@@ -216,15 +217,16 @@ function TopTokenList({ itemMax = 5 }) {
   }, [below680, formattedTokens, itemMax, page, sortDirection, sortedColumn])
 
   const ListItem = ({ item, index }) => {
+    const tokenNetworkInfo = NETWORKS_INFO[item.chainId] || NetworksInfoEnv[0]
     return (
       <DashGrid style={{ height: '56px' }} focus={true} isShowNetworkColumn={isShowNetworkColumn}>
         <DataText area='name' fontWeight='500'>
           <Row>
             {!below680 && <div style={{ marginRight: '1rem', width: '10px' }}>{index}</div>}
-            <TokenLogo address={item.id} networkInfo={NETWORKS_INFO[item.chainId]} />
+            <TokenLogo address={item.id} networkInfo={tokenNetworkInfo} />
             <CustomLink
               style={{ marginLeft: '16px', whiteSpace: 'nowrap' }}
-              to={'/' + NETWORKS_INFO[item.chainId].urlKey + '/token/' + item.id}
+              to={'/' + tokenNetworkInfo.urlKey + '/token/' + item.id}
             >
               <FormattedName
                 text={below680 ? item.symbol : item.name}
@@ -237,9 +239,9 @@ function TopTokenList({ itemMax = 5 }) {
         </DataText>
         {isShowNetworkColumn && (
           <DataText area='network'>
-            <Link to={'/' + NETWORKS_INFO[item.chainId].urlKey}>
-              <MouseoverTooltip text={NETWORKS_INFO[item.chainId].name} width='unset'>
-                <img src={NETWORKS_INFO[item.chainId].icon} width={25} />
+            <Link to={'/' + tokenNetworkInfo.urlKey}>
+              <MouseoverTooltip text={tokenNetworkInfo.name} width='unset'>
+                <img src={tokenNetworkInfo.icon} width={25} />
               </MouseoverTooltip>
             </Link>
           </DataText>

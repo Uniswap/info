@@ -6,7 +6,7 @@ const TokenWrapper = styled.div`
   position: relative;
   display: flex;
   flex-direction: row;
-  margin-right: ${({ sizeraw, margin }) => margin && (sizeraw / 3 + 8).toString() + 'px'};
+  ${'' /* margin-right: ${({ sizeraw, margin }) => margin && (sizeraw / 3 + 8).toString() + 'px'}; */}
 `
 
 const HigherLogo = styled(TokenLogo)`
@@ -15,8 +15,8 @@ const HigherLogo = styled(TokenLogo)`
 `
 
 const CoveredLogo = styled(TokenLogo)`
-  position: absolute;
-  left: ${({ sizeraw }) => (sizeraw / 2).toString() + 'px'};
+  ${'' /* position: absolute; */}
+  ${'' /* left: ${({ sizeraw }) => (sizeraw / 2).toString() + 'px'}; */}
   border-radius: 50%;
 `
 

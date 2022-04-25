@@ -19,6 +19,7 @@ import useTheme from '../../hooks/useTheme'
 import { NETWORKS_INFO } from '../../constants/networks'
 import { aggregatePairs } from '../../utils/aggregateData'
 import { MouseoverTooltip } from '../Tooltip'
+import { NetworksInfoEnv } from '../../contexts/NetworkInfo'
 
 dayjs.extend(utc)
 
@@ -173,10 +174,9 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 5 }) {
 
   const ListItem = ({ pairAddress, index }) => {
     const pairData = aggregatedPairs[pairAddress]
-
     if (pairData && pairData.token0 && pairData.token1) {
       const showData = MAP_SHOW_DATA(pairData)
-
+      const pairNetworkInfo = NETWORKS_INFO[pairData.chainId] || NetworksInfoEnv[0]
       return (
         <DashGrid style={{ height: '56px' }} disbaleLinks={disbaleLinks} focus={true} isShowNetworkColumn={isShowNetworkColumn}>
           <DataText area='name' fontWeight='500'>
@@ -186,11 +186,11 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 5 }) {
               a0={pairData.token0.id}
               a1={pairData.token1.id}
               margin={!below740}
-              networkInfo={NETWORKS_INFO[pairData.chainId]}
+              networkInfo={pairNetworkInfo}
             />
             <CustomLink
               style={{ marginLeft: '20px', whiteSpace: 'nowrap' }}
-              to={'/' + NETWORKS_INFO[pairData.chainId].urlKey + '/pair/' + pairAddress}
+              to={'/' + pairNetworkInfo.urlKey + '/pair/' + pairAddress}
               color={color}
             >
               <FormattedName text={showData.name} maxCharacters={below600 ? 8 : 16} adjustSize={true} link={true} />
@@ -198,9 +198,9 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 5 }) {
           </DataText>
           {isShowNetworkColumn && (
             <DataText area='network'>
-              <Link to={'/' + NETWORKS_INFO[pairData.chainId].urlKey}>
-                <MouseoverTooltip text={NETWORKS_INFO[pairData.chainId].name} width='unset'>
-                  <img src={NETWORKS_INFO[pairData.chainId].icon} width={25} />
+              <Link to={'/' + pairNetworkInfo.urlKey}>
+                <MouseoverTooltip text={pairNetworkInfo.name} width='unset'>
+                  <img src={pairNetworkInfo.icon} width={25} />
                 </MouseoverTooltip>
               </Link>
             </DataText>

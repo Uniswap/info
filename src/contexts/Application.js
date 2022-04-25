@@ -365,7 +365,7 @@ export function useListedTokens() {
       }, Promise.resolve([]))
       let formatted = allFetched?.map(t => t.address.toLowerCase())
       formatted.push((networkInfo.kncAddress || '0xdeFA4e8a7bcBA345F687a2f1456F5Edd9CE97202').toLowerCase())
-      formatted = formatted.concat(Object.keys(tokensList[networkInfo.chainId]).map(item => item.toLowerCase()))
+      formatted = formatted.concat(Object.keys(tokensList[networkInfo.chainId] ?? {}).map(item => item.toLowerCase()))
       updateSupportedTokens(formatted, networkInfo.chainId)
     }
     if (!supportedTokens) {
