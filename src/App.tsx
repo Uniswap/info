@@ -4,9 +4,9 @@ import { Route, Routes, Navigate } from 'react-router-dom'
 import GlobalPage from 'pages/GlobalPage'
 import TokenPage from 'pages/TokenPage'
 import PairPage from 'pages/PairPage'
-import { useGlobalData, useGlobalChartData } from 'state/features/global/hooks'
-import { usePairUpdater } from 'state/features/pairs/hooks'
-import { useTokenUpdater } from 'state/features/token/hooks'
+import { useGlobalData, useGlobalChartData, useFetchActiveTokenPrice } from 'state/features/global/hooks'
+import { useFetchPairs } from 'state/features/pairs/hooks'
+import { useFetchTokens } from 'state/features/token/hooks'
 import AccountPage from 'pages/AccountPage'
 import AllTokensPage from 'pages/AllTokensPage'
 import AllPairsPage from 'pages/AllPairsPage'
@@ -84,8 +84,9 @@ function App() {
   // show warning
   const showWarning = headBlock && latestBlock ? headBlock - latestBlock > BLOCK_DIFFERENCE_THRESHOLD : false
 
-  usePairUpdater()
-  useTokenUpdater()
+  useFetchActiveTokenPrice()
+  useFetchPairs()
+  useFetchTokens()
 
   return (
     <AppWrapper>
@@ -120,7 +121,7 @@ function App() {
           </Right>
         </ContentWrapper>
       ) : (
-        <LocalLoader fill="true" />
+        <LocalLoader fullscreen />
       )}
     </AppWrapper>
   )

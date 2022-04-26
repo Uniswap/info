@@ -10,15 +10,15 @@ import dayjs from 'dayjs'
 import { isAddress } from 'ethers/lib/utils'
 import { useEffect, useState } from 'react'
 import { useActiveNetworkId, useLatestBlocks } from '../application/hooks'
-import { useEthPrice } from '../global/hooks'
 import { useAppDispatch, useAppSelector } from 'state/hooks'
 import { setChartData, setHourlyData, setPair, setPairTransactions, setTopPairs } from './slice'
 import { Pair } from './types'
+import { useActiveTokenPrice } from '../global/selectors'
 
 export function usePairUpdater() {
   const dispatch = useAppDispatch()
   const activeNetwork = useActiveNetworkId()
-  const [price] = useEthPrice()
+  const price = useActiveTokenPrice()
 
   useEffect(() => {
     async function getData() {
@@ -58,7 +58,7 @@ export function useHourlyRateData(pairAddress: string, timeWindow: string) {
  * store these updates to reduce future redundant calls
  */
 export function useDataForList(pairList: Pair[]) {
-  const [price] = useEthPrice()
+  const price = useActiveTokenPrice()
   const activeNetwork = useActiveNetworkId()
   const pairs = useAppSelector(state => state.pairs[activeNetwork])
   const [pairsData, setPairsData] = useState<Record<string, Pair[]>>({})
@@ -101,7 +101,7 @@ export function useDataForList(pairList: Pair[]) {
 export function usePairData(pairAddress: string) {
   const dispatch = useAppDispatch()
   const activeNetwork = useActiveNetworkId()
-  const [price] = useEthPrice()
+  const price = useActiveTokenPrice()
   const pairData = useAppSelector(state => state.pairs[activeNetwork]?.[pairAddress])
 
   useEffect(() => {
@@ -154,10 +154,16 @@ export function usePairChartData(pairAddress: string) {
   return chartData
 }
 
-/**
- * Get list of all pairs in Uniswap
- */
-export function useAllPairData() {
+export function useFetchPairs() {
+  const dispatch = useAppDispatch()
   const activeNetwork = useActiveNetworkId()
-  return useAppSelector(state => state.pairs[activeNetwork])
+  const price = useActiveTokenPrice()
+
+  useEffect(() => {
+    async function getData() {
+      const topPairs = await getPairList(price)
+      topPairs && dispatch(setTopPairs({ topPairs, networkId: activeNetwork }))
+    }
+    price && getData()
+  }, [price, activeNetwork])
 }

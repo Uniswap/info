@@ -1,8 +1,15 @@
 import { getGlobalData, getChartData, getGlobalTransactions, getPrice } from 'data/ethereum/global'
 import { useState, useEffect } from 'react'
-import { useAppDispatch, useAppSelector } from 'state/hooks'
+import { useAppDispatch } from 'state/hooks'
 import { getTimeframe } from 'utils'
 import { useActiveNetworkId, useTimeframe } from '../application/hooks'
+import {
+  useActiveTokenOneDayPrice,
+  useActiveTokenPrice,
+  useGlobalChartDataSelector,
+  useGlobalDataSelector,
+  useGlobalTransactionsSelector
+} from './selectors'
 import { setChart, setGlobalData, setPrice, setTransactions } from './slice'
 
 /**
@@ -11,18 +18,19 @@ import { setChart, setGlobalData, setPrice, setTransactions } from './slice'
 export function useGlobalData() {
   const dispatch = useAppDispatch()
   const activeNetwork = useActiveNetworkId()
-  const data = useAppSelector(state => state.global[activeNetwork].globalData)
-  const [price, oldPrice] = useEthPrice()
+  const data = useGlobalDataSelector()
+  const price = useActiveTokenPrice()
+  const oneDayPrice = useActiveTokenOneDayPrice()
 
   useEffect(() => {
     async function fetchData() {
-      const globalData = await getGlobalData(price, oldPrice)
-      globalData && dispatch(setGlobalData({ data: globalData, networkId: activeNetwork }))
+      const globalData = await getGlobalData(price, oneDayPrice)
+      dispatch(setGlobalData({ data: globalData, networkId: activeNetwork }))
     }
-    if (!data && price && oldPrice) {
+    if (price && oneDayPrice) {
       fetchData()
     }
-  }, [price, oldPrice, data, activeNetwork])
+  }, [price, oneDayPrice, activeNetwork])
 
   return data || {}
 }
@@ -32,9 +40,7 @@ export function useGlobalChartData() {
   const activeNetwork = useActiveNetworkId()
   const [oldestDateFetch, setOldestDateFetched] = useState<number | undefined>()
   const [activeWindow] = useTimeframe()
-  const chartData = useAppSelector(state => state.global[activeNetwork].chartData)
-  const daily = chartData?.daily
-  const weekly = chartData?.weekly
+  const chartData = useGlobalChartDataSelector()
 
   /**
    * Keep track of oldest date fetched. Used to
@@ -59,46 +65,39 @@ export function useGlobalChartData() {
       const [newChartData, newWeeklyData] = await getChartData(oldestDateFetch!)
       dispatch(setChart({ daily: newChartData, weekly: newWeeklyData, networkId: activeNetwork }))
     }
-    if (oldestDateFetch && !(daily && weekly)) {
+    if (oldestDateFetch) {
       fetchData()
     }
-  }, [daily, weekly, oldestDateFetch, activeNetwork])
+  }, [oldestDateFetch, activeNetwork])
 
-  return [daily, weekly]
+  return chartData || {}
 }
 
 export function useGlobalTransactions() {
   const dispatch = useAppDispatch()
   const activeNetwork = useActiveNetworkId()
-  const transactions = useAppSelector(state => state.global[activeNetwork].transactions)
+  const transactions = useGlobalTransactionsSelector()
 
   useEffect(() => {
     async function fetchData() {
-      if (!transactions) {
-        const txns = await getGlobalTransactions()
-        dispatch(setTransactions({ transactions: txns, networkId: activeNetwork }))
-      }
+      const txns = await getGlobalTransactions()
+      dispatch(setTransactions({ transactions: txns, networkId: activeNetwork }))
     }
     fetchData()
-  }, [transactions, activeNetwork])
+  }, [activeNetwork])
+
   return transactions
 }
 
-export function useEthPrice() {
+export function useFetchActiveTokenPrice() {
   const dispatch = useAppDispatch()
   const activeNetwork = useActiveNetworkId()
-  const price = useAppSelector(state => state.global[activeNetwork].price)
-  const oneDayPrice = useAppSelector(state => state.global[activeNetwork].oneDayPrice)
 
   useEffect(() => {
     async function checkForPrice() {
-      if (!price) {
-        const [newPrice, newOneDayPrice, priceChange] = await getPrice()
-        dispatch(setPrice({ price: newPrice, oneDayPrice: newOneDayPrice, priceChange, networkId: activeNetwork }))
-      }
+      const [newPrice, newOneDayPrice, priceChange] = await getPrice()
+      dispatch(setPrice({ price: newPrice, oneDayPrice: newOneDayPrice, priceChange, networkId: activeNetwork }))
     }
     checkForPrice()
-  }, [price, activeNetwork])
-
-  return [price, oneDayPrice]
+  }, [activeNetwork])
 }

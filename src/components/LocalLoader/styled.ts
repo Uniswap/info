@@ -1,4 +1,4 @@
-import styled, { css, keyframes } from 'styled-components/macro'
+import styled, { keyframes } from 'styled-components/macro'
 
 export const pulse = keyframes`
 0% { transform: scale(1); }
@@ -6,21 +6,13 @@ export const pulse = keyframes`
 100% { transform: scale(1); }
 `
 
-export const Wrapper = styled.div<{ fill?: boolean }>`
+export const Wrapper = styled.div<{ fullscreen?: boolean }>`
   pointer-events: none;
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
-
-  ${({ fill }) =>
-    fill
-      ? css`
-          height: 100vh;
-        `
-      : css`
-          height: 180px;
-        `}
+  height: ${({ fullscreen }) => (fullscreen ? '100vh' : '180px')};
 `
 
 export const AnimatedImg = styled.div`

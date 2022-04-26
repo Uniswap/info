@@ -11,42 +11,43 @@ import dayjs from 'dayjs'
 import { isAddress } from 'ethers/lib/utils'
 import { useEffect } from 'react'
 import { useActiveNetworkId, useLatestBlocks } from '../application/hooks'
-import { useEthPrice } from '../global/hooks'
 import { useAppDispatch, useAppSelector } from 'state/hooks'
 import { setAllPairs, setChartData, setPriceData, setToken, setTopTokens, setTransactions } from './slice'
+import { useActiveTokenOneDayPrice, useActiveTokenPrice } from '../global/selectors'
 
-export function useTokenUpdater() {
+export function useFetchTokens() {
   const dispatch = useAppDispatch()
   const activeNetwork = useActiveNetworkId()
-  const [price, priceOld] = useEthPrice()
+  const price = useActiveTokenPrice()
+  const oneDayPrice = useActiveTokenOneDayPrice()
 
   useEffect(() => {
     async function fetchData() {
       // get top pairs for overview list
-      const topTokens = await getTopTokens(price, priceOld)
+      const topTokens = await getTopTokens(price, oneDayPrice)
       topTokens && dispatch(setTopTokens({ networkId: activeNetwork, topTokens }))
     }
-    price && priceOld && fetchData()
-  }, [price, priceOld, activeNetwork])
+    price && oneDayPrice && fetchData()
+  }, [price, oneDayPrice, activeNetwork])
 }
 
 export function useTokenData(tokenAddress: string) {
   const dispatch = useAppDispatch()
   const activeNetwork = useActiveNetworkId()
-  const [price, priceOld] = useEthPrice()
+  const price = useActiveTokenPrice()
+  const oneDayPrice = useActiveTokenOneDayPrice()
   const tokenData = useAppSelector(state => state.token[activeNetwork]?.[tokenAddress])
 
   useEffect(() => {
     async function fetchData() {
-      console.log('fetch data')
-      const data = await getTokenData(tokenAddress, price, priceOld)
+      const data = await getTokenData(tokenAddress, price, oneDayPrice)
       data && dispatch(setToken({ tokenAddress, networkId: activeNetwork, data }))
     }
     // TODO: isAddress only validate ETH address
-    if (!tokenData && price && priceOld && isAddress(tokenAddress)) {
+    if (!tokenData && price && oneDayPrice && isAddress(tokenAddress)) {
       fetchData()
     }
-  }, [price, priceOld, tokenAddress, tokenData, activeNetwork])
+  }, [price, oneDayPrice, tokenAddress, tokenData, activeNetwork])
 
   return tokenData || {}
 }
@@ -136,9 +137,4 @@ export function useTokenPriceData(tokenAddress: string, timeWindow: string, inte
   }, [chartData, interval, timeWindow, tokenAddress, latestBlock, activeNetwork])
 
   return chartData
-}
-
-export function useAllTokenData() {
-  const activeNetwork = useActiveNetworkId()
-  return useAppSelector(state => state.token[activeNetwork])
 }

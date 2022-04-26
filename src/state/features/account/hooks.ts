@@ -11,10 +11,11 @@ import { useEffect, useState } from 'react'
 import { useAppDispatch, useAppSelector } from 'state/hooks'
 import { getHistoricalPairReturns } from 'utils/returns'
 import { useActiveNetworkId, useStartTimestamp, useTimeframe } from '../application/hooks'
-import { useEthPrice } from '../global/hooks'
-import { useAllPairData, usePairData } from '../pairs/hooks'
+import { usePairData } from '../pairs/hooks'
 import { setPairReturns, setPositionHistory, setPositions, setTopLiquidityPositions, setTransactions } from './slice'
 import { LiquidityChart, Position } from './types'
+import { usePairs } from '../pairs/selectors'
+import { useActiveTokenPrice } from '../global/selectors'
 
 export function useUserTransactions(account: string) {
   const dispatch = useAppDispatch()
@@ -84,7 +85,7 @@ export function useUserPositionChart(position: Position, account: string) {
 
   // get data needed for calculations
   const currentPairData = usePairData(pairAddress)
-  const [price] = useEthPrice()
+  const price = useActiveTokenPrice()
 
   // formatetd array to return for chart data
   const formattedHistory = useAppSelector(
@@ -177,7 +178,7 @@ export function useUserPositions(account: string) {
   const positions = useAppSelector(state => state.account[activeNetwork].byAddress?.[account]?.positions)
 
   const snapshots = useUserSnapshots(account)
-  const [price] = useEthPrice()
+  const price = useActiveTokenPrice()
 
   useEffect(() => {
     async function fetchData(account: string) {
@@ -198,8 +199,7 @@ export function useTopLiquidityPositions() {
   const dispatch = useAppDispatch()
   const activeNetwork = useActiveNetworkId()
   const topLps = useAppSelector(state => state.account[activeNetwork].topLiquidityPositions)
-
-  const allPairs = useAllPairData()
+  const allPairs = usePairs()
 
   useEffect(() => {
     async function fetchData() {

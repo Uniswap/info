@@ -9,7 +9,7 @@ import { Divider } from 'components'
 import DoubleTokenLogo from 'components/DoubleLogo'
 import { formattedNum, getPoolLink } from 'utils'
 import { AutoColumn } from 'components/Column'
-import { useEthPrice } from 'state/features/global/hooks'
+import { useActiveTokenPrice } from 'state/features/global/selectors'
 import { RowFixed } from 'components/Row'
 import { ButtonLight } from 'components/ButtonStyled'
 import { TYPE } from 'Theme'
@@ -176,7 +176,7 @@ function PositionList({ positions }) {
     }
   }, [positions])
 
-  const [ethPrice] = useEthPrice()
+  const activeTokenPrice = useActiveTokenPrice()
 
   const ListItem = ({ position, index }) => {
     const poolOwnership = position.liquidityTokenBalance / position.pair.totalSupply
@@ -253,7 +253,7 @@ function PositionList({ positions }) {
                   <DataText fontWeight={400} fontSize={11}>
                     {parseFloat(position.pair.token0.derivedETH)
                       ? formattedNum(
-                          position?.fees.sum / (parseFloat(position.pair.token0.derivedETH) * ethPrice) / 2,
+                          position?.fees.sum / (parseFloat(position.pair.token0.derivedETH) * activeTokenPrice) / 2,
                           false,
                           true
                         )
@@ -270,7 +270,7 @@ function PositionList({ positions }) {
                   <DataText fontWeight={400} fontSize={11}>
                     {parseFloat(position.pair.token1.derivedETH)
                       ? formattedNum(
-                          position?.fees.sum / (parseFloat(position.pair.token1.derivedETH) * ethPrice) / 2,
+                          position?.fees.sum / (parseFloat(position.pair.token1.derivedETH) * activeTokenPrice) / 2,
                           false,
                           true
                         )

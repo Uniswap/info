@@ -2,7 +2,7 @@ import { useState } from 'react'
 import styled from 'styled-components/macro'
 import { RowFixed, RowBetween } from '../Row'
 import { useMedia } from 'react-use'
-import { useGlobalData, useEthPrice } from 'state/features/global/hooks'
+import { useGlobalDataSelector, useActiveTokenPrice } from 'state/features/global/selectors'
 import { formattedNum, localNumber } from '../../utils'
 
 import UniPrice from '../UniPrice'
@@ -25,9 +25,9 @@ export default function GlobalStats() {
 
   const [showPriceCard, setShowPriceCard] = useState(false)
 
-  const { oneDayVolumeUSD, oneDayTxns, pairCount } = useGlobalData()
-  const [ethPrice] = useEthPrice()
-  const formattedEthPrice = ethPrice ? formattedNum(ethPrice, true) : '-'
+  const { oneDayVolumeUSD, oneDayTxns, pairCount } = useGlobalDataSelector()
+  const activeTokenPrice = useActiveTokenPrice()
+  const formattedPrice = activeTokenPrice ? formattedNum(activeTokenPrice, true) : '-'
   const oneDayFees = oneDayVolumeUSD ? formattedNum(oneDayVolumeUSD * 0.003, true) : ''
 
   return (
@@ -48,7 +48,7 @@ export default function GlobalStats() {
                 }}
                 style={{ position: 'relative' }}
               >
-                ETH {t('price')}: {formattedEthPrice}
+                ETH {t('price')}: {formattedPrice}
                 {showPriceCard && <UniPrice />}
               </TYPE.light>
             )}
