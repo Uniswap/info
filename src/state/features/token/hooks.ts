@@ -13,14 +13,7 @@ import { useEffect } from 'react'
 import { useActiveNetworkId, useLatestBlocks } from '../application/hooks'
 import { useEthPrice } from '../global/hooks'
 import { useAppDispatch, useAppSelector } from 'state/hooks'
-import {
-  updateAllPairs,
-  updateChartData,
-  updatePriceData,
-  updateToken,
-  updateTopTokens,
-  updateTransactions
-} from './slice'
+import { setAllPairs, setChartData, setPriceData, setToken, setTopTokens, setTransactions } from './slice'
 
 export function useTokenUpdater() {
   const dispatch = useAppDispatch()
@@ -31,7 +24,7 @@ export function useTokenUpdater() {
     async function fetchData() {
       // get top pairs for overview list
       const topTokens = await getTopTokens(price, priceOld)
-      topTokens && dispatch(updateTopTokens({ networkId: activeNetwork, topTokens }))
+      topTokens && dispatch(setTopTokens({ networkId: activeNetwork, topTokens }))
     }
     price && priceOld && fetchData()
   }, [price, priceOld, activeNetwork])
@@ -47,7 +40,7 @@ export function useTokenData(tokenAddress: string) {
     async function fetchData() {
       console.log('fetch data')
       const data = await getTokenData(tokenAddress, price, priceOld)
-      data && dispatch(updateToken({ tokenAddress, networkId: activeNetwork, data }))
+      data && dispatch(setToken({ tokenAddress, networkId: activeNetwork, data }))
     }
     // TODO: isAddress only validate ETH address
     if (!tokenData && price && priceOld && isAddress(tokenAddress)) {
@@ -69,7 +62,7 @@ export function useTokenTransactions(tokenAddress: string) {
     async function checkForTransactions() {
       if (!tokenTransactions && allPairsFormatted) {
         const transactions = await getTokenTransactions(allPairsFormatted)
-        dispatch(updateTransactions({ networkId: activeNetwork, transactions, address: tokenAddress }))
+        dispatch(setTransactions({ networkId: activeNetwork, transactions, address: tokenAddress }))
       }
     }
     checkForTransactions()
@@ -86,7 +79,7 @@ export function useTokenPairs(tokenAddress: string) {
   useEffect(() => {
     async function fetchData() {
       const allPairs = await getTokenPairs(tokenAddress)
-      dispatch(updateAllPairs({ networkId: activeNetwork, allPairs, address: tokenAddress }))
+      dispatch(setAllPairs({ networkId: activeNetwork, allPairs, address: tokenAddress }))
     }
     if (!tokenPairs && isAddress(tokenAddress)) {
       fetchData()
@@ -104,7 +97,7 @@ export function useTokenChartData(tokenAddress: string) {
     async function checkForChartData() {
       if (!chartData) {
         const data = await getTokenChartData(tokenAddress)
-        dispatch(updateChartData({ networkId: activeNetwork, chartData: data, address: tokenAddress }))
+        dispatch(setChartData({ networkId: activeNetwork, chartData: data, address: tokenAddress }))
       }
     }
     checkForChartData()
@@ -135,7 +128,7 @@ export function useTokenPriceData(tokenAddress: string, timeWindow: string, inte
 
     async function fetch() {
       const data = await getIntervalTokenData(tokenAddress, startTime, interval, latestBlock)
-      dispatch(updatePriceData({ networkId: activeNetwork, timeWindow, interval, data, address: tokenAddress }))
+      dispatch(setPriceData({ networkId: activeNetwork, timeWindow, interval, data, address: tokenAddress }))
     }
     if (!chartData) {
       fetch()

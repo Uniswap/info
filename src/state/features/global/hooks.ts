@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import { useAppDispatch, useAppSelector } from 'state/hooks'
 import { getTimeframe } from 'utils'
 import { useActiveNetworkId, useTimeframe } from '../application/hooks'
-import { updateChart, updateGlobalData, updatePrice, updateTransactions } from './slice'
+import { setChart, setGlobalData, setPrice, setTransactions } from './slice'
 
 /**
  * Hook that fetches overview data, plus all tokens and pairs for search
@@ -17,7 +17,7 @@ export function useGlobalData() {
   useEffect(() => {
     async function fetchData() {
       const globalData = await getGlobalData(price, oldPrice)
-      globalData && dispatch(updateGlobalData({ data: globalData, networkId: activeNetwork }))
+      globalData && dispatch(setGlobalData({ data: globalData, networkId: activeNetwork }))
     }
     if (!data && price && oldPrice) {
       fetchData()
@@ -57,7 +57,7 @@ export function useGlobalChartData() {
     async function fetchData() {
       // historical stuff for chart
       const [newChartData, newWeeklyData] = await getChartData(oldestDateFetch!)
-      dispatch(updateChart({ daily: newChartData, weekly: newWeeklyData, networkId: activeNetwork }))
+      dispatch(setChart({ daily: newChartData, weekly: newWeeklyData, networkId: activeNetwork }))
     }
     if (oldestDateFetch && !(daily && weekly)) {
       fetchData()
@@ -76,7 +76,7 @@ export function useGlobalTransactions() {
     async function fetchData() {
       if (!transactions) {
         const txns = await getGlobalTransactions()
-        dispatch(updateTransactions({ transactions: txns, networkId: activeNetwork }))
+        dispatch(setTransactions({ transactions: txns, networkId: activeNetwork }))
       }
     }
     fetchData()
@@ -94,7 +94,7 @@ export function useEthPrice() {
     async function checkForPrice() {
       if (!price) {
         const [newPrice, newOneDayPrice, priceChange] = await getPrice()
-        dispatch(updatePrice({ price: newPrice, oneDayPrice: newOneDayPrice, priceChange, networkId: activeNetwork }))
+        dispatch(setPrice({ price: newPrice, oneDayPrice: newOneDayPrice, priceChange, networkId: activeNetwork }))
       }
     }
     checkForPrice()

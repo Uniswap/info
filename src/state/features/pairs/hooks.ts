@@ -12,7 +12,7 @@ import { useEffect, useState } from 'react'
 import { useActiveNetworkId, useLatestBlocks } from '../application/hooks'
 import { useEthPrice } from '../global/hooks'
 import { useAppDispatch, useAppSelector } from 'state/hooks'
-import { updateChartData, updateHourlyData, updatePair, updatePairTransactions, updateTopPairs } from './slice'
+import { setChartData, setHourlyData, setPair, setPairTransactions, setTopPairs } from './slice'
 import { Pair } from './types'
 
 export function usePairUpdater() {
@@ -23,7 +23,7 @@ export function usePairUpdater() {
   useEffect(() => {
     async function getData() {
       const topPairs = await getPairList(price)
-      topPairs && dispatch(updateTopPairs({ topPairs, networkId: activeNetwork }))
+      topPairs && dispatch(setTopPairs({ topPairs, networkId: activeNetwork }))
     }
     price && getData()
   }, [price, activeNetwork])
@@ -43,7 +43,7 @@ export function useHourlyRateData(pairAddress: string, timeWindow: string) {
 
     async function fetch() {
       const data = await getHourlyRateData(pairAddress, startTime, latestBlock)
-      dispatch(updateHourlyData({ address: pairAddress, hourlyData: data, timeWindow, networkId: activeNetwork }))
+      dispatch(setHourlyData({ address: pairAddress, hourlyData: data, timeWindow, networkId: activeNetwork }))
     }
     if (!chartData) {
       fetch()
@@ -107,7 +107,7 @@ export function usePairData(pairAddress: string) {
   useEffect(() => {
     async function fetchData() {
       const data = await getBulkPairData([pairAddress], price)
-      data && dispatch(updatePair({ networkId: activeNetwork, pairAddress, data: data[0] }))
+      data && dispatch(setPair({ networkId: activeNetwork, pairAddress, data: data[0] }))
     }
     // TODO: isAddress() only work for eth not for trx
     if (!pairData && pairAddress && price && isAddress(pairAddress)) {
@@ -129,7 +129,7 @@ export function usePairTransactions(pairAddress: string) {
     async function checkForTxns() {
       if (!pairTxns) {
         const transactions = await getPairTransactions(pairAddress)
-        dispatch(updatePairTransactions({ networkId: activeNetwork, transactions, address: pairAddress }))
+        dispatch(setPairTransactions({ networkId: activeNetwork, transactions, address: pairAddress }))
       }
     }
     checkForTxns()
@@ -146,7 +146,7 @@ export function usePairChartData(pairAddress: string) {
     async function checkForChartData() {
       if (!chartData) {
         const data = await getPairChartData(pairAddress)
-        dispatch(updateChartData({ networkId: activeNetwork, chartData: data, address: pairAddress }))
+        dispatch(setChartData({ networkId: activeNetwork, chartData: data, address: pairAddress }))
       }
     }
     checkForChartData()

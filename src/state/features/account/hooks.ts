@@ -13,13 +13,7 @@ import { getHistoricalPairReturns } from 'utils/returns'
 import { useActiveNetworkId, useStartTimestamp, useTimeframe } from '../application/hooks'
 import { useEthPrice } from '../global/hooks'
 import { useAllPairData, usePairData } from '../pairs/hooks'
-import {
-  updatePairReturns,
-  updatePositionHistory,
-  updatePositions,
-  updateTopLiquidityPositions,
-  updateTransactions
-} from './slice'
+import { setPairReturns, setPositionHistory, setPositions, setTopLiquidityPositions, setTransactions } from './slice'
 import { LiquidityChart, Position } from './types'
 
 export function useUserTransactions(account: string) {
@@ -30,7 +24,7 @@ export function useUserTransactions(account: string) {
   useEffect(() => {
     async function fetchData(account: string) {
       const result = await getUserTransactions(account)
-      dispatch(updateTransactions({ account, transactions: result, networkId: activeNetwork }))
+      dispatch(setTransactions({ account, transactions: result, networkId: activeNetwork }))
     }
     if (!transactions && account) {
       fetchData(account)
@@ -54,7 +48,7 @@ export function useUserSnapshots(account: string) {
     async function fetchData() {
       const result = await getUserHistory(account)
       if (result) {
-        dispatch(updatePositionHistory({ account, historyData: result, networkId: activeNetwork }))
+        dispatch(setPositionHistory({ account, historyData: result, networkId: activeNetwork }))
       }
     }
     if (!snapshots && account) {
@@ -100,7 +94,7 @@ export function useUserPositionChart(position: Position, account: string) {
   useEffect(() => {
     async function fetchData() {
       const fetchedData = await getHistoricalPairReturns(startDateTimestamp!, currentPairData, pairSnapshots, price)
-      dispatch(updatePairReturns({ networkId: activeNetwork, account, pairAddress, data: fetchedData }))
+      dispatch(setPairReturns({ networkId: activeNetwork, account, pairAddress, data: fetchedData }))
     }
     if (
       account &&
@@ -189,7 +183,7 @@ export function useUserPositions(account: string) {
     async function fetchData(account: string) {
       const positions = await getUserPositions(account, price, snapshots)
       if (positions) {
-        dispatch(updatePositions({ networkId: activeNetwork, account, positions }))
+        dispatch(setPositions({ networkId: activeNetwork, account, positions }))
       }
     }
     if (!positions && account && price && snapshots) {
@@ -210,7 +204,7 @@ export function useTopLiquidityPositions() {
   useEffect(() => {
     async function fetchData() {
       const response = await getTopLps(allPairs)
-      dispatch(updateTopLiquidityPositions({ liquidityPositions: response, networkId: activeNetwork }))
+      dispatch(setTopLiquidityPositions({ liquidityPositions: response, networkId: activeNetwork }))
     }
 
     if (!topLps && allPairs && Object.keys(allPairs).length > 0) {

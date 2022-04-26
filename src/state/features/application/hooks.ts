@@ -4,13 +4,13 @@ import dayjs from 'dayjs'
 
 import { useAppDispatch, useAppSelector } from 'state/hooks'
 import {
-  updateActiveNetwork,
-  updateCurrency,
-  updateHeadBlock,
-  updateLatestBlock,
-  updateSessionStart,
-  updateSupportedTokens,
-  updateTimeFrame
+  setActiveNetwork,
+  setCurrency,
+  setHeadBlock,
+  setLatestBlock,
+  setSessionStart,
+  setSupportedTokens,
+  setTimeFrame
 } from './slice'
 import { DEFAULT_LIST_OF_LISTS } from 'constants/lists'
 import getTokenList from 'utils/tokenLists'
@@ -27,8 +27,8 @@ export function useLatestBlocks() {
     async function fetch() {
       const result = await getSubgraphStatus()
       if (result) {
-        dispatch(updateLatestBlock(result.syncedBlock))
-        dispatch(updateHeadBlock(result.headBlock))
+        dispatch(setLatestBlock(result.syncedBlock))
+        dispatch(setHeadBlock(result.headBlock))
       }
     }
     fetch()
@@ -43,9 +43,9 @@ export function useCurrentCurrency() {
 
   const toggleCurrency = () => {
     if (currency === 'ETH') {
-      dispatch(updateCurrency('USD'))
+      dispatch(setCurrency('USD'))
     } else {
-      dispatch(updateCurrency('ETH'))
+      dispatch(setCurrency('ETH'))
     }
   }
   return [currency, toggleCurrency]
@@ -54,7 +54,7 @@ export function useCurrentCurrency() {
 export function useTimeframe() {
   const dispatch = useAppDispatch()
   const activeTimeFrame = useAppSelector(state => state.application.timeKey)
-  const updateActiveFrame = (newFrame: string) => dispatch(updateTimeFrame(newFrame))
+  const updateActiveFrame = (newFrame: string) => dispatch(setTimeFrame(newFrame))
 
   return [activeTimeFrame, updateActiveFrame]
 }
@@ -72,7 +72,7 @@ export function useUpdateActiveNetwork() {
   const networkId = useActiveNetworkId()
   const update = useCallback(newActiveNetwork => {
     if (networkId !== newActiveNetwork.id) {
-      dispatch(updateActiveNetwork(newActiveNetwork))
+      dispatch(setActiveNetwork(newActiveNetwork))
     }
     ApiService.setActiveNetwork(newActiveNetwork.id)
   }, [])
@@ -109,7 +109,7 @@ export function useSessionStart() {
 
   useEffect(() => {
     if (!sessionStart) {
-      dispatch(updateSessionStart(Date.now()))
+      dispatch(setSessionStart(Date.now()))
     }
   })
 
@@ -141,12 +141,12 @@ export function useListedTokens() {
         })
       )
       const formatted = allFetched.flat()?.map(t => t.address.toLowerCase())
-      dispatch(updateSupportedTokens(formatted))
+      dispatch(setSupportedTokens(formatted))
     }
     if (supportedTokens.length === 0) {
       fetchList()
     }
-  }, [updateSupportedTokens, supportedTokens, networkId])
+  }, [supportedTokens, networkId])
 
   return supportedTokens
 }

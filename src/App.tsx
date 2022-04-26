@@ -21,7 +21,7 @@ const AppWrapper = styled.div`
   position: relative;
   width: 100%;
 `
-const ContentWrapper = styled.div`
+const ContentWrapper = styled.div<{ open: boolean }>`
   display: grid;
   grid-template-columns: ${({ open }) => (open ? '220px 1fr 200px' : '220px 1fr 64px')};
 
@@ -37,7 +37,7 @@ const ContentWrapper = styled.div`
   }
 `
 
-const Right = styled.div`
+const Right = styled.div<{ open: boolean }>`
   position: fixed;
   right: 0;
   bottom: 0;
