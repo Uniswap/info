@@ -3,7 +3,7 @@ import styled from 'styled-components'
 
 import { ROPSTEN_TOKEN_LOGOS_MAPPING } from '../../constants'
 import { isAddress } from '../../utils/index.js'
-import PlaceHolder from '../../assets/placeholder.png'
+import { HelpCircle } from 'react-feather'
 import { getMaticTokenLogoURL } from '../../utils/maticTokenMapping'
 import { getMumbaiTokenLogoURL } from '../../utils/mumbaiTokenMapping'
 import { getBscTestnetTokenLogoURL } from '../../utils/bscTestnetTokenMapping'
@@ -39,6 +39,15 @@ const StyledNativeTokenLogo = styled.div`
   }
 `
 
+const StyledHelpCircle = styled(HelpCircle)`
+  width: ${({ size }) => size};
+  height: ${({ size }) => size};
+  border-radius: ${({ size }) => size};
+  box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.075);
+  color: ${({ theme }) => theme.text4};
+  background-color: ${({ theme }) => theme.white};
+`
+
 export function getCustomLogo({ address, chainId, src, size, setError, ...rest }) {
   return (
     <Inline>
@@ -71,7 +80,7 @@ export default function TokenLogo({ address, networkInfo, header = false, size =
   if (error || BAD_IMAGES[networkInfo.chainId]?.[address]) {
     return (
       <Inline>
-        <Image {...rest} alt={''} src={PlaceHolder} size={size} />
+        <StyledHelpCircle size={size} {...rest} />
       </Inline>
     )
   }
