@@ -29,7 +29,7 @@ import FormattedName from 'components/FormattedName'
 import { useListedTokens } from 'state/features/application/hooks'
 import { TYPE, DashboardWrapper } from 'Theme'
 import { useTranslation } from 'react-i18next'
-import { useActiveNetworkId } from 'state/features/application/hooks'
+import { useActiveNetworkId } from 'state/features/application/selectors'
 
 const PanelWrapper = styled.div`
   grid-template-columns: repeat(3, 1fr);

@@ -1,5 +1,5 @@
 import { useAppSelector } from 'state/hooks'
-import { useActiveNetworkId } from '../application/hooks'
+import { useActiveNetworkId } from '../application/selectors'
 
 export function useTokens() {
   const activeNetwork = useActiveNetworkId()

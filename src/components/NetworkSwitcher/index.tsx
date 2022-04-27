@@ -14,11 +14,11 @@ import {
 import { useLocation } from 'react-use'
 import { useNavigate } from 'react-router-dom'
 import { useOnClickOutside } from 'hooks/useOnClickOutSide'
-import { useActiveNetwork } from 'state/features/application/hooks'
 import ApiService from 'api/ApiService'
+import { useAppSelector } from 'state/hooks'
 
 const NetworkSwitcher = () => {
-  const activeNetwork = useActiveNetwork()
+  const activeNetwork = useAppSelector(state => state.application.activeNetwork)
   const [isOpen, setIsOpen] = useState(false)
   const dispatch = useDispatch()
   const { pathname } = useLocation()

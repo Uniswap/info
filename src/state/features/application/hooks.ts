@@ -8,7 +8,7 @@ import { DEFAULT_LIST_OF_LISTS } from 'constants/lists'
 import getTokenList from 'utils/tokenLists'
 import ApiService from 'api/ApiService'
 import { getSubgraphStatus } from 'data/ethereum/application'
-import { useTimeFrame } from './selectors'
+import { useActiveNetworkId, useTimeFrame } from './selectors'
 
 export function useLatestBlocks() {
   const dispatch = useAppDispatch()
@@ -28,14 +28,6 @@ export function useLatestBlocks() {
   }, [activeNetwork])
 
   return [latestBlock, headBlock]
-}
-
-export function useActiveNetworkId() {
-  return useAppSelector(state => state.application.activeNetwork.id)
-}
-
-export function useActiveNetwork() {
-  return useAppSelector(state => state.application.activeNetwork)
 }
 
 export function useUpdateActiveNetwork() {

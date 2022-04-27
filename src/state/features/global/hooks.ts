@@ -2,7 +2,7 @@ import { getGlobalData, getChartData, getGlobalTransactions, getPrice } from 'da
 import { useState, useEffect } from 'react'
 import { useAppDispatch } from 'state/hooks'
 import { getTimeframe } from 'utils'
-import { useActiveNetworkId } from '../application/hooks'
+import { useActiveNetworkId } from '../application/selectors'
 import { useTimeFrame } from '../application/selectors'
 import {
   useActiveTokenOneDayPrice,
