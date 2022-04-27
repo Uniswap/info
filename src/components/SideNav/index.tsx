@@ -67,7 +67,7 @@ function SideNav() {
               </AutoColumn>
             )}
           </AutoColumn>
-          <AutoColumn gap=".5rem" style={{ marginLeft: '1.5rem', marginBottom: '1rem' }}>
+          <AutoColumn gap=".5rem" style={{ marginLeft: '1.5rem', marginBottom: '1.5rem' }}>
             <HeaderText>
               <Link href="https://ws.exchange" target="_blank">
                 WS.exchange

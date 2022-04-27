@@ -102,8 +102,11 @@ export default function useInterval(callback: () => void, delay: null | number) 
 export function useFormatPath() {
   const activeNetwork = useAppSelector(state => state.application.activeNetwork)
 
-  return useCallback((url?: string) => {
-    const path = networkPrefix(activeNetwork)
-    return url ? `${path}${url}` : path
-  }, [])
+  return useCallback(
+    (url?: string) => {
+      const path = networkPrefix(activeNetwork)
+      return url ? `${path}${url}` : path
+    },
+    [activeNetwork]
+  )
 }
