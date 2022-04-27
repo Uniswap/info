@@ -68,7 +68,7 @@ function parseAddress1ForRoute(network, token1Address) {
 export function getPoolLink(network, token0Address, token1Address = null, remove = false) {
   const poolPage = remove ? 'remove' : 'add'
   const updatedAddress0 = parseAddress0ForRoute(token0Address)
-  const updatedAddress1 = parseAddress1ForRoute(token1Address)
+  const updatedAddress1 = parseAddress1ForRoute(network, token1Address)
   return `https://app.ws.exchange/${network}/${poolPage}/${updatedAddress0}/${updatedAddress1}`
 }
 
@@ -77,7 +77,7 @@ export function getSwapLink(network, token0Address, token1Address = null) {
   if (!token1Address) {
     return `https://app.ws.exchange/${network}/swap?inputCurrency=${updatedAddress0}`
   }
-  const updatedAddress1 = parseAddress1ForRoute(token1Address)
+  const updatedAddress1 = parseAddress1ForRoute(network, token1Address)
   return `https://app.ws.exchange/${network}/swap?inputCurrency=${updatedAddress0}&outputCurrency=${updatedAddress1}`
 }
 
