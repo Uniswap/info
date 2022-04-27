@@ -5,7 +5,6 @@ import dayjs from 'dayjs'
 import { useAppDispatch, useAppSelector } from 'state/hooks'
 import {
   setActiveNetwork,
-  setCurrency,
   setHeadBlock,
   setLatestBlock,
   setSessionStart,
@@ -35,20 +34,6 @@ export function useLatestBlocks() {
   }, [activeNetwork])
 
   return [latestBlock, headBlock]
-}
-
-export function useCurrentCurrency() {
-  const dispatch = useAppDispatch()
-  const currency = useAppSelector(state => state.application.currency)
-
-  const toggleCurrency = () => {
-    if (currency === 'ETH') {
-      dispatch(setCurrency('USD'))
-    } else {
-      dispatch(setCurrency('ETH'))
-    }
-  }
-  return [currency, toggleCurrency]
 }
 
 export function useTimeframe() {

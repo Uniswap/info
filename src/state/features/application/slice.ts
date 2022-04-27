@@ -5,7 +5,6 @@ import { ApplicationState } from './types'
 import { getCurrentNetwork } from 'utils'
 
 const initialState: ApplicationState = {
-  currency: 'USD',
   timeKey: timeframeOptions.ALL_TIME,
   sessionStart: 0,
   latestBlock: 0,
@@ -21,9 +20,6 @@ export const applicationSlice = createSlice({
   name: 'application',
   initialState,
   reducers: {
-    setCurrency: (state, action: PayloadAction<string>) => {
-      state.currency = action.payload
-    },
     setTimeFrame: (state, action: PayloadAction<string>) => {
       state.timeKey = action.payload
     },
@@ -45,14 +41,7 @@ export const applicationSlice = createSlice({
   }
 })
 
-export const {
-  setCurrency,
-  setTimeFrame,
-  setSessionStart,
-  setLatestBlock,
-  setHeadBlock,
-  setSupportedTokens,
-  setActiveNetwork
-} = applicationSlice.actions
+export const { setTimeFrame, setSessionStart, setLatestBlock, setHeadBlock, setSupportedTokens, setActiveNetwork } =
+  applicationSlice.actions
 
 export default applicationSlice.reducer
