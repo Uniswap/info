@@ -2,7 +2,8 @@ import { getGlobalData, getChartData, getGlobalTransactions, getPrice } from 'da
 import { useState, useEffect } from 'react'
 import { useAppDispatch } from 'state/hooks'
 import { getTimeframe } from 'utils'
-import { useActiveNetworkId, useTimeframe } from '../application/hooks'
+import { useActiveNetworkId } from '../application/hooks'
+import { useTimeFrame } from '../application/selectors'
 import {
   useActiveTokenOneDayPrice,
   useActiveTokenPrice,
@@ -39,7 +40,7 @@ export function useGlobalChartData() {
   const dispatch = useAppDispatch()
   const activeNetwork = useActiveNetworkId()
   const [oldestDateFetch, setOldestDateFetched] = useState<number | undefined>()
-  const [activeWindow] = useTimeframe()
+  const activeWindow = useTimeFrame()
   const chartData = useGlobalChartDataSelector()
 
   /**

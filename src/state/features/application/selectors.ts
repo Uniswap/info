@@ -11,3 +11,7 @@ export function useActiveNetwork() {
 export function useLatestBlock() {
   return useAppSelector(state => state.application.latestBlock)
 }
+
+export function useTimeFrame() {
+  return useAppSelector(state => state.application.timeKey)
+}

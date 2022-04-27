@@ -3,11 +3,12 @@ import { timeframeOptions } from '../../../constants'
 import dayjs from 'dayjs'
 
 import { useAppDispatch, useAppSelector } from 'state/hooks'
-import { setActiveNetwork, setHeadBlock, setLatestBlock, setSupportedTokens, setTimeFrame } from './slice'
+import { setActiveNetwork, setHeadBlock, setLatestBlock, setSupportedTokens } from './slice'
 import { DEFAULT_LIST_OF_LISTS } from 'constants/lists'
 import getTokenList from 'utils/tokenLists'
 import ApiService from 'api/ApiService'
 import { getSubgraphStatus } from 'data/ethereum/application'
+import { useTimeFrame } from './selectors'
 
 export function useLatestBlocks() {
   const dispatch = useAppDispatch()
@@ -27,14 +28,6 @@ export function useLatestBlocks() {
   }, [activeNetwork])
 
   return [latestBlock, headBlock]
-}
-
-export function useTimeframe() {
-  const dispatch = useAppDispatch()
-  const activeTimeFrame = useAppSelector(state => state.application.timeKey)
-  const updateActiveFrame = (newFrame: string) => dispatch(setTimeFrame(newFrame))
-
-  return [activeTimeFrame, updateActiveFrame]
 }
 
 export function useActiveNetworkId() {
@@ -59,7 +52,7 @@ export function useUpdateActiveNetwork() {
 }
 
 export function useStartTimestamp() {
-  const [activeWindow] = useTimeframe()
+  const activeWindow = useTimeFrame()
   const [startDateTimestamp, setStartDateTimestamp] = useState<number | undefined>()
 
   // monitor the old date fetched

@@ -10,12 +10,13 @@ import dayjs from 'dayjs'
 import { useEffect, useState } from 'react'
 import { useAppDispatch, useAppSelector } from 'state/hooks'
 import { getHistoricalPairReturns } from 'utils/returns'
-import { useActiveNetworkId, useStartTimestamp, useTimeframe } from '../application/hooks'
+import { useActiveNetworkId, useStartTimestamp } from '../application/hooks'
 import { usePairData } from '../pairs/hooks'
 import { setPairReturns, setPositionHistory, setPositions, setTopLiquidityPositions, setTransactions } from './slice'
 import { LiquidityChart, Position } from './types'
 import { usePairs } from '../pairs/selectors'
 import { useActiveTokenPrice } from '../global/selectors'
+import { useTimeFrame } from '../application/selectors'
 
 export function useUserTransactions(account: string) {
   const dispatch = useAppDispatch()
@@ -135,7 +136,7 @@ export function useUserLiquidityChart(account: string) {
   const [formattedHistory, setFormattedHistory] = useState<LiquidityChart[]>([])
 
   const [startDateTimestamp, setStartDateTimestamp] = useState<number | undefined>()
-  const [activeWindow] = useTimeframe()
+  const activeWindow = useTimeFrame()
 
   // monitor the old date fetched
   useEffect(() => {
