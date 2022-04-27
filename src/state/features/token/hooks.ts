@@ -13,7 +13,7 @@ import { useEffect } from 'react'
 import { useLatestBlocks } from '../application/hooks'
 import { useActiveNetworkId } from '../application/selectors'
 import { useAppDispatch, useAppSelector } from 'state/hooks'
-import { setAllPairs, setChartData, setPriceData, setToken, setTopTokens, setTransactions } from './slice'
+import { setTokenPairs, setChartData, setPriceData, setToken, setTopTokens, setTransactions } from './slice'
 import { useActiveTokenOneDayPrice, useActiveTokenPrice } from '../global/selectors'
 
 export function useFetchTokens() {
@@ -58,22 +58,21 @@ export function useTokenTransactions(tokenAddress: string) {
   const activeNetwork = useActiveNetworkId()
   const tokenTransactions = useAppSelector(state => state.token[activeNetwork]?.[tokenAddress]?.transactions)
   const tokenPairs = useAppSelector(state => state.token[activeNetwork]?.[tokenAddress]?.tokenPairs)
-  const allPairsFormatted = tokenPairs?.map(pair => pair.id)
 
   useEffect(() => {
     async function checkForTransactions() {
-      if (!tokenTransactions && allPairsFormatted) {
-        const transactions = await getTokenTransactions(allPairsFormatted)
+      if (!tokenTransactions && tokenPairs) {
+        const transactions = await getTokenTransactions(tokenPairs)
         dispatch(setTransactions({ networkId: activeNetwork, transactions, address: tokenAddress }))
       }
     }
     checkForTransactions()
-  }, [tokenTransactions, tokenAddress, allPairsFormatted, activeNetwork])
+  }, [tokenTransactions, tokenAddress, tokenPairs, activeNetwork])
 
   return tokenTransactions || []
 }
 
-export function useTokenPairs(tokenAddress: string) {
+export function useTokenPairsIds(tokenAddress: string) {
   const dispatch = useAppDispatch()
   const activeNetwork = useActiveNetworkId()
   const tokenPairs = useAppSelector(state => state.token[activeNetwork]?.[tokenAddress]?.tokenPairs)
@@ -81,7 +80,7 @@ export function useTokenPairs(tokenAddress: string) {
   useEffect(() => {
     async function fetchData() {
       const allPairs = await getTokenPairs(tokenAddress)
-      dispatch(setAllPairs({ networkId: activeNetwork, allPairs, address: tokenAddress }))
+      dispatch(setTokenPairs({ networkId: activeNetwork, allPairs, address: tokenAddress }))
     }
     if (!tokenPairs && isAddress(tokenAddress)) {
       fetchData()
@@ -89,6 +88,13 @@ export function useTokenPairs(tokenAddress: string) {
   }, [tokenAddress, tokenPairs, activeNetwork])
 
   return tokenPairs || []
+}
+
+export function useTokenPairs(pairIds: string[]) {
+  const activeNetwork = useActiveNetworkId()
+  const pairs = useAppSelector(state => state.pairs[activeNetwork])
+  const tokenPairs = Object.fromEntries(Object.entries(pairs).filter(([key]) => pairIds.indexOf(key) >= 0))
+  return tokenPairs
 }
 
 export function useTokenChartData(tokenAddress: string) {

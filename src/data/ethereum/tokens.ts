@@ -234,7 +234,7 @@ export const getTokenPairs = async (tokenAddress: string) => {
   try {
     // fetch all current and historical data
     const result = await tokenApi.getTokenData(tokenAddress)
-    return result.data?.['pairs0'].concat(result.data?.['pairs1'])
+    return result.data?.['pairs0'].concat(result.data?.['pairs1']).map((p: { id: string }) => p.id)
   } catch (e) {
     console.log(e)
   }

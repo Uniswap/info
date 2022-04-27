@@ -15,12 +15,11 @@ import TokenChart from 'components/TokenChart'
 import { BasicLink } from 'components/Link'
 import Search from 'components/Search'
 import { formattedNum, formattedPercent, getPoolLink, getSwapLink, localNumber, isAddress } from 'utils'
-import { useTokenData, useTokenTransactions, useTokenPairs } from 'state/features/token/hooks'
+import { useTokenData, useTokenTransactions, useTokenPairsIds, useTokenPairs } from 'state/features/token/hooks'
 import { useFormatPath, useColor } from 'hooks'
 import { OVERVIEW_TOKEN_BLACKLIST } from 'constants/index'
 import CopyHelper from 'components/Copy'
 import { useMedia } from 'react-use'
-import { useDataForList } from 'state/features/pairs/hooks'
 import Warning from 'components/Warning'
 import { usePathDismissed, useSavedTokens } from 'state/features/user/hooks'
 import { Hover, PageWrapper, ContentWrapper, StyledIcon } from '../components'
@@ -115,10 +114,10 @@ function TokenPage() {
   // detect color from token
   const backgroundColor = useColor(id, symbol)
 
-  const allPairs = useTokenPairs(tokenAddress)
+  const tokenPairIds = useTokenPairsIds(tokenAddress)
 
   // pairs to show in pair list
-  const fetchedPairsList = useDataForList(allPairs)
+  const pairsList = useTokenPairs(tokenPairIds)
   // all transactions with this token
   const transactions = useTokenTransactions(tokenAddress)
 
@@ -337,8 +336,8 @@ function TokenPage() {
             <TYPE.main fontSize={22} fontWeight={500}>
               {t('topPairs')}
             </TYPE.main>
-            {tokenAddress && fetchedPairsList ? (
-              <PairList color={backgroundColor} address={tokenAddress} pairs={fetchedPairsList} />
+            {tokenAddress && pairsList ? (
+              <PairList color={backgroundColor} address={tokenAddress} pairs={pairsList} />
             ) : (
               <Loader />
             )}

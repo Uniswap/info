@@ -49,12 +49,12 @@ export const tokenSlice = createSlice({
         }
       }
     },
-    setAllPairs: (state, { payload: { networkId, address, allPairs } }: PayloadAction<UpdateAllPairsPayload>) => {
+    setTokenPairs: (state, { payload: { networkId, address, allPairs } }: PayloadAction<UpdateAllPairsPayload>) => {
       state[networkId][address].tokenPairs = allPairs
     }
   }
 })
 
-export const { setToken, setTopTokens, setTransactions, setChartData, setPriceData, setAllPairs } = tokenSlice.actions
+export const { setToken, setTopTokens, setTransactions, setChartData, setPriceData, setTokenPairs } = tokenSlice.actions
 
 export default tokenSlice.reducer

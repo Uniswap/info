@@ -8,12 +8,11 @@ import {
 } from 'data/ethereum/pairs'
 import dayjs from 'dayjs'
 import { isAddress } from 'ethers/lib/utils'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useLatestBlocks } from '../application/hooks'
 import { useActiveNetworkId } from '../application/selectors'
 import { useAppDispatch, useAppSelector } from 'state/hooks'
 import { setChartData, setHourlyData, setPair, setPairTransactions, setTopPairs } from './slice'
-import { Pair } from './types'
 import { useActiveTokenPrice } from '../global/selectors'
 
 export function useHourlyRateData(pairAddress: string, timeWindow: string) {
@@ -38,48 +37,6 @@ export function useHourlyRateData(pairAddress: string, timeWindow: string) {
   }, [chartData, timeWindow, pairAddress, latestBlock, activeNetwork])
 
   return chartData
-}
-
-/**
- * @todo
- * store these updates to reduce future redundant calls
- */
-export function useDataForList(pairList: Pair[]) {
-  const price = useActiveTokenPrice()
-  const activeNetwork = useActiveNetworkId()
-  const pairs = useAppSelector(state => state.pairs[activeNetwork])
-  const [pairsData, setPairsData] = useState<Record<string, Pair[]>>({})
-
-  useEffect(() => {
-    async function fetchNewPairData() {
-      const newFetched: Pair[] = []
-      const unfetched: string[] = []
-
-      pairList.map(async pair => {
-        const currentData = pairs?.[pair.id]
-        if (!currentData) {
-          unfetched.push(pair.id)
-        } else {
-          newFetched.push(currentData)
-        }
-      })
-
-      const newPairData: Pair[] | undefined = await getBulkPairData(
-        unfetched.map(pair => pair),
-        price
-      )
-      if (newPairData) {
-        const response = newFetched.concat(newPairData)
-        const newFetchedPairs = response?.reduce((obj, cur) => ({ ...obj, [cur?.id]: cur }), {})
-        setPairsData(newFetchedPairs)
-      }
-    }
-    if (price && pairList && pairList.length > 0) {
-      fetchNewPairData()
-    }
-  }, [price, pairs, pairList, activeNetwork])
-
-  return pairsData
 }
 
 /**
