@@ -15,20 +15,6 @@ import { setChartData, setHourlyData, setPair, setPairTransactions, setTopPairs 
 import { Pair } from './types'
 import { useActiveTokenPrice } from '../global/selectors'
 
-export function usePairUpdater() {
-  const dispatch = useAppDispatch()
-  const activeNetwork = useActiveNetworkId()
-  const price = useActiveTokenPrice()
-
-  useEffect(() => {
-    async function getData() {
-      const topPairs = await getPairList(price)
-      topPairs && dispatch(setTopPairs({ topPairs, networkId: activeNetwork }))
-    }
-    price && getData()
-  }, [price, activeNetwork])
-}
-
 export function useHourlyRateData(pairAddress: string, timeWindow: string) {
   const dispatch = useAppDispatch()
   const activeNetwork = useActiveNetworkId()

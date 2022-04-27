@@ -124,7 +124,7 @@ export function useSessionStart() {
     return () => clearInterval(interval)
   }, [seconds, sessionStart])
 
-  return seconds / 1000
+  return Math.round(seconds / 1000)
 }
 
 export function useListedTokens() {
