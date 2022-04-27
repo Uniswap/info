@@ -3,14 +3,7 @@ import { timeframeOptions } from '../../../constants'
 import dayjs from 'dayjs'
 
 import { useAppDispatch, useAppSelector } from 'state/hooks'
-import {
-  setActiveNetwork,
-  setHeadBlock,
-  setLatestBlock,
-  setSessionStart,
-  setSupportedTokens,
-  setTimeFrame
-} from './slice'
+import { setActiveNetwork, setHeadBlock, setLatestBlock, setSupportedTokens, setTimeFrame } from './slice'
 import { DEFAULT_LIST_OF_LISTS } from 'constants/lists'
 import getTokenList from 'utils/tokenLists'
 import ApiService from 'api/ApiService'
@@ -85,31 +78,6 @@ export function useStartTimestamp() {
   }, [activeWindow, startDateTimestamp])
 
   return startDateTimestamp
-}
-
-// keep track of session length for refresh ticker
-export function useSessionStart() {
-  const dispatch = useAppDispatch()
-  const sessionStart = useAppSelector(state => state.application.sessionStart)
-
-  useEffect(() => {
-    if (!sessionStart) {
-      dispatch(setSessionStart(Date.now()))
-    }
-  })
-
-  const [seconds, setSeconds] = useState(0)
-
-  useEffect(() => {
-    let interval: any = null
-    interval = setInterval(() => {
-      setSeconds(Date.now() - sessionStart ?? Date.now())
-    }, 1000)
-
-    return () => clearInterval(interval)
-  }, [seconds, sessionStart])
-
-  return Math.round(seconds / 1000)
 }
 
 export function useListedTokens() {
