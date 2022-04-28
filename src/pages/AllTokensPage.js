@@ -1,17 +1,17 @@
 import { useEffect } from 'react'
 import TopTokenList from '../components/TokenList'
 import { TYPE } from '../Theme'
-import { useAllTokenData } from 'state/features/token/hooks'
 import { PageWrapper, FullWrapper } from '../components'
 import { RowBetween } from '../components/Row'
 import Search from '../components/Search'
 import { useMedia } from 'react-use'
 import { DashboardWrapper } from '../Theme'
 import { useTranslation } from 'react-i18next'
+import { useTokens } from 'state/features/token/selectors'
 
 function AllTokensPage() {
   const { t } = useTranslation()
-  const allTokens = useAllTokenData()
+  const allTokens = useTokens()
 
   useEffect(() => {
     window.scrollTo(0, 0)

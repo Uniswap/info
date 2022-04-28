@@ -38,7 +38,7 @@ export interface Token {
   volumeChangeUT: number
   transactions?: Transactions
   chartData?: TokenDayData[]
-  tokenPairs?: TokenPair[]
+  tokenPairs?: string[]
   timeWindowData?: Record<string, Record<string, TimeWindowItem[]>>
 }
 
@@ -72,5 +72,5 @@ export type UpdatePriceDataPayload = ParamsWithNetwork<{
 
 export type UpdateAllPairsPayload = ParamsWithNetwork<{
   address: string
-  allPairs: TokenPair[]
+  allPairs: string[]
 }>

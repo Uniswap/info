@@ -16,8 +16,8 @@ import FormattedName from '../FormattedName'
 import { TYPE } from '../../Theme'
 import { escapeRegExp } from 'utils'
 import { useTranslation } from 'react-i18next'
-import { useAllTokenData } from 'state/features/token/hooks'
-import { useAllPairData } from 'state/features/pairs/hooks'
+import { useTokens } from 'state/features/token/selectors'
+import { usePairs } from 'state/features/pairs/selectors'
 
 const Container = styled.div`
   height: 48px;
@@ -154,8 +154,8 @@ export const Search = ({ small = false }) => {
   const below470 = useMedia('(max-width: 470px)')
   const below410 = useMedia('(max-width: 410px)')
 
-  const allTokens = useAllTokenData()
-  const allPools = useAllPairData()
+  const allTokens = useTokens()
+  const allPools = usePairs()
 
   const [showMenu, toggleMenu] = useState(false)
   const [value, setValue] = useState('')

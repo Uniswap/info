@@ -8,26 +8,12 @@ import {
 } from 'data/ethereum/pairs'
 import dayjs from 'dayjs'
 import { isAddress } from 'ethers/lib/utils'
-import { useEffect, useState } from 'react'
-import { useActiveNetworkId, useLatestBlocks } from '../application/hooks'
-import { useEthPrice } from '../global/hooks'
+import { useEffect } from 'react'
+import { useLatestBlocks } from '../application/hooks'
+import { useActiveNetworkId } from '../application/selectors'
 import { useAppDispatch, useAppSelector } from 'state/hooks'
-import { updateChartData, updateHourlyData, updatePair, updatePairTransactions, updateTopPairs } from './slice'
-import { Pair } from './types'
-
-export function usePairUpdater() {
-  const dispatch = useAppDispatch()
-  const activeNetwork = useActiveNetworkId()
-  const [price] = useEthPrice()
-
-  useEffect(() => {
-    async function getData() {
-      const topPairs = await getPairList(price)
-      topPairs && dispatch(updateTopPairs({ topPairs, networkId: activeNetwork }))
-    }
-    price && getData()
-  }, [price, activeNetwork])
-}
+import { setChartData, setHourlyData, setPair, setPairTransactions, setTopPairs } from './slice'
+import { useActiveTokenPrice } from '../global/selectors'
 
 export function useHourlyRateData(pairAddress: string, timeWindow: string) {
   const dispatch = useAppDispatch()
@@ -43,7 +29,7 @@ export function useHourlyRateData(pairAddress: string, timeWindow: string) {
 
     async function fetch() {
       const data = await getHourlyRateData(pairAddress, startTime, latestBlock)
-      dispatch(updateHourlyData({ address: pairAddress, hourlyData: data, timeWindow, networkId: activeNetwork }))
+      dispatch(setHourlyData({ address: pairAddress, hourlyData: data, timeWindow, networkId: activeNetwork }))
     }
     if (!chartData) {
       fetch()
@@ -54,60 +40,18 @@ export function useHourlyRateData(pairAddress: string, timeWindow: string) {
 }
 
 /**
- * @todo
- * store these updates to reduce future redundant calls
- */
-export function useDataForList(pairList: Pair[]) {
-  const [price] = useEthPrice()
-  const activeNetwork = useActiveNetworkId()
-  const pairs = useAppSelector(state => state.pairs[activeNetwork])
-  const [pairsData, setPairsData] = useState<Record<string, Pair[]>>({})
-
-  useEffect(() => {
-    async function fetchNewPairData() {
-      const newFetched: Pair[] = []
-      const unfetched: string[] = []
-
-      pairList.map(async pair => {
-        const currentData = pairs?.[pair.id]
-        if (!currentData) {
-          unfetched.push(pair.id)
-        } else {
-          newFetched.push(currentData)
-        }
-      })
-
-      const newPairData: Pair[] | undefined = await getBulkPairData(
-        unfetched.map(pair => pair),
-        price
-      )
-      if (newPairData) {
-        const response = newFetched.concat(newPairData)
-        const newFetchedPairs = response?.reduce((obj, cur) => ({ ...obj, [cur?.id]: cur }), {})
-        setPairsData(newFetchedPairs)
-      }
-    }
-    if (price && pairList && pairList.length > 0) {
-      fetchNewPairData()
-    }
-  }, [price, pairs, pairList, activeNetwork])
-
-  return pairsData
-}
-
-/**
  * Get all the current and 24hr changes for a pair
  */
 export function usePairData(pairAddress: string) {
   const dispatch = useAppDispatch()
   const activeNetwork = useActiveNetworkId()
-  const [price] = useEthPrice()
+  const price = useActiveTokenPrice()
   const pairData = useAppSelector(state => state.pairs[activeNetwork]?.[pairAddress])
 
   useEffect(() => {
     async function fetchData() {
       const data = await getBulkPairData([pairAddress], price)
-      data && dispatch(updatePair({ networkId: activeNetwork, pairAddress, data: data[0] }))
+      data && dispatch(setPair({ networkId: activeNetwork, pairAddress, data: data[0] }))
     }
     // TODO: isAddress() only work for eth not for trx
     if (!pairData && pairAddress && price && isAddress(pairAddress)) {
@@ -129,7 +73,7 @@ export function usePairTransactions(pairAddress: string) {
     async function checkForTxns() {
       if (!pairTxns) {
         const transactions = await getPairTransactions(pairAddress)
-        dispatch(updatePairTransactions({ networkId: activeNetwork, transactions, address: pairAddress }))
+        dispatch(setPairTransactions({ networkId: activeNetwork, transactions, address: pairAddress }))
       }
     }
     checkForTxns()
@@ -146,7 +90,7 @@ export function usePairChartData(pairAddress: string) {
     async function checkForChartData() {
       if (!chartData) {
         const data = await getPairChartData(pairAddress)
-        dispatch(updateChartData({ networkId: activeNetwork, chartData: data, address: pairAddress }))
+        dispatch(setChartData({ networkId: activeNetwork, chartData: data, address: pairAddress }))
       }
     }
     checkForChartData()
@@ -154,10 +98,16 @@ export function usePairChartData(pairAddress: string) {
   return chartData
 }
 
-/**
- * Get list of all pairs in Uniswap
- */
-export function useAllPairData() {
+export function useFetchPairs() {
+  const dispatch = useAppDispatch()
   const activeNetwork = useActiveNetworkId()
-  return useAppSelector(state => state.pairs[activeNetwork])
+  const price = useActiveTokenPrice()
+
+  useEffect(() => {
+    async function getData() {
+      const topPairs = await getPairList(price)
+      topPairs && dispatch(setTopPairs({ topPairs, networkId: activeNetwork }))
+    }
+    price && getData()
+  }, [price, activeNetwork])
 }

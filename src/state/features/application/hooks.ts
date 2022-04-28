@@ -3,19 +3,12 @@ import { timeframeOptions } from '../../../constants'
 import dayjs from 'dayjs'
 
 import { useAppDispatch, useAppSelector } from 'state/hooks'
-import {
-  updateActiveNetwork,
-  updateCurrency,
-  updateHeadBlock,
-  updateLatestBlock,
-  updateSessionStart,
-  updateSupportedTokens,
-  updateTimeFrame
-} from './slice'
+import { setActiveNetwork, setHeadBlock, setLatestBlock, setSupportedTokens } from './slice'
 import { DEFAULT_LIST_OF_LISTS } from 'constants/lists'
 import getTokenList from 'utils/tokenLists'
 import ApiService from 'api/ApiService'
 import { getSubgraphStatus } from 'data/ethereum/application'
+import { useActiveNetworkId, useTimeFrame } from './selectors'
 
 export function useLatestBlocks() {
   const dispatch = useAppDispatch()
@@ -27,8 +20,8 @@ export function useLatestBlocks() {
     async function fetch() {
       const result = await getSubgraphStatus()
       if (result) {
-        dispatch(updateLatestBlock(result.syncedBlock))
-        dispatch(updateHeadBlock(result.headBlock))
+        dispatch(setLatestBlock(result.syncedBlock))
+        dispatch(setHeadBlock(result.headBlock))
       }
     }
     fetch()
@@ -37,42 +30,12 @@ export function useLatestBlocks() {
   return [latestBlock, headBlock]
 }
 
-export function useCurrentCurrency() {
-  const dispatch = useAppDispatch()
-  const currency = useAppSelector(state => state.application.currency)
-
-  const toggleCurrency = () => {
-    if (currency === 'ETH') {
-      dispatch(updateCurrency('USD'))
-    } else {
-      dispatch(updateCurrency('ETH'))
-    }
-  }
-  return [currency, toggleCurrency]
-}
-
-export function useTimeframe() {
-  const dispatch = useAppDispatch()
-  const activeTimeFrame = useAppSelector(state => state.application.timeKey)
-  const updateActiveFrame = (newFrame: string) => dispatch(updateTimeFrame(newFrame))
-
-  return [activeTimeFrame, updateActiveFrame]
-}
-
-export function useActiveNetworkId() {
-  return useAppSelector(state => state.application.activeNetwork.id)
-}
-
-export function useActiveNetwork() {
-  return useAppSelector(state => state.application.activeNetwork)
-}
-
 export function useUpdateActiveNetwork() {
   const dispatch = useAppDispatch()
   const networkId = useActiveNetworkId()
   const update = useCallback(newActiveNetwork => {
     if (networkId !== newActiveNetwork.id) {
-      dispatch(updateActiveNetwork(newActiveNetwork))
+      dispatch(setActiveNetwork(newActiveNetwork))
     }
     ApiService.setActiveNetwork(newActiveNetwork.id)
   }, [])
@@ -81,7 +44,7 @@ export function useUpdateActiveNetwork() {
 }
 
 export function useStartTimestamp() {
-  const [activeWindow] = useTimeframe()
+  const activeWindow = useTimeFrame()
   const [startDateTimestamp, setStartDateTimestamp] = useState<number | undefined>()
 
   // monitor the old date fetched
@@ -102,31 +65,6 @@ export function useStartTimestamp() {
   return startDateTimestamp
 }
 
-// keep track of session length for refresh ticker
-export function useSessionStart() {
-  const dispatch = useAppDispatch()
-  const sessionStart = useAppSelector(state => state.application.sessionStart)
-
-  useEffect(() => {
-    if (!sessionStart) {
-      dispatch(updateSessionStart(Date.now()))
-    }
-  })
-
-  const [seconds, setSeconds] = useState(0)
-
-  useEffect(() => {
-    let interval: any = null
-    interval = setInterval(() => {
-      setSeconds(Date.now() - sessionStart ?? Date.now())
-    }, 1000)
-
-    return () => clearInterval(interval)
-  }, [seconds, sessionStart])
-
-  return seconds / 1000
-}
-
 export function useListedTokens() {
   const dispatch = useAppDispatch()
   const networkId = useActiveNetworkId()
@@ -141,12 +79,12 @@ export function useListedTokens() {
         })
       )
       const formatted = allFetched.flat()?.map(t => t.address.toLowerCase())
-      dispatch(updateSupportedTokens(formatted))
+      dispatch(setSupportedTokens(formatted))
     }
     if (supportedTokens.length === 0) {
       fetchList()
     }
-  }, [updateSupportedTokens, supportedTokens, networkId])
+  }, [supportedTokens, networkId])
 
   return supportedTokens
 }

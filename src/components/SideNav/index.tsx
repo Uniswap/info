@@ -1,11 +1,9 @@
 import { AutoColumn } from 'components/Column'
 import Title from 'components/Title'
 import { useMedia } from 'react-use'
-import { TYPE } from 'Theme'
 import { useFormatPath } from 'hooks'
 import { TrendingUp, List, PieChart, Disc } from 'react-feather'
 import Link from 'components/Link'
-import { useSessionStart } from 'state/features/application/hooks'
 import { useDarkModeManager } from 'state/features/user/hooks'
 import Toggle from 'components/Toggle'
 import { useTranslation } from 'react-i18next'
@@ -14,13 +12,16 @@ import {
   DesktopWrapper,
   HeaderText,
   MobileWrapper,
-  Polling,
-  PollingDot,
   StyledNavButton,
   Wrapper,
-  NavigationLink
+  NavigationLink,
+  LatestBlockContainer,
+  LatestBlockText,
+  LatestBlock,
+  LatestBlockDot
 } from './styled'
 import MobileMenu from './MobileMenu'
+import { useLatestBlock } from 'state/features/application/selectors'
 
 function SideNav() {
   const { t } = useTranslation()
@@ -28,7 +29,7 @@ function SideNav() {
   const below1180 = useMedia('(max-width: 1180px)')
   const [isDark, toggleDarkMode] = useDarkModeManager()
   const formatPath = useFormatPath()
-  const seconds = useSessionStart()
+  const latestBlock = useLatestBlock()
 
   return (
     <Wrapper isMobile={below1080}>
@@ -66,7 +67,7 @@ function SideNav() {
               </AutoColumn>
             )}
           </AutoColumn>
-          <AutoColumn gap=".5rem" style={{ marginLeft: '1.5rem', marginBottom: '2.5rem' }}>
+          <AutoColumn gap=".5rem" style={{ marginLeft: '1.5rem', marginBottom: '1.5rem' }}>
             <HeaderText>
               <Link href="https://ws.exchange" target="_blank">
                 WS.exchange
@@ -93,18 +94,14 @@ function SideNav() {
               </Link>
             </HeaderText>
             <Toggle isActive={isDark} toggle={toggleDarkMode} />
+            {!below1180 && (
+              <LatestBlockContainer to="/">
+                <LatestBlockText>{t('latestBlock')}</LatestBlockText>
+                <LatestBlock>{latestBlock}</LatestBlock>
+                <LatestBlockDot />
+              </LatestBlockContainer>
+            )}
           </AutoColumn>
-          {!below1180 && (
-            <Polling style={{ marginLeft: '.5rem' }}>
-              <PollingDot />
-              <a href="/" style={{ color: 'activeColor' }}>
-                <TYPE.small>
-                  {`${t('updated')} ${seconds ? seconds + 's' : '-'} ${t('ago')}`}
-                  <br />
-                </TYPE.small>
-              </a>
-            </Polling>
-          )}
         </DesktopWrapper>
       ) : (
         <MobileWrapper>

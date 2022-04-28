@@ -22,7 +22,7 @@ import { useMedia } from 'react-use'
 import DoubleTokenLogo from 'components/DoubleLogo'
 import TokenLogo from 'components/TokenLogo'
 import { Hover } from 'components'
-import { useEthPrice } from 'state/features/global/hooks'
+import { useActiveTokenPrice } from 'state/features/global/selectors'
 import Warning from 'components/Warning'
 import { usePathDismissed, useSavedPairs } from 'state/features/user/hooks'
 import { useFormatPath } from 'hooks'
@@ -30,7 +30,7 @@ import { Bookmark, PlusCircle } from 'react-feather'
 import FormattedName from 'components/FormattedName'
 import { useListedTokens } from 'state/features/application/hooks'
 import { useTranslation } from 'react-i18next'
-import { useActiveNetworkId } from 'state/features/application/hooks'
+import { useActiveNetworkId } from 'state/features/application/selectors'
 
 const PanelWrapper = styled.div`
   grid-template-columns: repeat(3, 1fr);
@@ -175,12 +175,16 @@ function PairPage() {
       : '-'
 
   // token data for usd
-  const [ethPrice] = useEthPrice()
+  const activeTokenPrice = useActiveTokenPrice()
   const token0USD =
-    token0?.derivedETH && ethPrice ? formattedNum(parseFloat(token0.derivedETH) * parseFloat(ethPrice), true) : ''
+    token0?.derivedETH && activeTokenPrice
+      ? formattedNum(parseFloat(token0.derivedETH) * parseFloat(activeTokenPrice), true)
+      : ''
 
   const token1USD =
-    token1?.derivedETH && ethPrice ? formattedNum(parseFloat(token1.derivedETH) * parseFloat(ethPrice), true) : ''
+    token1?.derivedETH && activeTokenPrice
+      ? formattedNum(parseFloat(token1.derivedETH) * parseFloat(activeTokenPrice), true)
+      : ''
 
   // rates
   const token0Rate = reserve0 && reserve1 ? formattedNum(reserve1 / reserve0) : '-'

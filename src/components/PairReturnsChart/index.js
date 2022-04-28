@@ -9,10 +9,12 @@ import { useMedia } from 'react-use'
 import { timeframeOptions } from '../../constants'
 import DropdownSelect from '../DropdownSelect'
 import { useUserPositionChart } from 'state/features/account/hooks'
-import { useTimeframe } from 'state/features/application/hooks'
+import { useTimeFrame } from 'state/features/application/selectors'
+import { setTimeFrame } from 'state/features/application/slice'
 import LocalLoader from '../LocalLoader'
 import { useColor } from '../../hooks'
 import { useDarkModeManager } from 'state/features/user/hooks'
+import { useAppDispatch } from 'state/hooks'
 import { useTranslation } from 'react-i18next'
 
 const ChartWrapper = styled.div`
@@ -37,10 +39,10 @@ const CHART_VIEW = {
 
 const PairReturnsChart = ({ account, position }) => {
   const { t } = useTranslation()
+  const dispatch = useAppDispatch()
 
   let data = useUserPositionChart(position, account)
-
-  const [timeWindow, setTimeWindow] = useTimeframe()
+  const timeWindow = useTimeFrame()
 
   const below600 = useMedia('(max-width: 600px)')
   const aspect = below600 ? 60 / 42 : 60 / 16
@@ -54,12 +56,16 @@ const PairReturnsChart = ({ account, position }) => {
   let utcStartTime = getTimeframe(timeWindow)
   data = data?.filter(entry => entry.date >= utcStartTime)
 
+  const changeTimeFrame = timeFrame => {
+    dispatch(setTimeFrame(timeFrame))
+  }
+
   return (
     <ChartWrapper>
       {below600 ? (
         <RowBetween mb={40}>
           <div />
-          <DropdownSelect options={timeframeOptions} active={timeWindow} setActive={setTimeWindow} />
+          <DropdownSelect options={timeframeOptions} active={timeWindow} setActive={changeTimeFrame} />
         </RowBetween>
       ) : (
         <OptionsRow>
@@ -74,19 +80,19 @@ const PairReturnsChart = ({ account, position }) => {
           <AutoRow justify="flex-end" gap="6px">
             <OptionButton
               active={timeWindow === timeframeOptions.WEEK}
-              onClick={() => setTimeWindow(timeframeOptions.WEEK)}
+              onClick={() => changeTimeFrame(timeframeOptions.WEEK)}
             >
               1W
             </OptionButton>
             <OptionButton
               active={timeWindow === timeframeOptions.MONTH}
-              onClick={() => setTimeWindow(timeframeOptions.MONTH)}
+              onClick={() => changeTimeFrame(timeframeOptions.MONTH)}
             >
               1M
             </OptionButton>
             <OptionButton
               active={timeWindow === timeframeOptions.ALL_TIME}
-              onClick={() => setTimeWindow(timeframeOptions.ALL_TIME)}
+              onClick={() => changeTimeFrame(timeframeOptions.ALL_TIME)}
             >
               All
             </OptionButton>

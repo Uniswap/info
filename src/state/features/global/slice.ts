@@ -27,19 +27,19 @@ export const globalSlice = createSlice({
   name: 'global',
   initialState,
   reducers: {
-    updateGlobalData: (state, { payload: { networkId, data } }: PayloadAction<UpdateGlobalDataPayload>) => {
+    setGlobalData: (state, { payload: { networkId, data } }: PayloadAction<UpdateGlobalDataPayload>) => {
       state[networkId].globalData = data
     },
-    updateTransactions: (state, { payload: { networkId, transactions } }: PayloadAction<UpdateTransactionsPayload>) => {
+    setTransactions: (state, { payload: { networkId, transactions } }: PayloadAction<UpdateTransactionsPayload>) => {
       state[networkId].transactions = transactions
     },
-    updateChart: (state, { payload: { networkId, daily, weekly } }: PayloadAction<UpdateChartPayload>) => {
+    setChart: (state, { payload: { networkId, daily, weekly } }: PayloadAction<UpdateChartPayload>) => {
       state[networkId].chartData = {
         daily,
         weekly
       }
     },
-    updatePrice: (
+    setPrice: (
       state,
       { payload: { networkId, price, oneDayPrice, priceChange } }: PayloadAction<UpdatePricePayload>
     ) => {
@@ -50,6 +50,6 @@ export const globalSlice = createSlice({
   }
 })
 
-export const { updateGlobalData, updateTransactions, updateChart, updatePrice } = globalSlice.actions
+export const { setGlobalData, setTransactions, setChart, setPrice } = globalSlice.actions
 
 export default globalSlice.reducer

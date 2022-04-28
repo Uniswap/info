@@ -1,5 +1,6 @@
 import { darken } from 'polished'
 import { NavLink } from 'react-router-dom'
+import { Link as RouterLink } from 'react-router-dom'
 import styled from 'styled-components'
 
 export const Wrapper = styled.div<{ isMobile: boolean }>`
@@ -101,26 +102,31 @@ export const HeaderText = styled.div`
   }
 `
 
-export const Polling = styled.div`
-  position: fixed;
-  display: flex;
-  left: 0;
-  bottom: 0;
-  padding: 1rem;
-  color: white;
-  opacity: 0.4;
-  transition: opacity 0.25s ease;
-  :hover {
-    opacity: 1;
-  }
+export const LatestBlockContainer = styled(RouterLink)`
+  align-items: center;
+  display: grid;
+  width: fit-content;
+  grid-auto-flow: column;
+  gap: 4px;
+  text-decoration: none;
+  border-radius: 4px;
+  padding: 4px;
+  font-weight: 500;
+  font-size: 11px;
+  transition: opacity 0.25s ease 0s;
 `
-export const PollingDot = styled.div`
+
+export const LatestBlockDot = styled.div`
   width: 8px;
   height: 8px;
-  min-height: 8px;
-  min-width: 8px;
-  margin-right: 0.5rem;
-  margin-top: 3px;
   border-radius: 50%;
   background-color: ${({ theme }) => theme.green1};
+`
+
+export const LatestBlock = styled.span`
+  color: ${({ theme }) => theme.green1};
+`
+
+export const LatestBlockText = styled.span`
+  color: ${({ theme }) => theme.text3};
 `

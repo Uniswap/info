@@ -16,7 +16,7 @@ import FormattedName from 'components/FormattedName'
 import Panel from 'components/Panel'
 import { transparentize } from 'polished'
 import { useTranslation } from 'react-i18next'
-import { useActiveNetworkId } from 'state/features/application/hooks'
+import { useActiveNetworkId } from 'state/features/application/selectors'
 
 const PageButtons = styled.div`
   width: 100%;

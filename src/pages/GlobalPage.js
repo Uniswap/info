@@ -10,18 +10,19 @@ import GlobalChart from '../components/GlobalChart'
 import Search from '../components/Search'
 import GlobalStats from '../components/GlobalStats'
 
-import { useGlobalData, useGlobalTransactions } from 'state/features/global/hooks'
+import { useGlobalTransactions } from 'state/features/global/hooks'
+import { useGlobalDataSelector } from 'state/features/global/selectors'
 import { useFormatPath } from 'hooks'
-import { useAllPairData } from 'state/features/pairs/hooks'
+import { usePairs } from 'state/features/pairs/selectors'
 import { useMedia } from 'react-use'
 import Panel from '../components/Panel'
-import { useAllTokenData } from 'state/features/token/hooks'
 import { formattedNum, formattedPercent } from '../utils'
 import { DashboardWrapper, TYPE } from '../Theme'
 import { CustomLink } from '../components/Link'
 
 import { PageWrapper, ContentWrapper } from '../components'
 import { useTranslation } from 'react-i18next'
+import { useTokens } from 'state/features/token/selectors'
 
 const ListOptions = styled(AutoRow)`
   height: 40px;
@@ -48,10 +49,10 @@ function GlobalPage() {
   const formatPath = useFormatPath()
 
   // get data for lists and totals
-  const allPairs = useAllPairData()
-  const allTokens = useAllTokenData()
+  const allPairs = usePairs()
+  const allTokens = useTokens()
   const transactions = useGlobalTransactions()
-  const { totalLiquidityUSD, oneDayVolumeUSD, volumeChangeUSD, liquidityChangeUSD } = useGlobalData()
+  const { totalLiquidityUSD, oneDayVolumeUSD, volumeChangeUSD, liquidityChangeUSD } = useGlobalDataSelector()
 
   // breakpoints
   const below440 = useMedia('(max-width: 440px)')

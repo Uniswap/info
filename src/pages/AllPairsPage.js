@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { TYPE } from '../Theme'
-import { useAllPairData } from 'state/features/pairs/hooks'
+import { usePairs } from 'state/features/pairs/selectors'
 import PairList from '../components/PairList'
 import { PageWrapper, FullWrapper } from '../components'
 import { RowBetween } from '../components/Row'
@@ -11,7 +11,7 @@ import { useTranslation } from 'react-i18next'
 
 function AllPairsPage() {
   const { t } = useTranslation()
-  const allPairs = useAllPairData()
+  const allPairs = usePairs()
 
   useEffect(() => {
     window.scrollTo(0, 0)

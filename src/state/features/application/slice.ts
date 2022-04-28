@@ -5,9 +5,7 @@ import { ApplicationState } from './types'
 import { getCurrentNetwork } from 'utils'
 
 const initialState: ApplicationState = {
-  currency: 'USD',
   timeKey: timeframeOptions.ALL_TIME,
-  sessionStart: 0,
   latestBlock: 0,
   headBlock: 0,
   supportedTokens: {
@@ -21,38 +19,25 @@ export const applicationSlice = createSlice({
   name: 'application',
   initialState,
   reducers: {
-    updateCurrency: (state, action: PayloadAction<string>) => {
-      state.currency = action.payload
-    },
-    updateTimeFrame: (state, action: PayloadAction<string>) => {
+    setTimeFrame: (state, action: PayloadAction<string>) => {
       state.timeKey = action.payload
     },
-    updateSessionStart: (state, action: PayloadAction<number>) => {
-      state.sessionStart = action.payload
-    },
-    updateLatestBlock: (state, action: PayloadAction<number>) => {
+    setLatestBlock: (state, action: PayloadAction<number>) => {
       state.latestBlock = action.payload
     },
-    updateHeadBlock: (state, action: PayloadAction<number>) => {
+    setHeadBlock: (state, action: PayloadAction<number>) => {
       state.headBlock = action.payload
     },
-    updateSupportedTokens: (state, action: PayloadAction<Array<string>>) => {
+    setSupportedTokens: (state, action: PayloadAction<Array<string>>) => {
       state.supportedTokens[state.activeNetwork.id] = action.payload
     },
-    updateActiveNetwork: (state, action: PayloadAction<NetworkInfo>) => {
+    setActiveNetwork: (state, action: PayloadAction<NetworkInfo>) => {
       state.activeNetwork = action.payload
     }
   }
 })
 
-export const {
-  updateCurrency,
-  updateTimeFrame,
-  updateSessionStart,
-  updateLatestBlock,
-  updateHeadBlock,
-  updateSupportedTokens,
-  updateActiveNetwork
-} = applicationSlice.actions
+export const { setTimeFrame, setLatestBlock, setHeadBlock, setSupportedTokens, setActiveNetwork } =
+  applicationSlice.actions
 
 export default applicationSlice.reducer

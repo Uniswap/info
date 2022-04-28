@@ -3,7 +3,6 @@ import styled from 'styled-components/macro'
 
 import { formatTime, formattedNum, urls } from '../../utils'
 import { useMedia } from 'react-use'
-import { useCurrentCurrency } from 'state/features/application/hooks'
 import { RowFixed, RowBetween } from '../Row'
 
 import LocalLoader from '../LocalLoader'
@@ -201,8 +200,6 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
   const [filteredItems, setFilteredItems] = useState()
   const [txFilter, setTxFilter] = useState(TXN_TYPE.ALL)
 
-  const [currency] = useCurrentCurrency()
-
   useEffect(() => {
     setMaxPage(1) // edit this to do modular
     setPage(1)
@@ -324,9 +321,7 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
             {getTransactionType(item.type, item.token1Symbol, item.token0Symbol)}
           </CustomLink>
         </DataText>
-        <DataText area="value">
-          {currency === 'ETH' ? 'Ξ ' + formattedNum(item.valueETH) : formattedNum(item.amountUSD, true)}
-        </DataText>
+        <DataText area="value">{formattedNum(item.amountUSD, true)}</DataText>
         {!below780 && (
           <>
             <DataText area="amountOther">

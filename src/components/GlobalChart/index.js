@@ -1,13 +1,10 @@
 import { useState, useMemo, useEffect, useRef } from 'react'
 import { timeframeOptions } from '../../constants'
-import { useGlobalChartData, useGlobalData } from 'state/features/global/hooks'
+import { useGlobalChartDataSelector, useGlobalDataSelector } from 'state/features/global/selectors'
 import { useMedia } from 'react-use'
 import DropdownSelect from '../DropdownSelect'
 import TradingViewChart, { CHART_TYPES } from '../TradingviewChart'
-// import { RowFixed } from '../Row'
-// import { OptionButton } from '../ButtonStyled'
 import { getTimeframe } from '../../utils'
-// import { TYPE } from '../../Theme'
 import Panel from '../Panel'
 import { useTranslation } from 'react-i18next'
 
@@ -30,15 +27,15 @@ const GlobalChart = ({ display }) => {
   const [volumeWindow] = useState(VOLUME_WINDOW.DAYS)
 
   // global historical data
-  const [dailyData, weeklyData] = useGlobalChartData()
+  const { daily, weekly } = useGlobalChartDataSelector()
   const { totalLiquidityUSD, oneDayVolumeUSD, volumeChangeUSD, liquidityChangeUSD, oneWeekVolume, weeklyVolumeChange } =
-    useGlobalData()
+    useGlobalDataSelector()
 
   // based on window, get starttim
   let utcStartTime = getTimeframe(timeWindow)
 
   const chartDataFiltered = useMemo(() => {
-    let currentData = volumeWindow === VOLUME_WINDOW.DAYS ? dailyData : weeklyData
+    let currentData = volumeWindow === VOLUME_WINDOW.DAYS ? daily : weekly
     return (
       currentData &&
       Object.keys(currentData)
@@ -54,7 +51,7 @@ const GlobalChart = ({ display }) => {
           return !!item
         })
     )
-  }, [dailyData, utcStartTime, volumeWindow, weeklyData])
+  }, [daily, utcStartTime, volumeWindow, weekly])
   const below800 = useMedia('(max-width: 800px)')
 
   // update the width on a window resize
@@ -80,7 +77,7 @@ const GlobalChart = ({ display }) => {
       {chartDataFiltered && chartView === CHART_VIEW.LIQUIDITY && (
         <Panel>
           <TradingViewChart
-            data={dailyData}
+            data={daily}
             base={totalLiquidityUSD}
             baseChange={liquidityChangeUSD}
             title={t('liquidity')}
