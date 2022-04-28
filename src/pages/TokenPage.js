@@ -246,7 +246,7 @@ function TokenPage() {
                   <Link href={getPoolLink(activeNetworkId, tokenAddress)} target="_blank">
                     <ButtonLight color={backgroundColor}>{t('addLiquidity')}</ButtonLight>
                   </Link>
-                  <Link href={getSwapLink(tokenAddress)} target="_blank">
+                  <Link href={getSwapLink(activeNetworkId, tokenAddress)} target="_blank">
                     <ButtonDark ml={'.5rem'} color={backgroundColor}>
                       {t('trade')}
                     </ButtonDark>
