@@ -17,8 +17,7 @@ async function fetchTokens(block?: number) {
     query: GET_TOKENS,
     variables: {
       block: block ? { number: block } : null
-    },
-    fetchPolicy: 'cache-first'
+    }
   })
 }
 
@@ -28,8 +27,7 @@ async function fetchTokenData(tokenAddress: string, block?: number) {
     variables: {
       tokenAddress,
       block: block ? { number: block } : null
-    },
-    fetchPolicy: 'cache-first'
+    }
   })
 }
 
@@ -268,8 +266,7 @@ export const getIntervalTokenData = async (
     const result: any = await splitQuery(
       (params: BlockHeight[]) =>
         client.query({
-          query: PRICES_BY_BLOCK(tokenAddress, params),
-          fetchPolicy: 'cache-first'
+          query: PRICES_BY_BLOCK(tokenAddress, params)
         }),
       blocks,
       50
@@ -333,8 +330,7 @@ export const getTokenChartData = async (tokenAddress: string): Promise<TokenDayD
         variables: {
           tokenAddr: tokenAddress,
           skip
-        },
-        fetchPolicy: 'cache-first'
+        }
       })
       if (result.data.tokenDayDatas.length < 1000) {
         allFound = true

@@ -156,7 +156,6 @@ export async function splitQuery(callback, list, skipCount = 100) {
 export async function getBlockFromTimestamp(timestamp) {
   let result = await client.query({
     query: GET_BLOCK,
-    fetchPolicy: 'cache-first',
     variables: {
       timestampFrom: timestamp,
       timestampTo: timestamp + 600
@@ -184,7 +183,6 @@ export async function getBlocksFromTimestamps(timestamps, skipCount = 500) {
     params =>
       client.query({
         query: GET_BLOCKS(params),
-        fetchPolicy: 'cache-first',
         context: {
           client: 'block'
         }
@@ -213,8 +211,7 @@ export async function getLiquidityTokenBalanceOvertime(account, timestamps) {
 
   // get historical share values with time travel queries
   let result = await client.query({
-    query: SHARE_VALUE(account, blocks),
-    fetchPolicy: 'cache-first'
+    query: SHARE_VALUE(account, blocks)
   })
 
   let values = []
@@ -247,8 +244,7 @@ export async function getShareValueOverTime(pairAddress, timestamps) {
 
   // get historical share values with time travel queries
   let result = await client.query({
-    query: SHARE_VALUE(pairAddress, blocks),
-    fetchPolicy: 'cache-first'
+    query: SHARE_VALUE(pairAddress, blocks)
   })
 
   let values = []

@@ -32,8 +32,7 @@ export async function getUserHistory(account: string) {
         variables: {
           skip: skip,
           user: account
-        },
-        fetchPolicy: 'cache-first'
+        }
       })
       allResults = allResults.concat(result.data.liquidityPositionSnapshots)
       if (result.data.liquidityPositionSnapshots.length < 1000) {
@@ -199,8 +198,7 @@ export async function getTopLps(allPairs: any) {
         query: TOP_LPS_PER_PAIRS,
         variables: {
           pair
-        },
-        fetchPolicy: 'cache-first'
+        }
       })
       if (results) {
         return results.liquidityPositions

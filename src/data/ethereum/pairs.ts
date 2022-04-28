@@ -24,8 +24,7 @@ async function fetchPairData(pairAddress: string, block?: number) {
     variables: {
       pairAddress,
       block: block ? { number: block } : null
-    },
-    fetchPolicy: 'cache-first'
+    }
   })
 }
 
@@ -33,8 +32,7 @@ export async function getPairList(price: number) {
   const {
     data: { pairs }
   } = await client.query({
-    query: PAIRS_CURRENT,
-    fetchPolicy: 'cache-first'
+    query: PAIRS_CURRENT
   })
 
   // format as array of addresses
@@ -54,8 +52,7 @@ export async function getBulkPairData(pairList: string[], price: number) {
     query: PAIRS_BULK,
     variables: {
       allPairs: pairList
-    },
-    fetchPolicy: 'cache-first'
+    }
   })
 
   const [oneDayResult, twoDayResult, oneWeekResult] = await Promise.all(
@@ -65,8 +62,7 @@ export async function getBulkPairData(pairList: string[], price: number) {
         variables: {
           pairs: pairList,
           block: block ? { number: block } : null
-        },
-        fetchPolicy: 'cache-first'
+        }
       })
       return result
     })
@@ -174,8 +170,7 @@ export const getPairChartData = async (pairAddress: string) => {
         variables: {
           pairAddress,
           skip
-        },
-        fetchPolicy: 'cache-first'
+        }
       })
       skip += 1000
       data = data.concat(result.data.pairDayDatas)
@@ -263,8 +258,7 @@ export const getHourlyRateData = async (pairAddress: string, startTime: number, 
     const result: any = await splitQuery(
       (params: BlockHeight[]) =>
         client.query({
-          query: HOURLY_PAIR_RATES(pairAddress, params),
-          fetchPolicy: 'cache-first'
+          query: HOURLY_PAIR_RATES(pairAddress, params)
         }),
       blocks
     )

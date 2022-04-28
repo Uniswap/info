@@ -1,4 +1,4 @@
-import { ApolloClient, ApolloLink, HttpLink, InMemoryCache } from 'apollo-boost'
+import { ApolloClient, ApolloLink, DefaultOptions, HttpLink, InMemoryCache } from 'apollo-boost'
 import { SupportedNetwork } from 'constants/networks'
 import { getCurrentNetwork } from 'utils'
 import config from './config'
@@ -7,6 +7,12 @@ enum GraphQlClient {
   health = 'health',
   stake = 'stake',
   block = 'block'
+}
+
+const defaultOptions: DefaultOptions = {
+  query: {
+    fetchPolicy: 'cache-first'
+  }
 }
 
 const clientLink = new HttpLink({
@@ -38,7 +44,7 @@ function initApolloClient(network: SupportedNetwork) {
           )
         )
       )
-      return new ApolloClient({ link: directionalLink, cache: new InMemoryCache() })
+      return new ApolloClient({ link: directionalLink, cache: new InMemoryCache(), defaultOptions })
     }
     case SupportedNetwork.TRON:
     default: {
@@ -56,7 +62,11 @@ function initApolloClient(network: SupportedNetwork) {
           )
         )
       )
-      return new ApolloClient({ link: directionalLink, cache: new InMemoryCache() })
+      return new ApolloClient({
+        link: directionalLink,
+        cache: new InMemoryCache(),
+        defaultOptions
+      })
     }
   }
 }

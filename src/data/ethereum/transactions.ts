@@ -9,8 +9,7 @@ export const getTransactions = async (allPairs: string[]) => {
       query: FILTERED_TRANSACTIONS,
       variables: {
         allPairs
-      },
-      fetchPolicy: 'cache-first'
+      }
     })
     transactions.mints = result.data.mints
     transactions.burns = result.data.burns
@@ -45,8 +44,7 @@ export async function getAllTransactions() {
 
   try {
     const result = await client.query({
-      query: GLOBAL_TXNS,
-      fetchPolicy: 'cache-first'
+      query: GLOBAL_TXNS
     })
     transactions.mints = []
     transactions.burns = []

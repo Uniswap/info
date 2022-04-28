@@ -10,8 +10,7 @@ async function fetchGlobalData(block?: number) {
     variables: {
       block: block ? { number: block } : null,
       factoryAddress: FACTORY_ADDRESS
-    },
-    fetchPolicy: 'cache-first'
+    }
   })
 }
 
@@ -20,8 +19,7 @@ async function fetchPrice(block?: number) {
     query: ETH_PRICE,
     variables: {
       block: block ? { number: block } : null
-    },
-    fetchPolicy: 'cache-first'
+    }
   })
 }
 /**
@@ -134,8 +132,7 @@ export async function getChartData(oldestDateToFetch: number) {
         variables: {
           startTime: oldestDateToFetch,
           skip
-        },
-        fetchPolicy: 'cache-first'
+        }
       })
       skip += 1000
       data = result.data.whiteSwapDayDatas.map((el: any) => ({ ...el, dailyVolumeUSD: parseFloat(el.dailyVolumeUSD) }))
