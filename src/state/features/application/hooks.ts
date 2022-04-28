@@ -1,12 +1,10 @@
-import { useCallback, useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { timeframeOptions } from '../../../constants'
 import dayjs from 'dayjs'
-
 import { useAppDispatch, useAppSelector } from 'state/hooks'
-import { setActiveNetwork, setHeadBlock, setLatestBlock, setSupportedTokens } from './slice'
+import { setHeadBlock, setLatestBlock, setSupportedTokens } from './slice'
 import { DEFAULT_LIST_OF_LISTS } from 'constants/lists'
 import getTokenList from 'utils/tokenLists'
-import ApiService from 'api/ApiService'
 import { getSubgraphStatus } from 'data/ethereum/application'
 import { useActiveNetworkId, useTimeFrame } from './selectors'
 
@@ -28,19 +26,6 @@ export function useLatestBlocks() {
   }, [activeNetwork])
 
   return [latestBlock, headBlock]
-}
-
-export function useUpdateActiveNetwork() {
-  const dispatch = useAppDispatch()
-  const networkId = useActiveNetworkId()
-  const update = useCallback(newActiveNetwork => {
-    if (networkId !== newActiveNetwork.id) {
-      dispatch(setActiveNetwork(newActiveNetwork))
-    }
-    ApiService.setActiveNetwork(newActiveNetwork.id)
-  }, [])
-
-  return update
 }
 
 export function useStartTimestamp() {

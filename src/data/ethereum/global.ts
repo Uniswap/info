@@ -1,7 +1,29 @@
-import { globalApi } from 'api'
+import { FACTORY_ADDRESS } from '../../constants'
 import dayjs from 'dayjs'
+import { client } from 'service/client'
+import { ETH_PRICE, GLOBAL_CHART, GLOBAL_DATA } from 'service/queries/global'
 import { getBlocksFromTimestamps, get2DayPercentChange, getPercentChange, getBlockFromTimestamp } from 'utils'
 
+async function fetchGlobalData(block?: number) {
+  return client.query({
+    query: GLOBAL_DATA,
+    variables: {
+      block: block ? { number: block } : null,
+      factoryAddress: FACTORY_ADDRESS
+    },
+    fetchPolicy: 'cache-first'
+  })
+}
+
+async function fetchPrice(block?: number) {
+  return client.query({
+    query: ETH_PRICE,
+    variables: {
+      block: block ? { number: block } : null
+    },
+    fetchPolicy: 'cache-first'
+  })
+}
 /**
  * Gets all the global data for the overview page.
  * Needs current eth price and the old eth price to get
@@ -32,20 +54,20 @@ export async function getGlobalData(price: number, oldPrice: number) {
     ])
 
     // fetch the global data
-    const result = await globalApi.getGlobalData()
+    const result = await fetchGlobalData()
     data = result.data.whiteSwapFactories[0]
 
     // fetch the historical data
-    const oneDayResult = await globalApi.getGlobalData(oneDayBlock?.number)
+    const oneDayResult = await fetchGlobalData(oneDayBlock?.number)
     oneDayData = oneDayResult.data.whiteSwapFactories[0]
 
-    const twoDayResult = await globalApi.getGlobalData(twoDayBlock?.number)
+    const twoDayResult = await fetchGlobalData(twoDayBlock?.number)
     twoDayData = twoDayResult.data.whiteSwapFactories[0]
 
-    const oneWeekResult = await globalApi.getGlobalData(oneWeekBlock?.number)
+    const oneWeekResult = await fetchGlobalData(oneWeekBlock?.number)
     const oneWeekData = oneWeekResult.data.whiteSwapFactories[0]
 
-    const twoWeekResult = await globalApi.getGlobalData(twoWeekBlock?.number)
+    const twoWeekResult = await fetchGlobalData(twoWeekBlock?.number)
     const twoWeekData = twoWeekResult.data.whiteSwapFactories[0]
 
     if (data && oneDayData && twoDayData) {
@@ -98,7 +120,7 @@ export async function getGlobalData(price: number, oldPrice: number) {
  * on main page
  * @param {*} oldestDateToFetch // start of window to fetch from
  */
-export const getChartData = async (oldestDateToFetch: number) => {
+export async function getChartData(oldestDateToFetch: number) {
   let data: any[] = []
   const weeklyData: any[] = []
   const utcEndTime = dayjs.utc()
@@ -107,7 +129,14 @@ export const getChartData = async (oldestDateToFetch: number) => {
 
   try {
     while (!allFound) {
-      const result = await globalApi.getGlobalChart(oldestDateToFetch, skip)
+      const result = await client.query({
+        query: GLOBAL_CHART,
+        variables: {
+          startTime: oldestDateToFetch,
+          skip
+        },
+        fetchPolicy: 'cache-first'
+      })
       skip += 1000
       data = result.data.whiteSwapDayDatas.map((el: any) => ({ ...el, dailyVolumeUSD: parseFloat(el.dailyVolumeUSD) }))
       if (result.data.whiteSwapDayDatas.length < 1000) {
@@ -172,46 +201,9 @@ export const getChartData = async (oldestDateToFetch: number) => {
 }
 
 /**
- * Get and format transactions for global page
- */
-export const getGlobalTransactions = async () => {
-  const transactions: any = {}
-
-  try {
-    const result = await globalApi.getGlobalTransactions()
-    transactions.mints = []
-    transactions.burns = []
-    transactions.swaps = []
-    result?.data?.transactions &&
-      result.data.transactions.map((transaction: any) => {
-        if (transaction.mints.length > 0) {
-          transaction.mints.map((mint: any) => {
-            return transactions.mints.push(mint)
-          })
-        }
-        if (transaction.burns.length > 0) {
-          transaction.burns.map((burn: any) => {
-            return transactions.burns.push(burn)
-          })
-        }
-        if (transaction.swaps.length > 0) {
-          transaction.swaps.map((swap: any) => {
-            return transactions.swaps.push(swap)
-          })
-        }
-        return true
-      })
-  } catch (e) {
-    console.log(e)
-  }
-
-  return transactions
-}
-
-/**
  * Gets the current price  of ETH, 24 hour price, and % change between them
  */
-export const getPrice = async () => {
+export async function getPrice() {
   const utcCurrentTime = dayjs()
   const utcOneDayBack = utcCurrentTime.subtract(1, 'day').startOf('minute').unix()
 
@@ -221,8 +213,8 @@ export const getPrice = async () => {
 
   try {
     const oneDayBlock = await getBlockFromTimestamp(utcOneDayBack)
-    const result = await globalApi.getPrice()
-    const resultOneDay = await globalApi.getPrice(oneDayBlock)
+    const result = await fetchPrice()
+    const resultOneDay = await fetchPrice(oneDayBlock)
     const currentPrice = result?.data?.bundles[0]?.ethPrice
     const oneDayBackPrice = resultOneDay?.data?.bundles[0]?.ethPrice
     priceChange = getPercentChange(currentPrice, oneDayBackPrice)

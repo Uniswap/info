@@ -1,11 +1,6 @@
 import { timeframeOptions } from '../../../constants'
-import {
-  getBulkPairData,
-  getHourlyRateData,
-  getPairTransactions,
-  getPairChartData,
-  getPairList
-} from 'data/ethereum/pairs'
+import { getBulkPairData, getHourlyRateData, getPairChartData, getPairList } from 'data/ethereum/pairs'
+import { getTransactions } from 'data/ethereum/transactions'
 import dayjs from 'dayjs'
 import { isAddress } from 'ethers/lib/utils'
 import { useEffect } from 'react'
@@ -72,7 +67,7 @@ export function usePairTransactions(pairAddress: string) {
   useEffect(() => {
     async function checkForTxns() {
       if (!pairTxns) {
-        const transactions = await getPairTransactions(pairAddress)
+        const transactions = await getTransactions([pairAddress])
         dispatch(setPairTransactions({ networkId: activeNetwork, transactions, address: pairAddress }))
       }
     }

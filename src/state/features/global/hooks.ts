@@ -1,4 +1,5 @@
-import { getGlobalData, getChartData, getGlobalTransactions, getPrice } from 'data/ethereum/global'
+import { getGlobalData, getChartData, getPrice } from 'data/ethereum/global'
+import { getAllTransactions } from 'data/ethereum/transactions'
 import { useState, useEffect } from 'react'
 import { useAppDispatch } from 'state/hooks'
 import { getTimeframe } from 'utils'
@@ -81,7 +82,7 @@ export function useGlobalTransactions() {
 
   useEffect(() => {
     async function fetchData() {
-      const txns = await getGlobalTransactions()
+      const txns = await getAllTransactions()
       dispatch(setTransactions({ transactions: txns, networkId: activeNetwork }))
     }
     fetchData()

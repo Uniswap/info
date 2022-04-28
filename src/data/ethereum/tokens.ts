@@ -1,7 +1,8 @@
-import { tokenApi, pairApi, globalApi } from 'api'
-import { BlockHeight } from 'api/types'
 import { TOKEN_OVERRIDES } from 'constants/tokens'
 import dayjs from 'dayjs'
+import { client } from 'service/client'
+import { PRICES_BY_BLOCK } from 'service/queries/global'
+import { GET_TOKENS, TOKEN_CHART, TOKEN_DATA } from 'service/queries/tokens'
 import { Token, TokenDayData } from 'state/features/token/types'
 import {
   getBlockFromTimestamp,
@@ -11,6 +12,27 @@ import {
   splitQuery
 } from 'utils'
 
+async function fetchTokens(block?: number) {
+  return client.query({
+    query: GET_TOKENS,
+    variables: {
+      block: block ? { number: block } : null
+    },
+    fetchPolicy: 'cache-first'
+  })
+}
+
+async function fetchTokenData(tokenAddress: string, block?: number) {
+  return client.query({
+    query: TOKEN_DATA,
+    variables: {
+      tokenAddress,
+      block: block ? { number: block } : null
+    },
+    fetchPolicy: 'cache-first'
+  })
+}
+
 export const getTopTokens = async (price: number, priceOld: number): Promise<Token[]> => {
   const utcCurrentTime = dayjs()
   const utcOneDayBack = utcCurrentTime.subtract(1, 'day').unix()
@@ -19,9 +41,9 @@ export const getTopTokens = async (price: number, priceOld: number): Promise<Tok
   const twoDayBlock = await getBlockFromTimestamp(utcTwoDaysBack)
 
   try {
-    const current = await tokenApi.getTokens()
-    const oneDayResult = await tokenApi.getTokens(oneDayBlock)
-    const twoDayResult = await tokenApi.getTokens(twoDayBlock)
+    const current = await fetchTokens()
+    const oneDayResult = await fetchTokens(oneDayBlock)
+    const twoDayResult = await fetchTokens(twoDayBlock)
 
     const oneDayData = oneDayResult?.data?.tokens.reduce((obj: Record<string, Token>, cur: Token) => {
       return { ...obj, [cur.id]: cur }
@@ -44,11 +66,11 @@ export const getTopTokens = async (price: number, priceOld: number): Promise<Tok
 
           // catch the case where token wasnt in top list in previous days
           if (!oneDayHistory) {
-            const oneDayResult = await tokenApi.getTokenData(token.id, oneDayBlock)
+            const oneDayResult = await fetchTokenData(token.id, oneDayBlock)
             oneDayHistory = oneDayResult.data.tokens[0]
           }
           if (!twoDayHistory) {
-            const twoDayResult = await tokenApi.getTokenData(token.id, twoDayBlock)
+            const twoDayResult = await fetchTokenData(token.id, twoDayBlock)
             twoDayHistory = twoDayResult.data.tokens[0]
           }
 
@@ -91,25 +113,14 @@ export const getTopTokens = async (price: number, priceOld: number): Promise<Tok
             data.oneDayVolumeETH = +data.tradeVolume * +data.derivedETH
             data.oneDayTxns = +data.txCount
           }
-          // HOTFIX for Aave
-          if (data.id === '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9') {
-            const aaveData = await pairApi.getPairData('0xdfc14d2af169b0d36c4eff567ada9b2e0cae044f')
-            const result = aaveData.data.pairs[0]
-            data.totalLiquidityUSD = parseFloat(result.reserveUSD) / 2
-            data.liquidityChangeUSD = 0
-            data.priceChangeUSD = 0
-          }
 
           return data
         })
     )
 
     return bulkResults
-
-    // calculate percentage changes and daily changes
   } catch (e) {
     return []
-    console.log(e)
   }
 }
 
@@ -127,25 +138,25 @@ export const getTokenData = async (address: string, price: number, priceOld: num
 
   try {
     // fetch all current and historical data
-    const result = await tokenApi.getTokenData(address)
+    const result = await fetchTokenData(address)
     data = { ...result?.data?.tokens?.[0] }
     if (data) {
       // get results from 24 hours in past
-      const oneDayResult = await tokenApi.getTokenData(address, oneDayBlock)
+      const oneDayResult = await fetchTokenData(address, oneDayBlock)
       oneDayData = { ...oneDayResult.data.tokens[0] }
 
       // get results from 48 hours in past
-      const twoDayResult = await tokenApi.getTokenData(address, twoDayBlock)
+      const twoDayResult = await fetchTokenData(address, twoDayBlock)
       twoDayData = { ...twoDayResult.data.tokens[0] }
 
       // FIXME: WTF????
       // catch the case where token wasnt in top list in previous days
       if (!oneDayData) {
-        const oneDayResult = await tokenApi.getTokenData(address, oneDayBlock)
+        const oneDayResult = await fetchTokenData(address, oneDayBlock)
         oneDayData = oneDayResult.data.tokens[0]
       }
       if (!twoDayData) {
-        const twoDayResult = await tokenApi.getTokenData(address, twoDayBlock)
+        const twoDayResult = await fetchTokenData(address, twoDayBlock)
         twoDayData = twoDayResult.data.tokens[0]
       }
 
@@ -200,15 +211,6 @@ export const getTokenData = async (address: string, price: number, priceOld: num
         data.oneDayVolumeETH = +data.tradeVolume * +data.derivedETH
         data.oneDayTxns = +data.txCount
       }
-
-      // HOTFIX for Aave
-      if (data.id === '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9') {
-        const aaveData = await pairApi.getPairData('0xdfc14d2af169b0d36c4eff567ada9b2e0cae044f')
-        const result = aaveData.data.pairs[0]
-        data.totalLiquidityUSD = parseFloat(result.reserveUSD) / 2
-        data.liquidityChangeUSD = 0
-        data.priceChangeUSD = 0
-      }
     }
   } catch (e) {
     console.log(e)
@@ -216,24 +218,10 @@ export const getTokenData = async (address: string, price: number, priceOld: num
   return data
 }
 
-// TODO: can be improved by useQuery
-export const getTokenTransactions = async (allPairsFormatted: string[]) => {
-  const transactions: any = {}
-  try {
-    const result = await pairApi.getFilteredTransactions(allPairsFormatted)
-    transactions.mints = result.data.mints
-    transactions.burns = result.data.burns
-    transactions.swaps = result.data.swaps
-  } catch (e) {
-    console.log(e)
-  }
-  return transactions
-}
-
 export const getTokenPairs = async (tokenAddress: string) => {
   try {
     // fetch all current and historical data
-    const result = await tokenApi.getTokenData(tokenAddress)
+    const result = await fetchTokenData(tokenAddress)
     return result.data?.['pairs0'].concat(result.data?.['pairs1']).map((p: { id: string }) => p.id)
   } catch (e) {
     console.log(e)
@@ -278,7 +266,11 @@ export const getIntervalTokenData = async (
 
     // FIXME: refactor splitQuery
     const result: any = await splitQuery(
-      (params: BlockHeight[]) => globalApi.getPricesByBlock(tokenAddress, params),
+      (params: BlockHeight[]) =>
+        client.query({
+          query: PRICES_BY_BLOCK(tokenAddress, params),
+          fetchPolicy: 'cache-first'
+        }),
       blocks,
       50
     )
@@ -336,7 +328,14 @@ export const getTokenChartData = async (tokenAddress: string): Promise<TokenDayD
     let allFound = false
     let skip = 0
     while (!allFound) {
-      const result = await tokenApi.getTokenChart(tokenAddress, skip)
+      const result = await client.query({
+        query: TOKEN_CHART,
+        variables: {
+          tokenAddr: tokenAddress,
+          skip
+        },
+        fetchPolicy: 'cache-first'
+      })
       if (result.data.tokenDayDatas.length < 1000) {
         allFound = true
       }

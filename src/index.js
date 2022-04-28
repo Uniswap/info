@@ -13,7 +13,7 @@ import { store, persistor } from 'state/store'
 import { Provider } from 'react-redux'
 import App from 'App'
 import 'i18n'
-import ApiService from 'api/ApiService'
+import { client } from 'service/client'
 
 // initialize custom dayjs plugin
 dayjs.extend(utc)
@@ -37,7 +37,7 @@ ReactDOM.render(
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
         <ThemeProvider>
-          <ApolloProvider client={ApiService.graphqlClient}>
+          <ApolloProvider client={client}>
             <GlobalStyle />
             <BrowserRouter>
               <App />

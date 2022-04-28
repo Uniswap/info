@@ -1,6 +1,8 @@
 import dayjs from 'dayjs'
 import { getShareValueOverTime } from '.'
-import { accountApi } from 'api'
+import { UserMintsBurnsParams } from 'service/types/AccountTypes'
+import { client } from 'service/client'
+import { USER_MINTS_BURNS_PER_PAIR } from 'service/queries/transactions'
 
 export const priceOverrides = [
   '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', // USDC
@@ -48,12 +50,18 @@ function formatPricesForEarlyTimestamps(position: any): Position {
   return position
 }
 
-async function getPrincipalForUserPerPair(user: string, pairAddress: string) {
+async function getPrincipalForUserPerPair(user: string, pair: string) {
   let usd = 0
   let amount0 = 0
   let amount1 = 0
   // get all minst and burns to get principal amounts
-  const results = await accountApi.getUserMintsBurnsPerPair(user, pairAddress)
+  const results = await client.query<any, UserMintsBurnsParams>({
+    query: USER_MINTS_BURNS_PER_PAIR,
+    variables: {
+      user,
+      pair
+    }
+  })
   for (const index in results.data.mints) {
     const mint = results.data.mints[index]
     const mintToken0 = mint.pair.token0.id

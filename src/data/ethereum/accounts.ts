@@ -1,5 +1,18 @@
-import { accountApi, pairApi } from 'api'
 import dayjs from 'dayjs'
+import { client } from 'service/client'
+import {
+  TOP_LPS_PER_PAIRS,
+  USER_LIQUIDITY_POSITIONS,
+  USER_LIQUIDITY_POSITION_SNAPSHOTS
+} from 'service/queries/accounts'
+import { PAIR_DAY_DATA_BULK } from 'service/queries/pairs'
+import {
+  TopLiquidityPoolsData,
+  TopLiquidityPoolsParams,
+  UserHistoryParams,
+  UserParams,
+  UserPositionData
+} from 'service/types/AccountTypes'
 import { LiquidityChart, LiquidityPosition, LiquiditySnapshot, Position } from 'state/features/account/types'
 import { getLPReturnsOnPair } from 'utils/returns'
 
@@ -8,23 +21,20 @@ type OwnershipPair = {
   timestamp: number
 }
 
-export async function getUserTransactions(account: string) {
-  try {
-    const result = await accountApi.getUserTransactions(account)
-    return result.data
-  } catch (e) {
-    console.log(e)
-    return {}
-  }
-}
-
 export async function getUserHistory(account: string) {
   try {
     let skip = 0
     let allResults: LiquiditySnapshot[] = []
     let found = false
     while (!found) {
-      const result = await accountApi.getUserLiquidityPositionSnapshots(account, skip)
+      const result = await client.query<any, UserHistoryParams>({
+        query: USER_LIQUIDITY_POSITION_SNAPSHOTS,
+        variables: {
+          skip: skip,
+          user: account
+        },
+        fetchPolicy: 'cache-first'
+      })
       allResults = allResults.concat(result.data.liquidityPositionSnapshots)
       if (result.data.liquidityPositionSnapshots.length < 1000) {
         found = true
@@ -67,7 +77,13 @@ export async function getUserLiquidityChart(
   // get all day datas where date is in this list, and pair is in pair list
   const {
     data: { pairDayDatas }
-  } = await pairApi.getPairDayDataBulk(pairIds, startDateTimestamp)
+  } = await client.query<any>({
+    query: PAIR_DAY_DATA_BULK,
+    variables: {
+      pairs: pairIds,
+      startTimestamp: startDateTimestamp
+    }
+  })
 
   const formattedHistory: LiquidityChart[] = []
 
@@ -140,7 +156,13 @@ export async function getUserPositions(
   snapshots: LiquiditySnapshot[]
 ): Promise<Position[]> {
   try {
-    const result = await accountApi.getUserLiquidityPositions(account)
+    const result = await client.query<UserPositionData, UserParams>({
+      query: USER_LIQUIDITY_POSITIONS,
+      variables: {
+        user: account
+      },
+      fetchPolicy: 'no-cache'
+    })
     if (result?.data?.liquidityPositions) {
       const formattedPositions = await Promise.all(
         result?.data?.liquidityPositions.map(async (positionData: any) => {
@@ -163,7 +185,7 @@ export async function getUserPositions(
  * Get the top liquidity positions based on USD size
  * @TODO Not a perfect lookup needs improvement
  */
-export const getTopLps = async (allPairs: any) => {
+export async function getTopLps(allPairs: any) {
   // get top 20 by reserves
   const topPairs = Object.keys(allPairs)
     ?.sort((a, b) => (allPairs[a].reserveUSD > allPairs[b].reserveUSD ? -1 : 1))
@@ -173,7 +195,13 @@ export const getTopLps = async (allPairs: any) => {
   const topLpLists = await Promise.all(
     topPairs.map(async pair => {
       // for each one, fetch top LPs
-      const { data: results } = await accountApi.getTopLiquidityPools(pair.toString())
+      const { data: results } = await client.query<TopLiquidityPoolsData, TopLiquidityPoolsParams>({
+        query: TOP_LPS_PER_PAIRS,
+        variables: {
+          pair
+        },
+        fetchPolicy: 'cache-first'
+      })
       if (results) {
         return results.liquidityPositions
       }

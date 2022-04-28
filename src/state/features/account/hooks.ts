@@ -1,11 +1,6 @@
 import { timeframeOptions } from '../../../constants'
-import {
-  getUserTransactions,
-  getUserHistory,
-  getUserLiquidityChart,
-  getUserPositions,
-  getTopLps
-} from 'data/ethereum/accounts'
+import { getUserHistory, getUserLiquidityChart, getUserPositions, getTopLps } from 'data/ethereum/accounts'
+import { getUserTransactions } from 'data/ethereum/transactions'
 import dayjs from 'dayjs'
 import { useEffect, useState } from 'react'
 import { useAppDispatch, useAppSelector } from 'state/hooks'

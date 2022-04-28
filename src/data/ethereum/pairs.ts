@@ -1,7 +1,14 @@
-import { pairApi } from 'api'
-import { BlockHeight } from 'api/types'
 import { TOKEN_OVERRIDES } from 'constants/tokens'
 import dayjs from 'dayjs'
+import { client } from 'service/client'
+import {
+  HOURLY_PAIR_RATES,
+  PAIRS_BULK,
+  PAIRS_CURRENT,
+  PAIRS_HISTORICAL_BULK,
+  PAIR_CHART,
+  PAIR_DATA
+} from 'service/queries/pairs'
 import { Pair } from 'state/features/pairs/types'
 import {
   getTimestampsForChanges,
@@ -11,10 +18,24 @@ import {
   splitQuery
 } from 'utils'
 
+async function fetchPairData(pairAddress: string, block?: number) {
+  return client.query({
+    query: PAIR_DATA,
+    variables: {
+      pairAddress,
+      block: block ? { number: block } : null
+    },
+    fetchPolicy: 'cache-first'
+  })
+}
+
 export async function getPairList(price: number) {
   const {
     data: { pairs }
-  } = await pairApi.getCurrentPairs()
+  } = await client.query({
+    query: PAIRS_CURRENT,
+    fetchPolicy: 'cache-first'
+  })
 
   // format as array of addresses
   const formattedPairs = pairs.map((pair: Pair) => {
@@ -29,11 +50,24 @@ export async function getBulkPairData(pairList: string[], price: number) {
   const [t1, t2, tWeek] = getTimestampsForChanges()
   const [{ number: b1 }, { number: b2 }, { number: bWeek }] = await getBlocksFromTimestamps([t1, t2, tWeek])
 
-  const current = await pairApi.getPairsBulk(pairList)
+  const current = await client.query({
+    query: PAIRS_BULK,
+    variables: {
+      allPairs: pairList
+    },
+    fetchPolicy: 'cache-first'
+  })
 
   const [oneDayResult, twoDayResult, oneWeekResult] = await Promise.all(
     [b1, b2, bWeek].map(async block => {
-      const result = await pairApi.getPairsHistoricalBulk(block, pairList)
+      const result = await client.query({
+        query: PAIRS_HISTORICAL_BULK,
+        variables: {
+          pairs: pairList,
+          block: block ? { number: block } : null
+        },
+        fetchPolicy: 'cache-first'
+      })
       return result
     })
   )
@@ -56,17 +90,17 @@ export async function getBulkPairData(pairList: string[], price: number) {
         let data = pair
         let oneDayHistory = oneDayData?.[pair.id]
         if (!oneDayHistory) {
-          const newData = await pairApi.getPairData(pair.id, b1)
+          const newData = await fetchPairData(pair.id, b1)
           oneDayHistory = newData.data.pairs[0]
         }
         let twoDayHistory = twoDayData?.[pair.id]
         if (!twoDayHistory) {
-          const newData = await pairApi.getPairData(pair.id, b2)
+          const newData = await fetchPairData(pair.id, b2)
           twoDayHistory = newData.data.pairs[0]
         }
         let oneWeekHistory = oneWeekData?.[pair.id]
         if (!oneWeekHistory) {
-          const newData = await pairApi.getPairData(pair.id, bWeek)
+          const newData = await fetchPairData(pair.id, bWeek)
           oneWeekHistory = newData.data.pairs[0]
         }
         data = parseData(data, oneDayHistory, twoDayHistory, oneWeekHistory, price, b1)
@@ -125,22 +159,6 @@ function parseData(data: any, oneDayData: any, twoDayData: any, oneWeekData: any
   return parsedData
 }
 
-// TODO: can be improved using useQuery
-export const getPairTransactions = async (pairAddress: string) => {
-  const transactions: any = {}
-
-  try {
-    const result = await pairApi.getFilteredTransactions([pairAddress])
-    transactions.mints = result.data.mints
-    transactions.burns = result.data.burns
-    transactions.swaps = result.data.swaps
-  } catch (e) {
-    console.log(e)
-  }
-
-  return transactions
-}
-
 export const getPairChartData = async (pairAddress: string) => {
   let data: any = []
   const utcEndTime = dayjs.utc()
@@ -151,7 +169,14 @@ export const getPairChartData = async (pairAddress: string) => {
     let allFound = false
     let skip = 0
     while (!allFound) {
-      const result = await pairApi.getPairChart(pairAddress, skip)
+      const result = await client.query({
+        query: PAIR_CHART,
+        variables: {
+          pairAddress,
+          skip
+        },
+        fetchPolicy: 'cache-first'
+      })
       skip += 1000
       data = data.concat(result.data.pairDayDatas)
       if (result.data.pairDayDatas.length < 1000) {
@@ -236,7 +261,11 @@ export const getHourlyRateData = async (pairAddress: string, startTime: number, 
 
     // TODO: refactor
     const result: any = await splitQuery(
-      (params: BlockHeight[]) => pairApi.getPairHourlyRates(pairAddress, params),
+      (params: BlockHeight[]) =>
+        client.query({
+          query: HOURLY_PAIR_RATES(pairAddress, params),
+          fetchPolicy: 'cache-first'
+        }),
       blocks
     )
 

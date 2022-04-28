@@ -2,7 +2,6 @@ import { timeframeOptions } from '../../../constants'
 import {
   getTopTokens,
   getTokenData,
-  getTokenTransactions,
   getTokenPairs,
   getTokenChartData,
   getIntervalTokenData
@@ -15,6 +14,7 @@ import { useActiveNetworkId } from '../application/selectors'
 import { useAppDispatch, useAppSelector } from 'state/hooks'
 import { setTokenPairs, setChartData, setPriceData, setToken, setTopTokens, setTransactions } from './slice'
 import { useActiveTokenOneDayPrice, useActiveTokenPrice } from '../global/selectors'
+import { getTransactions } from 'data/ethereum/transactions'
 
 export function useFetchTokens() {
   const dispatch = useAppDispatch()
@@ -62,7 +62,7 @@ export function useTokenTransactions(tokenAddress: string) {
   useEffect(() => {
     async function checkForTransactions() {
       if (!tokenTransactions && tokenPairs) {
-        const transactions = await getTokenTransactions(tokenPairs)
+        const transactions = await getTransactions(tokenPairs)
         dispatch(setTransactions({ networkId: activeNetwork, transactions, address: tokenAddress }))
       }
     }

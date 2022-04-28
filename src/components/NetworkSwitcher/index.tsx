@@ -1,4 +1,4 @@
-import { NetworkInfo, SUPPORTED_NETWORK_VERSIONS } from 'constants/networks'
+import { SUPPORTED_NETWORK_VERSIONS, NetworkInfo } from 'constants/networks'
 import { useCallback, useRef, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { setActiveNetwork } from 'state/features/application/slice'
@@ -14,8 +14,8 @@ import {
 import { useLocation } from 'react-use'
 import { useNavigate } from 'react-router-dom'
 import { useOnClickOutside } from 'hooks/useOnClickOutSide'
-import ApiService from 'api/ApiService'
 import { useAppSelector } from 'state/hooks'
+import { changeApiClient } from 'service/client'
 
 const NetworkSwitcher = () => {
   const activeNetwork = useAppSelector(state => state.application.activeNetwork)
@@ -29,7 +29,7 @@ const NetworkSwitcher = () => {
       navigate(`${network.route}/`)
       setIsOpen(false)
       dispatch(setActiveNetwork(network))
-      ApiService.setActiveNetwork(network.id)
+      changeApiClient(network.id)
     },
     [activeNetwork.route, pathname]
   )
