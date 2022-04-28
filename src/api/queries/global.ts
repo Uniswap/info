@@ -113,13 +113,10 @@ export const ETH_PRICE = gql`
 export const GLOBAL_CHART = gql`
   query whiteSwapDayDatas($startTime: Int!, $skip: Int!) {
     whiteSwapDayDatas(first: 1000, skip: $skip, where: { date_gt: $startTime }, orderBy: date, orderDirection: asc) {
-      id
       date
       totalVolumeUSD
       dailyVolumeUSD
-      dailyVolumeETH
       totalLiquidityUSD
-      totalLiquidityETH
     }
   }
 `
