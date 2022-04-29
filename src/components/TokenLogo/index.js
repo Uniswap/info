@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import styled from 'styled-components/macro'
-import { isAddress } from '../../utils/index.js'
+import { isAddress } from '../../utils'
 import PlaceHolder from '../../assets/placeholder.png'
 import EthereumLogo from '../../assets/eth.png'
 import wseLogo from '../../assets/logo.svg'

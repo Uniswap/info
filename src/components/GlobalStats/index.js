@@ -3,6 +3,8 @@ import styled from 'styled-components/macro'
 import { RowFixed, RowBetween } from '../Row'
 import { useMedia } from 'react-use'
 import { useGlobalDataSelector, useActiveTokenPrice } from 'state/features/global/selectors'
+import { useActiveNetworkId } from 'state/features/application/selectors'
+import { SupportedNetwork } from 'constants/networks'
 import { formattedNum, localNumber } from '../../utils'
 
 import UniPrice from '../UniPrice'
@@ -27,6 +29,7 @@ export default function GlobalStats() {
 
   const { oneDayVolumeUSD, oneDayTxns, pairCount } = useGlobalDataSelector()
   const activeTokenPrice = useActiveTokenPrice()
+  const activeNetworkId = useActiveNetworkId()
   const formattedPrice = activeTokenPrice ? formattedNum(activeTokenPrice, true) : '-'
   const oneDayFees = oneDayVolumeUSD ? formattedNum(oneDayVolumeUSD * 0.003, true) : ''
 
@@ -35,23 +38,28 @@ export default function GlobalStats() {
       {!below400 && (
         <RowBetween style={{ padding: below816 ? '0.5rem' : '.5rem' }}>
           <RowFixed>
-            {!below400 && (
-              <TYPE.light
-                fontSize={14}
-                fontWeight={700}
-                mr={'1rem'}
-                onMouseEnter={() => {
-                  setShowPriceCard(true)
-                }}
-                onMouseLeave={() => {
-                  setShowPriceCard(false)
-                }}
-                style={{ position: 'relative' }}
-              >
-                ETH {t('price')}: {formattedPrice}
-                {showPriceCard && <UniPrice />}
-              </TYPE.light>
-            )}
+            {!below400 &&
+              (activeNetworkId === SupportedNetwork.ETHEREUM ? (
+                <TYPE.light
+                  fontSize={14}
+                  fontWeight={700}
+                  mr={'1rem'}
+                  onMouseEnter={() => {
+                    setShowPriceCard(true)
+                  }}
+                  onMouseLeave={() => {
+                    setShowPriceCard(false)
+                  }}
+                  style={{ position: 'relative' }}
+                >
+                  {activeNetworkId.toUpperCase()} {t('price')}: {formattedPrice}
+                  {showPriceCard && <UniPrice />}
+                </TYPE.light>
+              ) : (
+                <TYPE.light fontSize={14} fontWeight={700} mr={'1rem'}>
+                  {activeNetworkId.toUpperCase()} {t('price')}: {formattedPrice}
+                </TYPE.light>
+              ))}
 
             {!below1180 && (
               <TYPE.light fontSize={14} fontWeight={700} mr={'1rem'}>

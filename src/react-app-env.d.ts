@@ -6,7 +6,7 @@ declare enum SupportedNetwork {
 }
 
 type BlockHeight = {
-  timestamp: number
+  timestamp: string
   number: number
 }
 

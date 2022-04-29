@@ -1,22 +1,17 @@
 import { BigNumber } from 'bignumber.js'
 import dayjs from 'dayjs'
 import { ethers } from 'ethers'
-import _Decimal from 'decimal.js-light'
-import toFormat from 'toformat'
 import { timeframeOptions } from 'constants/index'
-import { SUPPORTED_NETWORK_VERSIONS } from 'constants/networks'
+import { NetworkInfo, SupportedNetwork, SUPPORTED_NETWORK_VERSIONS } from 'constants/networks'
 import Numeral from 'numeral'
 import { TronNetworkInfo } from 'constants/networks'
-import { Text } from 'rebass'
 import { GET_BLOCK, GET_BLOCKS, SHARE_VALUE } from 'service/queries/global'
 import { client } from 'service/client'
-
-// format libraries
-const Decimal = toFormat(_Decimal)
+import { ApolloQueryResult } from 'apollo-boost'
 
 BigNumber.set({ EXPONENTIAL_AT: 50 })
 
-export function getTimeframe(timeWindow) {
+export function getTimeframe(timeWindow: string) {
   const utcEndTime = dayjs.utc()
   // based on window, get starttime
   let utcStartTime
@@ -37,7 +32,7 @@ export function getTimeframe(timeWindow) {
   return utcStartTime
 }
 
-function parseAddress0ForRoute(token0Address) {
+function parseAddress0ForRoute(token0Address: string) {
   switch (token0Address) {
     case '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2':
       return 'ETH'
@@ -50,7 +45,7 @@ function parseAddress0ForRoute(token0Address) {
   }
 }
 
-function parseAddress1ForRoute(network, token1Address) {
+function parseAddress1ForRoute(network: SupportedNetwork, token1Address: string | null) {
   switch (token1Address) {
     case null:
       return network.toUpperCase()
@@ -66,14 +61,14 @@ function parseAddress1ForRoute(network, token1Address) {
   }
 }
 
-export function getPoolLink(network, token0Address, token1Address = null, remove = false) {
+export function getPoolLink(network: SupportedNetwork, token0Address: string, token1Address = null, remove = false) {
   const poolPage = remove ? 'remove' : 'add'
   const updatedAddress0 = parseAddress0ForRoute(token0Address)
   const updatedAddress1 = parseAddress1ForRoute(network, token1Address)
   return `https://app.ws.exchange/${network}/${poolPage}/${updatedAddress0}/${updatedAddress1}`
 }
 
-export function getSwapLink(network, token0Address, token1Address = null) {
+export function getSwapLink(network: SupportedNetwork, token0Address: string, token1Address = null) {
   const updatedAddress0 = parseAddress0ForRoute(token0Address)
   if (!token1Address) {
     return `https://app.ws.exchange/${network}/swap?inputCurrency=${updatedAddress0}`
@@ -82,12 +77,12 @@ export function getSwapLink(network, token0Address, token1Address = null) {
   return `https://app.ws.exchange/${network}/swap?inputCurrency=${updatedAddress0}&outputCurrency=${updatedAddress1}`
 }
 
-export function getMiningPoolLink(network, token0Address) {
+export function getMiningPoolLink(network: SupportedNetwork, token0Address: string) {
   return `https://app.ws.exchange/${network}/stake/${network.toUpperCase()}/${token0Address}`
 }
 
-export function getWhiteSwapAppLink(network, linkVariable) {
-  let baseWhiteSwapUrl = `https://app.ws.exchange/${network}/stake`
+export function getWhiteSwapAppLink(network: SupportedNetwork, linkVariable: string) {
+  const baseWhiteSwapUrl = `https://app.ws.exchange/${network}/stake`
   if (!linkVariable) {
     return baseWhiteSwapUrl
   }
@@ -95,23 +90,13 @@ export function getWhiteSwapAppLink(network, linkVariable) {
   return `${baseWhiteSwapUrl}/${network.toUpperCase()}/${linkVariable}`
 }
 
-export function localNumber(val) {
+export function localNumber(val: string) {
   return Numeral(val).format('0,0')
 }
 
-export const toNiceDate = date => {
-  let x = dayjs.utc(dayjs.unix(date)).format('MMM DD')
+export const toNiceDate = (date: number) => {
+  const x = dayjs.utc(dayjs.unix(date)).format('MMM DD')
   return x
-}
-
-export const toWeeklyDate = date => {
-  const formatted = dayjs.utc(dayjs.unix(date))
-  date = new Date(formatted)
-  const day = new Date(formatted).getDay()
-  var lessDays = day === 6 ? 0 : day + 1
-  var wkStart = new Date(new Date(date).setDate(date.getDate() - lessDays))
-  var wkEnd = new Date(new Date(wkStart).setDate(wkStart.getDate() + 6))
-  return dayjs.utc(wkStart).format('MMM DD') + ' - ' + dayjs.utc(wkEnd).format('MMM DD')
 }
 
 export function getTimestampsForChanges() {
@@ -122,7 +107,11 @@ export function getTimestampsForChanges() {
   return [t1, t2, tWeek]
 }
 
-export async function splitQuery(callback, list, skipCount = 100) {
+export async function splitQuery<T>(
+  callback: (p: T[]) => Promise<ApolloQueryResult<any>>,
+  list: T[],
+  skipCount = 100
+): Promise<any> {
   let fetchedData = {}
   let allFound = false
   let skip = 0
@@ -132,8 +121,8 @@ export async function splitQuery(callback, list, skipCount = 100) {
     if (skip + skipCount < list.length) {
       end = skip + skipCount
     }
-    let sliced = list.slice(skip, end)
-    let result = await callback(sliced)
+    const sliced = list.slice(skip, end)
+    const result = await callback(sliced)
     fetchedData = {
       ...fetchedData,
       ...result.data
@@ -153,8 +142,8 @@ export async function splitQuery(callback, list, skipCount = 100) {
  * @dev Query speed is optimized by limiting to a 600-second period
  * @param {Int} timestamp in seconds
  */
-export async function getBlockFromTimestamp(timestamp) {
-  let result = await client.query({
+export async function getBlockFromTimestamp(timestamp: number) {
+  const result = await client.query({
     query: GET_BLOCK,
     variables: {
       timestampFrom: timestamp,
@@ -174,12 +163,12 @@ export async function getBlockFromTimestamp(timestamp) {
  * @dev timestamps are returns as they were provided; not the block time.
  * @param {Array} timestamps
  */
-export async function getBlocksFromTimestamps(timestamps, skipCount = 500) {
+export async function getBlocksFromTimestamps(timestamps: number[], skipCount = 500) {
   if (timestamps?.length === 0) {
     return []
   }
 
-  let fetchedData = await splitQuery(
+  const fetchedData = await splitQuery(
     params =>
       client.query({
         query: GET_BLOCKS(params),
@@ -191,9 +180,9 @@ export async function getBlocksFromTimestamps(timestamps, skipCount = 500) {
     skipCount
   )
 
-  let blocks = []
+  const blocks = []
   if (fetchedData) {
-    for (var t in fetchedData) {
+    for (const t in fetchedData) {
       if (fetchedData[t].length > 0) {
         blocks.push({
           timestamp: t.split('t')[1],
@@ -205,34 +194,13 @@ export async function getBlocksFromTimestamps(timestamps, skipCount = 500) {
   return blocks
 }
 
-export async function getLiquidityTokenBalanceOvertime(account, timestamps) {
-  // get blocks based on timestamps
-  const blocks = await getBlocksFromTimestamps(timestamps)
-
-  // get historical share values with time travel queries
-  let result = await client.query({
-    query: SHARE_VALUE(account, blocks)
-  })
-
-  let values = []
-  for (var row in result?.data) {
-    let timestamp = row.split('t')[1]
-    if (timestamp) {
-      values.push({
-        timestamp,
-        balance: 0
-      })
-    }
-  }
-}
-
 /**
  * @notice Example query using time travel queries
  * @dev TODO - handle scenario where blocks are not available for a timestamps (e.g. current time)
  * @param {String} pairAddress
  * @param {Array} timestamps
  */
-export async function getShareValueOverTime(pairAddress, timestamps) {
+export async function getShareValueOverTime(pairAddress: string, timestamps: number[]) {
   if (!timestamps) {
     const utcCurrentTime = dayjs()
     const utcSevenDaysBack = utcCurrentTime.subtract(8, 'day').unix()
@@ -243,14 +211,14 @@ export async function getShareValueOverTime(pairAddress, timestamps) {
   const blocks = await getBlocksFromTimestamps(timestamps)
 
   // get historical share values with time travel queries
-  let result = await client.query({
+  const result = await client.query({
     query: SHARE_VALUE(pairAddress, blocks)
   })
 
-  let values = []
-  for (var row in result?.data) {
-    let timestamp = row.split('t')[1]
-    let sharePriceUsd = parseFloat(result.data[row]?.reserveUSD) / parseFloat(result.data[row]?.totalSupply)
+  const values: any[] = []
+  for (const row in result?.data) {
+    const timestamp = row.split('t')[1]
+    const sharePriceUsd = parseFloat(result.data[row]?.reserveUSD) / parseFloat(result.data[row]?.totalSupply)
     if (timestamp) {
       values.push({
         timestamp,
@@ -271,8 +239,8 @@ export async function getShareValueOverTime(pairAddress, timestamps) {
 
   // add eth prices
   let index = 0
-  for (var brow in result?.data) {
-    let timestamp = brow.split('b')[1]
+  for (const brow in result?.data) {
+    const timestamp = brow.split('b')[1]
     if (timestamp) {
       values[index].ethPrice = result.data[brow].ethPrice
       values[index].token0PriceUSD = result.data[brow].ethPrice * values[index].token0DerivedETH
@@ -291,17 +259,17 @@ export async function getShareValueOverTime(pairAddress, timestamps) {
  * @param {Int} period_length in seconds
  * @param {Int} periods
  */
-export function getTimestampRange(timestamp_from, period_length, periods) {
-  let timestamps = []
+export function getTimestampRange(timestamp_from: number, period_length: number, periods: number) {
+  const timestamps = []
   for (let i = 0; i <= periods; i++) {
     timestamps.push(timestamp_from + i * period_length)
   }
   return timestamps
 }
 
-export const toNiceDateYear = date => dayjs.utc(dayjs.unix(date)).format('MMMM DD, YYYY')
+export const toNiceDateYear = (date: number) => dayjs.utc(dayjs.unix(date)).format('MMMM DD, YYYY')
 
-export const isAddress = value => {
+export const isAddress = (value: string) => {
   try {
     return ethers.utils.getAddress(value.toLowerCase())
   } catch {
@@ -309,22 +277,46 @@ export const isAddress = value => {
   }
 }
 
-export const toK = num => {
+export const toK = (num: string) => {
   return Numeral(num).format('0.[00]a')
 }
 
-export const setThemeColor = theme => document.documentElement.style.setProperty('--c-token', theme || '#333333')
-
-export const Big = number => new BigNumber(number)
-
-export const urls = {
-  showTransaction: tx => `https://etherscan.io/tx/${tx}/`,
-  showAddress: address => `https://www.etherscan.io/address/${address}/`,
-  showToken: address => `https://www.etherscan.io/token/${address}/`,
-  showBlock: block => `https://etherscan.io/block/${block}/`
+const BLOCK_CHAIN_SCAN_URL: Record<SupportedNetwork, string> = {
+  [SupportedNetwork.ETHEREUM]: 'https://etherscan.io',
+  [SupportedNetwork.TRON]: 'https://tronscan.org/#'
 }
 
-export const formatTime = unix => {
+export function getBlockChainScanLink(
+  networkId: SupportedNetwork,
+  data: string,
+  type: 'transaction' | 'token' | 'address' | 'block'
+): string {
+  const scanUrl = BLOCK_CHAIN_SCAN_URL[networkId]
+
+  switch (type) {
+    case 'transaction': {
+      if (networkId === SupportedNetwork.ETHEREUM) {
+        return `${scanUrl}/tx/${data}`
+      }
+      return `${scanUrl}/transaction/${data}`
+    }
+    case 'token': {
+      if (networkId === SupportedNetwork.ETHEREUM) {
+        return `${scanUrl}/token/${data}`
+      }
+      return `${scanUrl}/token20/${data}`
+    }
+    case 'block': {
+      return `${scanUrl}/block/${data}`
+    }
+    case 'address':
+    default: {
+      return `${scanUrl}/address/${data}`
+    }
+  }
+}
+
+export const formatTime = (unix: number) => {
   const now = dayjs()
   const timestamp = dayjs.unix(unix)
 
@@ -344,32 +336,26 @@ export const formatTime = unix => {
   }
 }
 
-export const formatNumber = num => {
+export const formatNumber = (num: number) => {
   return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
 }
 
 // using a currency library here in case we want to add more in future
-var priceFormatter = new Intl.NumberFormat('en-US', {
+const priceFormatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
   currency: 'USD',
   minimumFractionDigits: 2
 })
 
-export const toSignificant = (number, significantDigits) => {
-  Decimal.set({ precision: significantDigits + 1, rounding: Decimal.ROUND_UP })
-  const updated = new Decimal(number).toSignificantDigits(significantDigits)
-  return updated.toFormat(updated.decimalPlaces(), { groupSeparator: '' })
-}
-
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const formattedNum = (number, usd = false, acceptNegatives = false) => {
-  if (isNaN(number) || number === '' || number === undefined) {
+export const formattedNum = (number?: number | string, usd = false) => {
+  if (Number.isNaN(number) || number === '' || number === undefined) {
     return usd ? '$0' : 0
   }
-  let num = parseFloat(number)
+  const num = typeof number === 'string' ? parseFloat(number) : number
 
   if (num > 500000000) {
-    return (usd ? '$' : '') + toK(num.toFixed(0), true)
+    return (usd ? '$' : '') + toK(num.toFixed(0))
   }
 
   if (num === 0) {
@@ -384,25 +370,23 @@ export const formattedNum = (number, usd = false, acceptNegatives = false) => {
   }
 
   if (num > 1000) {
-    return usd
-      ? '$' + Number(parseFloat(num).toFixed(0)).toLocaleString()
-      : '' + Number(parseFloat(num).toFixed(0)).toLocaleString()
+    return usd ? '$' + Number(num.toFixed(0)).toLocaleString() : '' + Number(num.toFixed(0)).toLocaleString()
   }
 
   if (usd) {
     if (num < 0.1) {
-      return '$' + Number(parseFloat(num).toFixed(4))
+      return '$' + Number(num.toFixed(4))
     } else {
-      let usdString = priceFormatter.format(num)
+      const usdString = priceFormatter.format(num)
       return '$' + usdString.slice(1, usdString.length)
     }
   }
 
-  return Number(parseFloat(num).toFixed(5))
+  return Number(num.toFixed(5))
 }
 
-export function rawPercent(percentRaw) {
-  let percent = parseFloat(percentRaw * 100)
+export function rawPercent(percentRaw: number) {
+  const percent = percentRaw * 100
   if (!percent || percent === 0) {
     return '0%'
   }
@@ -412,40 +396,31 @@ export function rawPercent(percentRaw) {
   return percent.toFixed(0) + '%'
 }
 
-export function formattedPercent(percent) {
-  const parsedPercent = parseFloat(percent)
+export function parsePercent(percent: number) {
   if (!percent || percent === 0) {
-    return <Text fontWeight={500}>0%</Text>
+    return { data: '0%' }
   }
 
-  if (parsedPercent < 0.0001 && parsedPercent > 0) {
-    return (
-      <Text fontWeight={500} color="#54B45D">
-        {'< 0.0001%'}
-      </Text>
-    )
+  if (percent < 0.0001 && percent > 0) {
+    return { data: '< 0.0001%', color: '#54B45D' }
   }
 
-  if (parsedPercent < 0 && parsedPercent > -0.0001) {
-    return (
-      <Text fontWeight={500} color="#C73846">
-        {'< 0.0001%'}
-      </Text>
-    )
+  if (percent < 0 && percent > -0.0001) {
+    return { data: '< 0.0001%', color: '#C73846' }
   }
 
-  let fixedPercent = parsedPercent.toFixed(2)
+  const fixedPercent = percent.toFixed(2)
   if (fixedPercent === '0.00') {
-    return '0%'
+    return { data: '0%' }
   }
-  if (fixedPercent > 0) {
-    if (fixedPercent > 100) {
-      return <Text fontWeight={500} color="#54B45D">{`+${percent?.toFixed(0).toLocaleString()}%`}</Text>
+  if (+fixedPercent > 0) {
+    if (+fixedPercent > 100) {
+      return { data: `+${percent?.toFixed(0).toLocaleString()}%`, color: '#54B45D' }
     } else {
-      return <Text fontWeight={500} color="#54B45D">{`+${fixedPercent}%`}</Text>
+      return { data: `+${fixedPercent}%`, color: '#54B45D' }
     }
   } else {
-    return <Text fontWeight={500} color="#C73846">{`${fixedPercent}%`}</Text>
+    return { data: `${fixedPercent}%`, color: '#C73846' }
   }
 }
 
@@ -455,12 +430,12 @@ export function formattedPercent(percent) {
  * @param {*} value24HoursAgo
  * @param {*} value48HoursAgo
  */
-export const get2DayPercentChange = (valueNow, value24HoursAgo, value48HoursAgo) => {
+export const get2DayPercentChange = (valueNow: any, value24HoursAgo: any, value48HoursAgo: any) => {
   // get volume info for both 24 hour periods
-  let currentChange = parseFloat(valueNow) - parseFloat(value24HoursAgo)
-  let previousChange = parseFloat(value24HoursAgo) - parseFloat(value48HoursAgo)
+  const currentChange = parseFloat(valueNow) - parseFloat(value24HoursAgo)
+  const previousChange = parseFloat(value24HoursAgo) - parseFloat(value48HoursAgo)
 
-  const adjustedPercentChange = (parseFloat(currentChange - previousChange) / parseFloat(previousChange)) * 100
+  const adjustedPercentChange = ((currentChange - previousChange) / previousChange) * 100
 
   if (isNaN(adjustedPercentChange) || !isFinite(adjustedPercentChange)) {
     return [currentChange, 0]
@@ -473,7 +448,7 @@ export const get2DayPercentChange = (valueNow, value24HoursAgo, value48HoursAgo)
  * @param {*} valueNow
  * @param {*} value24HoursAgo
  */
-export const getPercentChange = (valueNow, value24HoursAgo) => {
+export const getPercentChange = (valueNow: any, value24HoursAgo: any) => {
   const adjustedPercentChange =
     ((parseFloat(valueNow) - parseFloat(value24HoursAgo)) / parseFloat(value24HoursAgo)) * 100
   if (isNaN(adjustedPercentChange) || !isFinite(adjustedPercentChange)) {
@@ -482,22 +457,7 @@ export const getPercentChange = (valueNow, value24HoursAgo) => {
   return adjustedPercentChange
 }
 
-export function isEquivalent(a, b) {
-  var aProps = Object.getOwnPropertyNames(a)
-  var bProps = Object.getOwnPropertyNames(b)
-  if (aProps.length !== bProps.length) {
-    return false
-  }
-  for (var i = 0; i < aProps.length; i++) {
-    var propName = aProps[i]
-    if (a[propName] !== b[propName]) {
-      return false
-    }
-  }
-  return true
-}
-
-export function networkPrefix(activeNetwork) {
+export function networkPrefix(activeNetwork: NetworkInfo) {
   const prefix = '/' + activeNetwork.route.toLocaleLowerCase()
   return prefix
 }
@@ -512,6 +472,6 @@ export function getCurrentNetwork() {
   }
 }
 
-export function escapeRegExp(string) {
-  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') // $& means the whole matched string
+export function escapeRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') // $& means the whole matched string
 }

@@ -9,12 +9,12 @@ import { ButtonLight, ButtonDark } from 'components/ButtonStyled'
 import PairChart from 'components/PairChart'
 import Link from 'components/Link'
 import TxnList from 'components/TxnList'
-import { isAddress } from 'utils'
+import { getBlockChainScanLink, isAddress } from 'utils'
 import Loader from 'components/LocalLoader'
 import { PAIR_BLACKLIST } from 'constants/index'
 import { BasicLink } from 'components/Link'
 import Search from 'components/Search'
-import { formattedNum, formattedPercent, getPoolLink, getSwapLink } from 'utils'
+import { formattedNum, getPoolLink, getSwapLink } from 'utils'
 import { usePairData, usePairTransactions } from 'state/features/pairs/hooks'
 import { DashboardWrapper, TYPE } from 'Theme'
 import CopyHelper from 'components/Copy'
@@ -31,6 +31,7 @@ import FormattedName from 'components/FormattedName'
 import { useListedTokens } from 'state/features/application/hooks'
 import { useTranslation } from 'react-i18next'
 import { useActiveNetworkId } from 'state/features/application/selectors'
+import Percent from 'components/Percent'
 
 const PanelWrapper = styled.div`
   grid-template-columns: repeat(3, 1fr);
@@ -142,7 +143,6 @@ function PairPage() {
     : reserveUSD
     ? formattedNum(reserveUSD, true)
     : '-'
-  const liquidityChange = formattedPercent(liquidityChangeUSD)
 
   // mark if using untracked liquidity
   const [usingTracked, setUsingTracked] = useState(true)
@@ -164,7 +164,7 @@ function PairPage() {
     setUsingUtVolume(oneDayVolumeUSD === 0 ? true : false)
   }, [oneDayVolumeUSD])
 
-  const volumeChange = formattedPercent(!usingUtVolume ? volumeChangeUSD : volumeChangeUntracked)
+  const volumeChange = !usingUtVolume ? volumeChangeUSD : volumeChangeUntracked
 
   // get fees	  // get fees
   const fees =
@@ -351,7 +351,7 @@ function PairPage() {
                         {liquidity}
                       </TYPE.main>
                       <TYPE.main fontSize={12} fontWeight={500}>
-                        {liquidityChange}
+                        <Percent percent={liquidityChangeUSD} />
                       </TYPE.main>
                     </RowBetween>
                   </AutoColumn>
@@ -369,7 +369,7 @@ function PairPage() {
                         {volume}
                       </TYPE.main>
                       <TYPE.main fontSize={12} fontWeight={500}>
-                        {volumeChange}
+                        <Percent percent={volumeChange} />
                       </TYPE.main>
                     </RowBetween>
                   </AutoColumn>
@@ -387,7 +387,7 @@ function PairPage() {
                         {fees}
                       </TYPE.main>
                       <TYPE.main fontSize={12} fontWeight={500}>
-                        {volumeChange}
+                        <Percent percent={volumeChange} />
                       </TYPE.main>
                     </RowBetween>
                   </AutoColumn>
@@ -510,7 +510,7 @@ function PairPage() {
                   </RowBetween>
                 </Column>
                 <ButtonLight>
-                  <Link external href={'https://etherscan.io/address/' + pairAddress}>
+                  <Link external href={getBlockChainScanLink(activeNetworkId, pairAddress, 'address')}>
                     {t('viewOnEtherscan')} ↗
                   </Link>
                 </ButtonLight>
