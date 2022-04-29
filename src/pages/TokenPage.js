@@ -14,7 +14,15 @@ import TxnList from 'components/TxnList'
 import TokenChart from 'components/TokenChart'
 import { BasicLink } from 'components/Link'
 import Search from 'components/Search'
-import { formattedNum, getPoolLink, getSwapLink, localNumber, isAddress, getBlockChainScanLink } from 'utils'
+import {
+  formattedNum,
+  getPoolLink,
+  getSwapLink,
+  localNumber,
+  isAddress,
+  getBlockChainScanLink,
+  getViewOnScanKey
+} from 'utils'
 import { useTokenData, useTokenTransactions, useTokenPairsIds, useTokenPairs } from 'state/features/token/hooks'
 import { useFormatPath, useColor } from 'hooks'
 import { OVERVIEW_TOKEN_BLACKLIST } from 'constants/index'
@@ -392,7 +400,7 @@ function TokenPage() {
                     external
                     href={getBlockChainScanLink(activeNetworkId, tokenAddress, 'token')}
                   >
-                    {t('viewOnEtherscan')} ↗
+                    {t(getViewOnScanKey(activeNetworkId))} ↗
                   </Link>
                 </ButtonLight>
               </TokenDetailsLayout>

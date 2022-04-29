@@ -9,7 +9,7 @@ import { ButtonLight, ButtonDark } from 'components/ButtonStyled'
 import PairChart from 'components/PairChart'
 import Link from 'components/Link'
 import TxnList from 'components/TxnList'
-import { getBlockChainScanLink, isAddress } from 'utils'
+import { getBlockChainScanLink, getViewOnScanKey, isAddress } from 'utils'
 import Loader from 'components/LocalLoader'
 import { PAIR_BLACKLIST } from 'constants/index'
 import { BasicLink } from 'components/Link'
@@ -511,7 +511,7 @@ function PairPage() {
                 </Column>
                 <ButtonLight>
                   <Link external href={getBlockChainScanLink(activeNetworkId, pairAddress, 'address')}>
-                    {t('viewOnEtherscan')} ↗
+                    {t(getViewOnScanKey(activeNetworkId))} ↗
                   </Link>
                 </ButtonLight>
               </TokenDetailsLayout>

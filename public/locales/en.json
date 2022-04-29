@@ -12,6 +12,7 @@
   "account": "Account",
   "accounts": "Accounts",
   "viewOnEtherscan": "View on Etherscan",
+  "viewOnTronScan": "View on Tronscan",
   "feesCantBeCalc": "Fees cannot currently be calculated for pairs that include AMPL.",
   "allPositions": "All Positions",
   "positions": "Positions",

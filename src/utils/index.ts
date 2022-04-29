@@ -316,6 +316,16 @@ export function getBlockChainScanLink(
   }
 }
 
+export function getViewOnScanKey(networkId: SupportedNetwork) {
+  switch (networkId) {
+    case SupportedNetwork.ETHEREUM:
+      return 'viewOnEtherscan'
+    case SupportedNetwork.TRON:
+    default:
+      return 'viewOnTronScan'
+  }
+}
+
 export const formatTime = (unix: number) => {
   const now = dayjs()
   const timestamp = dayjs.unix(unix)

@@ -3,7 +3,7 @@ import { useUserTransactions, useUserPositions } from 'state/features/account/ho
 import TxnList from 'components/TxnList'
 import { useParams, Navigate } from 'react-router-dom'
 import Panel from 'components/Panel'
-import { formattedNum, getBlockChainScanLink, isAddress } from 'utils'
+import { formattedNum, getBlockChainScanLink, getViewOnScanKey, isAddress } from 'utils'
 import { AutoRow, RowFixed, RowBetween } from 'components/Row'
 import { AutoColumn } from 'components/Column'
 import UserChart from 'components/UserChart'
@@ -126,7 +126,7 @@ function AccountPage() {
                 href={getBlockChainScanLink(activeNetworkId, accountAddress, 'address')}
                 target="_blank"
               >
-                <TYPE.main fontSize={14}>{t('viewOnEtherscan')}</TYPE.main>
+                <TYPE.main fontSize={14}>{t(getViewOnScanKey(activeNetworkId))}</TYPE.main>
               </Link>
             </span>
             <AccountWrapper>
