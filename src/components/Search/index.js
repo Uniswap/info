@@ -16,9 +16,7 @@ import { escapeRegExp } from 'utils'
 import { useTranslation } from 'react-i18next'
 import { useTokens } from 'state/features/token/selectors'
 import { usePairs } from 'state/features/pairs/selectors'
-import { TOKEN_SEARCH } from 'service/queries/tokens'
-import { client } from 'service/client'
-import { PAIR_SEARCH } from 'service/queries/pairs'
+import DataService from 'data/DataService'
 
 const Container = styled.div`
   height: 48px;
@@ -245,20 +243,11 @@ export const Search = ({ small = false }) => {
   useEffect(() => {
     async function fetch() {
       try {
-        const tokens = await client.query({
-          query: TOKEN_SEARCH,
-          variables: {
-            value: value ? value.toUpperCase() : '',
-            id: value
-          }
-        })
-        const pools = await client.query({
-          query: PAIR_SEARCH,
-          variables: {
-            tokens: tokens.data.asSymbol?.map(t => t.id),
-            id: value
-          }
-        })
+        const tokens = await DataService.tokens.searchToken(value ? value.toUpperCase() : '', value)
+        const pools = await DataService.pairs.searchPair(
+          tokens.data.asSymbol?.map(t => t.id),
+          value
+        )
 
         if (tokens.data) {
           setTokenData([...tokens.data.asAddress, ...tokens.data.asName, ...tokens.data.asSymbol])

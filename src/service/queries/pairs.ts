@@ -1,5 +1,5 @@
-import { PAIR_DETAILS, PAIR_FIELDS } from 'api/fragments'
 import { gql } from 'apollo-boost'
+import { PAIR_DETAILS, PAIR_FIELDS } from 'service/fragments'
 
 export const HOURLY_PAIR_RATES = (pairAddress: string, blocks: BlockHeight[]) => {
   let queryString = 'query HourlyPairRates {'

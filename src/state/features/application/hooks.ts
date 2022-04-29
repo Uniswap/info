@@ -5,8 +5,8 @@ import { useAppDispatch, useAppSelector } from 'state/hooks'
 import { setHeadBlock, setLatestBlock, setSupportedTokens } from './slice'
 import { DEFAULT_LIST_OF_LISTS } from 'constants/lists'
 import getTokenList from 'utils/tokenLists'
-import { getSubgraphStatus } from 'data/ethereum/application'
 import { useActiveNetworkId, useTimeFrame } from './selectors'
+import DataService from 'data/DataService'
 
 export function useLatestBlocks() {
   const dispatch = useAppDispatch()
@@ -16,7 +16,7 @@ export function useLatestBlocks() {
 
   useEffect(() => {
     async function fetch() {
-      const result = await getSubgraphStatus()
+      const result = await DataService.global.getHealthStatus()
       if (result) {
         dispatch(setLatestBlock(result.syncedBlock))
         dispatch(setHeadBlock(result.headBlock))

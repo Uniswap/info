@@ -1,5 +1,4 @@
-import { getGlobalData, getChartData, getPrice } from 'data/ethereum/global'
-import { getAllTransactions } from 'data/ethereum/transactions'
+import DataService from 'data/DataService'
 import { useState, useEffect } from 'react'
 import { useAppDispatch } from 'state/hooks'
 import { getTimeframe } from 'utils'
@@ -26,7 +25,7 @@ export function useGlobalData() {
 
   useEffect(() => {
     async function fetchData() {
-      const globalData = await getGlobalData(price, oneDayPrice)
+      const globalData = await DataService.global.getGlobalData(price, oneDayPrice)
       dispatch(setGlobalData({ data: globalData, networkId: activeNetwork }))
     }
     if (price && oneDayPrice) {
@@ -64,7 +63,7 @@ export function useGlobalChartData() {
   useEffect(() => {
     async function fetchData() {
       // historical stuff for chart
-      const [newChartData, newWeeklyData] = await getChartData(oldestDateFetch!)
+      const [newChartData, newWeeklyData] = await DataService.global.getChartData(oldestDateFetch!)
       dispatch(setChart({ daily: newChartData, weekly: newWeeklyData, networkId: activeNetwork }))
     }
     if (oldestDateFetch) {
@@ -82,7 +81,7 @@ export function useGlobalTransactions() {
 
   useEffect(() => {
     async function fetchData() {
-      const txns = await getAllTransactions()
+      const txns = await DataService.transactions.getAllTransactions()
       dispatch(setTransactions({ transactions: txns, networkId: activeNetwork }))
     }
     fetchData()
@@ -97,7 +96,7 @@ export function useFetchActiveTokenPrice() {
 
   useEffect(() => {
     async function checkForPrice() {
-      const [newPrice, newOneDayPrice, priceChange] = await getPrice()
+      const [newPrice, newOneDayPrice, priceChange] = await DataService.global.getPrice()
       dispatch(setPrice({ price: newPrice, oneDayPrice: newOneDayPrice, priceChange, networkId: activeNetwork }))
     }
     checkForPrice()

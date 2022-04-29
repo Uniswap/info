@@ -16,6 +16,7 @@ import { useNavigate } from 'react-router-dom'
 import { useOnClickOutside } from 'hooks/useOnClickOutSide'
 import { useAppSelector } from 'state/hooks'
 import { changeApiClient } from 'service/client'
+import DataService from 'data/DataService'
 
 const NetworkSwitcher = () => {
   const activeNetwork = useAppSelector(state => state.application.activeNetwork)
@@ -30,6 +31,7 @@ const NetworkSwitcher = () => {
       setIsOpen(false)
       dispatch(setActiveNetwork(network))
       changeApiClient(network.id)
+      DataService.initDataControllers(network.id)
     },
     [activeNetwork.route, pathname]
   )

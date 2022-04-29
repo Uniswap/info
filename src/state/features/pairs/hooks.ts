@@ -1,6 +1,4 @@
 import { timeframeOptions } from '../../../constants'
-import { getBulkPairData, getHourlyRateData, getPairChartData, getPairList } from 'data/ethereum/pairs'
-import { getTransactions } from 'data/ethereum/transactions'
 import dayjs from 'dayjs'
 import { isAddress } from 'ethers/lib/utils'
 import { useEffect } from 'react'
@@ -9,6 +7,7 @@ import { useActiveNetworkId } from '../application/selectors'
 import { useAppDispatch, useAppSelector } from 'state/hooks'
 import { setChartData, setHourlyData, setPair, setPairTransactions, setTopPairs } from './slice'
 import { useActiveTokenPrice } from '../global/selectors'
+import DataService from 'data/DataService'
 
 export function useHourlyRateData(pairAddress: string, timeWindow: string) {
   const dispatch = useAppDispatch()
@@ -23,7 +22,7 @@ export function useHourlyRateData(pairAddress: string, timeWindow: string) {
       timeWindow === timeframeOptions.ALL_TIME ? 1589760000 : currentTime.subtract(1, windowSize).startOf('hour').unix()
 
     async function fetch() {
-      const data = await getHourlyRateData(pairAddress, startTime, latestBlock)
+      const data = await DataService.pairs.getHourlyRateData(pairAddress, startTime, latestBlock)
       dispatch(setHourlyData({ address: pairAddress, hourlyData: data, timeWindow, networkId: activeNetwork }))
     }
     if (!chartData) {
@@ -45,7 +44,7 @@ export function usePairData(pairAddress: string) {
 
   useEffect(() => {
     async function fetchData() {
-      const data = await getBulkPairData([pairAddress], price)
+      const data = await DataService.pairs.getBulkPairData([pairAddress], price)
       data && dispatch(setPair({ networkId: activeNetwork, pairAddress, data: data[0] }))
     }
     // TODO: isAddress() only work for eth not for trx
@@ -67,7 +66,7 @@ export function usePairTransactions(pairAddress: string) {
   useEffect(() => {
     async function checkForTxns() {
       if (!pairTxns) {
-        const transactions = await getTransactions([pairAddress])
+        const transactions = await DataService.transactions.getTransactions([pairAddress])
         dispatch(setPairTransactions({ networkId: activeNetwork, transactions, address: pairAddress }))
       }
     }
@@ -84,7 +83,7 @@ export function usePairChartData(pairAddress: string) {
   useEffect(() => {
     async function checkForChartData() {
       if (!chartData) {
-        const data = await getPairChartData(pairAddress)
+        const data = await DataService.pairs.getPairChartData(pairAddress)
         dispatch(setChartData({ networkId: activeNetwork, chartData: data, address: pairAddress }))
       }
     }
@@ -100,7 +99,7 @@ export function useFetchPairs() {
 
   useEffect(() => {
     async function getData() {
-      const topPairs = await getPairList(price)
+      const topPairs = await DataService.pairs.getPairList(price)
       topPairs && dispatch(setTopPairs({ topPairs, networkId: activeNetwork }))
     }
     price && getData()

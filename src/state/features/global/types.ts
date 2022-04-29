@@ -8,6 +8,7 @@ export interface ChartDailyItem {
   totalLiquidityETH: string
   totalLiquidityUSD: string
   totalVolumeUSD: string
+  mostLiquidTokens?: number
 }
 
 export interface ChartWeeklyItem {
