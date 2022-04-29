@@ -6,9 +6,10 @@ import toFormat from 'toformat'
 import { timeframeOptions } from 'constants/index'
 import { SUPPORTED_NETWORK_VERSIONS } from 'constants/networks'
 import Numeral from 'numeral'
-import { globalApi } from 'api'
 import { TronNetworkInfo } from 'constants/networks'
 import { Text } from 'rebass'
+import { GET_BLOCK, GET_BLOCKS, SHARE_VALUE } from 'service/queries/global'
+import { client } from 'service/client'
 
 // format libraries
 const Decimal = toFormat(_Decimal)
@@ -153,7 +154,16 @@ export async function splitQuery(callback, list, skipCount = 100) {
  * @param {Int} timestamp in seconds
  */
 export async function getBlockFromTimestamp(timestamp) {
-  let result = await globalApi.getBlock(timestamp, timestamp + 600)
+  let result = await client.query({
+    query: GET_BLOCK,
+    variables: {
+      timestampFrom: timestamp,
+      timestampTo: timestamp + 600
+    },
+    context: {
+      client: 'block'
+    }
+  })
   return +result?.data?.blocks?.[0]?.number
 }
 
@@ -169,7 +179,17 @@ export async function getBlocksFromTimestamps(timestamps, skipCount = 500) {
     return []
   }
 
-  let fetchedData = await splitQuery(params => globalApi.getBlocks(params), timestamps, skipCount)
+  let fetchedData = await splitQuery(
+    params =>
+      client.query({
+        query: GET_BLOCKS(params),
+        context: {
+          client: 'block'
+        }
+      }),
+    timestamps,
+    skipCount
+  )
 
   let blocks = []
   if (fetchedData) {
@@ -190,7 +210,9 @@ export async function getLiquidityTokenBalanceOvertime(account, timestamps) {
   const blocks = await getBlocksFromTimestamps(timestamps)
 
   // get historical share values with time travel queries
-  let result = await globalApi.getShareValue(account, blocks)
+  let result = await client.query({
+    query: SHARE_VALUE(account, blocks)
+  })
 
   let values = []
   for (var row in result?.data) {
@@ -221,7 +243,9 @@ export async function getShareValueOverTime(pairAddress, timestamps) {
   const blocks = await getBlocksFromTimestamps(timestamps)
 
   // get historical share values with time travel queries
-  let result = await globalApi.getShareValue(pairAddress, blocks)
+  let result = await client.query({
+    query: SHARE_VALUE(pairAddress, blocks)
+  })
 
   let values = []
   for (var row in result?.data) {

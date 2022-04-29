@@ -34,7 +34,7 @@ export interface Pair {
   txns?: Transactions
 }
 
-interface PairDayData {
+export interface PairDayData {
   dailyVolumeToken0?: string
   dailyVolumeToken1?: string
   dailyVolumeUSD: number

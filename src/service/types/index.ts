@@ -1,12 +1,3 @@
-export type BlockHeight = {
-  timestamp: number
-  number: number
-}
-
-export type OffsetParams<T> = T & {
-  skip: number
-}
-
 export type Maybe<T> = T | null
 export type InputMaybe<T> = Maybe<T>
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] }

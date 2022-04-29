@@ -1,11 +1,4 @@
 import { timeframeOptions } from '../../../constants'
-import {
-  getUserTransactions,
-  getUserHistory,
-  getUserLiquidityChart,
-  getUserPositions,
-  getTopLps
-} from 'data/ethereum/accounts'
 import dayjs from 'dayjs'
 import { useEffect, useState } from 'react'
 import { useAppDispatch, useAppSelector } from 'state/hooks'
@@ -18,6 +11,7 @@ import { LiquidityChart, Position } from './types'
 import { usePairs } from '../pairs/selectors'
 import { useActiveTokenPrice } from '../global/selectors'
 import { useTimeFrame } from '../application/selectors'
+import DataService from 'data/DataService'
 
 export function useUserTransactions(account: string) {
   const dispatch = useAppDispatch()
@@ -26,7 +20,7 @@ export function useUserTransactions(account: string) {
 
   useEffect(() => {
     async function fetchData(account: string) {
-      const result = await getUserTransactions(account)
+      const result = await DataService.transactions.getUserTransactions(account)
       dispatch(setTransactions({ account, transactions: result, networkId: activeNetwork }))
     }
     if (!transactions && account) {
@@ -49,7 +43,7 @@ export function useUserSnapshots(account: string) {
 
   useEffect(() => {
     async function fetchData() {
-      const result = await getUserHistory(account)
+      const result = await DataService.accounts.getUserHistory(account)
       if (result) {
         dispatch(setPositionHistory({ account, historyData: result, networkId: activeNetwork }))
       }
@@ -163,7 +157,7 @@ export function useUserLiquidityChart(account: string) {
 
   useEffect(() => {
     async function fetchData() {
-      const formattedHistory = await getUserLiquidityChart(startDateTimestamp!, [...history])
+      const formattedHistory = await DataService.accounts.getUserLiquidityChart(startDateTimestamp!, [...history])
       setFormattedHistory(formattedHistory)
     }
     if (history && startDateTimestamp && history.length > 0) {
@@ -184,7 +178,7 @@ export function useUserPositions(account: string) {
 
   useEffect(() => {
     async function fetchData(account: string) {
-      const positions = await getUserPositions(account, price, snapshots)
+      const positions = await DataService.accounts.getUserPositions(account, price, snapshots)
       if (positions) {
         dispatch(setPositions({ networkId: activeNetwork, account, positions }))
       }
@@ -205,7 +199,7 @@ export function useTopLiquidityPositions() {
 
   useEffect(() => {
     async function fetchData() {
-      const response = await getTopLps(allPairs)
+      const response = await DataService.accounts.getTopLps(allPairs)
       dispatch(setTopLiquidityPositions({ liquidityPositions: response, networkId: activeNetwork }))
     }
 

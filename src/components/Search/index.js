@@ -9,8 +9,6 @@ import { BasicLink } from '../Link'
 import { useFormatPath } from 'hooks'
 import DoubleTokenLogo from '../DoubleLogo'
 import { useMedia } from 'react-use'
-import { tokenApi, pairApi } from 'api'
-
 import { transparentize } from 'polished'
 import FormattedName from '../FormattedName'
 import { TYPE } from '../../Theme'
@@ -18,6 +16,7 @@ import { escapeRegExp } from 'utils'
 import { useTranslation } from 'react-i18next'
 import { useTokens } from 'state/features/token/selectors'
 import { usePairs } from 'state/features/pairs/selectors'
+import DataService from 'data/DataService'
 
 const Container = styled.div`
   height: 48px;
@@ -244,8 +243,8 @@ export const Search = ({ small = false }) => {
   useEffect(() => {
     async function fetch() {
       try {
-        const tokens = await tokenApi.searchToken(value ? value.toUpperCase() : '', value)
-        const pools = await pairApi.searchPair(
+        const tokens = await DataService.tokens.searchToken(value ? value.toUpperCase() : '', value)
+        const pools = await DataService.pairs.searchPair(
           tokens.data.asSymbol?.map(t => t.id),
           value
         )

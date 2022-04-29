@@ -1,6 +1,5 @@
-import { BURN_DETAILS, MINT_DETAILS, PAIR_DETAILS, PAIR_FIELDS, SWAP_DETAILS } from 'api/fragments'
-import { BlockHeight } from 'api/types'
 import { gql } from 'apollo-boost'
+import { PAIR_DETAILS, PAIR_FIELDS } from 'service/fragments'
 
 export const HOURLY_PAIR_RATES = (pairAddress: string, blocks: BlockHeight[]) => {
   let queryString = 'query HourlyPairRates {'
@@ -100,23 +99,6 @@ export const PAIRS_HISTORICAL_BULK = gql`
       trackedReserveETH
       volumeUSD
       untrackedVolumeUSD
-    }
-  }
-`
-
-export const FILTERED_TRANSACTIONS = gql`
-  ${MINT_DETAILS}
-  ${BURN_DETAILS}
-  ${SWAP_DETAILS}
-  query FilteredTransactions($allPairs: [Bytes]!) {
-    mints(first: 20, where: { pair_in: $allPairs }, orderBy: timestamp, orderDirection: desc) {
-      ...MintDetails
-    }
-    burns(first: 20, where: { pair_in: $allPairs }, orderBy: timestamp, orderDirection: desc) {
-      ...BurnDetails
-    }
-    swaps(first: 30, where: { pair_in: $allPairs }, orderBy: timestamp, orderDirection: desc) {
-      ...SwapDetails
     }
   }
 `

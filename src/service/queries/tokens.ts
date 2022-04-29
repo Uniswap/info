@@ -1,5 +1,5 @@
-import { TOKEN_FIELDS, TOKEN_INFO_LIQUIDITY } from 'api/fragments'
 import { gql } from 'apollo-boost'
+import { TOKEN_FIELDS, TOKEN_INFO_LIQUIDITY } from 'service/fragments'
 
 export const TOKEN_SEARCH = gql`
   ${TOKEN_INFO_LIQUIDITY}

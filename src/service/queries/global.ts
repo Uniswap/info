@@ -1,5 +1,3 @@
-import { BURN_DETAILS, MINT_DETAILS, SWAP_DETAILS } from 'api/fragments'
-import { BlockHeight } from 'api/types'
 import { gql } from 'apollo-boost'
 import { BUNDLE_ID } from '../../constants'
 
@@ -113,13 +111,10 @@ export const ETH_PRICE = gql`
 export const GLOBAL_CHART = gql`
   query whiteSwapDayDatas($startTime: Int!, $skip: Int!) {
     whiteSwapDayDatas(first: 1000, skip: $skip, where: { date_gt: $startTime }, orderBy: date, orderDirection: asc) {
-      id
       date
       totalVolumeUSD
       dailyVolumeUSD
-      dailyVolumeETH
       totalLiquidityUSD
-      totalLiquidityETH
     }
   }
 `
@@ -135,25 +130,6 @@ export const GLOBAL_DATA = gql`
       totalLiquidityETH
       txCount
       pairCount
-    }
-  }
-`
-
-export const GLOBAL_TXNS = gql`
-  ${MINT_DETAILS}
-  ${BURN_DETAILS}
-  ${SWAP_DETAILS}
-  query GlobalTransactions {
-    transactions(first: 100, orderBy: timestamp, orderDirection: desc) {
-      mints(orderBy: timestamp, orderDirection: desc) {
-        ...MintDetails
-      }
-      burns(orderBy: timestamp, orderDirection: desc) {
-        ...BurnDetails
-      }
-      swaps(orderBy: timestamp, orderDirection: desc) {
-        ...SwapDetails
-      }
     }
   }
 `

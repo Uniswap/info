@@ -5,6 +5,15 @@ declare enum SupportedNetwork {
   TRON = 'trx'
 }
 
+type BlockHeight = {
+  timestamp: number
+  number: number
+}
+
+type OffsetParams<T> = T & {
+  skip: number
+}
+
 type ParamsWithNetwork<T = unknown> = T & {
   networkId: SupportedNetwork
 }

@@ -1,5 +1,3 @@
-import { OffsetParams } from 'api/types'
-
 export type UserParams = {
   user: string
 }

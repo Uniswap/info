@@ -1,5 +1,10 @@
 import { NetworkInfo, SupportedNetwork } from 'constants/networks'
 
+export type HealthStatus = {
+  syncedBlock: number
+  headBlock: number
+}
+
 export interface ApplicationState {
   timeKey: string
   latestBlock: number

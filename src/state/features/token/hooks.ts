@@ -1,12 +1,4 @@
 import { timeframeOptions } from '../../../constants'
-import {
-  getTopTokens,
-  getTokenData,
-  getTokenTransactions,
-  getTokenPairs,
-  getTokenChartData,
-  getIntervalTokenData
-} from 'data/ethereum/tokens'
 import dayjs from 'dayjs'
 import { isAddress } from 'ethers/lib/utils'
 import { useEffect } from 'react'
@@ -15,6 +7,7 @@ import { useActiveNetworkId } from '../application/selectors'
 import { useAppDispatch, useAppSelector } from 'state/hooks'
 import { setTokenPairs, setChartData, setPriceData, setToken, setTopTokens, setTransactions } from './slice'
 import { useActiveTokenOneDayPrice, useActiveTokenPrice } from '../global/selectors'
+import DataService from 'data/DataService'
 
 export function useFetchTokens() {
   const dispatch = useAppDispatch()
@@ -25,7 +18,7 @@ export function useFetchTokens() {
   useEffect(() => {
     async function fetchData() {
       // get top pairs for overview list
-      const topTokens = await getTopTokens(price, oneDayPrice)
+      const topTokens = await DataService.tokens.getTopTokens(price, oneDayPrice)
       topTokens && dispatch(setTopTokens({ networkId: activeNetwork, topTokens }))
     }
     price && oneDayPrice && fetchData()
@@ -41,7 +34,7 @@ export function useTokenData(tokenAddress: string) {
 
   useEffect(() => {
     async function fetchData() {
-      const data = await getTokenData(tokenAddress, price, oneDayPrice)
+      const data = await DataService.tokens.getTokenData(tokenAddress, price, oneDayPrice)
       data && dispatch(setToken({ tokenAddress, networkId: activeNetwork, data }))
     }
     // TODO: isAddress only validate ETH address
@@ -62,7 +55,7 @@ export function useTokenTransactions(tokenAddress: string) {
   useEffect(() => {
     async function checkForTransactions() {
       if (!tokenTransactions && tokenPairs) {
-        const transactions = await getTokenTransactions(tokenPairs)
+        const transactions = await DataService.transactions.getTransactions(tokenPairs)
         dispatch(setTransactions({ networkId: activeNetwork, transactions, address: tokenAddress }))
       }
     }
@@ -79,7 +72,7 @@ export function useTokenPairsIds(tokenAddress: string) {
 
   useEffect(() => {
     async function fetchData() {
-      const allPairs = await getTokenPairs(tokenAddress)
+      const allPairs = await DataService.tokens.getTokenPairs(tokenAddress)
       dispatch(setTokenPairs({ networkId: activeNetwork, allPairs, address: tokenAddress }))
     }
     if (!tokenPairs && isAddress(tokenAddress)) {
@@ -104,7 +97,7 @@ export function useTokenChartData(tokenAddress: string) {
   useEffect(() => {
     async function checkForChartData() {
       if (!chartData) {
-        const data = await getTokenChartData(tokenAddress)
+        const data = await DataService.tokens.getTokenChartData(tokenAddress)
         dispatch(setChartData({ networkId: activeNetwork, chartData: data, address: tokenAddress }))
       }
     }
@@ -135,7 +128,7 @@ export function useTokenPriceData(tokenAddress: string, timeWindow: string, inte
       timeWindow === timeframeOptions.ALL_TIME ? 1589760000 : currentTime.subtract(1, windowSize).startOf('hour').unix()
 
     async function fetch() {
-      const data = await getIntervalTokenData(tokenAddress, startTime, interval, latestBlock)
+      const data = await DataService.tokens.getIntervalTokenData(tokenAddress, startTime, interval, latestBlock)
       dispatch(setPriceData({ networkId: activeNetwork, timeWindow, interval, data, address: tokenAddress }))
     }
     if (!chartData) {

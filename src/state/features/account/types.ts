@@ -1,3 +1,5 @@
+import { SupportedNetwork } from 'constants/networks'
+
 type PositionToken = {
   derivedETH: string
   id: string
