@@ -29,8 +29,6 @@ function uriToHttp(uri: string): string[] {
   }
 }
 
-// const tokenListValidator = new Ajv({ allErrors: true }).compile(schema)
-
 /**
  * Contains the logic for resolving a list URL to a validated token list
  * @param listUrl list url
