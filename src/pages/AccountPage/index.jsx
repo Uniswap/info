@@ -30,7 +30,7 @@ function AccountPage() {
   const activeNetworkId = useActiveNetworkId()
 
   const { accountAddress } = useParams()
-  if (!isValidAddress(accountAddress)) {
+  if (!isValidAddress(accountAddress, activeNetworkId)) {
     return <Navigate to={formatPath('/')} />
   }
 
@@ -77,7 +77,7 @@ function AccountPage() {
   const dynamicPositions = activePosition ? [activePosition] : positions
 
   const aggregateFees = dynamicPositions?.reduce(function (total, position) {
-    return total + position.fees.sum
+    return total + position.feeEarned
   }, 0)
 
   const positionValue = useMemo(() => {
