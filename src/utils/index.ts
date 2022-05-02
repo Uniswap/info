@@ -7,7 +7,9 @@ import Numeral from 'numeral'
 import { TronNetworkInfo } from 'constants/networks'
 import { GET_BLOCK, GET_BLOCKS, SHARE_VALUE } from 'service/queries/global'
 import { client } from 'service/client'
+import cryptoValidator from 'multicoin-address-validator'
 import { ApolloQueryResult } from 'apollo-boost'
+import { LOGO_OVERRIDES, LOGO_SOURCE } from 'constants/logo'
 
 BigNumber.set({ EXPONENTIAL_AT: 50 })
 
@@ -269,11 +271,30 @@ export function getTimestampRange(timestamp_from: number, period_length: number,
 
 export const toNiceDateYear = (date: number) => dayjs.utc(dayjs.unix(date)).format('MMMM DD, YYYY')
 
-export const isAddress = (value: string) => {
+export function getTokenLogoUrl(network: SupportedNetwork, address: string) {
+  const tokenAddress = network === SupportedNetwork.ETHEREUM ? checksumEthAddress(address) : address
+  return LOGO_OVERRIDES[network][address] || `${LOGO_SOURCE[network]}/${tokenAddress}/logo.png`
+}
+
+export const checksumEthAddress = (value: string) => {
   try {
     return ethers.utils.getAddress(value.toLowerCase())
   } catch {
     return false
+  }
+}
+
+export const isTronAddress = (value: string) => {
+  return cryptoValidator.validate(value, SupportedNetwork.TRON)
+}
+
+export const isValidAddress = (address: string, networkId: SupportedNetwork) => {
+  switch (networkId) {
+    case SupportedNetwork.ETHEREUM:
+      return Boolean(checksumEthAddress(address))
+    case SupportedNetwork.TRON:
+    default:
+      return isTronAddress(address)
   }
 }
 

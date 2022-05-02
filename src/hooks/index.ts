@@ -2,16 +2,16 @@ import { useState, useCallback, useEffect, useRef, RefObject } from 'react'
 import { shade } from 'polished'
 import Vibrant from 'node-vibrant'
 import { hex } from 'wcag-contrast'
-import { isAddress, networkPrefix } from '../utils'
+import { getTokenLogoUrl, networkPrefix } from '../utils'
 import copy from 'copy-to-clipboard'
 import { useAppSelector } from 'state/hooks'
+import { useActiveNetworkId } from 'state/features/application/selectors'
 
 export function useColor(tokenAddress: string, token: string) {
   const [color, setColor] = useState('#2172E5')
+  const activeNetwork = useActiveNetworkId()
   if (tokenAddress) {
-    const path = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${isAddress(
-      tokenAddress
-    )}/logo.png`
+    const path = getTokenLogoUrl(activeNetwork, tokenAddress)
     if (path) {
       Vibrant.from(path).getPalette((_err, palette) => {
         if (palette && palette.Vibrant) {

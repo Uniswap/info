@@ -19,9 +19,9 @@ import {
   getPoolLink,
   getSwapLink,
   localNumber,
-  isAddress,
   getBlockChainScanLink,
-  getViewOnScanKey
+  getViewOnScanKey,
+  isValidAddress
 } from 'utils'
 import { useTokenData, useTokenTransactions, useTokenPairsIds, useTokenPairs } from 'state/features/token/hooks'
 import { useFormatPath, useColor } from 'hooks'
@@ -100,7 +100,7 @@ function TokenPage() {
   const { tokenAddress } = useParams()
   const activeNetworkId = useActiveNetworkId()
 
-  if (OVERVIEW_TOKEN_BLACKLIST.includes(tokenAddress.toLowerCase()) || !isAddress(tokenAddress.toLowerCase())) {
+  if (OVERVIEW_TOKEN_BLACKLIST.includes(tokenAddress.toLowerCase()) || !isValidAddress(tokenAddress, activeNetworkId)) {
     return <Navigate to={formatPath('/')} />
   }
 

@@ -3,7 +3,7 @@ import { useUserTransactions, useUserPositions } from 'state/features/account/ho
 import TxnList from 'components/TxnList'
 import { useParams, Navigate } from 'react-router-dom'
 import Panel from 'components/Panel'
-import { formattedNum, getBlockChainScanLink, getViewOnScanKey, isAddress } from 'utils'
+import { formattedNum, getBlockChainScanLink, getViewOnScanKey, isValidAddress } from 'utils'
 import { AutoRow, RowFixed, RowBetween } from 'components/Row'
 import { AutoColumn } from 'components/Column'
 import UserChart from 'components/UserChart'
@@ -30,7 +30,7 @@ function AccountPage() {
   const activeNetworkId = useActiveNetworkId()
 
   const { accountAddress } = useParams()
-  if (!isAddress(accountAddress?.toLowerCase())) {
+  if (!isValidAddress(accountAddress)) {
     return <Navigate to={formatPath('/')} />
   }
 

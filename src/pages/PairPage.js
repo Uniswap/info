@@ -9,7 +9,7 @@ import { ButtonLight, ButtonDark } from 'components/ButtonStyled'
 import PairChart from 'components/PairChart'
 import Link from 'components/Link'
 import TxnList from 'components/TxnList'
-import { getBlockChainScanLink, getViewOnScanKey, isAddress } from 'utils'
+import { getBlockChainScanLink, getViewOnScanKey, isValidAddress } from 'utils'
 import Loader from 'components/LocalLoader'
 import { PAIR_BLACKLIST } from 'constants/index'
 import { BasicLink } from 'components/Link'
@@ -117,7 +117,7 @@ function PairPage() {
   const location = useLocation()
   const activeNetworkId = useActiveNetworkId()
 
-  if (PAIR_BLACKLIST.includes(pairAddress.toLowerCase()) || !isAddress(pairAddress.toLowerCase())) {
+  if (PAIR_BLACKLIST.includes(pairAddress.toLowerCase()) || !isValidAddress(pairAddress, activeNetworkId)) {
     return <Navigate to={formatPath('/')} />
   }
 

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { ButtonLight, ButtonFaded } from 'components/ButtonStyled'
 import { AutoRow, RowBetween } from 'components/Row'
-import { isAddress } from 'utils'
+import { isValidAddress } from 'utils'
 import { useSavedAccounts } from 'state/features/user/hooks'
 import { AutoColumn } from 'components/Column'
 import { TYPE } from 'Theme'
@@ -14,6 +14,7 @@ import { X } from 'react-feather'
 import { useMedia } from 'react-use'
 import { useTranslation } from 'react-i18next'
 import { AccountLink, DashGrid, Input, Wrapper } from './styled'
+import { useActiveNetworkId } from 'state/features/application/selectors'
 
 type Props = {
   small?: boolean
@@ -22,13 +23,14 @@ type Props = {
 function AccountSearch({ small }: Props) {
   const { t } = useTranslation()
   const formatPath = useFormatPath()
+  const activeNetworkId = useActiveNetworkId()
   const navigate = useNavigate()
   const [accountValue, setAccountValue] = useState<string | undefined>()
   const [savedAccounts, addAccount, removeAccount] = useSavedAccounts()
   const below440 = useMedia('(max-width: 440px)')
 
   function handleAccountSearch() {
-    if (accountValue && isAddress(accountValue)) {
+    if (accountValue && isValidAddress(accountValue, activeNetworkId)) {
       navigate(formatPath(`/accounts/${accountValue}`))
       if (!savedAccounts.includes(accountValue)) {
         addAccount(accountValue)

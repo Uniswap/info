@@ -1,6 +1,5 @@
 import { timeframeOptions } from '../../../constants'
 import dayjs from 'dayjs'
-import { isAddress } from 'ethers/lib/utils'
 import { useEffect } from 'react'
 import { useLatestBlocks } from '../application/hooks'
 import { useActiveNetworkId } from '../application/selectors'
@@ -8,6 +7,7 @@ import { useAppDispatch, useAppSelector } from 'state/hooks'
 import { setChartData, setHourlyData, setPair, setPairTransactions, setTopPairs } from './slice'
 import { useActiveTokenPrice } from '../global/selectors'
 import DataService from 'data/DataService'
+import { isValidAddress } from 'utils'
 
 export function useHourlyRateData(pairAddress: string, timeWindow: string) {
   const dispatch = useAppDispatch()
@@ -47,8 +47,7 @@ export function usePairData(pairAddress: string) {
       const data = await DataService.pairs.getBulkPairData([pairAddress], price)
       data && dispatch(setPair({ networkId: activeNetwork, pairAddress, data: data[0] }))
     }
-    // TODO: isAddress() only work for eth not for trx
-    if (!pairData && pairAddress && price && isAddress(pairAddress)) {
+    if (!pairData && pairAddress && price && isValidAddress(pairAddress, activeNetwork)) {
       fetchData()
     }
   }, [pairAddress, pairData, price, activeNetwork])
