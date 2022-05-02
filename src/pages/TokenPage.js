@@ -213,7 +213,12 @@ function TokenPage() {
             >
               <RowFixed style={{ flexWrap: 'wrap' }}>
                 <RowFixed style={{ alignItems: 'baseline' }}>
-                  <TokenLogo address={tokenAddress} size={below440 ? '22px' : '32px'} style={{ alignSelf: 'center' }} />
+                  <TokenLogo
+                    alt={symbol}
+                    address={tokenAddress}
+                    size={below440 ? '22px' : '32px'}
+                    style={{ alignSelf: 'center' }}
+                  />
                   <TYPE.main
                     fontSize={!below1080 ? '2.5rem' : below440 ? '1.25rem' : '1.5rem'}
                     style={{ margin: '0 1rem' }}

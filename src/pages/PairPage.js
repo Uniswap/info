@@ -311,7 +311,7 @@ function PairPage() {
             >
               <FixedPanel as={RouterLink} to={formatPath(`/tokens/${token0?.id}`)}>
                 <RowFixed>
-                  <TokenLogo address={token0?.id} size={'1rem'} />
+                  <TokenLogo alt={token0?.symbol} address={token0?.id} size={'1rem'} />
                   <TYPE.light fontSize=".875rem" lineHeight="1rem" fontWeight={700} ml=".25rem" mr="3.75rem">
                     {token0 && token1
                       ? `1 ${formattedSymbol0} = ${token0Rate} ${formattedSymbol1} ${
@@ -324,7 +324,7 @@ function PairPage() {
 
               <FixedPanel as={RouterLink} to={formatPath(`/tokens/${token1?.id}`)}>
                 <RowFixed>
-                  <TokenLogo address={token1?.id} size={'16px'} />
+                  <TokenLogo alt={token1?.symbol} address={token1?.id} size={'16px'} />
                   <TYPE.light fontSize={'.875rem'} lineHeight={'1rem'} fontWeight={700} ml={'.25rem'}>
                     {token0 && token1
                       ? `1 ${formattedSymbol1} = ${token1Rate} ${formattedSymbol0}  ${
@@ -403,7 +403,7 @@ function PairPage() {
                     </RowBetween>
                     <Hover as={RouterLink} to={formatPath(`/tokens/${token0?.id}`)} $fade>
                       <AutoRow gap="4px">
-                        <TokenLogo address={token0?.id} />
+                        <TokenLogo alt={token0?.symbol} address={token0?.id} />
                         <TYPE.main fontSize={20} lineHeight={1} fontWeight={500}>
                           <RowFixed>
                             {reserve0 ? formattedNum(reserve0) : ''}{' '}
@@ -414,7 +414,7 @@ function PairPage() {
                     </Hover>
                     <Hover as={RouterLink} to={formatPath(`/tokens/${token1?.id}`)} $fade>
                       <AutoRow gap="4px">
-                        <TokenLogo address={token1?.id} />
+                        <TokenLogo alt={token1?.symbol} address={token1?.id} />
                         <TYPE.main fontSize={20} lineHeight={1} fontWeight={500}>
                           <RowFixed>
                             {reserve1 ? formattedNum(reserve1) : ''}{' '}
