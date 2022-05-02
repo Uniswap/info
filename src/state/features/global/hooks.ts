@@ -63,8 +63,8 @@ export function useGlobalChartData() {
   useEffect(() => {
     async function fetchData() {
       // historical stuff for chart
-      const [newChartData, newWeeklyData] = await DataService.global.getChartData(oldestDateFetch!)
-      dispatch(setChart({ daily: newChartData, weekly: newWeeklyData, networkId: activeNetwork }))
+      const result = await DataService.global.getChartData(oldestDateFetch!)
+      dispatch(setChart({ data: result, networkId: activeNetwork }))
     }
     if (oldestDateFetch) {
       fetchData()

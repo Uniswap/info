@@ -112,7 +112,6 @@ export const GLOBAL_CHART = gql`
   query whiteSwapDayDatas($startTime: Int!, $skip: Int!) {
     whiteSwapDayDatas(first: 1000, skip: $skip, where: { date_gt: $startTime }, orderBy: date, orderDirection: asc) {
       date
-      totalVolumeUSD
       dailyVolumeUSD
       totalLiquidityUSD
     }

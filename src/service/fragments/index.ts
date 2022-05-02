@@ -3,7 +3,6 @@ import { gql } from 'apollo-boost'
 export const PAIR_FIELDS = gql`
   fragment PairFields on Pair {
     id
-    txCount
     token0 {
       id
       symbol
@@ -23,7 +22,6 @@ export const PAIR_FIELDS = gql`
     reserveUSD
     totalSupply
     trackedReserveETH
-    reserveETH
     volumeUSD
     untrackedVolumeUSD
     token0Price

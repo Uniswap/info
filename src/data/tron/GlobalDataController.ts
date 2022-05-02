@@ -3,7 +3,7 @@ import dayjs from 'dayjs'
 import { client } from 'service/client'
 import { ETH_PRICE, GLOBAL_CHART, GLOBAL_DATA, SUBGRAPH_HEALTH } from 'service/queries/global'
 import { getBlocksFromTimestamps, get2DayPercentChange, getPercentChange, getBlockFromTimestamp } from 'utils'
-import { ChartDailyItem, ChartWeeklyItem } from 'state/features/global/types'
+import { ChartDailyItem } from 'state/features/global/types'
 import { IGlobalDataController } from 'data/types/GlobalController.interface'
 
 async function fetchGlobalData(block?: number) {
@@ -120,9 +120,8 @@ export default class GlobalDataController implements IGlobalDataController {
 
     return data
   }
-  async getChartData(oldestDateToFetch: number): Promise<[ChartDailyItem[], ChartWeeklyItem[]]> {
+  async getChartData(oldestDateToFetch: number): Promise<ChartDailyItem[]> {
     let data: ChartDailyItem[] = []
-    const weeklyData: ChartWeeklyItem[] = []
     const utcEndTime = dayjs.utc()
     let skip = 0
     let allFound = false
@@ -184,23 +183,10 @@ export default class GlobalDataController implements IGlobalDataController {
 
       // format weekly data for weekly sized chunks
       data = data.sort((a, b) => (a.date > b.date ? 1 : -1))
-      let startIndexWeekly = -1
-      let currentWeek = -1
-      data.forEach((_entry, i) => {
-        const week = dayjs.utc(dayjs.unix(data[i].date)).week()
-        if (week !== currentWeek) {
-          currentWeek = week
-          startIndexWeekly++
-        }
-        weeklyData[startIndexWeekly] = weeklyData[startIndexWeekly] || {}
-        weeklyData[startIndexWeekly].date = data[i].date
-        weeklyData[startIndexWeekly].weeklyVolumeUSD =
-          (weeklyData[startIndexWeekly].weeklyVolumeUSD ?? 0) + data[i].dailyVolumeUSD
-      })
     } catch (e) {
       console.log(e)
     }
-    return [data, weeklyData]
+    return data
   }
   async getPrice() {
     const utcCurrentTime = dayjs()

@@ -11,16 +11,6 @@ export interface ChartDailyItem {
   mostLiquidTokens?: number
 }
 
-export interface ChartWeeklyItem {
-  date: number
-  weeklyVolumeUSD: number
-}
-
-export interface ChardData {
-  daily: ChartDailyItem[]
-  weekly: ChartWeeklyItem[]
-}
-
 export interface GlobalData {
   id: string
   liquidityChangeUSD: number
@@ -69,7 +59,7 @@ export interface LiquidityPosition {
 
 export interface GlobalNetworkState {
   globalData?: GlobalData
-  chartData?: ChardData
+  chartData?: ChartDailyItem[]
   transactions?: Transactions
   price: number
   oneDayPrice: number
@@ -87,8 +77,7 @@ export type UpdateTransactionsPayload = ParamsWithNetwork<{
 }>
 
 export type UpdateChartPayload = ParamsWithNetwork<{
-  daily: ChartDailyItem[]
-  weekly: ChartWeeklyItem[]
+  data: ChartDailyItem[]
 }>
 
 export type UpdatePricePayload = ParamsWithNetwork<{
