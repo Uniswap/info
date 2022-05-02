@@ -46,7 +46,6 @@ function AccountPage() {
 
   // get derived totals
   const totalSwappedUSD = useMemo(() => {
-    console.log(transactions)
     return transactions?.swaps
       ? transactions?.swaps.reduce((total, swap) => {
           return total + parseFloat(swap.amountUSD)
