@@ -121,7 +121,6 @@ export const GLOBAL_CHART = gql`
 export const GLOBAL_DATA = gql`
   query WhiteSwapFactories($block: Block_height, $factoryAddress: String!) {
     whiteSwapFactories(block: $block, where: { id: $factoryAddress }) {
-      id
       totalVolumeUSD
       totalVolumeETH
       untrackedVolumeUSD

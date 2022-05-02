@@ -3,7 +3,7 @@ import dayjs from 'dayjs'
 import { client } from 'service/client'
 import { ETH_PRICE, GLOBAL_CHART, GLOBAL_DATA, SUBGRAPH_HEALTH } from 'service/queries/global'
 import { getBlocksFromTimestamps, get2DayPercentChange, getPercentChange, getBlockFromTimestamp } from 'utils'
-import { ChartDailyItem } from 'state/features/global/types'
+import { ChartDailyItem, GlobalData } from 'state/features/global/types'
 import { IGlobalDataController } from 'data/types/GlobalController.interface'
 
 async function fetchGlobalData(block?: number) {
@@ -37,11 +37,18 @@ export default class GlobalDataController implements IGlobalDataController {
     const headBlock = +res.data.indexingStatusForCurrentVersion.chains[0].chainHeadBlock.number
     return { syncedBlock, headBlock }
   }
-  async getGlobalData(price: number, oldPrice: number) {
+  async getGlobalData(price: number, oldPrice: number): Promise<GlobalData> {
     // data for each day , historic data used for % changes
-    let data: any = {}
-    let oneDayData: any = {}
-    let twoDayData: any = {}
+    const data: GlobalData = {
+      pairCount: 0,
+      oneDayVolumeUSD: 0,
+      volumeChangeUSD: 0,
+      liquidityChangeUSD: 0,
+      oneDayTxns: 0,
+      oneWeekVolume: 0,
+      weeklyVolumeChange: 0,
+      totalLiquidityUSD: 0
+    }
 
     try {
       // get timestamps for the days
@@ -61,14 +68,14 @@ export default class GlobalDataController implements IGlobalDataController {
 
       // fetch the global data
       const result = await fetchGlobalData()
-      data = result.data.whiteSwapFactories[0]
+      const globalData = result.data.whiteSwapFactories[0]
 
       // fetch the historical data
       const oneDayResult = await fetchGlobalData(oneDayBlock?.number)
-      oneDayData = oneDayResult.data.whiteSwapFactories[0]
+      const oneDayData = oneDayResult.data.whiteSwapFactories[0]
 
       const twoDayResult = await fetchGlobalData(twoDayBlock?.number)
-      twoDayData = twoDayResult.data.whiteSwapFactories[0]
+      const twoDayData = twoDayResult.data.whiteSwapFactories[0]
 
       const oneWeekResult = await fetchGlobalData(oneWeekBlock?.number)
       const oneWeekData = oneWeekResult.data.whiteSwapFactories[0]
@@ -76,38 +83,38 @@ export default class GlobalDataController implements IGlobalDataController {
       const twoWeekResult = await fetchGlobalData(twoWeekBlock?.number)
       const twoWeekData = twoWeekResult.data.whiteSwapFactories[0]
 
-      if (data && oneDayData && twoDayData) {
+      if (globalData && oneDayData && twoDayData) {
         const [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentChange(
-          data.totalVolumeUSD,
+          globalData.totalVolumeUSD,
           oneDayData.totalVolumeUSD ? oneDayData.totalVolumeUSD : 0,
           twoDayData.totalVolumeUSD ? twoDayData.totalVolumeUSD : 0
         )
 
-        const [oneDayTxns, txnChange] = get2DayPercentChange(
-          data.txCount,
+        const [oneDayTxns] = get2DayPercentChange(
+          globalData.txCount,
           oneDayData.txCount ? oneDayData.txCount : 0,
           twoDayData.txCount ? twoDayData.txCount : 0
         )
 
         // format the total liquidity in USD
-        data.totalLiquidityUSD = data.totalLiquidityETH * price
+        data.totalLiquidityUSD = globalData.totalLiquidityETH * price
         const liquidityChangeUSD = getPercentChange(
-          data.totalLiquidityETH * price,
+          globalData.totalLiquidityETH * price,
           oneDayData.totalLiquidityETH * oldPrice
         )
 
         // add relevant fields with the calculated amounts
         data.oneDayVolumeUSD = oneDayVolumeUSD
-
         data.volumeChangeUSD = volumeChangeUSD
         data.liquidityChangeUSD = liquidityChangeUSD
         data.oneDayTxns = oneDayTxns
-        data.txnChange = txnChange
+        data.pairCount = globalData.pairCount
+        // data.txnChange = txnChange
       }
 
-      if (data && oneDayData && twoDayData && twoWeekData) {
+      if (globalData && oneDayData && twoDayData && twoWeekData) {
         const [oneWeekVolume, weeklyVolumeChange] = get2DayPercentChange(
-          data.totalVolumeUSD,
+          globalData.totalVolumeUSD,
           oneWeekData.totalVolumeUSD,
           twoWeekData.totalVolumeUSD
         )

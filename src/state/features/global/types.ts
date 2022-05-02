@@ -12,21 +12,14 @@ export interface ChartDailyItem {
 }
 
 export interface GlobalData {
-  id: string
+  pairCount: number
+  oneDayVolumeUSD: number
+  volumeChangeUSD: number
   liquidityChangeUSD: number
   oneDayTxns: number
-  oneDayVolumeUSD: number
   oneWeekVolume: number
-  pairCount: number
-  totalLiquidityETH: string
-  totalLiquidityUSD: number
-  totalVolumeETH: string
-  totalVolumeUSD: string
-  txCount: string
-  txnChange: number
-  untrackedVolumeUSD: string
-  volumeChangeUSD: number
   weeklyVolumeChange: number
+  totalLiquidityUSD: number
 }
 
 export interface Token {
