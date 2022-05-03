@@ -1,4 +1,5 @@
 import { darken } from 'polished'
+import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 
 export const NetworkSwitcherContainer = styled.div`
@@ -71,22 +72,24 @@ export const NetworkList = styled.ul`
 `
 
 export const NetworkListItem = styled.li`
-  cursor: pointer;
   transition: 0.3s;
-  padding: 0.75rem 1rem;
   margin: 0.5rem;
-  display: grid;
-  grid-template-columns: 1.5rem 1fr min-content;
-  align-items: center;
-  gap: 0 0.5rem;
   border-radius: 0.5rem;
-  color: ${({ theme }) => theme.text2};
   opacity: 0.9;
 
   :hover {
     background-color: ${({ theme }) => theme.bg1};
     opacity: 1;
   }
+`
+
+export const NetworkListItemLink = styled(Link)`
+  padding: 0.75rem 1rem;
+  display: grid;
+  grid-template-columns: 1.5rem 1fr min-content;
+  align-items: center;
+  gap: 0 0.5rem;
+  color: ${({ theme }) => theme.text2};
 `
 
 export const NetworkBlurb = styled.span`
