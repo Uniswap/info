@@ -91,13 +91,6 @@ function AccountPage() {
       : null
   }, [dynamicPositions])
 
-  useEffect(() => {
-    window.scrollTo({
-      behavior: 'smooth',
-      top: 0
-    })
-  }, [])
-
   return (
     <PageWrapper>
       <ContentWrapper>

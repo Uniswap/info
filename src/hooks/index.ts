@@ -6,6 +6,7 @@ import { getTokenLogoUrl, networkPrefix } from '../utils'
 import copy from 'copy-to-clipboard'
 import { useAppSelector } from 'state/hooks'
 import { useActiveNetworkId } from 'state/features/application/selectors'
+import { useLocation } from 'react-router-dom'
 
 export function useColor(tokenAddress: string, token: string) {
   const [color, setColor] = useState('#2172E5')
@@ -109,4 +110,12 @@ export function useFormatPath() {
     },
     [activeNetwork]
   )
+}
+
+export function useScrollToTop() {
+  const location = useLocation()
+
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [location])
 }

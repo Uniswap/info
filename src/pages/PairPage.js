@@ -201,11 +201,6 @@ function PairPage() {
   const below440 = useMedia('(max-width: 440px)')
 
   const [dismissed, markAsDismissed] = usePathDismissed(location.pathname)
-
-  useEffect(() => {
-    window.scrollTo(0, 0)
-  }, [])
-
   const [savedPairs, addPair] = useSavedPairs()
 
   const listedTokens = useListedTokens()

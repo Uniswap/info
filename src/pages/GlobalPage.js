@@ -1,4 +1,3 @@
-import { useEffect } from 'react'
 import styled from 'styled-components/macro'
 
 import { AutoRow, RowBetween } from '../components/Row'
@@ -58,15 +57,6 @@ function GlobalPage() {
   // breakpoints
   const below440 = useMedia('(max-width: 440px)')
   const below800 = useMedia('(max-width: 800px)')
-
-  // scrolling refs
-
-  useEffect(() => {
-    document.querySelector('body').scrollTo({
-      behavior: 'smooth',
-      top: 0
-    })
-  }, [])
 
   return (
     <PageWrapper>

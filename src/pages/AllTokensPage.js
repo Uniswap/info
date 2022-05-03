@@ -1,4 +1,3 @@
-import { useEffect } from 'react'
 import TopTokenList from '../components/TokenList'
 import { TYPE } from '../Theme'
 import { PageWrapper, FullWrapper } from '../components'
@@ -12,10 +11,6 @@ import { useTokens } from 'state/features/token/selectors'
 function AllTokensPage() {
   const { t } = useTranslation()
   const allTokens = useTokens()
-
-  useEffect(() => {
-    window.scrollTo(0, 0)
-  }, [])
 
   const below600 = useMedia('(max-width: 800px)')
 

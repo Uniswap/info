@@ -169,10 +169,6 @@ function TokenPage() {
   const [savedTokens, addToken] = useSavedTokens()
   const listedTokens = useListedTokens()
 
-  useEffect(() => {
-    window.scrollTo(0, 0)
-  }, [])
-
   return (
     <PageWrapper>
       <Warning
