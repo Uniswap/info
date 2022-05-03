@@ -34,8 +34,8 @@ function parseData(data: any, oneDayData: any, twoDayData: any, oneWeekData: any
   // get volume changes
   const [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentChange(
     data?.volumeUSD,
-    oneDayData?.volumeUSD ? oneDayData.volumeUSD : 0,
-    twoDayData?.volumeUSD ? twoDayData.volumeUSD : 0
+    oneDayData?.volumeUSD || 0,
+    twoDayData?.volumeUSD || 0
   )
   const [oneDayVolumeUntracked, volumeChangeUntracked] = get2DayPercentChange(
     data?.untrackedVolumeUSD,
@@ -143,7 +143,6 @@ export default class PairDataController implements IPairDataController {
     const pairData: Pair[] = await Promise.all(
       current &&
         current.data.pairs.map(async (pair: { id: string }) => {
-          let data = pair
           let oneDayHistory = oneDayData?.[pair.id]
           if (!oneDayHistory) {
             const newData = await fetchPairData(pair.id, b1)
@@ -159,8 +158,7 @@ export default class PairDataController implements IPairDataController {
             const newData = await fetchPairData(pair.id, bWeek)
             oneWeekHistory = newData.data.pairs[0]
           }
-          data = parseData(data, oneDayHistory, twoDayHistory, oneWeekHistory, price, b1)
-          return data
+          return parseData(pair, oneDayHistory, twoDayHistory, oneWeekHistory, price, b1)
         })
     )
     return pairData

@@ -215,7 +215,11 @@ function PairPage() {
       <span />
       <Warning
         type={'pair'}
-        show={!dismissed && listedTokens && !(listedTokens.includes(token0?.id) && listedTokens.includes(token1?.id))}
+        show={
+          !dismissed &&
+          listedTokens.length > 0 &&
+          !(listedTokens.includes(token0?.id) && listedTokens.includes(token1?.id))
+        }
         setShow={markAsDismissed}
         address={pairAddress}
       />

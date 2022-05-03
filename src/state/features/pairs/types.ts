@@ -40,7 +40,6 @@ export interface PairDayData {
   dailyVolumeUSD: number
   date: number
   dayString?: number
-  id: string
   reserveUSD: number
 }
 

@@ -19,7 +19,6 @@ export const HOURLY_PAIR_RATES = (pairAddress: string, blocks: BlockHeight[]) =>
 export const PAIR_CHART = gql`
   query PairChart($pairAddress: Bytes!, $skip: Int!) {
     pairDayDatas(first: 1000, skip: $skip, orderBy: date, orderDirection: asc, where: { pairAddress: $pairAddress }) {
-      id
       date
       dailyVolumeToken0
       dailyVolumeToken1
