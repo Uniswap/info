@@ -8,6 +8,8 @@ import { Hover } from '..'
 import Link from '../Link'
 import { useMedia } from 'react-use'
 import { useTranslation } from 'react-i18next'
+import { getBlockChainScanLink, getViewOnScanKey } from 'utils'
+import { useActiveNetworkId } from 'state/features/application/selectors'
 
 const WarningWrapper = styled.div`
   border-radius: 20px;
@@ -31,8 +33,9 @@ const StyledWarningIcon = styled(AlertTriangle)`
   stroke: red;
 `
 
-export default function Warning({ type, show, setShow, address }) {
+export default function Warning({ show, setShow, address }) {
   const { t } = useTranslation()
+  const activeNetworkId = useActiveNetworkId()
 
   const below800 = useMedia('(max-width: 800px)')
 
@@ -68,10 +71,10 @@ export default function Warning({ type, show, setShow, address }) {
                 fontWeight={500}
                 lineHeight={'145.23%'}
                 color={'#2172E5'}
-                href={'https://etherscan.io/address/' + address}
+                href={getBlockChainScanLink(activeNetworkId, address, 'address')}
                 target="_blank"
               >
-                {type === 'token' ? t('viewTokenContractOnEtherscan') : t('viewPairContractOnEtherscan')}
+                {t(getViewOnScanKey(activeNetworkId))}
               </Link>
             </Hover>
             <RowBetween style={{ marginTop: '20px' }}>
@@ -88,10 +91,10 @@ export default function Warning({ type, show, setShow, address }) {
                 fontWeight={500}
                 lineHeight={'145.23%'}
                 color={'#2172E5'}
-                href={'https://etherscan.io/address/' + address}
+                href={getBlockChainScanLink(activeNetworkId, address, 'address')}
                 target="_blank"
               >
-                {type === 'token' ? t('viewTokenContractOnEtherscan') : t('viewPairContractOnEtherscan')}
+                {t(getViewOnScanKey(activeNetworkId))}
               </Link>
             </Hover>
             <ButtonDark color={'#f82d3a'} style={{ minWidth: '140px' }} onClick={() => setShow(false)}>

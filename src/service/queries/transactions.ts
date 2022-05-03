@@ -53,36 +53,3 @@ export const USER_TRANSACTIONS = gql`
     }
   }
 `
-
-export const USER_MINTS_BURNS_PER_PAIR = gql`
-  query UserMintsBurnsPerPair($user: Bytes!, $pair: Bytes!) {
-    mints(where: { to: $user, pair: $pair }) {
-      amountUSD
-      amount0
-      amount1
-      timestamp
-      pair {
-        token0 {
-          id
-        }
-        token1 {
-          id
-        }
-      }
-    }
-    burns(where: { sender: $user, pair: $pair }) {
-      amountUSD
-      amount0
-      amount1
-      timestamp
-      pair {
-        token0 {
-          id
-        }
-        token1 {
-          id
-        }
-      }
-    }
-  }
-`

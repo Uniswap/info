@@ -1,5 +1,8 @@
 import { TokenList } from '@uniswap/token-lists'
-import schema from '@uniswap/token-lists/src/tokenlist.schema.json'
+import ethSchema from '@uniswap/token-lists/src/tokenlist.schema.json'
+import trxSchema from 'schema/tronTokenList.schema.json'
+import { SupportedNetwork } from 'constants/networks'
+
 import Ajv from 'ajv'
 
 /**
@@ -26,13 +29,11 @@ function uriToHttp(uri: string): string[] {
   }
 }
 
-const tokenListValidator = new Ajv({ allErrors: true }).compile(schema)
-
 /**
  * Contains the logic for resolving a list URL to a validated token list
  * @param listUrl list url
  */
-export default async function getTokenList(listUrl: string): Promise<TokenList> {
+export default async function getTokenList(listUrl: string, networkId: SupportedNetwork): Promise<TokenList> {
   const urls = uriToHttp(listUrl)
   for (let i = 0; i < urls.length; i++) {
     const url = urls[i]
@@ -52,6 +53,10 @@ export default async function getTokenList(listUrl: string): Promise<TokenList> 
     }
 
     const json: TokenList = await response.json()
+
+    const validationSchema = networkId === SupportedNetwork.ETHEREUM ? ethSchema : trxSchema
+    const tokenListValidator = new Ajv({ allErrors: true }).compile(validationSchema)
+
     if (!tokenListValidator(json)) {
       const validationErrors: string =
         tokenListValidator.errors?.reduce<string>((memo, error) => {

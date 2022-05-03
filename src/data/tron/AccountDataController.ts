@@ -158,10 +158,10 @@ export default class AccountDataController implements IAccountDataController {
       if (result?.data?.liquidityPositions) {
         const formattedPositions = await Promise.all(
           result?.data?.liquidityPositions.map(async (positionData: any) => {
-            const returnData = await getLPReturnsOnPair(account, positionData.pair, price, snapshots)
+            const feeEarned = await getLPReturnsOnPair(positionData.pair, price, snapshots)
             return {
               ...positionData,
-              ...returnData
+              feeEarned
             }
           })
         )

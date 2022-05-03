@@ -53,13 +53,13 @@ export function useStartTimestamp() {
 export function useListedTokens() {
   const dispatch = useAppDispatch()
   const networkId = useActiveNetworkId()
-  const supportedTokens = useAppSelector(state => state.application.supportedTokens[state.application.activeNetwork.id])
+  const supportedTokens = useAppSelector(state => state.application.supportedTokens[networkId])
 
   useEffect(() => {
     async function fetchList() {
       const allFetched = await Promise.all(
         DEFAULT_LIST_OF_LISTS[networkId].map(async url => {
-          const tokenList = await getTokenList(url)
+          const tokenList = await getTokenList(url, networkId)
           return tokenList.tokens
         })
       )

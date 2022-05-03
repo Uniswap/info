@@ -6,12 +6,6 @@ type PositionToken = {
   symbol: string
 }
 
-type Principal = {
-  amount0: number
-  amount1: number
-  usd: number
-}
-
 type PositionPair = {
   id: string
   reserve0: string
@@ -24,17 +18,8 @@ type PositionPair = {
 
 export interface Position {
   pair: PositionPair
-  principal: Principal
   liquidityTokenBalance: string
-  fees: {
-    sum: number
-  }
-  net: {
-    return: number
-  }
-  uniswap: {
-    return: number
-  }
+  feeEarned: number
 }
 
 export type SnapshotToken = {

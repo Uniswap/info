@@ -14,7 +14,15 @@ import TxnList from 'components/TxnList'
 import TokenChart from 'components/TokenChart'
 import { BasicLink } from 'components/Link'
 import Search from 'components/Search'
-import { formattedNum, formattedPercent, getPoolLink, getSwapLink, localNumber, isAddress } from 'utils'
+import {
+  formattedNum,
+  getPoolLink,
+  getSwapLink,
+  localNumber,
+  getBlockChainScanLink,
+  getViewOnScanKey,
+  isValidAddress
+} from 'utils'
 import { useTokenData, useTokenTransactions, useTokenPairsIds, useTokenPairs } from 'state/features/token/hooks'
 import { useFormatPath, useColor } from 'hooks'
 import { OVERVIEW_TOKEN_BLACKLIST } from 'constants/index'
@@ -29,6 +37,7 @@ import { useListedTokens } from 'state/features/application/hooks'
 import { TYPE, DashboardWrapper } from 'Theme'
 import { useTranslation } from 'react-i18next'
 import { useActiveNetworkId } from 'state/features/application/selectors'
+import Percent from 'components/Percent'
 
 const PanelWrapper = styled.div`
   grid-template-columns: repeat(3, 1fr);
@@ -91,7 +100,7 @@ function TokenPage() {
   const { tokenAddress } = useParams()
   const activeNetworkId = useActiveNetworkId()
 
-  if (OVERVIEW_TOKEN_BLACKLIST.includes(tokenAddress.toLowerCase()) || !isAddress(tokenAddress.toLowerCase())) {
+  if (OVERVIEW_TOKEN_BLACKLIST.includes(tokenAddress.toLowerCase()) || !isValidAddress(tokenAddress, activeNetworkId)) {
     return <Navigate to={formatPath('/')} />
   }
 
@@ -123,7 +132,6 @@ function TokenPage() {
 
   // price
   const price = priceUSD ? formattedNum(priceUSD, true) : ''
-  const priceChange = priceChangeUSD ? formattedPercent(priceChangeUSD) : ''
 
   // volume
   const volume =
@@ -139,14 +147,12 @@ function TokenPage() {
     setUsingUtVolume(oneDayVolumeUSD === 0 ? true : false)
   }, [oneDayVolumeUSD])
 
-  const volumeChange = formattedPercent(!usingUtVolume ? volumeChangeUSD : volumeChangeUT)
+  const volumeChange = !usingUtVolume ? volumeChangeUSD : volumeChangeUT
 
   // liquidity
   const liquidity = totalLiquidityUSD ? formattedNum(totalLiquidityUSD, true) : totalLiquidityUSD === 0 ? '$0' : '-'
-  const liquidityChange = formattedPercent(liquidityChangeUSD)
 
   // transactions
-  const txnChangeFormatted = formattedPercent(txnChange)
 
   const below1080 = useMedia('(max-width: 1080px)')
   const below1024 = useMedia('(max-width: 1024px)')
@@ -186,7 +192,7 @@ function TokenPage() {
               style={{ width: 'fit-content' }}
               color={backgroundColor}
               external
-              href={'https://etherscan.io/address/' + tokenAddress}
+              href={getBlockChainScanLink(activeNetworkId, tokenAddress, 'token')}
             >
               <Text style={{ marginLeft: '.15rem' }} fontSize={'14px'} fontWeight={400}>
                 ({tokenAddress.slice(0, 8) + '...' + tokenAddress.slice(36, 42)})
@@ -207,7 +213,12 @@ function TokenPage() {
             >
               <RowFixed style={{ flexWrap: 'wrap' }}>
                 <RowFixed style={{ alignItems: 'baseline' }}>
-                  <TokenLogo address={tokenAddress} size={below440 ? '22px' : '32px'} style={{ alignSelf: 'center' }} />
+                  <TokenLogo
+                    alt={symbol}
+                    address={tokenAddress}
+                    size={below440 ? '22px' : '32px'}
+                    style={{ alignSelf: 'center' }}
+                  />
                   <TYPE.main
                     fontSize={!below1080 ? '2.5rem' : below440 ? '1.25rem' : '1.5rem'}
                     style={{ margin: '0 1rem' }}
@@ -222,7 +233,7 @@ function TokenPage() {
                       <TYPE.main fontSize={'1.5rem'} fontWeight={500} style={{ marginRight: '1rem' }}>
                         {price}
                       </TYPE.main>
-                      {priceChange}
+                      {priceChangeUSD ? <Percent percent={priceChangeUSD} /> : ''}
                     </>
                   )}
                 </RowFixed>
@@ -267,7 +278,7 @@ function TokenPage() {
                       <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={500}>
                         {price}
                       </TYPE.main>
-                      <TYPE.main>{priceChange}</TYPE.main>
+                      <TYPE.main>{priceChangeUSD ? <Percent percent={priceChangeUSD} /> : ''}</TYPE.main>
                     </RowBetween>
                   </AutoColumn>
                 </Panel>
@@ -284,7 +295,9 @@ function TokenPage() {
                     <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={500}>
                       {liquidity}
                     </TYPE.main>
-                    <TYPE.main>{liquidityChange}</TYPE.main>
+                    <TYPE.main>
+                      <Percent percent={liquidityChangeUSD} />
+                    </TYPE.main>
                   </RowBetween>
                 </AutoColumn>
               </Panel>
@@ -300,7 +313,9 @@ function TokenPage() {
                     <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={500}>
                       {volume}
                     </TYPE.main>
-                    <TYPE.main>{volumeChange}</TYPE.main>
+                    <TYPE.main>
+                      <Percent percent={volumeChange} />
+                    </TYPE.main>
                   </RowBetween>
                 </AutoColumn>
               </Panel>
@@ -317,7 +332,9 @@ function TokenPage() {
                     <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={500}>
                       {oneDayTxns ? localNumber(oneDayTxns) : oneDayTxns === 0 ? 0 : '-'}
                     </TYPE.main>
-                    <TYPE.main>{txnChangeFormatted}</TYPE.main>
+                    <TYPE.main>
+                      <Percent percent={txnChange} />
+                    </TYPE.main>
                   </RowBetween>
                 </AutoColumn>
               </Panel>
@@ -383,8 +400,12 @@ function TokenPage() {
                   </RowBetween>
                 </Column>
                 <ButtonLight color={backgroundColor}>
-                  <Link color={backgroundColor} external href={'https://etherscan.io/address/' + tokenAddress}>
-                    {t('viewOnEtherscan')} ↗
+                  <Link
+                    color={backgroundColor}
+                    external
+                    href={getBlockChainScanLink(activeNetworkId, tokenAddress, 'token')}
+                  >
+                    {t(getViewOnScanKey(activeNetworkId))} ↗
                   </Link>
                 </ButtonLight>
               </TokenDetailsLayout>

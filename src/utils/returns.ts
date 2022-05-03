@@ -1,8 +1,5 @@
 import dayjs from 'dayjs'
 import { getShareValueOverTime } from '.'
-import { UserMintsBurnsParams } from 'service/types/AccountTypes'
-import { client } from 'service/client'
-import { USER_MINTS_BURNS_PER_PAIR } from 'service/queries/transactions'
 
 export const priceOverrides = [
   '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', // USDC
@@ -48,56 +45,6 @@ function formatPricesForEarlyTimestamps(position: any): Position {
     }
   }
   return position
-}
-
-async function getPrincipalForUserPerPair(user: string, pair: string) {
-  let usd = 0
-  let amount0 = 0
-  let amount1 = 0
-  // get all minst and burns to get principal amounts
-  const results = await client.query<any, UserMintsBurnsParams>({
-    query: USER_MINTS_BURNS_PER_PAIR,
-    variables: {
-      user,
-      pair
-    }
-  })
-  for (const index in results.data.mints) {
-    const mint = results.data.mints[index]
-    const mintToken0 = mint.pair.token0.id
-    const mintToken1 = mint.pair.token1.id
-
-    // if trackign before prices were discovered (pre-launch days), hardcode stablecoins
-    if (priceOverrides.includes(mintToken0) && mint.transaction.timestamp < PRICE_DISCOVERY_START_TIMESTAMP) {
-      usd += parseFloat(mint.amount0) * 2
-    } else if (priceOverrides.includes(mintToken1) && mint.transaction.timestamp < PRICE_DISCOVERY_START_TIMESTAMP) {
-      usd += parseFloat(mint.amount1) * 2
-    } else {
-      usd += parseFloat(mint.amountUSD)
-    }
-    amount0 += amount0 + parseFloat(mint.amount0)
-    amount1 += amount1 + parseFloat(mint.amount1)
-  }
-
-  for (const index in results.data.burns) {
-    const burn = results.data.burns[index]
-    const burnToken0 = burn.pair.token0.id
-    const burnToken1 = burn.pair.token1.id
-
-    // if trackign before prices were discovered (pre-launch days), hardcode stablecoins
-    if (priceOverrides.includes(burnToken0) && burn.transaction.timestamp < PRICE_DISCOVERY_START_TIMESTAMP) {
-      usd += parseFloat(burn.amount0) * 2
-    } else if (priceOverrides.includes(burnToken1) && burn.transaction.timestamp < PRICE_DISCOVERY_START_TIMESTAMP) {
-      usd += parseFloat(burn.amount1) * 2
-    } else {
-      usd -= parseFloat(results.data.burns[index].amountUSD)
-    }
-
-    amount0 -= parseFloat(results.data.burns[index].amount0)
-    amount1 -= parseFloat(results.data.burns[index].amount1)
-  }
-
-  return { usd, amount0, amount1 }
 }
 
 /**
@@ -258,16 +205,12 @@ export async function getHistoricalPairReturns(
 
 /**
  * For a given pair and user, get the return metrics
- * @param user
  * @param pair
  * @param ethPrice
+ * @param snapshots
  */
-export async function getLPReturnsOnPair(user: string, pair: any, ethPrice: number, snapshots: any) {
+export async function getLPReturnsOnPair(pair: any, ethPrice: number, snapshots: any) {
   // initialize values
-  const principal = await getPrincipalForUserPerPair(user, pair.id)
-  let hodlReturn = 0
-  let netReturn = 0
-  let uniswapReturn = 0
   let fees = 0
 
   snapshots = snapshots.filter((entry: any) => {
@@ -292,22 +235,8 @@ export async function getLPReturnsOnPair(user: string, pair: any, ethPrice: numb
     const positionT1 = parseInt(index) === snapshots.length - 1 ? currentPosition : snapshots[parseInt(index) + 1]
 
     const results = getMetricsForPositionWindow(positionT0, positionT1)
-    hodlReturn = hodlReturn + results.hodleReturn
-    netReturn = netReturn + results.netReturn
-    uniswapReturn = uniswapReturn + results.uniswapReturn
     fees = fees + results.fees
   }
 
-  return {
-    principal,
-    net: {
-      return: netReturn
-    },
-    uniswap: {
-      return: uniswapReturn
-    },
-    fees: {
-      sum: fees
-    }
-  }
+  return fees
 }

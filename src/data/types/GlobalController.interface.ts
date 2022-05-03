@@ -1,5 +1,5 @@
 import { HealthStatus } from 'state/features/application/types'
-import { ChartDailyItem, ChartWeeklyItem, GlobalData } from 'state/features/global/types'
+import { ChartDailyItem, GlobalData } from 'state/features/global/types'
 
 export interface IGlobalDataController {
   /**
@@ -15,7 +15,7 @@ export interface IGlobalDataController {
    * on main page
    * @param {*} oldestDateToFetch // start of window to fetch from
    */
-  getChartData(oldestDateToFetch: number): Promise<[ChartDailyItem[], ChartWeeklyItem[]]>
+  getChartData(oldestDateToFetch: number): Promise<ChartDailyItem[]>
   /**
    * Gets the current price  of ETH, 24 hour price, and % change between them
    */

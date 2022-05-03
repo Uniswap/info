@@ -33,11 +33,8 @@ export const globalSlice = createSlice({
     setTransactions: (state, { payload: { networkId, transactions } }: PayloadAction<UpdateTransactionsPayload>) => {
       state[networkId].transactions = transactions
     },
-    setChart: (state, { payload: { networkId, daily, weekly } }: PayloadAction<UpdateChartPayload>) => {
-      state[networkId].chartData = {
-        daily,
-        weekly
-      }
+    setChart: (state, { payload: { networkId, data } }: PayloadAction<UpdateChartPayload>) => {
+      state[networkId].chartData = data
     },
     setPrice: (
       state,

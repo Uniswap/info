@@ -1,6 +1,5 @@
 import { timeframeOptions } from '../../../constants'
 import dayjs from 'dayjs'
-import { isAddress } from 'ethers/lib/utils'
 import { useEffect } from 'react'
 import { useLatestBlocks } from '../application/hooks'
 import { useActiveNetworkId } from '../application/selectors'
@@ -8,6 +7,7 @@ import { useAppDispatch, useAppSelector } from 'state/hooks'
 import { setTokenPairs, setChartData, setPriceData, setToken, setTopTokens, setTransactions } from './slice'
 import { useActiveTokenOneDayPrice, useActiveTokenPrice } from '../global/selectors'
 import DataService from 'data/DataService'
+import { isValidAddress } from 'utils'
 
 export function useFetchTokens() {
   const dispatch = useAppDispatch()
@@ -38,7 +38,7 @@ export function useTokenData(tokenAddress: string) {
       data && dispatch(setToken({ tokenAddress, networkId: activeNetwork, data }))
     }
     // TODO: isAddress only validate ETH address
-    if (!tokenData && price && oneDayPrice && isAddress(tokenAddress)) {
+    if (!tokenData && price && oneDayPrice && isValidAddress(tokenAddress, activeNetwork)) {
       fetchData()
     }
   }, [price, oneDayPrice, tokenAddress, tokenData, activeNetwork])
@@ -75,7 +75,7 @@ export function useTokenPairsIds(tokenAddress: string) {
       const allPairs = await DataService.tokens.getTokenPairs(tokenAddress)
       dispatch(setTokenPairs({ networkId: activeNetwork, allPairs, address: tokenAddress }))
     }
-    if (!tokenPairs && isAddress(tokenAddress)) {
+    if (!tokenPairs && isValidAddress(tokenAddress, activeNetwork)) {
       fetchData()
     }
   }, [tokenAddress, tokenPairs, activeNetwork])

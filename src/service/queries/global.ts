@@ -112,7 +112,6 @@ export const GLOBAL_CHART = gql`
   query whiteSwapDayDatas($startTime: Int!, $skip: Int!) {
     whiteSwapDayDatas(first: 1000, skip: $skip, where: { date_gt: $startTime }, orderBy: date, orderDirection: asc) {
       date
-      totalVolumeUSD
       dailyVolumeUSD
       totalLiquidityUSD
     }
@@ -122,7 +121,6 @@ export const GLOBAL_CHART = gql`
 export const GLOBAL_DATA = gql`
   query WhiteSwapFactories($block: Block_height, $factoryAddress: String!) {
     whiteSwapFactories(block: $block, where: { id: $factoryAddress }) {
-      id
       totalVolumeUSD
       totalVolumeETH
       untrackedVolumeUSD

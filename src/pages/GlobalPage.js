@@ -16,13 +16,14 @@ import { useFormatPath } from 'hooks'
 import { usePairs } from 'state/features/pairs/selectors'
 import { useMedia } from 'react-use'
 import Panel from '../components/Panel'
-import { formattedNum, formattedPercent } from '../utils'
+import { formattedNum } from '../utils'
 import { DashboardWrapper, TYPE } from '../Theme'
 import { CustomLink } from '../components/Link'
 
 import { PageWrapper, ContentWrapper } from '../components'
 import { useTranslation } from 'react-i18next'
 import { useTokens } from 'state/features/token/selectors'
+import Percent from 'components/Percent'
 
 const ListOptions = styled(AutoRow)`
   height: 40px;
@@ -95,7 +96,9 @@ function GlobalPage() {
                     <TYPE.main fontSize={below440 ? '1.25rem' : '1.5rem'} lineHeight={1} fontWeight={600}>
                       {formattedNum(oneDayVolumeUSD, true)}
                     </TYPE.main>
-                    <TYPE.main fontSize={12}>{formattedPercent(volumeChangeUSD)}</TYPE.main>
+                    <TYPE.main fontSize={12}>
+                      <Percent percent={volumeChangeUSD} />
+                    </TYPE.main>
                   </RowBetween>
                 </AutoColumn>
                 <AutoColumn gap="1rem">
@@ -106,7 +109,9 @@ function GlobalPage() {
                     <TYPE.main fontSize={below440 ? '1.25rem' : '1.5rem'} lineHeight={1} fontWeight={600}>
                       {formattedNum(totalLiquidityUSD, true)}
                     </TYPE.main>
-                    <TYPE.main fontSize={12}>{formattedPercent(liquidityChangeUSD)}</TYPE.main>
+                    <TYPE.main fontSize={12}>
+                      <Percent percent={liquidityChangeUSD} />
+                    </TYPE.main>
                   </RowBetween>
                 </AutoColumn>
               </AutoColumn>

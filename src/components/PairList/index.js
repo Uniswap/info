@@ -7,7 +7,7 @@ import { useFormatPath } from 'hooks'
 
 import { CustomLink } from '../Link'
 import { Divider } from '../../components'
-import { formattedNum, formattedPercent } from '../../utils'
+import { formattedNum } from '../../utils'
 import DoubleTokenLogo from '../DoubleLogo'
 import FormattedName from '../FormattedName'
 import QuestionHelper from '../QuestionHelper'
@@ -15,6 +15,7 @@ import { TYPE } from '../../Theme'
 import { transparentize } from 'polished'
 import Panel from '../Panel'
 import { useTranslation } from 'react-i18next'
+import Percent from 'components/Percent'
 
 const PageButtons = styled.div`
   width: 100%;
@@ -184,7 +185,7 @@ function PairList({ pairs, disbaleLinks, maxItems = 10 }) {
     if (pairData && pairData.token0 && pairData.token1) {
       const liquidity = formattedNum(pairData.reserveUSD, true)
       const volume = formattedNum(pairData.oneDayVolumeUSD, true)
-      const apy = formattedPercent((pairData.oneDayVolumeUSD * 0.003 * 365 * 100) / pairData.reserveUSD)
+      const apy = (pairData.oneDayVolumeUSD * 0.003 * 365 * 100) / pairData.reserveUSD
 
       return (
         <DashGrid style={{ padding: below440 ? '.75rem' : '.875rem 2rem' }} disbaleLinks={disbaleLinks} focus={true}>
@@ -212,7 +213,11 @@ function PairList({ pairs, disbaleLinks, maxItems = 10 }) {
           <DataText area="vol">{volume}</DataText>
           {!below1080 && <DataText area="volWeek">{formattedNum(pairData.oneWeekVolumeUSD, true)}</DataText>}
           {!below1080 && <DataText area="fees">{formattedNum(pairData.oneDayVolumeUSD * 0.003, true)}</DataText>}
-          {!below1080 && <DataText area="apy">{apy}</DataText>}
+          {!below1080 && (
+            <DataText area="apy">
+              <Percent percent={apy} />
+            </DataText>
+          )}
         </DashGrid>
       )
     } else {

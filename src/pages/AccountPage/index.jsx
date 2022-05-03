@@ -3,7 +3,7 @@ import { useUserTransactions, useUserPositions } from 'state/features/account/ho
 import TxnList from 'components/TxnList'
 import { useParams, Navigate } from 'react-router-dom'
 import Panel from 'components/Panel'
-import { formattedNum, isAddress } from 'utils'
+import { formattedNum, getBlockChainScanLink, getViewOnScanKey, isValidAddress } from 'utils'
 import { AutoRow, RowFixed, RowBetween } from 'components/Row'
 import { AutoColumn } from 'components/Column'
 import UserChart from 'components/UserChart'
@@ -22,13 +22,15 @@ import { useMedia } from 'react-use'
 import Search from 'components/Search'
 import { useTranslation } from 'react-i18next'
 import { AccountWrapper, DropdownWrapper, Flyout, Header, MenuRow, Warning } from './styled'
+import { useActiveNetworkId } from 'state/features/application/selectors'
 
 function AccountPage() {
   const { t } = useTranslation()
   const formatPath = useFormatPath()
+  const activeNetworkId = useActiveNetworkId()
 
   const { accountAddress } = useParams()
-  if (!isAddress(accountAddress?.toLowerCase())) {
+  if (!isValidAddress(accountAddress, activeNetworkId)) {
     return <Navigate to={formatPath('/')} />
   }
 
@@ -44,7 +46,6 @@ function AccountPage() {
 
   // get derived totals
   const totalSwappedUSD = useMemo(() => {
-    console.log(transactions)
     return transactions?.swaps
       ? transactions?.swaps.reduce((total, swap) => {
           return total + parseFloat(swap.amountUSD)
@@ -75,7 +76,7 @@ function AccountPage() {
   const dynamicPositions = activePosition ? [activePosition] : positions
 
   const aggregateFees = dynamicPositions?.reduce(function (total, position) {
-    return total + position.fees.sum
+    return total + position.feeEarned
   }, 0)
 
   const positionValue = useMemo(() => {
@@ -103,7 +104,11 @@ function AccountPage() {
         <RowBetween>
           <TYPE.body>
             <BasicLink to={formatPath('/accounts')}>{`${t('accounts')} `}</BasicLink>→
-            <Link lineHeight={'145.23%'} href={'https://etherscan.io/address/' + accountAddress} target="_blank">
+            <Link
+              lineHeight={'145.23%'}
+              href={getBlockChainScanLink(activeNetworkId, accountAddress, 'address')}
+              target="_blank"
+            >
               {accountAddress?.slice(0, 42)}
             </Link>
           </TYPE.body>
@@ -115,8 +120,12 @@ function AccountPage() {
               <TYPE.header fontSize={24}>
                 {accountAddress?.slice(0, 6) + '...' + accountAddress?.slice(38, 42)}
               </TYPE.header>
-              <Link lineHeight={'145.23%'} href={'https://etherscan.io/address/' + accountAddress} target="_blank">
-                <TYPE.main fontSize={14}>{t('viewOnEtherscan')}</TYPE.main>
+              <Link
+                lineHeight={'145.23%'}
+                href={getBlockChainScanLink(activeNetworkId, accountAddress, 'address')}
+                target="_blank"
+              >
+                <TYPE.main fontSize={14}>{t(getViewOnScanKey(activeNetworkId))}</TYPE.main>
               </Link>
             </span>
             <AccountWrapper>

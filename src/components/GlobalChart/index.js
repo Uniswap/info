@@ -27,7 +27,7 @@ const GlobalChart = ({ display }) => {
   const [volumeWindow] = useState(VOLUME_WINDOW.DAYS)
 
   // global historical data
-  const { daily, weekly } = useGlobalChartDataSelector()
+  const chartData = useGlobalChartDataSelector()
   const { totalLiquidityUSD, oneDayVolumeUSD, volumeChangeUSD, liquidityChangeUSD, oneWeekVolume, weeklyVolumeChange } =
     useGlobalDataSelector()
 
@@ -35,12 +35,11 @@ const GlobalChart = ({ display }) => {
   let utcStartTime = getTimeframe(timeWindow)
 
   const chartDataFiltered = useMemo(() => {
-    let currentData = volumeWindow === VOLUME_WINDOW.DAYS ? daily : weekly
     return (
-      currentData &&
-      Object.keys(currentData)
+      chartData &&
+      Object.keys(chartData)
         ?.map(key => {
-          let item = currentData[key]
+          let item = chartData[key]
           if (item.date > utcStartTime) {
             return item
           } else {
@@ -51,7 +50,7 @@ const GlobalChart = ({ display }) => {
           return !!item
         })
     )
-  }, [daily, utcStartTime, volumeWindow, weekly])
+  }, [chartData, utcStartTime, volumeWindow])
   const below800 = useMedia('(max-width: 800px)')
 
   // update the width on a window resize
@@ -77,7 +76,7 @@ const GlobalChart = ({ display }) => {
       {chartDataFiltered && chartView === CHART_VIEW.LIQUIDITY && (
         <Panel>
           <TradingViewChart
-            data={daily}
+            data={chartData}
             base={totalLiquidityUSD}
             baseChange={liquidityChangeUSD}
             title={t('liquidity')}

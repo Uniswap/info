@@ -9,10 +9,10 @@ import {
   NetworkListItem,
   NetworkLogo,
   NetworkName,
-  NetworkBlurb
+  NetworkBlurb,
+  NetworkListItemLink
 } from './styled'
 import { useLocation } from 'react-use'
-import { useNavigate } from 'react-router-dom'
 import { useOnClickOutside } from 'hooks/useOnClickOutSide'
 import { useAppSelector } from 'state/hooks'
 import { changeApiClient } from 'service/client'
@@ -23,15 +23,15 @@ const NetworkSwitcher = () => {
   const [isOpen, setIsOpen] = useState(false)
   const dispatch = useDispatch()
   const { pathname } = useLocation()
-  const navigate = useNavigate()
 
   const handleSelect = useCallback(
     (network: NetworkInfo) => {
-      navigate(`${network.route}/`)
+      if (activeNetwork.id !== network.id) {
+        dispatch(setActiveNetwork(network))
+        changeApiClient(network.id)
+        DataService.initDataControllers(network.id)
+      }
       setIsOpen(false)
-      dispatch(setActiveNetwork(network))
-      changeApiClient(network.id)
-      DataService.initDataControllers(network.id)
     },
     [activeNetwork.route, pathname]
   )
@@ -49,9 +49,11 @@ const NetworkSwitcher = () => {
         <NetworkList ref={node}>
           {SUPPORTED_NETWORK_VERSIONS.map(network => (
             <NetworkListItem key={network.id} onClick={() => handleSelect(network)}>
-              <NetworkLogo src={network.imageURL} alt={network.name} />
-              <span>{network.name}</span>
-              {network.blurb ? <NetworkBlurb>{network.blurb}</NetworkBlurb> : undefined}
+              <NetworkListItemLink to={`${network.route}/`}>
+                <NetworkLogo src={network.imageURL} alt={network.name} />
+                <span>{network.name}</span>
+                {network.blurb ? <NetworkBlurb>{network.blurb}</NetworkBlurb> : undefined}
+              </NetworkListItemLink>
             </NetworkListItem>
           ))}
         </NetworkList>

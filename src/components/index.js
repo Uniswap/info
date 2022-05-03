@@ -1,10 +1,6 @@
 import styled from 'styled-components/macro'
 import { Text, Box } from 'rebass'
 
-import Link from './Link'
-
-import { urls } from '../utils'
-
 const Divider = styled(Box)`
   height: 1px;
   background-color: ${({ theme }) => theme.divider};
@@ -37,18 +33,6 @@ const Hint = ({ children, ...rest }) => (
   <Text fontSize={16} weight={500} {...rest}>
     {children}
   </Text>
-)
-
-const Address = ({ address, token, ...rest }) => (
-  <Link
-    color="button"
-    href={token ? urls.showToken(address) : urls.showAddress(address)}
-    external
-    style={{ wordBreak: 'break-all' }}
-    {...rest}
-  >
-    {address}
-  </Link>
 )
 
 export const Hover = styled.div`
@@ -184,4 +168,4 @@ export const FixedMenu = styled.div`
   }
 `
 
-export { Hint, Divider, Address, EmptyCard }
+export { Hint, Divider, EmptyCard }

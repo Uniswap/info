@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import styled from 'styled-components/macro'
 
-import { formatTime, formattedNum, urls } from '../../utils'
+import { formatTime, formattedNum, getBlockChainScanLink } from '../../utils'
 import { useMedia } from 'react-use'
 import { RowFixed, RowBetween } from '../Row'
 
@@ -15,6 +15,7 @@ import { TYPE } from '../../Theme'
 import { transparentize } from 'polished'
 import Panel from '../Panel'
 import { useTranslation } from 'react-i18next'
+import { useActiveNetworkId } from 'state/features/application/selectors'
 
 const PageButtons = styled.div`
   width: 100%;
@@ -199,6 +200,7 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
   const [sortedColumn, setSortedColumn] = useState(SORT_FIELD.TIMESTAMP)
   const [filteredItems, setFilteredItems] = useState()
   const [txFilter, setTxFilter] = useState(TXN_TYPE.ALL)
+  const activeNetworkId = useActiveNetworkId()
 
   useEffect(() => {
     setMaxPage(1) // edit this to do modular
@@ -317,7 +319,11 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
     return (
       <DashGrid>
         <DataText area="txn" fontWeight="500">
-          <CustomLink external href={urls.showTransaction(item.hash)} style={{ fontWeight: 700 }}>
+          <CustomLink
+            external
+            href={getBlockChainScanLink(activeNetworkId, item.hash, 'transaction')}
+            style={{ fontWeight: 700 }}
+          >
             {getTransactionType(item.type, item.token1Symbol, item.token0Symbol)}
           </CustomLink>
         </DataText>
@@ -336,7 +342,7 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
         )}
         {!below1080 && (
           <DataText area="account">
-            <CustomLink external href={'https://etherscan.io/address/' + item.account}>
+            <CustomLink external href={getBlockChainScanLink(activeNetworkId, item.account, 'address')}>
               {item.account && item.account.slice(0, 6) + '...' + item.account.slice(38, 42)}
             </CustomLink>
           </DataText>

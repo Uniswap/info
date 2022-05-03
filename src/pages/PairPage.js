@@ -9,12 +9,12 @@ import { ButtonLight, ButtonDark } from 'components/ButtonStyled'
 import PairChart from 'components/PairChart'
 import Link from 'components/Link'
 import TxnList from 'components/TxnList'
-import { isAddress } from 'utils'
+import { getBlockChainScanLink, getViewOnScanKey, isValidAddress } from 'utils'
 import Loader from 'components/LocalLoader'
 import { PAIR_BLACKLIST } from 'constants/index'
 import { BasicLink } from 'components/Link'
 import Search from 'components/Search'
-import { formattedNum, formattedPercent, getPoolLink, getSwapLink } from 'utils'
+import { formattedNum, getPoolLink, getSwapLink } from 'utils'
 import { usePairData, usePairTransactions } from 'state/features/pairs/hooks'
 import { DashboardWrapper, TYPE } from 'Theme'
 import CopyHelper from 'components/Copy'
@@ -31,6 +31,7 @@ import FormattedName from 'components/FormattedName'
 import { useListedTokens } from 'state/features/application/hooks'
 import { useTranslation } from 'react-i18next'
 import { useActiveNetworkId } from 'state/features/application/selectors'
+import Percent from 'components/Percent'
 
 const PanelWrapper = styled.div`
   grid-template-columns: repeat(3, 1fr);
@@ -116,7 +117,7 @@ function PairPage() {
   const location = useLocation()
   const activeNetworkId = useActiveNetworkId()
 
-  if (PAIR_BLACKLIST.includes(pairAddress.toLowerCase()) || !isAddress(pairAddress.toLowerCase())) {
+  if (PAIR_BLACKLIST.includes(pairAddress.toLowerCase()) || !isValidAddress(pairAddress, activeNetworkId)) {
     return <Navigate to={formatPath('/')} />
   }
 
@@ -142,7 +143,6 @@ function PairPage() {
     : reserveUSD
     ? formattedNum(reserveUSD, true)
     : '-'
-  const liquidityChange = formattedPercent(liquidityChangeUSD)
 
   // mark if using untracked liquidity
   const [usingTracked, setUsingTracked] = useState(true)
@@ -164,7 +164,7 @@ function PairPage() {
     setUsingUtVolume(oneDayVolumeUSD === 0 ? true : false)
   }, [oneDayVolumeUSD])
 
-  const volumeChange = formattedPercent(!usingUtVolume ? volumeChangeUSD : volumeChangeUntracked)
+  const volumeChange = !usingUtVolume ? volumeChangeUSD : volumeChangeUntracked
 
   // get fees	  // get fees
   const fees =
@@ -311,7 +311,7 @@ function PairPage() {
             >
               <FixedPanel as={RouterLink} to={formatPath(`/tokens/${token0?.id}`)}>
                 <RowFixed>
-                  <TokenLogo address={token0?.id} size={'1rem'} />
+                  <TokenLogo alt={token0?.symbol} address={token0?.id} size={'1rem'} />
                   <TYPE.light fontSize=".875rem" lineHeight="1rem" fontWeight={700} ml=".25rem" mr="3.75rem">
                     {token0 && token1
                       ? `1 ${formattedSymbol0} = ${token0Rate} ${formattedSymbol1} ${
@@ -324,7 +324,7 @@ function PairPage() {
 
               <FixedPanel as={RouterLink} to={formatPath(`/tokens/${token1?.id}`)}>
                 <RowFixed>
-                  <TokenLogo address={token1?.id} size={'16px'} />
+                  <TokenLogo alt={token1?.symbol} address={token1?.id} size={'16px'} />
                   <TYPE.light fontSize={'.875rem'} lineHeight={'1rem'} fontWeight={700} ml={'.25rem'}>
                     {token0 && token1
                       ? `1 ${formattedSymbol1} = ${token1Rate} ${formattedSymbol0}  ${
@@ -351,7 +351,7 @@ function PairPage() {
                         {liquidity}
                       </TYPE.main>
                       <TYPE.main fontSize={12} fontWeight={500}>
-                        {liquidityChange}
+                        <Percent percent={liquidityChangeUSD} />
                       </TYPE.main>
                     </RowBetween>
                   </AutoColumn>
@@ -369,7 +369,7 @@ function PairPage() {
                         {volume}
                       </TYPE.main>
                       <TYPE.main fontSize={12} fontWeight={500}>
-                        {volumeChange}
+                        <Percent percent={volumeChange} />
                       </TYPE.main>
                     </RowBetween>
                   </AutoColumn>
@@ -387,7 +387,7 @@ function PairPage() {
                         {fees}
                       </TYPE.main>
                       <TYPE.main fontSize={12} fontWeight={500}>
-                        {volumeChange}
+                        <Percent percent={volumeChange} />
                       </TYPE.main>
                     </RowBetween>
                   </AutoColumn>
@@ -403,7 +403,7 @@ function PairPage() {
                     </RowBetween>
                     <Hover as={RouterLink} to={formatPath(`/tokens/${token0?.id}`)} $fade>
                       <AutoRow gap="4px">
-                        <TokenLogo address={token0?.id} />
+                        <TokenLogo alt={token0?.symbol} address={token0?.id} />
                         <TYPE.main fontSize={20} lineHeight={1} fontWeight={500}>
                           <RowFixed>
                             {reserve0 ? formattedNum(reserve0) : ''}{' '}
@@ -414,7 +414,7 @@ function PairPage() {
                     </Hover>
                     <Hover as={RouterLink} to={formatPath(`/tokens/${token1?.id}`)} $fade>
                       <AutoRow gap="4px">
-                        <TokenLogo address={token1?.id} />
+                        <TokenLogo alt={token1?.symbol} address={token1?.id} />
                         <TYPE.main fontSize={20} lineHeight={1} fontWeight={500}>
                           <RowFixed>
                             {reserve1 ? formattedNum(reserve1) : ''}{' '}
@@ -510,8 +510,8 @@ function PairPage() {
                   </RowBetween>
                 </Column>
                 <ButtonLight>
-                  <Link external href={'https://etherscan.io/address/' + pairAddress}>
-                    {t('viewOnEtherscan')} ↗
+                  <Link external href={getBlockChainScanLink(activeNetworkId, pairAddress, 'address')}>
+                    {t(getViewOnScanKey(activeNetworkId))} ↗
                   </Link>
                 </ButtonLight>
               </TokenDetailsLayout>

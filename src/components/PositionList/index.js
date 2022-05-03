@@ -140,7 +140,7 @@ const ButtonsContainer = styled(RowFixed)`
 
 const SORT_FIELD = {
   VALUE: 'VALUE',
-  UNISWAP_RETURN: 'UNISWAP_RETURN'
+  FEE: 'FEE'
 }
 
 function PositionList({ positions }) {
@@ -246,14 +246,14 @@ function PositionList({ positions }) {
           <DataText area="return">
             <AutoColumn gap="12px" justify="flex-end">
               <TYPE.main color={'green'}>
-                <RowFixed>{formattedNum(position?.fees.sum, true, true)}</RowFixed>
+                <RowFixed>{formattedNum(position?.feeEarned, true, true)}</RowFixed>
               </TYPE.main>
               <AutoColumn gap="4px" justify="flex-end">
                 <RowFixed>
                   <DataText fontWeight={400} fontSize={11}>
                     {parseFloat(position.pair.token0.derivedETH)
                       ? formattedNum(
-                          position?.fees.sum / (parseFloat(position.pair.token0.derivedETH) * activeTokenPrice) / 2,
+                          position?.feeEarned / (parseFloat(position.pair.token0.derivedETH) * activeTokenPrice) / 2,
                           false,
                           true
                         )
@@ -270,7 +270,7 @@ function PositionList({ positions }) {
                   <DataText fontWeight={400} fontSize={11}>
                     {parseFloat(position.pair.token1.derivedETH)
                       ? formattedNum(
-                          position?.fees.sum / (parseFloat(position.pair.token1.derivedETH) * activeTokenPrice) / 2,
+                          position?.feeEarned / (parseFloat(position.pair.token1.derivedETH) * activeTokenPrice) / 2,
                           false,
                           true
                         )
@@ -296,14 +296,8 @@ function PositionList({ positions }) {
     [...positions]
 
       .sort((p0, p1) => {
-        if (sortedColumn === SORT_FIELD.PRINCIPAL) {
-          return p0?.principal?.usd > p1?.principal?.usd ? (sortDirection ? -1 : 1) : sortDirection ? 1 : -1
-        }
-        if (sortedColumn === SORT_FIELD.HODL) {
-          return p0?.hodl?.sum > p1?.hodl?.sum ? (sortDirection ? -1 : 1) : sortDirection ? 1 : -1
-        }
-        if (sortedColumn === SORT_FIELD.UNISWAP_RETURN) {
-          return p0?.uniswap?.return > p1?.uniswap?.return ? (sortDirection ? -1 : 1) : sortDirection ? 1 : -1
+        if (sortedColumn === SORT_FIELD.FEE) {
+          return p0?.feeEarned > p1?.feeEarned ? (sortDirection ? -1 : 1) : sortDirection ? 1 : -1
         }
         if (sortedColumn === SORT_FIELD.VALUE) {
           const bal0 = (p0.liquidityTokenBalance / p0.pair.totalSupply) * p0.pair.reserveUSD
@@ -359,12 +353,12 @@ function PositionList({ positions }) {
               <ClickableText
                 area="return"
                 onClick={() => {
-                  setSortedColumn(SORT_FIELD.UNISWAP_RETURN)
-                  setSortDirection(sortedColumn !== SORT_FIELD.UNISWAP_RETURN ? true : !sortDirection)
+                  setSortedColumn(SORT_FIELD.FEE)
+                  setSortDirection(sortedColumn !== SORT_FIELD.FEE ? true : !sortDirection)
                 }}
               >
                 {below740 ? t('fees') : t('totalFeesEarned')}{' '}
-                {sortedColumn === SORT_FIELD.UNISWAP_RETURN ? (!sortDirection ? '↑' : '↓') : ''}
+                {sortedColumn === SORT_FIELD.FEE ? (!sortDirection ? '↑' : '↓') : ''}
               </ClickableText>
             </Flex>
           )}
