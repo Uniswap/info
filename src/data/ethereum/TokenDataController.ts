@@ -5,7 +5,7 @@ import { client } from 'service/client'
 import { PRICES_BY_BLOCK } from 'service/queries/global'
 import { GET_TOKENS, TOKEN_CHART, TOKEN_DATA, TOKEN_SEARCH } from 'service/queries/tokens'
 import { TokensResponse, Token as ETHToken } from 'service/types'
-import { Token, TokenDayData } from 'state/features/token/types'
+import { TokenDayData } from 'state/features/token/types'
 import {
   getBlockFromTimestamp,
   get2DayPercentChange,

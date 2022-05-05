@@ -14,7 +14,7 @@ import {
   UserParams,
   UserPositionData
 } from 'service/types/AccountTypes'
-import { LiquidityChart, LiquidityPosition, LiquiditySnapshot } from 'state/features/account/types'
+import { LiquidityChart } from 'state/features/account/types'
 import { getLPReturnsOnPair } from 'utils/returns'
 
 type OwnershipPair = {

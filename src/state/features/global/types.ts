@@ -17,34 +17,6 @@ export interface GlobalData {
   totalLiquidityUSD: number
 }
 
-export interface Token {
-  id: string
-  symbol: string
-}
-
-export interface Pair {
-  token0: Token
-  token1: Token
-}
-
-export interface Transaction {
-  id: string
-  timestamp: string
-}
-
-export type LiquidityPositionUser = {
-  id: string
-}
-
-export interface LiquidityPosition {
-  pairAddress: string
-  pairName: string
-  token0: string
-  token1: string
-  usd: number
-  user: LiquidityPositionUser
-}
-
 export interface GlobalNetworkState {
   globalData?: GlobalData
   chartData?: ChartDailyItem[]

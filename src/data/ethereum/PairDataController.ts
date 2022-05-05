@@ -11,7 +11,6 @@ import {
   PAIR_DATA,
   PAIR_SEARCH
 } from 'service/queries/pairs'
-import { Pair } from 'state/features/pairs/types'
 import {
   getTimestampsForChanges,
   getBlocksFromTimestamps,

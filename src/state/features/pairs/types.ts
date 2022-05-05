@@ -1,34 +1,6 @@
-interface PairToken {
-  derivedETH: string
-  id: string
-  name: string
-  symbol: string
-  totalLiquidity: string
-}
+export type PairsState = Record<SupportedNetwork, Record<string, PairDetails>>
 
-export interface Pair {
-  createdAtTimestamp: string
-  id: string
-  liquidityChangeUSD: number
-  oneDayVolumeUSD: number
-  oneDayVolumeUntracked: number
-  oneWeekVolumeUSD: number
-  reserve0: string
-  reserve1: string
-  reserveETH: string
-  reserveUSD: string
-  token0: PairToken
-  token0Price: string
-  token1: PairToken
-  token1Price: string
-  totalSupply: string
-  trackedReserveETH: string
-  trackedReserveUSD: number
-  txCount: string
-  untrackedVolumeUSD: string
-  volumeChangeUSD: number
-  volumeChangeUntracked: number
-  volumeUSD: string
+export interface PairDetails extends Pair {
   chartData?: PairDayData[]
   timeWindowData?: TimeWindowData
   txns?: Transactions
@@ -42,14 +14,6 @@ export interface PairDayData {
   dayString?: number
   reserveUSD: number
 }
-
-export interface HourDataItem {
-  close: number
-  open: number
-  timestamp: string
-}
-
-export type PairsState = Record<SupportedNetwork, Record<string, Pair>>
 
 export type UpdatePairPayload = ParamsWithNetwork<{
   pairAddress: string
@@ -72,6 +36,6 @@ export type UpdateChartDataPayload = ParamsWithNetwork<{
 
 export type UpdateHourlyDataPayload = ParamsWithNetwork<{
   address: string
-  hourlyData: HourDataItem[][]
+  hourlyData: TimeWindowItem[][]
   timeWindow: string
 }>
