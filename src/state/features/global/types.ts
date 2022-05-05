@@ -1,14 +1,9 @@
 import { SupportedNetwork } from 'constants/networks'
 
 export interface ChartDailyItem {
-  dailyVolumeETH: string
-  dailyVolumeUSD: number
   date: number
-  id: string
-  totalLiquidityETH: string
-  totalLiquidityUSD: string
-  totalVolumeUSD: string
-  mostLiquidTokens?: number
+  dailyVolumeUSD: number
+  totalLiquidityUSD: number
 }
 
 export interface GlobalData {
