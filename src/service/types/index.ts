@@ -227,6 +227,10 @@ export type TokenDayData = {
 
 export type TokensResponse = {
   tokens: Token[]
+}
+
+export type TokenDataResponse = {
+  tokens: Token[]
   pairs0: { id: string }[]
   pairs1: { id: string }[]
 }

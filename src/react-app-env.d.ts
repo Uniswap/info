@@ -71,12 +71,10 @@ interface Token {
   oneDayTxns: number
   oneDayVolumeUSD: number
   oneDayVolumeUT: number
-  oneDayVolumeETH?: number
   priceChangeUSD: number
   priceUSD: number
   totalLiquidity: number
   totalLiquidityUSD: number
-  tradeVolume: number
   tradeVolumeUSD: number
   txCount: number
   txnChange: number

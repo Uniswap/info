@@ -4,7 +4,7 @@ import dayjs from 'dayjs'
 import { client } from 'service/client'
 import { PRICES_BY_BLOCK } from 'service/queries/global'
 import { GET_TOKENS, TOKEN_CHART, TOKEN_DATA, TOKEN_SEARCH } from 'service/queries/tokens'
-import { TokensResponse, Token as ETHToken } from 'service/types'
+import { TokensResponse, Token as ETHToken, TokenDataResponse } from 'service/types'
 import { TokenDayData } from 'state/features/token/types'
 import {
   getBlockFromTimestamp,
@@ -15,7 +15,7 @@ import {
 } from 'utils'
 
 async function fetchTokens(block?: number) {
-  return client.query({
+  return client.query<TokensResponse>({
     query: GET_TOKENS,
     variables: {
       block: block ? { number: block } : null
@@ -24,7 +24,7 @@ async function fetchTokens(block?: number) {
 }
 
 async function fetchTokenData(tokenAddress: string, block?: number) {
-  return client.query<TokensResponse>({
+  return client.query<TokenDataResponse>({
     query: TOKEN_DATA,
     variables: {
       tokenAddress,
@@ -39,7 +39,7 @@ function parseToken(
   priceOld: number,
   oneDayHistory?: ETHToken,
   twoDayHistory?: ETHToken
-) {
+): Token {
   const oneDayDerivedEth = oneDayHistory ? +oneDayHistory.derivedETH : 0
   const oneDayTotalLiquidity = oneDayHistory ? +oneDayHistory.totalLiquidity : 0
   const [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentChange(
@@ -58,14 +58,13 @@ function parseToken(
     twoDayHistory?.untrackedVolumeUSD ?? 0
   )
   // percent changes
-  const priceChangeUSD = getPercentChange(+data?.derivedETH * price, oneDayDerivedEth)
+  const priceChangeUSD = getPercentChange(+data?.derivedETH * price, oneDayDerivedEth * priceOld)
   const currentLiquidityUSD = +data?.totalLiquidity * price * +data?.derivedETH
   const oldLiquidityUSD = oneDayTotalLiquidity * priceOld * oneDayDerivedEth
 
   const tokenInfo: Token = {
     ...data,
     totalLiquidity: +data.totalLiquidity,
-    tradeVolume: +data.tradeVolume,
     tradeVolumeUSD: +data.tradeVolumeUSD,
     txCount: +data.txCount,
     untrackedVolumeUSD: +data.untrackedVolumeUSD,
@@ -87,7 +86,6 @@ function parseToken(
   // new tokens
   if (!oneDayHistory && data) {
     tokenInfo.oneDayVolumeUSD = +data.tradeVolumeUSD
-    tokenInfo.oneDayVolumeETH = +data.tradeVolume * +data.derivedETH
     tokenInfo.oneDayTxns = +data.txCount
   }
 
@@ -116,19 +114,21 @@ export default class TokenDataController implements ITokenDataController {
       const oneDayResult = await fetchTokens(oneDayBlock)
       const twoDayResult = await fetchTokens(twoDayBlock)
 
-      const oneDayData = oneDayResult?.data?.tokens.reduce((obj: Record<string, Token>, cur: Token) => {
-        return { ...obj, [cur.id]: cur }
-      }, {})
+      const oneDayData = oneDayResult?.data?.tokens.reduce<Record<string, ETHToken>>(
+        (obj, cur) => ({ ...obj, [cur.id]: cur }),
+        {}
+      )
 
-      const twoDayData = twoDayResult?.data?.tokens.reduce((obj: Record<string, Token>, cur: Token) => {
-        return { ...obj, [cur.id]: cur }
-      }, {})
+      const twoDayData = twoDayResult?.data?.tokens.reduce<Record<string, ETHToken>>(
+        (obj, cur) => ({ ...obj, [cur.id]: cur }),
+        {}
+      )
 
       const bulkResults = await Promise.all(
         current &&
           oneDayData &&
           twoDayData &&
-          current?.data?.tokens.map(async (token: Token) => {
+          current?.data?.tokens.map(async token => {
             const data = { ...token }
 
             let oneDayHistory = oneDayData?.[token.id]
