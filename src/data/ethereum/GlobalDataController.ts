@@ -207,8 +207,8 @@ export default class GlobalDataController implements IGlobalDataController {
       const oneDayBlock = await getBlockFromTimestamp(utcOneDayBack)
       const result = await fetchPrice()
       const resultOneDay = await fetchPrice(oneDayBlock)
-      const currentPrice = result?.data?.bundles[0]?.ethPrice
-      const oneDayBackPrice = resultOneDay?.data?.bundles[0]?.ethPrice
+      const currentPrice = +result?.data?.bundles[0]?.ethPrice
+      const oneDayBackPrice = +resultOneDay?.data?.bundles[0]?.ethPrice
       priceChange = getPercentChange(currentPrice, oneDayBackPrice)
       price = currentPrice
       priceOneDay = oneDayBackPrice

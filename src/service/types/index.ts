@@ -29,19 +29,12 @@ export type Token = {
   id: Scalars['ID']
   symbol: Scalars['String']
   name: Scalars['String']
-  decimals: Scalars['Int']
-  totalSupply: Scalars['Int']
   tradeVolume: Scalars['Float']
   tradeVolumeUSD: Scalars['Float']
   untrackedVolumeUSD: Scalars['Float']
   txCount: Scalars['Int']
   totalLiquidity: Scalars['Float']
-  derivedETH?: Maybe<Scalars['Float']>
-  tokenDayData: Array<TokenDayData>
-  pairDayDataBase: Array<PairDayData>
-  pairDayDataQuote: Array<PairDayData>
-  pairBase: Array<Pair>
-  pairQuote: Array<Pair>
+  derivedETH: Scalars['Float']
 }
 
 export type Pair = {
@@ -230,4 +223,10 @@ export type TokenDayData = {
   totalLiquidityETH: Scalars['Float']
   totalLiquidityUSD: Scalars['Float']
   priceUSD: Scalars['Float']
+}
+
+export type TokensResponse = {
+  tokens: Token[]
+  pairs0: { id: string }[]
+  pairs1: { id: string }[]
 }

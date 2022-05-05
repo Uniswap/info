@@ -37,7 +37,6 @@ export function useTokenData(tokenAddress: string) {
       const data = await DataService.tokens.getTokenData(tokenAddress, price, oneDayPrice)
       data && dispatch(setToken({ tokenAddress, networkId: activeNetwork, data }))
     }
-    // TODO: isAddress only validate ETH address
     if (!tokenData && price && oneDayPrice && isValidAddress(tokenAddress, activeNetwork)) {
       fetchData()
     }

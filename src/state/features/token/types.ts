@@ -16,24 +16,24 @@ export type TokenPair = {
 }
 
 export interface Token {
-  derivedETH: string
+  derivedETH: number
   id: string
   liquidityChangeUSD: number
   name: string
   oneDayTxns: number
   oneDayVolumeUSD: number
   oneDayVolumeUT: number
-  oneDayVolumeETH: number
+  oneDayVolumeETH?: number
   priceChangeUSD: number
   priceUSD: number
   symbol: string
-  totalLiquidity: string
+  totalLiquidity: number
   totalLiquidityUSD: number
-  tradeVolume: string
-  tradeVolumeUSD: string
-  txCount: string
+  tradeVolume: number
+  tradeVolumeUSD: number
+  txCount: number
   txnChange: number
-  untrackedVolumeUSD: string
+  untrackedVolumeUSD: number
   volumeChangeUSD: number
   volumeChangeUT: number
   transactions?: Transactions

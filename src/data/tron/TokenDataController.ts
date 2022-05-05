@@ -4,6 +4,7 @@ import dayjs from 'dayjs'
 import { client } from 'service/client'
 import { PRICES_BY_BLOCK } from 'service/queries/global'
 import { GET_TOKENS, TOKEN_CHART, TOKEN_DATA, TOKEN_SEARCH } from 'service/queries/tokens'
+import { TokensResponse, Token as ETHToken } from 'service/types'
 import { Token, TokenDayData } from 'state/features/token/types'
 import {
   getBlockFromTimestamp,
@@ -23,13 +24,74 @@ async function fetchTokens(block?: number) {
 }
 
 async function fetchTokenData(tokenAddress: string, block?: number) {
-  return client.query({
+  return client.query<TokensResponse>({
     query: TOKEN_DATA,
     variables: {
       tokenAddress,
       block: block ? { number: block } : null
     }
   })
+}
+
+function parseToken(
+  data: ETHToken,
+  price: number,
+  priceOld: number,
+  oneDayHistory?: ETHToken,
+  twoDayHistory?: ETHToken
+) {
+  const oneDayDerivedEth = oneDayHistory ? +oneDayHistory.derivedETH : 0
+  const oneDayTotalLiquidity = oneDayHistory ? +oneDayHistory.totalLiquidity : 0
+  const [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentChange(
+    data.tradeVolumeUSD,
+    oneDayHistory?.tradeVolumeUSD ?? 0,
+    twoDayHistory?.tradeVolumeUSD ?? 0
+  )
+  const [oneDayTxns, txnChange] = get2DayPercentChange(
+    data.txCount,
+    oneDayHistory?.txCount ?? 0,
+    twoDayHistory?.txCount ?? 0
+  )
+  const [oneDayVolumeUT, volumeChangeUT] = get2DayPercentChange(
+    data.untrackedVolumeUSD,
+    oneDayHistory?.untrackedVolumeUSD ?? 0,
+    twoDayHistory?.untrackedVolumeUSD ?? 0
+  )
+  // percent changes
+  const priceChangeUSD = getPercentChange(+data?.derivedETH * price, oneDayDerivedEth)
+  const currentLiquidityUSD = +data?.totalLiquidity * price * +data?.derivedETH
+  const oldLiquidityUSD = oneDayTotalLiquidity * priceOld * oneDayDerivedEth
+
+  const tokenInfo: Token = {
+    ...data,
+    totalLiquidity: +data.totalLiquidity,
+    tradeVolume: +data.tradeVolume,
+    tradeVolumeUSD: +data.tradeVolumeUSD,
+    txCount: +data.txCount,
+    untrackedVolumeUSD: +data.untrackedVolumeUSD,
+    derivedETH: +data.derivedETH,
+    priceUSD: +data?.derivedETH * price,
+    totalLiquidityUSD: currentLiquidityUSD,
+    oneDayVolumeUT: oneDayVolumeUT,
+    volumeChangeUT: volumeChangeUT,
+    oneDayVolumeUSD,
+    volumeChangeUSD,
+    priceChangeUSD,
+    liquidityChangeUSD: getPercentChange(currentLiquidityUSD ?? 0, oldLiquidityUSD ?? 0),
+    oneDayTxns,
+    txnChange,
+    name: TOKEN_OVERRIDES[data.id]?.name ?? data.name,
+    symbol: TOKEN_OVERRIDES[data.id]?.symbol ?? data.symbol
+  }
+
+  // new tokens
+  if (!oneDayHistory && data) {
+    tokenInfo.oneDayVolumeUSD = +data.tradeVolumeUSD
+    tokenInfo.oneDayVolumeETH = +data.tradeVolume * +data.derivedETH
+    tokenInfo.oneDayTxns = +data.txCount
+  }
+
+  return tokenInfo
 }
 
 export default class TokenDataController implements ITokenDataController {
@@ -69,7 +131,6 @@ export default class TokenDataController implements ITokenDataController {
           current?.data?.tokens.map(async (token: Token) => {
             const data = { ...token }
 
-            // let liquidityDataThisToken = liquidityData?.[token.id]
             let oneDayHistory = oneDayData?.[token.id]
             let twoDayHistory = twoDayData?.[token.id]
 
@@ -82,48 +143,7 @@ export default class TokenDataController implements ITokenDataController {
               const twoDayResult = await fetchTokenData(token.id, twoDayBlock)
               twoDayHistory = twoDayResult.data.tokens[0]
             }
-
-            // calculate percentage changes and daily changes
-            const [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentChange(
-              data.tradeVolumeUSD,
-              oneDayHistory?.tradeVolumeUSD ?? 0,
-              twoDayHistory?.tradeVolumeUSD ?? 0
-            )
-            const [oneDayTxns, txnChange] = get2DayPercentChange(
-              data.txCount,
-              oneDayHistory?.txCount ?? 0,
-              twoDayHistory?.txCount ?? 0
-            )
-
-            const currentLiquidityUSD = +data?.totalLiquidity * price * +data?.derivedETH
-            const oldLiquidityUSD = oneDayHistory?.totalLiquidity * priceOld * oneDayHistory?.derivedETH
-
-            // percent changes
-            const priceChangeUSD = getPercentChange(
-              +data?.derivedETH * price,
-              oneDayHistory?.derivedETH ? oneDayHistory?.derivedETH * priceOld : 0
-            )
-
-            // set data
-            data.priceUSD = +data?.derivedETH * price
-            data.totalLiquidityUSD = currentLiquidityUSD
-            data.oneDayVolumeUSD = oneDayVolumeUSD
-            data.volumeChangeUSD = volumeChangeUSD
-            data.priceChangeUSD = priceChangeUSD
-            data.liquidityChangeUSD = getPercentChange(currentLiquidityUSD ?? 0, oldLiquidityUSD ?? 0)
-            data.oneDayTxns = oneDayTxns
-            data.txnChange = txnChange
-            data.name = TOKEN_OVERRIDES[data.id]?.name ?? data.name
-            data.symbol = TOKEN_OVERRIDES[data.id]?.symbol ?? data.symbol
-
-            // new tokens
-            if (!oneDayHistory && data) {
-              data.oneDayVolumeUSD = +data.tradeVolumeUSD
-              data.oneDayVolumeETH = +data.tradeVolume * +data.derivedETH
-              data.oneDayTxns = +data.txCount
-            }
-
-            return data
+            return parseToken(data, price, priceOld, oneDayHistory, twoDayHistory)
           })
       )
 
@@ -139,100 +159,26 @@ export default class TokenDataController implements ITokenDataController {
     const oneDayBlock = await getBlockFromTimestamp(utcOneDayBack)
     const twoDayBlock = await getBlockFromTimestamp(utcTwoDaysBack)
 
-    // initialize data arrays
-    let data: Token | undefined
-    let oneDayData: Token | undefined
-    let twoDayData: Token | undefined
+    // fetch all current and historical data
+    const result = await fetchTokenData(address)
+    const data = { ...result?.data?.tokens?.[0] }
+    if (data) {
+      // get results from 24 hours in past
+      const oneDayResult = await fetchTokenData(address, oneDayBlock)
+      const oneDayData = { ...oneDayResult.data.tokens[0] }
 
-    try {
-      // fetch all current and historical data
-      const result = await fetchTokenData(address)
-      data = { ...result?.data?.tokens?.[0] }
-      if (data) {
-        // get results from 24 hours in past
-        const oneDayResult = await fetchTokenData(address, oneDayBlock)
-        oneDayData = { ...oneDayResult.data.tokens[0] }
+      // get results from 48 hours in past
+      const twoDayResult = await fetchTokenData(address, twoDayBlock)
+      const twoDayData = { ...twoDayResult.data.tokens[0] }
 
-        // get results from 48 hours in past
-        const twoDayResult = await fetchTokenData(address, twoDayBlock)
-        twoDayData = { ...twoDayResult.data.tokens[0] }
-
-        // FIXME: WTF????
-        // catch the case where token wasnt in top list in previous days
-        if (!oneDayData) {
-          const oneDayResult = await fetchTokenData(address, oneDayBlock)
-          oneDayData = oneDayResult.data.tokens[0]
-        }
-        if (!twoDayData) {
-          const twoDayResult = await fetchTokenData(address, twoDayBlock)
-          twoDayData = twoDayResult.data.tokens[0]
-        }
-
-        // calculate percentage changes and daily changes
-        const [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentChange(
-          data.tradeVolumeUSD,
-          oneDayData?.tradeVolumeUSD ?? 0,
-          twoDayData?.tradeVolumeUSD ?? 0
-        )
-
-        // calculate percentage changes and daily changes
-        const [oneDayVolumeUT, volumeChangeUT] = get2DayPercentChange(
-          data.untrackedVolumeUSD,
-          oneDayData?.untrackedVolumeUSD ?? 0,
-          twoDayData?.untrackedVolumeUSD ?? 0
-        )
-
-        // calculate percentage changes and daily changes
-        const [oneDayTxns, txnChange] = get2DayPercentChange(
-          data.txCount,
-          oneDayData?.txCount ?? 0,
-          twoDayData?.txCount ?? 0
-        )
-
-        const priceChangeUSD = getPercentChange(
-          +data.derivedETH * price,
-          parseFloat(oneDayData?.derivedETH ?? '0') * priceOld
-        )
-
-        const currentLiquidityUSD = +data.totalLiquidity * price * +data.derivedETH
-        const oldLiquidityUSD =
-          parseFloat(oneDayData?.totalLiquidity ?? '0') * priceOld * parseFloat(oneDayData?.derivedETH ?? '0')
-        const liquidityChangeUSD = getPercentChange(currentLiquidityUSD ?? 0, oldLiquidityUSD ?? 0)
-
-        // set data
-        data.priceUSD = +data.derivedETH * price
-        data.totalLiquidityUSD = currentLiquidityUSD
-        data.oneDayVolumeUSD = oneDayVolumeUSD
-        data.volumeChangeUSD = volumeChangeUSD
-        data.priceChangeUSD = priceChangeUSD
-        data.oneDayVolumeUT = oneDayVolumeUT
-        data.volumeChangeUT = volumeChangeUT
-        data.liquidityChangeUSD = liquidityChangeUSD
-        data.oneDayTxns = oneDayTxns
-        data.txnChange = txnChange
-        data.name = TOKEN_OVERRIDES[data.id]?.name ?? data.name
-        data.symbol = TOKEN_OVERRIDES[data.id]?.symbol ?? data.symbol
-
-        // new tokens
-        if (!oneDayData && data) {
-          data.oneDayVolumeUSD = +data.tradeVolumeUSD
-          data.oneDayVolumeETH = +data.tradeVolume * +data.derivedETH
-          data.oneDayTxns = +data.txCount
-        }
-      }
-    } catch (e) {
-      console.log(e)
+      return parseToken(data, price, priceOld, oneDayData, twoDayData)
     }
-    return data
+    return
   }
   async getTokenPairs(tokenAddress: string) {
-    try {
-      // fetch all current and historical data
-      const result = await fetchTokenData(tokenAddress)
-      return result.data?.['pairs0'].concat(result.data?.['pairs1']).map((p: { id: string }) => p.id)
-    } catch (e) {
-      console.log(e)
-    }
+    // fetch all current and historical data
+    const result = await fetchTokenData(tokenAddress)
+    return result.data?.['pairs0'].concat(result.data?.['pairs1']).map((p: { id: string }) => p.id)
   }
   async getIntervalTokenData(tokenAddress: string, startTime: number, interval: number, latestBlock: number) {
     const utcEndTime = dayjs.utc()
