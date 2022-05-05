@@ -234,3 +234,5 @@ export type TokenDataResponse = {
   pairs0: { id: string }[]
   pairs1: { id: string }[]
 }
+
+export type GlobalTransactionsResponse = { transactions: Array<Transactions> }
