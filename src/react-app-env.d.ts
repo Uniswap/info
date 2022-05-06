@@ -19,8 +19,12 @@ type ParamsWithNetwork<T = unknown> = T & {
 }
 
 interface TransactionData {
-  pair: Pair
+  pair: {
+    token0: Pick<Token, 'symbol'>
+    token1: Pick<Token, 'symbol'>
+  }
   transaction: Transaction
+  to: string
 }
 
 interface BurnTransaction extends TransactionData {
@@ -36,7 +40,6 @@ interface MintTransaction extends TransactionData {
   amount1: string
   amountUSD: string
   liquidity: string
-  to: string
 }
 
 interface SwapTransactions extends TransactionData {
@@ -45,7 +48,6 @@ interface SwapTransactions extends TransactionData {
   amount1In: string
   amount1Out: string
   amountUSD: string
-  to: string
 }
 
 interface Transactions {
@@ -92,7 +94,6 @@ interface Pair {
   oneWeekVolumeUSD: number
   reserve0: string
   reserve1: string
-  reserveETH: string
   reserveUSD: string
   token0: Pick<Token, 'derivedETH' | 'id' | 'name' | 'symbol' | 'totalLiquidity'>
   token0Price: string
@@ -101,7 +102,6 @@ interface Pair {
   totalSupply: string
   trackedReserveETH: string
   trackedReserveUSD: number
-  txCount: string
   untrackedVolumeUSD: string
   volumeChangeUSD: number
   volumeChangeUntracked: number

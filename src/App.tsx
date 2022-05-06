@@ -82,7 +82,7 @@ function App() {
   const [latestBlock, headBlock] = useLatestBlocks()
   const formatPath = useFormatPath()
   // show warning
-  const showWarning = headBlock && latestBlock ? headBlock - latestBlock > BLOCK_DIFFERENCE_THRESHOLD : false
+  const showWarning = headBlock - latestBlock > BLOCK_DIFFERENCE_THRESHOLD
   useScrollToTop()
 
   useFetchActiveTokenPrice()

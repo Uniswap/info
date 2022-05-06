@@ -1,47 +1,16 @@
 import { ITransactionDataController } from 'data/types/TransactionController.interface'
-import { client } from 'service/client'
-import { FILTERED_TRANSACTIONS, GLOBAL_TXNS, USER_TRANSACTIONS } from 'service/queries/transactions'
-import { GlobalTransactionsResponse } from 'service/types'
-import { UserParams } from 'service/types/AccountTypes'
+import { TransactionsMock } from '__mocks__/transactions'
 
 export default class TransactionDataController implements ITransactionDataController {
-  async getTransactions(allPairs: string[]) {
-    const result = await client.query<Transactions, { allPairs: string[] }>({
-      query: FILTERED_TRANSACTIONS,
-      variables: {
-        allPairs
-      }
-    })
-    return result.data
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async getTransactions(_allPairs: string[]) {
+    return Promise.resolve(TransactionsMock)
   }
-  async getUserTransactions(account: string) {
-    const result = await client.query<Transactions, UserParams>({
-      query: USER_TRANSACTIONS,
-      variables: {
-        user: account
-      },
-      fetchPolicy: 'no-cache'
-    })
-    return result.data
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async getUserTransactions(_account: string) {
+    return Promise.resolve(TransactionsMock)
   }
   async getAllTransactions() {
-    const result = await client.query<GlobalTransactionsResponse>({
-      query: GLOBAL_TXNS
-    })
-
-    return result.data.transactions.reduce<Transactions>(
-      (acc, cur) => {
-        return {
-          mints: acc.mints.concat(cur.mints),
-          swaps: acc.swaps.concat(cur.swaps),
-          burns: acc.burns.concat(cur.burns)
-        }
-      },
-      {
-        mints: [],
-        swaps: [],
-        burns: []
-      }
-    )
+    return Promise.resolve(TransactionsMock)
   }
 }

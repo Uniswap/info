@@ -85,11 +85,9 @@ export const MINT_DETAILS = gql`
     }
     pair {
       token0 {
-        id
         symbol
       }
       token1 {
-        id
         symbol
       }
     }
