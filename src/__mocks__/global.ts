@@ -22,24 +22,3 @@ export const GlobalDataMock = {
 }
 
 export const PriceMock = [2777.9613, 2943.2, -5.614322311298876]
-
-export const ChartDataMock = [
-  {
-    date: 1620345600,
-    dailyVolumeUSD: 45604.15679967096,
-    totalLiquidityUSD: 3207507.6183777433,
-    __typename: 'WhiteSwapDayData'
-  },
-  {
-    date: 1620432000,
-    dailyVolumeUSD: 36913.86663875902,
-    totalLiquidityUSD: 3468744.5333539867,
-    __typename: 'WhiteSwapDayData'
-  },
-  {
-    date: 1620518400,
-    dailyVolumeUSD: 28610.21198371381,
-    totalLiquidityUSD: 3502706.3947038273,
-    __typename: 'WhiteSwapDayData'
-  }
-]

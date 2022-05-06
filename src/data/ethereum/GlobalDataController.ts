@@ -3,7 +3,7 @@ import dayjs from 'dayjs'
 import { client } from 'service/client'
 import { ETH_PRICE, GLOBAL_CHART, GLOBAL_DATA, SUBGRAPH_HEALTH } from 'service/queries/global'
 import { getBlocksFromTimestamps, get2DayPercentChange, getPercentChange, getBlockFromTimestamp } from 'utils'
-import { ChartDailyItem, GlobalData } from 'state/features/global/types'
+import { GlobalData } from 'state/features/global/types'
 import { IGlobalDataController } from 'data/types/GlobalController.interface'
 
 async function fetchGlobalData(block?: number) {

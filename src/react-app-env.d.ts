@@ -149,3 +149,9 @@ interface LiquidityPosition {
     id: string
   }
 }
+
+interface ChartDailyItem {
+  date: number
+  dailyVolumeUSD: number
+  totalLiquidityUSD: number
+}

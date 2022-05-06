@@ -1,11 +1,5 @@
 import { SupportedNetwork } from 'constants/networks'
 
-export interface ChartDailyItem {
-  date: number
-  dailyVolumeUSD: number
-  totalLiquidityUSD: number
-}
-
 export interface GlobalData {
   pairCount: number
   oneDayVolumeUSD: number

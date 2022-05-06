@@ -117,6 +117,16 @@ export const GLOBAL_CHART = gql`
     }
   }
 `
+
+export const GLOBAL_CHART_TRX = gql`
+  query GlobalChart($startTime: Int!) {
+    whiteSwapDayDatas(startTime: $startTime) {
+      date
+      dailyVolumeUSD
+      totalLiquidityUSD
+    }
+  }
+`
 // ! need mapped
 export const GLOBAL_DATA = gql`
   query WhiteSwapFactories($block: Block_height, $factoryAddress: String!) {

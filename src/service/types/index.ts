@@ -236,3 +236,7 @@ export type TokenDataResponse = {
 }
 
 export type GlobalTransactionsResponse = { transactions: Array<Transactions> }
+
+export type GlobalChartTrxResponse = {
+  whiteSwapDayDatas: Pick<WhiteSwapDayData, 'date' | 'totalLiquidityUSD' | 'dailyVolumeUSD'>[]
+}
