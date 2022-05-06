@@ -10,7 +10,7 @@ import {
   PAIR_CHART,
   PAIR_DATA,
   PAIR_SEARCH
-} from 'service/queries/pairs'
+} from 'service/queries/ethereum/pairs'
 import {
   getTimestampsForChanges,
   getBlocksFromTimestamps,

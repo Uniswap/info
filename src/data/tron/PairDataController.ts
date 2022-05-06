@@ -1,6 +1,6 @@
 import { IPairDataController } from 'data/types/PairController.interface'
 import { client } from 'service/client'
-import { PAIR_SEARCH } from 'service/queries/pairs'
+import { PAIR_SEARCH } from 'service/queries/ethereum/pairs'
 import { PairDayData } from 'state/features/pairs/types'
 import { HourlyRateDataMock, PairChartDataMock, PairListMock } from '__mocks__/pairs'
 

@@ -1,6 +1,6 @@
 import { ITokenDataController } from 'data/types/TokenController.interface'
 import { client } from 'service/client'
-import { TOKEN_SEARCH } from 'service/queries/tokens'
+import { TOKEN_SEARCH } from 'service/queries/ethereum/tokens'
 import { IntervalTokenDataMock, TokenChartDatMock, TokenPairsMock, TopTokensMock } from '__mocks__/tokens'
 
 export default class TokenDataController implements ITokenDataController {

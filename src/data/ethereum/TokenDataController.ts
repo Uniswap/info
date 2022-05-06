@@ -2,9 +2,9 @@ import { TOKEN_OVERRIDES } from 'constants/tokens'
 import { ITokenDataController } from 'data/types/TokenController.interface'
 import dayjs from 'dayjs'
 import { client } from 'service/client'
-import { PRICES_BY_BLOCK } from 'service/queries/global'
-import { GET_TOKENS, TOKEN_CHART, TOKEN_DATA, TOKEN_SEARCH } from 'service/queries/tokens'
-import { TokensResponse, Token as ETHToken, TokenDataResponse } from 'service/types'
+import { PRICES_BY_BLOCK } from 'service/queries/ethereum/global'
+import { GET_TOKENS, TOKEN_CHART, TOKEN_DATA, TOKEN_SEARCH } from 'service/queries/ethereum/tokens'
+import { TokensQuery, Token as ETHToken, TokenDataQuery } from 'service/generated/ethereumGraphql'
 import { TokenDayData } from 'state/features/token/types'
 import {
   getBlockFromTimestamp,
@@ -15,7 +15,7 @@ import {
 } from 'utils'
 
 async function fetchTokens(block?: number) {
-  return client.query<TokensResponse>({
+  return client.query<TokensQuery>({
     query: GET_TOKENS,
     variables: {
       block: block ? { number: block } : null
@@ -24,7 +24,7 @@ async function fetchTokens(block?: number) {
 }
 
 async function fetchTokenData(tokenAddress: string, block?: number) {
-  return client.query<TokenDataResponse>({
+  return client.query<TokenDataQuery>({
     query: TOKEN_DATA,
     variables: {
       tokenAddress,
