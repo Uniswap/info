@@ -298,8 +298,7 @@ export function useCurrentCurrency() {
 
 export function useTimeframe() {
   const [state, { updateTimeframe }] = useApplicationContext()
-  const [networksInfo] = useNetworksInfo()
-  const activeTimeframe = networksInfo.map(networkInfo => state?.[networkInfo.chainId]?.[TIME_KEY])
+  const activeTimeframe = state?.[TIME_KEY]
   return [activeTimeframe, updateTimeframe]
 }
 
