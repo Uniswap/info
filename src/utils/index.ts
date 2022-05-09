@@ -506,3 +506,10 @@ export function getCurrentNetwork() {
 export function escapeRegExp(value: string) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') // $& means the whole matched string
 }
+
+export function getChartData(data: ChartDailyItem[], field: keyof ChartDailyItem) {
+  return data.map(entry => ({
+    time: dayjs.unix(entry.date).utc().format('YYYY-MM-DD'),
+    value: entry[field]
+  }))
+}

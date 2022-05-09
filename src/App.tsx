@@ -98,11 +98,7 @@ function App() {
           </WarningBanner>
         </WarningWrapper>
       )}
-      {latestBlock &&
-      globalData &&
-      Object.keys(globalData).length > 0 &&
-      globalChartData &&
-      Object.keys(globalChartData).length > 0 ? (
+      {latestBlock && globalData && globalChartData.length > 0 ? (
         <ContentWrapper open={savedOpen}>
           <SideNav />
           <Center id="center">

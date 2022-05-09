@@ -1,6 +1,6 @@
 import DataService from 'data/DataService'
 import { useState, useEffect } from 'react'
-import { useAppDispatch } from 'state/hooks'
+import { useAppDispatch, useAppSelector } from 'state/hooks'
 import { getTimeframe } from 'utils'
 import { useActiveNetworkId } from '../application/selectors'
 import { useTimeFrame } from '../application/selectors'
@@ -8,7 +8,6 @@ import {
   useActiveTokenOneDayPrice,
   useActiveTokenPrice,
   useGlobalChartDataSelector,
-  useGlobalDataSelector,
   useGlobalTransactionsSelector
 } from './selectors'
 import { setChart, setGlobalData, setPrice, setTransactions } from './slice'
@@ -19,7 +18,7 @@ import { setChart, setGlobalData, setPrice, setTransactions } from './slice'
 export function useGlobalData() {
   const dispatch = useAppDispatch()
   const activeNetwork = useActiveNetworkId()
-  const data = useGlobalDataSelector()
+  const data = useAppSelector(state => state.global[activeNetwork]?.globalData)
   const price = useActiveTokenPrice()
   const oneDayPrice = useActiveTokenOneDayPrice()
 
@@ -33,7 +32,7 @@ export function useGlobalData() {
     }
   }, [price, oneDayPrice, activeNetwork])
 
-  return data || {}
+  return data
 }
 
 export function useGlobalChartData() {
@@ -71,7 +70,7 @@ export function useGlobalChartData() {
     }
   }, [oldestDateFetch, activeNetwork])
 
-  return chartData || {}
+  return chartData
 }
 
 export function useGlobalTransactions() {

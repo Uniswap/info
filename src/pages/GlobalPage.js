@@ -5,17 +5,16 @@ import { AutoColumn } from '../components/Column'
 import PairList from '../components/PairList'
 import TopTokenList from '../components/TokenList'
 import TxnList from '../components/TxnList'
-import GlobalChart from '../components/GlobalChart'
 import Search from '../components/Search'
 import GlobalStats from '../components/GlobalStats'
 
 import { useGlobalTransactions } from 'state/features/global/hooks'
-import { useGlobalDataSelector } from 'state/features/global/selectors'
+import { useGlobalChartDataSelector, useGlobalDataSelector } from 'state/features/global/selectors'
 import { useFormatPath } from 'hooks'
 import { usePairs } from 'state/features/pairs/selectors'
 import { useMedia } from 'react-use'
 import Panel from '../components/Panel'
-import { formattedNum } from '../utils'
+import { formattedNum, getChartData } from '../utils'
 import { DashboardWrapper, TYPE } from '../Theme'
 import { CustomLink } from '../components/Link'
 
@@ -23,6 +22,9 @@ import { PageWrapper, ContentWrapper } from '../components'
 import { useTranslation } from 'react-i18next'
 import { useTokens } from 'state/features/token/selectors'
 import Percent from 'components/Percent'
+import DropdownSelect from 'components/DropdownSelect'
+import { SeriesChart } from 'components/SeriesChart'
+import { useState } from 'react'
 
 const ListOptions = styled(AutoRow)`
   height: 40px;
@@ -44,6 +46,11 @@ const GridRow = styled.div`
   justify-content: space-between;
 `
 
+const CHART_VIEW = {
+  VOLUME: 'Volume',
+  LIQUIDITY: 'Liquidity'
+}
+
 function GlobalPage() {
   const { t } = useTranslation()
   const formatPath = useFormatPath()
@@ -52,6 +59,8 @@ function GlobalPage() {
   const allPairs = usePairs()
   const allTokens = useTokens()
   const transactions = useGlobalTransactions()
+  const chartData = useGlobalChartDataSelector()
+  const [chartView, setChartView] = useState(CHART_VIEW.LIQUIDITY)
   const { totalLiquidityUSD, oneDayVolumeUSD, volumeChangeUSD, liquidityChangeUSD } = useGlobalDataSelector()
 
   // breakpoints
@@ -107,16 +116,52 @@ function GlobalPage() {
               </AutoColumn>
             </Panel>
           )}
-          {!below800 && (
-            <GridRow>
-              <GlobalChart display="liquidity" />
-              <GlobalChart display="volume" />
-            </GridRow>
-          )}
-          {below800 && (
+
+          {below800 ? (
             <AutoColumn style={{ marginTop: '6px' }} gap="24px">
-              <GlobalChart display="liquidity" />
+              <DropdownSelect options={CHART_VIEW} active={chartView} setActive={setChartView} color={'#2E69BB'} />
+              <Panel>
+                {chartView === CHART_VIEW.LIQUIDITY && (
+                  <SeriesChart
+                    data={getChartData(chartData, 'totalLiquidityUSD')}
+                    base={totalLiquidityUSD}
+                    baseChange={liquidityChangeUSD}
+                    title={t('liquidity')}
+                    type="Area"
+                  />
+                )}
+                {chartView === CHART_VIEW.VOLUME && (
+                  <SeriesChart
+                    data={getChartData(chartData, 'dailyVolumeUSD')}
+                    base={oneDayVolumeUSD}
+                    baseChange={volumeChangeUSD}
+                    title={t('volume')}
+                    type="Histogram"
+                  />
+                )}
+              </Panel>
             </AutoColumn>
+          ) : (
+            <GridRow>
+              <Panel>
+                <SeriesChart
+                  data={getChartData(chartData, 'totalLiquidityUSD')}
+                  base={totalLiquidityUSD}
+                  baseChange={liquidityChangeUSD}
+                  title={t('liquidity')}
+                  type="Area"
+                />
+              </Panel>
+              <Panel>
+                <SeriesChart
+                  data={getChartData(chartData, 'dailyVolumeUSD')}
+                  base={oneDayVolumeUSD}
+                  baseChange={volumeChangeUSD}
+                  title={t('volume')}
+                  type="Histogram"
+                />
+              </Panel>
+            </GridRow>
           )}
         </DashboardWrapper>
 

@@ -1,5 +1,5 @@
-import { Text } from 'rebass'
 import { parsePercent } from 'utils'
+import { PercentValue } from './styled'
 
 interface IPercent {
   percent: number
@@ -7,11 +7,7 @@ interface IPercent {
 
 const Percent = ({ percent }: IPercent) => {
   const { data, color } = parsePercent(percent)
-  return (
-    <Text fontWeight={500} color={color}>
-      {data}
-    </Text>
-  )
+  return <PercentValue color={color}>{data}</PercentValue>
 }
 
 export default Percent
