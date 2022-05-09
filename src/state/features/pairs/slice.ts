@@ -1,7 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { SupportedNetwork } from 'constants/networks'
 import {
-  Pair,
   PairsState,
   UpdateChartDataPayload,
   UpdateHourlyDataPayload,

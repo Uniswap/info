@@ -1,5 +1,5 @@
 import ReactDOM from 'react-dom'
-import { StrictMode } from 'react'
+import { StrictMode, Suspense } from 'react'
 import { BrowserRouter } from 'react-router-dom'
 import ReactGA from 'react-ga'
 import { isMobile } from 'react-device-detect'
@@ -40,7 +40,9 @@ ReactDOM.render(
           <ApolloProvider client={client}>
             <GlobalStyle />
             <BrowserRouter>
-              <App />
+              <Suspense fallback={null}>
+                <App />
+              </Suspense>
             </BrowserRouter>
           </ApolloProvider>
         </ThemeProvider>

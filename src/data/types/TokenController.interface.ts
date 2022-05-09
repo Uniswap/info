@@ -1,4 +1,4 @@
-import { Token, TokenDayData } from 'state/features/token/types'
+import { TokenDayData } from 'state/features/token/types'
 
 export interface ITokenDataController {
   getTopTokens(price: number, priceOld: number): Promise<Token[]>

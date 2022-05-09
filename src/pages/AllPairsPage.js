@@ -1,4 +1,3 @@
-import { useEffect } from 'react'
 import { TYPE } from '../Theme'
 import { usePairs } from 'state/features/pairs/selectors'
 import PairList from '../components/PairList'
@@ -12,10 +11,6 @@ import { useTranslation } from 'react-i18next'
 function AllPairsPage() {
   const { t } = useTranslation()
   const allPairs = usePairs()
-
-  useEffect(() => {
-    window.scrollTo(0, 0)
-  }, [])
 
   const below800 = useMedia('(max-width: 800px)')
 

@@ -1,4 +1,3 @@
-import { useEffect } from 'react'
 import { DashboardWrapper, TYPE } from 'Theme'
 import { PageWrapper, FullWrapper } from 'components'
 import LPList from 'components/LPList'
@@ -13,10 +12,6 @@ import { AccountWrapper } from './styled'
 
 function AccountLookup() {
   const { t } = useTranslation()
-
-  useEffect(() => {
-    window.scrollTo(0, 0)
-  }, [])
 
   const topLps = useTopLiquidityPositions()
 

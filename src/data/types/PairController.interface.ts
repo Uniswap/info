@@ -1,4 +1,4 @@
-import { HourDataItem, Pair, PairDayData } from 'state/features/pairs/types'
+import { PairDayData } from 'state/features/pairs/types'
 
 export interface IPairDataController {
   getPairList(price: number): Promise<Pair[]>
@@ -11,6 +11,6 @@ export interface IPairDataController {
    */
   getBulkPairData(pairList: string[], price: number): Promise<Pair[]>
   getPairChartData(pairAddress: string): Promise<PairDayData[]>
-  getHourlyRateData(pairAddress: string, startTime: number, latestBlock: number): Promise<HourDataItem[][]>
+  getHourlyRateData(pairAddress: string, startTime: number, latestBlock: number): Promise<TimeWindowItem[][]>
   searchPair(tokens: string[], id: string): any
 }

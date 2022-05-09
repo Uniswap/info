@@ -23,7 +23,7 @@ export const EthereumNetworkInfo: NetworkInfo = {
   name: 'Ethereum',
   imageURL: ETHEREUM_LOGO_URL,
   bgColor: '#fc077d',
-  primaryColor: '#fc077d',
+  primaryColor: '#607BEE',
   secondaryColor: '#2172E5'
 }
 
@@ -33,7 +33,7 @@ export const TronNetworkInfo: NetworkInfo = {
   name: 'Tron',
   imageURL: TRON_LOGO_URL,
   bgColor: '#0A294B',
-  primaryColor: '#0490ED',
+  primaryColor: '#F45670',
   secondaryColor: '#96BEDC',
   blurb: 'Beta'
 }

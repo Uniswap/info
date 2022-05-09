@@ -1,5 +1,5 @@
 import { HealthStatus } from 'state/features/application/types'
-import { ChartDailyItem, GlobalData } from 'state/features/global/types'
+import { GlobalData } from 'state/features/global/types'
 
 export interface IGlobalDataController {
   /**

@@ -29,19 +29,12 @@ export type Token = {
   id: Scalars['ID']
   symbol: Scalars['String']
   name: Scalars['String']
-  decimals: Scalars['Int']
-  totalSupply: Scalars['Int']
   tradeVolume: Scalars['Float']
   tradeVolumeUSD: Scalars['Float']
   untrackedVolumeUSD: Scalars['Float']
   txCount: Scalars['Int']
   totalLiquidity: Scalars['Float']
-  derivedETH?: Maybe<Scalars['Float']>
-  tokenDayData: Array<TokenDayData>
-  pairDayDataBase: Array<PairDayData>
-  pairDayDataQuote: Array<PairDayData>
-  pairBase: Array<Pair>
-  pairQuote: Array<Pair>
+  derivedETH: Scalars['Float']
 }
 
 export type Pair = {
@@ -230,4 +223,157 @@ export type TokenDayData = {
   totalLiquidityETH: Scalars['Float']
   totalLiquidityUSD: Scalars['Float']
   priceUSD: Scalars['Float']
+}
+
+export type TokensQuery = {
+  tokens: Token[]
+}
+
+export type TokenDataQuery = {
+  tokens: Token[]
+  pairs0: { id: string }[]
+  pairs1: { id: string }[]
+}
+
+export type GlobalTransactionsResponse = { transactions: Array<Transactions> }
+
+export type GlobalChartTrxResponse = {
+  whiteSwapDayDatas: Pick<WhiteSwapDayData, 'date' | 'totalLiquidityUSD' | 'dailyVolumeUSD'>[]
+}
+
+export type UserTransactionQueryVariables = Exact<{
+  user: Scalars['String']
+}>
+
+export type TransactionQuery = {
+  burns: Array<{
+    amount0: string
+    amount1: string
+    amountUSD: string
+    liquidity: string
+    sender: string
+    to: string
+    pair: {
+      token0: {
+        symbol: string
+        __typename: 'Token'
+      }
+      token1: {
+        symbol: string
+        __typename: 'Token'
+      }
+    }
+    transaction: {
+      id: string
+      timestamp: string
+      __typename: 'Transaction'
+    }
+    __typename: 'Burn'
+  }>
+  mints: Array<{
+    amount0: string
+    amount1: string
+    amountUSD: string
+    liquidity: string
+    to: string
+    pair: {
+      token0: {
+        symbol: string
+        __typename: 'Token'
+      }
+      token1: {
+        symbol: string
+        __typename: 'Token'
+      }
+    }
+    transaction: {
+      id: string
+      timestamp: string
+      __typename: 'Transaction'
+    }
+    __typename: 'Mint'
+  }>
+  swaps: Array<{
+    amount0In: string
+    amount0Out: string
+    amount1In: string
+    amount1Out: string
+    amountUSD: string
+    to: string
+    pair: {
+      token0: {
+        symbol: string
+        __typename: 'Token'
+      }
+      token1: {
+        symbol: string
+        __typename: 'Token'
+      }
+    }
+    transaction: {
+      id: string
+      timestamp: string
+      __typename: 'Transaction'
+    }
+    __typename: 'Swap'
+  }>
+}
+
+export type FilteredTransactionsQueryVariables = {
+  allPairs: string[]
+}
+
+export type UserLiquidityPositionSnapshotsVariables = {
+  skip: Scalars['Int']
+  user: Scalars['String']
+}
+
+export type UserLiquidityPositionsVariables = {
+  user: Scalars['String']
+}
+
+export type UserLiquidityPositionsQuery = {
+  liquidityPositions: Array<{
+    liquidityTokenBalance: string
+    pair: {
+      id: string
+      reserve0: string
+      reserve1: string
+      reserveUSD: string
+      token0: {
+        id: string
+        symbol: string
+        derivedETH: string
+        __typename: 'Token'
+      }
+      token1: {
+        id: string
+        symbol: string
+        derivedETH: string
+        __typename: 'Token'
+      }
+      totalSupply: string
+      __typename: 'Pair'
+    }
+    __typename: 'LiquidityPosition'
+  }>
+}
+
+export type TopLiquidityPositionVariables = {
+  pair: Scalars['String']
+}
+
+export type TopLiquidityPositionQuery = {
+  liquidityPositions: Array<{
+    user: {
+      id: string
+      __typename: 'User'
+    }
+    pair: {
+      id: string
+      __typename: 'Pair'
+    }
+    liquidityTokenBalance: string
+    __typename: 'LiquidityPosition'
+  }>
 }

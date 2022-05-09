@@ -201,11 +201,6 @@ function PairPage() {
   const below440 = useMedia('(max-width: 440px)')
 
   const [dismissed, markAsDismissed] = usePathDismissed(location.pathname)
-
-  useEffect(() => {
-    window.scrollTo(0, 0)
-  }, [])
-
   const [savedPairs, addPair] = useSavedPairs()
 
   const listedTokens = useListedTokens()
@@ -215,7 +210,11 @@ function PairPage() {
       <span />
       <Warning
         type={'pair'}
-        show={!dismissed && listedTokens && !(listedTokens.includes(token0?.id) && listedTokens.includes(token1?.id))}
+        show={
+          !dismissed &&
+          listedTokens.length > 0 &&
+          !(listedTokens.includes(token0?.id) && listedTokens.includes(token1?.id))
+        }
         setShow={markAsDismissed}
         address={pairAddress}
       />

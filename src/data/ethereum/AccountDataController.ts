@@ -2,19 +2,19 @@ import { IAccountDataController } from 'data/types/AccountController.interface'
 import dayjs from 'dayjs'
 import { client } from 'service/client'
 import {
+  TopLiquidityPositionQuery,
+  TopLiquidityPositionVariables,
+  UserLiquidityPositionSnapshotsVariables,
+  UserLiquidityPositionsQuery,
+  UserLiquidityPositionsVariables
+} from 'service/generated/ethereumGraphql'
+import {
   TOP_LPS_PER_PAIRS,
   USER_LIQUIDITY_POSITIONS,
   USER_LIQUIDITY_POSITION_SNAPSHOTS
-} from 'service/queries/accounts'
-import { PAIR_DAY_DATA_BULK } from 'service/queries/pairs'
-import {
-  TopLiquidityPoolsData,
-  TopLiquidityPoolsParams,
-  UserHistoryParams,
-  UserParams,
-  UserPositionData
-} from 'service/types/AccountTypes'
-import { LiquidityChart, LiquidityPosition, LiquiditySnapshot } from 'state/features/account/types'
+} from 'service/queries/ethereum/accounts'
+import { PAIR_DAY_DATA_BULK } from 'service/queries/ethereum/pairs'
+import { LiquidityChart } from 'state/features/account/types'
 import { getLPReturnsOnPair } from 'utils/returns'
 
 type OwnershipPair = {
@@ -29,7 +29,7 @@ export default class AccountDataController implements IAccountDataController {
       let allResults: LiquiditySnapshot[] = []
       let found = false
       while (!found) {
-        const result = await client.query<any, UserHistoryParams>({
+        const result = await client.query<any, UserLiquidityPositionSnapshotsVariables>({
           query: USER_LIQUIDITY_POSITION_SNAPSHOTS,
           variables: {
             skip: skip,
@@ -148,7 +148,7 @@ export default class AccountDataController implements IAccountDataController {
   }
   async getUserPositions(account: string, price: number, snapshots: LiquiditySnapshot[]) {
     try {
-      const result = await client.query<UserPositionData, UserParams>({
+      const result = await client.query<UserLiquidityPositionsQuery, UserLiquidityPositionsVariables>({
         query: USER_LIQUIDITY_POSITIONS,
         variables: {
           user: account
@@ -182,7 +182,7 @@ export default class AccountDataController implements IAccountDataController {
     const topLpLists = await Promise.all(
       topPairs.map(async pair => {
         // for each one, fetch top LPs
-        const { data: results } = await client.query<TopLiquidityPoolsData, TopLiquidityPoolsParams>({
+        const { data: results } = await client.query<TopLiquidityPositionQuery, TopLiquidityPositionVariables>({
           query: TOP_LPS_PER_PAIRS,
           variables: {
             pair

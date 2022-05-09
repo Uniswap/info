@@ -11,7 +11,7 @@ import AccountPage from 'pages/AccountPage'
 import AllTokensPage from 'pages/AllTokensPage'
 import AllPairsPage from 'pages/AllPairsPage'
 import PinnedData from 'components/PinnedData'
-import { useFormatPath } from './hooks'
+import { useFormatPath, useScrollToTop } from './hooks'
 import SideNav from 'components/SideNav'
 import AccountLookup from 'pages/AccountLookup'
 import LocalLoader from 'components/LocalLoader'
@@ -82,7 +82,8 @@ function App() {
   const [latestBlock, headBlock] = useLatestBlocks()
   const formatPath = useFormatPath()
   // show warning
-  const showWarning = headBlock && latestBlock ? headBlock - latestBlock > BLOCK_DIFFERENCE_THRESHOLD : false
+  const showWarning = headBlock - latestBlock > BLOCK_DIFFERENCE_THRESHOLD
+  useScrollToTop()
 
   useFetchActiveTokenPrice()
   useFetchPairs()
@@ -97,11 +98,7 @@ function App() {
           </WarningBanner>
         </WarningWrapper>
       )}
-      {latestBlock &&
-      globalData &&
-      Object.keys(globalData).length > 0 &&
-      globalChartData &&
-      Object.keys(globalChartData).length > 0 ? (
+      {latestBlock && globalData && globalChartData.length > 0 ? (
         <ContentWrapper open={savedOpen}>
           <SideNav />
           <Center id="center">

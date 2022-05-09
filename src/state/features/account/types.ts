@@ -1,58 +1,5 @@
 import { SupportedNetwork } from 'constants/networks'
 
-type PositionToken = {
-  derivedETH: string
-  id: string
-  symbol: string
-}
-
-type PositionPair = {
-  id: string
-  reserve0: string
-  reserve1: string
-  reserveUSD: string
-  totalSupply: string
-  token0: PositionToken
-  token1: PositionToken
-}
-
-export interface Position {
-  pair: PositionPair
-  liquidityTokenBalance: string
-  feeEarned: number
-}
-
-export type SnapshotToken = {
-  id: string
-}
-
-export type SnapshotPair = {
-  id: string
-  reserve0: string
-  reserve1: string
-  reserveUSD: string
-  token0: SnapshotToken
-  token1: SnapshotToken
-}
-
-export interface LiquiditySnapshot {
-  liquidityTokenBalance: string
-  liquidityTokenTotalSupply: string
-  pair: SnapshotPair
-  reserve0: string
-  reserve1: string
-  reserveUSD: string
-  timestamp: number
-  token0PriceUSD: string
-  token1PriceUSD: string
-}
-
-export type PairReturn = {
-  date: number
-  fees: number
-  usdValue: number
-}
-
 type PairReturns = Record<string, PairReturn[]>
 
 export interface Account {
@@ -65,6 +12,11 @@ export interface Account {
 export type AccountNetworkState = {
   topLiquidityPositions?: Array<LiquidityPosition>
   byAddress: Record<string, Account>
+}
+
+export type LiquidityChart = {
+  date: number
+  valueUSD: number
 }
 
 export type AccountState = Record<SupportedNetwork, AccountNetworkState>
@@ -89,24 +41,6 @@ export type UpdatePairReturnsPayload = ParamsWithNetwork<{
   pairAddress: string
   data: PairReturn[]
 }>
-
-export type LiquidityChart = {
-  date: number
-  valueUSD: number
-}
-
-export type LiquidityPositionUser = {
-  id: string
-}
-
-export interface LiquidityPosition {
-  pairAddress: string
-  pairName: string
-  token0: string
-  token1: string
-  usd: number
-  user: LiquidityPositionUser
-}
 
 export type UpdateTopLiquidityPositionsPayload = ParamsWithNetwork<{
   liquidityPositions: Array<LiquidityPosition>

@@ -1,16 +1,5 @@
 import { SupportedNetwork } from 'constants/networks'
 
-export interface ChartDailyItem {
-  dailyVolumeETH: string
-  dailyVolumeUSD: number
-  date: number
-  id: string
-  totalLiquidityETH: string
-  totalLiquidityUSD: string
-  totalVolumeUSD: string
-  mostLiquidTokens?: number
-}
-
 export interface GlobalData {
   pairCount: number
   oneDayVolumeUSD: number
@@ -20,34 +9,6 @@ export interface GlobalData {
   oneWeekVolume: number
   weeklyVolumeChange: number
   totalLiquidityUSD: number
-}
-
-export interface Token {
-  id: string
-  symbol: string
-}
-
-export interface Pair {
-  token0: Token
-  token1: Token
-}
-
-export interface Transaction {
-  id: string
-  timestamp: string
-}
-
-export type LiquidityPositionUser = {
-  id: string
-}
-
-export interface LiquidityPosition {
-  pairAddress: string
-  pairName: string
-  token0: string
-  token1: string
-  usd: number
-  user: LiquidityPositionUser
 }
 
 export interface GlobalNetworkState {

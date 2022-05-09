@@ -1,4 +1,4 @@
-import { LiquidityChart, LiquiditySnapshot, Position, LiquidityPosition } from 'state/features/account/types'
+import { LiquidityChart } from 'state/features/account/types'
 
 export interface IAccountDataController {
   /**

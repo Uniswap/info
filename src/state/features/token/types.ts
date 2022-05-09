@@ -1,3 +1,10 @@
+export interface TokenDetails extends Token {
+  transactions?: Transactions
+  chartData?: TokenDayData[]
+  tokenPairs?: string[]
+  timeWindowData?: Record<string, Record<string, TimeWindowItem[]>>
+}
+
 export type TokenDayData = {
   dailyVolumeETH?: string
   dailyVolumeToken?: string
@@ -11,38 +18,7 @@ export type TokenDayData = {
   dayString?: number
 }
 
-export type TokenPair = {
-  id: string
-}
-
-export interface Token {
-  derivedETH: string
-  id: string
-  liquidityChangeUSD: number
-  name: string
-  oneDayTxns: number
-  oneDayVolumeUSD: number
-  oneDayVolumeUT: number
-  oneDayVolumeETH: number
-  priceChangeUSD: number
-  priceUSD: number
-  symbol: string
-  totalLiquidity: string
-  totalLiquidityUSD: number
-  tradeVolume: string
-  tradeVolumeUSD: string
-  txCount: string
-  txnChange: number
-  untrackedVolumeUSD: string
-  volumeChangeUSD: number
-  volumeChangeUT: number
-  transactions?: Transactions
-  chartData?: TokenDayData[]
-  tokenPairs?: string[]
-  timeWindowData?: Record<string, Record<string, TimeWindowItem[]>>
-}
-
-export type TokenState = Record<SupportedNetwork, Record<string, Token>>
+export type TokenState = Record<SupportedNetwork, Record<string, TokenDetails>>
 
 export type UpdateTokenPayload = ParamsWithNetwork<{
   tokenAddress: string

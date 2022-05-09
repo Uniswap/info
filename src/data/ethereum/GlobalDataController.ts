@@ -1,9 +1,9 @@
 import { FACTORY_ADDRESS } from '../../constants'
 import dayjs from 'dayjs'
 import { client } from 'service/client'
-import { ETH_PRICE, GLOBAL_CHART, GLOBAL_DATA, SUBGRAPH_HEALTH } from 'service/queries/global'
+import { ETH_PRICE, GLOBAL_CHART, GLOBAL_DATA, SUBGRAPH_HEALTH } from 'service/queries/ethereum/global'
 import { getBlocksFromTimestamps, get2DayPercentChange, getPercentChange, getBlockFromTimestamp } from 'utils'
-import { ChartDailyItem, GlobalData } from 'state/features/global/types'
+import { GlobalData } from 'state/features/global/types'
 import { IGlobalDataController } from 'data/types/GlobalController.interface'
 
 async function fetchGlobalData(block?: number) {
@@ -145,7 +145,8 @@ export default class GlobalDataController implements IGlobalDataController {
         skip += 1000
         data = result.data.whiteSwapDayDatas.map((el: any) => ({
           ...el,
-          dailyVolumeUSD: parseFloat(el.dailyVolumeUSD)
+          totalLiquidityUSD: +el.totalLiquidityUSD,
+          dailyVolumeUSD: +el.dailyVolumeUSD
         }))
         if (result.data.whiteSwapDayDatas.length < 1000) {
           allFound = true
@@ -166,22 +167,18 @@ export default class GlobalDataController implements IGlobalDataController {
         // fill in empty days ( there will be no day datas if no trades made that day )
         let timestamp = data[0].date ? data[0].date : oldestDateToFetch
         let latestLiquidityUSD = data[0].totalLiquidityUSD
-        let latestDayDats = data[0].mostLiquidTokens
         let index = 1
         while (timestamp < utcEndTime.unix() - oneDay) {
           const nextDay = timestamp + oneDay
           const currentDayIndex = (nextDay / oneDay).toFixed(0)
           if (!dayIndexSet.has(currentDayIndex)) {
-            // @ts-ignore
             data.push({
               date: nextDay,
               dailyVolumeUSD: 0,
-              totalLiquidityUSD: latestLiquidityUSD,
-              mostLiquidTokens: latestDayDats
+              totalLiquidityUSD: latestLiquidityUSD
             })
           } else {
             latestLiquidityUSD = dayIndexArray[index].totalLiquidityUSD
-            latestDayDats = dayIndexArray[index].mostLiquidTokens
             index = index + 1
           }
           timestamp = nextDay
@@ -207,8 +204,8 @@ export default class GlobalDataController implements IGlobalDataController {
       const oneDayBlock = await getBlockFromTimestamp(utcOneDayBack)
       const result = await fetchPrice()
       const resultOneDay = await fetchPrice(oneDayBlock)
-      const currentPrice = result?.data?.bundles[0]?.ethPrice
-      const oneDayBackPrice = resultOneDay?.data?.bundles[0]?.ethPrice
+      const currentPrice = +result?.data?.bundles[0]?.ethPrice
+      const oneDayBackPrice = +resultOneDay?.data?.bundles[0]?.ethPrice
       priceChange = getPercentChange(currentPrice, oneDayBackPrice)
       price = currentPrice
       priceOneDay = oneDayBackPrice

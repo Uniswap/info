@@ -5,7 +5,7 @@ import { timeframeOptions } from 'constants/index'
 import { NetworkInfo, SupportedNetwork, SUPPORTED_NETWORK_VERSIONS } from 'constants/networks'
 import Numeral from 'numeral'
 import { TronNetworkInfo } from 'constants/networks'
-import { GET_BLOCK, GET_BLOCKS, SHARE_VALUE } from 'service/queries/global'
+import { GET_BLOCK, GET_BLOCKS, SHARE_VALUE } from 'service/queries/ethereum/global'
 import { client } from 'service/client'
 import cryptoValidator from 'multicoin-address-validator'
 import { ApolloQueryResult } from 'apollo-boost'
@@ -505,4 +505,11 @@ export function getCurrentNetwork() {
 
 export function escapeRegExp(value: string) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') // $& means the whole matched string
+}
+
+export function getChartData(data: ChartDailyItem[], field: keyof ChartDailyItem) {
+  return data.map(entry => ({
+    time: dayjs.unix(entry.date).utc().format('YYYY-MM-DD'),
+    value: entry[field]
+  }))
 }
