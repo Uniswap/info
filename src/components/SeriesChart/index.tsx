@@ -1,12 +1,15 @@
 import { IconWrapper } from 'components'
 import dayjs from 'dayjs'
 import { createChart, IChartApi, ISeriesApi, MouseEventParams, SeriesType, SingleValueData } from 'lightweight-charts'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Play } from 'react-feather'
 import { useAppSelector } from 'state/hooks'
 import Percent from 'components/Percent'
 import { formattedNum } from 'utils'
 import { Wrapper, ChartInfo, Title, ChartInfoPrice, ChartInfoDate } from './styled'
+import { EthereumNetworkInfo, SupportedNetwork, TronNetworkInfo } from 'constants/networks'
+import { useActiveNetworkId } from 'state/features/application/selectors'
+import { useTheme } from 'styled-components'
 
 interface ISeriesChart {
   data: SingleValueData[]
@@ -16,14 +19,42 @@ interface ISeriesChart {
   title: string
 }
 
+type CurrentDayData = {
+  price: string
+  date: string
+}
+
+const chartColors = {
+  [SupportedNetwork.ETHEREUM]: {
+    area: {
+      topColor: EthereumNetworkInfo.primaryColor,
+      bottomColor: 'rgba(41, 116, 255, 0.28)'
+    },
+    histogram: {
+      color: EthereumNetworkInfo.primaryColor,
+      baseLineColor: EthereumNetworkInfo.primaryColor
+    }
+  },
+  [SupportedNetwork.TRON]: {
+    area: {
+      topColor: TronNetworkInfo.primaryColor,
+      bottomColor: 'rgba(241, 50, 60, 0.157)'
+    },
+    histogram: {
+      color: TronNetworkInfo.primaryColor,
+      baseLineColor: TronNetworkInfo.primaryColor
+    }
+  }
+}
+
 export const SeriesChart = ({ data, type, base, baseChange, title }: ISeriesChart) => {
+  const theme = useTheme()
   const darkMode = useAppSelector(state => state.user.darkMode)
+  const activeNetwork = useActiveNetworkId()
   const chartContainerRef = useRef<HTMLDivElement>(null)
   const chartRef = useRef<IChartApi>()
   const seriesRef = useRef<ISeriesApi<'Area' | 'Histogram'>>()
-  const basePriceRef = useRef<HTMLParagraphElement>(null)
-  const chartPriceRef = useRef<HTMLParagraphElement>(null)
-  const chartDateRef = useRef<HTMLParagraphElement>(null)
+  const [currentDayData, setCurrentDayData] = useState<CurrentDayData | undefined>()
   const textColor = darkMode ? 'rgb(165, 172, 183)' : '#45484D'
 
   useEffect(() => {
@@ -65,7 +96,6 @@ export const SeriesChart = ({ data, type, base, baseChange, title }: ISeriesChar
           visible: true,
           style: 0,
           width: 2,
-          color: 'rgba(32, 38, 46, 0.1)',
           labelVisible: false
         }
       },
@@ -78,16 +108,17 @@ export const SeriesChart = ({ data, type, base, baseChange, title }: ISeriesChar
     switch (type) {
       case 'Area':
         seriesRef.current = chart.addAreaSeries({
-          topColor: '#2E69BB',
-          bottomColor: 'rgba(255, 255, 255, 0)',
-          lineColor: '#2E69BB',
-          lineWidth: 1
+          topColor: chartColors[activeNetwork].area.topColor,
+          bottomColor: chartColors[activeNetwork].area.bottomColor,
+          lineColor: chartColors[activeNetwork].area.topColor,
+          crosshairMarkerBorderColor: 'white',
+          lineWidth: 2
         })
         break
       case 'Histogram':
       default:
         seriesRef.current = chart.addHistogramSeries({
-          color: '#2E69BB',
+          color: chartColors[activeNetwork].histogram.color,
           priceFormat: {
             type: 'volume'
           },
@@ -95,46 +126,40 @@ export const SeriesChart = ({ data, type, base, baseChange, title }: ISeriesChar
             top: 0.32,
             bottom: 0
           },
-          baseLineColor: '#2E69BB',
-          baseLineWidth: 1
+          baseLineColor: chartColors[activeNetwork].histogram.color,
+          baseLineWidth: 2
         })
         break
     }
     seriesRef.current.setData(data)
 
-    const callback = (param: MouseEventParams) => {
-      if (!param.time) {
-        basePriceRef.current!.style.display = 'block'
-        chartPriceRef.current!.innerText = ''
-        chartDateRef.current!.innerText = ''
+    const chartScrollCallback = (param: MouseEventParams) => {
+      if (param.time) {
+        const dateStr =
+          typeof param.time === 'object'
+            ? dayjs(param.time.year + '-' + param.time.month + '-' + param.time.day).format('MMMM D, YYYY')
+            : ''
+        const price = param.seriesPrices.get(seriesRef.current!)?.toString()
+        setCurrentDayData({
+          price: formattedNum(price, true).toString(),
+          date: dateStr
+        })
       } else {
-        if (chartPriceRef.current && chartDateRef.current) {
-          basePriceRef.current!.style.display = 'none'
-          if (typeof param.time === 'object') {
-            const dateStr = dayjs(param.time.year + '-' + param.time.month + '-' + param.time.day).format(
-              'MMMM D, YYYY'
-            )
-            const price = param.seriesPrices.get(seriesRef.current!)?.toString()
-            chartPriceRef.current!.innerText = formattedNum(price, true).toString()
-            chartDateRef.current!.innerText = dateStr
-          }
-        }
+        setCurrentDayData(undefined)
       }
     }
-    chartRef.current?.subscribeCrosshairMove(callback)
 
     const handleResize = () => {
       chart.applyOptions({ width: chartContainerRef.current!.clientWidth })
     }
 
+    chartRef.current?.subscribeCrosshairMove(chartScrollCallback)
     window.addEventListener('resize', handleResize)
-
     chart.timeScale().fitContent()
 
     return () => {
       window.removeEventListener('resize', handleResize)
-
-      chart.unsubscribeCrosshairMove(callback)
+      chart.unsubscribeCrosshairMove(chartScrollCallback)
       chart.remove()
     }
   }, [])
@@ -147,25 +172,49 @@ export const SeriesChart = ({ data, type, base, baseChange, title }: ISeriesChar
   }, [data])
 
   useEffect(() => {
-    if (chartRef.current) {
-      chartRef.current.applyOptions({
-        layout: {
-          textColor
+    chartRef.current?.applyOptions({
+      layout: {
+        textColor
+      },
+      crosshair: {
+        vertLine: {
+          color: theme.text4
         }
-      })
+      }
+    })
+    switch (type) {
+      case 'Area':
+        seriesRef.current?.applyOptions({
+          topColor: chartColors[activeNetwork].area.topColor,
+          bottomColor: chartColors[activeNetwork].area.bottomColor,
+          lineColor: chartColors[activeNetwork].area.topColor
+        })
+        break
+      case 'Histogram':
+      default:
+        seriesRef.current?.applyOptions({
+          color: chartColors[activeNetwork].histogram.color,
+          baseLineColor: chartColors[activeNetwork].histogram.color
+        })
+        break
     }
-  }, [darkMode])
+  }, [darkMode, activeNetwork])
 
   return (
     <Wrapper>
       <div ref={chartContainerRef}>
         <ChartInfo>
           <Title>{type === 'Histogram' ? `${title}(24h)` : title}</Title>
-          <div ref={basePriceRef}>
-            <ChartInfoPrice>{formattedNum(base ?? 0, true)}</ChartInfoPrice> <Percent percent={baseChange} />
-          </div>
-          <ChartInfoPrice ref={chartPriceRef} />
-          <ChartInfoDate ref={chartDateRef} />
+          {currentDayData ? (
+            <>
+              <ChartInfoPrice>{currentDayData.price}</ChartInfoPrice>
+              <ChartInfoDate>{currentDayData.date}</ChartInfoDate>
+            </>
+          ) : (
+            <div>
+              <ChartInfoPrice>{formattedNum(base ?? 0, true)}</ChartInfoPrice> <Percent percent={baseChange} />
+            </div>
+          )}
         </ChartInfo>
       </div>
       <IconWrapper>
