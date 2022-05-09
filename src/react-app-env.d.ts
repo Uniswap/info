@@ -1,5 +1,12 @@
 /// <reference types="react-scripts" />
 
+declare namespace NodeJS {
+  interface ProcessEnv {
+    REACT_APP_TRON_API: string
+    REACT_APP_GOOGLE_ANALYTICS_ID: string
+  }
+}
+
 declare enum SupportedNetwork {
   ETHEREUM = 'eth',
   TRON = 'trx'

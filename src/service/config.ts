@@ -8,6 +8,6 @@ export default {
     blockClientUrl: 'https://api.thegraph.com/subgraphs/name/blocklytics/ethereum-blocks'
   },
   [SupportedNetwork.TRON]: {
-    clientUrl: 'https://info-portal-api.cryptofuture.tech/graphql/'
+    clientUrl: process.env.REACT_APP_TRON_API
   }
 }
