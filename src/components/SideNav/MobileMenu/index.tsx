@@ -14,7 +14,7 @@ const MENU_LINKS = [
   },
   {
     route: '/tokens',
-    Icon: List,
+    Icon: Disc,
     label: 'sideNav.tokens'
   },
   {
@@ -24,7 +24,7 @@ const MENU_LINKS = [
   },
   {
     route: '/accounts',
-    Icon: Disc,
+    Icon: List,
     label: 'sideNav.accounts'
   }
 ]
@@ -48,6 +48,7 @@ const MobileMenu = () => {
               key={route}
               onClick={() => {
                 navigate(formatPath(route))
+                setIsOpen(false)
               }}
             >
               <Icon />
