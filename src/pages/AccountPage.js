@@ -320,7 +320,7 @@ function AccountPage({ account }) {
                 {activePosition ? (
                   <PairReturnsChart account={account} position={activePosition} />
                 ) : (
-                  <UserChart account={account} position={activePosition} />
+                  <UserChart account={account} />
                 )}
               </Panel>
             </PanelWrapper>

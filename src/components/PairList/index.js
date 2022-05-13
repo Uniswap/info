@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { useMedia } from 'react-use'
 import dayjs from 'dayjs'
 import LocalLoader from '../LocalLoader'
@@ -156,7 +156,6 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 5 }) {
   // pagination
   const [page, setPage] = useState(1)
   const [maxPage, setMaxPage] = useState(1)
-  const ITEMS_PER_PAGE = maxItems
 
   // sorting
   const [sortDirection, setSortDirection] = useState(true)
@@ -165,99 +164,103 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 5 }) {
   useEffect(() => {
     if (aggregatedPairs) {
       let extraPages = 1
-      if (Object.keys(aggregatedPairs).length % ITEMS_PER_PAGE === 0) {
+      if (Object.keys(aggregatedPairs).length % maxItems === 0) {
         extraPages = 0
       }
-      setMaxPage(Math.floor(Object.keys(aggregatedPairs).length / ITEMS_PER_PAGE) + extraPages)
+      setMaxPage(Math.floor(Object.keys(aggregatedPairs).length / maxItems) + extraPages)
     }
-  }, [ITEMS_PER_PAGE, aggregatedPairs])
+  }, [maxItems, aggregatedPairs])
 
-  const ListItem = ({ pairAddress, index }) => {
-    const pairData = aggregatedPairs[pairAddress]
-    if (pairData && pairData.token0 && pairData.token1) {
-      const showData = MAP_SHOW_DATA(pairData)
-      const pairNetworkInfo = NETWORKS_INFO[pairData.chainId] || NetworksInfoEnv[0]
-      return (
-        <DashGrid style={{ height: '56px' }} disbaleLinks={disbaleLinks} focus={true} isShowNetworkColumn={isShowNetworkColumn}>
-          <DataText area='name' fontWeight='500'>
-            {!below600 && <div style={{ marginRight: '20px', width: '10px' }}>{index}</div>}
-            <DoubleTokenLogo
-              size={below600 ? 16 : 20}
-              a0={pairData.token0.id}
-              a1={pairData.token1.id}
-              margin={!below740}
-              networkInfo={pairNetworkInfo}
-            />
-            <CustomLink
-              style={{ marginLeft: '20px', whiteSpace: 'nowrap' }}
-              to={'/' + pairNetworkInfo.urlKey + '/pair/' + pairAddress}
-              color={color}
-            >
-              <FormattedName text={showData.name} maxCharacters={below600 ? 8 : 16} adjustSize={true} link={true} />
-            </CustomLink>
-          </DataText>
-          {isShowNetworkColumn && (
-            <DataText area='network'>
-              <Link to={'/' + pairNetworkInfo.urlKey}>
-                <MouseoverTooltip text={pairNetworkInfo.name} width='unset'>
-                  <img src={pairNetworkInfo.icon} width={25} />
-                </MouseoverTooltip>
-              </Link>
-            </DataText>
-          )}
-          <DataText area='liq'>{formattedNum(showData.liquidity, true)}</DataText>
-          <DataText area='vol'>{formattedNum(showData.volume, true)}</DataText>
-          {!below740 && <DataText area='volWeek'>{formattedNum(showData.weekVolume, true)}</DataText>}
-          {!below1080 && <DataText area='fees'>{formattedNum(showData.oneDayFee, true)}</DataText>}
-          {!below740 && <DataText area='apy'>{showData.apy ? formattedPercent(showData.apy) : '--'}</DataText>}
-        </DashGrid>
-      )
-    } else {
-      return ''
-    }
-  }
-
-  const pairList =
-    aggregatedPairs &&
-    Object.keys(aggregatedPairs)
-      .sort((addressA, addressB) => {
-        const pairA = aggregatedPairs[addressA]
-        const pairB = aggregatedPairs[addressB]
-        let valueToCompareA = null
-        let valueToCompareB = null
-        if (sortedColumn == FIELDS.NAME) {
-          //reverse order
-          valueToCompareB = MAP_SHOW_DATA(pairA)[sortedColumn]
-          valueToCompareA = MAP_SHOW_DATA(pairB)[sortedColumn]
-        } else if ([FIELDS.APY, FIELDS.FEES, FIELDS.LIQ, FIELDS.VOL, FIELDS.VOL_7DAYS].includes(sortedColumn)) {
-          valueToCompareA = parseFloat(MAP_SHOW_DATA(pairA)[sortedColumn])
-          valueToCompareB = parseFloat(MAP_SHOW_DATA(pairB)[sortedColumn])
-        } else if (sortedColumn === FIELDS.NETWORK) {
-          //reverse order
-          valueToCompareB = NETWORKS_INFO[pairA.chainId].name
-          valueToCompareA = NETWORKS_INFO[pairB.chainId].name
-        }
-        if (valueToCompareA == valueToCompareB) {
-          if (parseFloat(MAP_SHOW_DATA(pairA)[FIELDS.LIQ]) == parseFloat(MAP_SHOW_DATA(pairB)[FIELDS.LIQ])) {
-            return MAP_SHOW_DATA(pairA)[FIELDS.NAME] > MAP_SHOW_DATA(pairB)[FIELDS.NAME] ? 1 : -1
-          }
-          return parseFloat(MAP_SHOW_DATA(pairA)[FIELDS.LIQ]) < parseFloat(MAP_SHOW_DATA(pairB)[FIELDS.LIQ]) ? 1 : -1
-        }
-        return valueToCompareA > valueToCompareB ? (sortDirection ? -1 : 1) * 1 : (sortDirection ? -1 : 1) * -1
-      })
-      .slice(ITEMS_PER_PAGE * (page - 1), page * ITEMS_PER_PAGE)
-      .map((pairAddress, index) => {
+  const ListItem = useCallback(
+    ({ pairAddress, index }) => {
+      const pairData = aggregatedPairs[pairAddress]
+      if (pairData && pairData.token0 && pairData.token1) {
+        const showData = MAP_SHOW_DATA(pairData)
+        const pairNetworkInfo = NETWORKS_INFO[pairData.chainId] || NetworksInfoEnv[0]
         return (
-          pairAddress && (
-            <div key={pairAddress} style={{ padding: '0 20px' }}>
-              <ListItem index={(page - 1) * ITEMS_PER_PAGE + index + 1} pairAddress={pairAddress} />
-              <Divider />
-            </div>
-          )
+          <DashGrid style={{ height: '56px' }} disbaleLinks={disbaleLinks} focus={true} isShowNetworkColumn={isShowNetworkColumn}>
+            <DataText area='name' fontWeight='500'>
+              {!below600 && <div style={{ marginRight: '20px', width: '10px' }}>{index}</div>}
+              <DoubleTokenLogo
+                size={below600 ? 16 : 20}
+                a0={pairData.token0.id}
+                a1={pairData.token1.id}
+                margin={!below740}
+                networkInfo={pairNetworkInfo}
+              />
+              <CustomLink
+                style={{ marginLeft: '20px', whiteSpace: 'nowrap' }}
+                to={'/' + pairNetworkInfo.urlKey + '/pair/' + pairAddress}
+                color={color}
+              >
+                <FormattedName text={showData.name} maxCharacters={below600 ? 8 : 16} adjustSize={true} link={true} />
+              </CustomLink>
+            </DataText>
+            {isShowNetworkColumn && (
+              <DataText area='network'>
+                <Link to={'/' + pairNetworkInfo.urlKey}>
+                  <MouseoverTooltip text={pairNetworkInfo.name} width='unset'>
+                    <img src={pairNetworkInfo.icon} width={25} />
+                  </MouseoverTooltip>
+                </Link>
+              </DataText>
+            )}
+            <DataText area='liq'>{formattedNum(showData.liquidity, true)}</DataText>
+            <DataText area='vol'>{formattedNum(showData.volume, true)}</DataText>
+            {!below740 && <DataText area='volWeek'>{formattedNum(showData.weekVolume, true)}</DataText>}
+            {!below1080 && <DataText area='fees'>{formattedNum(showData.oneDayFee, true)}</DataText>}
+            {!below740 && <DataText area='apy'>{showData.apy ? formattedPercent(showData.apy) : '--'}</DataText>}
+          </DashGrid>
         )
-      })
+      } else {
+        return ''
+      }
+    },
+    [aggregatedPairs, below1080, below600, below740, color, disbaleLinks, isShowNetworkColumn]
+  )
 
-  const theme = useTheme()
+  const pairList = useMemo(
+    () =>
+      aggregatedPairs &&
+      Object.keys(aggregatedPairs)
+        .sort((addressA, addressB) => {
+          const pairA = aggregatedPairs[addressA]
+          const pairB = aggregatedPairs[addressB]
+          let valueToCompareA = null
+          let valueToCompareB = null
+          if (sortedColumn == FIELDS.NAME) {
+            //reverse order
+            valueToCompareB = MAP_SHOW_DATA(pairA)[sortedColumn]
+            valueToCompareA = MAP_SHOW_DATA(pairB)[sortedColumn]
+          } else if ([FIELDS.APY, FIELDS.FEES, FIELDS.LIQ, FIELDS.VOL, FIELDS.VOL_7DAYS].includes(sortedColumn)) {
+            valueToCompareA = parseFloat(MAP_SHOW_DATA(pairA)[sortedColumn])
+            valueToCompareB = parseFloat(MAP_SHOW_DATA(pairB)[sortedColumn])
+          } else if (sortedColumn === FIELDS.NETWORK) {
+            //reverse order
+            valueToCompareB = NETWORKS_INFO[pairA.chainId].name
+            valueToCompareA = NETWORKS_INFO[pairB.chainId].name
+          }
+          if (valueToCompareA == valueToCompareB) {
+            if (parseFloat(MAP_SHOW_DATA(pairA)[FIELDS.LIQ]) == parseFloat(MAP_SHOW_DATA(pairB)[FIELDS.LIQ])) {
+              return MAP_SHOW_DATA(pairA)[FIELDS.NAME] > MAP_SHOW_DATA(pairB)[FIELDS.NAME] ? 1 : -1
+            }
+            return parseFloat(MAP_SHOW_DATA(pairA)[FIELDS.LIQ]) < parseFloat(MAP_SHOW_DATA(pairB)[FIELDS.LIQ]) ? 1 : -1
+          }
+          return valueToCompareA > valueToCompareB ? (sortDirection ? -1 : 1) * 1 : (sortDirection ? -1 : 1) * -1
+        })
+        .slice(maxItems * (page - 1), page * maxItems)
+        .map((pairAddress, index) => {
+          return (
+            pairAddress && (
+              <div key={pairAddress} style={{ padding: '0 20px' }}>
+                <ListItem index={(page - 1) * maxItems + index + 1} pairAddress={pairAddress} />
+                <Divider />
+              </div>
+            )
+          )
+        }),
+    [maxItems, ListItem, aggregatedPairs, page, sortDirection, sortedColumn]
+  )
 
   return (
     <ListWrapper>

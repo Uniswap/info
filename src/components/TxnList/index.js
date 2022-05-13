@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react'
+import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import styled from 'styled-components'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
@@ -282,92 +282,97 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
     setPage(1)
   }, [txFilter])
 
-  const filteredList =
-    filteredItems &&
-    filteredItems
-      .sort((a, b) => {
-        let valueToCompareA = null
-        let valueToCompareB = null
-        if (sortedColumn === SORT_FIELD.NETWORK) {
-          valueToCompareA = NETWORKS_INFO[a.chainId].name
-          valueToCompareB = NETWORKS_INFO[b.chainId].name
-        } else {
-          valueToCompareA = parseFloat(a[sortedColumn])
-          valueToCompareB = parseFloat(b[sortedColumn])
-        }
-        if (valueToCompareA > valueToCompareB) return (sortDirection ? -1 : 1) * 1
-        if (valueToCompareA < valueToCompareB) return (sortDirection ? -1 : 1) * -1
+  const filteredList = useMemo(
+    () =>
+      filteredItems &&
+      filteredItems
+        .sort((a, b) => {
+          let valueToCompareA = null
+          let valueToCompareB = null
+          if (sortedColumn === SORT_FIELD.NETWORK) {
+            valueToCompareA = NETWORKS_INFO[a.chainId].name
+            valueToCompareB = NETWORKS_INFO[b.chainId].name
+          } else {
+            valueToCompareA = parseFloat(a[sortedColumn])
+            valueToCompareB = parseFloat(b[sortedColumn])
+          }
+          if (valueToCompareA > valueToCompareB) return (sortDirection ? -1 : 1) * 1
+          if (valueToCompareA < valueToCompareB) return (sortDirection ? -1 : 1) * -1
 
-        if (a.timestamp < b.timestamp) return 1
-        if (a.timestamp > b.timestamp) return -1
+          if (a.timestamp < b.timestamp) return 1
+          if (a.timestamp > b.timestamp) return -1
 
-        if (a.amountUSD < b.amountUSD) return 1
-        if (a.amountUSD > b.amountUSD) return -1
+          if (a.amountUSD < b.amountUSD) return 1
+          if (a.amountUSD > b.amountUSD) return -1
 
-        if (a.hash < b.hash) return 1
-        if (a.hash > b.hash) return -1
+          if (a.hash < b.hash) return 1
+          if (a.hash > b.hash) return -1
 
-        if (a.token0Symbol < b.token0Symbol) return 1
-        if (a.token0Symbol > b.token0Symbol) return -1
-      })
-      .slice(ITEMS_PER_PAGE * (page - 1), page * ITEMS_PER_PAGE)
-
+          if (a.token0Symbol < b.token0Symbol) return 1
+          if (a.token0Symbol > b.token0Symbol) return -1
+        })
+        .slice(ITEMS_PER_PAGE * (page - 1), page * ITEMS_PER_PAGE),
+    [filteredItems, page, sortDirection, sortedColumn]
+  )
   const below1080 = useMedia('(max-width: 1080px)')
   const below780 = useMedia('(max-width: 780px)')
   const below900 = useMedia('(max-width: 900px)')
   const below1280 = useMedia('(max-width: 1280px)')
   const isShowDropdown = below900 || (!below1080 && below1280)
 
-  const ListItem = ({ item }) => {
-    const urls = useMemo(() => getEtherScanUrls(NETWORKS_INFO[item.chainId]), [item.chainId])
-    if (item.token0Symbol === 'WETH') {
-      item.token0Symbol = 'ETH'
-    }
+  const ListItem = useCallback(
+    ({ item }) => {
+      const urls = getEtherScanUrls(NETWORKS_INFO[item.chainId])
+      if (item.token0Symbol === 'WETH') {
+        item.token0Symbol = 'ETH'
+      }
 
-    if (item.token1Symbol === 'WETH') {
-      item.token1Symbol = 'ETH'
-    }
+      if (item.token1Symbol === 'WETH') {
+        item.token1Symbol = 'ETH'
+      }
 
-    return (
-      <DashGrid style={{ height: '56px' }} isShowNetworkColumn={isShowNetworkColumn}>
-        <DataText area='txn' fontWeight='500'>
-          <Link color={color} external href={urls.showTransaction(item.hash)}>
-            {getTransactionType(item.type, item.token1Symbol, item.token0Symbol)}
-          </Link>
-        </DataText>
-        {isShowNetworkColumn && (
-          <DataText area='network'>
-            <RouterLink to={'/' + NETWORKS_INFO[item.chainId].urlKey}>
-              <MouseoverTooltip text={NETWORKS_INFO[item.chainId].name} width='unset'>
-                <img src={NETWORKS_INFO[item.chainId].icon} width={25} />
-              </MouseoverTooltip>
-            </RouterLink>
-          </DataText>
-        )}
-        <DataText area='value'>
-          {currency === 'ETH' ? 'Ξ ' + formattedNum(item.valueETH) : formattedNum(item.amountUSD, true)}
-        </DataText>
-        {!below780 && (
-          <>
-            <DataText area='amountOther'>
-              {formattedNum(item.token1Amount) + ' '} <FormattedName text={item.token1Symbol} maxCharacters={5} margin={true} />
-            </DataText>
-            <DataText area='amountToken'>
-              {formattedNum(item.token0Amount) + ' '} <FormattedName text={item.token0Symbol} maxCharacters={5} margin={true} />
-            </DataText>
-          </>
-        )}
-        {!below1080 && (
-          <DataText area='account'>
-            <Link color={color} external href={urls.showAddress(item.account)}>
-              {item.account && item.account.slice(0, 6) + '...' + item.account.slice(38, 42)}
+      return (
+        <DashGrid style={{ height: '56px' }} isShowNetworkColumn={isShowNetworkColumn}>
+          <DataText area='txn' fontWeight='500'>
+            <Link color={color} external href={urls.showTransaction(item.hash)}>
+              {getTransactionType(item.type, item.token1Symbol, item.token0Symbol)}
             </Link>
           </DataText>
-        )}
-        <DataText area='time'>{formatTime(item.timestamp)}</DataText>
-      </DashGrid>
-    )
-  }
+          {isShowNetworkColumn && (
+            <DataText area='network'>
+              <RouterLink to={'/' + NETWORKS_INFO[item.chainId].urlKey}>
+                <MouseoverTooltip text={NETWORKS_INFO[item.chainId].name} width='unset'>
+                  <img src={NETWORKS_INFO[item.chainId].icon} width={25} />
+                </MouseoverTooltip>
+              </RouterLink>
+            </DataText>
+          )}
+          <DataText area='value'>
+            {currency === 'ETH' ? 'Ξ ' + formattedNum(item.valueETH) : formattedNum(item.amountUSD, true)}
+          </DataText>
+          {!below780 && (
+            <>
+              <DataText area='amountOther'>
+                {formattedNum(item.token1Amount) + ' '} <FormattedName text={item.token1Symbol} maxCharacters={5} margin={true} />
+              </DataText>
+              <DataText area='amountToken'>
+                {formattedNum(item.token0Amount) + ' '} <FormattedName text={item.token0Symbol} maxCharacters={5} margin={true} />
+              </DataText>
+            </>
+          )}
+          {!below1080 && (
+            <DataText area='account'>
+              <Link color={color} external href={urls.showAddress(item.account)}>
+                {item.account && item.account.slice(0, 6) + '...' + item.account.slice(38, 42)}
+              </Link>
+            </DataText>
+          )}
+          <DataText area='time'>{formatTime(item.timestamp)}</DataText>
+        </DashGrid>
+      )
+    },
+    [below1080, below780, color, currency, isShowNetworkColumn]
+  )
 
   const theme = useTheme()
   return (

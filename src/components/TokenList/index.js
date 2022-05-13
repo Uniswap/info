@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import styled from 'styled-components'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
@@ -216,52 +216,55 @@ function TopTokenList({ itemMax = 5 }) {
     )
   }, [below680, formattedTokens, itemMax, page, sortDirection, sortedColumn])
 
-  const ListItem = ({ item, index }) => {
-    const tokenNetworkInfo = NETWORKS_INFO[item.chainId] || NetworksInfoEnv[0]
-    return (
-      <DashGrid style={{ height: '56px' }} focus={true} isShowNetworkColumn={isShowNetworkColumn}>
-        <DataText area='name' fontWeight='500'>
-          <Row>
-            {!below680 && <div style={{ marginRight: '1rem', width: '10px' }}>{index}</div>}
-            <TokenLogo address={item.id} networkInfo={tokenNetworkInfo} />
-            <CustomLink
-              style={{ marginLeft: '16px', whiteSpace: 'nowrap' }}
-              to={'/' + tokenNetworkInfo.urlKey + '/token/' + item.id}
-            >
-              <FormattedName
-                text={below680 ? item.symbol : item.name}
-                maxCharacters={below600 ? 8 : 16}
-                adjustSize={true}
-                link={true}
-              />
-            </CustomLink>
-          </Row>
-        </DataText>
-        {isShowNetworkColumn && (
-          <DataText area='network'>
-            <Link to={'/' + tokenNetworkInfo.urlKey}>
-              <MouseoverTooltip text={tokenNetworkInfo.name} width='unset'>
-                <img src={tokenNetworkInfo.icon} width={25} />
-              </MouseoverTooltip>
-            </Link>
+  const ListItem = useCallback(
+    ({ item, index }) => {
+      const tokenNetworkInfo = NETWORKS_INFO[item.chainId] || NetworksInfoEnv[0]
+      return (
+        <DashGrid style={{ height: '56px' }} focus={true} isShowNetworkColumn={isShowNetworkColumn}>
+          <DataText area='name' fontWeight='500'>
+            <Row>
+              {!below680 && <div style={{ marginRight: '1rem', width: '10px' }}>{index}</div>}
+              <TokenLogo address={item.id} networkInfo={tokenNetworkInfo} />
+              <CustomLink
+                style={{ marginLeft: '16px', whiteSpace: 'nowrap' }}
+                to={'/' + tokenNetworkInfo.urlKey + '/token/' + item.id}
+              >
+                <FormattedName
+                  text={below680 ? item.symbol : item.name}
+                  maxCharacters={below600 ? 8 : 16}
+                  adjustSize={true}
+                  link={true}
+                />
+              </CustomLink>
+            </Row>
           </DataText>
-        )}
-        {!below680 && (
-          <DataText area='symbol' fontWeight='500'>
-            <FormattedName text={item.symbol} maxCharacters={6} />
-          </DataText>
-        )}
-        <DataText area='liq'>{formattedNum(item.totalLiquidityUSD, true)}</DataText>
-        <DataText area='vol'>{formattedNum(item.oneDayVolumeUSD, true)}</DataText>
-        {!below680 && (
-          <DataText area='price' fontWeight='500'>
-            {formattedNum(item.priceUSD, true)}
-          </DataText>
-        )}
-        {!below1080 && <DataText area='change'>{formattedPercent(item.priceChangeUSD)}</DataText>}
-      </DashGrid>
-    )
-  }
+          {isShowNetworkColumn && (
+            <DataText area='network'>
+              <Link to={'/' + tokenNetworkInfo.urlKey}>
+                <MouseoverTooltip text={tokenNetworkInfo.name} width='unset'>
+                  <img src={tokenNetworkInfo.icon} width={25} />
+                </MouseoverTooltip>
+              </Link>
+            </DataText>
+          )}
+          {!below680 && (
+            <DataText area='symbol' fontWeight='500'>
+              <FormattedName text={item.symbol} maxCharacters={6} />
+            </DataText>
+          )}
+          <DataText area='liq'>{formattedNum(item.totalLiquidityUSD, true)}</DataText>
+          <DataText area='vol'>{formattedNum(item.oneDayVolumeUSD, true)}</DataText>
+          {!below680 && (
+            <DataText area='price' fontWeight='500'>
+              {formattedNum(item.priceUSD, true)}
+            </DataText>
+          )}
+          {!below1080 && <DataText area='change'>{formattedPercent(item.priceChangeUSD)}</DataText>}
+        </DashGrid>
+      )
+    },
+    [below1080, below600, below680, isShowNetworkColumn]
+  )
 
   return (
     <ListWrapper>

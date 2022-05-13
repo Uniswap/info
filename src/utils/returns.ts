@@ -182,9 +182,7 @@ export async function getHistoricalPairReturns(
   }
   let dayIndex: number = Math.round(startDateTimestamp / 86400) // get unique day bucket unix
   const currentDayIndex: number = Math.round(dayjs.utc().unix() / 86400)
-  const sortedPositions = pairSnapshots.sort((a, b) => {
-    return parseInt(a.timestamp) > parseInt(b.timestamp) ? 1 : -1
-  })
+  const sortedPositions = pairSnapshots.sort((a, b) => a.timestamp - b.timestamp)
   if (sortedPositions[0].timestamp > startDateTimestamp) {
     dayIndex = Math.round(sortedPositions[0].timestamp / 86400)
   }
