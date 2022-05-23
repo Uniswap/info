@@ -254,7 +254,7 @@ const getTopTokens = async (client, ethPrice, ethPriceOld, networkInfo) => {
             data.oneDayTxns = data.txCount
           }
 
-          if (data.id === networkInfo.wethAddress) {
+          if (data.id?.toLowerCase() === networkInfo.wethAddress.toLowerCase()) {
             data.name = networkInfo.nativeTokenWrappedName
             data.symbol = networkInfo.nativeTokenSymbol
           }

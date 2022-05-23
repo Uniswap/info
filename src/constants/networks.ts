@@ -95,7 +95,7 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     subgraphBlockUrl: 'https://api.thegraph.com/subgraphs/name/edwardevans094/ropsten-blocks',
     etherscanUrl: 'https://ropsten.etherscan.io',
     kncAddress: '0x8B4DDF9F13f382aff76D262F6C8C50E6d7961b94',
-    wethAddress: '0xc778417e063141139fce010982780140aa0cd5ab',
+    wethAddress: '0xc778417E063141139Fce010982780140Aa0cD5Ab',
     defaultStartTime: 1620201600,
     nativeTokenSymbol: 'ETH',
     nativeTokenWrappedName: 'Ether (Wrapped)',

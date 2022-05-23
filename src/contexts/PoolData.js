@@ -289,11 +289,11 @@ function parseData(data, oneDayData, twoDayData, oneWeekData, ethPrice, oneDayBl
   if (!oneWeekData && data) {
     data.oneWeekVolumeUSD = parseFloat(data.volumeUSD)
   }
-  if (data?.token0?.id === networkInfo.wethAddress) {
+  if (data?.token0?.id?.toLowerCase() === networkInfo.wethAddress.toLowerCase()) {
     data.token0.name = networkInfo.nativeTokenWrappedName
     data.token0.symbol = networkInfo.nativeTokenSymbol
   }
-  if (data?.token1?.id === networkInfo.wethAddress) {
+  if (data?.token1?.id?.toLowerCase() === networkInfo.wethAddress.toLowerCase()) {
     data.token1.name = networkInfo.nativeTokenWrappedName
     data.token1.symbol = networkInfo.nativeTokenSymbol
   }

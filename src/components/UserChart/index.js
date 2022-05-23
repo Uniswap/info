@@ -20,6 +20,7 @@ const ChartWrapper = styled.div`
 
   @media screen and (max-width: 600px) {
     min-height: 200px;
+    max-height: unset;
   }
 `
 

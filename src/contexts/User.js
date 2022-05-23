@@ -293,7 +293,7 @@ export function useUserPositionChart(position, account) {
  */
 export function useUserLiquidityChart(account) {
   const [exchangeSubgraphClient] = useExchangeClients()
-  const history = useUserSnapshots(account)
+  const snapshots = useUserSnapshots(account)
   // formatetd array to return for chart data
   const [formattedHistory, setFormattedHistory] = useState()
 
@@ -328,9 +328,7 @@ export function useUserLiquidityChart(account) {
       const currentDayIndex = parseInt(dayjs.utc().unix() / 86400)
 
       // sort snapshots in order
-      let sortedPositions = history.sort((a, b) => {
-        return parseInt(a.timestamp) > parseInt(b.timestamp) ? 1 : -1
-      })
+      let sortedPositions = snapshots.sort((a, b) => (parseInt(a.timestamp) > parseInt(b.timestamp) ? 1 : -1))
       // if UI start time is > first position time - bump start index to this time
       if (parseInt(sortedPositions[0].timestamp) > dayIndex) {
         dayIndex = parseInt(parseInt(sortedPositions[0].timestamp) / 86400)
@@ -342,11 +340,19 @@ export function useUserLiquidityChart(account) {
         dayTimestamps.push(parseInt(dayIndex) * 86400)
         dayIndex = dayIndex + 1
       }
+      const snapshotMappedByTimestamp = {}
+      dayTimestamps.forEach(dayTimestamp => (snapshotMappedByTimestamp[dayTimestamp] = []))
+      snapshots.forEach(snapshot => {
+        const index = parseInt(parseInt(snapshot.timestamp) / 86400) * 86400
+        if (snapshotMappedByTimestamp[index]) snapshotMappedByTimestamp[index].push(snapshot)
+        else {
+          snapshotMappedByTimestamp[index] = [snapshot]
+          console.warn('namgold: something wrong here. This if branch should not be execute.')
+        }
+      })
 
-      const pairs = history.reduce((pairList, position) => {
-        return [...pairList, position.pair.id]
-      }, [])
-
+      // const pairs = snapshots.reduce((pairList, position) => [...pairList, position.pair.id], [])
+      const pairs = snapshots.map(position => position.pair.id)
       // get all day datas where date is in this list, and pair is in pair list
       let {
         data: { pairDayDatas },
@@ -354,77 +360,60 @@ export function useUserLiquidityChart(account) {
         query: PAIR_DAY_DATA_BULK(pairs, startDateTimestamp),
       })
 
-      const formattedHistory = []
+      const pairDayDatasMapped = {}
+      pairDayDatas.forEach(pairDayData => {
+        const index = pairDayData.pairAddress
+        if (pairDayDatasMapped[index]) pairDayDatasMapped[index].push(pairDayData)
+        else pairDayDatasMapped[index] = [pairDayData]
+      })
+      Object.keys(pairDayDatasMapped).forEach(address => pairDayDatasMapped[address].sort((a, b) => a.date - b.date))
 
       // map of current pair => ownership %
-      const ownershipPerPair = {}
-      for (const index in dayTimestamps) {
-        const dayTimestamp = dayTimestamps[index]
-        const timestampCeiling = dayTimestamp + 86400
-
+      const latestDataForPairs = {}
+      const formattedHistory = dayTimestamps.map(dayTimestamp => {
         // cycle through relevant positions and update ownership for any that we need to
-        const relevantPositions = history.filter(snapshot => {
-          return snapshot.timestamp < timestampCeiling && snapshot.timestamp > dayTimestamp
-        })
-        for (const index in relevantPositions) {
-          const position = relevantPositions[index]
+        const relevantPositions = snapshotMappedByTimestamp[dayTimestamp]
+        relevantPositions.forEach(position => {
           // case where pair not added yet
-          if (!ownershipPerPair[position.pair.id]) {
-            ownershipPerPair[position.pair.id] = {
+          if (!latestDataForPairs[position.pair.id] || latestDataForPairs[position.pair.id].timestamp < position.timestamp) {
+            latestDataForPairs[position.pair.id] = {
               lpTokenBalance: position.liquidityTokenBalance,
               timestamp: position.timestamp,
             }
           }
-          // case where more recent timestamp is found for pair
-          if (ownershipPerPair[position.pair.id] && ownershipPerPair[position.pair.id].timestamp < position.timestamp) {
-            ownershipPerPair[position.pair.id] = {
-              lpTokenBalance: position.liquidityTokenBalance,
-              timestamp: position.timestamp,
-            }
-          }
-        }
-
-        const relavantDayDatas = Object.keys(ownershipPerPair).map(pairAddress => {
-          // find last day data after timestamp update
-          const dayDatasForThisPair = pairDayDatas.filter(dayData => {
-            return dayData.pairAddress === pairAddress
-          })
-          // find the most recent reference to pair liquidity data
-          let mostRecent = dayDatasForThisPair[0]
-          for (const index in dayDatasForThisPair) {
-            const dayData = dayDatasForThisPair[index]
-            if (dayData.date < dayTimestamp && dayData.date > mostRecent.date) {
-              mostRecent = dayData
-            }
-          }
-          return mostRecent
         })
+
+        // find last day data after timestamp update
+        // find the most recent reference to pair liquidity data
+        const relevantDayDatas = Object.keys(latestDataForPairs).map(pairAddress =>
+          pairDayDatasMapped[pairAddress].findLast(dayData => dayData.date < dayTimestamp)
+        )
 
         // now cycle through pair day datas, for each one find usd value = ownership[address] * reserveUSD
-        const dailyUSD = relavantDayDatas.reduce((totalUSD, dayData) => {
-          if (dayData) {
-            const currentSumData = ownershipPerPair[dayData.pairAddress]
-              ? (parseFloat(ownershipPerPair[dayData.pairAddress].lpTokenBalance) / parseFloat(dayData.totalSupply)) *
-                parseFloat(dayData.reserveUSD)
-              : 0
-            return totalUSD + (currentSumData || 0)
-          } else {
-            return totalUSD
+        let totalUSD = 0
+        relevantDayDatas.forEach(dayData => {
+          if (dayData && latestDataForPairs[dayData.pairAddress]) {
+            const currentSumData =
+              (parseFloat(latestDataForPairs[dayData.pairAddress].lpTokenBalance) / parseFloat(dayData.totalSupply)) *
+              parseFloat(dayData.reserveUSD)
+            if (currentSumData) {
+              totalUSD += currentSumData
+            }
           }
-        }, 0)
-
-        formattedHistory.push({
-          date: dayTimestamp,
-          valueUSD: dailyUSD,
         })
-      }
+
+        return {
+          date: dayTimestamp,
+          valueUSD: totalUSD,
+        }
+      })
 
       setFormattedHistory(formattedHistory)
     }
-    if (history && startDateTimestamp && history.length > 0) {
+    if (snapshots && startDateTimestamp && snapshots.length > 0) {
       fetchData()
     }
-  }, [history, startDateTimestamp, exchangeSubgraphClient])
+  }, [snapshots, startDateTimestamp, exchangeSubgraphClient])
 
   return formattedHistory
 }

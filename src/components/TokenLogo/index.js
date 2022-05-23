@@ -85,7 +85,7 @@ export default function TokenLogo({ address, networkInfo, header = false, size =
     )
   }
 
-  if (address?.toLowerCase() === networkInfo.wethAddress) {
+  if (address?.toLowerCase() === networkInfo.wethAddress.toLowerCase()) {
     return (
       <StyledNativeTokenLogo size={size} {...rest}>
         <img

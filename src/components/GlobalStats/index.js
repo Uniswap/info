@@ -24,6 +24,11 @@ const Divider = styled.div`
   height: 100%;
 `
 
+const Separator = styled.span`
+  user-select: none;
+  font-size: 12px;
+`
+
 export default function GlobalStats() {
   const globalDatas = useGlobalData()
   const { oneDayTxns, oneDayFeeUSD, oneDayFeeChange, txnChange } = globalDatas[1]
@@ -33,13 +38,13 @@ export default function GlobalStats() {
   const theme = useTheme()
   const aggregatorVolume = useAggregatorVolume()
   const above768 = useMedia('(min-width: 768px)')
-  const above500 = useMedia('(min-width: 500px)')
+  const above800 = useMedia('(min-width: 800px)')
 
   // ALL || 24H
   const [tradingVolumeType, setTradingVolumeType] = useState('ALL')
 
   return (
-    <Flex sx={{ gap: '20px' }} flexDirection={above768 ? 'row' : 'column'}>
+    <Flex sx={{ gap: above800 ? '32px' : '16px' }} flexDirection={above800 ? 'row' : 'column'}>
       <Stats>
         <Flex alignItems='center' justifyContent='space-between'>
           <Text color={theme.subText} fontSize='12px'>
@@ -47,13 +52,13 @@ export default function GlobalStats() {
           </Text>
 
           <Flex sx={{ gap: '4px' }}>
-            <ButtonEmpty sx={{ padding: '0 !important' }} onClick={() => setTradingVolumeType('ALL')}>
+            <ButtonEmpty sx={{ padding: '0 !important' }} onClick={() => setTradingVolumeType('ALL')} border='none'>
               <Text color={tradingVolumeType === 'ALL' ? theme.green1 : theme.subText} fontSize='12px' fontWeight='500'>
                 All time
               </Text>
             </ButtonEmpty>
-            <Divider />
-            <ButtonEmpty sx={{ padding: '0 !important' }} onClick={() => setTradingVolumeType('24H')}>
+            <Separator>|</Separator>
+            <ButtonEmpty sx={{ padding: '0 !important' }} onClick={() => setTradingVolumeType('24H')} border='none'>
               <Text color={tradingVolumeType === '24H' ? theme.green1 : theme.subText} fontSize='12px' fontWeight='500'>
                 24H
               </Text>
@@ -73,34 +78,32 @@ export default function GlobalStats() {
           )}
         </Text>
       </Stats>
-      <Flex sx={{ gap: '20px' }} flex={2} flexDirection={above500 ? 'row' : 'column'}>
-        <Stats>
-          <Text color={theme.subText} fontSize='12px'>
-            Fees (24H)
+      <Stats>
+        <Text color={theme.subText} fontSize='12px'>
+          Fees (24H)
+        </Text>
+        <Flex justifyContent='space-between' marginTop='8px' alignItems='center'>
+          <Text fontSize='18px' fontWeight='500'>
+            {oneDayFees}
           </Text>
-          <Flex justifyContent='space-between' marginTop='8px' alignItems='center'>
-            <Text fontSize='18px' fontWeight='500'>
-              {oneDayFees}
-            </Text>
-            <Text fontSize='12px' color={oneDayFeeChange > 0 ? 'green' : theme.red1}>
-              {oneDayFeeChange ? oneDayFeeChange.toFixed(2) : '-'}%
-            </Text>
-          </Flex>
-        </Stats>
-        <Stats>
-          <Text color={theme.subText} fontSize='12px'>
-            Transactions (24H)
+          <Text fontSize='12px' color={oneDayFeeChange > 0 ? 'green' : theme.red1}>
+            {oneDayFeeChange ? oneDayFeeChange.toFixed(2) : '-'}%
           </Text>
-          <Flex justifyContent='space-between' marginTop='8px' alignItems='center'>
-            <Text fontSize='18px' fontWeight='500'>
-              {localNumber(oneDayTxns)}
-            </Text>
-            <Text fontSize='12px' color={txnChange > 0 ? 'green' : theme.red1}>
-              {txnChange ? txnChange.toFixed(2) : '-'}%
-            </Text>
-          </Flex>
-        </Stats>
-      </Flex>
+        </Flex>
+      </Stats>
+      <Stats>
+        <Text color={theme.subText} fontSize='12px'>
+          Transactions (24H)
+        </Text>
+        <Flex justifyContent='space-between' marginTop='8px' alignItems='center'>
+          <Text fontSize='18px' fontWeight='500'>
+            {localNumber(oneDayTxns)}
+          </Text>
+          <Text fontSize='12px' color={txnChange > 0 ? 'green' : theme.red1}>
+            {txnChange ? txnChange.toFixed(2) : '-'}%
+          </Text>
+        </Flex>
+      </Stats>
     </Flex>
   )
 }

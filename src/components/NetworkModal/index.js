@@ -31,9 +31,9 @@ const NetworkList = styled.div`
   grid-gap: 1rem;
   grid-template-columns: repeat(3, auto);
   justify-content: space-between;
-
+  overflow: auto;
   ${({ theme }) => theme.mediaWidth.upToExtraSmall`
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
     width: 100%;
   `};
 `

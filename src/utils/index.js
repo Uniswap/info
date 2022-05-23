@@ -60,15 +60,17 @@ export function getPoolLink(token0Address, networkInfo, token1Address = null, re
       return addNetworkIdQueryString(
         networkInfo.dmmSwapUrl +
           (remove ? `remove` : `add`) +
-          `/${token0Address === networkInfo.wethAddress ? nativeTokenSymbol : token0Address}/${nativeTokenSymbol}/${poolAddress}`,
+          `/${
+            token0Address.toLowerCase() === networkInfo.wethAddress.toLowerCase() ? nativeTokenSymbol : token0Address
+          }/${nativeTokenSymbol}/${poolAddress}`,
         networkInfo
       )
     } else {
       return addNetworkIdQueryString(
         networkInfo.dmmSwapUrl +
           (remove ? `remove` : `add`) +
-          `/${token0Address === networkInfo.wethAddress ? nativeTokenSymbol : token0Address}/${
-            token1Address === networkInfo.wethAddress ? nativeTokenSymbol : token1Address
+          `/${token0Address.toLowerCase() === networkInfo.wethAddress.toLowerCase() ? nativeTokenSymbol : token0Address}/${
+            token1Address.toLowerCase() === networkInfo.wethAddress.toLowerCase() ? nativeTokenSymbol : token1Address
           }/${poolAddress}`,
         networkInfo
       )
@@ -79,15 +81,17 @@ export function getPoolLink(token0Address, networkInfo, token1Address = null, re
     return addNetworkIdQueryString(
       networkInfo.dmmSwapUrl +
         (remove ? `remove` : `add`) +
-        `/${token0Address === networkInfo.wethAddress ? nativeTokenSymbol : token0Address}/${nativeTokenSymbol}`,
+        `/${
+          token0Address.toLowerCase() === networkInfo.wethAddress.toLowerCase() ? nativeTokenSymbol : token0Address
+        }/${nativeTokenSymbol}`,
       networkInfo
     )
   } else {
     return addNetworkIdQueryString(
       networkInfo.dmmSwapUrl +
         (remove ? `remove` : `add`) +
-        `/${token0Address === networkInfo.wethAddress ? nativeTokenSymbol : token0Address}/${
-          token1Address === networkInfo.wethAddress ? nativeTokenSymbol : token1Address
+        `/${token0Address.toLowerCase() === networkInfo.wethAddress.toLowerCase() ? nativeTokenSymbol : token0Address}/${
+          token1Address.toLowerCase() === networkInfo.wethAddress.toLowerCase() ? nativeTokenSymbol : token1Address
         }`,
       networkInfo
     )
@@ -102,8 +106,10 @@ export function getSwapLink(token0Address, networkInfo, token1Address = null) {
   } else {
     return addNetworkIdQueryString(
       `${networkInfo.dmmSwapUrl}swap?inputCurrency=${
-        token0Address === networkInfo.wethAddress ? nativeTokenSymbol : token0Address
-      }&outputCurrency=${token1Address === networkInfo.wethAddress ? nativeTokenSymbol : token1Address}`,
+        token0Address.toLowerCase() === networkInfo.wethAddress.toLowerCase() ? nativeTokenSymbol : token0Address
+      }&outputCurrency=${
+        token1Address.toLowerCase() === networkInfo.wethAddress.toLowerCase() ? nativeTokenSymbol : token1Address
+      }`,
       networkInfo
     )
   }

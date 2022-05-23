@@ -142,8 +142,6 @@ export const Search = ({ small = false }) => {
 
   const [showMenu, toggleMenu] = useState(false)
   const [value, setValue] = useState('')
-  const [, toggleShadow] = useState(false)
-  const [, toggleBottomShadow] = useState(false)
 
   // fetch new data on tokens and pairs if needed
   useTokenData(value)
@@ -196,71 +194,88 @@ export const Search = ({ small = false }) => {
       }
     }
     fetchData()
-  }, [exchangeSubgraphClient, value])
+  }, [exchangeSubgraphClient, networkInfo.chainId, value])
 
   function escapeRegExp(string) {
     return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') // $& means the whole matched string
   }
 
   // add the searched tokens to the list if now found yet
-  allTokens = allTokens.concat(
-    searchedTokens.filter(searchedToken => {
-      let included = false
-      allTokens.map(token => {
+  const appendTokens = searchedTokens.filter(
+    searchedToken =>
+      !allTokens.some(token => {
         if (token.id === searchedToken.id) {
-          included = true
+          return true
         }
-        return true
       })
-      return !included
-    })
   )
+  allTokens = allTokens.concat(appendTokens)
 
-  let uniqueTokens = []
-  let found = {}
-  allTokens &&
-    allTokens.map(token => {
+  const uniqueTokens = useMemo(() => {
+    const uniqueTokens = []
+    const found = {}
+    allTokens?.forEach(token => {
       if (!found[token.id]) {
         found[token.id] = true
         uniqueTokens.push(token)
       }
-      return true
     })
+    return uniqueTokens
+  }, [allTokens])
 
-  allPairs = allPairs.concat(
-    searchedPairs.filter(searchedPair => {
-      let included = false
-      allPairs.map(pair => {
+  const appendPairs = searchedPairs.filter(
+    searchedPair =>
+      !allPairs.some(pair => {
         if (pair.id === searchedPair.id) {
-          included = true
+          return true
         }
-        return true
       })
-      return !included
-    })
   )
+  allPairs = allPairs.concat(appendPairs)
 
-  let uniquePairs = []
-  let pairsFound = {}
-  allPairs &&
-    allPairs.map(pair => {
+  const uniquePairs = useMemo(() => {
+    const uniquePairs = []
+    const pairsFound = {}
+    allPairs?.forEach(pair => {
       if (!pairsFound[pair.id]) {
         pairsFound[pair.id] = true
         uniquePairs.push(pair)
       }
       return true
     })
+    return uniquePairs
+  }, [allPairs])
 
   const filteredTokenList = useMemo(() => {
     return uniqueTokens
       ? uniqueTokens
+          .filter(token => {
+            if (OVERVIEW_TOKEN_BLACKLIST.includes(token.id)) {
+              return false
+            }
+            if (value === '') return true
+            const isAddress = value.slice(0, 2) === '0x'
+            const regexMatch =
+              (token.id && isAddress && token.id.match(new RegExp(escapeRegExp(value), 'i'))) ||
+              (token.symbol && !isAddress && token.symbol.match(new RegExp(escapeRegExp(value), 'i'))) ||
+              (token.name && !isAddress && token.name.match(new RegExp(escapeRegExp(value), 'i')))
+
+            // const regexMatches = Object.keys(token).map(tokenEntryKey => {
+            //   const isAddress = value.slice(0, 2) === '0x'
+            //   if (tokenEntryKey === 'id' && isAddress) {
+            //     return token[tokenEntryKey].match(new RegExp(escapeRegExp(value), 'i'))
+            //   }
+            //   if (tokenEntryKey === 'symbol' && !isAddress) {
+            //     return token[tokenEntryKey].match(new RegExp(escapeRegExp(value), 'i'))
+            //   }
+            //   if (tokenEntryKey === 'name' && !isAddress) {
+            //     return token[tokenEntryKey].match(new RegExp(escapeRegExp(value), 'i'))
+            //   }
+            //   return false
+            // })
+            return Boolean(regexMatch)
+          })
           .sort((a, b) => {
-            if (OVERVIEW_TOKEN_BLACKLIST.includes(a.id)) {
-              return 1
-            }
-            if (OVERVIEW_TOKEN_BLACKLIST.includes(b.id)) {
-              return -1
-            }
             const tokenA = allTokenData[a.id]
             const tokenB = allTokenData[b.id]
             if (tokenA?.oneDayVolumeUSD && tokenB?.oneDayVolumeUSD) {
@@ -273,25 +288,6 @@ export const Search = ({ small = false }) => {
               return tokenA?.totalLiquidity > tokenB?.totalLiquidity ? -1 : 1
             }
             return 1
-          })
-          .filter(token => {
-            if (OVERVIEW_TOKEN_BLACKLIST.includes(token.id)) {
-              return false
-            }
-            const regexMatches = Object.keys(token).map(tokenEntryKey => {
-              const isAddress = value.slice(0, 2) === '0x'
-              if (tokenEntryKey === 'id' && isAddress) {
-                return token[tokenEntryKey].match(new RegExp(escapeRegExp(value), 'i'))
-              }
-              if (tokenEntryKey === 'symbol' && !isAddress) {
-                return token[tokenEntryKey].match(new RegExp(escapeRegExp(value), 'i'))
-              }
-              if (tokenEntryKey === 'name' && !isAddress) {
-                return token[tokenEntryKey].match(new RegExp(escapeRegExp(value), 'i'))
-              }
-              return false
-            })
-            return regexMatches.some(m => m)
           })
       : []
   }, [allTokenData, uniqueTokens, value])
@@ -357,22 +353,6 @@ export const Search = ({ small = false }) => {
       : []
   }, [allPairData, uniquePairs, value])
 
-  useEffect(() => {
-    if (Object.keys(filteredTokenList).length > 2) {
-      toggleShadow(true)
-    } else {
-      toggleShadow(false)
-    }
-  }, [filteredTokenList])
-
-  useEffect(() => {
-    if (Object.keys(filteredPairList).length > 2) {
-      toggleBottomShadow(true)
-    } else {
-      toggleBottomShadow(false)
-    }
-  }, [filteredPairList])
-
   const [tokensShown, setTokensShown] = useState(3)
   const [pairsShown, setPairsShown] = useState(3)
 
@@ -403,7 +383,7 @@ export const Search = ({ small = false }) => {
     return () => {
       document.removeEventListener('click', handleClick)
     }
-  })
+  }, [])
 
   return (
     <Container small={small}>
@@ -446,11 +426,11 @@ export const Search = ({ small = false }) => {
           )}
           {filteredPairList &&
             filteredPairList.slice(0, pairsShown).map(pair => {
-              if (pair?.token0?.id === NETWORKS_INFO[pair.chainId].wethAddress) {
+              if (pair?.token0?.id?.toLowerCase() === NETWORKS_INFO[pair.chainId].wethAddress.toLowerCase()) {
                 pair.token0.name = NETWORKS_INFO[pair.chainId].nativeTokenWrappedName
                 pair.token0.symbol = NETWORKS_INFO[pair.chainId].nativeTokenSymbol
               }
-              if (pair?.token1.id === NETWORKS_INFO[pair.chainId].wethAddress) {
+              if (pair?.token1.id?.toLowerCase() === NETWORKS_INFO[pair.chainId].wethAddress.toLowerCase()) {
                 pair.token1.name = NETWORKS_INFO[pair.chainId].nativeTokenWrappedName
                 pair.token1.symbol = NETWORKS_INFO[pair.chainId].nativeTokenSymbol
               }

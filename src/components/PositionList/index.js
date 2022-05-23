@@ -104,6 +104,7 @@ const SORT_FIELD = {
 }
 
 function PositionList({ positions }) {
+  const below520 = useMedia('(max-width: 520px)')
   const below740 = useMedia('(max-width: 740px)')
   const below900 = useMedia('(max-width: 900px)')
   const [[networkInfo]] = useNetworksInfo()
@@ -175,8 +176,8 @@ function PositionList({ positions }) {
             <CustomLink to={'/' + networkInfo.urlKey + '/pool/' + position.pool.id}>
               <TYPE.main style={{ whiteSpace: 'nowrap' }}>
                 <FormattedName
-                  text={shortenAddress(position.pool.id, 3)}
-                  maxCharacters={below740 ? 14 : 18}
+                  text={below520 || !below740 ? shortenAddress(position.pool.id, 3) : position.pool.id}
+                  maxCharacters={below740 && !below520 ? undefined : 18}
                   style={{ color: theme.primary }}
                 />
               </TYPE.main>
@@ -197,7 +198,7 @@ function PositionList({ positions }) {
                     <TYPE.main style={{ whiteSpace: 'nowrap' }}>
                       <FormattedName
                         text={position.pair.token0.symbol + '-' + position.pair.token1.symbol}
-                        maxCharacters={below740 ? 10 : 18}
+                        maxCharacters={below740 ? undefined : 18}
                         style={{ color: theme.primary }}
                       />
                     </TYPE.main>

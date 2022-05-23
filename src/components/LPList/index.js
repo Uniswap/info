@@ -128,6 +128,7 @@ function LPList({ lps, disbaleLinks, maxItems = 10 }) {
               whiteSpace: 'nowrap',
               textOverflow: 'ellipsis',
               overflow: 'hidden',
+              width: 'fit-content',
             }}
             to={'/' + NETWORKS_INFO[lp.chainId].urlKey + '/account/' + lp.user.id}
           >

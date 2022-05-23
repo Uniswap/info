@@ -160,6 +160,8 @@ function AccountPage({ account }) {
   }, [])
 
   const below600 = useMedia('(max-width: 600px)')
+  const below800 = useMedia('(max-width: 800px)')
+  const below400 = useMedia('(max-width: 400px)')
 
   // adding/removing account from saved accounts
   const [savedAccounts, addAccount, removeAccount] = useSavedAccounts()
@@ -176,7 +178,7 @@ function AccountPage({ account }) {
           <TYPE.body>
             <BasicLink to={'/' + networkInfo.urlKey + '/accounts'}>{'Accounts '}</BasicLink>→{' '}
             <Link lineHeight={'145.23%'} href={urls.showAddress(account)} target='_blank'>
-              {account?.slice(0, 42)}
+              {(below800 && !below600) || below400 ? account.slice(0, 5) + '...' + account.slice(39, 42) : account?.slice(0, 42)}
             </Link>
           </TYPE.body>
           {!below600 && <Search small={true} />}

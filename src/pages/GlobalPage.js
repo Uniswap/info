@@ -60,7 +60,7 @@ function GlobalPage() {
   const prefixNetworkURL = currentNetworkURL ? `/${currentNetworkURL}` : ''
 
   // breakpoints
-  const below800 = useMedia('(max-width: 800px)')
+  const below600 = useMedia('(max-width: 600px)')
 
   // scrolling refs
 
@@ -76,13 +76,13 @@ function GlobalPage() {
       <ThemedBackground backgroundColor={transparentize(0.8, theme.primary)} />
       <ContentWrapper>
         <div>
-          <AutoColumn gap='24px' style={{ paddingBottom: below800 ? '12px' : '24px' }}>
+          <AutoColumn gap='24px' style={{ paddingBottom: '24px' }}>
             <Flex
-              alignItems={below800 ? 'flex-start' : 'center'}
+              alignItems={below600 ? 'flex-start' : 'center'}
               justifyContent='space-between'
-              flexDirection={below800 ? 'column-reverse' : 'row'}
+              flexDirection={below600 ? 'column-reverse' : 'row'}
             >
-              <TYPE.largeHeader style={{ marginTop: below800 ? '20px' : '0' }}>Summary</TYPE.largeHeader>
+              <TYPE.largeHeader style={{ marginTop: below600 ? '20px' : '0' }}>Summary</TYPE.largeHeader>
               {currentNetworkURL && <Search />}
             </Flex>
             <GlobalStats />

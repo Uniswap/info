@@ -42,10 +42,10 @@ function formatPricesForEarlyTimestamps(position, networkInfo: NETWORK_INFO): Po
       position.token1PriceUSD = 1
     }
     // WETH price
-    if (position.pair?.token0.id === networkInfo.wethAddress) {
+    if (position.pair?.token0.id?.toLowerCase() === networkInfo.wethAddress.toLowerCase()) {
       position.token0PriceUSD = 203
     }
-    if (position.pair?.token1.id === networkInfo.wethAddress) {
+    if (position.pair?.token1.id?.toLowerCase() === networkInfo.wethAddress.toLowerCase()) {
       position.token1PriceUSD = 203
     }
   }
