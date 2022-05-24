@@ -109,8 +109,16 @@ export function getMetricsForPositionWindow(positionT0: Position, positionT1: Po
   positionT1 = formatPricesForEarlyTimestamps(positionT1)
 
   // calculate ownership at ends of window, for end of window we need original LP token balance / new total supply
-  const t0Ownership = positionT0.liquidityTokenBalance / positionT0.liquidityTokenTotalSupply
-  const t1Ownership = positionT0.liquidityTokenBalance / positionT1.liquidityTokenTotalSupply
+  // eslint-disable-next-line eqeqeq
+  const t0Ownership =
+    positionT0.liquidityTokenTotalSupply != 0
+      ? positionT0.liquidityTokenBalance / positionT0.liquidityTokenTotalSupply
+      : 0
+  // eslint-disable-next-line eqeqeq
+  const t1Ownership =
+    positionT1.liquidityTokenTotalSupply != 0
+      ? positionT0.liquidityTokenBalance / positionT1.liquidityTokenTotalSupply
+      : 0
 
   // get starting amounts of token0 and token1 deposited by LP
   const token0_amount_t0 = t0Ownership * positionT0.reserve0
