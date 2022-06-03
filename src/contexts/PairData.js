@@ -200,6 +200,7 @@ async function getBulkPairData(pairList, ethPrice) {
 
     let [oneDayResult, twoDayResult, oneWeekResult] = await Promise.all(
       [b1, b2, bWeek].map(async (block) => {
+        console.log("blockblock", block);
         let result = await v2client.query({
           query: PAIRS_HISTORICAL_BULK(block, pairList),
           fetchPolicy: 'cache-first',
@@ -557,6 +558,7 @@ export function useDataForList(pairList) {
       let unfetched = []
 
       pairList.map(async (pair) => {
+        console.log("pairpair", pair);
         let currentData = state?.[pair.id]
         if (!currentData) {
           unfetched.push(pair.id)
@@ -653,5 +655,6 @@ export function usePairChartData(pairAddress) {
  */
 export function useAllPairData() {
   const [state] = usePairDataContext()
+  console.log("state1", state);
   return state || {}
 }

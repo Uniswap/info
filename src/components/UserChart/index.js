@@ -24,7 +24,7 @@ const ChartWrapper = styled.div`
 
 const UserChart = ({ account }) => {
   const chartData = useUserLiquidityChart(account)
-
+  console.log("chartDatachartDatachartData", chartData);
   const [timeWindow, setTimeWindow] = useState(timeframeOptions.ALL_TIME)
   let utcStartTime = getTimeframe(timeWindow)
 

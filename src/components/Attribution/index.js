@@ -6,8 +6,8 @@ const Attribution = () => (
       Github
     </a>{' '}
     |{' '}
-    <a href="https://casper-swap.herokuapp.com" rel="noopener noreferrer" target="_blank">
-      Uniswap
+    <a href="https://app.casperswap.xyz" rel="noopener noreferrer" target="_blank">
+      Casper Swap
     </a>{' '}
     |{' '}
     <a href="https://gifer.com/en/1Atv" rel="noopener noreferrer" target="_blank">

@@ -178,35 +178,42 @@ function TopTokenList({ tokens, itemMax = 10, useTracked = false }) {
   console.log("filteredList", filteredList);
   const ListItem = ({ item, index }) => {
     return (
-      <DashGrid style={{ height: '48px' }} focus={true}>
-        <DataText area="name" fontWeight="500">
-          <Row>
-            {!below680 && <div style={{ marginRight: '1rem', width: '10px' }}>{index}</div>}
-            <TokenLogo address={item.id} />
-            <CustomLink style={{ marginLeft: '16px', whiteSpace: 'nowrap' }} to={'/token/' + item.id}>
-              <FormattedName
-                text={below680 ? item.symbol : item.name}
-                maxCharacters={below600 ? 8 : 16}
-                adjustSize={true}
-                link={true}
-              />
-            </CustomLink>
-          </Row>
-        </DataText>
-        {!below680 && (
-          <DataText area="symbol" color="text" fontWeight="500">
-            <FormattedName text={item.symbol} maxCharacters={5} />
+
+      item.name ? (
+        <DashGrid style={{ height: '48px' }} focus={true}>
+          <DataText area="name" fontWeight="500">
+            <Row>
+              {!below680 && <div style={{ marginRight: '1rem', width: '10px' }}>{index}</div>}
+
+              <>
+                <TokenLogo address={item.id} />
+                <CustomLink style={{ marginLeft: '16px', whiteSpace: 'nowrap' }} to={'/token/' + item.id}>
+                  <FormattedName
+                    text={below680 ? item.symbol : item.name}
+                    maxCharacters={below600 ? 8 : 16}
+                    adjustSize={true}
+                    link={true}
+                  />
+                </CustomLink>
+              </>
+            </Row>
           </DataText>
-        )}
-        <DataText area="liq">{formattedNum(item.totalLiquidityUSD, true)}</DataText>
-        <DataText area="vol">{formattedNum(item.oneDayVolumeUSD, true)}</DataText>
-        {!below1080 && (
-          <DataText area="price" color="text" fontWeight="500">
-            {formattedNum(item.priceUSD, true)}
-          </DataText>
-        )}
-        {!below1080 && <DataText area="change">{formattedPercent(item.priceChangeUSD)}</DataText>}
-      </DashGrid>
+          {!below680 && (
+            <DataText area="symbol" color="text" fontWeight="500">
+              <FormattedName text={item.symbol} maxCharacters={5} />
+            </DataText>
+          )}
+          <DataText area="liq">{formattedNum(item.totalLiquidityUSD, true)}</DataText>
+          <DataText area="vol">{formattedNum(item.tradeVolume, true)}</DataText>
+          {!below1080 && (
+            <DataText area="price" color="text" fontWeight="500">
+              {formattedNum(item.priceUSD, true)}
+            </DataText>
+          )}
+          {!below1080 && <DataText area="change">{formattedPercent(item.priceChangeUSD)}</DataText>}
+        </DashGrid>
+      ) : (null)
+
     )
   }
 
@@ -261,7 +268,7 @@ function TopTokenList({ tokens, itemMax = 10, useTracked = false }) {
               )
             }}
           >
-            Volume (24hrs)
+            Trade Volume
             {sortedColumn === (useTracked ? SORT_FIELD.VOL_UT : SORT_FIELD.VOL) ? (!sortDirection ? '↑' : '↓') : ''}
           </ClickableText>
         </Flex>

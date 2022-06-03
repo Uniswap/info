@@ -50,9 +50,11 @@ function GlobalPage() {
   // get data for lists and totals
   const allPairs = useAllPairData()
   const allTokens = useAllTokenData()
+  console.log("allPairs", allPairs);
+  console.log("allTokens", allTokens);
   const transactions = useGlobalTransactions()
   const { totalLiquidityUSD, oneDayVolumeUSD, volumeChangeUSD, liquidityChangeUSD } = useGlobalData()
-
+  console.log("volumeChangeUSD", volumeChangeUSD);
   // breakpoints
   const below800 = useMedia('(max-width: 800px)')
 

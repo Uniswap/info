@@ -45,7 +45,7 @@ const DashGrid = styled.div`
   display: grid;
   grid-gap: 1em;
   grid-template-columns: 100px 1fr 1fr;
-  grid-template-areas: 'name liq vol';
+  grid-template-areas: 'name liq reserve0';
   padding: 0 1.125rem;
 
   opacity: ${({ fade }) => (fade ? '0.6' : '1')};
@@ -63,18 +63,18 @@ const DashGrid = styled.div`
   @media screen and (min-width: 740px) {
     padding: 0 1.125rem;
     grid-template-columns: 1.5fr 1fr 1fr};
-    grid-template-areas: ' name liq vol pool ';
+    grid-template-areas: ' name liq reserve0 pool ';
   }
 
   @media screen and (min-width: 1080px) {
     padding: 0 1.125rem;
     grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr 1fr;
-    grid-template-areas: ' name liq vol volWeek fees apy';
+    grid-template-areas: ' name liq reserve0 reserve1 fees apy';
   }
 
   @media screen and (min-width: 1200px) {
     grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr 1fr;
-    grid-template-areas: ' name liq vol volWeek fees apy';
+    grid-template-areas: ' name liq reserve0 reserve1 fees apy';
   }
 `
 
@@ -106,8 +106,8 @@ const DataText = styled(Flex)`
 
 const SORT_FIELD = {
   LIQ: 0,
-  VOL: 1,
-  VOL_7DAYS: 3,
+  RESERVE0: 1,
+  RESERVE1: 3,
   FEES: 4,
   APY: 5,
 }
@@ -116,9 +116,9 @@ const FIELD_TO_VALUE = (field, useTracked) => {
   switch (field) {
     case SORT_FIELD.LIQ:
       return useTracked ? 'trackedReserveUSD' : 'reserveUSD'
-    case SORT_FIELD.VOL:
+    case SORT_FIELD.RESERVE0:
       return useTracked ? 'oneDayVolumeUSD' : 'oneDayVolumeUntracked'
-    case SORT_FIELD.VOL_7DAYS:
+    case SORT_FIELD.RESERVE1:
       return useTracked ? 'oneWeekVolumeUSD' : 'oneWeekVolumeUntracked'
     case SORT_FIELD.FEES:
       return useTracked ? 'oneDayVolumeUSD' : 'oneDayVolumeUntracked'
@@ -170,7 +170,7 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10, useTracked = fals
 
   const ListItem = ({ pairAddress, index }) => {
     const pairData = pairs[pairAddress]
-
+    console.log("pairDatapairData", pairData);
     if (pairData && pairData.token0 && pairData.token1) {
       const liquidity = formattedNum(
         !!pairData.trackedReserveUSD ? pairData.trackedReserveUSD : pairData.reserveUSD,
@@ -184,7 +184,7 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10, useTracked = fals
 
       const apy = formattedPercent(
         ((pairData.oneDayVolumeUSD ? pairData.oneDayVolumeUSD : pairData.oneDayVolumeUntracked) * 0.003 * 365 * 100) /
-          (pairData.oneDayVolumeUSD ? pairData.trackedReserveUSD : pairData.reserveUSD)
+        (pairData.oneDayVolumeUSD ? pairData.trackedReserveUSD : pairData.reserveUSD)
       )
 
       const weekVolume = formattedNum(
@@ -194,6 +194,22 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10, useTracked = fals
 
       const fees = formattedNum(
         pairData.oneDayVolumeUSD ? pairData.oneDayVolumeUSD * 0.003 : pairData.oneDayVolumeUntracked * 0.003,
+        true
+      )
+
+      // const volume = formattedNum(
+      //   pairData.oneDayVolumeUSD ? pairData.oneDayVolumeUSD : pairData.oneDayVolumeUntracked,
+      //   true
+      // )
+
+
+      const reserve1 = formattedNum(
+        pairData.reserve1 ? pairData.reserve1 : 0,
+        true
+      )
+
+      const reserve0 = formattedNum(
+        pairData.reserve0 ? pairData.reserve0 : 0,
         true
       )
 
@@ -217,9 +233,9 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10, useTracked = fals
             </CustomLink>
           </DataText>
           <DataText area="liq">{formatDataText(liquidity, pairData.trackedReserveUSD)}</DataText>
-          <DataText area="vol">{formatDataText(volume, pairData.oneDayVolumeUSD)}</DataText>
-          {!below1080 && <DataText area="volWeek">{formatDataText(weekVolume, pairData.oneWeekVolumeUSD)}</DataText>}
-          {!below1080 && <DataText area="fees">{formatDataText(fees, pairData.oneDayVolumeUSD)}</DataText>}
+          <DataText area="reserve0">{formatDataText(reserve0, pairData.reserve0)}</DataText>
+          {!below1080 && <DataText area="reserve1">{formatDataText(reserve1, pairData.reserve1)}</DataText>}
+          {!below1080 && <DataText area="fees">{formatDataText(fees, pairData.fees)}</DataText>}
           {!below1080 && (
             <DataText area="apy">
               {formatDataText(apy, pairData.oneDayVolumeUSD, pairData.oneDayVolumeUSD === 0)}
@@ -262,7 +278,7 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10, useTracked = fals
           )
         )
       })
-
+  // console.log("pairList", pairList);
   return (
     <ListWrapper>
       <DashGrid
@@ -286,26 +302,26 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10, useTracked = fals
         </Flex>
         <Flex alignItems="center">
           <ClickableText
-            area="vol"
+            area="reserve0"
             onClick={(e) => {
-              setSortedColumn(SORT_FIELD.VOL)
-              setSortDirection(sortedColumn !== SORT_FIELD.VOL ? true : !sortDirection)
+              setSortedColumn(SORT_FIELD.RESERVE0)
+              setSortDirection(sortedColumn !== SORT_FIELD.RESERVE0 ? true : !sortDirection)
             }}
           >
-            Volume (24hrs)
-            {sortedColumn === SORT_FIELD.VOL ? (!sortDirection ? '↑' : '↓') : ''}
+            Reserve 0
+            {sortedColumn === SORT_FIELD.RESERVE0 ? (!sortDirection ? '↑' : '↓') : ''}
           </ClickableText>
         </Flex>
         {!below1080 && (
           <Flex alignItems="center" justifyContent="flexEnd">
             <ClickableText
-              area="volWeek"
+              area="reserve1"
               onClick={(e) => {
-                setSortedColumn(SORT_FIELD.VOL_7DAYS)
-                setSortDirection(sortedColumn !== SORT_FIELD.VOL_7DAYS ? true : !sortDirection)
+                setSortedColumn(SORT_FIELD.RESERVE1)
+                setSortDirection(sortedColumn !== SORT_FIELD.RESERVE1 ? true : !sortDirection)
               }}
             >
-              Volume (7d) {sortedColumn === SORT_FIELD.VOL_7DAYS ? (!sortDirection ? '↑' : '↓') : ''}
+              Reserve 1 {sortedColumn === SORT_FIELD.RESERVE1 ? (!sortDirection ? '↑' : '↓') : ''}
             </ClickableText>
           </Flex>
         )}
@@ -318,7 +334,7 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10, useTracked = fals
                 setSortDirection(sortedColumn !== SORT_FIELD.FEES ? true : !sortDirection)
               }}
             >
-              Fees (24hr) {sortedColumn === SORT_FIELD.FEES ? (!sortDirection ? '↑' : '↓') : ''}
+              Fees {sortedColumn === SORT_FIELD.FEES ? (!sortDirection ? '↑' : '↓') : ''}
             </ClickableText>
           </Flex>
         )}

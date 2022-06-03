@@ -92,6 +92,7 @@ function AccountPage({ account }) {
   // get data for this account
   const transactions = useUserTransactions(account)
   const positions = useUserPositions(account)
+  console.log("positions", positions);
   const miningPositions = useMiningPositions(account)
 
   // get data for user stats

@@ -21,7 +21,7 @@ import {
 } from '../apollo/v2queries'
 import weekOfYear from 'dayjs/plugin/weekOfYear'
 import { useAllPairData } from './PairData'
-import { useTokenChartDataCombined } from './TokenData'
+import { useTokenChartDataCombined, useTokenDataCombined } from './TokenData'
 const UPDATE = 'UPDATE'
 const UPDATE_TXNS = 'UPDATE_TXNS'
 const UPDATE_CHART = 'UPDATE_CHART'
@@ -32,9 +32,9 @@ const UPDATE_ALL_TOKENS_IN_UNISWAP = 'UPDATE_ALL_TOKENS_IN_UNISWAP'
 const UPDATE_TOP_LPS = 'UPDATE_TOP_LPS'
 
 const offsetVolumes = [
-  '1853ea67e80caaf81a8d96ff28ce3aaf105080f0299d9b7b7c0cb36064ee1fa9',
-  'b761da7d5ef67f8825c30c40df8b72feca4724eb666dba556b0e3f67778143e0',
-  // '0x9ea3b5b4ec044b70375236a281986106457b20ef',
+  'f229b8aa1bc676217429e1a0c325e52b33762a87d6e236fbca70f904fe435166',
+  '6603c25b9abcac478c0c2d0201b161f3bb0a498185aa771c6ce06e26f345dfc1',
+  // '6603c25b9abcac478c0c2d0201b161f3bb0a498185aa771c6ce06e26f345dfc1',
   // '0x05934eba98486693aaec2d00b0e9ce918e37dc3f',
   // '0x3d7e683fc9c86b4d653c9e47ca12517440fad14e',
   // '0xfae9c647ad7d89e738aba720acf09af93dc535f7',
@@ -337,7 +337,7 @@ const getChartData = async (oldestDateToFetch, offsetData) => {
 
   try {
     // console.log("oldestDateToFetch", oldestDateToFetch);
-    const date = "1637234132";
+    const date = "1654158705";
     console.log("date", date);
     while (!allFound) {
       let result = await v2client.query({
@@ -351,6 +351,7 @@ const getChartData = async (oldestDateToFetch, offsetData) => {
       console.log("GLOBAL_CHART", result);
       skip += 1000
       data = data.concat(result.data.uniswapdaydatasbydate)
+
       if (result.data.uniswapdaydatasbydate.length < 1000) {
         allFound = true
       }
@@ -564,7 +565,7 @@ async function getAllTokensOnUniswap() {
         },
         fetchPolicy: 'cache-first',
       })
-      // console.log("ALL_TOKENS", result);
+      console.log("ALL_TOKENS", result);
       tokens = tokens.concat(result?.data?.tokens)
       if (result?.data?.tokens?.length < TOKENS_TO_FETCH || tokens.length > TOKENS_TO_FETCH) {
         allFound = true
@@ -598,6 +599,7 @@ export function useGlobalData() {
       updateAllPairsInUniswap(allPairs)
 
       let allTokens = await getAllTokensOnUniswap()
+      console.log("allTokensallTokens", allTokens);
       updateAllTokensInUniswap(allTokens)
     }
     if (!data && ethPrice && oldEthPrice) {
@@ -612,7 +614,7 @@ export function useGlobalChartData() {
   const [state, { updateChart }] = useGlobalDataContext()
   const [oldestDateFetch, setOldestDateFetched] = useState()
   const [activeWindow] = useTimeframe()
-
+  console.log("statestatestate", state);
   // console.log("state", state);
   const chartDataDaily = state?.chartData?.daily
   const chartDataWeekly = state?.chartData?.weekly

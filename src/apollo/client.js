@@ -4,7 +4,7 @@ import { HttpLink } from 'apollo-link-http'
 
 export const v2client = new ApolloClient({
   link: new HttpLink({
-    uri: 'https://casper-uniswap-v2-graphql.herokuapp.com/graphql',
+    uri: 'http://localhost:3000/graphql',
   }),
   cache: new InMemoryCache(),
   shouldBatch: true,

@@ -40,28 +40,28 @@ export function getTimeframe(timeWindow) {
 export function getPoolLink(token0Address, token1Address = null, remove = false) {
   if (!token1Address) {
     return (
-      `https://casper-swap.herokuapp.com/` +
-      (remove ? `pool/removeLiquidity${token0Address === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' ? 'CSPR' : token0Address}/${'CSPR'}` : `pool/addLiquidity`)
+      `https://app.casperswap.xyz/` +
+      (remove ? `pool/removeLiquidity${token0Address === '861312332a373618c94ce01022ed02370e792c4a7fac356f8c2df05514ee2cd7' ? token0Address : token0Address}/${'CSPR'}` : `pool/addLiquidity`)
     )
   } else {
     return (
-      `https://casper-swap.herokuapp.com/` +
-      (remove ? `pool/removeLiquidity/${token0Address === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' ? 'CSPR' : token0Address}/${token1Address === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' ? 'CSPR' : token1Address
+      `https://app.casperswap.xyz/` +
+      (remove ? `pool/removeLiquidity/${token0Address === '861312332a373618c94ce01022ed02370e792c4a7fac356f8c2df05514ee2cd7' ? token0Address : token0Address}/${token1Address === '861312332a373618c94ce01022ed02370e792c4a7fac356f8c2df05514ee2cd7' ? token1Address : token1Address
         }` : `pool/addLiquidity`)
     )
   }
 }
 
 export function getSwapLink(token0Address, token1Address = null) {
-  return `https://casper-swap.herokuapp.com/swap`
+  return `https://app.casperswap.xyz/swap`
 }
 
 export function getMiningPoolLink(token0Address) {
-  return `https://casper-swap.herokuapp.com/pool`
+  return `https://app.casperswap.xyz/pool`
 }
 
 export function getCasperswapAppLink(linkVariable) {
-  let baseCasperswapUrl = 'https://casper-swap.herokuapp.com/'
+  let baseCasperswapUrl = 'https://app.casperswap.xyz/'
   if (!linkVariable) {
     return baseCasperswapUrl
   }
