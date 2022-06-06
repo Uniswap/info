@@ -37,7 +37,7 @@ const Content = styled.div`
   `}
 `
 
-function KyberSwapAnounce() {
+function KyberSwapAnounce(): JSX.Element {
   const below768 = useMedia('(max-width: 768px)')
 
   const rebrandingAnnouncement = false

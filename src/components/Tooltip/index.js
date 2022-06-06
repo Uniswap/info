@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import Popover from '../Popover'
 
 const TooltipContainer = styled.div`
-  width: ${({ width }) => width || '228px'};
+  width: ${({ width }) => width || ''};
   padding: 0.6rem 1rem;
   line-height: 150%;
   font-weight: 400;

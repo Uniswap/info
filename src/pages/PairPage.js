@@ -153,7 +153,7 @@ function PairPage({ pairAddress, history }) {
   const [usingUtVolume, setUsingUtVolume] = useState(false)
   useEffect(() => {
     !error && setUsingUtVolume(oneDayVolumeUSD === 0 ? true : false)
-  }, [oneDayVolumeUSD])
+  }, [error, oneDayVolumeUSD])
 
   const volumeChange = !error && formattedPercent(!usingUtVolume ? volumeChangeUSD : volumeChangeUntracked)
 

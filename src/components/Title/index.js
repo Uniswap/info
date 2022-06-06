@@ -10,6 +10,9 @@ import { RowFixed } from '../Row'
 import useTheme from '../../hooks/useTheme'
 import { useDarkModeManager } from '../../contexts/LocalStorage'
 
+import LogoDark from '../../assets/logo-dark.svg'
+import LogoLight from '../../assets/logo-light.svg'
+
 const TitleWrapper = styled.div`
   text-decoration: none;
   z-index: 10;
@@ -61,13 +64,13 @@ export default function Title() {
           <DMMIcon id='link' to={prefixNetworkURL}>
             <img
               width={below1080 ? '110px' : '160px'}
-              src={isDark ? '/logo-dark.svg' : '/logo.svg?version=v'}
+              src={isDark ? LogoDark : LogoLight}
               alt='logo'
               style={{ marginTop: '2px' }}
             />
           </DMMIcon>
-          <Text fontSize='12px' color={theme.subText} textAlign='right' marginTop='-12px'>
-            Analytics
+          <Text fontSize={below1080 ? '10px' : '12px'} color={theme.subText} textAlign='right' marginTop='-12px'>
+            Classic Analytics
           </Text>
         </div>
         {below1080 && (

@@ -129,7 +129,7 @@ export const ButtonDark = styled(Base)`
   }
 `
 
-export const ButtonFaded = styled(Base)`
+const ButtonFaded = styled(Base)`
   background-color: ${({ theme }) => theme.bg2};
   color: (255, 255, 255, 0.5);
   white-space: nowrap;

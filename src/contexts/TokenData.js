@@ -600,7 +600,7 @@ export function Updater() {
         memoRequest(() => getData(index), 'UpdaterTokenData_' + networkInfo.chainId + '_' + ethPrice[index], 10000)
       }
     })
-  }, [ethPrice, ethPriceOld, updateTopTokens, exchangeSubgraphClient, networksInfo])
+  }, [ethPrice, ethPriceOld, updateTopTokens, exchangeSubgraphClient, networksInfo, state])
 
   return null
 }

@@ -19,12 +19,6 @@ const ModalContentWrapper = styled.div`
   background-color: ${({ theme }) => theme.bg6};
 `
 
-const InstructionText = styled.div`
-  margin-bottom: 24px;
-  font-size: 14px;
-  color: ${({ theme }) => theme.text9};
-`
-
 const NetworkList = styled.div`
   width: 100%;
   display: grid;
@@ -62,6 +56,7 @@ const SelectNetworkButton = styled(ButtonEmpty)`
   justify-content: center;
   align-items: center;
   padding: 0;
+  border: 1px solid transparent;
 
   &:focus {
     text-decoration: none;

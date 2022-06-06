@@ -19,6 +19,7 @@ export const useClient = () => {
             shouldBatch: true,
           })
       ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [JSON.stringify(networksInfo)]
   )
   return client

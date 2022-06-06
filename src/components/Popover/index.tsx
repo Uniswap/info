@@ -7,7 +7,7 @@ import Portal from '@reach/portal'
 import useInterval from '../../hooks'
 
 const PopoverContainer = styled.div<{ show: boolean }>`
-  z-index: 9999;
+  z-index: 99999;
 
   visibility: ${props => (props.show ? 'visible' : 'hidden')};
   opacity: ${props => (props.show ? 1 : 0)};
@@ -84,7 +84,7 @@ export interface PopoverProps {
   width?: string
 }
 
-export default function Popover({ width, content, show, children, placement = 'auto' }: PopoverProps) {
+export default function Popover({ width, content, show, children, placement = 'auto' }: PopoverProps): JSX.Element {
   const [referenceElement, setReferenceElement] = useState<HTMLDivElement>(null)
   const [popperElement, setPopperElement] = useState<HTMLDivElement>(null)
   const [arrowElement, setArrowElement] = useState<HTMLDivElement>(null)

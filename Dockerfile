@@ -1,6 +1,6 @@
 FROM nginx:alpine
 
-COPY ./build /var/www
+COPY ./build /var/www/classic
 
 COPY ./etc/nginx.conf /etc/nginx/conf.d/default.conf
 

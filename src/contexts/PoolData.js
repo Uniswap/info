@@ -490,7 +490,7 @@ export function Updater() {
         memoRequest(() => getData(index), 'UpdaterPoolData_' + networkInfo.chainId + '_' + ethPrice[index], 10000)
       }
     })
-  }, [ethPrice, updateTopPools, exchangeSubgraphClient, networksInfo])
+  }, [ethPrice, updateTopPools, exchangeSubgraphClient, networksInfo, state])
   return null
 }
 

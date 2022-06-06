@@ -68,12 +68,13 @@ export function getCustomLogo({ address, chainId, src, size, setError, ...rest }
 
 export default function TokenLogo({ address, networkInfo, header = false, size = '24px', ...rest }) {
   const [error, setError] = useState(false)
-  const tokensList = useTokensList()
+  const tokensList = useTokensList()?.[networkInfo.chainId]
 
   useEffect(() => {
     setError(false)
     BAD_IMAGES[networkInfo.chainId] && (BAD_IMAGES[networkInfo.chainId][address] = false)
-  }, [address, networkInfo, tokensList])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tokensList])
 
   if (!networkInfo) return null
 
@@ -103,11 +104,11 @@ export default function TokenLogo({ address, networkInfo, header = false, size =
   const formattedAddress = isAddress(address)
   let path
 
-  if (formattedAddress && tokensList?.[networkInfo.chainId]?.[formattedAddress]?.logoURI) {
+  if (formattedAddress && tokensList?.[formattedAddress]?.logoURI) {
     return getCustomLogo({
       address,
       chainId: networkInfo.chainId,
-      src: tokensList[networkInfo.chainId][formattedAddress].logoURI,
+      src: tokensList[formattedAddress].logoURI,
       size,
       setError,
       ...rest,

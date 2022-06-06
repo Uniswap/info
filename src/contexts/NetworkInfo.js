@@ -41,7 +41,10 @@ function reducer(state, { type, payload }) {
         {}
       )
 
-      state.tokensList[chainId] = tokensListMapped
+      state.tokensList = {
+        ...state.tokensList,
+        [chainId]: tokensListMapped,
+      }
       return state
     }
 

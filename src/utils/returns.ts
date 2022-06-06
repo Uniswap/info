@@ -169,13 +169,13 @@ export function getMetricsForPositionWindow(
  * @param currentETHPrice // current price of eth used for usd conversions
  */
 export async function getHistoricalPairReturns(
-  client,
-  startDateTimestamp,
-  currentPairData,
-  pairSnapshots,
-  currentETHPrice,
+  client: ApolloClient<NormalizedCacheObject>,
+  startDateTimestamp: number,
+  currentPairData: Record<string, any>,
+  pairSnapshots: any[],
+  currentETHPrice: number,
   networkInfo: NETWORK_INFO
-) {
+): Promise<any[]> {
   // catch case where data not puplated yet
   if (!currentPairData.createdAtTimestamp) {
     return []
@@ -270,11 +270,26 @@ export async function getHistoricalPairReturns(
 export async function getLPReturnsOnPair(
   client: ApolloClient<NormalizedCacheObject>,
   user: string,
-  pair,
+  pair: Record<string, any>,
   ethPrice: number,
-  snapshots,
+  snapshots: any[],
   networkInfo: NETWORK_INFO
-) {
+): Promise<{
+  principal: {
+    usd: number
+    amount0: number
+    amount1: number
+  }
+  net: {
+    return: number
+  }
+  uniswap: {
+    return: number
+  }
+  fees: {
+    sum: any
+  }
+}> {
   // initialize values
   const principal = await getPrincipalForUserPerPair(client, user, pair.id)
   let hodlReturn = 0

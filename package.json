@@ -1,7 +1,7 @@
 {
   "name": "@uniswap/info",
   "private": true,
-  "homepage": "https://info.uniswap.org",
+  "homepage": "/classic",
   "devDependencies": {
     "@popperjs/core": "^2.4.2",
     "@reach/dialog": "^0.15.3",

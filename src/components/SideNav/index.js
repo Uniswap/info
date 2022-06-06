@@ -67,7 +67,7 @@ const DesktopWrapper = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 100vh;
+  height: 100%;
   overflow-y: scroll;
 `
 
@@ -178,7 +178,7 @@ function SideNav() {
               </AutoColumn>
             )}
           </AutoColumn>
-          <AutoColumn gap='0.75rem' style={{ marginBottom: '2.5rem', marginTop: '1.5rem' }}>
+          <AutoColumn gap='0.75rem' style={{ marginTop: '1.5rem' }}>
             <Option onClick={toggleDarkMode}>
               <ThemeToggle />
             </Option>

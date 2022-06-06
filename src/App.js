@@ -194,7 +194,7 @@ function App() {
   const [savedOpen, setSavedOpen] = useState(false)
 
   return (
-    <BrowserRouter>
+    <BrowserRouter basename='/classic'>
       <Switch>
         <Route
           exacts

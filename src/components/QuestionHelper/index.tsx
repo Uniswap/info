@@ -20,7 +20,7 @@ const QuestionWrapper = styled.div`
   }
 `
 
-export default function QuestionHelper({ text, disabled }: { text: string; disabled?: boolean }) {
+export default function QuestionHelper({ text, disabled }: { text: string; disabled?: boolean }): JSX.Element {
   const [show, setShow] = useState<boolean>(false)
 
   const open = useCallback(() => setShow(true), [setShow])
