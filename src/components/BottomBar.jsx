@@ -4,7 +4,7 @@ import SwitchNetworkButton from './SwitchNetworkButton'
 import { useSessionStart } from '../contexts/Application'
 import { Flex, Text } from 'rebass'
 import useTheme from '../hooks/useTheme'
-import { Menu, Repeat } from 'react-feather'
+import { Activity, Menu, Repeat } from 'react-feather'
 import { ButtonEmpty } from './ButtonStyled'
 import { useOnClickOutside } from '../hooks'
 import { ApplicationModal, useModalOpen, useToggleMenuModal } from '../contexts/Application'
@@ -115,6 +115,12 @@ function BottomBar() {
             <Flex color={theme.subText} alignItems='center'>
               <Repeat size={16} />
               <Text marginLeft='8px'>Swap</Text>
+            </Flex>
+          </Link>
+          <Link href='/elastic' external>
+            <Flex color={theme.subText} alignItems='center'>
+              <Activity size={16} />
+              <Text marginLeft='8px'>Elastic Analytics</Text>
             </Flex>
           </Link>
           <Divider />

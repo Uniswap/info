@@ -74,6 +74,34 @@ const SelectNetworkButton = styled(ButtonEmpty)`
     cursor: not-allowed;
   }
 `
+const TabWrapper = styled.div`
+  border-radius: 999px;
+  background: ${({ theme }) => theme.buttonBlack};
+  display: flex;
+  width: 100%;
+  margin-bottom: 28px;
+`
+const TabItem = styled.div`
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border-radius: 999px;
+  background: ${({ theme, active }) => (!active ? theme.buttonBlack : theme.primary)};
+  color: ${({ theme, active }) => (active ? theme.textReverse : theme.subText)};
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 16px;
+`
+const LinkWrapper = styled.a`
+  text-decoration: none;
+  :hover {
+    cursor: pointer;
+    opacity: 0.7;
+  }
+  color: ${({ theme }) => theme.subText};
+`
 
 export default function NetworkModal() {
   const [networksInfo] = useNetworksInfo()
@@ -88,6 +116,15 @@ export default function NetworkModal() {
     <Modal isOpen={networkModalOpen} onDismiss={toggleNetworkModal} maxWidth='624px'>
       <ModalContentWrapper ref={node}>
         <ModalHeader onClose={toggleNetworkModal} title='Select a Network' />
+
+        <TabWrapper>
+          <TabItem role='button'>
+            <LinkWrapper href='/elastic'>Elastic Analytics</LinkWrapper>
+          </TabItem>
+          <TabItem active role='button'>
+            Classic Analytics
+          </TabItem>
+        </TabWrapper>
 
         <NetworkList>
           {[{ name: 'All Chains', icon: Kyber }, ...NetworksInfoEnv].map((network, index) => {

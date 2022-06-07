@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 import { useHistory, useParams } from 'react-router-dom'
-import { TrendingUp, PieChart, Disc, Repeat } from 'react-feather'
+import { TrendingUp, PieChart, Disc, Repeat, Activity } from 'react-feather'
 import { useMedia } from 'react-use'
 
 import { AutoRow } from '../Row'
@@ -17,14 +17,16 @@ import SocialLinks from '../SocialLinks'
 import ThemeToggle from '../ThemeToggle'
 import { addNetworkIdQueryString } from '../../utils'
 import Wallet from '../Icons/Wallet'
-import { Text } from 'rebass'
+import { Flex, Text } from 'rebass'
 import { useNetworksInfo } from '../../contexts/NetworkInfo'
+import InfoHelper from '../InfoHelper'
+import useTheme from '../../hooks/useTheme'
 
 const Wrapper = styled.div`
   height: ${({ isMobile }) => (isMobile ? 'initial' : '100vh')};
   background-color: ${({ theme }) => theme.background};
   color: ${({ theme }) => theme.text1};
-  padding: 28px 24px;
+  padding: 32px 24px 28px;
   position: sticky;
   top: 0px;
   z-index: 999;
@@ -68,7 +70,6 @@ const DesktopWrapper = styled.div`
   flex-direction: column;
   justify-content: space-between;
   height: 100%;
-  overflow-y: scroll;
 `
 
 const MobileWrapper = styled.div`
@@ -121,6 +122,7 @@ function SideNav() {
   const seconds = useSessionStart()
 
   const [, toggleDarkMode] = useDarkModeManager()
+  const theme = useTheme()
 
   const networkModalOpen = useModalOpen(ApplicationModal.NETWORK)
   const [networksInfo] = useNetworksInfo()
@@ -133,10 +135,20 @@ function SideNav() {
       {!below1080 ? (
         <DesktopWrapper>
           <AutoColumn gap='2rem'>
-            <Title />
-            <AutoRow>
-              <SwitchNetworkButton />
-            </AutoRow>
+            <AutoColumn gap='1rem'>
+              <AutoColumn gap='1.5rem'>
+                <Title />
+                <Flex alignItems='flex-start' width='100%'>
+                  <Text fontSize={16} fontWeight='500' color={theme.subText}>
+                    Select a network
+                  </Text>
+                  <InfoHelper text='You can switch between networks in our Elastic Analytics and Classic Analytics below' />
+                </Flex>
+              </AutoColumn>
+              <AutoRow>
+                <SwitchNetworkButton />
+              </AutoRow>
+            </AutoColumn>
             {!below1080 && (
               <AutoColumn gap='2rem'>
                 <BasicLink to={prefixNetworkURL + `/home`}>
@@ -173,6 +185,12 @@ function SideNav() {
                   <Option>
                     <Repeat size={16} style={{ marginRight: '.75rem' }} />
                     Swap
+                  </Option>
+                </Link>
+                <Link href='/elastic' external>
+                  <Option>
+                    <Activity size={16} style={{ marginRight: '.75rem' }} />
+                    Elastic Analytics
                   </Option>
                 </Link>
               </AutoColumn>

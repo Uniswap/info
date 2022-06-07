@@ -3,6 +3,7 @@ import styled from 'styled-components'
 import Popover from '../Popover'
 
 const TooltipContainer = styled.div`
+  max-width: 228px;
   width: ${({ width }) => width || ''};
   padding: 0.6rem 1rem;
   line-height: 150%;
@@ -48,7 +49,7 @@ export function OverflowTooltip({ children, ...rest }) {
   const open = useCallback(() => hoverStatus && setShow(true), [setShow, hoverStatus])
   const close = useCallback(() => setShow(false), [setShow])
   return (
-    <Tooltip {...rest} show={show} width='100%'>
+    <Tooltip {...rest} show={show}>
       <div
         onMouseEnter={open}
         onMouseLeave={close}

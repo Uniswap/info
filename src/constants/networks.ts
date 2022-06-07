@@ -149,8 +149,8 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
   [ChainId.BSCMAINNET]: {
     chainId: ChainId.BSCMAINNET,
     icon: BSC,
-    name: 'BSC',
-    urlKey: 'bsc',
+    name: 'BNB Chain',
+    urlKey: 'bnb',
     dmmSwapUrl: 'https://kyberswap.com/',
     factoryAddress: '0x878dfe971d44e9122048308301f540910bbd934c',
     subgraphName: 'dynamic-amm/dmm-exchange-bsc',
