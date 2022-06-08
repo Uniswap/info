@@ -20,6 +20,7 @@ import useTheme from '../../hooks/useTheme'
 import { NETWORKS_INFO } from '../../constants/networks'
 import { aggregateGlobalTxns } from '../../utils/aggregateData'
 import { MouseoverTooltip } from '../Tooltip'
+import { useNetworksInfo } from '../../contexts/NetworkInfo'
 
 dayjs.extend(utc)
 
@@ -278,9 +279,11 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [aggregatedTransactions, txFilter])
 
+  const [[networkInfo]] = useNetworksInfo()
+
   useEffect(() => {
     setPage(1)
-  }, [txFilter])
+  }, [txFilter, networkInfo])
 
   const filteredList = useMemo(
     () =>

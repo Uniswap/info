@@ -15,11 +15,10 @@ import FormattedName from '../FormattedName'
 import QuestionHelper from '../QuestionHelper'
 import { TYPE } from '../../Theme'
 import { MAX_ALLOW_APY } from '../../constants'
-import useTheme from '../../hooks/useTheme'
 import { NETWORKS_INFO } from '../../constants/networks'
 import { aggregatePairs } from '../../utils/aggregateData'
 import { MouseoverTooltip } from '../Tooltip'
-import { NetworksInfoEnv, useTokensList } from '../../contexts/NetworkInfo'
+import { NetworksInfoEnv, useNetworksInfo, useTokensList } from '../../contexts/NetworkInfo'
 
 dayjs.extend(utc)
 
@@ -162,6 +161,11 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 5 }) {
   // sorting
   const [sortDirection, setSortDirection] = useState(true)
   const [sortedColumn, setSortedColumn] = useState(FIELDS.LIQ)
+
+  const [[networkInfo]] = useNetworksInfo()
+  useEffect(() => {
+    setPage(1)
+  }, [networkInfo])
 
   useEffect(() => {
     if (aggregatedPairs) {

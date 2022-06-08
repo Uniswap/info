@@ -250,6 +250,7 @@ const PairChart = ({ address, color, base0, base1 }) => {
               tick={{ fill: textColor }}
               type={'number'}
               domain={['dataMin', 'dataMax']}
+              scale='time'
             />
             <YAxis
               type='number'
@@ -322,6 +323,7 @@ const PairChart = ({ address, color, base0, base1 }) => {
               tick={{ fill: textColor }}
               type={'number'}
               domain={['dataMin', 'dataMax']}
+              scale='time'
             />
             <YAxis
               type='number'

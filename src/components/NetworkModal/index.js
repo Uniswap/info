@@ -1,4 +1,4 @@
-import React, { useRef } from 'react'
+import React, { useRef, useState } from 'react'
 import styled from 'styled-components'
 
 import { ApplicationModal, useModalOpen, useToggleNetworkModal } from '../../contexts/Application'
@@ -111,6 +111,11 @@ export default function NetworkModal() {
   useOnClickOutside(node, networkModalOpen ? toggleNetworkModal : undefined)
   const history = useHistory()
   const { network: currentNetworkURL } = useParams()
+  const [tab, setTab] = useState('Classic')
+  const networkListToShow = [...NetworksInfoEnv]
+  if (tab === 'Classic')
+    //todo namgold: remove above if line
+    networkListToShow.unshift({ name: 'All Chains', icon: Kyber })
 
   return (
     <Modal isOpen={networkModalOpen} onDismiss={toggleNetworkModal} maxWidth='624px'>
@@ -118,33 +123,19 @@ export default function NetworkModal() {
         <ModalHeader onClose={toggleNetworkModal} title='Select a Network' />
 
         <TabWrapper>
-          <TabItem role='button'>
-            <LinkWrapper href='/elastic'>Elastic Analytics</LinkWrapper>
+          <TabItem active={tab === 'Elastic'} role='button' onClick={() => setTab('Elastic')}>
+            Elastic Analytics
           </TabItem>
-          <TabItem active role='button'>
+          <TabItem active={tab === 'Classic'} role='button' onClick={() => setTab('Classic')}>
             Classic Analytics
           </TabItem>
         </TabWrapper>
 
         <NetworkList>
-          {[{ name: 'All Chains', icon: Kyber }, ...NetworksInfoEnv].map((network, index) => {
-            if (
-              (networksInfo[1] && network.name == 'All Chains') ||
+          {networkListToShow.map((network, index) => {
+            const selected =
+              (networksInfo[1] && network.name === 'All Chains') ||
               (!networksInfo[1] && networksInfo[0].chainId === network.chainId)
-            ) {
-              return (
-                <SelectNetworkButton key={network.name} padding='0'>
-                  <ListItem selected>
-                    {typeof network.icon == 'string' ? (
-                      <img src={network.icon} alt='Logo' style={{ width: '2rem', marginRight: '1rem' }} />
-                    ) : (
-                      <network.icon color='black' width='2rem' height='2rem' style={{ marginRight: '1rem' }} />
-                    )}
-                    <NetworkLabel selected>{network.name}</NetworkLabel>
-                  </ListItem>
-                </SelectNetworkButton>
-              )
-            }
 
             let currentUrl = currentNetworkURL
               ? history.location.pathname.split('/').slice(2).join('/')
@@ -171,25 +162,57 @@ export default function NetworkModal() {
                 break
             }
             const linkTo = (network.urlKey ? `/${network.urlKey}` : '') + '/' + currentUrl
-            return (
-              <Link to={linkTo} key={network.name}>
-                <SelectNetworkButton
-                  padding='0'
-                  onClick={() => {
-                    toggleNetworkModal()
-                  }}
-                >
-                  <ListItem>
-                    {typeof network.icon == 'string' ? (
-                      <img src={network.icon} alt='Logo' style={{ width: '2rem', marginRight: '1rem' }} />
-                    ) : (
-                      <network.icon width='2rem' height='2rem' style={{ marginRight: '1rem' }} />
-                    )}
-                    <NetworkLabel>{network.name}</NetworkLabel>
-                  </ListItem>
-                </SelectNetworkButton>
-              </Link>
-            )
+            if (tab === 'Classic') {
+              return (
+                <Link to={linkTo} key={network.name}>
+                  <SelectNetworkButton
+                    padding='0'
+                    onClick={() => {
+                      toggleNetworkModal()
+                    }}
+                  >
+                    <ListItem selected={selected}>
+                      {typeof network.icon === 'string' ? (
+                        <img src={network.icon} alt='Logo' style={{ width: '2rem', marginRight: '1rem' }} />
+                      ) : (
+                        <network.icon
+                          color={selected ? 'black' : undefined}
+                          width='2rem'
+                          height='2rem'
+                          style={{ marginRight: '1rem' }}
+                        />
+                      )}
+                      <NetworkLabel selected={selected}>{network.name}</NetworkLabel>
+                    </ListItem>
+                  </SelectNetworkButton>
+                </Link>
+              )
+            } else {
+              return (
+                <a href={'/elastic' + linkTo} key={network.name}>
+                  <SelectNetworkButton
+                    padding='0'
+                    onClick={() => {
+                      toggleNetworkModal()
+                    }}
+                  >
+                    <ListItem selected={selected}>
+                      {typeof network.icon === 'string' ? (
+                        <img src={network.icon} alt='Logo' style={{ width: '2rem', marginRight: '1rem' }} />
+                      ) : (
+                        <network.icon
+                          color={selected ? 'black' : undefined}
+                          width='2rem'
+                          height='2rem'
+                          style={{ marginRight: '1rem' }}
+                        />
+                      )}
+                      <NetworkLabel selected={selected}>{network.name}</NetworkLabel>
+                    </ListItem>
+                  </SelectNetworkButton>
+                </a>
+              )
+            }
           })}
         </NetworkList>
       </ModalContentWrapper>

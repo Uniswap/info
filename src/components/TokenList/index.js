@@ -20,7 +20,7 @@ import { useAllTokenData } from '../../contexts/TokenData'
 import { NETWORKS_INFO } from '../../constants/networks'
 import { aggregateTokens } from '../../utils/aggregateData'
 import { MouseoverTooltip } from '../Tooltip'
-import { NetworksInfoEnv } from '../../contexts/NetworkInfo'
+import { NetworksInfoEnv, useNetworksInfo } from '../../contexts/NetworkInfo'
 
 dayjs.extend(utc)
 
@@ -174,6 +174,11 @@ function TopTokenList({ itemMax = 5 }) {
         .map(key => aggregatedTokens[key])
     )
   }, [aggregatedTokens])
+
+  const [[networkInfo]] = useNetworksInfo()
+  useEffect(() => {
+    setPage(1)
+  }, [networkInfo])
 
   useEffect(() => {
     if (tokens && formattedTokens) {

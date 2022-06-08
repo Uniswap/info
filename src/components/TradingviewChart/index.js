@@ -223,7 +223,7 @@ const TradingViewChart = ({ type = CHART_TYPES.BAR, data, base, baseChange, fiel
 
   return (
     <Wrapper>
-      <div ref={ref} />
+      <div style={{ paddingTop: '50px' }} ref={ref} />
       <IconWrapper>
         <Play
           onClick={() => {

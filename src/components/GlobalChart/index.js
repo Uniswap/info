@@ -99,12 +99,13 @@ const GlobalChart = ({ display }) => {
             />
           </ResponsiveContainer>
         ) : null)}
+
       {display === 'volume' && (
         <RowFixed
           style={{
-            top: '100px',
+            top: '20px',
             position: 'absolute',
-            left: '20px',
+            right: '20px',
             zIndex: 10,
           }}
         >

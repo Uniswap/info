@@ -219,12 +219,13 @@ const TokenChart = ({ address, color, base }) => {
               axisLine={false}
               interval='preserveEnd'
               tickMargin={16}
-              minTickGap={120}
+              minTickGap={80}
               tickFormatter={tick => toNiceDate(tick)}
               dataKey='date'
               tick={{ fill: textColor }}
               type={'number'}
               domain={['dataMin', 'dataMax']}
+              scale='time'
             />
             <YAxis
               type='number'
@@ -342,6 +343,7 @@ const TokenChart = ({ address, color, base }) => {
               tick={{ fill: textColor }}
               type={'number'}
               domain={['dataMin', 'dataMax']}
+              scale='time'
             />
             <YAxis
               type='number'
