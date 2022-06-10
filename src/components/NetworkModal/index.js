@@ -9,6 +9,7 @@ import { useOnClickOutside } from '../../hooks'
 import { NetworksInfoEnv, useNetworksInfo } from '../../contexts/NetworkInfo'
 import { Link, useHistory, useParams } from 'react-router-dom'
 import Kyber from '../Icons/Kyber'
+import { ChainId } from '../../constants/networks'
 
 const ModalContentWrapper = styled.div`
   display: flex;
@@ -188,6 +189,7 @@ export default function NetworkModal() {
                 </Link>
               )
             } else {
+              if (network.chainId === ChainId.AURORA) return undefined
               return (
                 <a href={'/elastic' + linkTo} key={network.name}>
                   <SelectNetworkButton
