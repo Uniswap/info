@@ -190,6 +190,7 @@ export default function NetworkModal() {
               )
             } else {
               if (network.chainId === ChainId.AURORA) return undefined
+              if (network.chainId === ChainId.VELAS) return undefined
               return (
                 <a href={'/elastic' + linkTo} key={network.name}>
                   <SelectNetworkButton
