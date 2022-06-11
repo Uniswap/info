@@ -358,7 +358,7 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 5 }) {
                 setSortDirection(prev => (sortedColumn !== FIELDS.APY ? true : !prev))
               }}
             >
-              APR {sortedColumn === FIELDS.APY ? (!sortDirection ? '↑' : '↓') : ''}
+              APY {sortedColumn === FIELDS.APY ? (!sortDirection ? '↑' : '↓') : ''}
             </ClickableText>
             <QuestionHelper text={'Estimated return based on yearly fees of the pool'} />
           </Flex>
