@@ -563,6 +563,10 @@ export function useGlobalData() {
   const [state, { update, updateAllPairsInUniswap, updateAllTokensInUniswap }] = useGlobalDataContext()
   const [ethPrice, oldEthPrice] = useEthPrice()
 
+  useEffect(() => {
+    console.log('[ethPrice]:', ethPrice, oldEthPrice)
+  }, [ethPrice, oldEthPrice])
+
   const data = state?.globalData
 
   // const combinedVolume = useTokenDataCombined(offsetVolumes)
@@ -649,6 +653,7 @@ export function useEthPrice() {
   const [state, { updateEthPrice }] = useGlobalDataContext()
   const ethPrice = state?.[ETH_PRICE_KEY]
   const ethPriceOld = state?.['oneDayPrice']
+
   useEffect(() => {
     async function checkForEthPrice() {
       if (!ethPrice) {
@@ -708,7 +713,7 @@ export function useTopLps() {
             if (results) {
               return results.liquidityPositions
             }
-          } catch (e) {}
+          } catch (e) { }
         })
       )
 
