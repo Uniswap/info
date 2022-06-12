@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import { ApolloProvider } from 'react-apollo'
 import { client } from './apollo/client'
@@ -102,6 +102,10 @@ function App() {
   const globalChartData = useGlobalChartData()
   const [latestBlock, headBlock] = useLatestBlocks()
 
+  useEffect(() => {
+    console.log('[globalChartData]:', globalChartData, globalData, latestBlock)
+  }, [globalChartData, globalData, latestBlock])
+
   // show warning
   const showWarning = headBlock && latestBlock ? headBlock - latestBlock > BLOCK_DIFFERENCE_THRESHOLD : false
 
@@ -116,9 +120,9 @@ function App() {
           </WarningWrapper>
         )}
         {globalData &&
-        Object.keys(globalData).length > 0 &&
-        globalChartData &&
-        Object.keys(globalChartData).length > 0 ? (
+          Object.keys(globalData).length > 0 &&
+          globalChartData &&
+          Object.keys(globalChartData).length > 0 ? (
           <BrowserRouter>
             <Route component={GoogleAnalyticsReporter} />
             <Switch>

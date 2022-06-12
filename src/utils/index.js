@@ -48,8 +48,7 @@ export function getPoolLink(token0Address, token1Address = null, remove = false)
     return (
       `https://app.uniswap.org/#/` +
       (remove ? `remove` : `add`) +
-      `/v2/${token0Address === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' ? 'ETH' : token0Address}/${
-        token1Address === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' ? 'ETH' : token1Address
+      `/v2/${token0Address === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' ? 'ETH' : token0Address}/${token1Address === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' ? 'ETH' : token1Address
       }`
     )
   }
@@ -59,9 +58,8 @@ export function getSwapLink(token0Address, token1Address = null) {
   if (!token1Address) {
     return `https://app.uniswap.org/#/swap?inputCurrency=${token0Address}`
   } else {
-    return `https://app.uniswap.org/#/swap?inputCurrency=${
-      token0Address === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' ? 'ETH' : token0Address
-    }&outputCurrency=${token1Address === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' ? 'ETH' : token1Address}`
+    return `https://app.uniswap.org/#/swap?inputCurrency=${token0Address === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' ? 'ETH' : token0Address
+      }&outputCurrency=${token1Address === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' ? 'ETH' : token1Address}`
   }
 }
 
@@ -174,6 +172,7 @@ export async function getBlocksFromTimestamps(timestamps, skipCount = 500) {
 
   let fetchedData = await splitQuery(GET_BLOCKS, blockClient, [], timestamps, skipCount)
 
+  console.log('[fetchedData]:', fetchedData)
   let blocks = []
   if (fetchedData) {
     for (var t in fetchedData) {
@@ -181,6 +180,11 @@ export async function getBlocksFromTimestamps(timestamps, skipCount = 500) {
         blocks.push({
           timestamp: t.split('t')[1],
           number: fetchedData[t][0]['number'],
+        })
+      } else {
+        blocks.push({
+          timestamp: 0,
+          number: 0,
         })
       }
     }
@@ -278,7 +282,7 @@ export async function getShareValueOverTime(pairAddress, timestamps) {
  */
 export function getTimestampRange(timestamp_from, period_length, periods) {
   let timestamps = []
-  for (let i = 0; i <= periods; i++) {
+  for (let i = 0;i <= periods;i++) {
     timestamps.push(timestamp_from + i * period_length)
   }
   return timestamps
@@ -473,7 +477,7 @@ export function isEquivalent(a, b) {
   if (aProps.length !== bProps.length) {
     return false
   }
-  for (var i = 0; i < aProps.length; i++) {
+  for (var i = 0;i < aProps.length;i++) {
     var propName = aProps[i]
     if (a[propName] !== b[propName]) {
       return false
