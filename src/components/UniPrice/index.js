@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useEffect } from 'react'
 import styled from 'styled-components'
 import Panel from '../Panel'
 import { AutoColumn } from '../Column'
@@ -24,9 +24,9 @@ function formatPercent(rawPercent) {
 }
 
 export default function UniPrice() {
-  const daiPair = usePairData('0xa478c2975ab1ea89e8196811f51a7b7ade33eb11')
-  const usdcPair = usePairData('0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc')
-  const usdtPair = usePairData('0x0d4a11d5eeaac28ec3f61d100daf4d40471f1852')
+  const daiPair = usePairData('0x412fb096944e0c1d64509a9d5dea472108ac2f63')
+  const usdcPair = usePairData('0x6ea91c1e7bdc58baa773aa0486c09a3d136be706')
+  const usdtPair = usePairData('0xb410241562d9650ea590ff3d0e44f63e305dc763')
 
   const totalLiquidity = useMemo(() => {
     return daiPair && usdcPair && usdtPair
@@ -36,7 +36,7 @@ export default function UniPrice() {
 
   const daiPerEth = daiPair ? parseFloat(daiPair.token0Price).toFixed(2) : '-'
   const usdcPerEth = usdcPair ? parseFloat(usdcPair.token0Price).toFixed(2) : '-'
-  const usdtPerEth = usdtPair ? parseFloat(usdtPair.token1Price).toFixed(2) : '-'
+  const usdtPerEth = usdtPair ? parseFloat(usdtPair.token0Price).toFixed(2) : '-'
 
   return (
     <PriceCard>

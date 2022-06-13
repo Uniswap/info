@@ -276,6 +276,7 @@ export function useListedTokens() {
         if (newTokens?.tokens) {
           return Promise.resolve([...tokensSoFar, ...newTokens.tokens])
         }
+        return fetchedTokens
       }, Promise.resolve([]))
       let formatted = allFetched?.map((t) => t.address.toLowerCase())
       updateSupportedTokens(formatted)
