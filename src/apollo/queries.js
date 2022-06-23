@@ -503,7 +503,7 @@ export const GLOBAL_CHART = gql`
   }
 `
 
-export const GLOBAL_DATA = (block) => {
+export const GLOBAL_DATA = block => {
   const queryString = `query dmmFactories {
     dmmFactories${block ? `(block: { number: ${block}})` : ``} {
         id

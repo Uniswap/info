@@ -179,16 +179,17 @@ export default function Provider({ children }) {
   )
 }
 
-const mergeFactoriesData = (factories)=>{
+const mergeFactoriesData = factories => {
   return factories.reduce((merged, factory) => {
     return {
       totalVolumeUSD: parseFloat(merged.totalVolumeUSD) + parseFloat(factory.totalVolumeUSD),
       totalFeeUSD: parseFloat(merged.totalFeeUSD) + parseFloat(factory.totalFeeUSD),
-      untrackedVolumeUSD:parseFloat(merged.untrackedVolumeUSD) + parseFloat(factory.untrackedVolumeUSD),
-      totalLiquidityUSD:parseFloat(merged.totalLiquidityUSD) + parseFloat(factory.totalLiquidityUSD),
-      txCount:parseFloat(merged.txCount) + parseFloat(factory.txCount),
-      pairCount:parseFloat(merged.pairCount) + parseFloat(factory.pairCount),
-  }})
+      untrackedVolumeUSD: parseFloat(merged.untrackedVolumeUSD) + parseFloat(factory.untrackedVolumeUSD),
+      totalLiquidityUSD: parseFloat(merged.totalLiquidityUSD) + parseFloat(factory.totalLiquidityUSD),
+      txCount: parseFloat(merged.txCount) + parseFloat(factory.txCount),
+      pairCount: parseFloat(merged.pairCount) + parseFloat(factory.pairCount),
+    }
+  })
 }
 
 /**
