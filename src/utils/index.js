@@ -233,10 +233,7 @@ export async function getLiquidityTokenBalanceOvertime(client, account, timestam
   const blocks = await getBlocksFromTimestamps(timestamps, networkInfo)
 
   // get historical share values with time travel queries
-  let result = await client.query({
-    query: SHARE_VALUE(account, blocks),
-    fetchPolicy: 'cache-first',
-  })
+  const result = await splitQuery(SHARE_VALUE, client, [account], blocks, 100)
 
   let values = []
   for (var row in result?.data) {
@@ -267,10 +264,7 @@ export async function getShareValueOverTime(client, pairAddress, timestamps, net
   const blocks = await getBlocksFromTimestamps(timestamps, networkInfo)
 
   // get historical share values with time travel queries
-  let result = await client.query({
-    query: SHARE_VALUE(pairAddress, blocks),
-    fetchPolicy: 'cache-first',
-  })
+  const result = await splitQuery(SHARE_VALUE, client, [pairAddress], blocks, 100)
 
   let values = []
   for (var row in result?.data) {
