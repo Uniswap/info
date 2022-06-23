@@ -503,11 +503,9 @@ export const GLOBAL_CHART = gql`
   }
 `
 
-export const GLOBAL_DATA = (networkInfo, block) => {
+export const GLOBAL_DATA = (block) => {
   const queryString = `query dmmFactories {
-    dmmFactories(
-       ${block ? `block: { number: ${block}}` : ``}
-       where: { id: "${(networkInfo.factoryAddress || '0x0639542a5cd99bd5f4e85f58cb1f61d8fbe32de9').toLowerCase()}" }) {
+    dmmFactories${block ? `(block: { number: ${block}})` : ``} {
         id
         totalVolumeUSD
         totalFeeUSD

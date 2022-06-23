@@ -179,6 +179,18 @@ export default function Provider({ children }) {
   )
 }
 
+const mergeFactoriesData = (factories)=>{
+  return factories.reduce((merged, factory) => {
+    return {
+      totalVolumeUSD: parseFloat(merged.totalVolumeUSD) + parseFloat(factory.totalVolumeUSD),
+      totalFeeUSD: parseFloat(merged.totalFeeUSD) + parseFloat(factory.totalFeeUSD),
+      untrackedVolumeUSD:parseFloat(merged.untrackedVolumeUSD) + parseFloat(factory.untrackedVolumeUSD),
+      totalLiquidityUSD:parseFloat(merged.totalLiquidityUSD) + parseFloat(factory.totalLiquidityUSD),
+      txCount:parseFloat(merged.txCount) + parseFloat(factory.txCount),
+      pairCount:parseFloat(merged.pairCount) + parseFloat(factory.pairCount),
+  }})
+}
+
 /**
  * Gets all the global data for the overview page.
  * Needs current eth price and the old eth price to get
@@ -208,36 +220,36 @@ async function getGlobalData(client, networksInfo) {
 
     // fetch the global data
     let result = await client.query({
-      query: GLOBAL_DATA(networksInfo),
+      query: GLOBAL_DATA(),
       fetchPolicy: 'cache-first',
     })
-    data = result.data.dmmFactories[0] || {}
+    data = mergeFactoriesData(result.data.dmmFactories) || {}
 
     // fetch the historical data
     let oneDayResult = await client.query({
-      query: GLOBAL_DATA(networksInfo, oneDayBlock?.number),
+      query: GLOBAL_DATA(oneDayBlock?.number),
       fetchPolicy: 'cache-first',
     })
 
-    data.oneDayData = { ...oneDayResult.data.dmmFactories[0] } //preventing fetchPolicy: 'cache-first' returning same object causing circular object
+    data.oneDayData = { ...mergeFactoriesData(oneDayResult.data.dmmFactories) } //preventing fetchPolicy: 'cache-first' returning same object causing circular object
 
     let twoDayResult = await client.query({
-      query: GLOBAL_DATA(networksInfo, twoDayBlock?.number),
+      query: GLOBAL_DATA(twoDayBlock?.number),
       fetchPolicy: 'cache-first',
     })
-    data.twoDayData = { ...twoDayResult.data.dmmFactories[0] } //preventing fetchPolicy: 'cache-first' returning same object causing circular object
+    data.twoDayData = { ...mergeFactoriesData(twoDayResult.data.dmmFactories) } //preventing fetchPolicy: 'cache-first' returning same object causing circular object
 
     let oneWeekResult = await client.query({
-      query: GLOBAL_DATA(networksInfo, oneWeekBlock?.number),
+      query: GLOBAL_DATA(oneWeekBlock?.number),
       fetchPolicy: 'cache-first',
     })
-    data.oneWeekData = { ...oneWeekResult.data.dmmFactories[0] } //preventing fetchPolicy: 'cache-first' returning same object causing circular object
+    data.oneWeekData = { ...mergeFactoriesData(oneWeekResult.data.dmmFactories) } //preventing fetchPolicy: 'cache-first' returning same object causing circular object
 
     let twoWeekResult = await client.query({
-      query: GLOBAL_DATA(networksInfo, twoWeekBlock?.number),
+      query: GLOBAL_DATA(twoWeekBlock?.number),
       fetchPolicy: 'cache-first',
     })
-    data.twoWeekData = { ...twoWeekResult.data.dmmFactories[0] } //preventing fetchPolicy: 'cache-first' returning same object causing circular object
+    data.twoWeekData = { ...mergeFactoriesData(twoWeekResult.data.dmmFactories) } //preventing fetchPolicy: 'cache-first' returning same object causing circular object
 
     calculateValuesOnGlobalData(data)
   } catch (e) {
