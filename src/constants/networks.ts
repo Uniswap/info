@@ -47,7 +47,6 @@ export type NETWORK_INFO = {
   name: string
   urlKey: string
   dmmSwapUrl: string
-  factoryAddress: string
   subgraphName: string
   subgraphUrls: string[]
   subgraphBlockUrl: string
@@ -69,7 +68,6 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     name: 'Ethereum',
     urlKey: 'ethereum',
     dmmSwapUrl: 'https://kyberswap.com/',
-    factoryAddress: '0x833e4083B7ae46CeA85695c4f7ed25CDAd8886dE',
     subgraphName: 'dynamic-amm/dynamic-amm',
     subgraphUrls: ['https://api.thegraph.com/subgraphs/name/kybernetwork/kyberswap-exchange-ethereum'],
     subgraphBlockUrl: 'https://api.thegraph.com/subgraphs/name/dynamic-amm/ethereum-blocks-ethereum',
@@ -89,7 +87,6 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     name: 'Ropsten',
     urlKey: 'ropsten',
     dmmSwapUrl: 'https://dev-dmm.knstats.com/#/',
-    factoryAddress: '0x0639542a5cd99bd5f4e85f58cb1f61d8fbe32de9',
     subgraphName: 'piavgh/dmm-exchange-ropsten',
     subgraphUrls: ['https://api.thegraph.com/subgraphs/name/viet-nv/kyberswap-classic-ropsten'],
     subgraphBlockUrl: 'https://api.thegraph.com/subgraphs/name/edwardevans094/ropsten-blocks',
@@ -109,7 +106,6 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     name: 'Polygon',
     urlKey: 'polygon',
     dmmSwapUrl: 'https://kyberswap.com/',
-    factoryAddress: '0x5f1fe642060b5b9658c15721ea22e982643c095c',
     subgraphName: 'dynamic-amm/dmm-exchange-matic',
     subgraphUrls: [
       'https://api.thegraph.com/subgraphs/name/kybernetwork/kyberswap-exchange-polygon',
@@ -132,7 +128,6 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     name: 'Mumbai',
     urlKey: 'mumbai',
     dmmSwapUrl: 'https://dev-dmm.knstats.com/#/',
-    factoryAddress: '0x7900309d0b1c8d3d665ae40e712e8ba4fc4f5453', //todo: check this
     subgraphName: 'piavgh/dmm-exchange-mumbai',
     subgraphUrls: ['https://api.thegraph.com/subgraphs/name/piavgh/dmm-exchange-mumbai'],
     subgraphBlockUrl: 'https://api.thegraph.com/subgraphs/name/piavgh/mumbai-blocks',
@@ -152,7 +147,6 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     name: 'BNB Chain',
     urlKey: 'bnb',
     dmmSwapUrl: 'https://kyberswap.com/',
-    factoryAddress: '0x878dfe971d44e9122048308301f540910bbd934c',
     subgraphName: 'dynamic-amm/dmm-exchange-bsc',
     subgraphUrls: [
       'https://api.thegraph.com/subgraphs/name/dynamic-amm/dmm-exchange-bsc',
@@ -175,7 +169,6 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     name: 'BSC Testnet',
     urlKey: 'bsc-testnet',
     dmmSwapUrl: 'https://dev-dmm.knstats.com/#/',
-    factoryAddress: '0x7900309d0b1c8d3d665ae40e712e8ba4fc4f5453', //todo: check this
     subgraphName: 'ducquangkstn/dynamic-amm-ropsten',
     subgraphUrls: ['https://api.thegraph.com/subgraphs/name/ducquangkstn/dynamic-amm-ropsten'],
     subgraphBlockUrl: 'https://api.thegraph.com/subgraphs/name/ducquangkstn/ethereum-blocks-bsctestnet',
@@ -195,7 +188,6 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     name: 'Avalanche',
     urlKey: 'avalanche',
     dmmSwapUrl: 'https://kyberswap.com/',
-    factoryAddress: '0x10908c875d865c66f271f5d3949848971c9595c9',
     subgraphName: 'dynamic-amm/dmm-exchange-avax',
     subgraphUrls: [
       'https://api.thegraph.com/subgraphs/name/kybernetwork/kyberswap-exchange-avalanche',
@@ -219,7 +211,6 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     name: 'Avalanche Testnest',
     urlKey: 'avalanche-testnet',
     dmmSwapUrl: 'https://dev-dmm.knstats.com/#/',
-    factoryAddress: '0x10908c875d865c66f271f5d3949848971c9595c9',
     subgraphName: 'ducquangkstn/dmm-exchange-fuij',
     subgraphUrls: ['https://api.thegraph.com/subgraphs/name/ducquangkstn/dmm-exchange-fuij'],
     subgraphBlockUrl: 'https://api.thegraph.com/subgraphs/name/ducquangkstn/avalache-blocks',
@@ -239,7 +230,6 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     name: 'Fantom',
     urlKey: 'fantom',
     dmmSwapUrl: 'https://kyberswap.com/',
-    factoryAddress: '0x78df70615ffc8066cc0887917f2Cd72092C86409',
     subgraphName: 'dynamic-amm/dmm-exchange-ftm',
     subgraphUrls: ['https://api.thegraph.com/subgraphs/name/kybernetwork/kyberswap-exchange-fantom'],
     subgraphBlockUrl: 'https://api.thegraph.com/subgraphs/name/dynamic-amm/ethereum-blocks-fantom',
@@ -259,7 +249,6 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     name: 'Cronos',
     urlKey: 'cronos',
     dmmSwapUrl: 'https://kyberswap.com/',
-    factoryAddress: '0xd9bfe9979e9ca4b2fe84ba5d4cf963bbcb376974',
     subgraphName: 'kyberswap/kyberswap-cronos',
     subgraphUrls: ['https://cronos-graph.kyberengineering.io/subgraphs/name/kybernetwork/kyberswap-exchange-cronos'],
     subgraphBlockUrl: 'https://cronos-graph.kyberengineering.io/subgraphs/name/kybernetwork/cronos-blocks',
@@ -279,7 +268,6 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     name: 'Cronos Testnet',
     urlKey: 'cronos-testnet',
     dmmSwapUrl: 'https://dev-dmm.knstats.com/#/',
-    factoryAddress: '0x9fe747aea6173dd2c72e9d9bf4e2bcbbc0f8ad9e',
     subgraphName: 'dynamic-amm/dmm-exchange-cronos-testnet',
     subgraphUrls: ['https://testnet-cronos-subgraph.knstats.com/subgraphs/name/dynamic-amm/dmm-exchange-cronos-testnet'],
     subgraphBlockUrl: 'https://testnet-cronos-subgraph.knstats.com/subgraphs/name/dynamic-amm/ethereum-blocks-cronos-testnet',
@@ -299,7 +287,6 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     name: 'Arbitrum',
     urlKey: 'arbitrum',
     dmmSwapUrl: 'https://kyberswap.com/',
-    factoryAddress: '0x51e8d106c646ca58caf32a47812e95887c071a62',
     subgraphName: 'viet-nv/kyberswap-arbitrum',
     subgraphUrls: ['https://arbitrum-graph.kyberengineering.io/subgraphs/name/kybernetwork/kyberswap-exchange-arbitrum'],
     subgraphBlockUrl: 'https://api.thegraph.com/subgraphs/name/viet-nv/arbitrum-blocks',
@@ -319,7 +306,6 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     name: 'Arbitrum Rinkeby',
     urlKey: 'arbitrum-rinkeby',
     dmmSwapUrl: 'https://dev-dmm.knstats.com/#/',
-    factoryAddress: '0x570797C68C6D060503b2CfcBe5780205057010d5',
     subgraphName: 'viet-nv/kyberswap-arbitrum-rinkeby',
     subgraphUrls: ['https://api.thegraph.com/subgraphs/name/viet-nv/kyberswap-arbitrum-rinkeby'],
     subgraphBlockUrl: 'https://api.thegraph.com/subgraphs/name/viet-nv/arbitrum-rinkeby-blocks',
@@ -339,7 +325,6 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     name: 'BitTorrent',
     urlKey: 'bittorrent',
     dmmSwapUrl: 'https://kyberswap.com/',
-    factoryAddress: '0xD9bfE9979e9CA4b2fe84bA5d4Cf963bBcB376974',
     subgraphName: 'dynamic-amm/kyberswap-bttc',
     subgraphUrls: ['https://bttc-graph.kyberengineering.io/subgraphs/name/kybernetwork/kyberswap-exchange-bttc'],
     subgraphBlockUrl: 'https://bttc-graph.kyberengineering.io/subgraphs/name/kybernetwork/bttc-blocks',
@@ -359,7 +344,6 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     name: 'Velas',
     urlKey: 'velas',
     dmmSwapUrl: 'https://kyberswap.com/',
-    factoryAddress: '0xaf0936B1DC49B5c7444CA838A5f32080FC043AdD',
     subgraphName: 'kybernetwork/kyberswap-exchange-velas',
     subgraphUrls: ['https://velas-graph.kyberengineering.io/subgraphs/name/kybernetwork/kyberswap-exchange-velas'],
     subgraphBlockUrl: 'https://velas-graph.kyberengineering.io/subgraphs/name/kybernetwork/velas-blocks',
@@ -379,7 +363,6 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     name: 'Aurora',
     urlKey: 'aurora',
     dmmSwapUrl: 'https://kyberswap.com/',
-    factoryAddress: '0x39a8809fbbf22ccaeac450eaf559c076843eb910',
     subgraphName: 'piavgh/dmm-exchange-aurora',
     subgraphUrls: ['https://aurora-graph.kyberengineering.io/subgraphs/name/kybernetwork/kyberswap-exchange-aurora'],
     subgraphBlockUrl: 'https://aurora-graph.kyberengineering.io/subgraphs/name/kybernetwork/aurora-blocks',
@@ -399,7 +382,6 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     name: 'Oasis',
     urlKey: 'oasis',
     dmmSwapUrl: 'https://kyberswap.com/',
-    factoryAddress: '0xD9bfE9979e9CA4b2fe84bA5d4Cf963bBcB376974',
     subgraphName: 'kybernetwork/kyberswap-exchange-oasis',
     subgraphUrls: ['https://oasis-graph.kyberengineering.io/subgraphs/name/kybernetwork/kyberswap-exchange-oasis'],
     subgraphBlockUrl: 'https://oasis-graph.kyberengineering.io/subgraphs/name/kybernetwork/oasis-blocks',
