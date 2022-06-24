@@ -223,7 +223,7 @@ async function getBulkPairData(client, pairList, ethPrice, networkInfo) {
           let oneDayHistory = oneDayData?.[pair.id]
           if (!oneDayHistory) {
             let newData = await client.query({
-              query: PAIR_DATA(pair.id, b1),
+              query: PAIR_DATA(pair.id.toLowerCase(), b1),
               fetchPolicy: 'network-only',
             })
             oneDayHistory = newData.data.pairs[0]
@@ -231,7 +231,7 @@ async function getBulkPairData(client, pairList, ethPrice, networkInfo) {
           let twoDayHistory = twoDayData?.[pair.id]
           if (!twoDayHistory) {
             let newData = await client.query({
-              query: PAIR_DATA(pair.id, b2),
+              query: PAIR_DATA(pair.id.toLowerCase(), b2),
               fetchPolicy: 'network-only',
             })
             twoDayHistory = newData.data.pairs[0]
@@ -239,7 +239,7 @@ async function getBulkPairData(client, pairList, ethPrice, networkInfo) {
           let oneWeekHistory = oneWeekData?.[pair.id]
           if (!oneWeekHistory) {
             let newData = await client.query({
-              query: PAIR_DATA(pair.id, bWeek),
+              query: PAIR_DATA(pair.id.toLowerCase(), bWeek),
               fetchPolicy: 'network-only',
             })
             oneWeekHistory = newData.data.pairs[0]
@@ -325,7 +325,7 @@ const getPairPools = async (client, pairAddress) => {
 
   try {
     let result = await client.query({
-      query: PAIR_POOLS_DATA(pairAddress),
+      query: PAIR_POOLS_DATA(pairAddress.toLowerCase()),
       fetchPolicy: 'no-cache',
     })
     pools = result.data.pools
@@ -349,7 +349,7 @@ const getPairChartData = async (client, pairAddress) => {
       let result = await client.query({
         query: PAIR_CHART,
         variables: {
-          pairAddress: pairAddress,
+          pairAddress: pairAddress.toLowerCase(),
           skip,
         },
         fetchPolicy: 'cache-first',

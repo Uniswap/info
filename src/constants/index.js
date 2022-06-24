@@ -20,7 +20,7 @@ export const getSUPPORTED_LIST_URLS__NO_ENS = networkInfo =>
     : networkInfo.chainId === ChainId.BSCMAINNET
     ? ['https://tokens.pancakeswap.finance/pancakeswap-extended.json']
     : networkInfo.chainId === ChainId.AVAXMAINNET
-    ? ['https://raw.githubusercontent.com/pangolindex/tokenlists/main/ab.tokenlist.json']
+    ? ['https://raw.githubusercontent.com/pangolindex/tokenlists/main/pangolin.tokenlist.json']
     : networkInfo.chainId === ChainId.FANTOM
     ? ['https://raw.githubusercontent.com/SpookySwap/spooky-info/master/src/constants/token/spookyswap.json']
     : ['https://gateway.ipfs.io/ipns/tokens.uniswap.org']

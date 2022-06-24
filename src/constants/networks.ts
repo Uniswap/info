@@ -364,7 +364,7 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     urlKey: 'aurora',
     dmmSwapUrl: 'https://kyberswap.com/',
     subgraphName: 'piavgh/dmm-exchange-aurora',
-    subgraphUrls: ['https://aurora-graph.kyberengineering.io/subgraphs/name/kybernetwork/kyberswap-exchange-aurora'],
+    subgraphUrls: ['https://api.thegraph.com/subgraphs/name/kybernetwork/kyberswap-exchange-aurora'],
     subgraphBlockUrl: 'https://aurora-graph.kyberengineering.io/subgraphs/name/kybernetwork/aurora-blocks',
     etherscanUrl: 'https://aurorascan.dev',
     kncAddress: '0xfe56d5892bdffc7bf58f2e84be1b2c32d21c308b',

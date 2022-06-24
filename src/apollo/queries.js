@@ -782,7 +782,7 @@ export const PAIR_DATA = (pairAddress, block) => {
   const queryString = `
     ${PairFields}
     query pairs {
-      pairs(${block ? `block: {number: ${block}}` : ``} where: { id: "${pairAddress}"} ) {
+      pairs(${block ? `block: {number: ${block}}` : ``} where: { id: "${pairAddress.toLowerCase()}"} ) {
         ...PairFields
       }
     }`
@@ -793,7 +793,7 @@ export const POOL_DATA = (poolAddress, block) => {
   const queryString = `
     ${PoolFields}
     query pools {
-      pools(${block ? `block: {number: ${block}}` : ``} where: { id: "${poolAddress}"} ) {
+      pools(${block ? `block: {number: ${block}}` : ``} where: { id: "${poolAddress.toLowerCase()}"} ) {
         ...PoolFields
       }
     }`
@@ -804,7 +804,7 @@ export const PAIR_POOLS_DATA = (pairAddress, block) => {
   const queryString = `
     ${PoolFields}
     query pools {
-      pools(${block ? `block: {number: ${block}}` : ``} where: { pair: "${pairAddress}"} ) {
+      pools(${block ? `block: {number: ${block}}` : ``} where: { pair: "${pairAddress.toLowerCase()}"} ) {
         ...PoolFields
       }
     }`
@@ -832,7 +832,7 @@ export const POOLS_BULK = gql`
 export const PAIRS_HISTORICAL_BULK = (block, pairs) => {
   let pairsString = `[`
   pairs.map(pair => {
-    return (pairsString += `"${pair}"`)
+    return (pairsString += `"${pair.toLowerCase()}"`)
   })
   pairsString += ']'
   let queryString = `
@@ -854,7 +854,7 @@ export const PAIRS_HISTORICAL_BULK = (block, pairs) => {
 export const POOLS_HISTORICAL_BULK = (block, pools) => {
   let poolsString = `[`
   pools.map(pool => {
-    return (poolsString += `"${pool}"`)
+    return (poolsString += `"${pool.toLowerCase()}"`)
   })
   poolsString += ']'
   let queryString = `
@@ -940,13 +940,13 @@ export const TOKEN_DATA = (tokenAddress, block) => {
   const queryString = `
     ${TokenFields}
     query tokens {
-      tokens(${block ? `block : {number: ${block}}` : ``} where: {id:"${tokenAddress}"}) {
+      tokens(${block ? `block : {number: ${block}}` : ``} where: {id:"${tokenAddress.toLowerCase()}"}) {
         ...TokenFields
       }
-      pairs0: pairs(where: {token0: "${tokenAddress}"}, first: 50, orderBy: reserveUSD, orderDirection: desc){
+      pairs0: pairs(where: {token0: "${tokenAddress.toLowerCase()}"}, first: 50, orderBy: reserveUSD, orderDirection: desc){
         id
       }
-      pairs1: pairs(where: {token1: "${tokenAddress}"}, first: 50, orderBy: reserveUSD, orderDirection: desc){
+      pairs1: pairs(where: {token1: "${tokenAddress.toLowerCase()}"}, first: 50, orderBy: reserveUSD, orderDirection: desc){
         id
       }
     }

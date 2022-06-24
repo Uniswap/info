@@ -308,7 +308,7 @@ const getPoolTransactions = async (client, poolAddress) => {
     let result = await client.query({
       query: FILTERED_TRANSACTIONS_POOL,
       variables: {
-        allPools: [poolAddress],
+        allPools: [poolAddress?.toLowerCase() || ''],
       },
       fetchPolicy: 'no-cache',
     })
@@ -335,7 +335,7 @@ const getPoolChartData = async (client, poolAddress) => {
       let result = await client.query({
         query: POOL_CHART,
         variables: {
-          poolAddress: poolAddress,
+          poolAddress: poolAddress?.toLowerCase() || '',
           skip,
         },
         fetchPolicy: 'cache-first',
@@ -422,7 +422,7 @@ const getHourlyRateData = async (client, poolAddress, startTime, latestBlock, fr
       })
     }
 
-    const result = await splitQuery(HOURLY_POOL_RATES, client, [poolAddress], blocks, 100)
+    const result = await splitQuery(HOURLY_POOL_RATES, client, [poolAddress?.toLowerCase() || ''], blocks, 100)
 
     // format token ETH price results
     let values = []
