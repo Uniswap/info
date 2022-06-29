@@ -9,6 +9,7 @@ import BitTorrent from '../assets/networks/bittorrent-network.png'
 import Velas from '../assets/networks/velas-network.png'
 import Aurora from '../assets/networks/aurora-network.svg'
 import Oasis from '../assets/networks/oasis-network.svg'
+import Optimism from '../assets/networks/optimism-network.svg'
 
 import EthereumLogo from '../assets/eth.png'
 import MaticLogo from '../assets/polygon.png'
@@ -39,6 +40,7 @@ export enum ChainId {
   VELAS = 106,
   AURORA = 1313161554,
   OASIS = 42262,
+  OPTIMISM = 10,
 }
 
 export type NETWORK_INFO = {
@@ -394,5 +396,24 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     nativeTokenLogo: OasisLogo,
     etherscanLinkText: 'Oasis Emerald Explorer',
     tokensListUrl: 'https://raw.githubusercontent.com/KyberNetwork/ks-assets/main/tokenLists/oasis.tokenlist.json',
+  },
+  [ChainId.OPTIMISM]: {
+    chainId: ChainId.OPTIMISM,
+    icon: Optimism,
+    name: 'Optimism',
+    urlKey: 'optimism',
+    dmmSwapUrl: 'https://kyberswap.com/',
+    subgraphName: 'kybernetwork/kyberswap-exchange-optimism',
+    subgraphUrls: ['https://api.thegraph.com/subgraphs/name/kybernetwork/kyberswap-exchange-optimism'],
+    subgraphBlockUrl: 'https://api.thegraph.com/subgraphs/name/ianlapham/uni-testing-subgraph',
+    etherscanUrl: 'https://optimistic.etherscan.io',
+    kncAddress: '',
+    wethAddress: '0x4200000000000000000000000000000000000006',
+    defaultStartTime: 1655341071,
+    nativeTokenSymbol: 'ETH',
+    nativeTokenWrappedName: 'ETH (Wrapped)',
+    nativeTokenLogo: EthereumLogo,
+    etherscanLinkText: 'Optimistic Ethereum Explorer',
+    tokensListUrl: 'https://raw.githubusercontent.com/KyberNetwork/ks-assets/main/tokenLists/optimism.tokenlist.json',
   },
 }

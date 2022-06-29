@@ -155,6 +155,7 @@ export default function TokenLogo({ address, networkInfo, header = false, size =
     case ChainId.VELAS:
     case ChainId.AURORA:
     case ChainId.OASIS:
+    case ChainId.OPTIMISM:
       path = 'error'
       break
 
