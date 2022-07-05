@@ -619,7 +619,7 @@ export function useTokenData(tokenAddress) {
 
   useEffect(() => {
     let cancelled = false
-    if (!tokenData && !error) {
+    if (!tokenData?.id && !error) {
       if (!isAddress(tokenAddress)) setError(true)
       else if (ethPrice && ethPriceOld) {
         memoRequest(

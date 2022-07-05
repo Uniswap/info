@@ -637,7 +637,7 @@ export function usePairData(pairAddress) {
       }
     }
 
-    if (!pairData && !error) {
+    if (!pairData?.id && !error) {
       if (isAddress(pairAddress?.split?.('_')[0]) && isAddress(pairAddress?.split?.('_')[1])) {
         if (pairAddress && ethPrice) {
           memoRequest(fetchData, 'usePairData_' + networkInfo.chainId + '_' + ethPrice + '_' + pairAddress, 10000)
