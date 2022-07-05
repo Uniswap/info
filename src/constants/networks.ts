@@ -149,11 +149,8 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     name: 'BNB Chain',
     urlKey: 'bnb',
     dmmSwapUrl: 'https://kyberswap.com/',
-    subgraphName: 'dynamic-amm/dmm-exchange-bsc',
-    subgraphUrls: [
-      'https://api.thegraph.com/subgraphs/name/dynamic-amm/dmm-exchange-bsc',
-      'https://bsc-subgraph.dmm.exchange/subgraphs/name/dynamic-amm/dmm-exchange-bsc',
-    ],
+    subgraphName: 'kybernetwork/kyberswap-exchange-bsc',
+    subgraphUrls: ['https://api.thegraph.com/subgraphs/name/kybernetwork/kyberswap-exchange-bsc'],
     subgraphBlockUrl: 'https://api.thegraph.com/subgraphs/name/dynamic-amm/ethereum-blocks-bsc',
     etherscanUrl: 'https://bscscan.com',
     kncAddress: '0xfe56d5892bdffc7bf58f2e84be1b2c32d21c308b',
