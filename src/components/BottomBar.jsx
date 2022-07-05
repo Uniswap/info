@@ -87,13 +87,6 @@ function BottomBar() {
       <div>
         <SwitchNetworkButton />
       </div>
-      <Flex alignItems='center' color={theme.subText} fontSize='10px'>
-        <PollingDot />
-        <a href='/'>
-          Updated {!!seconds ? seconds + 's' : '-'} ago <br />
-        </a>
-      </Flex>
-
       <ButtonEmpty style={{ background: theme.buttonBlack, borderRadius: '8px', padding: '6px' }} onClick={toggleMenuModal}>
         <Menu color={theme.text} />
       </ButtonEmpty>

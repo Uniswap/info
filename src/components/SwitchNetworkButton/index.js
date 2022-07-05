@@ -53,9 +53,9 @@ const SwitchNetworkButton = () => {
           alt='Network Icon'
           style={{ maxWidth: '24px', maxHeight: '24px' }}
         />
-        {!below576 && <NetworkLabel>{networksInfo[1] ? 'All Chains' : networksInfo[0].name}</NetworkLabel>}
+        <NetworkLabel>{networksInfo[1] ? 'All Chains' : networksInfo[0].name}</NetworkLabel>
       </NetworkWrapper>
-      <img src={SwitchNetworkIcon} alt='Switch Network Icon' style={{ width: '20px', maxHeight: '20px' }} />
+      <img src={SwitchNetworkIcon} alt='Switch Network Icon' style={{ width: '20px', maxHeight: '20px', marginLeft: '8px' }} />
     </ButtonWrapper>
   )
 }
