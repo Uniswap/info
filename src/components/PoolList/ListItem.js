@@ -168,7 +168,7 @@ export const ItemCard = ({ pool }) => {
           <DataText>{formattedNum(amp.toPrecision(5))}</DataText>
         </GridItem>
         <GridItem noBorder>
-          <DataTitle>APY</DataTitle>
+          <DataTitle>APR</DataTitle>
           <DataText>{oneYearFL < MAX_ALLOW_APY ? `${oneYearFL}%` : '--'} </DataText>
         </GridItem>
       </StyledItemCard>
