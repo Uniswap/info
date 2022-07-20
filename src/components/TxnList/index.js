@@ -183,6 +183,7 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
   // parse the txns and format for UI
   useEffect(() => {
     if (transactions && transactions.mints && transactions.burns && transactions.swaps) {
+      console.log("transactions", transactions);
       let newTxns = []
       if (transactions.mints.length > 0) {
         transactions.mints.map((mint) => {

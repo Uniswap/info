@@ -4,7 +4,7 @@ import { HttpLink } from 'apollo-link-http'
 
 export const v2client = new ApolloClient({
   link: new HttpLink({
-    uri: 'http://localhost:3000/graphql',
+    uri: 'http://graphqlbackendkafka-env.eba-td22di2h.us-east-1.elasticbeanstalk.com/graphql',
   }),
   cache: new InMemoryCache(),
   shouldBatch: true,

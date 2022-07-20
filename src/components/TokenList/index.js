@@ -304,6 +304,7 @@ function TopTokenList({ tokens, itemMax = 10, useTracked = false }) {
       <List p={0}>
         {filteredList &&
           filteredList.map((item, index) => {
+            console.log("itemitemitem", item);
             return (
               <div key={index}>
                 <ListItem key={index} index={(page - 1) * itemMax + index + 1} item={item} />

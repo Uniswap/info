@@ -32,8 +32,9 @@ const UPDATE_ALL_TOKENS_IN_UNISWAP = 'UPDATE_ALL_TOKENS_IN_UNISWAP'
 const UPDATE_TOP_LPS = 'UPDATE_TOP_LPS'
 
 const offsetVolumes = [
-  'f229b8aa1bc676217429e1a0c325e52b33762a87d6e236fbca70f904fe435166',
-  '6603c25b9abcac478c0c2d0201b161f3bb0a498185aa771c6ce06e26f345dfc1',
+  'afcaa550ebb63266fb2752b58ecd7e8fcd78e0a75777ecd57045213a013d9813',
+  '03e3e09b28dc4d41a4507b38073e7a1641becc0b40e79beb72733d2fb022defa',
+  "bdcd8c9844cd2f98c81b3f98ce806f20c5a625f954d7b29bf70626fef060ff1f",
   // '6603c25b9abcac478c0c2d0201b161f3bb0a498185aa771c6ce06e26f345dfc1',
   // '0x05934eba98486693aaec2d00b0e9ce918e37dc3f',
   // '0x3d7e683fc9c86b4d653c9e47ca12517440fad14e',
@@ -343,7 +344,7 @@ const getChartData = async (oldestDateToFetch, offsetData) => {
       let result = await v2client.query({
         query: GLOBAL_CHART,
         variables: {
-          startTime: date,
+          startTime: oldestDateToFetch,
           skip,
         },
         fetchPolicy: 'cache-first',
@@ -493,12 +494,12 @@ const getEthPrice = async () => {
       query: ETH_PRICE(),
       fetchPolicy: 'cache-first',
     })
-    // console.log("ETH_PRICE", result);
+    console.log("ETH_PRICE", result);
     let resultOneDay = await v2client.query({
       query: ETH_PRICE(oneDayBlock),
       fetchPolicy: 'cache-first',
     })
-    // console.log("ETH_PRICE2", resultOneDay);
+    console.log("ETH_PRICE2", resultOneDay);
     const currentPrice = result?.data?.bundle?.ethPrice
     const oneDayBackPrice = resultOneDay?.data?.bundle?.ethPrice
     // console.log("currentPrice", currentPrice);

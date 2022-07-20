@@ -41,12 +41,12 @@ export function getPoolLink(token0Address, token1Address = null, remove = false)
   if (!token1Address) {
     return (
       `https://app.casperswap.xyz/` +
-      (remove ? `pool/removeLiquidity${token0Address === '861312332a373618c94ce01022ed02370e792c4a7fac356f8c2df05514ee2cd7' ? token0Address : token0Address}/${'CSPR'}` : `pool/addLiquidity`)
+      (remove ? `pool/removeLiquidity${token0Address === 'afcaa550ebb63266fb2752b58ecd7e8fcd78e0a75777ecd57045213a013d9813' ? token0Address : token0Address}/${'CSPR'}` : `pool/addLiquidity`)
     )
   } else {
     return (
       `https://app.casperswap.xyz/` +
-      (remove ? `pool/removeLiquidity/${token0Address === '861312332a373618c94ce01022ed02370e792c4a7fac356f8c2df05514ee2cd7' ? token0Address : token0Address}/${token1Address === '861312332a373618c94ce01022ed02370e792c4a7fac356f8c2df05514ee2cd7' ? token1Address : token1Address
+      (remove ? `pool/removeLiquidity/${token0Address === 'afcaa550ebb63266fb2752b58ecd7e8fcd78e0a75777ecd57045213a013d9813' ? token0Address : token0Address}/${token1Address === 'afcaa550ebb63266fb2752b58ecd7e8fcd78e0a75777ecd57045213a013d9813' ? token1Address : token1Address
         }` : `pool/addLiquidity`)
     )
   }

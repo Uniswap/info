@@ -235,7 +235,7 @@ const getTopTokens = async (ethPrice, ethPriceOld) => {
     console.log("currentDate", currentDate);
     console.log("utcOneDayBack", utcOneDayBack);
     console.log("utcTwoDaysBack", utcTwoDaysBack);
-    const date = "1654080255";
+    const date = "1656335816";
     // console.log(date);
     // let tokenids = await client.query({
     //   query: TOKEN_TOP_DAY_DATAS,
@@ -245,7 +245,7 @@ const getTopTokens = async (ethPrice, ethPriceOld) => {
     let tokenids2 = await v2client.query({
       query: TOKEN_TOP_DAY_DATAS,
       fetchPolicy: 'network-only',
-      variables: { date: date },
+      variables: { date: currentDate },
     })
 
     // console.log("tokenids", tokenids);
@@ -364,10 +364,11 @@ const getTopTokens = async (ethPrice, ethPriceOld) => {
           token0: data,
         })
 
+        console.log("datadatadata", data);
         // HOTFIX for Aave
-        if (data.id === 'f229b8aa1bc676217429e1a0c325e52b33762a87d6e236fbca70f904fe435166') {
+        if (data.id === 'afcaa550ebb63266fb2752b58ecd7e8fcd78e0a75777ecd57045213a013d9813') {
           const aaveData = await v2client.query({
-            query: PAIR_DATA('f2bb3e09a818cf19e4f71d785cb2979c59b27a94c0a6708aea9ea5ea846404da'),
+            query: PAIR_DATA('cb0f9f291ae73928b739c90c03eca70cd610d945304ea606fe4adced3fa07060'),
             fetchPolicy: 'cache-first',
           })
           console.log("aaveData", aaveData);
@@ -505,13 +506,14 @@ const getTokenData = async (address, ethPrice, ethPriceOld) => {
     })
 
     // HOTFIX for Aave
-    if (data.id === 'f229b8aa1bc676217429e1a0c325e52b33762a87d6e236fbca70f904fe435166') {
+    console.log("datadatadata", data);
+    if (data.id === 'afcaa550ebb63266fb2752b58ecd7e8fcd78e0a75777ecd57045213a013d9813') {
       const aaveData = await v2client.query({
-        query: PAIR_DATA('f2bb3e09a818cf19e4f71d785cb2979c59b27a94c0a6708aea9ea5ea846404da'),
+        query: PAIR_DATA('cb0f9f291ae73928b739c90c03eca70cd610d945304ea606fe4adced3fa07060'),
         fetchPolicy: 'cache-first',
       })
       const result = aaveData.data.pairbyId[0]
-      // console.log("result", result);
+      console.log("resultttttttttttttttttttt", result);
       data.totalLiquidityUSD = parseFloat(result.reserveUSD) / 2
       data.liquidityChangeUSD = 0
       data.priceChangeUSD = 0
