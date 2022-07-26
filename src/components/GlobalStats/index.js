@@ -9,6 +9,7 @@ import { ButtonEmpty } from '../ButtonStyled'
 import { Loader } from 'react-feather'
 import { useMedia } from 'react-use'
 import { aggregateGlobalData } from '../../utils/aggregateData'
+import QuestionHelper from '../QuestionHelper'
 
 const Stats = styled.div`
   border: 1px solid ${({ theme }) => theme.border};
@@ -47,9 +48,12 @@ export default function GlobalStats() {
     <Flex sx={{ gap: above800 ? '32px' : '16px' }} flexDirection={above800 ? 'row' : 'column'}>
       <Stats>
         <Flex alignItems='center' justifyContent='space-between'>
-          <Text color={theme.subText} fontSize='12px'>
-            Trading Volume
-          </Text>
+          <Flex alignItems='center' justifyContent='space-between'>
+            <Text color={theme.subText} fontSize='12px'>
+              Trading Volume
+            </Text>
+            <QuestionHelper text={'Total Trading volume through our aggregator on all chains'} />
+          </Flex>
 
           <Flex sx={{ gap: '4px' }}>
             <ButtonEmpty sx={{ padding: '0 !important' }} onClick={() => setTradingVolumeType('ALL')} border='none'>
