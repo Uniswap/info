@@ -17,7 +17,7 @@ const ModalContentWrapper = styled.div`
   align-items: flex-start;
   padding: 30px 22px 28px 24px;
   width: 100%;
-  background-color: ${({ theme }) => theme.bg6};
+  background-color: ${({ theme }) => theme.background};
 `
 
 const NetworkList = styled.div`

@@ -76,10 +76,10 @@ const WarningWrapper = styled.div`
 `
 
 const WarningBanner = styled.div`
-  border: 1px solid ${({ theme }) => theme.warningBorder};
-  background: ${({ theme }) => theme.warningBackground};
+  border-bottom: 1px solid ${({ theme }) => theme.border};
+  background: ${({ theme }) => theme.buttonBlack};
   padding: 1.5rem 2.5rem;
-  color: ${({ theme }) => theme.warningTextColor};
+  color: ${({ theme }) => theme.subText};
   width: 100%;
   text-align: center;
   font-weight: 500;

@@ -19,12 +19,6 @@ const Stats = styled.div`
   flex: 1;
 `
 
-const Divider = styled.div`
-  background: ${({ theme }) => theme.border}
-  width: 1px;
-  height: 100%;
-`
-
 const Separator = styled.span`
   user-select: none;
   font-size: 12px;
@@ -38,7 +32,6 @@ export default function GlobalStats() {
   const oneDayFees = oneDayFeeUSD ? formattedNum(oneDayFeeUSD, true) : ''
   const theme = useTheme()
   const aggregatorVolume = useAggregatorVolume()
-  const above768 = useMedia('(min-width: 768px)')
   const above800 = useMedia('(min-width: 800px)')
 
   // ALL || 24H
@@ -90,7 +83,7 @@ export default function GlobalStats() {
           <Text fontSize='18px' fontWeight='500'>
             {oneDayFees}
           </Text>
-          <Text fontSize='12px' color={oneDayFeeChange > 0 ? 'green' : theme.red1}>
+          <Text fontSize='12px' color={oneDayFeeChange > 0 ? theme.primary : theme.red1}>
             {oneDayFeeChange ? oneDayFeeChange.toFixed(2) : '-'}%
           </Text>
         </Flex>
@@ -103,7 +96,7 @@ export default function GlobalStats() {
           <Text fontSize='18px' fontWeight='500'>
             {localNumber(oneDayTxns)}
           </Text>
-          <Text fontSize='12px' color={txnChange > 0 ? 'green' : theme.red1}>
+          <Text fontSize='12px' color={txnChange > 0 ? theme.primary : theme.red1}>
             {txnChange ? txnChange.toFixed(2) : '-'}%
           </Text>
         </Flex>

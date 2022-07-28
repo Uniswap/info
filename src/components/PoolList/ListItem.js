@@ -14,6 +14,7 @@ import { MAX_ALLOW_APY } from '../../constants'
 import useTheme from '../../hooks/useTheme'
 import { useNetworksInfo } from '../../contexts/NetworkInfo'
 import { useParams } from 'react-router-dom'
+import { rgba } from 'polished'
 
 const TableRow = styled.div`
   display: grid;
@@ -26,7 +27,7 @@ const TableRow = styled.div`
   height: fit-content;
   position: relative;
   opacity: ${({ fade }) => (fade ? '0.6' : '1')};
-  background-color: ${({ theme, oddRow }) => (oddRow ? theme.oddRow : theme.evenRow)};
+  background-color: ${({ theme, oddRow }) => (oddRow ? theme.background : rgba(theme.tableHeader, 0.6))};
   border: 1px solid transparent;
 
   &:hover {

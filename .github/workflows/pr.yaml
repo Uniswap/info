@@ -1,0 +1,132 @@
+name: "Auto Deploy PR"
+
+concurrency:
+  group: pr-workflow-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+
+env:
+  SERVICE: dmm-info
+
+jobs:
+  prepare:
+    runs-on: ubuntu-18.04
+    outputs:
+      current_branch: ${{ steps.current_branch.outputs.value }}
+      head_sha: ${{ github.event.pull_request.head.sha }}
+      image_name: "asia.gcr.io/kyber-operation/core/${{ env.SERVICE }}"
+      image_tag: ${{ steps.get_tag.outputs.image_tag }}
+      repository: ${{ github.repository	}}
+      pr_number: ${{github.event.number}}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Extract branch
+        shell: bash
+        id: current_branch
+        run: |
+          if [[ ! "${{ github.ref }}"  = "refs/tags/"* ]]; then
+            if [[ "${{ github.event_name }}" = "pull_request" ]]; then
+              HEAD_REF=$(printf "%q" "${{ github.head_ref }}")
+              HEAD_REF=${HEAD_REF/refs\/heads\//}
+              BRANCH=$HEAD_REF
+            else
+              REF=$(printf "%q" "${{ github.ref }}")
+              REF_BRANCH=${REF/refs\/pull\//}
+              REF_BRANCH=${REF_BRANCH/refs\/heads\//}
+              BRANCH=$REF_BRANCH
+            fi
+          else
+            REF=$(printf "%q" "${{ github.ref }}")
+            REF_BRANCH=${REF/refs\/tags\//}
+            BRANCH=$REF_BRANCH
+          fi
+          echo "::set-output name=value::$BRANCH"
+
+      - name: Extract GitHub HEAD SHA
+        id: head_sha
+        run: echo "::set-output name=value::$(git rev-parse HEAD)"
+
+      - name: Get Docker image tag
+        id: get_tag
+        env:
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+            short_sha="$(echo $HEAD_SHA | head -c7)"
+            echo "::set-output name=image_tag::adpr-$short_sha"
+
+  build:
+    runs-on: ubuntu-18.04
+    needs:
+      - prepare
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js 16.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16.x
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@master
+
+      - name: Gcloud Auth
+        uses: google-github-actions/auth@v0
+        with:
+          credentials_json: '${{ secrets.GCR_CREDENTIALS }}'
+
+      - name: Setup Gcloud SDK
+        uses: google-github-actions/setup-gcloud@v0
+
+      - name: Configure docker
+        run: gcloud auth configure-docker
+
+      - name: Cache Docker layers
+        uses: actions/cache@v2
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-${{ env.SERVICE }}-buildx
+
+      - name: Restore node_modules
+        uses: actions/cache@v2
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Install dependences
+        uses: bahmutov/npm-install@HEAD
+
+      - name: Yarn Build
+        env:
+          CI: false
+          REACT_APP_VERSION: ${{ github.sha }}
+          CURRENT_BRANCH: ${{ needs.prepare.outputs.current_branch }}
+        run: yarn build
+
+      - name: Docker build and push
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          labels: |
+            kyber.network.schema-version=1.0
+            kyber.network.vcs-ref=${{ github.sha }}
+            kyber.network.version=${{ needs.prepare.outputs.image_tag }}
+            kyber.network.name=${{ env.SERVICE }}
+          tags: |
+            ${{ needs.prepare.outputs.image_name }}:${{ needs.prepare.outputs.image_tag }}
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache-new
+
+      - name: Move Docker cache
+        run: |
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache

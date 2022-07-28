@@ -23,7 +23,7 @@ const TableHeader = styled.div`
   height: fit-content;
   position: relative;
   opacity: ${({ fade }) => (fade ? '0.6' : '1')};
-  background-color: ${({ theme }) => theme.evenRow};
+  background-color: ${({ theme }) => theme.tableHeader};
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
 `
@@ -31,7 +31,7 @@ const TableHeader = styled.div`
 const ClickableText = styled(Text)`
   display: flex;
   align-items: center;
-  color: ${({ theme }) => theme.text6};
+  color: ${({ theme }) => theme.subText};
   &:hover {
     cursor: pointer;
     opacity: 0.6;
@@ -44,7 +44,7 @@ const LoadMoreButtonContainer = styled.div`
   width: 100%;
   display: flex;
   justify-content: center;
-  background-color: ${({ theme }) => theme.oddRow};
+  background-color: ${({ theme }) => theme.background};
   font-size: 12px;
   border-bottom-left-radius: 8px;
   border-bottom-right-radius: 8px;

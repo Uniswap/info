@@ -13,7 +13,7 @@ const InfoWrapper = styled.div`
   outline: none;
   cursor: default;
   border-radius: 36px;
-  color: ${({ theme }) => theme.text6};
+  color: ${({ theme }) => theme.subText};
 
   :hover,
   :focus {

@@ -62,7 +62,6 @@ const theme = (darkMode, color) => ({
   bg3: darkMode ? '#40444F' : '#EDEEF2',
   bg4: darkMode ? '#565A69' : '#CED0D9',
   bg5: darkMode ? '#565A69' : '#888D9B',
-  bg6: darkMode ? '#243036' : '#FFFFFF',
   bg7: darkMode ? '#303e46' : '#FFFFFF',
   bg8: darkMode ? '#3e4b51' : '#E7E7E7',
 
@@ -92,12 +91,12 @@ const theme = (darkMode, color) => ({
   // border: darkMode ? '#4c5f69' : '#859aa5',
 
   // table colors
-  tableHeader: darkMode ? '#303E46' : '#F9F9F9',
+  tableHeader: darkMode ? '#313131' : '#FBFBFB',
   oddRow: darkMode ? '#283339' : '#f4f4f4',
   evenRow: darkMode ? '#303e46' : '#F9F9F9',
 
   // other
-  red1: '#FF537B',
+  red1: '#ff537b',
   green1: '#31CB9E',
   yellow1: '#FFE270',
   yellow2: '#F3841E',
@@ -109,12 +108,14 @@ const theme = (darkMode, color) => ({
   warningBorder: darkMode ? '#303e46' : '#ffaf01',
   warningTextColor: darkMode ? '#859aa5' : '#1d272b',
 
-  buttonBlack: darkMode ? '#11171A' : '#F5F5F5',
-  background: darkMode ? '#243036' : '#FFFFFF',
-  text: darkMode ? '#FFFFFF' : '#3A3A3A',
-  textReverse: !darkMode ? '#FFFFFF' : '#3A3A3A',
-  subText: darkMode ? '#A7B6BD' : '#5C6468',
-  border: darkMode ? '#40505A' : '#E9E9E9',
+  buttonBlack: darkMode ? '#0F0F0F' : '#f5f5f5',
+  background: darkMode ? '#1C1C1C' : '#FFFFFF',
+
+  text: darkMode ? '#ffffff' : '#222222',
+  textReverse: darkMode ? '#222222' : '#ffffff',
+  subText: darkMode ? '#A9A9A9' : '#5E5E5E',
+
+  border: darkMode ? '#505050' : '#C1C1C1',
 
   // media queries
   mediaWidth: mediaWidthTemplates,
@@ -223,7 +224,7 @@ export const GlobalStyle = createGlobalStyle`
     width: 100%;
     height: 100%;
     font-size: 14px;
-    background-color: ${({ theme }) => theme.bg6};
+    background-color: ${({ theme }) => theme.background};
   }
 
   a {

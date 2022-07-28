@@ -1,0 +1,10 @@
+adpr:
+  image:
+    repository: asia.gcr.io/kyber-operation/core/dmm-info
+    tagPrefix: adpr
+  workflow:
+    name: "Auto Deploy PR"
+    ignoreCase: true
+
+container:
+  port: 80
