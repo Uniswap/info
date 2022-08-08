@@ -113,10 +113,7 @@ export default function NetworkModal() {
   const history = useHistory()
   const { network: currentNetworkURL } = useParams()
   const [tab, setTab] = useState('Classic')
-  const networkListToShow = [...NetworksInfoEnv]
-  if (tab === 'Classic')
-    //todo namgold: remove above if line
-    networkListToShow.unshift({ name: 'All Chains', icon: Kyber })
+  const networkListToShow = [{ name: 'All Chains', icon: Kyber }, ...NetworksInfoEnv]
 
   return (
     <Modal isOpen={networkModalOpen} onDismiss={toggleNetworkModal} maxWidth='624px'>
@@ -133,7 +130,7 @@ export default function NetworkModal() {
         </TabWrapper>
 
         <NetworkList>
-          {networkListToShow.map((network, index) => {
+          {networkListToShow.map(network => {
             const selected =
               (networksInfo[1] && network.name === 'All Chains') ||
               (!networksInfo[1] && networksInfo[0].chainId === network.chainId)
@@ -153,8 +150,6 @@ export default function NetworkModal() {
                 currentUrl = 'tokens'
                 break
               case 'pair':
-                currentUrl = 'pairs'
-                break
               case 'pool':
                 currentUrl = 'pairs'
                 break
