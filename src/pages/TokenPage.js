@@ -31,7 +31,6 @@ import { PlusCircle, Bookmark, AlertCircle } from 'react-feather'
 import FormattedName from '../components/FormattedName'
 import { useListedTokens } from '../contexts/Application'
 import HoverText from '../components/HoverText'
-import { UNTRACKED_COPY, TOKEN_BLACKLIST, BLOCKED_WARNINGS } from '../constants'
 import QuestionHelper from '../components/QuestionHelper'
 import Checkbox from '../components/Checkbox'
 import { shortenAddress } from '../utils'
@@ -170,23 +169,6 @@ function TokenPage({ address, history }) {
   }, [])
 
   const [useTracked, setUseTracked] = useState(true)
-
-  if (TOKEN_BLACKLIST.includes(address)) {
-    return (
-      <BlockedWrapper>
-        <BlockedMessageWrapper>
-          <AutoColumn gap="1rem" justify="center">
-            <TYPE.light style={{ textAlign: 'center' }}>
-              {BLOCKED_WARNINGS[address] ?? `This token is not supported.`}
-            </TYPE.light>
-            <Link external={true} href={'https://etherscan.io/address/' + address}>{`More about ${shortenAddress(
-              address
-            )}`}</Link>
-          </AutoColumn>
-        </BlockedMessageWrapper>
-      </BlockedWrapper>
-    )
-  }
 
   return (
     <PageWrapper>
