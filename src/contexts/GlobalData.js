@@ -289,7 +289,7 @@ const getChartData = async (client, oldestDateToFetch) => {
       }
     }
 
-    if (data) {
+    if (data.length) {
       let dayIndexSet = new Set()
       let dayIndexArray = []
       const oneDay = 24 * 60 * 60
