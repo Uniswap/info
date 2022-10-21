@@ -18,7 +18,7 @@ import { MAX_ALLOW_APY } from '../../constants'
 import { NETWORKS_INFO } from '../../constants/networks'
 import { aggregatePairs } from '../../utils/aggregateData'
 import { MouseoverTooltip } from '../Tooltip'
-import { NetworksInfoEnv, useNetworksInfo, useTokensList } from '../../contexts/NetworkInfo'
+import { NetworksInfoEnv, useNetworksInfo } from '../../contexts/NetworkInfo'
 
 dayjs.extend(utc)
 
@@ -151,8 +151,6 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 5 }) {
   const below600 = useMedia('(max-width: 600px)')
   const below740 = useMedia('(max-width: 740px)')
   const below1080 = useMedia('(max-width: 1080px)')
-  let tokensLists = useTokensList() // please do not remove this line. It helps DoubleTokenLogo reload
-  tokensLists = tokensLists || 2
 
   // pagination
   const [page, setPage] = useState(1)

@@ -16,6 +16,7 @@ import weekOfYear from 'dayjs/plugin/weekOfYear'
 import { useAllPoolData } from './PoolData'
 import { useNetworksInfo } from './NetworkInfo'
 import { calculateValuesOnGlobalData } from '../utils/aggregateData'
+import { stringify } from 'querystring'
 const UPDATE = 'UPDATE'
 const UPDATE_TXNS = 'UPDATE_TXNS'
 const UPDATE_CHART = 'UPDATE_CHART'
@@ -24,6 +25,7 @@ const ETH_PRICE_KEY = 'ETH_PRICE_KEY'
 const UPDATE_ALL_PAIRS_IN_KYBERSWAP = 'UPDATE_ALL_PAIRS_IN_KYBERSWAP'
 const UPDATE_ALL_TOKENS_IN_KYBERSWAP = 'UPDATE_ALL_TOKENS_IN_KYBERSWAP'
 const UPDATE_TOP_LPS = 'UPDATE_TOP_LPS'
+const UPDATE_WHITELIST_TOKEN_MAP = 'UPDATE_WHITELIST_TOKEN_MAP'
 
 // format dayjs with the libraries that we need
 dayjs.extend(utc)
@@ -62,6 +64,11 @@ function reducer(state, { type, payload }) {
     case UPDATE_ALL_TOKENS_IN_KYBERSWAP: {
       const { allTokens, chainId } = payload
       return merge(state, { [chainId]: { allTokens } }, { arrayMerge: overwriteArrayMerge })
+    }
+
+    case UPDATE_WHITELIST_TOKEN_MAP: {
+      const { whitelistTokenMap, chainId } = payload
+      return merge(state, { [chainId]: { whitelistTokenMap } }, { arrayMerge: overwriteArrayMerge })
     }
 
     case UPDATE_TOP_LPS: {
@@ -138,6 +145,13 @@ export default function Provider({ children }) {
     })
   }, [])
 
+  const updateAllWhitelistToken = useCallback((whitelistTokenMap, chainId) => {
+    dispatch({
+      type: UPDATE_WHITELIST_TOKEN_MAP,
+      payload: { whitelistTokenMap, chainId },
+    })
+  }, [])
+
   const updateTopLps = useCallback((topLps, chainId) => {
     dispatch({
       type: UPDATE_TOP_LPS,
@@ -160,6 +174,7 @@ export default function Provider({ children }) {
             updateTopLps,
             updateAllPairsInKyberswap,
             updateAllTokensInKyberswap,
+            updateAllWhitelistToken,
           },
         ],
         [
@@ -171,6 +186,7 @@ export default function Provider({ children }) {
           updateEthPrice,
           updateAllPairsInKyberswap,
           updateAllTokensInKyberswap,
+          updateAllWhitelistToken,
         ]
       )}
     >
@@ -202,8 +218,6 @@ const mergeFactoriesData = factories => {
 async function getGlobalData(client, networksInfo) {
   // data for each day , historic data used for % changes
   let data = {}
-  let oneDayData = {}
-  let twoDayData = {}
 
   try {
     // get timestamps for the days
@@ -490,7 +504,10 @@ async function getAllTokensOnKyberswap(client) {
  */
 export function useGlobalData() {
   const exchangeSubgraphClient = useExchangeClients()
-  const [state, { update, updateAllPairsInKyberswap, updateAllTokensInKyberswap }] = useGlobalDataContext()
+  const [
+    state,
+    { update, updateAllPairsInKyberswap, updateAllTokensInKyberswap, updateAllWhitelistToken },
+  ] = useGlobalDataContext()
   const [ethPrice, oldEthPrice] = useEthPrice()
   const [networksInfo] = useNetworksInfo()
   const data = networksInfo.map(networkInfo => state?.[networkInfo.chainId]?.globalData)
@@ -500,11 +517,17 @@ export function useGlobalData() {
       let globalData = await getGlobalData(exchangeSubgraphClient[index], networksInfo[index])
       globalData && update(globalData, networksInfo[index].chainId)
 
-      let allPairs = await getAllPairsOnKyberswap(exchangeSubgraphClient[index])
+      const [allPairs, whitelistTokenMap, allTokens] = await Promise.all([
+        getAllPairsOnKyberswap(exchangeSubgraphClient[index]),
+        getWhitelistToken(networksInfo[index].chainId),
+        getAllTokensOnKyberswap(exchangeSubgraphClient[index]),
+      ])
+
       allPairs?.forEach(allPair => (allPair.chainId = networksInfo[index].chainId))
       updateAllPairsInKyberswap(allPairs, networksInfo[index].chainId)
 
-      let allTokens = await getAllTokensOnKyberswap(exchangeSubgraphClient[index])
+      updateAllWhitelistToken(whitelistTokenMap, networksInfo[index].chainId)
+
       allTokens?.forEach(allToken => (allToken.chainId = networksInfo[index].chainId))
       updateAllTokensInKyberswap(allTokens, networksInfo[index].chainId)
     }
@@ -523,6 +546,7 @@ export function useGlobalData() {
     updateAllTokensInKyberswap,
     exchangeSubgraphClient,
     networksInfo,
+    updateAllWhitelistToken,
   ])
 
   return data || []
@@ -640,6 +664,13 @@ export function useAllTokensInKyberswap() {
   return allTokens || []
 }
 
+export function useWhitelistTokensMap(chainId) {
+  const [state] = useGlobalDataContext()
+  const allTokens = state?.[chainId]?.whitelistTokenMap
+
+  return allTokens || {}
+}
+
 /**
  * Get the top liquidity positions based on USD size
  * @TODO Not a perfect lookup needs improvement
@@ -709,4 +740,39 @@ export function useTopLps() {
   })
 
   return topLps
+}
+
+function formatWhitelistToken(tokens) {
+  return tokens.reduce((tokenMap, token) => {
+    const address = token.address || ''
+    if (address) tokenMap[address] = token
+    return tokenMap
+  }, {})
+}
+
+// loop to fetch all whitelist token
+async function getWhitelistToken(chainId) {
+  let tokens = []
+  try {
+    const pageSize = 100
+    const maximumPage = 15
+    let page = 1
+    while (true) {
+      const { data } = await fetch(
+        `${process.env.REACT_APP_KS_SETTING_API}/v1/tokens?${stringify({
+          pageSize,
+          page,
+          isWhitelisted: true,
+          chainIds: chainId,
+        })}`
+      ).then(data => data.json())
+      page++
+      const tokensResponse = data.tokens ?? []
+      tokens = tokens.concat(tokensResponse)
+      if (tokensResponse.length < pageSize || page >= maximumPage) break // out of tokens, and prevent infinity loop
+    }
+  } catch (error) {
+    console.log(`Failed to fetch list token of chainId ${chainId}`)
+  }
+  return formatWhitelistToken(tokens)
 }

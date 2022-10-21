@@ -20,6 +20,7 @@ module.exports = {
     'no-unused-vars': 0,
     'no-extra-boolean-cast': 0,
     'no-inner-declarations': 0,
+    'no-constant-condition': 0,
   },
   overrides: [
     // typescript
