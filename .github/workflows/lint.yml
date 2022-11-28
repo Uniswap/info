@@ -4,9 +4,7 @@ on:
   push:
     branches:
       - v2
-  pull_request_target:
-    branches:
-      - v2
+  pull_request:
 
 jobs:
   run-linters:
@@ -20,7 +18,7 @@ jobs:
       - name: Set up node
         uses: actions/setup-node@v1
         with:
-          node-version: 12
+          node-version: 14
           always-auth: true
           registry-url: https://registry.npmjs.org
 
