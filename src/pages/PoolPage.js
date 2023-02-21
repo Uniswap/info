@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
+import usePrices from '../hooks/useTokensPrice'
 import { withRouter } from 'react-router-dom'
 import 'feather-icons'
 import { transparentize } from 'polished'
@@ -143,8 +144,12 @@ function PoolPage({ poolAddress, history }) {
     token0PriceMax,
     token1PriceMin,
     token1PriceMax,
+    oneDayVolumeToken0,
+    oneDayVolumeToken1,
   } = usePoolData(poolAddress)
   const [[networkInfo]] = useNetworksInfo()
+
+  const prices = usePrices([token0?.id, token1?.id].filter(Boolean))
 
   useEffect(() => {
     document.querySelector('body').scrollTo(0, 0)
@@ -152,11 +157,18 @@ function PoolPage({ poolAddress, history }) {
 
   const theme = useTheme()
 
-  const transactions = usePoolTransactions(poolAddress)
+  const transactions = usePoolTransactions(poolAddress, prices)
   const backgroundColor = theme.primary
 
+  const reserveUsingPriceService =
+    prices[0] && prices[1] ? prices[0] * parseFloat(reserve0 || '0') + prices[1] * parseFloat(reserve1 || '0') : 0
+
   // liquidity
-  const liquidity = reserveUSD ? formattedNum(reserveUSD, true) : '-'
+  const liquidity = reserveUsingPriceService
+    ? formattedNum(reserveUsingPriceService)
+    : reserveUSD
+    ? formattedNum(reserveUSD, true)
+    : '-'
   const liquidityChange = formattedPercent(liquidityChangeUSD)
 
   // mark if using untracked liquidity
@@ -166,12 +178,15 @@ function PoolPage({ poolAddress, history }) {
   }, [trackedReserveUSD])
 
   // volume	  // volume
-  const volume =
-    oneDayVolumeUSD || oneDayVolumeUSD === 0
-      ? formattedNum(oneDayVolumeUSD === 0 ? oneDayVolumeUntracked : oneDayVolumeUSD, true)
-      : oneDayVolumeUSD === 0
-      ? '$0'
-      : '-'
+  const usePriceService = prices[0] && prices[1] && oneDayVolumeToken0 && oneDayVolumeToken1
+
+  const volume = usePriceService
+    ? formattedNum((oneDayVolumeToken0 * prices[0] + oneDayVolumeToken1 * prices[1]) / 2, true)
+    : oneDayVolumeUSD || oneDayVolumeUSD === 0
+    ? formattedNum(oneDayVolumeUSD === 0 ? oneDayVolumeUntracked : oneDayVolumeUSD, true)
+    : oneDayVolumeUSD === 0
+    ? '$0'
+    : '-'
 
   // mark if using untracked volume
   const [usingUtVolume, setUsingUtVolume] = useState(false)
@@ -191,9 +206,18 @@ function PoolPage({ poolAddress, history }) {
 
   // token data for usd
   const [ethPrice] = useEthPrice()
-  const token0USD = token0?.derivedETH && ethPrice ? formattedNum(parseFloat(token0.derivedETH) * parseFloat(ethPrice), true) : ''
 
-  const token1USD = token1?.derivedETH && ethPrice ? formattedNum(parseFloat(token1.derivedETH) * parseFloat(ethPrice), true) : ''
+  const token0USD = prices[0]
+    ? formattedNum(prices[0], true)
+    : !error && token0?.derivedETH && ethPrice
+    ? formattedNum(parseFloat(token0.derivedETH) * parseFloat(ethPrice), true)
+    : ''
+
+  const token1USD = prices[1]
+    ? formattedNum(prices[1], true)
+    : !error && token1?.derivedETH && ethPrice
+    ? formattedNum(parseFloat(token1.derivedETH) * parseFloat(ethPrice), true)
+    : ''
 
   // rates
   const token0Rate = vReserve0 && vReserve1 ? formattedNum(vReserve1 / vReserve0) : '-'

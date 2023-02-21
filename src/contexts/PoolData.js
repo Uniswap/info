@@ -248,6 +248,8 @@ function parseData(data, oneDayData, twoDayData, oneWeekData, ethPrice, oneDayBl
     oneDayData?.volumeUSD ? oneDayData.volumeUSD : 0,
     twoDayData?.volumeUSD ? twoDayData.volumeUSD : 0
   )
+  data.oneDayVolumeToken0 = (parseFloat(data?.volumeToken0) || 0) - (parseFloat(oneDayData?.volumeToken0) || 0)
+  data.oneDayVolumeToken1 = (parseFloat(data?.volumeToken1) || 0) - (parseFloat(oneDayData?.volumeToken1) || 0)
 
   const [oneDayFeeUSD] = get2DayPercentChange(
     data?.feeUSD,
@@ -581,7 +583,7 @@ export function usePoolData(poolAddress) {
 /**
  * Get most recent txns for a pool
  */
-export function usePoolTransactions(poolAddress) {
+export function usePoolTransactions(poolAddress, prices) {
   const [exchangeSubgraphClient] = useExchangeClients()
   const [state, { updatePoolTxns }] = usePoolDataContext()
   const [[networkInfo]] = useNetworksInfo()
@@ -590,15 +592,28 @@ export function usePoolTransactions(poolAddress) {
     async function checkForTxns() {
       if (!poolTxns) {
         let transactions = await getPoolTransactions(exchangeSubgraphClient, poolAddress)
-        transactions.burns?.forEach(burn => (burn.chainId = networkInfo.chainId))
-        transactions.mints?.forEach(mint => (mint.chainId = networkInfo.chainId))
-        transactions.swaps?.forEach(swap => (swap.chainId = networkInfo.chainId))
+        transactions.burns?.forEach(burn => {
+          burn.chainId = networkInfo.chainId
+          burn.amountUSD = prices[0] && prices[1] ? prices[0] * +burn.amount0 + +burn.amount1 * prices[1] : burn.amountUSD
+        })
+        transactions.mints?.forEach(mint => {
+          mint.chainId = networkInfo.chainId
+          mint.amountUSD = prices[0] && prices[1] ? prices[0] * +mint.amount0 + +mint.amount1 * prices[1] : mint.amountUSD
+        })
+        transactions.swaps?.forEach(swap => {
+          swap.chainId = networkInfo.chainId
+          swap.amountUSD =
+            prices[0] && prices[1]
+              ? (prices[0] * (+swap.amount0In + +swap.amount0Out) + (+swap.amount1In + +swap.amount0Out) * prices[1]) / 2
+              : swap.amountUSD
+        })
+
         if (transactions.burns?.length || transactions.mints?.length || transactions.swaps?.length)
           updatePoolTxns(poolAddress, transactions, networkInfo.chainId)
       }
     }
     checkForTxns()
-  }, [poolTxns, poolAddress, updatePoolTxns, exchangeSubgraphClient, networkInfo.chainId])
+  }, [poolTxns, poolAddress, updatePoolTxns, exchangeSubgraphClient, networkInfo.chainId, prices])
   return poolTxns
 }
 

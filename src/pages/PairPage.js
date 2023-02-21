@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import usePrices from '../hooks/useTokensPrice'
 import { withRouter } from 'react-router-dom'
 import 'feather-icons'
 import { transparentize } from 'polished'
@@ -119,7 +120,11 @@ function PairPage({ pairAddress, history }) {
     oneDayFeeUntracked,
     volumeChangeUntracked,
     liquidityChangeUSD,
+    oneDayVolumeToken0,
+    oneDayVolumeToken1,
   } = usePairData(pairAddress)
+
+  const prices = usePrices(pairAddress.split('_'))
 
   useEffect(() => {
     document.querySelector('body').scrollTo(0, 0)
@@ -131,8 +136,15 @@ function PairPage({ pairAddress, history }) {
 
   const backgroundColor = theme.primary
 
+  const reserveUsingPriceService =
+    prices[0] && prices[1] ? prices[0] * parseFloat(reserve0 || '0') + prices[1] * parseFloat(reserve1 || '0') : 0
   // liquidity
-  const formattedLiquidity = !error && reserveUSD ? formattedNum(reserveUSD, true) : formattedNum(trackedReserveUSD, true)
+  const formattedLiquidity = reserveUsingPriceService
+    ? formattedNum(reserveUsingPriceService)
+    : !error && reserveUSD
+    ? formattedNum(reserveUSD, true)
+    : formattedNum(trackedReserveUSD, true)
+
   const liquidityChange = !error && formattedPercent(liquidityChangeUSD)
 
   // mark if using untracked liquidity
@@ -141,13 +153,30 @@ function PairPage({ pairAddress, history }) {
     setUsingTracked(!trackedReserveUSD ? false : true)
   }, [trackedReserveUSD])
 
+  // token data for usd
+  const [ethPrice] = useEthPrice()
+  const token0USD = prices[0]
+    ? formattedNum(prices[0], true)
+    : !error && token0?.derivedETH && ethPrice
+    ? formattedNum(parseFloat(token0.derivedETH) * parseFloat(ethPrice), true)
+    : ''
+
+  const token1USD = prices[1]
+    ? formattedNum(prices[1], true)
+    : !error && token1?.derivedETH && ethPrice
+    ? formattedNum(parseFloat(token1.derivedETH) * parseFloat(ethPrice), true)
+    : ''
+
+  const usePriceService = prices[0] && prices[1] && oneDayVolumeToken0 && oneDayVolumeToken1
+
   // volume	  // volume
-  const volume =
-    oneDayVolumeUSD || oneDayVolumeUSD === 0
-      ? formattedNum(oneDayVolumeUSD === 0 ? oneDayVolumeUntracked : oneDayVolumeUSD, true)
-      : oneDayVolumeUSD === 0
-      ? '$0'
-      : '-'
+  const volume = usePriceService
+    ? formattedNum((oneDayVolumeToken0 * prices[0] + oneDayVolumeToken1 * prices[1]) / 2, true)
+    : oneDayVolumeUSD || oneDayVolumeUSD === 0
+    ? formattedNum(oneDayVolumeUSD === 0 ? oneDayVolumeUntracked : oneDayVolumeUSD, true)
+    : oneDayVolumeUSD === 0
+    ? '$0'
+    : '-'
 
   // mark if using untracked volume
   const [usingUtVolume, setUsingUtVolume] = useState(false)
@@ -164,14 +193,6 @@ function PairPage({ pairAddress, history }) {
         ? formattedNum(oneDayFeeUntracked, true)
         : formattedNum(oneDayFeeUSD, true)
       : '-'
-
-  // token data for usd
-  const [ethPrice] = useEthPrice()
-  const token0USD =
-    !error && token0?.derivedETH && ethPrice ? formattedNum(parseFloat(token0.derivedETH) * parseFloat(ethPrice), true) : ''
-
-  const token1USD =
-    !error && token1?.derivedETH && ethPrice ? formattedNum(parseFloat(token1.derivedETH) * parseFloat(ethPrice), true) : ''
 
   // rates
   const token0Rate =

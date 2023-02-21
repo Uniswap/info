@@ -263,6 +263,9 @@ function parseData(data, oneDayData, twoDayData, oneWeekData, ethPrice, oneDayBl
     twoDayData?.volumeUSD ? twoDayData.volumeUSD : 0
   )
 
+  data.oneDayVolumeToken0 = (parseFloat(data?.volumeToken0) || 0) - (parseFloat(oneDayData?.volumeToken0) || 0)
+  data.oneDayVolumeToken1 = (parseFloat(data?.volumeToken1) || 0) - (parseFloat(oneDayData?.volumeToken1) || 0)
+
   const [oneDayFeeUSD] = get2DayPercentChange(
     data?.feeUSD,
     oneDayData?.feeUSD ? oneDayData.feeUSD : 0,

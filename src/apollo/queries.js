@@ -717,6 +717,8 @@ const PairFields = `
     untrackedFeeUSD
     token0Price
     token1Price
+    volumeToken0,
+    volumeToken1,
     createdAtTimestamp
   }
 `
@@ -749,6 +751,8 @@ const PoolFields = `
     trackedReserveETH
     reserveETH
     volumeUSD
+    volumeToken0
+    volumeToken1
     feeUSD
     untrackedVolumeUSD
     untrackedFeeUSD
@@ -842,6 +846,8 @@ export const PAIRS_HISTORICAL_BULK = (block, pairs) => {
       reserveUSD
       trackedReserveETH
       volumeUSD
+      volumeToken0
+      volumeToken1
       feeUSD
       untrackedVolumeUSD
       untrackedFeeUSD
@@ -863,6 +869,8 @@ export const POOLS_HISTORICAL_BULK = (block, pools) => {
       id
       reserveUSD
       trackedReserveETH
+      volumeToken0
+      volumeToken1
       volumeUSD
       feeUSD
       untrackedVolumeUSD
