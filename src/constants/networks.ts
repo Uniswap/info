@@ -25,14 +25,10 @@ import OasisLogo from '../assets/oasis.svg'
 export enum ChainId {
   MAINNET = 1,
   MATIC = 137,
-  MUMBAI = 80001,
-  BSCTESTNET = 97,
   BSCMAINNET = 56,
-  AVAXTESTNET = 43113,
   AVAXMAINNET = 43114,
   FANTOM = 250,
   CRONOS = 25,
-  ARBITRUM_TESTNET = 421611,
   ARBITRUM = 42161,
   BTTC = 199,
   VELAS = 106,
@@ -47,6 +43,7 @@ export type NETWORK_INFO = {
   name: string
   urlKey: string
   priceRoute: string
+  blockServiceRoute: string
   dmmSwapUrl: string
   subgraphName: string
   subgraphUrls: string[]
@@ -60,6 +57,7 @@ export type NETWORK_INFO = {
   nativeTokenLogo: string
   etherscanLinkText: string
   tokensListUrl: string
+  isEnableBlockService: boolean
 }
 
 export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
@@ -69,6 +67,7 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     name: 'Ethereum',
     urlKey: 'ethereum',
     priceRoute: 'ethereum',
+    blockServiceRoute: 'ethereum',
     dmmSwapUrl: 'https://kyberswap.com/',
     subgraphName: 'dynamic-amm/dynamic-amm',
     subgraphUrls: ['https://api.thegraph.com/subgraphs/name/kybernetwork/kyberswap-exchange-ethereum'],
@@ -82,6 +81,7 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     nativeTokenLogo: EthereumLogo,
     etherscanLinkText: 'Etherscan',
     tokensListUrl: 'https://raw.githubusercontent.com/KyberNetwork/ks-assets/main/tokenLists/ethereum.tokenlist.json',
+    isEnableBlockService: true,
   },
   [ChainId.MATIC]: {
     chainId: ChainId.MATIC,
@@ -89,6 +89,7 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     name: 'Polygon',
     urlKey: 'polygon',
     priceRoute: 'polygon',
+    blockServiceRoute: 'polygon',
     dmmSwapUrl: 'https://kyberswap.com/',
     subgraphName: 'dynamic-amm/dmm-exchange-matic',
     subgraphUrls: [
@@ -105,26 +106,7 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     nativeTokenLogo: MaticLogo,
     etherscanLinkText: 'Polygonscan',
     tokensListUrl: 'https://raw.githubusercontent.com/KyberNetwork/ks-assets/main/tokenLists/matic.tokenlist.json',
-  },
-  [ChainId.MUMBAI]: {
-    chainId: ChainId.MUMBAI,
-    icon: Polygon,
-    name: 'Mumbai',
-    priceRoute: 'mumbai',
-    urlKey: 'mumbai',
-    dmmSwapUrl: 'https://dev-dmm.knstats.com/#/',
-    subgraphName: 'piavgh/dmm-exchange-mumbai',
-    subgraphUrls: ['https://api.thegraph.com/subgraphs/name/piavgh/dmm-exchange-mumbai'],
-    subgraphBlockUrl: 'https://api.thegraph.com/subgraphs/name/piavgh/mumbai-blocks',
-    etherscanUrl: 'https://mumbai.polygonscan.com',
-    kncAddress: '0xFD1f9381Cb641Dc76Fe8087dbcf8ea84a2c77cbE',
-    wethAddress: '0x9c3c9283d3e44854697cd22d3faa240cfb032889',
-    defaultStartTime: 1625097600,
-    nativeTokenSymbol: 'MATIC',
-    nativeTokenWrappedName: 'Matic (Wrapped)',
-    nativeTokenLogo: MaticLogo,
-    etherscanLinkText: 'Polygonscan',
-    tokensListUrl: 'https://raw.githubusercontent.com/KyberNetwork/ks-assets/main/tokenLists/mumbai.tokenlist.json',
+    isEnableBlockService: true,
   },
   [ChainId.BSCMAINNET]: {
     chainId: ChainId.BSCMAINNET,
@@ -132,6 +114,7 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     name: 'BNB Chain',
     urlKey: 'bnb',
     priceRoute: 'bsc',
+    blockServiceRoute: 'bsc',
     dmmSwapUrl: 'https://kyberswap.com/',
     subgraphName: 'kybernetwork/kyberswap-exchange-bsc',
     subgraphUrls: ['https://api.thegraph.com/subgraphs/name/kybernetwork/kyberswap-exchange-bsc'],
@@ -145,26 +128,7 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     nativeTokenLogo: BnbLogo,
     etherscanLinkText: 'BscScan',
     tokensListUrl: 'https://raw.githubusercontent.com/KyberNetwork/ks-assets/main/tokenLists/bsc.mainnet.tokenlist.json',
-  },
-  [ChainId.BSCTESTNET]: {
-    chainId: ChainId.BSCTESTNET,
-    icon: BSC,
-    name: 'BSC Testnet',
-    urlKey: 'bsc-testnet',
-    priceRoute: 'bsc',
-    dmmSwapUrl: 'https://dev-dmm.knstats.com/#/',
-    subgraphName: 'ducquangkstn/dynamic-amm-ropsten',
-    subgraphUrls: ['https://api.thegraph.com/subgraphs/name/ducquangkstn/dynamic-amm-ropsten'],
-    subgraphBlockUrl: 'https://api.thegraph.com/subgraphs/name/ducquangkstn/ethereum-blocks-bsctestnet',
-    etherscanUrl: 'https://testnet.bscscan.com',
-    kncAddress: '0xfd1f9381cb641dc76fe8087dbcf8ea84a2c77cbe',
-    wethAddress: '0xae13d989dac2f0debff460ac112a837c89baa7cd',
-    defaultStartTime: 1628074210,
-    nativeTokenSymbol: 'BNB',
-    nativeTokenWrappedName: 'BNB (Wrapped)',
-    nativeTokenLogo: BnbLogo,
-    etherscanLinkText: 'Bscscan',
-    tokensListUrl: 'https://raw.githubusercontent.com/KyberNetwork/ks-assets/main/tokenLists/bsc.testnet.tokenlist.json',
+    isEnableBlockService: true,
   },
   [ChainId.AVAXMAINNET]: {
     chainId: ChainId.AVAXMAINNET,
@@ -172,6 +136,7 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     name: 'Avalanche',
     urlKey: 'avalanche',
     priceRoute: 'avalanche',
+    blockServiceRoute: 'avalanche',
     dmmSwapUrl: 'https://kyberswap.com/',
     subgraphName: 'dynamic-amm/dmm-exchange-avax',
     subgraphUrls: [
@@ -188,27 +153,7 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     nativeTokenLogo: AvaxLogo,
     etherscanLinkText: 'Snowtrace',
     tokensListUrl: 'https://raw.githubusercontent.com/KyberNetwork/ks-assets/main/tokenLists/avax.mainnet.tokenlist.json',
-  },
-  [ChainId.AVAXTESTNET]: {
-    //todo: check this
-    chainId: ChainId.AVAXTESTNET,
-    icon: AVAX,
-    name: 'Avalanche Testnest',
-    urlKey: 'avalanche-testnet',
-    priceRoute: 'fuji',
-    dmmSwapUrl: 'https://dev-dmm.knstats.com/#/',
-    subgraphName: 'ducquangkstn/dmm-exchange-fuij',
-    subgraphUrls: ['https://api.thegraph.com/subgraphs/name/ducquangkstn/dmm-exchange-fuij'],
-    subgraphBlockUrl: 'https://api.thegraph.com/subgraphs/name/ducquangkstn/avalache-blocks',
-    etherscanUrl: 'https://testnet.snowtrace.io/',
-    kncAddress: '',
-    wethAddress: '0xb31f66aa3c1e785363f0875a1b74e27b85fd66c7',
-    defaultStartTime: 1630431653,
-    nativeTokenSymbol: 'AVAX',
-    nativeTokenWrappedName: 'AVAX (Wrapped)',
-    nativeTokenLogo: AvaxLogo,
-    etherscanLinkText: 'Snowtrace',
-    tokensListUrl: 'https://raw.githubusercontent.com/KyberNetwork/ks-assets/main/tokenLists/avax.testnet.tokenlist.json',
+    isEnableBlockService: true,
   },
   [ChainId.FANTOM]: {
     chainId: ChainId.FANTOM,
@@ -216,6 +161,7 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     name: 'Fantom',
     urlKey: 'fantom',
     priceRoute: 'fantom',
+    blockServiceRoute: 'fantom',
     dmmSwapUrl: 'https://kyberswap.com/',
     subgraphName: 'dynamic-amm/dmm-exchange-ftm',
     subgraphUrls: ['https://api.thegraph.com/subgraphs/name/kybernetwork/kyberswap-exchange-fantom'],
@@ -229,6 +175,7 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     nativeTokenLogo: FantomLogo,
     etherscanLinkText: 'Ftmscan',
     tokensListUrl: 'https://raw.githubusercontent.com/KyberNetwork/ks-assets/main/tokenLists/fantom.mainnet.tokenlist.json',
+    isEnableBlockService: true,
   },
   [ChainId.CRONOS]: {
     chainId: ChainId.CRONOS,
@@ -236,6 +183,7 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     name: 'Cronos',
     urlKey: 'cronos',
     priceRoute: 'cronos',
+    blockServiceRoute: 'cronos',
     dmmSwapUrl: 'https://kyberswap.com/',
     subgraphName: 'kyberswap/kyberswap-cronos',
     subgraphUrls: ['https://cronos-graph.kyberengineering.io/subgraphs/name/kybernetwork/kyberswap-exchange-cronos'],
@@ -249,6 +197,7 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     nativeTokenLogo: CronosLogo,
     etherscanLinkText: 'Explorer',
     tokensListUrl: 'https://raw.githubusercontent.com/KyberNetwork/ks-assets/main/tokenLists/cronos.tokenlist.json',
+    isEnableBlockService: true,
   },
   [ChainId.ARBITRUM]: {
     chainId: ChainId.ARBITRUM,
@@ -256,6 +205,7 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     name: 'Arbitrum',
     urlKey: 'arbitrum',
     priceRoute: 'arbitrum',
+    blockServiceRoute: 'arbitrum',
     dmmSwapUrl: 'https://kyberswap.com/',
     subgraphName: 'viet-nv/kyberswap-arbitrum',
     subgraphUrls: ['https://arbitrum-graph.kyberengineering.io/subgraphs/name/kybernetwork/kyberswap-exchange-arbitrum'],
@@ -269,26 +219,7 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     nativeTokenLogo: EthereumLogo,
     etherscanLinkText: 'Arbiscan',
     tokensListUrl: 'https://raw.githubusercontent.com/KyberNetwork/ks-assets/main/tokenLists/arbitrum.tokenlist.json',
-  },
-  [ChainId.ARBITRUM_TESTNET]: {
-    chainId: ChainId.ARBITRUM_TESTNET,
-    icon: Arbitrum,
-    name: 'Arbitrum Rinkeby',
-    urlKey: 'arbitrum-rinkeby',
-    priceRoute: 'arbitrum-rinkeby',
-    dmmSwapUrl: 'https://dev-dmm.knstats.com/#/',
-    subgraphName: 'viet-nv/kyberswap-arbitrum-rinkeby',
-    subgraphUrls: ['https://api.thegraph.com/subgraphs/name/viet-nv/kyberswap-arbitrum-rinkeby'],
-    subgraphBlockUrl: 'https://api.thegraph.com/subgraphs/name/viet-nv/arbitrum-rinkeby-blocks',
-    etherscanUrl: 'https://testnet.arbiscan.io',
-    kncAddress: '0x7596961744096D12eFa3CfA58d1D30EDd82BD396',
-    wethAddress: '0x93D51226c4C3c265ca0c2F6420fa4c6A9151c09e',
-    defaultStartTime: 1644212237,
-    nativeTokenSymbol: 'ETH',
-    nativeTokenWrappedName: 'Ether (Wrapped)',
-    nativeTokenLogo: EthereumLogo,
-    etherscanLinkText: 'Arbiscan',
-    tokensListUrl: 'https://raw.githubusercontent.com/KyberNetwork/ks-assets/main/tokenLists/arbitrum.testnet.tokenlist.json',
+    isEnableBlockService: true,
   },
   [ChainId.BTTC]: {
     chainId: ChainId.BTTC,
@@ -296,6 +227,7 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     name: 'BitTorrent',
     urlKey: 'bittorrent',
     priceRoute: 'bttc',
+    blockServiceRoute: 'bttc',
     dmmSwapUrl: 'https://kyberswap.com/',
     subgraphName: 'dynamic-amm/kyberswap-bttc',
     subgraphUrls: ['https://bttc-graph.kyberengineering.io/subgraphs/name/kybernetwork/kyberswap-exchange-bttc'],
@@ -309,6 +241,7 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     nativeTokenLogo: BTTCLogo,
     etherscanLinkText: 'Bttcscan',
     tokensListUrl: 'https://raw.githubusercontent.com/KyberNetwork/ks-assets/main/tokenLists/bttc.tokenlist.json',
+    isEnableBlockService: true,
   },
   [ChainId.VELAS]: {
     chainId: ChainId.VELAS,
@@ -316,6 +249,7 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     name: 'Velas',
     urlKey: 'velas',
     priceRoute: 'velas',
+    blockServiceRoute: 'velas',
     dmmSwapUrl: 'https://kyberswap.com/',
     subgraphName: 'kybernetwork/kyberswap-exchange-velas',
     subgraphUrls: ['https://velas-graph.kyberengineering.io/subgraphs/name/kybernetwork/kyberswap-exchange-velas'],
@@ -329,6 +263,7 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     nativeTokenLogo: VelasLogo,
     etherscanLinkText: 'Velas EVM Explorer',
     tokensListUrl: 'https://raw.githubusercontent.com/KyberNetwork/ks-assets/main/tokenLists/velas.tokenlist.json',
+    isEnableBlockService: false,
   },
   [ChainId.AURORA]: {
     chainId: ChainId.AURORA,
@@ -336,6 +271,7 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     name: 'Aurora',
     urlKey: 'aurora',
     priceRoute: 'aurora',
+    blockServiceRoute: 'aurora',
     dmmSwapUrl: 'https://kyberswap.com/',
     subgraphName: 'piavgh/dmm-exchange-aurora',
     subgraphUrls: ['https://api.thegraph.com/subgraphs/name/kybernetwork/kyberswap-exchange-aurora'],
@@ -349,6 +285,7 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     nativeTokenLogo: AuroraLogo,
     etherscanLinkText: 'Aurora Explorer',
     tokensListUrl: 'https://raw.githubusercontent.com/KyberNetwork/ks-assets/main/tokenLists/aurora.tokenlist.json',
+    isEnableBlockService: false,
   },
   [ChainId.OASIS]: {
     chainId: ChainId.OASIS,
@@ -356,6 +293,7 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     name: 'Oasis',
     urlKey: 'oasis',
     priceRoute: 'oasis',
+    blockServiceRoute: 'oasis',
     dmmSwapUrl: 'https://kyberswap.com/',
     subgraphName: 'kybernetwork/kyberswap-exchange-oasis',
     subgraphUrls: ['https://oasis-graph.kyberengineering.io/subgraphs/name/kybernetwork/kyberswap-exchange-oasis'],
@@ -369,6 +307,7 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     nativeTokenLogo: OasisLogo,
     etherscanLinkText: 'Oasis Emerald Explorer',
     tokensListUrl: 'https://raw.githubusercontent.com/KyberNetwork/ks-assets/main/tokenLists/oasis.tokenlist.json',
+    isEnableBlockService: true,
   },
   [ChainId.OPTIMISM]: {
     chainId: ChainId.OPTIMISM,
@@ -376,6 +315,7 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     name: 'Optimism',
     urlKey: 'optimism',
     priceRoute: 'optimism',
+    blockServiceRoute: 'optimism',
     dmmSwapUrl: 'https://kyberswap.com/',
     subgraphName: 'kybernetwork/kyberswap-exchange-optimism',
     subgraphUrls: ['https://api.thegraph.com/subgraphs/name/kybernetwork/kyberswap-exchange-optimism'],
@@ -389,5 +329,9 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     nativeTokenLogo: EthereumLogo,
     etherscanLinkText: 'Optimistic Ethereum Explorer',
     tokensListUrl: 'https://raw.githubusercontent.com/KyberNetwork/ks-assets/main/tokenLists/optimism.tokenlist.json',
+    isEnableBlockService: true,
   },
 }
+
+export const NETWORKS_INFO_LIST: NETWORK_INFO[] = Object.values(NETWORKS_INFO)
+export const SUPPORTED_NETWORKS: ChainId[] = Object.keys(NETWORKS_INFO).map(Number)

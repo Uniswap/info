@@ -17,10 +17,10 @@ import FormattedName from '../FormattedName'
 import { TYPE } from '../../Theme'
 import LocalLoader from '../LocalLoader'
 import { useAllTokenData } from '../../contexts/TokenData'
-import { NETWORKS_INFO } from '../../constants/networks'
+import { NETWORKS_INFO, NETWORKS_INFO_LIST } from '../../constants/networks'
 import { aggregateTokens } from '../../utils/aggregateData'
 import { MouseoverTooltip } from '../Tooltip'
-import { NetworksInfoEnv, useNetworksInfo } from '../../contexts/NetworkInfo'
+import { useNetworksInfo } from '../../contexts/NetworkInfo'
 
 dayjs.extend(utc)
 
@@ -223,7 +223,7 @@ function TopTokenList({ itemMax = 5 }) {
 
   const ListItem = useCallback(
     ({ item, index }) => {
-      const tokenNetworkInfo = NETWORKS_INFO[item.chainId] || NetworksInfoEnv[0]
+      const tokenNetworkInfo = NETWORKS_INFO[item.chainId] || NETWORKS_INFO_LIST[0]
       return (
         <DashGrid style={{ height: '56px' }} focus={true} isShowNetworkColumn={isShowNetworkColumn}>
           <DataText area='name' fontWeight='500'>

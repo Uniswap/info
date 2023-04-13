@@ -1,5 +1,6 @@
 import { useNetworksInfo } from '../contexts/NetworkInfo'
 import { useEffect, useState } from 'react'
+import { PRICE_API } from '../constants/env'
 
 export default function usePrices(addresses) {
   const [[networksInfo]] = useNetworksInfo()
@@ -9,7 +10,7 @@ export default function usePrices(addresses) {
   const ids = addresses.map(item => item.toLowerCase()).join(',')
   useEffect(() => {
     const fetchPrices = async () => {
-      const res = await fetch(`${process.env.REACT_APP_PRICE_API}/${networksInfo.priceRoute}/api/v1/prices`, {
+      const res = await fetch(`${PRICE_API}/${networksInfo.priceRoute}/api/v1/prices`, {
         method: 'POST',
         body: JSON.stringify({
           ids,

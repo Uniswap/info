@@ -1,4 +1,5 @@
 import useSWR from 'swr'
+import { AGGREGATOR_STATS_API } from '../constants/env'
 
 interface VolumeResponse {
   totalVolume: string
@@ -8,7 +9,7 @@ interface VolumeResponse {
 export default function useAggregatorVolume(): VolumeResponse {
   const fetcher = (url: string) => fetch(url).then(r => r.json())
 
-  const url = `${process.env.REACT_APP_AGGREGATOR_STATS_API}/api/volume`
+  const url = `${AGGREGATOR_STATS_API}/api/volume`
 
   const { data, error } = useSWR(url, fetcher, {
     refreshInterval: 10000,

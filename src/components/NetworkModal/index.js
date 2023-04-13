@@ -6,10 +6,10 @@ import Modal from '../Modal'
 import ModalHeader from '../ModalHeader'
 import { ButtonEmpty } from '../ButtonStyled'
 import { useOnClickOutside } from '../../hooks'
-import { NetworksInfoEnv, useNetworksInfo } from '../../contexts/NetworkInfo'
+import { useNetworksInfo } from '../../contexts/NetworkInfo'
 import { Link, useHistory, useParams } from 'react-router-dom'
 import Kyber from '../Icons/Kyber'
-import { ChainId } from '../../constants/networks'
+import { ChainId, NETWORKS_INFO_LIST } from '../../constants/networks'
 
 const ModalContentWrapper = styled.div`
   display: flex;
@@ -113,7 +113,7 @@ export default function NetworkModal() {
   const history = useHistory()
   const { network: currentNetworkURL } = useParams()
   const [tab, setTab] = useState('Classic')
-  const networkListToShow = [{ name: 'All Chains', icon: Kyber }, ...NetworksInfoEnv]
+  const networkListToShow = [{ name: 'All Chains', icon: Kyber }, ...NETWORKS_INFO_LIST]
 
   return (
     <Modal isOpen={networkModalOpen} onDismiss={toggleNetworkModal} maxWidth='624px'>

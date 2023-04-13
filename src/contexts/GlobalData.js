@@ -16,6 +16,7 @@ import weekOfYear from 'dayjs/plugin/weekOfYear'
 import { useAllPoolData } from './PoolData'
 import { useNetworksInfo } from './NetworkInfo'
 import { calculateValuesOnGlobalData } from '../utils/aggregateData'
+import { KS_SETTING_API } from '../constants/env'
 import { stringify } from 'querystring'
 const UPDATE = 'UPDATE'
 const UPDATE_TXNS = 'UPDATE_TXNS'
@@ -759,7 +760,7 @@ async function getWhitelistToken(chainId) {
     let page = 1
     while (true) {
       const { data } = await fetch(
-        `${process.env.REACT_APP_KS_SETTING_API}/v1/tokens?${stringify({
+        `${KS_SETTING_API}/v1/tokens?${stringify({
           pageSize,
           page,
           isWhitelisted: true,

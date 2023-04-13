@@ -1,16 +1,12 @@
 import React, { createContext, useContext, useReducer, useMemo, useCallback, useEffect } from 'react'
-import { NETWORKS_INFO } from '../constants/networks'
+import { NETWORKS_INFO_LIST } from '../constants/networks'
 import { memoRequest } from '../utils'
 
 const UPDATE_CHAIN = 'UPDATE_CHAIN'
 const UPDATE_TOKENS_LIST = 'UPDATE_TOKENS_LIST'
 
-export const NetworksInfoEnv = process.env.REACT_APP_SUPPORT_CHAINS_ID.split(',').map(
-  supportChainId => NETWORKS_INFO[supportChainId]
-)
-
 const INITIAL_STATE = {
-  networksInfo: [NetworksInfoEnv[0]],
+  networksInfo: [NETWORKS_INFO_LIST[0]],
   tokensList: {},
 }
 
@@ -24,10 +20,10 @@ function reducer(state, { type, payload }) {
   switch (type) {
     case UPDATE_CHAIN: {
       const { newChain } = payload
-      const newNetworkInfo = NetworksInfoEnv.find(network => network.chainId === newChain)
+      const newNetworkInfo = NETWORKS_INFO_LIST.find(network => network.chainId === newChain)
       return {
         ...state,
-        networksInfo: newNetworkInfo ? [newNetworkInfo] : NetworksInfoEnv,
+        networksInfo: newNetworkInfo ? [newNetworkInfo] : NETWORKS_INFO_LIST,
       }
     }
 
@@ -120,7 +116,7 @@ async function getTokenList(listUrl) {
 
 export function useNetworksInfo() {
   const [{ networksInfo }, { updateChain }] = useNetworksInfoContext()
-  return [networksInfo.filter(Boolean).length ? networksInfo : [NetworksInfoEnv[0]], updateChain]
+  return [networksInfo.filter(Boolean).length ? networksInfo : [NETWORKS_INFO_LIST[0]], updateChain]
 }
 
 export function useTokensList() {

@@ -15,10 +15,10 @@ import FormattedName from '../FormattedName'
 import QuestionHelper from '../QuestionHelper'
 import { TYPE } from '../../Theme'
 import { MAX_ALLOW_APY } from '../../constants'
-import { NETWORKS_INFO } from '../../constants/networks'
+import { NETWORKS_INFO, NETWORKS_INFO_LIST } from '../../constants/networks'
 import { aggregatePairs } from '../../utils/aggregateData'
 import { MouseoverTooltip } from '../Tooltip'
-import { NetworksInfoEnv, useNetworksInfo } from '../../contexts/NetworkInfo'
+import { useNetworksInfo } from '../../contexts/NetworkInfo'
 
 dayjs.extend(utc)
 
@@ -180,7 +180,7 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 5 }) {
       const pairData = aggregatedPairs[pairAddress]
       if (pairData && pairData.token0 && pairData.token1) {
         const showData = MAP_SHOW_DATA(pairData)
-        const pairNetworkInfo = NETWORKS_INFO[pairData.chainId] || NetworksInfoEnv[0]
+        const pairNetworkInfo = NETWORKS_INFO[pairData.chainId] || NETWORKS_INFO_LIST[0]
         return (
           <DashGrid style={{ height: '56px' }} disbaleLinks={disbaleLinks} focus={true} isShowNetworkColumn={isShowNetworkColumn}>
             <DataText area='name' fontWeight='500'>

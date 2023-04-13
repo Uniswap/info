@@ -9,6 +9,7 @@ import { Text } from 'rebass'
 import _Decimal from 'decimal.js-light'
 import toFormat from 'toformat'
 import { timeframeOptions } from '../constants'
+import { BLOCK_SERVICE_API } from '../constants/env'
 import Numeral from 'numeral'
 import { OverflowTooltip } from '../components/Tooltip'
 
@@ -174,7 +175,7 @@ export async function splitQuery(query, localClient, vars, list, skipCount = 100
  * @dev Query speed is optimized by limiting to a 600-second period
  * @param {Int} timestamp in seconds
  */
-export async function getBlockFromTimestamp(timestamp, networkInfo) {
+async function getBlockFromTimestampSubgraph(timestamp, networkInfo) {
   const run = async () => {
     if (parseInt(timestamp) < networkInfo.defaultStartTime) {
       timestamp = networkInfo.defaultStartTime
@@ -192,6 +193,25 @@ export async function getBlockFromTimestamp(timestamp, networkInfo) {
   return await memoRequest(run, 'getBlockFromTimestamp_' + timestamp + '_' + networkInfo.chainId, 10000)
 }
 
+async function getBlocksFromTimestampsBlockService(timestamps, networkInfo) {
+  const result = (
+    await (
+      await fetch(`${BLOCK_SERVICE_API}/${networkInfo.blockServiceRoute}/api/v1/block?timestamps=${timestamps.join(',')}`)
+    ).json()
+  ).data.map(block => ({ timestamp: String(block.timestamp), number: String(block.number) }))
+  return result
+}
+
+export async function getBlockFromTimestamp(timestamp, networkInfo) {
+  if (networkInfo.isEnableBlockService) return (await getBlocksFromTimestampsBlockService([timestamp], networkInfo))[0].number
+  return getBlockFromTimestampSubgraph(timestamp, networkInfo)
+}
+
+export async function getBlocksFromTimestamps(timestamps, networkInfo, skipCount = 500) {
+  if (networkInfo.isEnableBlockService) return getBlocksFromTimestampsBlockService(timestamps, networkInfo)
+  return getBlocksFromTimestampsSubgraph(timestamps, networkInfo, skipCount)
+}
+
 /**
  * @notice Fetches block objects for an array of timestamps.
  * @dev blocks are returned in chronological order (ASC) regardless of input.
@@ -199,7 +219,7 @@ export async function getBlockFromTimestamp(timestamp, networkInfo) {
  * @dev timestamps are returns as they were provided; not the block time.
  * @param {Array} timestamps
  */
-export async function getBlocksFromTimestamps(timestamps, networkInfo, skipCount = 500) {
+async function getBlocksFromTimestampsSubgraph(timestamps, networkInfo, skipCount = 500) {
   if (timestamps?.length === 0) {
     return []
   }

@@ -925,7 +925,7 @@ const TokenFields = `
 
 export const TOKENS_CURRENT = gql`
   ${TokenFields}
-  query tokens {
+  query topTokens {
     tokens(first: 200, orderBy: tradeVolumeUSD, orderDirection: desc) {
       ...TokenFields
     }
@@ -935,7 +935,7 @@ export const TOKENS_CURRENT = gql`
 export const TOKENS_DYNAMIC = block => {
   const queryString = `
     ${TokenFields}
-    query tokens {
+    query tokensByBlock {
       tokens(block: {number: ${block}} first: 200, orderBy: tradeVolumeUSD, orderDirection: desc) {
         ...TokenFields
       }
@@ -947,7 +947,7 @@ export const TOKENS_DYNAMIC = block => {
 export const TOKEN_DATA = (tokenAddress, block) => {
   const queryString = `
     ${TokenFields}
-    query tokens {
+    query tokensWithPairs {
       tokens(${block ? `block : {number: ${block}}` : ``} where: {id:"${tokenAddress.toLowerCase()}"}) {
         ...TokenFields
       }

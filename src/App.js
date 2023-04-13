@@ -22,8 +22,8 @@ import { useLatestBlocks } from './contexts/Application'
 import useTheme from './hooks/useTheme'
 import BottomBar from './components/BottomBar'
 import KyberSwapAnounce from './components/KyberSwapAnnounce'
-import { NetworksInfoEnv, useNetworksInfo } from './contexts/NetworkInfo'
-import { ChainId } from './constants/networks'
+import { useNetworksInfo } from './contexts/NetworkInfo'
+import { ChainId, NETWORKS_INFO_LIST } from './constants/networks'
 
 const AppWrapper = styled.div`
   position: relative;
@@ -162,7 +162,7 @@ function AppLogicWrapper(props) {
 const LayoutWrapper = props => {
   const { network: currentNetworkURL } = useParams()
   const [, updateChain] = useNetworksInfo()
-  let networkInfoFromURL = NetworksInfoEnv.find(networkInfo => networkInfo.urlKey === currentNetworkURL)
+  let networkInfoFromURL = NETWORKS_INFO_LIST.find(networkInfo => networkInfo.urlKey === currentNetworkURL)
 
   useEffect(() => {
     if (!currentNetworkURL) {
