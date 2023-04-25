@@ -12,6 +12,7 @@ import { timeframeOptions } from '../constants'
 import { BLOCK_SERVICE_API } from '../constants/env'
 import Numeral from 'numeral'
 import { OverflowTooltip } from '../components/Tooltip'
+import { chunk } from './array'
 
 // format libraries
 const Decimal = toFormat(_Decimal)
@@ -195,10 +196,19 @@ async function getBlockFromTimestampSubgraph(timestamp, networkInfo) {
 
 async function getBlocksFromTimestampsBlockService(timestamps, networkInfo) {
   const result = (
-    await (
-      await fetch(`${BLOCK_SERVICE_API}/${networkInfo.blockServiceRoute}/api/v1/block?timestamps=${timestamps.join(',')}`)
-    ).json()
-  ).data.map(block => ({ timestamp: String(block.timestamp), number: String(block.number) }))
+    await Promise.all(
+      chunk(timestamps, 50).map(async timestampsChunk =>
+        (
+          await fetch(
+            `${BLOCK_SERVICE_API}/${networkInfo.blockServiceRoute}/api/v1/block?timestamps=${timestampsChunk.join(',')}`
+          )
+        ).json()
+      )
+    )
+  )
+    .map(chunk => chunk.data)
+    .flat()
+    .map(block => ({ timestamp: String(block.timestamp), number: String(block.number) }))
   return result
 }
 
