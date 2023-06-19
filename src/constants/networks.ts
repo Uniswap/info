@@ -10,6 +10,7 @@ import Velas from '../assets/networks/velas-network.png'
 import Aurora from '../assets/networks/aurora-network.svg'
 import Oasis from '../assets/networks/oasis-network.svg'
 import Optimism from '../assets/networks/optimism-network.svg'
+import ZkSync from '../assets/networks/zksync-network.png'
 
 import EthereumLogo from '../assets/eth.png'
 import MaticLogo from '../assets/polygon.png'
@@ -35,6 +36,7 @@ export enum ChainId {
   AURORA = 1313161554,
   OASIS = 42262,
   OPTIMISM = 10,
+  ZKSYNC = 324,
 }
 
 export type NETWORK_INFO = {
@@ -329,6 +331,28 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     nativeTokenLogo: EthereumLogo,
     etherscanLinkText: 'Optimistic Ethereum Explorer',
     tokensListUrl: 'https://raw.githubusercontent.com/KyberNetwork/ks-assets/main/tokenLists/optimism.tokenlist.json',
+    isEnableBlockService: true,
+  },
+  [ChainId.ZKSYNC]: {
+    chainId: ChainId.ZKSYNC,
+    icon: ZkSync,
+    name: 'zkSync Era',
+    urlKey: 'zksync',
+    priceRoute: 'zksync',
+    blockServiceRoute: 'zksync',
+    dmmSwapUrl: 'https://kyberswap.com/',
+    subgraphName: 'kybernetwork/kyberswap-exchange-zksync',
+    subgraphUrls: ['https://zksync-graph.kyberengineering.io/subgraphs/name/kybernetwork/kyberswap-exchange-zksync'],
+    subgraphBlockUrl: 'https://zksync-graph.kyberengineering.io/subgraphs/name/kybernetwork/zksync-blocks',
+    etherscanUrl: 'https://explorer.zksync.io',
+    kncAddress: '',
+    wethAddress: '0x5AEa5775959fBC2557Cc8789bC1bf90A239D9a91',
+    defaultStartTime: 1685083020,
+    nativeTokenSymbol: 'ETH',
+    nativeTokenWrappedName: 'ETH (Wrapped)',
+    nativeTokenLogo: EthereumLogo,
+    etherscanLinkText: 'zkSync Era Explorer',
+    tokensListUrl: 'https://raw.githubusercontent.com/KyberNetwork/ks-assets/main/tokenLists/zksync.tokenlist.json',
     isEnableBlockService: true,
   },
 }
