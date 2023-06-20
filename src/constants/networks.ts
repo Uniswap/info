@@ -359,3 +359,4 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
 
 export const NETWORKS_INFO_LIST: NETWORK_INFO[] = Object.values(NETWORKS_INFO)
 export const SUPPORTED_NETWORKS: ChainId[] = Object.keys(NETWORKS_INFO).map(Number)
+export const NOT_SUPPORT_ELASTIC_NETWORKS: ChainId[] = [ChainId.AURORA, ChainId.ZKSYNC]

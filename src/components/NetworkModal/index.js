@@ -9,7 +9,7 @@ import { useOnClickOutside } from '../../hooks'
 import { useNetworksInfo } from '../../contexts/NetworkInfo'
 import { Link, useHistory, useParams } from 'react-router-dom'
 import Kyber from '../Icons/Kyber'
-import { ChainId, NETWORKS_INFO_LIST } from '../../constants/networks'
+import { ChainId, NOT_SUPPORT_ELASTIC_NETWORKS, NETWORKS_INFO_LIST } from '../../constants/networks'
 
 const ModalContentWrapper = styled.div`
   display: flex;
@@ -184,7 +184,7 @@ export default function NetworkModal() {
                 </Link>
               )
             } else {
-              if (network.chainId === ChainId.AURORA) return undefined
+              if (NOT_SUPPORT_ELASTIC_NETWORKS.includes(network.chainId)) return undefined
               return (
                 <a href={'/elastic' + linkTo} key={network.name}>
                   <SelectNetworkButton
