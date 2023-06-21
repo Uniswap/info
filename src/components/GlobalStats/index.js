@@ -45,7 +45,7 @@ export default function GlobalStats() {
             <Text color={theme.subText} fontSize='12px'>
               Trading Volume
             </Text>
-            <QuestionHelper text={'Total Trading volume through our aggregator on all chains'} />
+            <QuestionHelper text={'Total trading volume through aggregator and liquidity pools on all chains'} />
           </Flex>
 
           <Flex sx={{ gap: '4px' }}>
