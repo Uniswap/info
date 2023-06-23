@@ -15,7 +15,7 @@ import { ApplicationModal, useModalOpen, useSessionStart } from '../../contexts/
 import { useDarkModeManager } from '../../contexts/LocalStorage'
 import SocialLinks from '../SocialLinks'
 import ThemeToggle from '../ThemeToggle'
-import { addNetworkIdQueryString } from '../../utils'
+import { constructSwapURL } from '../../utils'
 import Wallet from '../Icons/Wallet'
 import { Flex, Text } from 'rebass'
 import { useNetworksInfo } from '../../contexts/NetworkInfo'
@@ -181,7 +181,7 @@ function SideNav() {
 
                 <Divider />
 
-                <Link href={addNetworkIdQueryString(networksInfo[0].dmmSwapUrl, networksInfo[0])} external>
+                <Link href={constructSwapURL(networksInfo[0])} external>
                   <Option>
                     <Repeat size={16} style={{ marginRight: '.75rem' }} />
                     Swap

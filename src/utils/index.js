@@ -46,75 +46,50 @@ export function getTimeframe(timeWindow) {
   return utcStartTime
 }
 
-export function addNetworkIdQueryString(url, networkInfo) {
-  if (url.includes('?')) {
-    return `${url}&networkId=${networkInfo.chainId}`
-  }
+export function constructSwapURL(networkInfo) {
+  const chainRoute = networkInfo.urlKey
+  const swapUrl = networkInfo.dmmSwapUrl
 
-  return `${url}?networkId=${networkInfo.chainId}`
+  return `${swapUrl}swap/${chainRoute}`
 }
 
 export function getPoolLink(token0Address, networkInfo, token1Address = null, remove = false, poolAddress = null) {
   const nativeTokenSymbol = networkInfo.nativeTokenSymbol
+  const action = remove ? 'remove' : 'add'
+  const chainRoute = networkInfo.urlKey
+  const swapUrl = networkInfo.dmmSwapUrl
+
+  const token0 = token0Address?.toLowerCase() === networkInfo.wethAddress.toLowerCase() ? nativeTokenSymbol : token0Address
+  const token1 = token1Address?.toLowerCase() === networkInfo.wethAddress.toLowerCase() ? nativeTokenSymbol : token1Address
 
   if (poolAddress) {
     if (!token1Address) {
-      return addNetworkIdQueryString(
-        networkInfo.dmmSwapUrl +
-          (remove ? `remove` : `add`) +
-          `/${
-            token0Address.toLowerCase() === networkInfo.wethAddress.toLowerCase() ? nativeTokenSymbol : token0Address
-          }/${nativeTokenSymbol}/${poolAddress}`,
-        networkInfo
-      )
-    } else {
-      return addNetworkIdQueryString(
-        networkInfo.dmmSwapUrl +
-          (remove ? `remove` : `add`) +
-          `/${token0Address.toLowerCase() === networkInfo.wethAddress.toLowerCase() ? nativeTokenSymbol : token0Address}/${
-            token1Address.toLowerCase() === networkInfo.wethAddress.toLowerCase() ? nativeTokenSymbol : token1Address
-          }/${poolAddress}`,
-        networkInfo
-      )
+      return `${swapUrl}${chainRoute}/${action}/${token0}/${nativeTokenSymbol}/${poolAddress}`
     }
+
+    return `${swapUrl}${chainRoute}/${action}/${token0}/${token1}/${poolAddress}`
   }
 
   if (!token1Address) {
-    return addNetworkIdQueryString(
-      networkInfo.dmmSwapUrl +
-        (remove ? `remove` : `add`) +
-        `/${
-          token0Address.toLowerCase() === networkInfo.wethAddress.toLowerCase() ? nativeTokenSymbol : token0Address
-        }/${nativeTokenSymbol}`,
-      networkInfo
-    )
-  } else {
-    return addNetworkIdQueryString(
-      networkInfo.dmmSwapUrl +
-        (remove ? `remove` : `add`) +
-        `/${token0Address.toLowerCase() === networkInfo.wethAddress.toLowerCase() ? nativeTokenSymbol : token0Address}/${
-          token1Address.toLowerCase() === networkInfo.wethAddress.toLowerCase() ? nativeTokenSymbol : token1Address
-        }`,
-      networkInfo
-    )
+    return `${swapUrl}${chainRoute}/${action}/${token0}/${nativeTokenSymbol}`
   }
+
+  return `${swapUrl}${chainRoute}/${action}/${token0}/${token1}`
 }
 
 export function getSwapLink(token0Address, networkInfo, token1Address = null) {
   const nativeTokenSymbol = networkInfo.nativeTokenSymbol
+  const chainRoute = networkInfo.urlKey
+  const swapUrl = networkInfo.dmmSwapUrl
+
+  const tokenIn = token0Address?.toLowerCase() === networkInfo.wethAddress.toLowerCase() ? nativeTokenSymbol : token0Address
+  const tokenOut = token1Address?.toLowerCase() === networkInfo.wethAddress.toLowerCase() ? nativeTokenSymbol : token1Address
 
   if (!token1Address) {
-    return addNetworkIdQueryString(`${networkInfo.dmmSwapUrl}swap?inputCurrency=${token0Address}`, networkInfo)
-  } else {
-    return addNetworkIdQueryString(
-      `${networkInfo.dmmSwapUrl}swap?inputCurrency=${
-        token0Address.toLowerCase() === networkInfo.wethAddress.toLowerCase() ? nativeTokenSymbol : token0Address
-      }&outputCurrency=${
-        token1Address.toLowerCase() === networkInfo.wethAddress.toLowerCase() ? nativeTokenSymbol : token1Address
-      }`,
-      networkInfo
-    )
+    return `${swapUrl}swap/${chainRoute}?inputCurrency=${token0Address}`
   }
+
+  return `${swapUrl}swap/${chainRoute}?inputCurrency=${tokenIn}&outputCurrency=${tokenOut}`
 }
 
 export function localNumber(val) {

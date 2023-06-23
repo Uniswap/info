@@ -9,7 +9,7 @@ import Link, { CustomLink } from '../Link'
 import { MouseoverTooltip } from '../Tooltip'
 import CopyHelper from '../Copy'
 import { TYPE } from '../../Theme'
-import { shortenAddress, formattedNum } from '../../utils'
+import { shortenAddress, formattedNum, getPoolLink } from '../../utils'
 import { MAX_ALLOW_APY } from '../../constants'
 import useTheme from '../../hooks/useTheme'
 import { useNetworksInfo } from '../../contexts/NetworkInfo'
@@ -235,10 +235,7 @@ const ListItem = ({ pool, oddRow }) => {
       </DataText>
       <DataText grid-area='add_liquidity' alignItems='flex-end'>
         {
-          <Link
-            href={`${networkInfo.dmmSwapUrl}add/${pool.token0.id}/${pool.token1.id}/${pool.id}?networkId=${networkInfo.chainId}`}
-            target='_blank'
-          >
+          <Link href={getPoolLink(pool.token0.id, networkInfo, pool.token1.id, false, pool.id)} target='_blank'>
             <ButtonLight>+ Add</ButtonLight>
           </Link>
         }
