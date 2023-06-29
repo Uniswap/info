@@ -411,7 +411,7 @@ const getHourlyRateData = async (pairAddress, startTime, latestBlock) => {
 
     // create an array of hour start times until we reach current hour
     const timestamps = []
-    while (time <= utcEndTime.unix() - 3600) {
+    while (time <= utcEndTime.unix()) {
       timestamps.push(time)
       time += 3600
     }
