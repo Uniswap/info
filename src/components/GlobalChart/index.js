@@ -42,7 +42,7 @@ const GlobalChart = ({ display }) => {
     liquidityChangeUSD,
     oneWeekVolume,
     weeklyVolumeChange,
-  } = globalDatas[1] ? aggregateGlobalData(globalDatas) : globalDatas[0]
+  } = globalDatas[1] ? aggregateGlobalData(globalDatas) : globalDatas[0] || {}
 
   // based on window, get starttim
   let utcStartTime = getTimeframe(timeWindow)

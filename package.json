@@ -2,6 +2,9 @@
   "name": "@uniswap/info",
   "private": true,
   "homepage": "/classic",
+  "engines": {
+    "node": "14 || 16"
+  },
   "devDependencies": {
     "@popperjs/core": "^2.4.2",
     "@reach/dialog": "^0.15.3",

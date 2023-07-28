@@ -28,7 +28,7 @@ export default function GlobalStats() {
   const globalDatas = useGlobalData()
   const { oneDayTxns, oneDayFeeUSD, oneDayFeeChange, txnChange } = globalDatas[1]
     ? aggregateGlobalData(globalDatas)
-    : globalDatas[0]
+    : globalDatas[0] || {}
   const oneDayFees = oneDayFeeUSD ? formattedNum(oneDayFeeUSD, true) : ''
   const theme = useTheme()
   const aggregatorVolume = useAggregatorVolume()

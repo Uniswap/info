@@ -141,16 +141,7 @@ function AppLogicWrapper(props) {
           </WarningBanner>
         </WarningWrapper>
       )}
-      {latestBlocks[0] &&
-      globalData[0] &&
-      Object.keys(globalData[0]).length > 0 &&
-      globalChartData[0] &&
-      Object.keys(globalChartData[0]).length > 0 ? (
-        props.children
-      ) : (
-        <LocalLoader fill='true' size='200px' />
-      )}
-      {/* {props.children} */}
+      {props.children}
     </AppWrapper>
   )
 }
