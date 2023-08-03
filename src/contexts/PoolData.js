@@ -567,8 +567,9 @@ export function usePoolData(poolAddress) {
         setError(true)
       }
     }
+
     if (!poolData?.id && !error) {
-      if (poolAddress && ethPrice && isAddress(poolAddress)) {
+      if (poolAddress && isAddress(poolAddress)) {
         fetchData()
       } else {
         setError(true)

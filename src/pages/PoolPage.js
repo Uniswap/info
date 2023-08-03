@@ -147,6 +147,7 @@ function PoolPage({ poolAddress, history }) {
     oneDayVolumeToken0,
     oneDayVolumeToken1,
   } = usePoolData(poolAddress)
+
   const [[networkInfo]] = useNetworksInfo()
 
   const prices = usePrices([token0?.id, token1?.id].filter(Boolean))

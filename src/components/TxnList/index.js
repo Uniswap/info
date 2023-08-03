@@ -299,11 +299,11 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
             valueToCompareA = parseFloat(a[sortedColumn])
             valueToCompareB = parseFloat(b[sortedColumn])
           }
-          if (valueToCompareA > valueToCompareB) return (sortDirection ? -1 : 1) * 1
-          if (valueToCompareA < valueToCompareB) return (sortDirection ? -1 : 1) * -1
+          if (valueToCompareA > valueToCompareB) return (sortDirection ? -1 : 1) * -1
+          if (valueToCompareA < valueToCompareB) return (sortDirection ? -1 : 1) * 1
 
-          if (a.timestamp < b.timestamp) return 1
-          if (a.timestamp > b.timestamp) return -1
+          if (a.timestamp < b.timestamp) return -1
+          if (a.timestamp > b.timestamp) return 1
 
           if (a.amountUSD < b.amountUSD) return 1
           if (a.amountUSD > b.amountUSD) return -1

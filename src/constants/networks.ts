@@ -37,6 +37,7 @@ export enum ChainId {
   OASIS = 42262,
   OPTIMISM = 10,
   ZKSYNC = 324,
+  LINEA = 59144,
 }
 
 export type NETWORK_INFO = {
@@ -354,6 +355,29 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     etherscanLinkText: 'zkSync Era Explorer',
     tokensListUrl: 'https://raw.githubusercontent.com/KyberNetwork/ks-assets/main/tokenLists/zksync.tokenlist.json',
     isEnableBlockService: true,
+  },
+
+  [ChainId.LINEA]: {
+    chainId: ChainId.LINEA,
+    icon: 'https://linea.build/apple-touch-icon.png',
+    name: 'Linea',
+    urlKey: 'linea',
+    priceRoute: 'linea',
+    blockServiceRoute: 'linea',
+    dmmSwapUrl: 'https://kyberswap.com/',
+    subgraphName: 'kybernetwork/kyberswap-classic-linea',
+    subgraphUrls: ['https://graph-query.linea.build/subgraphs/name/kybernetwork/kyberswap-classic-linea'],
+    subgraphBlockUrl: 'https://graph-query.linea.build/subgraphs/name/kybernetwork/linea-blocks',
+    etherscanUrl: 'https://lineascan.build',
+    kncAddress: '',
+    wethAddress: '0xe5d7c2a44ffddf6b295a15c148167daaaf5cf34f',
+    defaultStartTime: 1690394855,
+    nativeTokenSymbol: 'ETH',
+    nativeTokenWrappedName: 'ETH (Wrapped)',
+    nativeTokenLogo: EthereumLogo,
+    etherscanLinkText: 'LINEA Explorer',
+    tokensListUrl: 'https://raw.githubusercontent.com/KyberNetwork/ks-assets/main/tokenLists/linea.tokenlist.json',
+    isEnableBlockService: false,
   },
 }
 

@@ -1,8 +1,8 @@
 import { TokenList } from '@uniswap/token-lists'
 // override schema of uni for extend  name length and additional info
-import schema from './scheme.json'
+// import schema from './scheme.json'
 // import schema from '@uniswap/token-lists/src/tokenlist.schema.json'
-import Ajv from 'ajv'
+// import Ajv from 'ajv'
 import { ChainId, NETWORK_INFO } from '../constants/networks'
 
 /**
@@ -27,7 +27,7 @@ function uriToHttp(uri: string): string[] {
   }
 }
 
-const tokenListValidator = new Ajv({ allErrors: true }).compile(schema)
+// const tokenListValidator = new Ajv({ allErrors: true }).compile(schema)
 
 /**
  * Contains the logic for resolving a list URL to a validated token list
@@ -74,14 +74,14 @@ export default async function getTokenList(listUrl: string, networkInfo: NETWORK
       return json
     }
 
-    if (!tokenListValidator(json)) {
-      const validationErrors: string =
-        tokenListValidator.errors?.reduce<string>((memo, error) => {
-          const add = `${error.dataPath} ${error.message ?? ''}`
-          return memo.length > 0 ? `${memo}; ${add}` : `${add}`
-        }, '') ?? 'unknown error'
-      throw new Error(`Token list failed validation: ${validationErrors}`)
-    }
+    // if (!tokenListValidator(json)) {
+    //   const validationErrors: string =
+    //     tokenListValidator.errors?.reduce<string>((memo, error) => {
+    //       const add = `${error.dataPath} ${error.message ?? ''}`
+    //       return memo.length > 0 ? `${memo}; ${add}` : `${add}`
+    //     }, '') ?? 'unknown error'
+    //   throw new Error(`Token list failed validation: ${validationErrors}`)
+    // }
 
     return json
   }
