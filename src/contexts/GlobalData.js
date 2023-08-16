@@ -261,11 +261,13 @@ async function getGlobalData(client, networksInfo) {
     })
     data.oneWeekData = { ...mergeFactoriesData(oneWeekResult.data.dmmFactories) } //preventing fetchPolicy: 'cache-first' returning same object causing circular object
 
-    let twoWeekResult = await client.query({
-      query: GLOBAL_DATA(twoWeekBlock?.number),
-      fetchPolicy: 'cache-first',
-    })
-    data.twoWeekData = { ...mergeFactoriesData(twoWeekResult.data.dmmFactories) } //preventing fetchPolicy: 'cache-first' returning same object causing circular object
+    try {
+      let twoWeekResult = await client.query({
+        query: GLOBAL_DATA(twoWeekBlock?.number),
+        fetchPolicy: 'cache-first',
+      })
+      data.twoWeekData = { ...mergeFactoriesData(twoWeekResult.data.dmmFactories) } //preventing fetchPolicy: 'cache-first' returning same object causing circular object
+    } catch (e) {}
 
     calculateValuesOnGlobalData(data)
   } catch (e) {

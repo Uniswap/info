@@ -38,6 +38,7 @@ export enum ChainId {
   OPTIMISM = 10,
   ZKSYNC = 324,
   LINEA = 59144,
+  ZKEVM = 1101,
 }
 
 export type NETWORK_INFO = {
@@ -378,6 +379,30 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     etherscanLinkText: 'LINEA Explorer',
     tokensListUrl: 'https://raw.githubusercontent.com/KyberNetwork/ks-assets/main/tokenLists/linea.tokenlist.json',
     isEnableBlockService: false,
+  },
+  [ChainId.ZKEVM]: {
+    chainId: ChainId.ZKEVM,
+    icon: 'https://wallet.polygon.technology/assets/img/zkEVM.svg',
+    name: 'Polygon zkEvm',
+    urlKey: 'polygon-zkevm',
+    priceRoute: 'polygon-zkevm',
+    blockServiceRoute: 'polygon-zkevm',
+    dmmSwapUrl: 'https://kyberswap.com/',
+    subgraphName: 'kybernetwork/kyberswap-exchange-polygon-zkevm',
+    subgraphUrls: [
+      'https://polygon-zkevm-graph.kyberengineering.io/subgraphs/name/kybernetwork/kyberswap-exchange-polygon-zkevm',
+    ],
+    subgraphBlockUrl: '',
+    etherscanUrl: 'https://zkevm.polygonscan.com',
+    kncAddress: '',
+    wethAddress: '0x4f9a0e7fd2bf6067db6994cf12e4495df938e6e9',
+    defaultStartTime: 1691391568,
+    nativeTokenSymbol: 'ETH',
+    nativeTokenWrappedName: 'ETH (Wrapped)',
+    nativeTokenLogo: EthereumLogo,
+    etherscanLinkText: 'Polygon zkEvm Explorer',
+    tokensListUrl: '',
+    isEnableBlockService: true,
   },
 }
 

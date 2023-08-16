@@ -14,6 +14,7 @@ const ButtonWrapper = styled(ButtonOutlined)`
   justify-content: space-between;
   align-items: center;
   padding: 8px 10px;
+  overflow: hidden;
   border-radius: 8px;
   background: ${({ theme }) => theme.buttonBlack};
   border: none;
@@ -28,15 +29,21 @@ const ButtonWrapper = styled(ButtonOutlined)`
 `
 
 const NetworkWrapper = styled.div`
+  flex: 1;
   display: flex;
   align-items: center;
 `
 
 const NetworkLabel = styled.div`
+  flex: 1;
   font-size: 16px;
   font-weight: 500;
   color: ${({ theme }) => theme.primary};
-  margin-left: 10px;
+  margin-left: 6px;
+  max-width: 100px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `
 
 const SwitchNetworkButton = () => {
@@ -48,14 +55,10 @@ const SwitchNetworkButton = () => {
   return (
     <ButtonWrapper onClick={toggleNetworkModal}>
       <NetworkWrapper>
-        <img
-          src={networksInfo[1] ? Kyber : networksInfo[0].icon}
-          alt='Network Icon'
-          style={{ maxWidth: '24px', maxHeight: '24px' }}
-        />
+        <img src={networksInfo[1] ? Kyber : networksInfo[0].icon} alt='Network Icon' width='24px' />
         <NetworkLabel>{networksInfo[1] ? 'All Chains' : networksInfo[0].name}</NetworkLabel>
       </NetworkWrapper>
-      <img src={SwitchNetworkIcon} alt='Switch Network Icon' style={{ width: '20px', maxHeight: '20px', marginLeft: '8px' }} />
+      <img src={SwitchNetworkIcon} alt='Switch Network Icon' width='20px' marginLeft='6px' />
     </ButtonWrapper>
   )
 }

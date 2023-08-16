@@ -29,7 +29,7 @@ export default function GlobalStats() {
   const { oneDayTxns, oneDayFeeUSD, oneDayFeeChange, txnChange } = globalDatas[1]
     ? aggregateGlobalData(globalDatas)
     : globalDatas[0] || {}
-  const oneDayFees = oneDayFeeUSD ? formattedNum(oneDayFeeUSD, true) : ''
+  const oneDayFees = oneDayFeeUSD ? formattedNum(oneDayFeeUSD, true) : '0'
   const theme = useTheme()
   const aggregatorVolume = useAggregatorVolume()
   const above800 = useMedia('(min-width: 800px)')
