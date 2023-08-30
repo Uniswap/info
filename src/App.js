@@ -12,7 +12,7 @@ import { useUniswapHistory } from './Data/UniswapHistory'
 import { timeframeOptions } from './constants'
 import { useAllExchanges } from './Data/GetAllExchanges'
 import LocalLoader from './components/LocalLoader'
-import { Meta } from './components/Meta'
+import Meta from './components/Meta'
 
 // const WarningWrapper = styled.div`
 //   width: 100%;
