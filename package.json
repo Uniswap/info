@@ -7,7 +7,7 @@
     "@reach/portal": "^0.10.3",
     "@reach/router": "^1.2.1",
     "@types/jest": "^26.0.0",
-    "@types/node": "^14.0.13",
+    "@types/node": "^16.x",
     "@types/react": "^16.9.36",
     "@types/react-dom": "^16.9.8",
     "@types/styled-components": "^5.1.0",
