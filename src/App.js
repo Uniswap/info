@@ -12,6 +12,7 @@ import { useUniswapHistory } from './Data/UniswapHistory'
 import { timeframeOptions } from './constants'
 import { useAllExchanges } from './Data/GetAllExchanges'
 import LocalLoader from './components/LocalLoader'
+import { Meta } from './components/Meta'
 
 // const WarningWrapper = styled.div`
 //   width: 100%;
@@ -98,15 +99,18 @@ function App() {
                       tokenToExchangeMap.hasOwnProperty(match.params.tokenAddressURL.toLowerCase())
                     ) {
                       return (
-                        <ExchangeWrapper
-                          currencyUnit={currencyUnit}
-                          address={tokenToExchangeMap[match.params.tokenAddressURL.toLowerCase()]}
-                          exchanges={exchanges}
-                          historyDaysToQuery={historyDaysToQuery}
-                          timeWindow={timeWindow}
-                          setTimeWindow={setTimeWindow}
-                          setHistoryDaysToQuery={setHistoryDaysToQuery}
-                        />
+                        <>
+                          <Meta />
+                          <ExchangeWrapper
+                            currencyUnit={currencyUnit}
+                            address={tokenToExchangeMap[match.params.tokenAddressURL.toLowerCase()]}
+                            exchanges={exchanges}
+                            historyDaysToQuery={historyDaysToQuery}
+                            timeWindow={timeWindow}
+                            setTimeWindow={setTimeWindow}
+                            setHistoryDaysToQuery={setHistoryDaysToQuery}
+                          />
+                        </>
                       )
                     } else {
                       return <Redirect to="/home" />
@@ -114,6 +118,7 @@ function App() {
                   }}
                 />
                 <Route path="/home">
+                  <Meta />
                   <OverviewPage
                     currencyUnit={currencyUnit}
                     globalData={globalData}
