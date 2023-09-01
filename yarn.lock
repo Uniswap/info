@@ -12450,12 +12450,27 @@ react-fast-compare@^2.0.4:
   resolved "https://registry.yarnpkg.com/react-fast-compare/-/react-fast-compare-2.0.4.tgz#e84b4d455b0fec113e0402c329352715196f81f9"
   integrity sha512-suNP+J1VU1MWFKcyt7RtjiSWUjvidmQSlqu+eHslq+342xCbGTYmC0mEhPCOHxlW0CywylOC1u2DFAT+bv4dBw==
 
+react-fast-compare@^3.1.1:
+  version "3.2.2"
+  resolved "https://registry.yarnpkg.com/react-fast-compare/-/react-fast-compare-3.2.2.tgz#929a97a532304ce9fee4bcae44234f1ce2c21d49"
+  integrity sha512-nsO+KSNgo1SbJqJEYRE9ERzo7YtYbou/OqjSQKxV7jcKox7+usiUVZOAC+XnDOABXggQTno0Y1CpVnuWEc1boQ==
+
 react-feather@^2.0.3:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/react-feather/-/react-feather-2.0.3.tgz#1453ff5d8c242f72b8c02846118fbd2d406375ad"
   integrity sha512-XVjtxIyMxb2RFlqC2APoB/IZvXKDW9uLN1c264XEeZNYe8jIxjQVQpeTo3nxtHiLTgMfgf0ZYxJC6HwmY8+9BA==
   dependencies:
     prop-types "^15.7.2"
+
+react-helmet@^6.1.0:
+  version "6.1.0"
+  resolved "https://registry.yarnpkg.com/react-helmet/-/react-helmet-6.1.0.tgz#a750d5165cb13cf213e44747502652e794468726"
+  integrity sha512-4uMzEY9nlDlgxr61NL3XbKRy1hEkXmKNXhjbAIOVw5vcFrsdYbH2FEwcNyWvWinl103nXgzYNlns9ca+8kFiWw==
+  dependencies:
+    object-assign "^4.1.1"
+    prop-types "^15.7.2"
+    react-fast-compare "^3.1.1"
+    react-side-effect "^2.1.0"
 
 react-iframe@^1.8.0:
   version "1.8.0"
@@ -12606,6 +12621,11 @@ react-select@^3.0.7:
     prop-types "^15.6.0"
     react-input-autosize "^2.2.2"
     react-transition-group "^2.2.1"
+
+react-side-effect@^2.1.0:
+  version "2.1.2"
+  resolved "https://registry.yarnpkg.com/react-side-effect/-/react-side-effect-2.1.2.tgz#dc6345b9e8f9906dc2eeb68700b615e0b4fe752a"
+  integrity sha512-PVjOcvVOyIILrYoyGEpDN3vmYNLdy1CajSFNt4TDsVQC5KpTijDvWVoR+/7Rz2xT978D8/ZtFceXxzsPwZEDvw==
 
 react-smooth-fork@^1.0.3:
   version "1.0.3"
