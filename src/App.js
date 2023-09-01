@@ -15,6 +15,7 @@ import PinnedData from './components/PinnedData'
 
 import SideNav from './components/SideNav'
 import AccountLookup from './pages/AccountLookup'
+import Meta from './components/Meta'
 import LocalLoader from './components/LocalLoader'
 import { useLatestBlocks } from './contexts/Application'
 import GoogleAnalyticsReporter from './components/analytics/GoogleAnalyticsReporter'
@@ -83,6 +84,7 @@ const LayoutWrapper = ({ children, savedOpen, setSavedOpen }) => {
   return (
     <>
       <ContentWrapper open={savedOpen}>
+        <Meta />
         <SideNav />
         <Center id="center">{children}</Center>
         <Right open={savedOpen}>
