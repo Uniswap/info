@@ -6,9 +6,7 @@ import Fantom from '../assets/networks/fantom-network.png'
 import Cronos from '../assets/networks/cronos-network.png'
 import Arbitrum from '../assets/networks/arbitrum-network.svg'
 import BitTorrent from '../assets/networks/bittorrent-network.png'
-import Velas from '../assets/networks/velas-network.png'
 import Aurora from '../assets/networks/aurora-network.svg'
-import Oasis from '../assets/networks/oasis-network.svg'
 import Optimism from '../assets/networks/optimism-network.svg'
 import ZkSync from '../assets/networks/zksync-network.png'
 
@@ -19,9 +17,7 @@ import AvaxLogo from '../assets/avax.png'
 import FantomLogo from '../assets/networks/fantom-network.png'
 import CronosLogo from '../assets/cronos.svg'
 import BTTCLogo from '../assets/bttc.png'
-import VelasLogo from '../assets/velas.png'
 import AuroraLogo from '../assets/aurora.svg'
-import OasisLogo from '../assets/oasis.svg'
 
 export enum ChainId {
   MAINNET = 1,
@@ -32,9 +28,7 @@ export enum ChainId {
   CRONOS = 25,
   ARBITRUM = 42161,
   BTTC = 199,
-  VELAS = 106,
   AURORA = 1313161554,
-  OASIS = 42262,
   OPTIMISM = 10,
   ZKSYNC = 324,
   LINEA = 59144,
@@ -247,28 +241,6 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     tokensListUrl: 'https://raw.githubusercontent.com/KyberNetwork/ks-assets/main/tokenLists/bttc.tokenlist.json',
     isEnableBlockService: true,
   },
-  [ChainId.VELAS]: {
-    chainId: ChainId.VELAS,
-    icon: Velas,
-    name: 'Velas',
-    urlKey: 'velas',
-    priceRoute: 'velas',
-    blockServiceRoute: 'velas',
-    dmmSwapUrl: 'https://kyberswap.com/',
-    subgraphName: 'kybernetwork/kyberswap-exchange-velas',
-    subgraphUrls: ['https://velas-graph.kyberengineering.io/subgraphs/name/kybernetwork/kyberswap-exchange-velas'],
-    subgraphBlockUrl: 'https://velas-graph.kyberengineering.io/subgraphs/name/kybernetwork/velas-blocks',
-    etherscanUrl: 'https://evmexplorer.velas.com',
-    kncAddress: '0xfe56d5892bdffc7bf58f2e84be1b2c32d21c308b',
-    wethAddress: '0xc579D1f3CF86749E05CD06f7ADe17856c2CE3126',
-    defaultStartTime: 1630313700,
-    nativeTokenSymbol: 'VLX',
-    nativeTokenWrappedName: 'VLX (Wrapped)',
-    nativeTokenLogo: VelasLogo,
-    etherscanLinkText: 'Velas EVM Explorer',
-    tokensListUrl: 'https://raw.githubusercontent.com/KyberNetwork/ks-assets/main/tokenLists/velas.tokenlist.json',
-    isEnableBlockService: false,
-  },
   [ChainId.AURORA]: {
     chainId: ChainId.AURORA,
     icon: Aurora,
@@ -290,28 +262,6 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     etherscanLinkText: 'Aurora Explorer',
     tokensListUrl: 'https://raw.githubusercontent.com/KyberNetwork/ks-assets/main/tokenLists/aurora.tokenlist.json',
     isEnableBlockService: false,
-  },
-  [ChainId.OASIS]: {
-    chainId: ChainId.OASIS,
-    icon: Oasis,
-    name: 'Oasis',
-    urlKey: 'oasis',
-    priceRoute: 'oasis',
-    blockServiceRoute: 'oasis',
-    dmmSwapUrl: 'https://kyberswap.com/',
-    subgraphName: 'kybernetwork/kyberswap-exchange-oasis',
-    subgraphUrls: ['https://oasis-graph.kyberengineering.io/subgraphs/name/kybernetwork/kyberswap-exchange-oasis'],
-    subgraphBlockUrl: 'https://oasis-graph.kyberengineering.io/subgraphs/name/kybernetwork/oasis-blocks',
-    etherscanUrl: 'https://explorer.emerald.oasis.dev',
-    kncAddress: '0xfe56d5892bdffc7bf58f2e84be1b2c32d21c308b',
-    wethAddress: '0x21C718C22D52d0F3a789b752D4c2fD5908a8A733',
-    defaultStartTime: 1647932400,
-    nativeTokenSymbol: 'ROSE',
-    nativeTokenWrappedName: 'ROSE (Wrapped)',
-    nativeTokenLogo: OasisLogo,
-    etherscanLinkText: 'Oasis Emerald Explorer',
-    tokensListUrl: 'https://raw.githubusercontent.com/KyberNetwork/ks-assets/main/tokenLists/oasis.tokenlist.json',
-    isEnableBlockService: true,
   },
   [ChainId.OPTIMISM]: {
     chainId: ChainId.OPTIMISM,

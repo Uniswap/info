@@ -65,9 +65,7 @@ export default async function getTokenList(listUrl: string, networkInfo: NETWORK
         ChainId.CRONOS,
         ChainId.ARBITRUM,
         ChainId.BTTC,
-        ChainId.VELAS,
         ChainId.AURORA,
-        ChainId.OASIS,
         ChainId.OPTIMISM,
       ].includes(networkInfo.chainId)
     ) {
