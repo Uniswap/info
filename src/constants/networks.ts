@@ -33,6 +33,7 @@ export enum ChainId {
   ZKSYNC = 324,
   LINEA = 59144,
   ZKEVM = 1101,
+  SCROLL = 534352,
 }
 
 export type NETWORK_INFO = {
@@ -351,6 +352,29 @@ export const NETWORKS_INFO: { [key in ChainId]: NETWORK_INFO } = {
     nativeTokenWrappedName: 'ETH (Wrapped)',
     nativeTokenLogo: EthereumLogo,
     etherscanLinkText: 'Polygon zkEvm Explorer',
+    tokensListUrl: '',
+    isEnableBlockService: true,
+  },
+  [ChainId.SCROLL]: {
+    chainId: ChainId.SCROLL,
+    icon:
+      'https://file.notion.so/f/s/253723b6-f537-4968-a2e6-f102b893ef4c/Scroll_logo_mark_300300px_RGB.svg?id=2ecfe530-2ce5-48d0-8bed-537a584a92ce&table=block&spaceId=cc12e519-e01d-4277-9573-3fe8e5bdf9ce&expirationTimestamp=1697558400000&signature=-PD15tUbD8xuN5VOSpwW0B1Cl30TILAHe-LsLjqPhlQ&downloadName=Scroll_logo+mark_300*300px_RGB.svg',
+    name: 'Scroll',
+    urlKey: 'scroll',
+    priceRoute: 'scroll',
+    blockServiceRoute: 'scroll',
+    dmmSwapUrl: 'https://kyberswap.com/',
+    subgraphName: 'kybernetwork/kyberswap-exchange-scroll',
+    subgraphUrls: ['https://scroll-graph.kyberengineering.io/subgraphs/name/kybernetwork/kyberswap-exchange-scroll'],
+    subgraphBlockUrl: '',
+    etherscanUrl: 'https://scrollscan.com',
+    kncAddress: '',
+    wethAddress: '0x5300000000000000000000000000000000000004',
+    defaultStartTime: 1697214852,
+    nativeTokenSymbol: 'ETH',
+    nativeTokenWrappedName: 'ETH (Wrapped)',
+    nativeTokenLogo: EthereumLogo,
+    etherscanLinkText: 'Scrollscan',
     tokensListUrl: '',
     isEnableBlockService: true,
   },
