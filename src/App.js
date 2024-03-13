@@ -6,6 +6,7 @@ import { Route, Switch, BrowserRouter, Redirect } from 'react-router-dom'
 import GlobalPage from './pages/GlobalPage'
 import TokenPage from './pages/TokenPage'
 import PairPage from './pages/PairPage'
+import Link from './components/Link'
 import { useGlobalData, useGlobalChartData } from './contexts/GlobalData'
 import { isAddress } from './utils'
 import AccountPage from './pages/AccountPage'
@@ -62,7 +63,7 @@ const Center = styled.div`
   background-color: ${({ theme }) => theme.onlyLight};
 `
 
-const WarningWrapper = styled.div`
+const BannerWrapper = styled.div`
   width: 100%;
   display: flex;
   justify-content: center;
@@ -75,6 +76,19 @@ const WarningBanner = styled.div`
   width: 100%;
   text-align: center;
   font-weight: 500;
+`
+
+const UrlBanner = styled.div`
+  background-color: #ff007a;
+  padding: 1rem;
+  color: white;
+  width: 100%;
+  text-align: center;
+  font-weight: 500;
+`
+
+const Decorator = styled.span`
+  text-decoration: underline;
 `
 
 /**
@@ -110,12 +124,20 @@ function App() {
   return (
     <ApolloProvider client={client}>
       <AppWrapper>
+        <BannerWrapper>
+          <UrlBanner>
+            {`Explore the new combinved V2 and V2 analytics at `}
+            <Link color="white" external href={'https://app.uniswap.org/explore'}>
+              <Decorator>app.uniswap.org</Decorator>
+            </Link>{' '}
+          </UrlBanner>
+        </BannerWrapper>
         {showWarning && (
-          <WarningWrapper>
+          <BannerWrapper>
             <WarningBanner>
               {`Warning: The data on this site has only synced to Ethereum block ${latestBlock} (out of ${headBlock}). Please check back soon.`}
             </WarningBanner>
-          </WarningWrapper>
+          </BannerWrapper>
         )}
         {globalData &&
         Object.keys(globalData).length > 0 &&
