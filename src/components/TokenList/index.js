@@ -12,7 +12,6 @@ import { Divider } from '..'
 import { formattedNum, formattedPercent } from '../../utils'
 import { useMedia } from 'react-use'
 import { withRouter } from 'react-router-dom'
-import { TOKEN_BLACKLIST } from '../../constants'
 import FormattedName from '../FormattedName'
 import { TYPE } from '../../Theme'
 
@@ -140,15 +139,7 @@ function TopTokenList({ tokens, itemMax = 10, useTracked = false }) {
   }, [tokens])
 
   const formattedTokens = useMemo(() => {
-    return (
-      tokens &&
-      Object.keys(tokens)
-        .filter((key) => {
-          return !TOKEN_BLACKLIST.includes(key)
-        })
-        .map((key) => tokens[key])
-    )
-  }, [tokens])
+    return (tokens)}, [tokens])
 
   useEffect(() => {
     if (tokens && formattedTokens) {
