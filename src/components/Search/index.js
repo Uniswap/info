@@ -293,13 +293,19 @@ export const Search = ({ small = false }) => {
             const regexMatches = Object.keys(token).map((tokenEntryKey) => {
               const isAddress = value.slice(0, 2) === '0x'
               if (tokenEntryKey === 'id' && isAddress) {
-                return token[tokenEntryKey].match(new RegExp(escapeRegExp(value), 'i'))
+                return token[tokenEntryKey]
+                  .toLocaleLowerCase()
+                  .match(new RegExp(escapeRegExp(value.toLocaleLowerCase()), 'i'))
               }
               if (tokenEntryKey === 'symbol' && !isAddress) {
-                return token[tokenEntryKey].match(new RegExp(escapeRegExp(value), 'i'))
+                return token[tokenEntryKey]
+                  .toLocaleLowerCase()
+                  .match(new RegExp(escapeRegExp(value.toLocaleLowerCase()), 'i'))
               }
               if (tokenEntryKey === 'name' && !isAddress) {
-                return token[tokenEntryKey].match(new RegExp(escapeRegExp(value), 'i'))
+                return token[tokenEntryKey]
+                  .toLocaleLowerCase()
+                  .match(new RegExp(escapeRegExp(value.toLocaleLowerCase()), 'i'))
               }
               return false
             })
@@ -348,18 +354,22 @@ export const Search = ({ small = false }) => {
             const regexMatches = Object.keys(pair).map((field) => {
               const isAddress = value.slice(0, 2) === '0x'
               if (field === 'id' && isAddress) {
-                return pair[field].match(new RegExp(escapeRegExp(value), 'i'))
+                return pair[field].toLocaleLowerCase().match(new RegExp(escapeRegExp(value.toLocaleLowerCase()), 'i'))
               }
               if (field === 'token0') {
                 return (
-                  pair[field].symbol.match(new RegExp(escapeRegExp(value), 'i')) ||
-                  pair[field].name.match(new RegExp(escapeRegExp(value), 'i'))
+                  pair[field].symbol
+                    .toLocaleLowerCase()
+                    .match(new RegExp(escapeRegExp(value.toLocaleLowerCase()), 'i')) ||
+                  pair[field].name.toLocaleLowerCase().match(new RegExp(escapeRegExp(value.toLocaleLowerCase()), 'i'))
                 )
               }
               if (field === 'token1') {
                 return (
-                  pair[field].symbol.match(new RegExp(escapeRegExp(value), 'i')) ||
-                  pair[field].name.match(new RegExp(escapeRegExp(value), 'i'))
+                  pair[field].symbol
+                    .toLocaleLowerCase()
+                    .match(new RegExp(escapeRegExp(value.toLocaleLowerCase()), 'i')) ||
+                  pair[field].name.toLocaleLowerCase().match(new RegExp(escapeRegExp(value.toLocaleLowerCase()), 'i'))
                 )
               }
               return false
